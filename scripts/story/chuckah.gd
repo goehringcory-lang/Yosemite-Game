@@ -10,13 +10,47 @@ const WITHDRAW_AMOUNT := 4
 const BUILD_MINUTES := 4 * 60
 
 
+## Painted art: the bare spot before it's built, and the granary after. Without
+## them the placeholder shapes below are drawn.
+@export var texture_empty: Texture2D
+@export var texture_built: Texture2D
+## Footprint and reach in pixels (zero keeps the scene's default sizes).
+@export var body_size := Vector2.ZERO
+@export var reach_size := Vector2.ZERO
+
+var _art: Sprite2D
+
+
 func _ready() -> void:
-	Granary.changed.connect(queue_redraw)
-	queue_redraw()
+	Granary.changed.connect(_refresh_art)
+	if texture_empty and texture_built:
+		_art = Sprite2D.new()
+		_art.name = "Art"
+		add_child(_art)
+		move_child(_art, 0)
+		for spec: Array in [["Collision", body_size, Vector2(0, -body_size.y / 2.0)], ["Hitbox/Shape", reach_size, Vector2(0, -reach_size.y / 2.0 - 2.0)]]:
+			var size: Vector2 = spec[1]
+			var shape_node := get_node_or_null(spec[0] as String) as CollisionShape2D
+			if size.x > 0.0 and shape_node:
+				var rect := RectangleShape2D.new()
+				rect.size = size
+				shape_node.shape = rect
+				shape_node.position = spec[2]
+	_refresh_art()
+
+
+func _refresh_art() -> void:
+	if _art:
+		_art.texture = texture_built if Granary.chuckahs_built > 0 else texture_empty
+		_art.offset = Vector2(0, -_art.texture.get_height() / 2.0 + 4.0)
+	else:
+		queue_redraw()
 
 
 ## Placeholder art: a pole frame, and a tall woven granary once it's built.
 func _draw() -> void:
+	if _art:
+		return
 	var pole := Color(0.45, 0.32, 0.2)
 	if Granary.chuckahs_built == 0:
 		draw_line(Vector2(-6, 0), Vector2(0, -18), pole, 1.0)

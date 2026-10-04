@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "higher_cathedral_spire"
+display_name = "Higher Cathedral Spire"
+grade = "III 5.9, 6 pitches"
+description = "A granite fin on the south wall near Bridalveil. In 1934 three Berkeley climbers hauled the best gear in North America up it: German pitons, a rope, and a plan. It was the first big technical climb in the Valley."
+first_ascent = "Jules Eichorn, Dick Leonard, and Bestor Robinson, April 15, 1934"
+required_gear = {"rope": 1, "harness": 1, "cam": 4, "quickdraw": 2}
+pitches = Array[int]([2, 2, 3, 3, 3, 2])
+moves_per_pitch = 8
+nights = 0
+guide_chapter = "The Valley walls"
+guide_order = 30
+guide_tip = "The Rock Climbing Section's 1934 route. Mind the Bathtub."

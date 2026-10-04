@@ -5,26 +5,49 @@
 [ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="3_r"]
 [ext_resource type="Resource" path="res://data/characters/galen_clark.tres" id="4_r"]
 [ext_resource type="Resource" path="res://data/characters/james_lamon.tres" id="5_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lamon/chuckah_empty.png" id="6_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lamon/chuckah_built.png" id="7_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lamon/campfire.png" id="8_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lamon/mortar_slab.png" id="9_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lamon/leaching_basin.png" id="10_r"]
 
 [node name="LamonHomesteadStory" type="Node2D"]
 
 [node name="Chuckah" parent="." instance=ExtResource("1_r")]
-position = Vector2(104, 128)
+position = Vector2(1068, 410)
+texture_empty = ExtResource("6_r")
+texture_built = ExtResource("7_r")
+body_size = Vector2(30, 8)
+reach_size = Vector2(38, 40)
 
 [node name="Campfire" parent="." instance=ExtResource("2_r")]
-position = Vector2(184, 176)
+position = Vector2(1000, 472)
 station = "campfire"
 display_name = "Campfire"
+texture = ExtResource("8_r")
+frames = 4
+fps = 6.0
+ground_inset = 6
+body_size = Vector2(26, 8)
+reach_size = Vector2(36, 24)
 
 [node name="BedrockMortar" parent="." instance=ExtResource("2_r")]
-position = Vector2(248, 152)
+position = Vector2(906, 500)
 station = "mortar"
 display_name = "Bedrock mortar"
+texture = ExtResource("9_r")
+ground_inset = 5
+body_size = Vector2(50, 10)
+reach_size = Vector2(60, 26)
 
 [node name="LeachingBasin" parent="." instance=ExtResource("2_r")]
-position = Vector2(296, 156)
+position = Vector2(1130, 450)
 station = "leaching"
 display_name = "Leaching basin"
+texture = ExtResource("10_r")
+ground_inset = 6
+body_size = Vector2(30, 8)
+reach_size = Vector2(40, 22)
 
 [node name="GalenClark" parent="." instance=ExtResource("3_r")]
 character = ExtResource("4_r")
@@ -33,5 +56,5 @@ offset = Vector2(24, -16)
 
 [node name="JamesLamon" parent="." instance=ExtResource("3_r")]
 character = ExtResource("5_r")
-spot = "home"
-offset = Vector2(-48, 40)
+spot = "cabin"
+offset = Vector2(0, 0)

@@ -18,9 +18,19 @@ extends Resource
 ##   "climbed"    route (route id): have finished this climb
 ##   "return"     nothing: just come back and talk to the quest giver
 ## Every step except "talk" is turned in by talking to the quest giver.
+##
+## Any step can also hand the player something the moment it's done:
+##   "unlock": ability id (for example "guidebook")
+##   "gear":   gear id -> count
+##   "items":  item id -> count
+## Main-line quests (see [member main_line]) end on a "climbed" step, so they
+## finish only after the route is ticked in the guidebook.
 
 @export var id: String
 @export var title: String
+## Part of the main storyline: the quests that follow the guidebook's tick
+## list. Everything else is a side story.
+@export var main_line := false
 ## Character id of the person who gives the quest.
 @export var giver: String
 ## Quest ids that must be finished before this one is offered.

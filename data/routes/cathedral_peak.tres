@@ -13,3 +13,6 @@ required_gear = {"rope": 1, "harness": 1, "cam": 4, "quickdraw": 4}
 pitches = Array[int]([2, 3, 3])
 moves_per_pitch = 8
 nights = 0
+guide_chapter = "The high country"
+guide_order = 70
+guide_tip = "Tuolumne's classic. Wide views from a tiny summit."

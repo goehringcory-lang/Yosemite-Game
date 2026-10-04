@@ -5,7 +5,9 @@ extends CPUParticles2D
 ## should be and pick an [member effect]. Particles are plain pixels, so they
 ## match the pixel art at any zoom.
 
-@export_enum("smoke", "mist", "sparks", "fireflies") var effect := "smoke"
+## "drift" is blossom petals in spring and falling leaves in fall, and nothing
+## the rest of the year.
+@export_enum("smoke", "mist", "sparks", "fireflies", "drift") var effect := "smoke"
 ## Half the width and height of the area it spreads over, in pixels.
 @export var area := Vector2(2, 1)
 
@@ -69,11 +71,37 @@ func _ready() -> void:
 			emitting = false
 			fade.offsets = PackedFloat32Array([0.0, 0.3, 0.7, 1.0])
 			fade.colors = PackedColorArray([Color(1, 1, 0.5, 0.0), Color(1, 0.95, 0.5, 0.95), Color(1, 0.95, 0.5, 0.95), Color(1, 1, 0.5, 0.0)])
+		"drift":
+			amount = 26
+			lifetime = 7.0
+			direction = Vector2(1, 1)
+			spread = 35.0
+			gravity = Vector2(3.0, 4.0)
+			initial_velocity_min = 1.0
+			initial_velocity_max = 4.0
+			angular_velocity_min = -60.0
+			angular_velocity_max = 60.0
+			scale_amount_min = 1.0
+			scale_amount_max = 1.6
+			emitting = false
+			fade.offsets = PackedFloat32Array([0.0, 0.15, 0.85, 1.0])
+			fade.colors = PackedColorArray([Color(1, 1, 1, 0.0), Color(1, 1, 1, 0.9), Color(1, 1, 1, 0.9), Color(1, 1, 1, 0.0)])
 	color_ramp = fade
 
 
 func _process(_delta: float) -> void:
-	if effect == "fireflies":
+	if effect == "drift":
+		# Petals of apple blossom in spring, gold leaves in fall.
+		match GameClock.season:
+			GameClock.Season.SPRING:
+				color = Color(0.98, 0.84, 0.88)
+				emitting = true
+			GameClock.Season.FALL:
+				color = Color(0.9, 0.66, 0.22)
+				emitting = true
+			_:
+				emitting = false
+	elif effect == "fireflies":
 		emitting = _darkness() > 0.35
 	elif effect == "smoke":
 		# Chimneys smoke in the cold months and at either end of the day.

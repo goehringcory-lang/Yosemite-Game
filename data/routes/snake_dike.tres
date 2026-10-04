@@ -13,3 +13,6 @@ required_gear = {"rope": 1, "harness": 1, "cam": 2, "quickdraw": 6, "belay_devic
 pitches = Array[int]([2, 3, 3, 2, 3])
 moves_per_pitch = 9
 nights = 0
+guide_chapter = "Half Dome"
+guide_order = 50
+guide_tip = "Runout. Place gear when the dike lets you."

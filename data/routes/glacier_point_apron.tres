@@ -13,3 +13,6 @@ pitches = Array[int]([2, 2, 3])
 moves_per_pitch = 8
 destination_hub = "glacier_point"
 destination_spawn = "apron_top"
+guide_chapter = "Curry Village"
+guide_order = 20
+guide_tip = "Smear on tiny edges and trust your feet. It tops out at Glacier Point."

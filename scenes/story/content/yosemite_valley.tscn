@@ -15,6 +15,7 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_angler.tres" id="15_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_ccc_worker.tres" id="16_r"]
 
+[ext_resource type="Resource" path="res://data/routes/higher_cathedral_spire.tres" id="spire_r"]
 [ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="door_r"]
 
 [node name="YosemiteValleyStory" type="Node2D"]
@@ -83,3 +84,7 @@ position = Vector2(3440, 992)
 label = "Curry Village"
 target_region = "curry_village"
 target_spawn = "west_road"
+
+[node name="HigherCathedralSpire" parent="." instance=ExtResource("3_r")]
+position = Vector2(1780, 1530)
+route = ExtResource("spire_r")

@@ -67,12 +67,22 @@ func _refresh() -> void:
 		child.queue_free()
 	_heading("The Guardian's Register")
 
+	var main := QuestLog.main_objective()
+	if not main.is_empty():
+		_heading("Main story")
+		_line("%s: %s" % [main.quest.title, main.objective])
+	elif not QuestLog.has_guidebook():
+		_heading("Main story")
+		_line("Pick up a climbing guidebook at the Mountain Shop in Curry Village.")
+
 	_heading("Quests")
 	var objectives := QuestLog.objectives()
 	if objectives.is_empty():
 		_line("No open quests. Talk to people around the valley.", DIM)
 	for text in objectives:
 		_line("- " + text)
+
+	_guidebook()
 
 	_heading("Climbing gear")
 	var any_gear := false
@@ -99,15 +109,33 @@ func _refresh() -> void:
 		_heading("Chuckah")
 		_line("%d of %d acorns stored. They won't spoil." % [Granary.acorns, Granary.capacity])
 
-	var climbed := PackedStringArray()
-	for id in QuestLog.climbed:
-		climbed.append(id.capitalize())
-	if not climbed.is_empty():
-		_heading("Climbs")
-		_line(", ".join(climbed))
-
 	_line("")
 	_line("J or Esc to close (gamepad: Y or B)", DIM)
+
+
+## The guidebook's tick list: every route, its grade, the gear it needs, and
+## whether you've topped it out. A * marks the routes the main story needs.
+func _guidebook() -> void:
+	if not QuestLog.has_guidebook():
+		_heading("Guidebook")
+		_line("You don't have one yet. The Mountain Shop in Curry Village sells them.", DIM)
+		return
+	_heading("Guidebook: tick list (%d of %d)" % [Guidebook.ticked_count(), Guidebook.routes().size()])
+	var chapter := ""
+	for entry in Guidebook.entries():
+		var route: RouteData = entry.route
+		if route.guide_chapter != chapter:
+			chapter = route.guide_chapter
+			_line(chapter.to_upper(), DIM)
+		var box := "[x]" if entry.ticked else "[ ]"
+		var star := " *" if entry.main else ""
+		_line("%s %s%s  %s" % [box, route.display_name, star, route.grade], Color(0.7, 1.0, 0.7) if entry.ticked else Color.WHITE)
+		if not entry.ticked:
+			var need: String = Guidebook.gear_text(route)
+			if entry.ready:
+				_line("     Needs %s. You're ready." % need, DIM)
+			else:
+				_line("     Needs %s. Still missing: %s." % [need, ", ".join(entry.missing)], DIM)
 
 
 func _gear_line(item: GearData, count: int) -> void:

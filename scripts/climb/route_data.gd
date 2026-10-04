@@ -13,6 +13,14 @@ extends Resource
 ## Gear id -> count needed to start.
 @export var required_gear: Dictionary = {}
 
+@export_group("Guidebook")
+## The guidebook section this route is listed under, for example "Curry Village".
+@export var guide_chapter := ""
+## Where it falls in the guidebook, lowest first.
+@export var guide_order := 100
+## A line of beta shown beside the route in the tick list.
+@export var guide_tip := ""
+
 @export_group("Climb")
 ## Difficulty of each pitch, 1 (easy) to 5 (very hard). One entry per pitch.
 @export var pitches: Array[int] = [1]

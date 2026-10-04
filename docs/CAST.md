@@ -78,18 +78,18 @@ Talking to a visitor gets one random line.
 | Place | Region · spot | Who's there |
 |---|---|---|
 | Lamon Homestead (your camp) | lamon_homestead | Clark, Lamon |
-| Camp 4 and Swan Slab | yosemite_village · `camp_4` | Leonard, Eichorn, Robinson, Robbins, Salathé, a Camp 4 climber; Swan Slab |
+| Camp 4 and Swan Slab | yosemite_village · `camp_4` | Leonard, Salathé, a Camp 4 climber; Swan Slab |
 | Degnan's Bakery | yosemite_village · `degnans_bakery` | Bridget Degnan |
 | Best's Studio | yosemite_village · `bests_studio` | Ansel Adams |
 | Yosemite Museum | yosemite_village · `yosemite_museum` | Lucy Telles |
 | Ranger station (Wilderness Center) | yosemite_village · `ranger_station` | Clare Hodges |
 | Cook's Meadow | yosemite_village · `cooks_meadow` | a motorist |
 | The black oaks | yosemite_valley | Tabuce |
-| Camp Curry | curry_village · `registration_porch` | Jennie Curry, a camper, the Pavilion cook, a ranger-naturalist, a tourist; a shopper in the store and a climber in the Mountain Shop |
+| Camp Curry | curry_village · `registration_porch`, `apron_trailhead` | Jennie Curry, Jules Eichorn and Bestor Robinson (at the foot of the Apron trail), a camper, the Pavilion cook, a ranger-naturalist, a tourist; a shopper in the store and a climber in the Mountain Shop |
 | El Capitan Meadow | yosemite_valley · `el_capitan_meadow` | Harding, Johnson; The Nose |
 | Happy Isles | yosemite_valley · `happy_isles` | Anderson; Snake Dike |
 | The Ahwahnee / Royal Arches | yosemite_valley · `the_ahwahnee` | Maria Lebrado; Royal Arches |
-| The Ahwahnee grounds (walk north from the homestead: `ahwahnee_trail`, then `the_ahwahnee`) | the_ahwahnee · `front_door`, `rose_garden`, `tea_lawn`, `cascade`, `ahwahnee_meadow` | No one yet: the hotel's doors are a sign, and its grounds have no inside. Stoneman Meadow (`ahwahnee_trail` · `meadow`, `bridge_east`) is empty too. |
+| The Ahwahnee grounds (walk north from the homestead: `ahwahnee_trail`, then `the_ahwahnee`) | the_ahwahnee · `front_door`, `rose_garden`, `tea_lawn`, `cascade`, `ahwahnee_meadow` | Royal Robbins and the Royal Arches start behind the hotel. The hotel's doors are still a sign, with no inside. |
 | Mirror Lake | yosemite_valley · `mirror_lake` | Tenaya |
 | Glacier Point Apron | yosemite_valley · `apron_base` | the Apron climb |
 | Glacier Point | glacier_point | McCauley, Enid Michael, a painter |
@@ -101,60 +101,65 @@ Yosemite Village is the hand-made hub you arrive at when you drive to the Valley
 
 ## Quest chains
 
-All gear comes from quests. Other quests trade in **materials**: food and one-of-a-kind items that you carry from one person to another. `tests/cast_test.tscn` walks the chain and checks that every climb's gear is in hand by the time a quest asks for it.
+### The main line: the guidebook and its tick list
+
+The main storyline is one chain of quests (marked ★ in the Journal). Each one ends on a **tick**: a route topped out and logged in the climbing guidebook. The giver hands over the reward when you report back, so no main quest finishes without a climb. The only exceptions are the first (fetching the guidebook) and the last (the ending).
+
+Gear arrives in the order the routes need it, and a quest can hand over gear as each of its steps is finished (a step's `gear` key). `tests/cast_test.tscn` plays the chain and checks every climb's gear is in hand when it comes up.
 
 ```
-Chapter 1 · Arrival (Valley floor)
-  Clark: The Guardian's Register ─┬─ Lamon: Lamon's Garden ............ onions + berries → 4 apples
-                                  ├─ Tenaya: Ahwahnee ✦ ............... carry his account to Clark → Register entry
-                                  └─ Degnan: Bread for the Valley ...... deliver to Leonard + Curry → 3 bread, starter
-                                        └─ Curry: Let the Bread Rise ... starter → 6 apples
-  Tabuce: Acorns for the Winter → The Chuckah ✦ ........................ acorns → chuckah + acorn recipes
-  Leonard: The Rock Climbing Section ................................... Swan Slab + trail food → rope, harness, 2 cams
-      ▼ climb the Glacier Point Apron → Glacier Point
+★ 1  The Guidebook ........ Clark sends you to the Curry Village Mountain Shop. The clerk hands over the guidebook.
+                              Without it no route will start: you have no tick list to log it in.
+★ 2  Rock Climbing Section  Leonard, Swan Slab ................ food, then TICK Swan Slab → rope, harness, 2 cams
+★ 3  Up the Apron .......... Eichorn, at Curry Village ........ TICK Glacier Point Apron → 2 cams, 2 quickdraws (and opens Glacier Point)
+★ 4  The Cathedral Spires .. Eichorn; Robinson's story first .. TICK Higher Cathedral Spire → 2 quickdraws
+★ 5  Clean Climbing ........ Robbins, at the Ahwahnee ......... TICK Royal Arches → belay device, 2 cams, 2 quickdraws
+★ 6  Hard Steel ............ Salathé, Camp 4 ................. Model A axle from El Portal, then TICK Snake Dike → 2 cams
+★ 7  The Nose .............. Harding, El Capitan Meadow ....... acorn cakes → aiders; food → haul bag;
+                              then Beverly Johnson → ascenders + portaledge; then TICK The Nose → the road to Tuolumne
+★ 8  Cathedral Peak ........ Muir, Tuolumne ................... TICK Cathedral Peak → ice axe, crampons
+★ 9  Living Ice ............ Muir ............................ TICK Lyell Glacier
+★ 10 The Last Page ......... Clark: after Lucy Telles's and Maria Lebrado's stories → ending
+```
 
-Chapter 2 · The rim (all need Leonard's quest)
+Geography is part of the progression. You leave the Lamon Homestead: south to Curry Village (guidebook, then the Apron behind it), north to the Ahwahnee (Royal Arches), then out across the Valley (Camp 4, Happy Isles, El Capitan Meadow) and finally up the Tioga Road.
+
+### Side stories
+
+These stay available alongside the main line. The ones that start at the rim (McCauley, Enid Michael, Hodges, Adams) open after the Apron.
+
+```
+Clark's guidebook errand ─┬─ Lamon: Lamon's Garden ............ onions + berries → 4 apples
+                          ├─ Tenaya: Ahwahnee ✦ ............... carry his account to Clark → Register entry
+                          └─ Degnan: Bread for the Valley ...... deliver to Leonard + Curry → 3 bread, starter
+                                └─ Curry: Let the Bread Rise ... starter → 6 apples
+Tabuce: Acorns for the Winter → The Chuckah ✦ .................. acorns → chuckah + acorn recipes (needed for the Nose)
+After the Apron:
   McCauley: The Fall of Fire ...... ask Curry about the Firefall → 2 bread, Register entry
   Enid Michael: Leave Some Behind . 2 yerba buena → elderberry sauce, toasted toyon, manzanita cider recipes
   Hodges: Mounted Patrol .......... check on Anderson and Michael → 2 quickdraws
   Ansel Adams: Monolith ........... climb the Apron, report back → 2 quickdraws
-
-Chapter 3 · The domes
-  Eichorn: The Cathedral Spires ... lead the Apron, hear Robinson → 2 cams, 2 quickdraws
-  Anderson: Anderson's Iron ....... food worth 60 energy → Anderson's eyebolt (material)
-  Robbins: Clean Climbing ......... show the eyebolt, climb Royal Arches → belay device, 2 cams, 2 quickdraws
-      ▼ Snake Dike → the top of Half Dome
-
-Chapter 4 · The big walls
+Other:
+  Anderson: Anderson's Iron ....... food worth 60 energy → Anderson's eyebolt (keepsake)
   Lucy Telles: The Big Basket ✦ ... her name in the Register → 2 acorn cakes
-  Salathé: Hard Steel ............. Snake Dike + the Model A axle from El Portal → 2 cams
-  Harding: Siege Supplies ......... 4 batches of acorn cakes + 150 energy of food → aiders, haul bag
-  Johnson: Self-Reliance .......... 30 acorns stored + 2 acorn cakes → ascenders, portaledge
-  Harding: The Nose ............... climb the Nose → Tioga Road opens (hub:tuolumne_meadows)
-
-Chapter 5 · High country
-  Muir: Cathedral Peak ............ food + Cathedral Peak → ice axe, crampons
   Carrie Bethel: Over the Crest ✦ . 4 acorn flour → 10 pine nuts
-  Muir: Living Ice ................ Lyell Glacier → pine nuts, Register entry
   Maria Lebrado: Where the Villages Were ✦ ... carry her account to Clark → Register entry
-
-Chapter 6 · The last page
-  Clark: The Last Page ............ ask Tabuce and Lebrado what they want written (and what they'd rather keep) → ending
 ```
 
 ### Gear curve
 
-| Route | Needs | Earliest source |
+| Route | Needs | Comes from |
 |---|---|---|
 | Swan Slab | nothing (top rope) | start |
 | Glacier Point Apron | rope, harness, 2 cams | Leonard |
-| Royal Arches | + 4 cams, 4 quickdraws | + Eichorn |
-| Snake Dike | + belay device, 6 quickdraws | + Robbins, and Hodges or Adams |
-| Cathedral Peak | 4 cams, 4 quickdraws | (already have) |
+| Higher Cathedral Spire | rope, harness, 4 cams, 2 quickdraws | + Eichorn (Apron) |
+| Royal Arches | + 4 cams, 4 quickdraws | + Eichorn (Spires) |
+| Snake Dike | 2 cams, 6 quickdraws, belay device | + Robbins |
 | The Nose | 8 cams, 6 quickdraws, 2 aiders, 2 ascenders, haul bag, portaledge | + Salathé, Harding, Johnson |
+| Cathedral Peak | 4 cams, 4 quickdraws | (already have) |
 | Lyell Glacier | + ice axe, crampons | + Muir |
 
-The side quests from Hodges and Adams matter. You need at least one of them to have enough quickdraws for Snake Dike and the Nose.
+The Mountain Shop and Camp 4 traders sell more of the same pieces for food, but never the one that opens a new tier.
 
 ### Materials
 
@@ -169,6 +174,7 @@ The side quests from Hodges and Adams matter. You need at least one of them to h
 
 ### New quest mechanics
 
+- **Guidebook and ticks:** `Guidebook` (`scripts/story/guidebook.gd`) lists every route with its grade and gear. A step with `"unlock": "guidebook"` hands it over, and `ClimbStart` won't start a route without it. `QuestData.main_line` marks the main story. A step can also carry `gear`, `unlock`, or `items` to hand over when it's done. A shop's `talk_target` lets a quest send you to a shopkeeper.
 - **`return` step:** done as soon as you talk to the quest giver again. It closes delivery rounds ("take bread to Leonard and Curry, then come back").
 - **`hub:<id>` unlock reward:** opens a locked hub. Harding's *The Nose* uses `hub:tuolumne_meadows`.
 - **Story pickups** (`scenes/story/pickup.tscn`): a one-of-a-kind item lying in the park, picked up once and remembered in the save. Give each one a unique node name.

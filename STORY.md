@@ -27,6 +27,10 @@ Cozy, curious, and grounded, with real awe at scale: a tent at dawn under Half D
 
 A newcomer with a tent and a pair of approach shoes. They have no destiny and no special heritage. What they bring is a willingness to show up, carry things, and listen. At first they treat the Register as a checklist of people to meet. Over time they learn that each story belongs to the person telling it, and that some people will choose not to share theirs.
 
+## The main storyline: the tick list
+
+The player's way through the story is the **climbing guidebook**. Clark's first errand sends them to the Mountain Shop in Curry Village, where the clerk hands over a guidebook listing every route, its grade, and the gear it takes. A route counts only when the player tops it out and ticks it. Every main-line quest after the first ends on a tick, and the person who gave the quest hands over the next piece of gear when they hear about it. The routes in order: Swan Slab, the Glacier Point Apron, Higher Cathedral Spire, Royal Arches, Snake Dike, the Nose, Cathedral Peak, and the Lyell Glacier. The full chain is in [docs/CAST.md](docs/CAST.md#quest-chains). Side stories (the people who aren't on the main line) come alongside it.
+
 ## Story arc
 
 The chapters follow DESIGN.md's gear tiers. The seasons pace the story: acorns drop in fall, and snow closes the high country in winter.

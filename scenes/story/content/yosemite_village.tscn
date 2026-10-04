@@ -4,9 +4,6 @@
 [ext_resource type="Resource" path="res://data/characters/dick_leonard.tres" id="2_r"]
 [ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="3_r"]
 [ext_resource type="Resource" path="res://data/routes/swan_slab.tres" id="4_r"]
-[ext_resource type="Resource" path="res://data/characters/jules_eichorn.tres" id="5_r"]
-[ext_resource type="Resource" path="res://data/characters/bestor_robinson.tres" id="6_r"]
-[ext_resource type="Resource" path="res://data/characters/royal_robbins.tres" id="7_r"]
 [ext_resource type="Resource" path="res://data/characters/john_salathe.tres" id="8_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_dirtbag.tres" id="9_r"]
 [ext_resource type="Resource" path="res://data/characters/bridget_degnan.tres" id="10_r"]
@@ -25,22 +22,6 @@ offset = Vector2(16, -24)
 [node name="SwanSlab" parent="." instance=ExtResource("3_r")]
 position = Vector2(324, 258)
 route = ExtResource("4_r")
-
-[node name="JulesEichorn" parent="." instance=ExtResource("1_r")]
-character = ExtResource("5_r")
-spot = "camp_4"
-offset = Vector2(-24, -8)
-
-[node name="BestorRobinson" parent="." instance=ExtResource("1_r")]
-character = ExtResource("6_r")
-spot = "camp_4"
-offset = Vector2(4, -44)
-wander_radius = 12.0
-
-[node name="RoyalRobbins" parent="." instance=ExtResource("1_r")]
-character = ExtResource("7_r")
-spot = "camp_4"
-offset = Vector2(-44, -32)
 
 [node name="JohnSalathe" parent="." instance=ExtResource("1_r")]
 character = ExtResource("8_r")

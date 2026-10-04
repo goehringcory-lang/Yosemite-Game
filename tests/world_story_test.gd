@@ -32,10 +32,13 @@ func _ready() -> void:
 	var leonard = find_named(world.region, "DickLeonard")
 	check(leonard != null and leonard.get_parent() == world.region.entities, "Dick Leonard is in Camp 4's Entities (Yosemite Village)")
 	# talk to Leonard: quest starts
+	QuestLog.unlocks.append("guidebook")
+	QuestLog.completed.append("clark_register")
 	var lines = QuestLog.talk_to("dick_leonard")
 	check(QuestLog.active.has("leonard_belay"), "talking to Leonard starts his quest")
 	QuestLog.record_climb("swan_slab")
 	Inventory.add("acorn_cake", 1)
+	QuestLog.talk_to("dick_leonard")
 	lines = QuestLog.talk_to("dick_leonard")
 	check(Gear.count("cam") == 2, "Leonard gives 2 cams")
 	check(Gear.has_all(load("res://data/routes/glacier_point_apron.tres").required_gear), "player can now start the Apron")

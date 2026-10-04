@@ -13,6 +13,6 @@ bio = "Climber and music teacher who studied piano with Ansel Adams as a teenage
 idle_lines = PackedStringArray("Ansel taught me piano. The mountains taught me the rest.", "The Spires look impossible from the road. That's why we had to try.")
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.478, 0.478, 0.447, 1)
-home = "Camp 4"
+home = "Curry Village, foot of the Apron trail"
 needs_tribal_review = false
 sources = "To verify: Steve Roper, Camp 4 (1994); Sierra Club Bulletin (1934)."

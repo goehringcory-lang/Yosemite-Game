@@ -11,3 +11,6 @@ description = "A low-angle slab a short walk from Camp 4, where generations of c
 pitches = Array[int]([1])
 moves_per_pitch = 7
 top_rope = true
+guide_chapter = "Valley floor"
+guide_order = 10
+guide_tip = "Top rope, nothing to carry. Dick Leonard runs the practice day."

@@ -21,6 +21,9 @@ func _draw() -> void:
 
 
 func interact(player: Player) -> void:
+	if not Guidebook.has_book():
+		DialogueBox.say_to(player, [{"speaker": "", "text": "%s. You don't know this route yet. Pick up a climbing guidebook at the Mountain Shop in Curry Village, so you have a tick list to log it in." % route.display_name}])
+		return
 	var missing := Gear.missing(route.required_gear)
 	if not missing.is_empty():
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s (%s). You need more gear to climb this: %s." % [
@@ -29,6 +32,8 @@ func interact(player: Player) -> void:
 	var info := "%s, %s, %d pitch%s" % [route.display_name, route.grade, route.pitches.size(), "" if route.pitches.size() == 1 else "es"]
 	if route.nights > 0:
 		info += ", %d night%s on the wall" % [route.nights, "" if route.nights == 1 else "s"]
+	if QuestLog.has_climbed(route.id):
+		info += " (already ticked)"
 	info += ". You're carrying %d energy of food." % FoodDB.carried_energy()
 	player.can_act = false
 	var box := DialogueBox.open(player)
@@ -51,10 +56,13 @@ func climb(player: Player) -> void:
 	var success: bool = result[0]
 	GameClock.paused = was_paused
 	GameClock.advance_minutes(result[1])
-	if success:
-		QuestLog.record_climb(route.id)
+	var report: Array[Dictionary] = []
+	if success and QuestLog.record_climb(route.id):
+		report = QuestLog.tick_report(route.id)
 	player.can_act = true
 	climb_finished.emit(route, success)
+	if not report.is_empty():
+		await DialogueBox.say_to(player, report)
 	if success and route.destination_hub != "":
 		_travel_to_top()
 

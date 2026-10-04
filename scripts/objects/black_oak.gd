@@ -2,8 +2,9 @@ extends StaticBody2D
 ## A California black oak. Its canopy changes color with the seasons, and
 ## the Forage node drops acorns and morels beneath it.
 
-## Canopy tint per season. The canopy art is drawn in light grays so these
-## colors come through cleanly.
+## Canopy tint per season, for the older light-gray canopy art. A canopy sheet
+## with four frames (spring, summer, fall, winter), like the Lamon Homestead's
+## oaks, is already in color: this picks its frame and leaves the tint alone.
 const SEASON_COLORS := [
 	Color(0.62, 0.85, 0.45), # Spring: fresh, pinkish-green new leaves
 	Color(0.38, 0.64, 0.32), # Summer
@@ -23,4 +24,8 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if GameClock.season != _season:
 		_season = GameClock.season
-		canopy.modulate = SEASON_COLORS[_season]
+		if canopy.hframes >= 4:
+			canopy.frame = clampi(_season, 0, canopy.hframes - 1)
+			canopy.modulate = Color.WHITE
+		else:
+			canopy.modulate = SEASON_COLORS[_season]

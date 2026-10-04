@@ -6,14 +6,78 @@ extends StaticBody2D
 ## Must match RecipeData.station.
 @export_enum("campfire", "mortar", "leaching") var station := "campfire"
 @export var display_name := "Campfire"
+## Painted art. Without it the station draws the plain placeholder shapes
+## below. [member frames] side-by-side frames play at [member fps]; the
+## sprite's ground line sits [member ground_inset] px above its bottom edge.
+@export var texture: Texture2D
+@export var frames := 1
+@export var fps := 0.0
+@export var ground_inset := 4
+## Footprint and reach in pixels (zero keeps the scene's default sizes).
+@export var body_size := Vector2.ZERO
+@export var reach_size := Vector2.ZERO
 
 
 func _ready() -> void:
-	queue_redraw()
+	if texture:
+		_add_sprite()
+		if body_size.x > 0.0:
+			_resize("Collision", body_size, Vector2(0, -body_size.y / 2.0))
+		if reach_size.x > 0.0:
+			_resize("Hitbox/Shape", reach_size, Vector2(0, -reach_size.y / 2.0 - 2.0))
+		if station == "campfire":
+			_add_fire_effects()
+	else:
+		queue_redraw()
+
+
+func _add_sprite() -> void:
+	var sprite := Sprite2D.new()
+	sprite.name = "Art"
+	sprite.texture = texture
+	sprite.hframes = frames
+	sprite.offset = Vector2(0, -texture.get_height() / 2.0 + ground_inset)
+	if frames > 1 and fps > 0.0:
+		sprite.set_script(load("res://scripts/world/frame_cycle.gd"))
+		sprite.set("fps", fps)
+	add_child(sprite)
+	move_child(sprite, 0)
+
+
+func _resize(node_path: String, size: Vector2, at_pos: Vector2) -> void:
+	var shape_node := get_node_or_null(node_path) as CollisionShape2D
+	if shape_node == null:
+		return
+	var rect := RectangleShape2D.new()
+	rect.size = size
+	shape_node.shape = rect
+	shape_node.position = at_pos
+
+
+## A fire throws sparks, and lights the ground around it after dark.
+func _add_fire_effects() -> void:
+	var sparks := CPUParticles2D.new()
+	sparks.name = "Sparks"
+	sparks.set_script(load("res://scripts/world/ambient_fx.gd"))
+	sparks.set("effect", "sparks")
+	sparks.set("area", Vector2(4, 1))
+	sparks.position = Vector2(0, -12)
+	sparks.z_index = 6
+	add_child(sparks)
+	var light := PointLight2D.new()
+	light.name = "NightLight"
+	light.set_script(load("res://scripts/world/night_light.gd"))
+	light.position = Vector2(0, -10)
+	light.set("radius", 70.0)
+	light.set("strength", 1.0)
+	light.set("flicker", 0.35)
+	add_child(light)
 
 
 ## Placeholder art until real sprites exist.
 func _draw() -> void:
+	if texture:
+		return
 	match station:
 		"campfire":
 			for i in 5:

@@ -6,10 +6,11 @@
 script = ExtResource("1_s")
 id = "muir_glacier"
 title = "Living Ice"
+main_line = true
 giver = "john_muir"
 requires = PackedStringArray("muir_cathedral")
 intro = PackedStringArray("Mount Lyell carries a glacier on its shoulder. A living one, still moving and carving the rock.", "Go up with your axe and crampons. Look at the crevasses and the cracked granite below the ice. That's how this whole valley was made.")
-steps = [{"type": "climbed", "route": "lyell_glacier", "objective": "Climb the Lyell Glacier", "reminder": "The Lyell Canyon trail starts by the Tuolumne lodge.", "done": ["You walked on the glacier!"]}, {"type": "return", "objective": "Tell John Muir what you saw", "reminder": "Come tell me everything.", "done": ["Crevasses, moraines, polished rock. Glaciers made this valley. I'm sure of it."]}]
+steps = [{"type": "climbed", "route": "lyell_glacier", "objective": "Tick the Lyell Glacier (up Lyell Canyon)", "reminder": "The Lyell Canyon trail starts by the Tuolumne lodge. You'll need the axe and crampons.", "done": ["You walked on the glacier! Crevasses, moraines, polished rock. Glaciers made this valley. I'm sure of it."]}]
 outro = PackedStringArray("I've written a great deal about these mountains. Put this down too: I didn't always see the people who lived here, and they saw a great deal I missed.")
 reward_items = {"pine_nuts": 4}
 reward_unlocks = PackedStringArray("register_glaciers")

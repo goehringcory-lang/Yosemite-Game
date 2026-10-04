@@ -27,13 +27,12 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/enid_leave_some.tres"),
 	preload("res://data/quests/hodges_patrol.tres"),
 	preload("res://data/quests/ansel_monolith.tres"),
+	preload("res://data/quests/eichorn_apron.tres"),
 	preload("res://data/quests/eichorn_spires.tres"),
 	preload("res://data/quests/anderson_half_dome.tres"),
 	preload("res://data/quests/robbins_clean.tres"),
 	preload("res://data/quests/lucy_basket.tres"),
 	preload("res://data/quests/salathe_steel.tres"),
-	preload("res://data/quests/harding_nose.tres"),
-	preload("res://data/quests/johnson_solo.tres"),
 	preload("res://data/quests/harding_summit.tres"),
 	preload("res://data/quests/muir_cathedral.tres"),
 	preload("res://data/quests/bethel_trade.tres"),
@@ -113,10 +112,59 @@ func has_climbed(route_id: String) -> bool:
 	return route_id in climbed
 
 
-func record_climb(route_id: String) -> void:
-	if not has_climbed(route_id):
-		climbed.append(route_id)
-		changed.emit()
+## Ticks a route in the guidebook. Returns true the first time.
+func record_climb(route_id: String) -> bool:
+	if has_climbed(route_id):
+		return false
+	climbed.append(route_id)
+	changed.emit()
+	return true
+
+
+## What to tell the player right after a first ascent: the tick, and which
+## quests that climb finished (their givers hand over the reward when you
+## talk to them).
+func tick_report(route_id: String) -> Array[Dictionary]:
+	var lines: Array[Dictionary] = []
+	var route_name := route_id.capitalize()
+	for route in Guidebook.routes():
+		if route.id == route_id:
+			route_name = route.display_name
+	lines.append({"speaker": "", "text": "Ticked! %s goes in your tick list (%d of %d routes in the guidebook)." % [
+		route_name, Guidebook.ticked_count(), Guidebook.routes().size()]})
+	for quest: QuestData in QUESTS:
+		var step := current_step(quest)
+		if step.get("type") == "climbed" and step.route == route_id and quest.steps.back() == step:
+			var giver := get_character(quest.giver)
+			lines.append({"speaker": "", "text": "%s is waiting to hear about it. Go and tell %s to finish \"%s\"." % [
+				giver.display_name if giver else quest.giver, giver.display_name if giver else "them", quest.title]})
+	return lines
+
+
+func has_guidebook() -> bool:
+	return is_unlocked(Guidebook.ABILITY)
+
+
+## The current step of the main storyline: {"quest", "objective"}, or {}.
+func main_objective() -> Dictionary:
+	for quest: QuestData in QUESTS:
+		if quest.main_line and active.has(quest.id):
+			return {"quest": quest, "objective": objective_text(quest)}
+	# Between quests: point at the next person on the main line.
+	for quest: QuestData in QUESTS:
+		if not quest.main_line or is_completed(quest.id):
+			continue
+		var unmet := Array(quest.requires).filter(func(r: String) -> bool: return not is_completed(r))
+		if not unmet.is_empty() and unmet.all(func(r: String) -> bool: return not get_quest(r).main_line):
+			var titles := PackedStringArray()
+			for r: String in unmet:
+				titles.append(get_quest(r).title)
+			return {"quest": quest, "objective": "Before the last page, hear everyone out: %s" % ", ".join(titles)}
+		if unmet.is_empty():
+			var giver := get_character(quest.giver)
+			var where := " (%s)" % giver.home if giver and giver.home != "" else ""
+			return {"quest": quest, "objective": "Talk to %s%s" % [giver.display_name if giver else quest.giver, where]}
+	return {}
 
 
 ## The next quest this person would offer, or null.
@@ -162,15 +210,25 @@ func objectives() -> PackedStringArray:
 	var result := PackedStringArray()
 	for quest: QuestData in QUESTS:
 		if active.has(quest.id):
-			result.append("%s: %s" % [quest.title, current_step(quest).get("objective", "")])
+			result.append("%s%s: %s" % ["* " if quest.main_line else "", quest.title, objective_text(quest)])
 	return result
+
+
+## The quest's current objective. A climb that's already ticked says who to
+## tell, since the quest finishes when you report it.
+func objective_text(quest: QuestData) -> String:
+	var step := current_step(quest)
+	if step.get("type") == "climbed" and is_step_done(step):
+		var giver := get_character(quest.giver)
+		return "Ticked! Tell %s" % (giver.display_name if giver else quest.giver)
+	return step.get("objective", "")
 
 
 ## Runs a conversation with [param character_id], updating quests along the
 ## way, and returns the lines to show.
-func talk_to(character_id: String) -> Array[Dictionary]:
+func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 	var character := get_character(character_id)
-	var speaker := character.display_name if character else character_id
+	var speaker := speaker_name if speaker_name != "" else (character.display_name if character else character_id)
 	var lines: Array[Dictionary] = []
 
 	# Someone else's quest sent the player here.
@@ -214,6 +272,10 @@ func talk_to(character_id: String) -> Array[Dictionary]:
 
 
 func _advance(quest: QuestData, lines: Array[Dictionary]) -> void:
+	var finished: Dictionary = quest.steps[active[quest.id]]
+	var gift := _give_step_rewards(finished)
+	if gift != "":
+		lines.append({"speaker": "", "text": gift})
 	var next: int = active[quest.id] + 1
 	if next < quest.steps.size():
 		active[quest.id] = next
@@ -227,6 +289,28 @@ func _advance(quest: QuestData, lines: Array[Dictionary]) -> void:
 	lines.append({"speaker": "", "text": _give_rewards(quest)})
 	quest_completed.emit(quest)
 	changed.emit()
+
+
+## Gifts a step hands over when it's done ("unlock", "gear", "items").
+## Returns a line describing them, or "".
+func _give_step_rewards(step: Dictionary) -> String:
+	var got := PackedStringArray()
+	var ability: String = step.get("unlock", "")
+	if ability != "" and not is_unlocked(ability):
+		unlocks.append(ability)
+		got.append("the %s" % ability.replace("_", " "))
+	var gear: Dictionary = step.get("gear", {})
+	for id: String in gear:
+		var amount := int(gear[id])
+		Gear.add(id, amount)
+		var gear_name := Gear.get_gear(id).display_name
+		got.append(gear_name if amount == 1 else "%d %ss" % [amount, gear_name])
+	var items: Dictionary = step.get("items", {})
+	for id: String in items:
+		Inventory.add(id, int(items[id]))
+		var item := ItemDB.get_item(id)
+		got.append("%d %s" % [int(items[id]), item.display_name if item else id])
+	return "Received %s." % ", ".join(got) if not got.is_empty() else ""
 
 
 ## Hands out the rewards and returns a "Quest complete" line describing them.

@@ -5,10 +5,11 @@
 [resource]
 script = ExtResource("1_s")
 id = "clark_register"
-title = "The Guardian's Register"
+title = "The Guidebook"
+main_line = true
 giver = "galen_clark"
 requires = PackedStringArray()
-intro = PackedStringArray("Good morning. You're the one camping at Lamon's place? Then you'll want this.", "It's a register. The State made me Guardian of this valley in 1866, and I've been writing down what happens here.", "Go and meet the people of this place. Listen, and write down what they tell you. Start with James Lamon. It's his cabin you're camped beside.", "And eat something before you go wandering. Take something with you.")
-steps = [{"type": "talk", "target": "james_lamon", "objective": "Meet James Lamon at the homestead", "reminder": "James is out by his cabin. You can't miss the apple trees.", "done": ["Clark sent you with his book, did he? Good. Write down that I stayed the winter when nobody else would.", "Now go on back to Clark. He'll want to see you've got something in your pack."]}, {"type": "have_food", "energy": 10, "objective": "Carry food worth 10 energy, then return to Galen Clark", "reminder": "Greens under the oaks, berries in the meadow. Bring a little something to eat.", "done": ["Good. You'll get hungry out there, and hungry people stop listening."]}]
-outro = PackedStringArray("The Register's yours to carry now. Fill it with what people tell you, not with what you'd like them to say.", "My pages start in 1864, with the Grant. Some people will tell you that's the wrong place to start. Write that down too.")
+intro = PackedStringArray("Good morning. You're the one camping at Lamon's place? Then you'll want this.", "It's a register. The State made me Guardian of this valley in 1866, and I've been writing down what happens here. Now it's yours to fill: go and meet the people of this place, listen, and write down what they tell you.", "But you can't learn a valley by standing in it. The walls are the point, and the people here know them by their routes. There's a book for that: a climbing guidebook, every route with its grade and the gear it takes.", "The Mountain Shop in Curry Village keeps copies. It's a short walk south through the gate. Ask for one, and eat something before you go wandering.")
+steps = [{"type": "talk", "target": "mountain_shop", "unlock": "guidebook", "objective": "Get a climbing guidebook at the Mountain Shop in Curry Village", "reminder": "Out the south gate to Curry Village. The Mountain Shop is the building by the store.", "done": ["Clark sent you? Then this copy's yours. We keep one back for anybody who comes in with that look.", "Every route in the Valley is in here: the grade, the gear it takes, and a box to tick. A route only counts when you've topped it out. No ticks, no stories. That's how the old-timers see it.", "Page one is Swan Slab, up behind Camp 4. It's top-rope, so you don't need a thing. Dick Leonard runs the practice days there. Ride the shuttle to Camp 4 and go see him."]}]
+outro = PackedStringArray()
 reward_unlocks = PackedStringArray("register")

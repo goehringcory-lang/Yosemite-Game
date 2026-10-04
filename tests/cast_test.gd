@@ -26,6 +26,7 @@ func _ready() -> void:
 	_check_quest_references()
 	_check_gear_curve()
 	_check_placements()
+	_check_main_line()
 	_play_first_chapter()
 	_play_the_nose()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
@@ -79,7 +80,7 @@ func _check_quest_references() -> void:
 		for s: Dictionary in quest.steps:
 			match s.type:
 				"talk":
-					if QuestLog.get_character(s.target) == null:
+					if QuestLog.get_character(s.target) == null and not _shop_targets().has(s.target):
 						problems.append("talk " + s.target)
 				"have":
 					if ItemDB.get_item(s.item) == null or not obtainable.has(s.item):
@@ -142,11 +143,19 @@ func _check_gear_curve() -> void:
 			if done.has(quest.id) or not Array(quest.requires).all(func(r): return done.has(r)):
 				continue
 			var climbs_ok := true
+			var gifts := {}
+			var have := gear.duplicate()
 			for s: Dictionary in quest.steps:
-				if s.type == "climbed" and not _has_gear(gear, routes[s.route].required_gear):
+				# Gear a step hands over counts for the steps after it.
+				for id in s.get("gear", {}):
+					have[id] = have.get(id, 0) + int(s.gear[id])
+				if s.type == "climbed" and not _has_gear(have, routes[s.route].required_gear):
 					climbs_ok = false
 			if not climbs_ok:
 				continue
+			for s: Dictionary in quest.steps:
+				for id in s.get("gear", {}):
+					gear[id] = gear.get(id, 0) + int(s.gear[id])
 			done[quest.id] = true
 			for id in quest.reward_gear:
 				gear[id] = gear.get(id, 0) + int(quest.reward_gear[id])
@@ -203,21 +212,70 @@ func _check_placements() -> void:
 		if not placed.has(quest.giver):
 			unplaced.append(quest.giver)
 		for s: Dictionary in quest.steps:
-			if s.type == "talk" and not placed.has(s.target):
+			if s.type == "talk" and not placed.has(s.target) and not _shop_targets().has(s.target):
 				unplaced.append(s.target)
 	check(unplaced.is_empty(), "every quest giver and talk target is placed in the park %s" % [unplaced])
 
 
-## Clark's first quest, then Degnan's delivery round, which ends with a
-## "return" step and a material (the starter) for Jennie Curry's quest.
+## The main storyline: every route in the guidebook is reachable, and every
+## main-line quest (but the ending) finishes on a climb.
+func _check_main_line() -> void:
+	var main: Array[QuestData] = QuestLog.QUESTS.filter(func(q: QuestData) -> bool: return q.main_line)
+	check(main.size() >= 10, "the main line has its quests (%d)" % main.size())
+	for quest in main:
+		if quest.id in ["clark_register", "clark_last_page"]:
+			continue # the guidebook errand and the ending
+		check(quest.steps.back().type == "climbed", "%s finishes on a tick in the guidebook" % quest.id)
+	for route in Guidebook.routes():
+		check(Guidebook.main_quest_for(route.id) != null or route.id == "swan_slab" or route.id == "glacier_point_apron",
+			"%s is on the main line" % route.id)
+		check(route.guide_chapter != "" and route.guide_tip != "", "%s has a guidebook chapter and tip" % route.id)
+	var first := QuestLog.get_quest("clark_register")
+	check(first.giver == "galen_clark" and first.steps[0].unlock == "guidebook" and first.steps[0].target == "mountain_shop",
+		"the first quest sends you to the Mountain Shop for the guidebook")
+	# The chain runs in one line from the guidebook to the glacier.
+	var order := ["clark_register", "leonard_belay", "eichorn_apron", "eichorn_spires", "robbins_clean",
+		"salathe_steel", "harding_summit", "muir_cathedral", "muir_glacier"]
+	for i in range(1, order.size()):
+		var quest := QuestLog.get_quest(order[i])
+		check(quest != null and quest.main_line and not quest.requires.is_empty(), "%s follows %s" % [order[i], order[i - 1]])
+
+
+func _shop_targets() -> Dictionary:
+	var result := {}
+	for shop: ShopData in _load_dir("res://data/shops/"):
+		if shop.talk_target != "":
+			result[shop.talk_target] = true
+	return result
+
+
+## The whole opening: Clark sends you to the Mountain Shop, the guidebook is
+## the first thing in your pack, and only a tick finishes each quest after it.
 func _play_first_chapter() -> void:
 	QuestLog.start_new_game()
-	QuestLog.talk_to("galen_clark")
-	check(QuestLog.active.has("clark_register"), "Galen Clark hands over the Register")
-	QuestLog.talk_to("james_lamon")
-	Inventory.add("lamon_apple", 1)
-	QuestLog.talk_to("galen_clark")
-	check(QuestLog.is_completed("clark_register") and QuestLog.is_unlocked("register"), "The Guardian's Register is done after meeting Lamon and packing food")
+	Gear.start_new_game()
+	check(not Guidebook.has_book(), "you start without a guidebook")
+	var lines := QuestLog.talk_to("galen_clark")
+	check(QuestLog.active.has("clark_register") and QuestLog.main_objective().objective.contains("Mountain Shop"), "Galen Clark sends you to the Mountain Shop")
+	check(QuestLog.talk_to("dick_leonard").size() > 0 and not QuestLog.active.has("leonard_belay"), "no lessons before the guidebook")
+	lines = QuestLog.talk_to("mountain_shop", "Mountain Shop clerk")
+	check(Guidebook.has_book() and QuestLog.is_completed("clark_register"), "the clerk hands over the guidebook")
+	check(lines[0].speaker == "Mountain Shop clerk", "the clerk is the one speaking")
+	check("guidebook" in lines.filter(func(l): return l.text.begins_with("Received"))[0].text, "the pickup is announced")
+	check(QuestLog.main_objective().objective.contains("Dick Leonard"), "the journal points you to Dick Leonard next")
+	QuestLog.talk_to("dick_leonard")
+	Inventory.add("lamon_apple", 3)
+	QuestLog.talk_to("dick_leonard")
+	check(not QuestLog.is_completed("leonard_belay"), "food alone doesn't finish the quest")
+	QuestLog.talk_to("dick_leonard")
+	check(not QuestLog.is_completed("leonard_belay"), "you have to climb Swan Slab first")
+	QuestLog.record_climb("swan_slab")
+	QuestLog.talk_to("dick_leonard")
+	check(QuestLog.is_completed("leonard_belay") and Gear.count("rope") == 1, "the tick finishes Leonard's quest and pays out the rack")
+	QuestLog.talk_to("jules_eichorn")
+	check(QuestLog.active.has("eichorn_apron"), "Jules Eichorn sets the Apron")
+	check(Guidebook.entries().filter(func(e): return e.ticked).size() == 1, "one route is ticked")
+	# Side stories still work: Degnan's delivery round.
 	QuestLog.talk_to("bridget_degnan")
 	QuestLog.talk_to("dick_leonard")
 	QuestLog.talk_to("jennie_curry")
@@ -233,10 +291,34 @@ func _play_first_chapter() -> void:
 
 ## Topping out on the Nose finishes Harding's quest and opens the road to Tuolumne.
 func _play_the_nose() -> void:
-	QuestLog.completed.append_array(["harding_nose", "johnson_solo"])
+	QuestLog.start_new_game()
+	Inventory.items.clear()
+	Gear.start_new_game()
+	Gear.add("rope")
+	Gear.add("harness")
+	Gear.add("cam", 8)
+	Gear.add("quickdraw", 6)
+	QuestLog.completed.append_array(["salathe_steel", "tabuce_chuckah"])
+	var nose: RouteData = load("res://data/routes/the_nose.tres")
 	check(not Park.is_hub_unlocked("tuolumne_meadows"), "Tuolumne starts locked")
 	QuestLog.talk_to("warren_harding")
-	check(QuestLog.active.has("harding_summit"), "Harding sends you up the Nose")
+	check(QuestLog.active.has("harding_summit"), "Harding starts The Nose")
+	check(not Gear.has_all(nose.required_gear), "the Nose needs the big-wall kit")
+	Recipes.times_made["acorn_cake"] = 4
+	QuestLog.talk_to("warren_harding")
+	check(Gear.count("aiders") == 2, "four batches of acorn cakes earn the aiders")
+	Inventory.add("acorn_cake", 4)
+	Granary.acorns = 30
+	QuestLog.talk_to("warren_harding")
+	check(Gear.count("haul_bag") == 1, "enough food earns the haul bag")
+	check(QuestLog.current_step(QuestLog.get_quest("harding_summit")).type == "talk", "then Beverly Johnson is next")
+	QuestLog.talk_to("beverly_johnson")
+	check(Gear.count("ascenders") == 2 and Gear.count("portaledge") == 1, "Beverly Johnson hands over the ascenders and portaledge")
+	check(Gear.has_all(nose.required_gear), "the rack is complete for the Nose")
+	check(not QuestLog.is_completed("harding_summit") and QuestLog.current_step(QuestLog.get_quest("harding_summit")).type == "climbed",
+		"only the climb is left")
+	QuestLog.talk_to("warren_harding")
+	check(not Park.is_hub_unlocked("tuolumne_meadows"), "talking isn't enough to open Tuolumne")
 	QuestLog.record_climb("the_nose")
 	var lines := QuestLog.talk_to("warren_harding")
 	check(QuestLog.is_completed("harding_summit") and Park.is_hub_unlocked("tuolumne_meadows"), "climbing the Nose opens Tuolumne Meadows")

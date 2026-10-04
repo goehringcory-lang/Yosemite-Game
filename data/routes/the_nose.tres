@@ -13,3 +13,6 @@ required_gear = {"rope": 1, "harness": 1, "cam": 8, "quickdraw": 6, "aiders": 2,
 pitches = Array[int]([3, 3, 4, 3, 4, 4, 5, 4, 3])
 moves_per_pitch = 9
 nights = 2
+guide_chapter = "El Capitan"
+guide_order = 60
+guide_tip = "Two nights on the wall: pack a real meal for each."

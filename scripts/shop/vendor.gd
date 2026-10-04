@@ -74,6 +74,10 @@ func offer_name(offer: ShopOffer) -> String:
 func interact(player: Player) -> void:
 	player.can_act = false
 	var box := DialogueBox.open(player)
+	if shop.talk_target != "":
+		var story := QuestLog.talk_to(shop.talk_target, shop.keeper)
+		if not story.is_empty():
+			await box.say(story)
 	if shop.greeting != "":
 		await box.say([{"speaker": shop.keeper, "text": shop.greeting}])
 	while true:

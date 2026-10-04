@@ -13,6 +13,6 @@ bio = "Led the first ascent of the Northwest Face of Half Dome in 1957, the firs
 idle_lines = PackedStringArray("Leave the rock the way you found it. The next party deserves the same climb you had.", "Style matters. How you get up is part of what you did.")
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.353, 0.478, 0.627, 1)
-home = "Camp 4"
+home = "The Ahwahnee"
 needs_tribal_review = false
 sources = "Portrayal to confirm with the Robbins family, since he died recently. To verify: Royal Robbins, Basic Rockcraft (1971); Steve Roper, Camp 4 (1994)."

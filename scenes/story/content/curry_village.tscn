@@ -6,6 +6,8 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_pavilion_cook.tres" id="4_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_ranger.tres" id="5_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_tourist.tres" id="6_r"]
+[ext_resource type="Resource" path="res://data/characters/jules_eichorn.tres" id="7_r"]
+[ext_resource type="Resource" path="res://data/characters/bestor_robinson.tres" id="8_r"]
 
 [node name="CurryVillageStory" type="Node2D"]
 
@@ -36,3 +38,14 @@ character = ExtResource("6_r")
 spot = "plaza"
 offset = Vector2(-20, 30)
 wander_radius = 40.0
+
+[node name="JulesEichorn" parent="." instance=ExtResource("1_r")]
+character = ExtResource("7_r")
+spot = "apron_trailhead"
+offset = Vector2(-20, 36)
+
+[node name="BestorRobinson" parent="." instance=ExtResource("1_r")]
+character = ExtResource("8_r")
+spot = "apron_trailhead"
+offset = Vector2(14, 44)
+wander_radius = 12.0

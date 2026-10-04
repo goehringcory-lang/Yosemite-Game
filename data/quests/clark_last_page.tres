@@ -6,6 +6,7 @@
 script = ExtResource("1_s")
 id = "clark_last_page"
 title = "The Last Page"
+main_line = true
 giver = "galen_clark"
 requires = PackedStringArray("lebrado_villages", "muir_glacier", "lucy_basket")
 intro = PackedStringArray("Look at this book. It started as mine. Now it's full of other people's handwriting, and they don't all agree.", "Before you write the last page, go see Tabuce and Maria Lebrado. Ask them if there's anything they want written down, or if they'd rather keep it.")
