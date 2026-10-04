@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/store_foods.png" id="1_k2wye"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_qgqod"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_k2wye"]
+atlas = ExtResource("1_k2wye")
+region = Rect2(0, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_qgqod")
+id = "pilot_bread"
+display_name = "Pilot Bread"
+description = "Big round crackers, hard as a board and just as durable. Climbers have carried them up walls since before the war."
+icon = SubResource("AtlasTexture_k2wye")

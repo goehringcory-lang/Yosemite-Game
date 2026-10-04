@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_stage_lady.tres" id="2_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_stage_gent.tres" id="3_r"]
+
+[node name="WawonaStory" type="Node2D"]
+
+[node name="VisitorStageLady" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "wawona_hotel"
+offset = Vector2(-24, 16)
+wander_radius = 24.0
+
+[node name="VisitorStageGent" parent="." instance=ExtResource("1_r")]
+character = ExtResource("3_r")
+spot = "wawona_hotel"
+offset = Vector2(36, 20)
+wander_radius = 24.0

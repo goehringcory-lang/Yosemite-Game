@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/region.gd" id="1_od2od"]
+[ext_resource type="PackedScene" path="res://scenes/regions/generated/wawona_map.tscn" id="2_7tgaa"]
+[ext_resource type="Script" path="res://scripts/world/forage_spawner.gd" id="3_7tgaa"]
+
+[node name="Wawona" type="Node2D" unique_id=507757295]
+y_sort_enabled = true
+script = ExtResource("1_od2od")
+region_id = "wawona"
+hub_id = "wawona"
+display_name = "Wawona"
+
+[node name="Map" parent="." unique_id=283546220 instance=ExtResource("2_7tgaa")]
+
+[node name="Entities" type="Node2D" parent="." unique_id=1483436240]
+y_sort_enabled = true
+
+[node name="Forage_wawona" type="Node2D" parent="Entities" unique_id=1692723072 node_paths=PackedStringArray("ground", "flora", "oak_canopy")]
+y_sort_enabled = true
+script = ExtResource("3_7tgaa")
+ground = NodePath("../../Map/Ground")
+flora = NodePath("../../Map/Flora")
+oak_canopy = NodePath("../../Map/OakCanopy")
+amount_scale = 4.0
+
+[node name="Markers" type="Node2D" parent="." unique_id=83886376]

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "tabuce_acorns"
+title = "Acorns for the Winter"
+giver = "maggie_howard"
+requires = PackedStringArray()
+intro = PackedStringArray("You want to climb out of the Valley? Then you'll need food that lasts.", "In the fall the black oaks drop their acorns. Gather twelve good ones and bring them to me.")
+steps = [{"type": "have", "item": "black_oak_acorn", "count": 12, "consume": false, "objective": "Gather 12 black oak acorns (they drop in fall)", "reminder": "Look under the black oaks in the fall. Bring me twelve.", "done": ["These are good ones. Now they need a place to keep, up off the ground where the squirrels can't get them."]}]
+outro = PackedStringArray("Build a chuckah near your camp. I'll show you how.")
+reward_unlocks = PackedStringArray("chuckah")

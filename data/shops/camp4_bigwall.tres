@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="ShopData" format=3]
+
+[ext_resource type="Script" path="res://scripts/shop/shop_offer.gd" id="1_4pgxb"]
+[ext_resource type="Script" path="res://scripts/shop/shop_data.gd" id="2_xqrmw"]
+
+[sub_resource type="Resource" id="Resource_b5h5j"]
+script = ExtResource("1_4pgxb")
+id = "haul_bag"
+price = 80
+requires = {
+"aiders": 1
+}
+max_owned = 1
+
+[sub_resource type="Resource" id="Resource_y3yve"]
+script = ExtResource("1_4pgxb")
+id = "cam"
+price = 55
+requires = {
+"cam": 4
+}
+max_owned = 8
+
+[sub_resource type="Resource" id="Resource_65ape"]
+script = ExtResource("1_4pgxb")
+id = "portaledge"
+price = 140
+requires = {
+"ascenders": 1,
+"haul_bag": 1
+}
+max_owned = 1
+
+[resource]
+script = ExtResource("2_xqrmw")
+keeper = "Big-wall climber"
+greeting = "Just down off El Cap. Everything I hauled up there is for trade, for food."
+nothing_yet = "Big-wall gear won't do you any good until someone teaches you to aid climb."
+offers = Array[ExtResource("1_4pgxb")]([SubResource("Resource_b5h5j"), SubResource("Resource_y3yve"), SubResource("Resource_65ape")])

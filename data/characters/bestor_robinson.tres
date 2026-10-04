@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/bestor_robinson.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "bestor_robinson"
+display_name = "Bestor Robinson"
+years = "1898–1987"
+affiliation = "Sierra Club Rock Climbing Section"
+bio = "Oakland lawyer and one of the 1934 Higher Cathedral Spire team. He was a careful planner and later a long-serving Sierra Club leader."
+idle_lines = PackedStringArray("Plan the climb, then climb the plan. Then plan again when the rock disagrees.", "We hauled more iron up the Spire than we'd ever carried in our lives.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.690, 0.604, 0.439, 1)
+home = "Camp 4"
+needs_tribal_review = false
+sources = "To verify: Steve Roper, Camp 4 (1994); Sierra Club history pages."

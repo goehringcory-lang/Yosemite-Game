@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hodges_patrol"
+title = "Mounted Patrol"
+giver = "clare_hodges"
+requires = PackedStringArray("leonard_belay")
+intro = PackedStringArray("Ranger Hodges. Yes, a woman ranger. You'll get used to it; the bears did.", "I need someone who can move faster than a horse on the trails. Check on the fellow drilling up Half Dome, and on Miss Michael up at Sentinel Dome.", "Then report back to me here.")
+steps = [{"type": "talk", "target": "george_anderson", "objective": "Check on George Anderson at Happy Isles", "reminder": "Anderson's camp is near Happy Isles, at the foot of the Half Dome trail.", "done": ["Tell the ranger I'm fine. Tired and hungry, but fine."]}, {"type": "talk", "target": "enid_michael", "objective": "Check on Enid Michael at Sentinel Dome", "reminder": "Miss Michael is up at Sentinel Dome, off the Glacier Point road.", "done": ["Tell Clare I'm counting lupines and I'll be down before dark."]}, {"type": "return", "objective": "Report back to Clare Hodges", "reminder": "Report to me at the ranger station.", "done": ["Good work. That would've taken me two days in the saddle."]}]
+outro = PackedStringArray("The rescue cache has more carabiners than we'll ever use. Take a couple of quickdraws. Somebody should get some good out of them.")
+reward_gear = {"quickdraw": 2}

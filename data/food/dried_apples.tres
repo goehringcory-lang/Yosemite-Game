@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/store_items.png" id="1_50f5v"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_j1r7u"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1pxbv"]
+atlas = ExtResource("1_50f5v")
+region = Rect2(16, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_j1r7u")
+id = "dried_apples"
+display_name = "Dried Apples"
+description = "Rings of dried apple. Apples have grown in the Valley since the homesteaders' orchards of the 1860s."
+icon = SubResource("AtlasTexture_1pxbv")

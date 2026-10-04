@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/quickdraw.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "quickdraw"
+display_name = "Quickdraw"
+description = "Clips the rope to bolts on slab routes like Snake Dike."
+icon = ExtResource("2_icon")
+tier = 2

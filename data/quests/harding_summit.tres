@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "harding_summit"
+title = "The Nose"
+giver = "warren_harding"
+requires = PackedStringArray("harding_nose", "johnson_solo")
+intro = PackedStringArray("You've got the kit and the food. Now climb it.", "From the top you can walk the north rim east, and the whole high country opens up. Tioga Road, Tuolumne, all of it.")
+steps = [{"type": "climbed", "route": "the_nose", "objective": "Climb the Nose of El Capitan", "reminder": "The Nose starts right at the toe of El Cap. Bring food for the nights.", "done": ["You topped out! Three thousand feet!"]}]
+outro = PackedStringArray("Somebody said the Nose was the end of Yosemite climbing. It was only the beginning.", "The road to Tuolumne's open to you now. Go find Muir up there. He won't stop talking about glaciers.")
+reward_unlocks = PackedStringArray("hub:tuolumne_meadows")

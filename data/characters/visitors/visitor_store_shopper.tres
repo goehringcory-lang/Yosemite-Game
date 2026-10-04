@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_store_shopper.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_store_shopper"
+display_name = "Shopper"
+years = "1950s"
+affiliation = "Park visitor"
+bio = "An everyday visitor or worker at Curry Village. Not a historical figure."
+idle_lines = PackedStringArray("A whole cart of groceries and the kids only want the chocolate.", "The apples are good this year. Somebody has been picking from the old orchard, I think.", "Keep everything in the bear box. I learned that the hard way.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Camp Curry Store"
+visitor = true

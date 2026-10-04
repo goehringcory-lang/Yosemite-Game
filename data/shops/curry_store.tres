@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="ShopData" format=3]
+
+[ext_resource type="Script" path="res://scripts/shop/shop_offer.gd" id="1_xlpgx"]
+[ext_resource type="Script" path="res://scripts/shop/shop_data.gd" id="2_2q41s"]
+
+[sub_resource type="Resource" id="Resource_1cihp"]
+script = ExtResource("1_xlpgx")
+kind = "item"
+id = "pilot_bread"
+
+[sub_resource type="Resource" id="Resource_iunkh"]
+script = ExtResource("1_xlpgx")
+kind = "item"
+id = "dried_apricots"
+price = 26
+
+[sub_resource type="Resource" id="Resource_2mwp8"]
+script = ExtResource("1_xlpgx")
+kind = "item"
+id = "chocolate_bar"
+price = 36
+
+[sub_resource type="Resource" id="Resource_32eci"]
+script = ExtResource("1_xlpgx")
+kind = "item"
+id = "cheddar_wedge"
+price = 40
+
+[sub_resource type="Resource" id="Resource_7ahe6"]
+script = ExtResource("1_xlpgx")
+kind = "item"
+id = "beef_jerky"
+price = 46
+
+[sub_resource type="Resource" id="Resource_v12q2"]
+script = ExtResource("1_xlpgx")
+kind = "item"
+id = "trail_mix"
+price = 40
+
+[sub_resource type="Resource" id="Resource_d2sps"]
+script = ExtResource("1_xlpgx")
+kind = "item"
+id = "dried_apples"
+price = 20
+
+[resource]
+script = ExtResource("2_2q41s")
+keeper = "Camp Curry Store clerk"
+greeting = "Morning! Fresh forage on the counter and I'll put food that keeps in your pack. Everything here travels well."
+nothing_yet = "We're all out. Deliveries come up the road tomorrow."
+offers = Array[ExtResource("1_xlpgx")]([SubResource("Resource_1cihp"), SubResource("Resource_iunkh"), SubResource("Resource_2mwp8"), SubResource("Resource_32eci"), SubResource("Resource_7ahe6"), SubResource("Resource_v12q2"), SubResource("Resource_d2sps")])

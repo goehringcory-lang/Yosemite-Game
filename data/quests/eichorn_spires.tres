@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "eichorn_spires"
+title = "The Cathedral Spires"
+giver = "jules_eichorn"
+requires = PackedStringArray("leonard_belay")
+intro = PackedStringArray("Dick tells me you've got good feet. In 1934 Dick, Bestor, and I climbed Higher Cathedral Spire. Everyone said it couldn't be done.", "If you want to climb the Arches you'll need more protection than Dick gave you.", "Show me you can lead the Apron, then go hear Bestor's side of the Spire story. He tells it better than me, and longer.")
+steps = [{"type": "climbed", "route": "glacier_point_apron", "objective": "Lead the Glacier Point Apron", "reminder": "Lead the Apron. Place your cams where the cracks are, not where you wish they were.", "done": ["Clean lead. You didn't hurry. Good."]}, {"type": "talk", "target": "bestor_robinson", "objective": "Hear Bestor Robinson's side of the Spire story", "reminder": "Bestor's around Camp 4 somewhere, probably with a notebook.", "done": ["The Spire? We carried fifty-five pitons up it and used most of them. Jules tells it like it was easy. It wasn't.", "Tell him I said the rope was my idea."]}, {"type": "return", "objective": "Go back to Jules Eichorn", "reminder": "Head back to Camp 4 and tell me what Bestor said.", "done": ["His idea! Ha. Well, maybe it was."]}]
+outro = PackedStringArray("Two more cams and a couple of quickdraws. That's enough to try the Royal Arches.")
+reward_gear = {"cam": 2, "quickdraw": 2}

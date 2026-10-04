@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/recipe_data.gd" id="1_recipe"]
+
+[resource]
+script = ExtResource("1_recipe")
+id = "manzanita_cider"
+display_name = "Manzanita Cider"
+station = "campfire"
+inputs = {"manzanita_berries": 4}
+output_id = "manzanita_cider"
+output_count = 1
+minutes = 30
+description = "Crush the berries and steep them in cool water for a tart drink."

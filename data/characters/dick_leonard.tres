@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/dick_leonard.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "dick_leonard"
+display_name = "Dick Leonard"
+years = "1908–1993"
+affiliation = "Sierra Club Rock Climbing Section"
+bio = "Berkeley lawyer who started the Cragmont Climbing Club in 1932, which grew into the Sierra Club's Rock Climbing Section. He championed the dynamic belay, which catches a falling climber gently instead of stopping them short. In 1934 he, Jules Eichorn, and Bestor Robinson made the first ascent of Higher Cathedral Spire, one of the first technical rock climbs in Yosemite Valley."
+idle_lines = PackedStringArray("Keep your weight over your feet. Granite rewards patience.", "Jules and Bestor are off scouting the Cathedral Spires again.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.35, 0.45, 0.6, 1)
+sources = "To verify: Steve Roper, Camp 4: Recollections of a Yosemite Rockclimber (1994); Sierra Club Bulletin (1934); Sierra Club history pages."
+home = "Swan Slab, behind Camp 4"

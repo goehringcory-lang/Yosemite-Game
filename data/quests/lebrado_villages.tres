@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "lebrado_villages"
+title = "Where the Villages Were"
+giver = "maria_lebrado"
+requires = PackedStringArray("tenaya_ahwahnee", "harding_summit")
+intro = PackedStringArray("[Placeholder dialogue pending tribal review.]", "I was a girl in 1851 when the soldiers came. Now I'm old, and they've asked me where the villages stood.", "I remember. There, by the river. And there, below the cliffs. Take what I tell you to Clark.")
+steps = [{"type": "talk", "target": "galen_clark", "objective": "Take Maria Lebrado's account to Galen Clark", "reminder": "Mr. Clark is at the homestead gate.", "done": ["(Clark listens for a long time before he answers.)", "She remembers the village sites. The places I thought were just meadows were homes.", "My pages were wrong. Hers belong at the front of the book."]}, {"type": "return", "objective": "Go back to Maria Lebrado", "reminder": "Come back when he's heard it.", "done": ["Good. Now it's written down."]}]
+outro = PackedStringArray()
+reward_unlocks = PackedStringArray("register_villages")

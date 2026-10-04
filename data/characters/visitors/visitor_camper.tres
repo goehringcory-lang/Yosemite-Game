@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_camper.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_camper"
+display_name = "Camper"
+years = "1950s"
+affiliation = "Park visitor"
+bio = "An everyday visitor from the 1950s. Not a historical figure."
+idle_lines = PackedStringArray("We've come every summer since the kids were small.", "Keep your cooler in the car. The bears know what a cooler looks like.", "Nothing like coffee on a camp stove at sunrise.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Yosemite Valley"
+visitor = true

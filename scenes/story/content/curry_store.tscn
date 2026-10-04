@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_store_shopper.tres" id="2_r"]
+
+[node name="CurryStoreStory" type="Node2D"]
+
+[node name="VisitorShopper" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "customer"

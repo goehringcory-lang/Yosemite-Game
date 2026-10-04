@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_dovo2"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/player_frames.tres" id="2_gmlin"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lvxji"]
+size = Vector2(10, 6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p47bc"]
+size = Vector2(12, 12)
+
+[node name="Player" type="CharacterBody2D" unique_id=306573633]
+collision_layer = 2
+motion_mode = 1
+script = ExtResource("1_dovo2")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="." unique_id=1727705912]
+sprite_frames = ExtResource("2_gmlin")
+animation = &"idle_down"
+offset = Vector2(0, -11)
+
+[node name="Collision" type="CollisionShape2D" parent="." unique_id=1789725718]
+position = Vector2(0, -3)
+shape = SubResource("RectangleShape2D_lvxji")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=1828131034]
+position = Vector2(0, 12)
+collision_layer = 0
+collision_mask = 4
+monitorable = false
+
+[node name="Shape" type="CollisionShape2D" parent="InteractionArea" unique_id=339636125]
+shape = SubResource("RectangleShape2D_p47bc")
+
+[node name="Camera" type="Camera2D" parent="." unique_id=237503454]
+position_smoothing_enabled = true
+position_smoothing_speed = 6.0

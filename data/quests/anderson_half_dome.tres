@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "anderson_half_dome"
+title = "Anderson's Iron"
+giver = "george_anderson"
+requires = PackedStringArray("leonard_belay")
+intro = PackedStringArray("You see Half Dome up there? I'm drilling my way up the back of it. A hole, an eyebolt, a step, another hole.", "Trouble is, a man can't drill on an empty stomach, and I ate my last beans on Tuesday.", "Bring me some real food, enough for a long day, and I'll give you something to remember the climb by.")
+steps = [{"type": "have_food", "energy": 60, "objective": "Bring food worth 60 energy to George Anderson", "reminder": "Something that sticks to your ribs. Apples, bread, anything but more beans.", "done": ["Now that's a meal. I could drill all the way to the top on that."]}]
+outro = PackedStringArray("Here's a spare eyebolt from the Dome. Iron from Scotland, drilled into California granite.", "Show it to those young climbers at Camp 4. They'll have opinions about it, I expect.")
+reward_items = {"anderson_eyebolt": 1}

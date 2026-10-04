@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/john_muir.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "john_muir"
+display_name = "John Muir"
+years = "1838–1914"
+affiliation = "Naturalist"
+bio = "Came to Yosemite in 1868 and worked at James Hutchings's sawmill in the valley. In 1869 he climbed Cathedral Peak, and in the early 1870s he found living glaciers high in the Sierra. His writing helped create Yosemite National Park in 1890. His views of Native people were often dismissive, and the Register should say that too."
+idle_lines = PackedStringArray("A crust of bread and a cup of tea, and you can go anywhere.", "The mountains are calling. Well, they're always calling. You just have to listen.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.416, 0.353, 0.282, 1)
+home = "Cathedral Lakes trailhead"
+needs_tribal_review = false
+sources = "To verify: John Muir, My First Summer in the Sierra (1911); Donald Worster, A Passion for Nature (2008)."

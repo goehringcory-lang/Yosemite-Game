@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/items.png" id="1_lr3b3"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_futhe"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j2qwg"]
+atlas = ExtResource("1_lr3b3")
+region = Rect2(128, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_futhe")
+id = "yerba_buena"
+display_name = "Yerba Buena"
+description = "A trailing native mint that brews a calming tea."
+icon = SubResource("AtlasTexture_j2qwg")
+forage_seasons = 3
+habitat = 4
+forage_per_day = 2

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/recipe_data.gd" id="1_recipe"]
+
+[resource]
+script = ExtResource("1_recipe")
+id = "leached_acorn_meal"
+display_name = "Leached Acorn Meal"
+station = "leaching"
+inputs = {"acorn_flour": 1}
+output_id = "leached_acorn_meal"
+output_count = 1
+minutes = 120
+description = "Pour water through the flour again and again until the bitterness is gone."

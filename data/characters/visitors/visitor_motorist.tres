@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_motorist.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_motorist"
+display_name = "Motorist"
+years = "1920s"
+affiliation = "Park visitor"
+bio = "An everyday visitor from the 1920s. Not a historical figure."
+idle_lines = PackedStringArray("We drove in on the new highway. Only had two flat tires!", "They let cars in the valley now. Imagine that.", "Have you seen the Firefall? Everyone says we must.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Yosemite Valley"
+visitor = true

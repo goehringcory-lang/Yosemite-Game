@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/galen_clark.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "galen_clark"
+display_name = "Galen Clark"
+years = "1814–1910"
+affiliation = "Guardian of the Yosemite Grant"
+bio = "Came to California in 1853 and homesteaded at Wawona in 1856, where Clark's Station fed and housed travelers on the way to the valley. In 1866 the state named him the first Guardian of the Yosemite Grant. He is remembered as a protector of the valley and the Mariposa Grove, and he is also part of the history of how the valley was taken from the people who lived here."
+idle_lines = PackedStringArray("Write down what people tell you, and who told you. The who matters as much as the what.", "I was given this job by the State of California. The valley had keepers long before that.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.227, 0.227, 0.259, 1)
+home = "Lamon Homestead gate"
+needs_tribal_review = false
+sources = "To verify: NPS Yosemite history pages; Shirley Sargent, Galen Clark: Yosemite Guardian (1964)."

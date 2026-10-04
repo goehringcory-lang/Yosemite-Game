@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/items.png" id="1_5t5n1"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_jvdxs"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pm5ta"]
+atlas = ExtResource("1_5t5n1")
+region = Rect2(48, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_jvdxs")
+id = "yampah"
+display_name = "Yampah"
+description = "A sweet, nutty root long gathered from wet Sierra meadows."
+icon = SubResource("AtlasTexture_pm5ta")
+forage_seasons = 6
+habitat = 1
+forage_per_day = 1

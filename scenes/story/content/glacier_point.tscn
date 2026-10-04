@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/james_mccauley.tres" id="2_r"]
+[ext_resource type="Resource" path="res://data/characters/enid_michael.tres" id="3_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_painter.tres" id="4_r"]
+
+[node name="GlacierPointStory" type="Node2D"]
+
+[node name="JamesMccauley" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "apron_top"
+offset = Vector2(32, -16)
+
+[node name="EnidMichael" parent="." instance=ExtResource("1_r")]
+character = ExtResource("3_r")
+spot = "sentinel_dome"
+offset = Vector2(16, -8)
+wander_radius = 16.0
+
+[node name="VisitorPainter" parent="." instance=ExtResource("1_r")]
+character = ExtResource("4_r")
+spot = "apron_top"
+offset = Vector2(-40, 24)
+wander_radius = 24.0

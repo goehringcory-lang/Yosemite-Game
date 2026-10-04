@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/items.png" id="1_tk33q"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_lpanp"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c8c0s"]
+atlas = ExtResource("1_tk33q")
+region = Rect2(0, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_lpanp")
+id = "wild_strawberry"
+display_name = "Wild Strawberry"
+description = "Tiny, intensely sweet berries from sunny meadow edges."
+icon = SubResource("AtlasTexture_c8c0s")
+forage_seasons = 3
+habitat = 1
+forage_per_day = 2

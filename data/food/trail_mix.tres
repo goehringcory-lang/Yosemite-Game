@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/store_items.png" id="1_h6wuy"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_gw2y0"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rxjqo"]
+atlas = ExtResource("1_h6wuy")
+region = Rect2(0, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_gw2y0")
+id = "trail_mix"
+display_name = "Trail Mix"
+description = "Nuts, raisins, and oats from the Village Store. Light to carry and slow to spoil."
+icon = SubResource("AtlasTexture_rxjqo")

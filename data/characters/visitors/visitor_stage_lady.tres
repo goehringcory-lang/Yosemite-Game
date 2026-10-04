@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_stage_lady.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_stage_lady"
+display_name = "Stagecoach traveler"
+years = "1880s"
+affiliation = "Park visitor"
+bio = "An everyday visitor from the 1880s. Not a historical figure."
+idle_lines = PackedStringArray("Two days on the stage road from Mariposa, and every bone aches. Worth it.", "Mr. Clark's hotel serves trout for breakfast. Trout!", "Mind the dust when the next coach comes through.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Wawona"
+visitor = true

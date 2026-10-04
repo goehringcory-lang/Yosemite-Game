@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/region.gd" id="1_k6qit"]
+[ext_resource type="PackedScene" path="res://scenes/regions/generated/glacier_point_map.tscn" id="2_cj7ie"]
+[ext_resource type="Script" path="res://scripts/world/forage_spawner.gd" id="3_cj7ie"]
+
+[node name="GlacierPoint" type="Node2D" unique_id=202504098]
+y_sort_enabled = true
+script = ExtResource("1_k6qit")
+region_id = "glacier_point"
+hub_id = "glacier_point"
+display_name = "Glacier Point"
+
+[node name="Map" parent="." unique_id=1082040348 instance=ExtResource("2_cj7ie")]
+
+[node name="Entities" type="Node2D" parent="." unique_id=333289844]
+y_sort_enabled = true
+
+[node name="Forage_glacier_point" type="Node2D" parent="Entities" unique_id=2079174866 node_paths=PackedStringArray("ground", "flora", "oak_canopy")]
+y_sort_enabled = true
+script = ExtResource("3_cj7ie")
+ground = NodePath("../../Map/Ground")
+flora = NodePath("../../Map/Flora")
+oak_canopy = NodePath("../../Map/OakCanopy")
+amount_scale = 4.0
+
+[node name="Markers" type="Node2D" parent="." unique_id=798362846]

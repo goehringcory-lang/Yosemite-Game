@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "lucy_basket"
+title = "The Big Basket"
+giver = "lucy_telles"
+requires = PackedStringArray("tabuce_chuckah")
+intro = PackedStringArray("[Placeholder dialogue pending tribal review.]", "This basket will take me years. People watch me weave it and ask how long. I tell them: as long as it takes.", "Mr. Clark's book has plenty of names in it. Go see if he has room for mine.")
+steps = [{"type": "talk", "target": "galen_clark", "objective": "Ask Galen Clark to write Lucy Telles's name in the Register", "reminder": "Mr. Clark is at the homestead gate.", "done": ["Lucy Telles. I should have asked her myself years ago.", "Tell her she can write it in her own hand if she likes."]}, {"type": "return", "objective": "Go back to Lucy Telles at the Museum", "reminder": "Come back when you've spoken to him.", "done": ["In my own hand. Good."]}]
+outro = PackedStringArray("Here, take some acorn cakes. You'll be going up the big walls soon, and you'll need them.")
+reward_items = {"acorn_cake": 2}
+reward_unlocks = PackedStringArray("register_telles")

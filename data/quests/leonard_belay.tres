@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "leonard_belay"
+title = "The Rock Climbing Section"
+giver = "dick_leonard"
+requires = PackedStringArray()
+intro = PackedStringArray("I climb with the Sierra Club's Rock Climbing Section. Most of us learned our ropework out of a magazine article, if you can believe it.", "Everything depends on the belay. Let the rope run a little when your partner falls, and you'll catch them gently instead of yanking them tight.", "Let's see how you move. Try Swan Slab, up behind Camp 4. I'll belay you from the top.")
+steps = [{"type": "climbed", "route": "swan_slab", "objective": "Climb Swan Slab (the practice slab behind Camp 4)", "reminder": "Swan Slab's just up from Camp 4. I'll have the rope ready.", "done": ["Nicely done. You trust your feet, and that's the whole game on slab."]}, {"type": "have_food", "energy": 30, "objective": "Carry trail food worth 30 energy", "reminder": "Nobody climbs well hungry. Bring some food: greens, berries, whatever's in season.", "done": ["That'll keep you going for a long day."]}]
+outro = PackedStringArray("You're ready for something bigger. Take this kit: a rope, a harness, and a couple of cams.", "That's enough to lead the Glacier Point Apron. It's all slab. Place your cams where you find cracks, and don't let yourself get too far above your last one.")
+reward_gear = {"rope": 1, "harness": 1, "cam": 2}

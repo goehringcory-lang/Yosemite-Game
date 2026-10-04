@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/james_mccauley.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "james_mccauley"
+display_name = "James McCauley"
+years = ""
+affiliation = "Glacier Point Mountain House"
+bio = "Irish-born builder of the Four Mile Trail from the valley floor to Glacier Point (1872), which he ran as a toll trail. He later ran the Mountain House hotel at Glacier Point, and the Firefall is said to have started with his family pushing a campfire's embers over the edge."
+idle_lines = PackedStringArray("Four miles up, three thousand feet. I built every switchback of it.", "The fall of fire! People came from all over to see it.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.878, 0.847, 0.784, 1)
+home = "Glacier Point"
+needs_tribal_review = false
+sources = "To verify: NPS Yosemite history; the Firefall's origins are told several ways, so the Register should say so."

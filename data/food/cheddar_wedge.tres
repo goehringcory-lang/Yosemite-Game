@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/store_foods.png" id="1_6puk0"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_k0fj6"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6puk0"]
+atlas = ExtResource("1_6puk0")
+region = Rect2(16, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_k0fj6")
+id = "cheddar_wedge"
+display_name = "Cheddar Wedge"
+description = "A wedge of sharp cheddar in wax paper. Rich, dense and worth its weight on a long pitch."
+icon = SubResource("AtlasTexture_6puk0")

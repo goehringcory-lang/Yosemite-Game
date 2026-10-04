@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/ansel_adams.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "ansel_adams"
+display_name = "Ansel Adams"
+years = "1902–1984"
+affiliation = "Sierra Club; Best's Studio"
+bio = "Photographer who first came to Yosemite as a boy in 1916. In 1927 he made 'Monolith, the Face of Half Dome' from the Diving Board. He married Virginia Best, whose father ran Best's Studio in the valley, and was a longtime Sierra Club leader."
+idle_lines = PackedStringArray("The light changes every minute. You learn to wait.", "Jules had the best hands of any student I taught. Then he found rock climbing.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.227, 0.227, 0.220, 1)
+home = "Best's Studio, Yosemite Village"
+needs_tribal_review = false
+sources = "To verify: Ansel Adams, An Autobiography (1985); Ansel Adams Gallery history."

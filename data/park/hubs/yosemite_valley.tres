@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="HubData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/hub_data.gd" id="1_hub"]
+
+[resource]
+script = ExtResource("1_hub")
+id = "yosemite_valley"
+display_name = "Yosemite Valley"
+elevation_ft = 4000
+tagline = "Main hub: Curry Village, the Village, and your homestead"
+description = "A glacier-carved valley about seven miles long and a mile wide, walled by El Capitan, Half Dome, and Yosemite Falls. The Merced River winds through its meadows. Your camp is at the old Lamon homestead, a short walk from Curry Village and its tent cabins, store, and Mountain Shop."
+activities = PackedStringArray("Camp at the Lamon Homestead, then Curry Village: tent cabins, the store, and the Mountain Shop", "Bouldering at Camp 4 and climbs up the Valley walls", "Yosemite Village: Welcome Center, store, and museum", "Walks to Cook's Meadow, Lower Yosemite Fall, and Mirror Lake")
+latitude = 37.7482
+longitude = -119.5869
+arrival_region = "yosemite_village"
+west = -119.682
+east = -119.528
+south = 37.711
+north = 37.762
+meters_per_tile = 45.0
+walk_min_elevation = 1150.0
+walk_max_elevation = 1420.0

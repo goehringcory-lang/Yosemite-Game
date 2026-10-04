@@ -1,0 +1,68 @@
+[gd_resource type="Resource" script_class="ShopData" format=3]
+
+[ext_resource type="Script" path="res://scripts/shop/shop_offer.gd" id="1_7sdry"]
+[ext_resource type="Script" path="res://scripts/shop/shop_data.gd" id="2_1mfbe"]
+
+[sub_resource type="Resource" id="Resource_3eq6e"]
+script = ExtResource("1_7sdry")
+id = "quickdraw"
+amount = 2
+price = 28
+requires = {
+"rope": 1
+}
+max_owned = 12
+
+[sub_resource type="Resource" id="Resource_4xbnm"]
+script = ExtResource("1_7sdry")
+id = "cam"
+price = 48
+requires = {
+"cam": 2
+}
+max_owned = 10
+
+[sub_resource type="Resource" id="Resource_d0yrh"]
+script = ExtResource("1_7sdry")
+id = "belay_device"
+price = 36
+requires = {
+"harness": 1,
+"rope": 1
+}
+max_owned = 1
+
+[sub_resource type="Resource" id="Resource_vjimg"]
+script = ExtResource("1_7sdry")
+id = "haul_bag"
+price = 76
+requires = {
+"aiders": 1
+}
+max_owned = 1
+
+[sub_resource type="Resource" id="Resource_hxv0q"]
+script = ExtResource("1_7sdry")
+id = "ascenders"
+price = 60
+requires = {
+"aiders": 1
+}
+max_owned = 1
+
+[sub_resource type="Resource" id="Resource_wddds"]
+script = ExtResource("1_7sdry")
+id = "portaledge"
+price = 130
+requires = {
+"ascenders": 1,
+"haul_bag": 1
+}
+max_owned = 1
+
+[resource]
+script = ExtResource("2_1mfbe")
+keeper = "Mountain Shop clerk"
+greeting = "Welcome to the Mountain Shop. We outfit half the climbers in the Valley. Rope, cams, draws... we take food in trade, same as everyone up here."
+nothing_yet = "You'll want a rope and a couple of cams before I can help. Talk to the folks at Camp 4, or ask around the Valley."
+offers = Array[ExtResource("1_7sdry")]([SubResource("Resource_3eq6e"), SubResource("Resource_4xbnm"), SubResource("Resource_d0yrh"), SubResource("Resource_vjimg"), SubResource("Resource_hxv0q"), SubResource("Resource_wddds")])

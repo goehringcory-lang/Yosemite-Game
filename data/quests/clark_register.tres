@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "clark_register"
+title = "The Guardian's Register"
+giver = "galen_clark"
+requires = PackedStringArray()
+intro = PackedStringArray("Good morning. You're the one camping at Lamon's place? Then you'll want this.", "It's a register. The State made me Guardian of this valley in 1866, and I've been writing down what happens here.", "Go and meet the people of this place. Listen, and write down what they tell you. Start with James Lamon. It's his cabin you're camped beside.", "And eat something before you go wandering. Take something with you.")
+steps = [{"type": "talk", "target": "james_lamon", "objective": "Meet James Lamon at the homestead", "reminder": "James is out by his cabin. You can't miss the apple trees.", "done": ["Clark sent you with his book, did he? Good. Write down that I stayed the winter when nobody else would.", "Now go on back to Clark. He'll want to see you've got something in your pack."]}, {"type": "have_food", "energy": 10, "objective": "Carry food worth 10 energy, then return to Galen Clark", "reminder": "Greens under the oaks, berries in the meadow. Bring a little something to eat.", "done": ["Good. You'll get hungry out there, and hungry people stop listening."]}]
+outro = PackedStringArray("The Register's yours to carry now. Fill it with what people tell you, not with what you'd like them to say.", "My pages start in 1864, with the Grant. Some people will tell you that's the wrong place to start. Write that down too.")
+reward_unlocks = PackedStringArray("register")

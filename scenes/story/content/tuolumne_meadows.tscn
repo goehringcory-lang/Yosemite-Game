@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/john_muir.tres" id="2_r"]
+[ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="3_r"]
+[ext_resource type="Resource" path="res://data/routes/cathedral_peak.tres" id="4_r"]
+[ext_resource type="Resource" path="res://data/characters/carrie_bethel.tres" id="5_r"]
+[ext_resource type="Resource" path="res://data/routes/lyell_glacier.tres" id="6_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_backpacker.tres" id="7_r"]
+
+[node name="TuolumneMeadowsStory" type="Node2D"]
+
+[node name="JohnMuir" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "cathedral_lakes_trailhead"
+offset = Vector2(-20, -12)
+wander_radius = 16.0
+
+[node name="CathedralPeak" parent="." instance=ExtResource("3_r")]
+position = Vector2(1328, 1024)
+route = ExtResource("4_r")
+
+[node name="CarrieBethel" parent="." instance=ExtResource("1_r")]
+character = ExtResource("5_r")
+spot = "soda_springs"
+offset = Vector2(16, 8)
+
+[node name="LyellGlacier" parent="." instance=ExtResource("3_r")]
+position = Vector2(2800, 840)
+route = ExtResource("6_r")
+
+[node name="VisitorBackpacker" parent="." instance=ExtResource("1_r")]
+character = ExtResource("7_r")
+spot = "arrival"
+offset = Vector2(40, 0)
+wander_radius = 48.0

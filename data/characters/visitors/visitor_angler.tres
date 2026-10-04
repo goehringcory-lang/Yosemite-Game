@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_angler.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_angler"
+display_name = "Angler"
+years = "1930s"
+affiliation = "Park visitor"
+bio = "An everyday visitor from the 1930s. Not a historical figure."
+idle_lines = PackedStringArray("The Merced's running cold and clear today.", "Patience. The trout have all day, and so do I.", "Stay back from the riverbank in spring. The water's faster than it looks.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Yosemite Valley"
+visitor = true

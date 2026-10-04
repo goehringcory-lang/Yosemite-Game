@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "lyell_glacier"
+display_name = "Lyell Glacier"
+grade = "Glacier, class 3–4"
+description = "Snow and ice on the north face of Mount Lyell, the highest peak in the park. The glacier is shrinking fast."
+first_ascent = "John Boies, 1871 (Mount Lyell)"
+required_gear = {"rope": 1, "harness": 1, "ice_axe": 1, "crampons": 1}
+pitches = Array[int]([2, 3, 3, 2])
+moves_per_pitch = 8
+nights = 0

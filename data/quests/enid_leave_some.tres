@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "enid_leave_some"
+title = "Leave Some Behind"
+giver = "enid_michael"
+requires = PackedStringArray("leonard_belay")
+intro = PackedStringArray("Before you gather anything up here, learn it first. Some plants are food, some are medicine, and some will make you very sick.", "Bring me a little yerba buena from along the river. I'll show you what else is safe and how to cook what isn't.", "And never take the last plant in a patch. Leave some for the deer, the bees, and next year.")
+steps = [{"type": "have", "item": "yerba_buena", "count": 2, "consume": true, "objective": "Bring Enid Michael 2 yerba buena", "reminder": "Yerba buena grows in shady spots along the river. It smells like mint when you crush a leaf.", "done": ["That's it. Smell that? Now let me show you the berries."]}]
+outro = PackedStringArray("Elderberries have to be cooked. Toyon berries need toasting. Manzanita berries make a fine cider.", "Nobody learned any of this from a book. People here worked it out over thousands of years, long before I got here.")
+reward_recipes = PackedStringArray("elderberry_sauce", "toasted_toyon", "manzanita_cider")

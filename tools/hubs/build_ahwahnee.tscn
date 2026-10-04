@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tools/hubs/build_ahwahnee.gd" id="1"]
+
+[node name="BuildAhwahnee" type="Node"]
+script = ExtResource("1")

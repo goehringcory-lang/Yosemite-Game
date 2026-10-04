@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "bethel_trade"
+title = "Over the Crest"
+giver = "carrie_bethel"
+requires = PackedStringArray("harding_summit", "tabuce_chuckah")
+intro = PackedStringArray("[Placeholder dialogue pending tribal review.]", "Pine nuts from the east side and acorns from the west. People have traded across these passes for a very long time.", "Bring me acorn flour from the valley, and I'll trade you pine nuts from the east side.")
+steps = [{"type": "have", "item": "acorn_flour", "count": 4, "consume": true, "objective": "Bring Carrie Bethel 4 acorn flour", "reminder": "Grind acorns into flour at the mortar in the valley.", "done": ["This is good flour. Well ground."]}]
+outro = PackedStringArray("Pine nuts. They keep a long time and they're good up high.", "The valley was never cut off from anywhere. People came and went over the passes long before any road.")
+reward_items = {"pine_nuts": 10}

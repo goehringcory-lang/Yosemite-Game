@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/store_foods.png" id="1_nxx3s"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_3jd5n"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nxx3s"]
+atlas = ExtResource("1_nxx3s")
+region = Rect2(48, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_3jd5n")
+id = "beef_jerky"
+display_name = "Beef Jerky"
+description = "Salty strips that last a season in a pack. Not a thing in the Valley you can't get with a good chew."
+icon = SubResource("AtlasTexture_nxx3s")

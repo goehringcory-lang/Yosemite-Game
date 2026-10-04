@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_shop_climber.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_shop_climber"
+display_name = "Climber"
+years = "1970s"
+affiliation = "Park visitor"
+bio = "An everyday visitor or worker at Curry Village. Not a historical figure."
+idle_lines = PackedStringArray("These shoes are half a size too small and I love them.", "Everyone talks about the Nose. I would take a good afternoon on the slabs any day.", "Never trust a rope that is older than you are.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Mountain Shop"
+visitor = true

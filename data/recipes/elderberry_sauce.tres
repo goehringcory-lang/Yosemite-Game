@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/recipe_data.gd" id="1_recipe"]
+
+[resource]
+script = ExtResource("1_recipe")
+id = "elderberry_sauce"
+display_name = "Elderberry Sauce"
+station = "campfire"
+inputs = {"blue_elderberries": 3}
+output_id = "elderberry_sauce"
+output_count = 1
+minutes = 30
+description = "Blue elderberries have to be cooked before they're safe to eat."

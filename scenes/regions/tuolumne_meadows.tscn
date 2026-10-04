@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/region.gd" id="1_y40cu"]
+[ext_resource type="PackedScene" path="res://scenes/regions/generated/tuolumne_meadows_map.tscn" id="2_vllp4"]
+[ext_resource type="Script" path="res://scripts/world/forage_spawner.gd" id="3_vllp4"]
+
+[node name="TuolumneMeadows" type="Node2D" unique_id=1147643175]
+y_sort_enabled = true
+script = ExtResource("1_y40cu")
+region_id = "tuolumne_meadows"
+hub_id = "tuolumne_meadows"
+display_name = "Tuolumne Meadows"
+
+[node name="Map" parent="." unique_id=1810629294 instance=ExtResource("2_vllp4")]
+
+[node name="Entities" type="Node2D" parent="." unique_id=421111406]
+y_sort_enabled = true
+
+[node name="Forage_tuolumne_meadows" type="Node2D" parent="Entities" unique_id=657519272 node_paths=PackedStringArray("ground", "flora", "oak_canopy")]
+y_sort_enabled = true
+script = ExtResource("3_vllp4")
+ground = NodePath("../../Map/Ground")
+flora = NodePath("../../Map/Flora")
+oak_canopy = NodePath("../../Map/OakCanopy")
+amount_scale = 4.0
+
+[node name="Markers" type="Node2D" parent="." unique_id=429947074]

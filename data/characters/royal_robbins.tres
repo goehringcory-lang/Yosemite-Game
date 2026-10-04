@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/royal_robbins.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "royal_robbins"
+display_name = "Royal Robbins"
+years = "1935–2017"
+affiliation = "Climber"
+bio = "Led the first ascent of the Northwest Face of Half Dome in 1957, the first Grade VI climb in the country. In the late 1960s and 70s he championed clean climbing: protection that could be placed and removed without scarring the rock."
+idle_lines = PackedStringArray("Leave the rock the way you found it. The next party deserves the same climb you had.", "Style matters. How you get up is part of what you did.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.353, 0.478, 0.627, 1)
+home = "Camp 4"
+needs_tribal_review = false
+sources = "Portrayal to confirm with the Robbins family, since he died recently. To verify: Royal Robbins, Basic Rockcraft (1971); Steve Roper, Camp 4 (1994)."

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/story_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(16, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_item")
+id = "degnan_loaf"
+display_name = "Degnan's Bread"
+description = "A loaf from Bridget Degnan's oven, still a little warm."
+icon = SubResource("AtlasTexture_icon")

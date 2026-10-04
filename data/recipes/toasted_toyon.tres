@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/recipe_data.gd" id="1_recipe"]
+
+[resource]
+script = ExtResource("1_recipe")
+id = "toasted_toyon"
+display_name = "Toasted Toyon"
+station = "campfire"
+inputs = {"toyon_berries": 4}
+output_id = "toasted_toyon"
+output_count = 1
+minutes = 20
+description = "Toasting takes the bitterness out of toyon berries."

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/store_foods.png" id="1_2og54"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_4gkj5"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2og54"]
+atlas = ExtResource("1_2og54")
+region = Rect2(32, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_4gkj5")
+id = "dried_apricots"
+display_name = "Dried Apricots"
+description = "Sun-dried and chewy. A little sweet, a little tart, and they keep for weeks."
+icon = SubResource("AtlasTexture_2og54")

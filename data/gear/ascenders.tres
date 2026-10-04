@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/ascenders.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "ascenders"
+display_name = "Ascenders"
+description = "Clamps for climbing a fixed rope on multi-day walls."
+icon = ExtResource("2_icon")
+tier = 3

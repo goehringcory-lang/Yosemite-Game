@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_backpacker.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_backpacker"
+display_name = "Backpacker"
+years = "1970s"
+affiliation = "Park visitor"
+bio = "An everyday visitor from the 1970s. Not a historical figure."
+idle_lines = PackedStringArray("Two weeks on the John Muir Trail. My feet have opinions.", "Pack it in, pack it out.", "The high country looks like the world just finished being made.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Tuolumne Meadows"
+visitor = true

@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/jennie_curry.tres" id="2_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_camper.tres" id="3_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_pavilion_cook.tres" id="4_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_ranger.tres" id="5_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_tourist.tres" id="6_r"]
+
+[node name="CurryVillageStory" type="Node2D"]
+
+[node name="JennieCurry" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "registration_porch"
+offset = Vector2(22, 26)
+
+[node name="VisitorCamper" parent="." instance=ExtResource("1_r")]
+character = ExtResource("3_r")
+spot = "campsite_center"
+offset = Vector2(-10, 20)
+wander_radius = 24.0
+
+[node name="VisitorPavilionCook" parent="." instance=ExtResource("1_r")]
+character = ExtResource("4_r")
+spot = "pavilion_door"
+offset = Vector2(20, 2)
+
+[node name="VisitorRanger" parent="." instance=ExtResource("1_r")]
+character = ExtResource("5_r")
+spot = "amphitheater"
+offset = Vector2(-6, -4)
+wander_radius = 20.0
+
+[node name="VisitorTourist" parent="." instance=ExtResource("1_r")]
+character = ExtResource("6_r")
+spot = "plaza"
+offset = Vector2(-20, 30)
+wander_radius = 40.0

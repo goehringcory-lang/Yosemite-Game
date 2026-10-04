@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_rail_passenger.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_rail_passenger"
+display_name = "Railroad passenger"
+years = "1910s"
+affiliation = "Park visitor"
+bio = "An everyday visitor from the 1910s. Not a historical figure."
+idle_lines = PackedStringArray("The Yosemite Valley Railroad runs right up the Merced Canyon. What a ride!", "The stage from here to the valley is the bumpy part.", "El Portal means 'the gateway,' you know.")
+sprite_sheet = ExtResource("2_sprite")
+home = "El Portal"
+visitor = true

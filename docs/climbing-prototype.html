@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Yosemite · Climbing design prototype</title>
+<style>
+:root{color-scheme:dark;font:16px/1.5 system-ui,sans-serif;color:#f0eadb;background:#172522}*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:1160px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;gap:24px;align-items:center}h1{font:36px Georgia,serif;margin:0}h2{font:24px Georgia,serif;margin:0 0 12px}p{margin:8px 0}.eyebrow{color:#c5b783;font-size:12px;letter-spacing:2px;text-transform:uppercase}.muted,small{color:#b8c5bb}main{padding-top:0;display:grid;grid-template-columns:1fr 320px;gap:20px}button,select{font:inherit;border:1px solid #67796b;border-radius:6px;background:#293e35;color:#f0eadb;padding:9px 12px;cursor:pointer}button:hover:not(:disabled){background:#3c5846}button:focus-visible,select:focus-visible{outline:3px solid #f1ce73;outline-offset:3px}button:disabled{opacity:.4;cursor:default}select{width:100%;margin-bottom:12px}.wall-shell{position:relative;background:#263932;border:1px solid #546052;border-radius:10px;overflow:hidden}.wall-heading{padding:16px 20px;border-bottom:1px solid #546052;display:flex;justify-content:space-between;gap:12px}.wall{position:relative;height:580px;background:radial-gradient(ellipse at 30% 30%,#a49c86 0,transparent 50%),repeating-linear-gradient(107deg,transparent 0 60px,#636c6025 61px 63px),#858873;margin:0 26px;border-left:12px solid #667262;border-right:12px solid #667262}.ledge{position:absolute;left:0;right:0;height:15px;background:#4d5746;box-shadow:0 7px #333e35;pointer-events:none}.hold{position:absolute;width:42px;height:36px;transform:translate(-50%,-50%);padding:0;border-radius:40% 40% 25% 25%;background:#354b3d;border:2px solid #273d31;font-size:13px;color:#faf2d8;z-index:2;opacity:1!important}.hold.future{background:#656b59;border-color:#575c4a;color:#e2decc}.hold.reachable{border-color:#f6e8a8;box-shadow:0 0 0 3px #f6e8a830}.hold.crack{border-radius:5px;background:#4b4036}.hold.bolt{border-radius:50%;background:#4b6070}.hold.aid{background:#6c4f68}.hold.fixed{background:#4b6261}.hold.snow{background:#c3d2cf;color:#263932}.hold.visited{opacity:.65!important}.hold .placed{position:absolute;top:-13px;right:-8px;color:#ffdd78;font-size:20px}.climber{position:absolute;transform:translate(-50%,-86%);font-size:30px;color:#fff3ce;text-shadow:2px 2px #913e28;pointer-events:none;z-index:4}.rope{position:absolute;width:100%;height:100%;pointer-events:none;z-index:1}.panel{background:#20342c;border:1px solid #546052;border-radius:10px;padding:20px;margin-bottom:16px}.stats{display:flex;justify-content:space-between;font-size:14px;margin:10px 0}progress{width:100%;height:12px;accent-color:#d7c180}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.actions button{font-size:13px}.gear{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.gear span{font-size:12px;padding:4px 8px;border:1px solid #607062;border-radius:4px}.preview{min-height:92px;border-top:1px solid #546052;padding:12px 20px;background:#20342c}.notice{min-height:86px;color:#f0d88d}.legend{padding:14px 20px;font-size:12px;color:#c9cebb}.wide{width:100%;margin-top:8px}.end{color:#f1ce73}footer{padding-top:0;font-size:13px}@media(max-width:780px){header{display:block}main{grid-template-columns:1fr}.wall{height:500px;margin:0 10px}h1{font-size:30px}.hold{width:36px}aside{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.panel{margin:0}}
+</style>
+<header><div><div class="eyebrow">Yosemite / interaction study 01</div><h1>A route worth reading.</h1><p class="muted">Find your line. Protect the climb. Make the next ledge.</p></div><small>Standalone design prototype<br>Sample gear · no game saves changed</small></header>
+<main>
+<section class="wall-shell" aria-label="Climbing wall">
+ <div class="wall-heading"><strong id="route-name"></strong><span id="pitch"></span></div>
+ <div id="wall" class="wall"></div>
+ <div id="preview" class="preview">Select a highlighted hold to climb. Hover or focus to preview its cost.</div>
+ <div class="legend">Numbers = stamina cost · │ crack · ● bolt · △ aid · ↟ fixed rope · ❄ snow<br>Gold markers = placed protection. The climber is ◆.</div>
+</section>
+<aside>
+ <section class="panel"><div class="eyebrow">Story progression / sample kits</div><label for="scenario">Try a climbing chapter</label><select id="scenario"><option value="practice">01 · Swan Slab practice</option><option value="apron" selected>02 · Leonard’s first lead kit</option><option value="bolts">03 · Bolted slab study</option><option value="wall">04 · Big-wall study</option><option value="alpine">05 · Alpine study</option></select><p id="intro" class="muted"></p><div id="gear" class="gear"></div><button id="restart" class="wide">Restart this study</button></section>
+ <section class="panel"><h2 id="state-title">On the wall</h2><div class="stats"><span>Stamina</span><strong id="stamina"></strong></div><progress id="meter" max="100"></progress><div class="stats"><span id="rack"></span><span id="runout"></span></div><div class="stats"><span id="food"></span><span id="time"></span></div><p id="message" class="notice" role="status" aria-live="polite"></p><div class="actions"><button id="protect">Place / clip [Space]</button><button id="chalk">Chalk up [C]</button><button id="aid">Aider mode [A]</button><button id="ascend">Ascender mode [U]</button><button id="axe">Ice axe mode [I]</button><button id="snack">Eat snack +25</button><button id="meal">Eat meal +40</button><button id="bivy">Set portaledge</button></div><button id="next" class="wide">Next pitch [E]</button><button id="retreat" class="wide">Retreat [Esc]</button></section>
+</aside>
+</main>
+<footer>Click or tap holds, or use ← ↑ →. Equipment actions cost game time; thinking does not. Falls and terrain are simplified game rules. Later kits are design fixtures, not existing quest rewards.</footer>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const names = {approach_shoes:'Approach shoes',chalk_bag:'Chalk bag',rope:'Rope',harness:'Harness',cam:'Cams',quickdraw:'Quickdraws',belay_device:'Belay device',aiders:'Aiders',ascenders:'Ascenders',haul_bag:'Haul bag',portaledge:'Portaledge',ice_axe:'Ice axe',crampons:'Crampons'};
+const starter = {approach_shoes:1,chalk_bag:1};
+const lead = {...starter,rope:1,harness:1,cam:2};
+const advanced = {...lead,cam:3,quickdraw:3,belay_device:1};
+const scenarios = {
+ practice:{name:'Swan Slab · practice',pitches:1,gear:starter,base:5,topRope:true,description:'Borrowed top rope. Learn to read effort and use chalk before a hard sequence.'},
+ apron:{name:'Glacier Point Apron · lead study',pitches:3,gear:lead,base:9,description:'Leonard’s rope, harness and two cams. Protect the cracks, save energy for the crux, and eat at ledges.'},
+ bolts:{name:'Bolted slab · equipment study',pitches:2,gear:advanced,base:10,description:'Quickdraws clip bolts; cams fit cracks. A gentler detour can miss a protection opportunity.'},
+ wall:{name:'Big wall · equipment study',pitches:3,gear:{...advanced,aiders:1,ascenders:1,haul_bag:1,portaledge:1},base:10,description:'Aid a blank section, ascend a fixed rope, haul supplies, and spend a night on the portaledge after pitch two.'},
+ alpine:{name:'High country · equipment study',pitches:2,gear:{...advanced,ice_axe:1,crampons:1},base:10,description:'Crampons support snowy footholds. Select your ice axe for snow moves; switch back to rock above.'}
+};
+const symbols = {rock:'',crack:'│',bolt:'●',aid:'△',fixed:'↟',snow:'❄'};
+let s, cfg, mode='climb';
+function buildHolds(){
+ const holds=[];
+ for(let row=1;row<=8;row++) for(let col=1;col<=3;col++){
+  let type='rock';
+  if([2,5].includes(row)&&col===2) type=$('scenario').value==='bolts'?'bolt':'crack';
+  if($('scenario').value==='wall'&&row===3) type='aid';
+  if($('scenario').value==='wall'&&row===6) type='fixed';
+  if($('scenario').value==='alpine'&&[3,4].includes(row)) type='snow';
+  const cost=cfg.base+(col===2?0:col===1?-2:3)+(row===6?4:0);
+  holds.push({row,col,type,cost});
+ }
+ holds.push({row:9,col:1,type:'ledge',cost:0},{row:9,col:2,type:'ledge',cost:0},{row:9,col:3,type:'ledge',cost:0});
+ return holds;
+}
+function start(){
+ cfg=scenarios[$('scenario').value]; mode='climb';
+ s={row:0,col:2,pitch:1,stamina:100,cams:cfg.gear.cam||0,draws:cfg.gear.quickdraw||0,protection:0,placements:[],minutes:0,falls:0,snacks:3,meals:2,chalk:0,chalkUsed:false,bivied:false,done:false,won:false,holds:buildHolds(),message:'At the belay. Read the line above, then choose your first hold.'};
+ render();
+}
+function reachable(h){return !s.done&&s.row<9&&h.row===s.row+1&&Math.abs(h.col-s.col)<=1;}
+function cost(h){
+ if(h.type==='ledge')return 0;
+ let n=h.type==='aid'?5:h.type==='fixed'?4:h.type==='snow'?6:h.cost;
+ if(h.type==='rock'&&cfg.gear.approach_shoes)n-=1;
+ if(s.chalk>0&&['rock','crack','bolt'].includes(h.type))n-=3;
+ return Math.max(1,n);
+}
+function blocked(h){
+ if(h.type==='aid'&&(!cfg.gear.aiders||!s.cams||mode!=='aid'))return 'Select aiders and keep one cam available for this section.';
+ if(h.type==='fixed'&&(!cfg.gear.ascenders||mode!=='ascend'))return 'Select ascenders to use the fixed rope.';
+ if(h.type==='snow'&&(!cfg.gear.crampons||!cfg.gear.ice_axe||mode!=='axe'))return 'This snow section needs crampons and ice axe mode.';
+ return '';
+}
+function move(h){
+ if(!reachable(h))return;
+ const reason=blocked(h);if(reason){s.message=reason;render();return;}
+ const effort=cost(h);s.stamina-=effort;s.minutes+=h.type==='aid'?12:h.type==='fixed'?8:6;
+ s.row=h.row;s.col=h.col;
+ if(s.chalk>0&&['rock','crack','bolt'].includes(h.type))s.chalk--;
+ if(h.type==='aid'){s.cams--;s.protection=s.row;s.placements.push({row:s.row,col:s.col});}
+ if(h.type==='fixed')s.protection=s.row;
+ s.message=`${h.type==='aid'?'Aiders placed. ':h.type==='fixed'?'Ascended the fixed rope. ':''}Moved up. Used ${effort} stamina.`;
+ if(s.stamina<=0)fall();
+ else if(s.row===9){
+  if(s.pitch===cfg.pitches){s.done=true;s.won=true;s.message='Top out! In the game, this is where the route completion returns to the story and map.';}
+  else {s.stamina=Math.min(100,s.stamina+10);s.message='Belay reached. Recovered 10 stamina. Choose food before the next pitch.';}
+ }
+ render();
+}
+function fall(){
+ s.falls++;s.minutes+=20;
+ const distance=Math.max(0,s.row-s.protection);
+ if(s.falls>=3||(!cfg.topRope&&distance>=4)){s.done=true;s.message='You lower off safely. Time and eaten food are spent; all equipment returns with you.';return;}
+ if(!cfg.topRope){s.row=Math.max(0,s.protection-distance);s.col=s.row?Math.max(1,Math.min(3,s.col)):2;}
+ s.stamina=30;s.chalk=0;
+ s.message=cfg.topRope?'The top rope catches you. Recover to 30 stamina and try again.':'Your protection catches you. Recover to 30 stamina; the placed gear stays on the wall.';
+}
+function protect(){
+ const h=s.holds.find(h=>h.row===s.row&&h.col===s.col);
+ if(s.done||cfg.topRope||s.protection>=s.row||!h)return;
+ const key=h.type==='bolt'?'draws':h.type==='crack'?'cams':null;
+ if(!key||!s[key])return;
+ s[key]--;s.protection=s.row;s.placements.push({row:s.row,col:s.col});s.minutes+=2;s.stamina-=1;
+ s.message=key==='cams'?'Cam placed. One fewer piece on the rack until the next pitch.':'Bolt clipped with a quickdraw.';
+ if(s.stamina<=0)fall();render();
+}
+function chalk(){if(s.done||!cfg.gear.chalk_bag||s.chalkUsed||s.row===9)return;s.chalk=2;s.chalkUsed=true;s.minutes+=2;s.message='Chalk ready: the next two rock moves cost 3 less stamina. Once per pitch.';render();}
+function setMode(value){if(s.done)return;const required={aid:'aiders',ascend:'ascenders',axe:'ice_axe'}[value];if(required&&!cfg.gear[required])return;mode=value;s.message=`${value==='aid'?'Aiders':value==='ascend'?'Ascenders':value==='axe'?'Ice axe':'Climbing'} selected. Choose a highlighted hold.`;render();}
+function eat(kind){if(s.done||![0,9].includes(s.row)||!s[kind]||s.stamina===100)return;s[kind]--;s.stamina=Math.min(100,s.stamina+(kind==='snacks'?25:40));s.minutes+=5;s.message='Ate at the ledge. Food is spent; the energy stays with you.';render();}
+function needsBivy(){return $('scenario').value==='wall'&&s.pitch===2&&!s.bivied;}
+function bivy(){if(s.done||s.row!==9||!needsBivy()||!s.meals)return;s.meals--;s.stamina=100;s.minutes+=600;s.bivied=true;s.message='Portaledge set. One meal eaten; you wake rested. Supplies are ready to haul.';render();}
+function next(){if(s.done||s.row!==9||needsBivy())return;s.pitch++;s.row=0;s.col=2;s.cams=cfg.gear.cam||0;s.draws=cfg.gear.quickdraw||0;s.protection=0;s.placements=[];s.falls=0;s.chalk=0;s.chalkUsed=false;mode='climb';s.holds=buildHolds();s.message='Rack recovered. Begin the next pitch.';if(cfg.gear.haul_bag){s.minutes+=10;s.message='Supplies hauled (+10 minutes). Rack recovered for the next pitch.';}render();}
+function retreat(){if(s.done)return;s.done=true;s.minutes+=15;s.message='You retreat with all your equipment. The game would return you to the route base.';render();}
+function describe(h){const reason=blocked(h);return `Row ${h.row} · ${h.type} · ${cost(h)} stamina · ${reason|| (s.stamina<=cost(h)?'This move will exhaust you and cause a fall.':`Stamina afterward: ${s.stamina-cost(h)}.`)}`;}
+function render(){
+ $('route-name').textContent=cfg.name;$('pitch').textContent=`Pitch ${s.pitch} / ${cfg.pitches}`;$('intro').textContent=cfg.description;
+ $('gear').replaceChildren(...Object.entries(cfg.gear).map(([key,n])=>{const tag=document.createElement('span');tag.textContent=names[key]+(n>1?` ×${n}`:'');return tag;}));
+ $('state-title').textContent=s.done?(s.won?'Top out':'Back to the base'):s.row===9?'At the belay':'On the wall';
+ $('stamina').textContent=`${Math.max(0,s.stamina)} / 100`;$('meter').value=Math.max(0,s.stamina);
+ $('rack').textContent=`Cams ${s.cams} · Draws ${s.draws}`;$('runout').textContent=cfg.topRope?'Top rope':`Runout ${Math.max(0,s.row-s.protection)}`;
+ $('food').textContent=`Snacks ${s.snacks} · Meals ${s.meals}`;$('time').textContent=`${Math.floor(s.minutes/60)}h ${s.minutes%60}m`;$('message').textContent=s.message;
+ $('preview').textContent=s.done?s.message:`${mode==='climb'?'Climbing':mode==='aid'?'Aiders':mode==='ascend'?'Ascenders':'Ice axe'} selected. ${s.chalk?`${s.chalk} chalked moves remaining. `:''}Hover or focus a highlighted hold to preview.`;
+ const h=s.holds.find(h=>h.row===s.row&&h.col===s.col);
+ $('protect').disabled=s.done||cfg.topRope||s.row<=s.protection||!(h?.type==='crack'&&s.cams||h?.type==='bolt'&&s.draws);
+ $('chalk').disabled=s.done||s.chalkUsed||s.row===9||!cfg.gear.chalk_bag;
+ for(const [id,key,val] of [['aid','aiders','aid'],['ascend','ascenders','ascend'],['axe','ice_axe','axe']]){$(id).disabled=s.done||!cfg.gear[key];$(id).setAttribute('aria-pressed',String(mode===val));}
+ $('snack').disabled=s.done||![0,9].includes(s.row)||!s.snacks||s.stamina===100;
+ $('meal').disabled=s.done||![0,9].includes(s.row)||!s.meals||s.stamina===100;
+ $('bivy').disabled=s.done||s.row!==9||!needsBivy()||!s.meals;
+ $('next').disabled=s.done||s.row!==9||needsBivy();$('retreat').disabled=s.done;
+ const wall=$('wall');wall.replaceChildren();
+ for(const row of [0,9]){const el=document.createElement('div');el.className='ledge';el.style.top=`${y(row)+2}%`;wall.append(el);}
+ const points=[{row:0,col:2},...s.placements,{row:s.row,col:s.col}].map(p=>`${x(p.col)},${y(p.row)}`).join(' ');
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 100 100');svg.setAttribute('preserveAspectRatio','none');svg.classList.add('rope');
+ const line=document.createElementNS(svg.namespaceURI,'polyline');line.setAttribute('points',points);line.setAttribute('fill','none');line.setAttribute('stroke','#e6b765');line.setAttribute('stroke-width','.65');svg.append(line);wall.append(svg);
+ for(const hold of s.holds){
+  const el=document.createElement('button');const available=reachable(hold);
+  el.className=`hold ${hold.type} ${available?'reachable':'future'} ${hold.row<s.row?'visited':''}`;
+  el.style.left=`${x(hold.col)}%`;el.style.top=`${y(hold.row)}%`;el.disabled=!available;
+  el.textContent=hold.type==='ledge'?'Top':`${symbols[hold.type]}${cost(hold)}`;
+  el.setAttribute('aria-label',`Column ${hold.col}, ${describe(hold)}`);
+  el.onmouseenter=el.onfocus=()=>{if(available)$('preview').textContent=describe(hold);};el.onclick=()=>move(hold);
+  if(s.placements.some(p=>p.row===hold.row&&p.col===hold.col)){const pin=document.createElement('span');pin.className='placed';pin.textContent='◆';el.append(pin);}
+  wall.append(el);
+ }
+ const climber=document.createElement('div');climber.className='climber';climber.textContent='◆';climber.style.left=`${x(s.col)}%`;climber.style.top=`${y(s.row)}%`;wall.append(climber);
+}
+function x(col){return 12+col*19;}
+function y(row){return 94-row*9.5;}
+$('scenario').onchange=start;$('restart').onclick=start;$('protect').onclick=protect;$('chalk').onclick=chalk;
+$('aid').onclick=()=>setMode(mode==='aid'?'climb':'aid');$('ascend').onclick=()=>setMode(mode==='ascend'?'climb':'ascend');$('axe').onclick=()=>setMode(mode==='axe'?'climb':'axe');
+$('snack').onclick=()=>eat('snacks');$('meal').onclick=()=>eat('meals');$('bivy').onclick=bivy;$('next').onclick=next;$('retreat').onclick=retreat;
+document.addEventListener('keydown',event=>{
+ if(event.target.matches('select,input,textarea')||event.altKey||event.ctrlKey||event.metaKey||event.repeat)return;
+ if(event.target.matches('button')&&[' ','Enter'].includes(event.key))return;
+ const dx={ArrowLeft:-1,ArrowUp:0,ArrowRight:1}[event.key];
+ if(dx!==undefined){event.preventDefault();const h=s.holds.find(h=>h.row===s.row+1&&h.col===s.col+dx);if(h)move(h);return;}
+ const action={' ':protect,c:chalk,a:()=>setMode(mode==='aid'?'climb':'aid'),u:()=>setMode(mode==='ascend'?'climb':'ascend'),i:()=>setMode(mode==='axe'?'climb':'axe'),e:next,Escape:retreat}[event.key];
+ if(action){event.preventDefault();action();}
+});
+start();
+</script>
+</html>

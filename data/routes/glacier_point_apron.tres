@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "glacier_point_apron"
+display_name = "Glacier Point Apron"
+grade = "5.9 slab"
+description = "A sweep of smooth granite below Glacier Point. The climbing is all about trusting your feet on tiny edges."
+required_gear = {"cam": 2, "harness": 1, "rope": 1}
+pitches = Array[int]([2, 2, 3])
+moves_per_pitch = 8
+destination_hub = "glacier_point"
+destination_spawn = "apron_top"

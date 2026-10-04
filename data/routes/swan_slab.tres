@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "swan_slab"
+display_name = "Swan Slab"
+grade = "easy"
+description = "A low-angle slab a short walk from Camp 4, where generations of climbers have learned the basics."
+pitches = Array[int]([1])
+moves_per_pitch = 7
+top_rope = true

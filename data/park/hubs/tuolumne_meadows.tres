@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="HubData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/hub_data.gd" id="1_hub"]
+
+[resource]
+script = ExtResource("1_hub")
+id = "tuolumne_meadows"
+display_name = "Tuolumne Meadows"
+elevation_ft = 8600
+tagline = "High country, Tioga Road (open about June to November)"
+description = "One of the largest subalpine meadows in the Sierra Nevada, ringed by granite domes and peaks. Tioga Road opens only after plows clear the snow, so this hub can be reached from early summer into fall."
+activities = PackedStringArray("Summer-only alpine meadows and wildflowers", "Lembert Dome, Soda Springs, and Parsons Lodge", "High Sierra trailheads: John Muir Trail, Cathedral Lakes", "Tuolumne River and Dog Lake")
+latitude = 37.8736
+longitude = -119.3597
+starts_locked = true
+locked_hint = "The high country is still ahead of you. Tuolumne opens once you're ready for alpine climbing (ice axe, crampons, and an alpine pack)."
+west = -119.412
+east = -119.318
+south = 37.858
+north = 37.896
+meters_per_tile = 40.0
+walk_min_elevation = 2550.0
+walk_max_elevation = 3000.0

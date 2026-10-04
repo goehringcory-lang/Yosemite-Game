@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/items.png" id="1_3s572"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_28emq"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qi2n5"]
+atlas = ExtResource("1_3s572")
+region = Rect2(16, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_28emq")
+id = "miners_lettuce"
+display_name = "Miner's Lettuce"
+description = "Gold Rush miners ate these round leaves to stave off scurvy."
+icon = SubResource("AtlasTexture_qi2n5")
+forage_seasons = 1
+habitat = 2
+forage_per_day = 3

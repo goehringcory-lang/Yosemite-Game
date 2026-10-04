@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/enid_michael.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "enid_michael"
+display_name = "Enid Michael"
+years = "1883–1966"
+affiliation = "National Park Service"
+bio = "Botanist and one of the park's first women ranger-naturalists, working seasonally from 1921 to 1943. She kept the wildflower garden at the Yosemite Museum and wrote hundreds of nature notes about the valley's plants and birds."
+idle_lines = PackedStringArray("Know a plant before you pick it, and never take the last one.", "Every plant here has a name, and most had several before mine.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.659, 0.627, 0.471, 1)
+home = "Sentinel Dome"
+needs_tribal_review = false
+sources = "To verify: Yosemite Nature Notes archive; NPS history of women rangers."

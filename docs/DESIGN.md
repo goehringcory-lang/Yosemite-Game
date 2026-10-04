@@ -1,0 +1,204 @@
+# Yosemite Game: Design
+
+Working design doc. Farming has been removed from the game. Anything marked **(open)** still needs a decision.
+
+## Core idea
+
+You travel through Yosemite, meet real people from its history, and hear their stories. Their quests give you climbing gear, and the climbers at Camp 4 will trade you more of it for food. New gear opens climbing routes, and those routes lead to new parts of the park. To survive longer climbs, you gather, store, and cook food.
+
+```
+Hear a story → Take a quest → Gather / cook / climb → Earn gear
+      ↑                                                   ↓
+New area & new people  ←  Climb a route  ←  Pack food for the climb
+```
+
+## Pillars
+
+1. **Stories first.** Every quest giver is a real historical person, and their quest teaches something true about the park.
+2. **Gear opens the map.** Climbing is the main way to reach new areas. The map follows real geography loosely, so walking trails don't let you skip ahead.
+3. **Food is fuel.** Short climbs need a snack. Big walls need days of stored, cooked food. Acorns are the staple.
+4. **Seasons matter.** The existing clock and seasons stay. Miner's lettuce grows in spring, manzanita berries ripen in summer, and acorns drop in fall.
+
+## Gear progression
+
+Gear comes two ways, and there's no money in the game:
+
+- **Quest rewards.** The key pieces for each tier, the ones that open a new area, come from the people you meet once they trust you.
+- **Barter at Camp 4 and the Curry Village Mountain Shop.** Climbers and the shop clerk trade gear for food and forage, a climber's real currency. Trades fill out your rack (extra cams, quickdraws) rather than skipping a tier, so the story still sets the pace: every offer needs gear you already own. The offers are data in `data/shops/*.tres`.
+
+| Tier | Gear | Example routes | Opens up |
+|---|---|---|---|
+| 0 | Approach shoes, chalk bag | Camp 4 boulders | Valley floor |
+| 1 | Rope, harness, 2 cams | Glacier Point Apron | **Glacier Point** |
+| 2 | More cams, quickdraws, belay/rappel device | Royal Arches, Snake Dike | North Dome rim, **Half Dome** |
+| 3 | Aiders, ascenders, haul bag, portaledge | The Nose, Salathé Wall | **El Capitan**, the north rim |
+| 4 | Ice axe, crampons, alpine pack | Cathedral Peak, Lyell Glacier | **Tuolumne Meadows**, high country, **Mono Lake** |
+
+How the gear affects the climbing minigame:
+- **Rope length** sets how long each pitch can be.
+- **Number of cams** sets how many placements you get per pitch. Too few means long runouts and a riskier climb.
+- **Big wall gear** lets a climb last several days, with nights on a portaledge. Multi-day climbs are where food matters most.
+
+## Food, storage & cooking
+
+### Acorns: the long-term staple
+The acorn cycle follows traditional Southern Sierra Miwuk and Ahwahneechee practice. All details must be checked with tribal advisors (see below).
+
+1. **Gather** black oak acorns in fall.
+2. **Store** them in a **chuckah** (acorn granary) that you build. Stored acorns keep all year. A bigger or second granary holds more.
+3. **Process:** crack and shell, grind at a bedrock mortar, then leach the meal with water to remove the bitter tannins.
+4. **Cook** with hot stones into mush or cakes. Acorn meals are slow-burning, long-lasting climbing food.
+
+### Seasonal foods: quick energy
+They spoil fast (in a day or two), so they're good for short climbs or as a boost partway up.
+
+| Food | Season | Notes |
+|---|---|---|
+| Miner's lettuce | Spring | Fresh greens |
+| Wild strawberries | Late spring | |
+| Manzanita berries | Summer | Can also be made into cider |
+| Blue elderberries | Late summer | Must be cooked |
+| Thimbleberries / gooseberries | Summer | |
+| Trout | Most seasons | From the Merced River |
+| Pine nuts | Fall | Traded from Paiute people east of the crest (Mono Lake) |
+| Lamon orchard apples | Fall | James Lamon's 1860s orchard (now Curry Village) |
+
+### Cooking & meals
+- You cook at a **campfire**. A recipe combines ingredients into a meal.
+- Every meal has **energy** (stamina on the climb) and **shelf life** (how many days it lasts in your pack).
+- Before a climb you **pack a food bag**. The route tells you roughly how many days it takes, and you need enough food to cover it.
+
+| Meal type | Energy | Shelf life | Best for |
+|---|---|---|---|
+| Fresh forage | Low–medium | 1–2 days | Day climbs, snacks |
+| Cooked seasonal dish | Medium | 2–3 days | Day climbs, short multi-pitch |
+| Acorn mush / cakes | High | Many days | Big walls, expeditions |
+
+## Climbing minigame
+
+The next design is in [Climbing minigame: first design](CLIMBING_MINIGAME.md), with a [standalone playable browser study](climbing-prototype.html). It explores equipment actions and later progression separately from the current Godot implementation, for integration later.
+
+Short, and played one pitch at a time:
+- **Holds:** pick your next hold. Harder moves cost more stamina.
+- **Protection:** place a cam when you're at a good crack. Cams are limited, and falling far from your last placement hurts more.
+- **Stamina:** drops as you climb. Eat from your food bag at belay ledges.
+- **Pitches:** a route is a chain of pitches. A big wall adds bivy nights, and each night uses up food.
+- **Failure:** you lower off safely and keep your gear. You only lose time and food.
+
+**(open)** Visual style of the minigame: a side-view wall screen that the top-down game switches into is the likely choice.
+
+## Map (loose real geography)
+
+| Area | Reached by | Themes / people |
+|---|---|---|
+| **Valley floor**: Ahwahnee, Camp 4, the village, meadows | Start | Ahwahneechee homeland, acorn gathering, early climbers |
+| **Glacier Point** | Tier 1 climb | Views, early tourism, the Firefall |
+| **North Dome / rim** | Tier 2 climb | |
+| **Half Dome** | Tier 2 climb | George Anderson's 1875 first ascent |
+| **El Capitan** | Tier 3 big wall | Golden-age climbing |
+| **Tuolumne Meadows** | Tier 4 | John Muir, Cathedral Peak |
+| **Mono Lake / east side** | Tier 4 | Mono Lake Kutzadika'a, Paiute trade routes |
+| **Wawona / Mariposa Grove** | **(open)** | Galen Clark, the giant sequoias |
+
+## People
+
+Everyone is a real historical person. This is a starting list. Some of them are only possible NPCs until we confirm permission.
+
+### Native people and nations
+The quest line should feature the Ahwahneechee and all seven tribes traditionally associated with Yosemite:
+
+1. American Indian Council of Mariposa County (Southern Sierra Miwuk Nation)
+2. Tuolumne Band of Me-Wuk Indians
+3. Picayune Rancheria of the Chukchansi Indians
+4. North Fork Rancheria of Mono Indians
+5. Mono Lake Kutzadika'a Tribe
+6. Bishop Paiute Tribe
+7. Bridgeport Indian Colony
+
+Possible historical figures:
+
+| Person | Story ideas |
+|---|---|
+| **Tenaya** | Ahwahneechee leader in 1851 and the Mariposa Battalion. Tell this truthfully, including the violence of removal. |
+| **Maria Lebrado (Totuya)** | Tenaya's granddaughter. She returned to the valley in 1929 and identified village sites. |
+| **Maggie "Tabuce" Howard** | Mono Lake Paiute. Demonstrated traditional skills at the Yosemite Museum. A natural teacher for the acorn and granary quests. |
+| **Lucy Telles** | Basket weaver (Mono Lake Paiute/Miwuk). Her very large basket. |
+| **Carrie Bethel** | Mono Lake Paiute basket weaver |
+| **Chris Brown (Chief Lemee)** | Miwuk dancer and cultural demonstrator |
+| **Julia Parker** | Weaver and acorn demonstrator. Died in 2024, so we need her family's permission. |
+
+### Explorers, naturalists, rangers
+| Person | Story / quest ideas |
+|---|---|
+| **John Muir** | Cathedral Peak (1869), glaciers. Tier 4 gatekeeper. |
+| **Galen Clark** | First Guardian of Yosemite, Mariposa Grove |
+| **George Anderson** | Drilled his way up Half Dome in 1875 |
+| **James Lamon** | First non-Native settler to stay year-round. Orchard (apples). |
+| **Clare Marie Hodges** | First woman ranger (1918) |
+| **Enid Michael** | Early naturalist and botanist. A plant-ID / foraging mentor. |
+| **Ansel Adams** | Photography quests, views from the rim |
+
+### Climbers
+| Person | Story / quest ideas |
+|---|---|
+| **Jules Eichorn, Dick Leonard, Bestor Robinson** | First technical climbs in the Valley (Cathedral Spires, 1934). Rope and belay basics. **Tier 1 givers.** |
+| **John Salathé** | Blacksmith who forged hard steel pitons. Lost Arrow, Salathé Wall. |
+| **Allen Steck** | Sentinel with Salathé (1950) |
+| **Warren Harding** | First ascent of the Nose (1958). **Tier 3 giver.** |
+| **Royal Robbins** | Half Dome NW Face (1957). Clean climbing. |
+| **Tom Frost, Chuck Pratt** | Golden-age big walls |
+| **Beverly Johnson** | First woman to solo El Cap (1978) |
+| *Yvon Chouinard, Ray Jardine, Lynn Hill* | Still living, so we'd need permission (see open questions) |
+
+## Timeline framing
+
+These people lived from before 1851 through the 1990s, and the gear they used changed over that time (hemp rope → steel pitons → cams). Options:
+
+- **A. Timeless valley.** Everyone is present together, and nobody explains how. This is the simplest option.
+- **B. Stories as memories.** You find places and objects, and the stories play out as vignettes from their own time.
+- **C. The gear follows history.** You move forward through the eras, and your gear modernizes the way real climbing gear did.
+
+**Chosen: A, a timeless valley.** Everyone the player meets is a real historical person, and all of them share one season with no explanation or magic. Each of them lives in their own era, and everyone is treated equally as a living person. The Guardian's Register, which Galen Clark gives the player, works as the quest log and records what really happened. See [STORY.md](../STORY.md).
+
+## Cultural review & rights
+
+- **Tribal consultation.** Before any Native story, character, food practice, or place name ships, it should be reviewed by the associated tribes. The NPS tribal liaison is a good first contact. Until then, their dialogue is placeholder text marked `TRIBAL REVIEW NEEDED`.
+- **Naming.** Use each tribe's own preferred spelling (Miwuk, Miwok, and Me-Wuk all appear). Avoid depicting ceremonies or sacred objects unless the tribes invite it.
+- **Real people.** Deceased historical figures are generally fine to portray respectfully. Living people (Chouinard, Jardine, Hill) and people who died recently (Julia Parker) need permission, or should be left out. This matters especially for a game sold on Steam.
+
+## What changes in the code
+
+| Keep | Remove / replace | Add |
+|---|---|---|
+| GameClock (days, seasons) | Farm, crops, hoe/watering/seeds | NPC + dialogue system |
+| Inventory, ItemDB, forage spawner | Shipping crate & money | Quest system (steps, rewards) |
+| Save system | Farm hotbar | Gear inventory + gear-gated areas |
+| Tent (rest/save) | | Chuckah granary, acorn processing |
+| Day/night lighting | | Campfire cooking, meals, food bag |
+| | | Climbing minigame scene |
+| | | Multiple map areas with transitions |
+
+## Built so far
+
+All of this is wired into the World. Each region's people, climbs, and cooking spots live in a story overlay, `scenes/story/content/<region_id>.tscn`, which World adds to the region on first visit (`StoryContent.attach`). Mapgen never touches these files.
+
+| System | Files | Notes |
+|---|---|---|
+| Gear | `scripts/story/gear.gd`, `data/gear/*.tres` | Autoload `Gear`. You start with approach shoes and a chalk bag. |
+| Quests & dialogue | `scripts/story/quest_log.gd`, `quest_data.gd`, `character_data.gd`, `dialogue_box.gd`, `npc.gd` | Autoload `QuestLog`. Quest steps: have, have_food, talk, chuckah, stored, made, climbed. |
+| Food & spoilage | `scripts/story/food_db.gd`, `larder.gd`, `data/food/*.tres` | Autoloads `FoodDB` (energy, shelf life) and `Larder` (spoils food overnight). |
+| Chuckah | `scripts/story/granary.gd`, `chuckah.gd` | Autoload `Granary`. Stored acorns never spoil, and one chuckah holds 40. |
+| Cooking | `scripts/story/recipes.gd`, `station.gd`, `data/recipes/*.tres` | Stations: campfire, bedrock mortar, leaching basin. Acorn chain: 4 acorns → flour → leached meal → mush or cakes. |
+| Climbing | `scripts/climb/*`, `scenes/climb/*`, `data/routes/*.tres` | Rules are in `ClimbState`. Routes: Swan Slab (top-rope practice) and Glacier Point Apron (rope, harness, 2 cams). |
+| Journal | `scripts/story/journal.gd` | Press J. Shows quests, gear, food with days left, the chuckah, and climbs. Pauses the clock. |
+| Tests | `tests/story_test.tscn`, `tests/world_story_test.tscn` | Run headless. The world test uses its own save file. |
+
+First playable stretch:
+1. **Dick Leonard:** climb Swan Slab and carry some trail food. The reward is a rope, a harness, and 2 cams.
+2. **Tabuce:** gather 12 acorns in fall. She then shows you how to build a chuckah. Build it and store the acorns, and she teaches you the acorn recipes.
+3. **The Glacier Point Apron** leads to Glacier Point.
+
+Still open:
+- Building materials for the chuckah. For now it only costs time. Settle this during tribal review.
+- Cams from 1930s climbers: settled by the timeline choice. Gear is described as "what they can spare from their kit," simplified to its modern version.
+- Real art for stations and the climbing screen. They're placeholder shapes for now. NPCs have generated pixel sprites (see [CAST.md](CAST.md)); hand-drawn replacements can use the same sheet layout.

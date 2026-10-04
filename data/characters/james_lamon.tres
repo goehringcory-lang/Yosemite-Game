@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/james_lamon.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "james_lamon"
+display_name = "James Lamon"
+years = "1817–1875"
+affiliation = "Settler"
+bio = "One of the first non-Native settlers to live in Yosemite Valley year-round. He built a cabin near the upper end of the valley around 1859 and planted apple trees there. Some of the orchard still grows near today's Curry Village."
+idle_lines = PackedStringArray("Apples keep in a cool cellar all winter. Better than anything you'll find in a tin.", "First winter I stayed, the snow came up to the windows. Nobody else stayed that year.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.659, 0.227, 0.165, 1)
+home = "Lamon Homestead"
+needs_tribal_review = false
+sources = "To verify: NPS Yosemite history; Hank Johnston, Yosemite's Yesterdays."

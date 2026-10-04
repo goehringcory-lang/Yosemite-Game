@@ -1,0 +1,9 @@
+# Godot 4 cache and imported-asset data (regenerated automatically)
+.godot/
+/android/
+
+# Exported builds
+/build/
+
+# Map generator downloads (elevation tiles, OpenStreetMap extracts)
+/tools/mapgen/cache/

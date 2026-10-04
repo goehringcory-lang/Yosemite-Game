@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/recipe_data.gd" id="1_recipe"]
+
+[resource]
+script = ExtResource("1_recipe")
+id = "acorn_flour"
+display_name = "Acorn Flour"
+station = "mortar"
+inputs = {"black_oak_acorn": 4}
+output_id = "acorn_flour"
+output_count = 1
+minutes = 60
+description = "Crack and shell the acorns, then pound them fine in a bedrock mortar."

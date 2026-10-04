@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/carrie_bethel.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "carrie_bethel"
+display_name = "Carrie Bethel"
+years = "1898–1974"
+affiliation = "Mono Lake Paiute"
+bio = "Mono Lake Paiute basket weaver whose work won prizes at Yosemite Indian Field Days. One of her largest baskets took several years to weave and is in the Yosemite Museum collection."
+idle_lines = PackedStringArray("People have walked these passes for a very long time. Trade goes both ways.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.416, 0.290, 0.478, 1)
+home = "Soda Springs"
+needs_tribal_review = true
+sources = "Placeholder pending tribal review. To verify with tribal advisors and the Yosemite Museum: Bates and Lee, Tradition and Innovation (1990)."

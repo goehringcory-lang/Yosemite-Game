@@ -1,0 +1,82 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/dick_leonard.tres" id="2_r"]
+[ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="3_r"]
+[ext_resource type="Resource" path="res://data/routes/swan_slab.tres" id="4_r"]
+[ext_resource type="Resource" path="res://data/characters/jules_eichorn.tres" id="5_r"]
+[ext_resource type="Resource" path="res://data/characters/bestor_robinson.tres" id="6_r"]
+[ext_resource type="Resource" path="res://data/characters/royal_robbins.tres" id="7_r"]
+[ext_resource type="Resource" path="res://data/characters/john_salathe.tres" id="8_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_dirtbag.tres" id="9_r"]
+[ext_resource type="Resource" path="res://data/characters/bridget_degnan.tres" id="10_r"]
+[ext_resource type="Resource" path="res://data/characters/ansel_adams.tres" id="11_r"]
+[ext_resource type="Resource" path="res://data/characters/lucy_telles.tres" id="12_r"]
+[ext_resource type="Resource" path="res://data/characters/clare_hodges.tres" id="13_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_motorist.tres" id="14_r"]
+
+[node name="YosemiteVillageStory" type="Node2D"]
+
+[node name="DickLeonard" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "camp_4"
+offset = Vector2(16, -24)
+
+[node name="SwanSlab" parent="." instance=ExtResource("3_r")]
+position = Vector2(324, 258)
+route = ExtResource("4_r")
+
+[node name="JulesEichorn" parent="." instance=ExtResource("1_r")]
+character = ExtResource("5_r")
+spot = "camp_4"
+offset = Vector2(-24, -8)
+
+[node name="BestorRobinson" parent="." instance=ExtResource("1_r")]
+character = ExtResource("6_r")
+spot = "camp_4"
+offset = Vector2(4, -44)
+wander_radius = 12.0
+
+[node name="RoyalRobbins" parent="." instance=ExtResource("1_r")]
+character = ExtResource("7_r")
+spot = "camp_4"
+offset = Vector2(-44, -32)
+
+[node name="JohnSalathe" parent="." instance=ExtResource("1_r")]
+character = ExtResource("8_r")
+spot = "camp_4"
+offset = Vector2(-54, -7)
+
+[node name="VisitorDirtbag" parent="." instance=ExtResource("1_r")]
+character = ExtResource("9_r")
+spot = "camp_4"
+offset = Vector2(9, 10)
+wander_radius = 32.0
+
+[node name="BridgetDegnan" parent="." instance=ExtResource("1_r")]
+character = ExtResource("10_r")
+spot = "degnans_bakery"
+offset = Vector2(0, 24)
+
+[node name="AnselAdams" parent="." instance=ExtResource("1_r")]
+character = ExtResource("11_r")
+spot = "bests_studio"
+offset = Vector2(0, 24)
+wander_radius = 16.0
+
+[node name="LucyTelles" parent="." instance=ExtResource("1_r")]
+character = ExtResource("12_r")
+spot = "yosemite_museum"
+offset = Vector2(0, 24)
+
+[node name="ClareHodges" parent="." instance=ExtResource("1_r")]
+character = ExtResource("13_r")
+spot = "ranger_station"
+offset = Vector2(0, 24)
+wander_radius = 20.0
+
+[node name="VisitorMotorist" parent="." instance=ExtResource("1_r")]
+character = ExtResource("14_r")
+spot = "cooks_meadow"
+offset = Vector2(0, 0)
+wander_radius = 48.0

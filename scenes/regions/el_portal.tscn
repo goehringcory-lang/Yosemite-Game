@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/region.gd" id="1_frlwe"]
+[ext_resource type="PackedScene" path="res://scenes/regions/generated/el_portal_map.tscn" id="2_khqib"]
+[ext_resource type="Script" path="res://scripts/world/forage_spawner.gd" id="3_khqib"]
+
+[node name="ElPortal" type="Node2D" unique_id=884961295]
+y_sort_enabled = true
+script = ExtResource("1_frlwe")
+region_id = "el_portal"
+hub_id = "el_portal"
+display_name = "El Portal"
+
+[node name="Map" parent="." unique_id=558061917 instance=ExtResource("2_khqib")]
+
+[node name="Entities" type="Node2D" parent="." unique_id=415381500]
+y_sort_enabled = true
+
+[node name="Forage_el_portal" type="Node2D" parent="Entities" unique_id=1223427862 node_paths=PackedStringArray("ground", "flora", "oak_canopy")]
+y_sort_enabled = true
+script = ExtResource("3_khqib")
+ground = NodePath("../../Map/Ground")
+flora = NodePath("../../Map/Flora")
+oak_canopy = NodePath("../../Map/OakCanopy")
+amount_scale = 4.0
+
+[node name="Markers" type="Node2D" parent="." unique_id=1761504787]

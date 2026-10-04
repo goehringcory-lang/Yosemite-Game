@@ -1,0 +1,66 @@
+extends Node
+## Registry of every item in the game.
+##
+## To add an item: create a new ItemData resource in res://data/items/
+## (right-click > New Resource > ItemData), then add it to ITEMS below.
+## Foods also need an entry in FoodDB for their energy and shelf life.
+
+const ITEMS := [
+	# Wild forage
+	preload("res://data/items/wild_strawberry.tres"),
+	preload("res://data/items/miners_lettuce.tres"),
+	preload("res://data/items/sierra_onion.tres"),
+	preload("res://data/items/yampah.tres"),
+	preload("res://data/items/black_oak_acorn.tres"),
+	preload("res://data/items/manzanita_berries.tres"),
+	preload("res://data/items/morel_mushroom.tres"),
+	preload("res://data/items/blue_elderberries.tres"),
+	preload("res://data/items/yerba_buena.tres"),
+	preload("res://data/items/toyon_berries.tres"),
+	# Prepared food (see Recipes)
+	preload("res://data/food/acorn_flour.tres"),
+	preload("res://data/food/leached_acorn_meal.tres"),
+	preload("res://data/food/acorn_mush.tres"),
+	preload("res://data/food/acorn_cake.tres"),
+	preload("res://data/food/elderberry_sauce.tres"),
+	preload("res://data/food/manzanita_cider.tres"),
+	preload("res://data/food/roasted_morels.tres"),
+	preload("res://data/food/toasted_toyon.tres"),
+	preload("res://data/food/yerba_buena_tea.tres"),
+	# Story items: gifts, trades, and materials from quests
+	preload("res://data/story_items/lamon_apple.tres"),
+	preload("res://data/story_items/degnan_loaf.tres"),
+	preload("res://data/story_items/pine_nuts.tres"),
+	preload("res://data/story_items/model_a_axle.tres"),
+	preload("res://data/story_items/anderson_eyebolt.tres"),
+	preload("res://data/story_items/sourdough_starter.tres"),
+	# Village Store trail food (see data/shops/village_store.tres)
+	preload("res://data/food/trail_mix.tres"),
+	preload("res://data/food/dried_apples.tres"),
+	# Camp Curry Store food (see data/shops/curry_store.tres)
+	preload("res://data/food/pilot_bread.tres"),
+	preload("res://data/food/cheddar_wedge.tres"),
+	preload("res://data/food/dried_apricots.tres"),
+	preload("res://data/food/beef_jerky.tres"),
+	preload("res://data/food/chocolate_bar.tres"),
+]
+
+var _by_id: Dictionary = {}
+
+
+func _ready() -> void:
+	for item: ItemData in ITEMS:
+		_by_id[item.id] = item
+
+
+## Returns null if [param id] isn't a registered item.
+func get_item(id: String) -> ItemData:
+	return _by_id.get(id)
+
+
+func forage_items() -> Array[ItemData]:
+	var result: Array[ItemData] = []
+	for item: ItemData in ITEMS:
+		if item.forage_per_day > 0:
+			result.append(item)
+	return result

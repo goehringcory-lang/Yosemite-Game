@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/tent.gd" id="1_sbp2i"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tent.png" id="2_svq73"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2m50l"]
+size = Vector2(26, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_88ffe"]
+size = Vector2(30, 18)
+
+[node name="Tent" type="StaticBody2D" unique_id=1982925934]
+collision_mask = 0
+script = ExtResource("1_sbp2i")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1391631469]
+texture = ExtResource("2_svq73")
+offset = Vector2(0, -12)
+
+[node name="Collision" type="CollisionShape2D" parent="." unique_id=992125621]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_2m50l")
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=1890438172]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="Hitbox" unique_id=26147077]
+position = Vector2(0, -9)
+shape = SubResource("RectangleShape2D_88ffe")

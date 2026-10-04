@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/black_oak.gd" id="1_emhv1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/oak_trunk.png" id="2_a34vn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/oak_canopy.png" id="3_5g6i3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j7tbe"]
+size = Vector2(8, 5)
+
+[node name="BlackOak" type="StaticBody2D" unique_id=1903779846]
+collision_mask = 0
+script = ExtResource("1_emhv1")
+
+[node name="Trunk" type="Sprite2D" parent="." unique_id=1676640127]
+texture = ExtResource("2_a34vn")
+offset = Vector2(0, -22)
+
+[node name="Canopy" type="Sprite2D" parent="." unique_id=1167128279]
+texture = ExtResource("3_5g6i3")
+offset = Vector2(0, -22)
+
+[node name="Collision" type="CollisionShape2D" parent="." unique_id=1910488887]
+position = Vector2(0, -3)
+shape = SubResource("RectangleShape2D_j7tbe")

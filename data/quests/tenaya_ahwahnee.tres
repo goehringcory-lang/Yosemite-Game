@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "tenaya_ahwahnee"
+title = "Ahwahnee"
+giver = "tenaya"
+requires = PackedStringArray("clark_register")
+intro = PackedStringArray("[Placeholder dialogue pending tribal review.]", "You carry Clark's book. What does it say about this valley before 1851?", "Our villages were here. In 1851 soldiers came, burned our homes and our food, and made us leave.", "Take that to Clark and see if he writes it down.")
+steps = [{"type": "talk", "target": "galen_clark", "objective": "Tell Galen Clark what Tenaya said", "reminder": "Clark is by the homestead gate.", "done": ["(Clark reads it twice before he speaks.)", "It's true. The Battalion came through in '51, years before the Grant. My pages start after it, as if nothing came before.", "Write it at the front of the book, not the back."]}]
+outro = PackedStringArray()
+reward_unlocks = PackedStringArray("register_ahwahnee")

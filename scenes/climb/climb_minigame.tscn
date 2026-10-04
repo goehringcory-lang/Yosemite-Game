@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/climb_minigame.gd" id="1_climb"]
+
+[node name="ClimbMinigame" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_climb")

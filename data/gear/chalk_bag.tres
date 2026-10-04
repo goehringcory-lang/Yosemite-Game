@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/chalk_bag.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "chalk_bag"
+display_name = "Chalk Bag"
+description = "Dry hands hold better on warm granite."
+icon = ExtResource("2_icon")
+tier = 0

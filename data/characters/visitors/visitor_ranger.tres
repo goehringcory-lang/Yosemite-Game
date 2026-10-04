@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_ranger.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_ranger"
+display_name = "Ranger-naturalist"
+years = "1950s"
+affiliation = "National Park Service"
+bio = "An everyday visitor or worker at Curry Village. Not a historical figure."
+idle_lines = PackedStringArray("Evening program starts at the amphitheater at eight. Bring a jacket, it gets cold when the sun leaves the wall.", "See that gray streak up the cliff? That is where the rock came off. Keep to the trails below the wall.", "Stay on the boardwalk in Stoneman Meadow. Every footprint shows for a season.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Curry Village"
+visitor = true

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "snake_dike"
+display_name = "Snake Dike"
+grade = "5.7 R, 8 pitches"
+description = "A thin dike of harder rock snakes up the smooth southwest shoulder of Half Dome. Protection is sparse, and the climbing is easier than it looks and scarier than it sounds."
+first_ascent = "Eric Beck, Jim Bridwell, and Chris Fredericks, 1965"
+required_gear = {"rope": 1, "harness": 1, "cam": 2, "quickdraw": 6, "belay_device": 1}
+pitches = Array[int]([2, 3, 3, 2, 3])
+moves_per_pitch = 9
+nights = 0

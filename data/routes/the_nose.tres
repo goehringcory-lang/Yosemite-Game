@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "the_nose"
+display_name = "The Nose"
+grade = "VI 5.9 C2, 31 pitches"
+description = "The prow of El Capitan: three thousand feet of cracks, pendulums, and roofs. Most parties spend several nights on the wall."
+first_ascent = "Warren Harding, Wayne Merry, and George Whitmore, 1958"
+required_gear = {"rope": 1, "harness": 1, "cam": 8, "quickdraw": 6, "aiders": 2, "ascenders": 2, "haul_bag": 1, "portaledge": 1}
+pitches = Array[int]([3, 3, 4, 3, 4, 4, 5, 4, 3])
+moves_per_pitch = 9
+nights = 2

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/clare_hodges.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "clare_hodges"
+display_name = "Clare Marie Hodges"
+years = "1890–1970"
+affiliation = "National Park Service"
+bio = "Hired in 1918 as Yosemite's first woman ranger, during World War I when many men had gone to war. She patrolled the valley on horseback."
+idle_lines = PackedStringArray("They said a woman couldn't do the job. I had a horse and a hat, same as anybody.", "Keep your food packed away. Bears learn faster than visitors.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.478, 0.447, 0.282, 1)
+home = "Ranger station, Yosemite Village"
+needs_tribal_review = false
+sources = "To verify: NPS Yosemite history; NPS women in parks history."

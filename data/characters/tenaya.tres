@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/tenaya.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "tenaya"
+display_name = "Tenaya"
+years = "died 1853"
+affiliation = "Ahwahneechee"
+bio = "Leader of the Ahwahneechee when the Mariposa Battalion entered Yosemite Valley in 1851. The battalion burned villages and food stores and forced his people out; his youngest son was killed. How his life and words are told here must be worked out with the associated tribes."
+idle_lines = PackedStringArray("This is Ahwahnee. People lived here long before your book.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.541, 0.416, 0.282, 1)
+home = "Tenaya Creek, near Mirror Lake"
+needs_tribal_review = true
+sources = "Placeholder pending tribal review. Background to verify with tribal advisors: Lafayette Bunnell, Discovery of the Yosemite (1880), read critically; NPS Yosemite ethnographic sources."

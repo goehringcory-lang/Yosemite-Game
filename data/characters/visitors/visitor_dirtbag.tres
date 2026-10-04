@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_dirtbag.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_dirtbag"
+display_name = "Camp 4 climber"
+years = "1970s"
+affiliation = "Park visitor"
+bio = "An everyday visitor from the 1970s. Not a historical figure."
+idle_lines = PackedStringArray("Spent my last dollar on chalk. Worth it.", "Got shut down on a crack this morning. Going back tomorrow.", "If you're heading up, tell someone where you're going.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Camp 4"
+visitor = true

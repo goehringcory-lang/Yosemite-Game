@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/items.png" id="1_xs4ql"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_v4bwa"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_07ryh"]
+atlas = ExtResource("1_xs4ql")
+region = Rect2(96, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_v4bwa")
+id = "morel_mushroom"
+display_name = "Morel Mushroom"
+description = "A spring prize, most common where fire burned the year before."
+icon = SubResource("AtlasTexture_07ryh")
+forage_seasons = 1
+habitat = 2
+forage_per_day = 1

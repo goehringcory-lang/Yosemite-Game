@@ -1,0 +1,85 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/maggie_howard.tres" id="2_r"]
+[ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="3_r"]
+[ext_resource type="Resource" path="res://data/routes/glacier_point_apron.tres" id="4_r"]
+[ext_resource type="Resource" path="res://data/characters/maria_lebrado.tres" id="5_r"]
+[ext_resource type="Resource" path="res://data/routes/royal_arches.tres" id="6_r"]
+[ext_resource type="Resource" path="res://data/characters/tenaya.tres" id="7_r"]
+[ext_resource type="Resource" path="res://data/characters/george_anderson.tres" id="10_r"]
+[ext_resource type="Resource" path="res://data/routes/snake_dike.tres" id="11_r"]
+[ext_resource type="Resource" path="res://data/characters/warren_harding.tres" id="12_r"]
+[ext_resource type="Resource" path="res://data/characters/beverly_johnson.tres" id="13_r"]
+[ext_resource type="Resource" path="res://data/routes/the_nose.tres" id="14_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_angler.tres" id="15_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_ccc_worker.tres" id="16_r"]
+
+[ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="door_r"]
+
+[node name="YosemiteValleyStory" type="Node2D"]
+
+[node name="Tabuce" parent="." instance=ExtResource("1_r")]
+position = Vector2(2968, 568)
+character = ExtResource("2_r")
+
+[node name="GlacierPointApron" parent="." instance=ExtResource("3_r")]
+position = Vector2(3336, 1036)
+route = ExtResource("4_r")
+
+[node name="MariaLebrado" parent="." instance=ExtResource("1_r")]
+character = ExtResource("5_r")
+spot = "the_ahwahnee"
+offset = Vector2(-104, -4)
+
+[node name="RoyalArches" parent="." instance=ExtResource("3_r")]
+position = Vector2(3448, 568)
+route = ExtResource("6_r")
+
+[node name="Tenaya" parent="." instance=ExtResource("1_r")]
+character = ExtResource("7_r")
+spot = "mirror_lake"
+offset = Vector2(16, -16)
+
+
+
+[node name="GeorgeAnderson" parent="." instance=ExtResource("1_r")]
+character = ExtResource("10_r")
+spot = "happy_isles"
+offset = Vector2(-38, 0)
+
+[node name="SnakeDike" parent="." instance=ExtResource("3_r")]
+position = Vector2(3920, 1120)
+route = ExtResource("11_r")
+
+[node name="WarrenHarding" parent="." instance=ExtResource("1_r")]
+character = ExtResource("12_r")
+spot = "el_capitan_meadow"
+offset = Vector2(-24, -16)
+
+[node name="BeverlyJohnson" parent="." instance=ExtResource("1_r")]
+character = ExtResource("13_r")
+spot = "el_capitan_meadow"
+offset = Vector2(16, -24)
+
+[node name="TheNose" parent="." instance=ExtResource("3_r")]
+position = Vector2(1568, 1456)
+route = ExtResource("14_r")
+
+[node name="VisitorAngler" parent="." instance=ExtResource("1_r")]
+character = ExtResource("15_r")
+spot = "yosemite_valley_lodge"
+offset = Vector2(-6, 25)
+wander_radius = 24.0
+
+[node name="VisitorCccWorker" parent="." instance=ExtResource("1_r")]
+character = ExtResource("16_r")
+spot = "four_mile_trailhead"
+offset = Vector2(16, 0)
+wander_radius = 32.0
+
+[node name="CurryVillageDoor" parent="." instance=ExtResource("door_r")]
+position = Vector2(3440, 992)
+label = "Curry Village"
+target_region = "curry_village"
+target_spawn = "west_road"

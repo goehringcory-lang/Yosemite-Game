@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/jules_eichorn.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "jules_eichorn"
+display_name = "Jules Eichorn"
+years = "1912–2000"
+affiliation = "Sierra Club Rock Climbing Section"
+bio = "Climber and music teacher who studied piano with Ansel Adams as a teenager. With Dick Leonard and Bestor Robinson he made the first ascent of Higher Cathedral Spire in 1934, and he made many first ascents in the High Sierra."
+idle_lines = PackedStringArray("Ansel taught me piano. The mountains taught me the rest.", "The Spires look impossible from the road. That's why we had to try.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.478, 0.478, 0.447, 1)
+home = "Camp 4"
+needs_tribal_review = false
+sources = "To verify: Steve Roper, Camp 4 (1994); Sierra Club Bulletin (1934)."

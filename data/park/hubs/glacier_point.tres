@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="HubData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/hub_data.gd" id="1_hub"]
+
+[resource]
+script = ExtResource("1_hub")
+id = "glacier_point"
+display_name = "Glacier Point"
+elevation_ft = 7214
+tagline = "Overlook on the Valley rim, Glacier Point Road (May to Nov)"
+description = "A granite overlook 3,200 feet above the Valley floor, facing Half Dome, Vernal and Nevada Falls, and the High Sierra. Glacier Point Road closes for winter snow, usually from November to May."
+activities = PackedStringArray("Views of Half Dome and the High Sierra", "Stargazing above the Valley", "Short hikes to Sentinel Dome and Washburn Point", "The Firefall, a summer-night tradition from 1872 to 1968")
+latitude = 37.7306
+longitude = -119.5738
+starts_locked = true
+locked_hint = "You can't reach the rim yet. Climb the Glacier Point Apron above Curry Village to open the way (rope, harness, and two cams)."
+west = -119.598
+east = -119.528
+south = 37.708
+north = 37.750
+meters_per_tile = 35.0
+walk_min_elevation = 1950.0
+walk_max_elevation = 2520.0

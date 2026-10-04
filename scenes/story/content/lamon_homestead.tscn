@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/chuckah.tscn" id="1_r"]
+[ext_resource type="PackedScene" path="res://scenes/story/station.tscn" id="2_r"]
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="3_r"]
+[ext_resource type="Resource" path="res://data/characters/galen_clark.tres" id="4_r"]
+[ext_resource type="Resource" path="res://data/characters/james_lamon.tres" id="5_r"]
+
+[node name="LamonHomesteadStory" type="Node2D"]
+
+[node name="Chuckah" parent="." instance=ExtResource("1_r")]
+position = Vector2(104, 128)
+
+[node name="Campfire" parent="." instance=ExtResource("2_r")]
+position = Vector2(184, 176)
+station = "campfire"
+display_name = "Campfire"
+
+[node name="BedrockMortar" parent="." instance=ExtResource("2_r")]
+position = Vector2(248, 152)
+station = "mortar"
+display_name = "Bedrock mortar"
+
+[node name="LeachingBasin" parent="." instance=ExtResource("2_r")]
+position = Vector2(296, 156)
+station = "leaching"
+display_name = "Leaching basin"
+
+[node name="GalenClark" parent="." instance=ExtResource("3_r")]
+character = ExtResource("4_r")
+spot = "gate"
+offset = Vector2(24, -16)
+
+[node name="JamesLamon" parent="." instance=ExtResource("3_r")]
+character = ExtResource("5_r")
+spot = "home"
+offset = Vector2(-48, 40)

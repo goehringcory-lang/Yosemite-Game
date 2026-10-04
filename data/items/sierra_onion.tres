@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/items.png" id="1_bx6a4"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_h3yks"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p0avh"]
+atlas = ExtResource("1_bx6a4")
+region = Rect2(32, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_h3yks")
+id = "sierra_onion"
+display_name = "Sierra Onion"
+description = "A small, pungent bulb that blooms pink in spring meadows."
+icon = SubResource("AtlasTexture_p0avh")
+forage_seasons = 1
+habitat = 1
+forage_per_day = 2

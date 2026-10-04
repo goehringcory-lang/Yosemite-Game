@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_stage_gent.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_stage_gent"
+display_name = "Stagecoach traveler"
+years = "1880s"
+affiliation = "Park visitor"
+bio = "An everyday visitor from the 1880s. Not a historical figure."
+idle_lines = PackedStringArray("I'm told the big trees were here before Rome was built.", "The driver says the road ahead is 'mostly' safe.", "I've come all the way from Boston to see a waterfall.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Wawona"
+visitor = true

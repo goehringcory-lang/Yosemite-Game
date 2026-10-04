@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_ccc_worker.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_ccc_worker"
+display_name = "Civilian Conservation Corps worker"
+years = "1930s"
+affiliation = "Park visitor"
+bio = "An everyday visitor from the 1930s. Not a historical figure."
+idle_lines = PackedStringArray("We're building trail and fighting fires. A dollar a day, and most of it goes home to my family.", "Hard work, but good food and mountains every morning.", "See that rock wall? My crew laid it stone by stone.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Yosemite Valley"
+visitor = true

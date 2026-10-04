@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/george_anderson.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "george_anderson"
+display_name = "George Anderson"
+years = "died 1884"
+affiliation = "Blacksmith and trail builder"
+bio = "Scottish-born blacksmith who made the first recorded ascent of Half Dome in October 1875. He drilled holes up the smooth granite, set iron eyebolts, and tied a rope between them. Others used his rope soon after, and later cables followed his line."
+idle_lines = PackedStringArray("Drill, bolt, step, drill again. It's slow, but it goes.", "They said nobody would ever stand on top of it.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.478, 0.165, 0.165, 1)
+home = "Happy Isles"
+needs_tribal_review = false
+sources = "To verify: NPS Half Dome history; Yosemite Nature Notes."

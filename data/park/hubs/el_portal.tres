@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="HubData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/hub_data.gd" id="1_hub"]
+
+[resource]
+script = ExtResource("1_hub")
+id = "el_portal"
+display_name = "El Portal"
+elevation_ft = 2000
+tagline = "Gateway town on the Merced River, Highway 140"
+description = "Just outside the Arch Rock Entrance, where the Merced River canyon opens up. From 1907 to 1945 the Yosemite Valley Railroad ended here, and travelers rode the last miles into the Valley by stage. It sits 2,000 feet below the Valley, so spring arrives early."
+activities = PackedStringArray("El Portal Market: groceries and supplies", "Lowest, warmest hub: the first to green up in spring", "Swimming holes and fishing along the Merced", "Arch Rock Entrance into the park")
+latitude = 37.6747
+longitude = -119.7843
+west = -119.815
+east = -119.722
+south = 37.660
+north = 37.702
+meters_per_tile = 45.0
+walk_min_elevation = 450.0
+walk_max_elevation = 1000.0

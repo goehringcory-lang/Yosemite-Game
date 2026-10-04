@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "curry_starter"
+title = "Let the Bread Rise"
+giver = "jennie_curry"
+requires = PackedStringArray("degnan_bread")
+intro = PackedStringArray("Did Bridget send her starter? Our cook's been making bread like bricks all week.", "Bring me the jar and I'll see you're fed. This camp sits on James Lamon's old orchard, and the trees still bear.")
+steps = [{"type": "have", "item": "sourdough_starter", "count": 1, "consume": true, "objective": "Bring Bridget's sourdough starter to Jennie Curry", "reminder": "Bridget Degnan will give you a jar of starter. Mind you don't drop it.", "done": ["Oh, smell that. That's a proper starter."]}]
+outro = PackedStringArray("Take some of Lamon's apples. We've more than the guests can eat.", "And come back after dark sometime. Look up at Glacier Point around nine o'clock.")
+reward_items = {"lamon_apple": 6}

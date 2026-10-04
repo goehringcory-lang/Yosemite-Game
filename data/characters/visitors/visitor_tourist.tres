@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_tourist.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_tourist"
+display_name = "Tourist"
+years = "1930s"
+affiliation = "Park visitor"
+bio = "An everyday visitor or worker at Curry Village. Not a historical figure."
+idle_lines = PackedStringArray("I have taken forty photographs of Half Dome and none of them do it justice.", "Do you know when the fire falls tonight? I have been promised a wonder.", "What a place! Nothing in Ohio prepared me for it.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Curry Village"
+visitor = true

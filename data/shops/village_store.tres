@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ShopData" format=3]
+
+[ext_resource type="Script" path="res://scripts/shop/shop_offer.gd" id="1_ks2gc"]
+[ext_resource type="Script" path="res://scripts/shop/shop_data.gd" id="2_8jobk"]
+
+[sub_resource type="Resource" id="Resource_u0nlw"]
+script = ExtResource("1_ks2gc")
+kind = "item"
+id = "trail_mix"
+price = 40
+
+[sub_resource type="Resource" id="Resource_kqhn6"]
+script = ExtResource("1_ks2gc")
+kind = "item"
+id = "dried_apples"
+price = 20
+
+[resource]
+script = ExtResource("2_8jobk")
+keeper = "Village Store clerk"
+greeting = "Welcome to the Village Store. We'll swap you trail food that keeps for your fresh forage."
+nothing_yet = "We're sold out today."
+offers = Array[ExtResource("1_ks2gc")]([SubResource("Resource_u0nlw"), SubResource("Resource_kqhn6")])

@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="ShopData" format=3]
+
+[ext_resource type="Script" path="res://scripts/shop/shop_offer.gd" id="1_qsj76"]
+[ext_resource type="Script" path="res://scripts/shop/shop_data.gd" id="2_akkmp"]
+
+[sub_resource type="Resource" id="Resource_xqpua"]
+script = ExtResource("1_qsj76")
+id = "cam"
+price = 50
+requires = {
+"cam": 2
+}
+max_owned = 6
+
+[sub_resource type="Resource" id="Resource_nphu2"]
+script = ExtResource("1_qsj76")
+id = "quickdraw"
+amount = 2
+requires = {
+"rope": 1
+}
+max_owned = 8
+
+[sub_resource type="Resource" id="Resource_y1ek2"]
+script = ExtResource("1_qsj76")
+id = "belay_device"
+price = 40
+requires = {
+"harness": 1,
+"rope": 1
+}
+max_owned = 1
+
+[resource]
+script = ExtResource("2_akkmp")
+keeper = "Camp 4 climber"
+greeting = "Hey. Rope, cams, draws... everything's for trade, and I'm always hungry."
+nothing_yet = "Come back once you've got a rope and a couple of cams. Then I can help fill out your rack."
+offers = Array[ExtResource("1_qsj76")]([SubResource("Resource_xqpua"), SubResource("Resource_nphu2"), SubResource("Resource_y1ek2")])

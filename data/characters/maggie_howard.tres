@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/maggie_howard.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "maggie_howard"
+display_name = "Tabuce (Maggie Howard)"
+years = ""
+affiliation = "Mono Lake Paiute"
+bio = "A Mono Lake Paiute woman who for many years demonstrated traditional skills, including acorn preparation and basketry, for visitors at the Yosemite Museum. Dates, details, and how she is portrayed must be confirmed with the tribes and the Yosemite Museum before release."
+idle_lines = PackedStringArray("The oaks don't give the same every year. Some years you gather a lot, some years hardly any.", "Keep your chuckah off the ground, and the squirrels will have a harder time.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.55, 0.35, 0.3, 1)
+needs_tribal_review = true
+sources = "To verify with tribal advisors: Yosemite Museum records; NPS Yosemite ethnographic sources."
+home = "The black oaks, Yosemite Valley"

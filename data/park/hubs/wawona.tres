@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="HubData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/hub_data.gd" id="1_hub"]
+
+[resource]
+script = ExtResource("1_hub")
+id = "wawona"
+display_name = "Wawona"
+elevation_ft = 4000
+tagline = "History and giant sequoias, Wawona Road (Hwy 41)"
+description = "A meadow on the South Fork of the Merced River, home to the Wawona Hotel (1879) and the Yosemite History Center with its covered bridge. The Mariposa Grove, the park's largest stand of giant sequoias, is just up the road."
+activities = PackedStringArray("Yosemite History Center and the covered bridge", "Mariposa Grove of Giant Sequoias", "Wawona Store, meadow loop, and golf course", "South Fork Merced River")
+latitude = 37.5366
+longitude = -119.6555
+west = -119.680
+east = -119.590
+south = 37.500
+north = 37.556
+meters_per_tile = 45.0
+walk_min_elevation = 1150.0
+walk_max_elevation = 2100.0

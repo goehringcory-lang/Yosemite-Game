@@ -1,0 +1,341 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://scripts/world/region.gd" id="1_co1dh"]
+[ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="2_b4akk"]
+[ext_resource type="Script" path="res://scripts/world/seasonal_canopy.gd" id="3_2diyi"]
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/shop_counter.png" id="4_nvc5f"]
+[ext_resource type="Script" path="res://scripts/shop/vendor.gd" id="5_o2dg4"]
+[ext_resource type="Resource" path="res://data/shops/curry_mountain_shop.tres" id="6_se844"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/curry_shop_clerk.png" id="7_85yoq"]
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/practice_wall.png" id="8_qlxbd"]
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/crash_pad.png" id="9_85kk6"]
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/glass_case.png" id="10_yytm0"]
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/pack_rack.png" id="11_bdi0w"]
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/workbench.png" id="12_kbcy8"]
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/boot_bench.png" id="13_jtqvo"]
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/shop_stove.png" id="14_l77ut"]
+[ext_resource type="Script" path="res://scripts/world/frame_cycle.gd" id="15_6bm0k"]
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/rope_bin.png" id="16_x644f"]
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/stool.png" id="17_4qd00"]
+[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="18_6yltn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/info_sign.png" id="19_h0t4h"]
+[ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="20_67kdo"]
+[ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/shop_room.png" id="21_dsj7a"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c3xfk"]
+size = Vector2(96, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kcunp"]
+size = Vector2(8, 4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6r2ul"]
+size = Vector2(36, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qsqv0"]
+size = Vector2(70, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7nfpe"]
+size = Vector2(66, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_br3ms"]
+size = Vector2(66, 14)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whqru"]
+size = Vector2(66, 14)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pl3lt"]
+size = Vector2(30, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jvabv"]
+size = Vector2(58, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4cm7t"]
+size = Vector2(38, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oykn2"]
+size = Vector2(18, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ta7wa"]
+size = Vector2(26, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7bbs0"]
+size = Vector2(10, 5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_30i65"]
+size = Vector2(12, 4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ei34n"]
+size = Vector2(18, 14)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_easho"]
+size = Vector2(12, 4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5ycgy"]
+size = Vector2(18, 14)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2jkf8"]
+size = Vector2(44, 10)
+
+[node name="CurryMountainShop" type="Node2D" unique_id=656778507]
+y_sort_enabled = true
+script = ExtResource("1_co1dh")
+region_id = "curry_mountain_shop"
+hub_id = "yosemite_valley"
+display_name = "Mountain Shop"
+geo_anchor = Vector2(-119.5728, 37.7385)
+indoors = true
+
+[node name="Ground" type="TileMapLayer" parent="." unique_id=259566501]
+z_index = -10
+tile_map_data = PackedByteArray("AAAAAAAAAQAAAAgAAAABAAAAAQADAAgAAAACAAAAAQACAAgAAAADAAAAAQABAAgAAAAEAAAAAQAAAAgAAAAFAAAAAQADAAgAAAAGAAAAAQACAAgAAAAHAAAAAQABAAgAAAAIAAAAAQAAAAgAAAAJAAAAAQADAAgAAAAKAAAAAQACAAgAAAALAAAAAQABAAgAAAAMAAAAAQAAAAgAAAANAAAAAQADAAgAAAAOAAAAAQACAAgAAAAPAAAAAQABAAgAAAAQAAAAAQAAAAgAAAARAAAAAQADAAgAAAASAAAAAQACAAgAAAATAAAAAQABAAgAAAAUAAAAAQAAAAgAAAAVAAAAAQADAAgAAAAWAAAAAQACAAgAAAAXAAAAAQABAAgAAAAYAAAAAQAAAAgAAAAZAAAAAQADAAgAAAAaAAAAAQACAAgAAAAbAAAAAQABAAgAAAAcAAAAAQAAAAgAAAAdAAAAAQADAAgAAAAAAAEAAQABAAgAAAABAAEAAQABAAgAAAACAAEAAQABAAgAAAADAAEAAQABAAgAAAAEAAEAAQABAAgAAAAFAAEAAQAAAAgAAAAGAAEAAQAAAAgAAAAHAAEAAQAAAAgAAAAIAAEAAQAAAAgAAAAJAAEAAQAAAAgAAAAKAAEAAQADAAgAAAALAAEAAQADAAgAAAAMAAEAAQADAAgAAAANAAEAAQADAAgAAAAOAAEAAQADAAgAAAAPAAEAAQACAAgAAAAQAAEAAQACAAgAAAARAAEAAQACAAgAAAASAAEAAQACAAgAAAATAAEAAQACAAgAAAAUAAEAAQABAAgAAAAVAAEAAQABAAgAAAAWAAEAAQABAAgAAAAXAAEAAQABAAgAAAAYAAEAAQABAAgAAAAZAAEAAQAAAAgAAAAaAAEAAQAAAAgAAAAbAAEAAQAAAAgAAAAcAAEAAQAAAAgAAAAdAAEAAQAAAAgAAAAAAAIAAQACAAgAAAABAAIAAQADAAgAAAACAAIAAQAAAAgAAAADAAIAAQAAAAgAAAAEAAIAAQABAAgAAAAFAAIAAQABAAgAAAAGAAIAAQACAAgAAAAHAAIAAQADAAgAAAAIAAIAAQADAAgAAAAJAAIAAQAAAAgAAAAKAAIAAQAAAAgAAAALAAIAAQABAAgAAAAMAAIAAQACAAgAAAANAAIAAQACAAgAAAAOAAIAAQADAAgAAAAPAAIAAQADAAgAAAAQAAIAAQAAAAgAAAARAAIAAQABAAgAAAASAAIAAQABAAgAAAATAAIAAQACAAgAAAAUAAIAAQACAAgAAAAVAAIAAQADAAgAAAAWAAIAAQAAAAgAAAAXAAIAAQAAAAgAAAAYAAIAAQABAAgAAAAZAAIAAQABAAgAAAAaAAIAAQACAAgAAAAbAAIAAQADAAgAAAAcAAIAAQADAAgAAAAdAAIAAQAAAAgAAAAAAAMAAQADAAgAAAABAAMAAQABAAgAAAACAAMAAQACAAgAAAADAAMAAQAAAAgAAAAEAAMAAQABAAgAAAAFAAMAAQACAAgAAAAGAAMAAQAAAAgAAAAHAAMAAQABAAgAAAAIAAMAAQADAAgAAAAJAAMAAQAAAAgAAAAKAAMAAQABAAgAAAALAAMAAQADAAgAAAAMAAMAAQAAAAgAAAANAAMAAQACAAgAAAAOAAMAAQADAAgAAAAPAAMAAQAAAAgAAAAQAAMAAQACAAgAAAARAAMAAQADAAgAAAASAAMAAQABAAgAAAATAAMAAQACAAgAAAAUAAMAAQADAAgAAAAVAAMAAQABAAgAAAAWAAMAAQACAAgAAAAXAAMAAQAAAAgAAAAYAAMAAQABAAgAAAAZAAMAAQACAAgAAAAaAAMAAQAAAAgAAAAbAAMAAQABAAgAAAAcAAMAAQADAAgAAAAdAAMAAQAAAAgAAAAAAAQAAQAAAAgAAAABAAQAAQADAAgAAAACAAQAAQABAAgAAAADAAQAAQADAAgAAAAEAAQAAQABAAgAAAAFAAQAAQADAAgAAAAGAAQAAQACAAgAAAAHAAQAAQAAAAgAAAAIAAQAAQACAAgAAAAJAAQAAQAAAAgAAAAKAAQAAQACAAgAAAALAAQAAQABAAgAAAAMAAQAAQADAAgAAAANAAQAAQABAAgAAAAOAAQAAQADAAgAAAAPAAQAAQABAAgAAAAQAAQAAQAAAAgAAAARAAQAAQACAAgAAAASAAQAAQAAAAgAAAATAAQAAQACAAgAAAAUAAQAAQAAAAgAAAAVAAQAAQADAAgAAAAWAAQAAQABAAgAAAAXAAQAAQADAAgAAAAYAAQAAQABAAgAAAAZAAQAAQADAAgAAAAaAAQAAQACAAgAAAAbAAQAAQAAAAgAAAAcAAQAAQACAAgAAAAdAAQAAQAAAAgAAAAAAAUAAQABAAgAAAABAAUAAQAAABkAAAACAAUAAQADABkAAAADAAUAAQACABkAAAAEAAUAAQABABkAAAAFAAUAAQAAABkAAAAGAAUAAQADABkAAAAHAAUAAQACABkAAAAIAAUAAQABABkAAAAJAAUAAQAAABkAAAAKAAUAAQADABkAAAALAAUAAQACABkAAAAMAAUAAQABABkAAAANAAUAAQAAABkAAAAOAAUAAQADABkAAAAPAAUAAQACABkAAAAQAAUAAQABABkAAAARAAUAAQAAABkAAAASAAUAAQADABkAAAATAAUAAQACABkAAAAUAAUAAQABABkAAAAVAAUAAQAAABkAAAAWAAUAAQADABkAAAAXAAUAAQACABkAAAAYAAUAAQABABkAAAAZAAUAAQAAABkAAAAaAAUAAQADABkAAAAbAAUAAQACABkAAAAcAAUAAQABABkAAAAdAAUAAQAAAAgAAAAAAAYAAQACAAgAAAABAAYAAQACABkAAAACAAYAAQACABkAAAADAAYAAQACABkAAAAEAAYAAQACABkAAAAFAAYAAQABABkAAAAGAAYAAQABABkAAAAHAAYAAQABABkAAAAIAAYAAQABABkAAAAJAAYAAQABABkAAAAKAAYAAQAAABkAAAALAAYAAQAAABkAAAAMAAYAAQAAABkAAAANAAYAAQAAABkAAAAOAAYAAQAAABkAAAAPAAYAAQADABkAAAAQAAYAAQADABkAAAARAAYAAQADABkAAAASAAYAAQADABkAAAATAAYAAQADABkAAAAUAAYAAQACABkAAAAVAAYAAQACABkAAAAWAAYAAQACABkAAAAXAAYAAQACABkAAAAYAAYAAQACABkAAAAZAAYAAQABABkAAAAaAAYAAQABABkAAAAbAAYAAQABABkAAAAcAAYAAQABABkAAAAdAAYAAQABAAgAAAAAAAcAAQADAAgAAAABAAcAAQAAABkAAAACAAcAAQABABkAAAADAAcAAQABABkAAAAEAAcAAQACABkAAAAFAAcAAQACABkAAAAGAAcAAQADABkAAAAHAAcAAQAAABkAAAAIAAcAAQAAABkAAAAJAAcAAQABABkAAAAKAAcAAQABABkAAAALAAcAAQACABkAAAAMAAcAAQADABkAAAANAAcAAQADABkAAAAOAAcAAQAAABkAAAAPAAcAAQAAABkAAAAQAAcAAQABABkAAAARAAcAAQACABkAAAASAAcAAQACABkAAAATAAcAAQADABkAAAAUAAcAAQADABkAAAAVAAcAAQAAABkAAAAWAAcAAQABABkAAAAXAAcAAQABABkAAAAYAAcAAQACABkAAAAZAAcAAQACABkAAAAaAAcAAQADABkAAAAbAAcAAQAAABkAAAAcAAcAAQAAABkAAAAdAAcAAQABAAgAAAAAAAgAAQAAAAgAAAABAAgAAQACABkAAAACAAgAAQADABkAAAADAAgAAQABABkAAAAEAAgAAQACABkAAAAFAAgAAQADABkAAAAGAAgAAQABABkAAAAHAAgAAQACABkAAAAIAAgAAQAAABkAAAAJAAgAAQABABkAAAAKAAgAAQACABkAAAALAAgAAQAAABkAAAAMAAgAAQABABkAAAANAAgAAQADABkAAAAOAAgAAQAAABkAAAAPAAgAAQABABkAAAAQAAgAAQADABkAAAARAAgAAQAAABkAAAASAAgAAQACABkAAAATAAgAAQADABkAAAAUAAgAAQAAABkAAAAVAAgAAQACABkAAAAWAAgAAQADABkAAAAXAAgAAQABABkAAAAYAAgAAQACABkAAAAZAAgAAQADABkAAAAaAAgAAQABABkAAAAbAAgAAQACABkAAAAcAAgAAQAAABkAAAAdAAgAAQABAAgAAAAAAAkAAQABAAgAAAABAAkAAQAAABkAAAACAAkAAQACABkAAAADAAkAAQAAABkAAAAEAAkAAQACABkAAAAFAAkAAQAAABkAAAAGAAkAAQADABkAAAAHAAkAAQABABkAAAAIAAkAAQADABkAAAAJAAkAAQABABkAAAAKAAkAAQADABkAAAALAAkAAQACABkAAAAMAAkAAQAAABkAAAANAAkAAQACABkAAAAOAAkAAQAAABkAAAAPAAkAAQACABkAAAAQAAkAAQABABkAAAARAAkAAQADABkAAAASAAkAAQABABkAAAATAAkAAQADABkAAAAUAAkAAQABABkAAAAVAAkAAQAAABkAAAAWAAkAAQACABkAAAAXAAkAAQAAABkAAAAYAAkAAQACABkAAAAZAAkAAQAAABkAAAAaAAkAAQADABkAAAAbAAkAAQABABkAAAAcAAkAAQADABkAAAAdAAkAAQABAAgAAAAAAAoAAQACAAgAAAABAAoAAQABABkAAAACAAoAAQAAABkAAAADAAoAAQADABkAAAAEAAoAAQACABkAAAAFAAoAAQABABkAAAAGAAoAAQAAABkAAAAHAAoAAQADABkAAAAIAAoAAQACABkAAAAJAAoAAQABABkAAAAKAAoAAQAAABkAAAALAAoAAQADABkAAAAMAAoAAQACABkAAAANAAoAAQABABkAAAAOAAoAAQAAABkAAAAPAAoAAQADABkAAAAQAAoAAQACABkAAAARAAoAAQABABkAAAASAAoAAQAAABkAAAATAAoAAQADABkAAAAUAAoAAQACABkAAAAVAAoAAQABABkAAAAWAAoAAQAAABkAAAAXAAoAAQADABkAAAAYAAoAAQACABkAAAAZAAoAAQABABkAAAAaAAoAAQAAABkAAAAbAAoAAQADABkAAAAcAAoAAQACABkAAAAdAAoAAQABAAgAAAAAAAsAAQADAAgAAAABAAsAAQADABkAAAACAAsAAQADABkAAAADAAsAAQADABkAAAAEAAsAAQADABkAAAAFAAsAAQACABkAAAAGAAsAAQACABkAAAAHAAsAAQACABkAAAAIAAsAAQACABkAAAAJAAsAAQACABkAAAAKAAsAAQABABkAAAALAAsAAQABABkAAAAMAAsAAQABABkAAAANAAsAAQABABkAAAAOAAsAAQABABkAAAAPAAsAAQAAABkAAAAQAAsAAQAAABkAAAARAAsAAQAAABkAAAASAAsAAQAAABkAAAATAAsAAQAAABkAAAAUAAsAAQADABkAAAAVAAsAAQADABkAAAAWAAsAAQADABkAAAAXAAsAAQADABkAAAAYAAsAAQADABkAAAAZAAsAAQACABkAAAAaAAsAAQACABkAAAAbAAsAAQACABkAAAAcAAsAAQACABkAAAAdAAsAAQACAAgAAAAAAAwAAQAAAAgAAAABAAwAAQABABkAAAACAAwAAQACABkAAAADAAwAAQACABkAAAAEAAwAAQADABkAAAAFAAwAAQADABkAAAAGAAwAAQAAABkAAAAHAAwAAQABABkAAAAIAAwAAQABABkAAAAJAAwAAQACABkAAAAKAAwAAQACABkAAAALAAwAAQADABkAAAAMAAwAAQAAABkAAAANAAwAAQAAABkAAAAOAAwAAQABABkAAAAPAAwAAQABABkAAAAQAAwAAQACABkAAAARAAwAAQADABkAAAASAAwAAQADABkAAAATAAwAAQAAABkAAAAUAAwAAQAAABkAAAAVAAwAAQABABkAAAAWAAwAAQACABkAAAAXAAwAAQACABkAAAAYAAwAAQADABkAAAAZAAwAAQADABkAAAAaAAwAAQAAABkAAAAbAAwAAQABABkAAAAcAAwAAQABABkAAAAdAAwAAQACAAgAAAAAAA0AAQABAAgAAAABAA0AAQADABkAAAACAA0AAQAAABkAAAADAA0AAQACABkAAAAEAA0AAQADABkAAAAFAA0AAQAAABkAAAAGAA0AAQACABkAAAAHAA0AAQADABkAAAAIAA0AAQABABkAAAAJAA0AAQACABkAAAAKAA0AAQADABkAAAALAA0AAQABABkAAAAMAA0AAQACABkAAAANAA0AAQAAABkAAAAOAA0AAQABABkAAAAPAA0AAQACABkAAAAQAA0AAQAAABkAAAARAA0AAQABABkAAAASAA0AAQADABkAAAATAA0AAQAAABkAAAAUAA0AAQABABkAAAAVAA0AAQADABkAAAAWAA0AAQAAABkAAAAXAA0AAQACABkAAAAYAA0AAQADABkAAAAZAA0AAQAAABkAAAAaAA0AAQACABkAAAAbAA0AAQADABkAAAAcAA0AAQABABkAAAAdAA0AAQACAAgAAAAAAA4AAQACAAgAAAABAA4AAQABABkAAAACAA4AAQADABkAAAADAA4AAQABABkAAAAEAA4AAQADABkAAAAFAA4AAQABABkAAAAGAA4AAQAAABkAAAAHAA4AAQACABkAAAAIAA4AAQAAABkAAAAJAA4AAQACABkAAAAKAA4AAQAAABkAAAALAA4AAQADABkAAAAMAA4AAQABABkAAAANAA4AAQADABkAAAAOAA4AAQABABkAAAAPAA4AAQADABkAAAAQAA4AAQACABkAAAARAA4AAQAAABkAAAASAA4AAQACABkAAAATAA4AAQAAABkAAAAUAA4AAQACABkAAAAVAA4AAQABABkAAAAWAA4AAQADABkAAAAXAA4AAQABABkAAAAYAA4AAQADABkAAAAZAA4AAQABABkAAAAaAA4AAQAAABkAAAAbAA4AAQACABkAAAAcAA4AAQAAABkAAAAdAA4AAQACAAgAAAAAAA8AAQADAAgAAAABAA8AAQACABkAAAACAA8AAQABABkAAAADAA8AAQAAABkAAAAEAA8AAQADABkAAAAFAA8AAQACABkAAAAGAA8AAQABABkAAAAHAA8AAQAAABkAAAAIAA8AAQADABkAAAAJAA8AAQACABkAAAAKAA8AAQABABkAAAALAA8AAQAAABkAAAAMAA8AAQADABkAAAANAA8AAQACABkAAAAOAA8AAQABABkAAAAPAA8AAQAAABkAAAAQAA8AAQADABkAAAARAA8AAQACABkAAAASAA8AAQABABkAAAATAA8AAQAAABkAAAAUAA8AAQADABkAAAAVAA8AAQACABkAAAAWAA8AAQABABkAAAAXAA8AAQAAABkAAAAYAA8AAQADABkAAAAZAA8AAQACABkAAAAaAA8AAQABABkAAAAbAA8AAQAAABkAAAAcAA8AAQADABkAAAAdAA8AAQACAAgAAAAAABAAAQAAAAgAAAABABAAAQAAAAgAAAACABAAAQAAAAgAAAADABAAAQAAAAgAAAAEABAAAQAAAAgAAAAFABAAAQADAAgAAAAGABAAAQADAAgAAAAHABAAAQADAAgAAAAIABAAAQADAAgAAAAJABAAAQADAAgAAAAKABAAAQACAAgAAAALABAAAQACAAgAAAAMABAAAQACAAgAAAANABAAAQACAAgAAAAOABAAAQACABkAAAAPABAAAQABABkAAAAQABAAAQABAAgAAAARABAAAQABAAgAAAASABAAAQABAAgAAAATABAAAQABAAgAAAAUABAAAQAAAAgAAAAVABAAAQAAAAgAAAAWABAAAQAAAAgAAAAXABAAAQAAAAgAAAAYABAAAQAAAAgAAAAZABAAAQADAAgAAAAaABAAAQADAAgAAAAbABAAAQADAAgAAAAcABAAAQADAAgAAAAdABAAAQADAAgAAAA=")
+tile_set = ExtResource("2_b4akk")
+
+[node name="Blocker" type="TileMapLayer" parent="." unique_id=542933966]
+visible = false
+tile_map_data = PackedByteArray("AAAAAAQAAwAAAAAAAAABAAQAAwAAAAAAAAACAAQAAwAAAAAAAAADAAQAAwAAAAAAAAAEAAQAAwAAAAAAAAAFAAQAAwAAAAAAAAAGAAQAAwAAAAAAAAAHAAQAAwAAAAAAAAAIAAQAAwAAAAAAAAAJAAQAAwAAAAAAAAAKAAQAAwAAAAAAAAALAAQAAwAAAAAAAAAMAAQAAwAAAAAAAAANAAQAAwAAAAAAAAAOAAQAAwAAAAAAAAAPAAQAAwAAAAAAAAAQAAQAAwAAAAAAAAARAAQAAwAAAAAAAAASAAQAAwAAAAAAAAATAAQAAwAAAAAAAAAUAAQAAwAAAAAAAAAVAAQAAwAAAAAAAAAWAAQAAwAAAAAAAAAXAAQAAwAAAAAAAAAYAAQAAwAAAAAAAAAZAAQAAwAAAAAAAAAaAAQAAwAAAAAAAAAbAAQAAwAAAAAAAAAcAAQAAwAAAAAAAAAdAAQAAwAAAAAAAAAAAAUAAwAAAAAAAAAdAAUAAwAAAAAAAAAAAAYAAwAAAAAAAAAdAAYAAwAAAAAAAAAAAAcAAwAAAAAAAAAdAAcAAwAAAAAAAAAAAAgAAwAAAAAAAAAdAAgAAwAAAAAAAAAAAAkAAwAAAAAAAAAdAAkAAwAAAAAAAAAAAAoAAwAAAAAAAAAdAAoAAwAAAAAAAAAAAAsAAwAAAAAAAAAdAAsAAwAAAAAAAAAAAAwAAwAAAAAAAAAdAAwAAwAAAAAAAAAAAA0AAwAAAAAAAAAdAA0AAwAAAAAAAAAAAA4AAwAAAAAAAAAdAA4AAwAAAAAAAAAAAA8AAwAAAAAAAAAdAA8AAwAAAAAAAAAAABAAAwAAAAAAAAABABAAAwAAAAAAAAACABAAAwAAAAAAAAADABAAAwAAAAAAAAAEABAAAwAAAAAAAAAFABAAAwAAAAAAAAAGABAAAwAAAAAAAAAHABAAAwAAAAAAAAAIABAAAwAAAAAAAAAJABAAAwAAAAAAAAAKABAAAwAAAAAAAAALABAAAwAAAAAAAAAMABAAAwAAAAAAAAANABAAAwAAAAAAAAAQABAAAwAAAAAAAAARABAAAwAAAAAAAAASABAAAwAAAAAAAAATABAAAwAAAAAAAAAUABAAAwAAAAAAAAAVABAAAwAAAAAAAAAWABAAAwAAAAAAAAAXABAAAwAAAAAAAAAYABAAAwAAAAAAAAAZABAAAwAAAAAAAAAaABAAAwAAAAAAAAAbABAAAwAAAAAAAAAcABAAAwAAAAAAAAAdABAAAwAAAAAAAAA=")
+tile_set = ExtResource("2_b4akk")
+
+[node name="Flora" type="TileMapLayer" parent="." unique_id=1100546071]
+y_sort_enabled = true
+tile_set = ExtResource("2_b4akk")
+
+[node name="OakCanopy" type="TileMapLayer" parent="." unique_id=516543000]
+y_sort_enabled = true
+tile_set = ExtResource("2_b4akk")
+script = ExtResource("3_2diyi")
+
+[node name="Entities" type="Node2D" parent="." unique_id=37390479]
+y_sort_enabled = true
+
+[node name="Counter" type="StaticBody2D" parent="Entities" unique_id=175319800]
+position = Vector2(386, 138)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/Counter" unique_id=1284769188]
+texture = ExtResource("4_nvc5f")
+offset = Vector2(0, -20)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/Counter" unique_id=596731626]
+position = Vector2(0, -8)
+shape = SubResource("RectangleShape2D_c3xfk")
+
+[node name="ShopClerk" type="StaticBody2D" parent="Entities" unique_id=974902776]
+position = Vector2(386, 110)
+collision_mask = 0
+script = ExtResource("5_o2dg4")
+shop = ExtResource("6_se844")
+color = Color(0.3, 0.4, 0.55, 1)
+sprite_sheet = ExtResource("7_85yoq")
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/ShopClerk" unique_id=976715678]
+position = Vector2(0, -2)
+shape = SubResource("RectangleShape2D_kcunp")
+
+[node name="Hitbox" type="Area2D" parent="Entities/ShopClerk" unique_id=1195890793]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="Entities/ShopClerk/Hitbox" unique_id=60549070]
+position = Vector2(0, 8)
+shape = SubResource("RectangleShape2D_6r2ul")
+
+[node name="PracticeWall" type="StaticBody2D" parent="Entities" unique_id=1800086577]
+position = Vector2(76, 178)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/PracticeWall" unique_id=597067511]
+texture = ExtResource("8_qlxbd")
+offset = Vector2(0, -48)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/PracticeWall" unique_id=1687562701]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_qsqv0")
+
+[node name="CrashPad" type="StaticBody2D" parent="Entities" unique_id=1762459734]
+position = Vector2(76, 200)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/CrashPad" unique_id=360191146]
+texture = ExtResource("9_85kk6")
+offset = Vector2(0, -8)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/CrashPad" unique_id=1382741187]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_7nfpe")
+
+[node name="GlassCase" type="StaticBody2D" parent="Entities" unique_id=774099822]
+position = Vector2(196, 208)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/GlassCase" unique_id=1478896466]
+texture = ExtResource("10_yytm0")
+offset = Vector2(0, -20)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/GlassCase" unique_id=366746666]
+position = Vector2(0, -7)
+shape = SubResource("RectangleShape2D_br3ms")
+
+[node name="GlassCase2" type="StaticBody2D" parent="Entities" unique_id=221784990]
+position = Vector2(292, 208)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/GlassCase2" unique_id=294386158]
+texture = ExtResource("10_yytm0")
+offset = Vector2(0, -20)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/GlassCase2" unique_id=727686627]
+position = Vector2(0, -7)
+shape = SubResource("RectangleShape2D_whqru")
+
+[node name="PackRack" type="StaticBody2D" parent="Entities" unique_id=1722095801]
+position = Vector2(444, 200)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/PackRack" unique_id=474182473]
+texture = ExtResource("11_bdi0w")
+offset = Vector2(0, -27)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/PackRack" unique_id=994601550]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_pl3lt")
+
+[node name="Workbench" type="StaticBody2D" parent="Entities" unique_id=1523765610]
+position = Vector2(108, 250)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/Workbench" unique_id=931496517]
+texture = ExtResource("12_kbcy8")
+offset = Vector2(0, -20)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/Workbench" unique_id=1858178845]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_jvabv")
+
+[node name="BootBench" type="StaticBody2D" parent="Entities" unique_id=873364363]
+position = Vector2(352, 250)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/BootBench" unique_id=1707530416]
+texture = ExtResource("13_jtqvo")
+offset = Vector2(0, -13)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/BootBench" unique_id=1195688856]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_4cm7t")
+
+[node name="Stove" type="StaticBody2D" parent="Entities" unique_id=909843580]
+position = Vector2(444, 132)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/Stove" unique_id=1665111089]
+texture = ExtResource("14_l77ut")
+offset = Vector2(0, -22)
+hframes = 2
+script = ExtResource("15_6bm0k")
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/Stove" unique_id=1209014520]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_oykn2")
+
+[node name="RopeBin" type="StaticBody2D" parent="Entities" unique_id=1479838396]
+position = Vector2(150, 124)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/RopeBin" unique_id=916378098]
+texture = ExtResource("16_x644f")
+offset = Vector2(0, -15)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/RopeBin" unique_id=1793684613]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_ta7wa")
+
+[node name="Stool" type="StaticBody2D" parent="Entities" unique_id=1660412095]
+position = Vector2(350, 132)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/Stool" unique_id=1769388886]
+texture = ExtResource("17_4qd00")
+offset = Vector2(0, -9)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/Stool" unique_id=1720728437]
+position = Vector2(0, -2.5)
+shape = SubResource("RectangleShape2D_7bbs0")
+
+[node name="SchoolBoard" type="StaticBody2D" parent="Entities" unique_id=1473712618]
+position = Vector2(200, 110)
+collision_mask = 0
+script = ExtResource("18_6yltn")
+title = "Mountaineering School"
+text = "The Yosemite Mountaineering School teaches from Curry Village: knots, belaying, and a first few pitches on the granite slabs. Sign up at the counter."
+
+[node name="Sprite" type="Sprite2D" parent="Entities/SchoolBoard" unique_id=174542000]
+texture = ExtResource("19_h0t4h")
+offset = Vector2(0, -8)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/SchoolBoard" unique_id=1366005436]
+position = Vector2(0, -2)
+shape = SubResource("RectangleShape2D_30i65")
+
+[node name="Hitbox" type="Area2D" parent="Entities/SchoolBoard" unique_id=1174398565]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="Entities/SchoolBoard/Hitbox" unique_id=361006204]
+position = Vector2(0, -7)
+shape = SubResource("RectangleShape2D_ei34n")
+
+[node name="NoseNotice" type="StaticBody2D" parent="Entities" unique_id=530006670]
+position = Vector2(250, 110)
+collision_mask = 0
+script = ExtResource("18_6yltn")
+title = "The Nose, 1958"
+text = "A photograph of Warren Harding, Wayne Merry and George Whitmore at the top of El Capitan on November 12, 1958, after 47 days of climbing spread over 18 months."
+
+[node name="Sprite" type="Sprite2D" parent="Entities/NoseNotice" unique_id=1935054704]
+texture = ExtResource("19_h0t4h")
+offset = Vector2(0, -8)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/NoseNotice" unique_id=1092003117]
+position = Vector2(0, -2)
+shape = SubResource("RectangleShape2D_easho")
+
+[node name="Hitbox" type="Area2D" parent="Entities/NoseNotice" unique_id=2033217313]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="Entities/NoseNotice/Hitbox" unique_id=656528725]
+position = Vector2(0, -7)
+shape = SubResource("RectangleShape2D_5ycgy")
+
+[node name="Markers" type="Node2D" parent="." unique_id=102993663]
+
+[node name="door" type="Marker2D" parent="Markers" unique_id=2028494369]
+position = Vector2(240, 244)
+
+[node name="counter" type="Marker2D" parent="Markers" unique_id=1664864813]
+position = Vector2(386, 150)
+
+[node name="customer" type="Marker2D" parent="Markers" unique_id=520850722]
+position = Vector2(244, 190)
+
+[node name="Places" type="Node2D" parent="." unique_id=1280141650]
+
+[node name="Exits" type="Node2D" parent="." unique_id=1999133129]
+
+[node name="ToCurry" type="Area2D" parent="Exits" unique_id=188613702]
+position = Vector2(240, 268)
+script = ExtResource("20_67kdo")
+label = "Curry Village"
+target_region = "curry_village"
+target_spawn = "shop_door"
+
+[node name="Shape" type="CollisionShape2D" parent="Exits/ToCurry" unique_id=306794281]
+shape = SubResource("RectangleShape2D_2jkf8")
+
+[node name="Room" type="Sprite2D" parent="." unique_id=411009366]
+z_index = -8
+texture = ExtResource("21_dsj7a")
+centered = false

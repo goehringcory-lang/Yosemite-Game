@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "salathe_steel"
+title = "Hard Steel"
+giver = "john_salathe"
+requires = PackedStringArray("robbins_clean")
+intro = PackedStringArray("Soft iron pitons bend in these cracks like wet noodles. I forge mine from old car axles. Model A Ford steel is the best there is.", "Climb Snake Dike first, so I know you're serious. Then find me an axle.", "There's an old wreck down by the railroad at El Portal, I'm told.")
+steps = [{"type": "climbed", "route": "snake_dike", "objective": "Climb Snake Dike to the top of Half Dome", "reminder": "Snake Dike. Up the back of Half Dome. Go.", "done": ["Up Half Dome! Good. Now, my steel."]}, {"type": "have", "item": "model_a_axle", "count": 1, "consume": true, "objective": "Bring John Salathé a Model A axle from El Portal", "reminder": "The railroad yard at El Portal. Look for the rusted old Ford.", "done": ["Ah, that's the stuff. Listen to it ring."]}]
+outro = PackedStringArray("I've forged this into protection that won't bend. Two more pieces, and they'll hold on El Capitan.", "Go see Warren Harding. He's been staring at the Nose for a year.")
+reward_gear = {"cam": 2}

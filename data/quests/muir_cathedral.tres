@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "muir_cathedral"
+title = "Cathedral Peak"
+giver = "john_muir"
+requires = PackedStringArray("harding_summit")
+intro = PackedStringArray("Cathedral Peak! I climbed it in 1869 in my shirtsleeves, with a notebook and a crust of bread in my pocket.", "The rock up there is as fine as any cathedral in Europe. Climb it and see.", "Carry some food, mind. I skipped a lot of meals, and I don't recommend it.")
+steps = [{"type": "have_food", "energy": 40, "objective": "Carry food worth 40 energy", "reminder": "Bread and tea will do. Don't go up hungry.", "done": ["Bread! Good. Now go up."]}, {"type": "climbed", "route": "cathedral_peak", "objective": "Climb Cathedral Peak", "reminder": "The trail to Cathedral Peak starts right here.", "done": ["You were on top! Did you feel the whole range around you?"]}]
+outro = PackedStringArray("Now the glaciers. Everyone says the Sierra glaciers are long dead, but I've found living ice up high.", "Take an ice axe and crampons. You'll need them for Mount Lyell.")
+reward_gear = {"ice_axe": 1, "crampons": 1}
