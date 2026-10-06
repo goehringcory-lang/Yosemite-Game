@@ -1,6 +1,6 @@
 extends "res://tools/hubs/ahwahnee_hotel_art.gd"
-## Yosemite Village and Camp 4 pixel art in the Ahwahnee's style: the village
-## buildings and camp props, drawn with the hotel's materials (cut granite
+## Yosemite Village pixel art in the Ahwahnee's style: the village buildings
+## and street props (Camp 4's props are in camp4_art.gd), drawn with the hotel's materials (cut granite
 ## foundations, stained-timber walls, mossy shingle roofs, painted signs), the
 ## same ramps, ordered dithering and light from the upper left, and a dark rim.
 ## Written to assets/sprites/buildings/ at the sizes the village scene expects,
@@ -24,10 +24,9 @@ const BUILDINGS := {
 	"valley_lodge": {"size": Vector2i(72, 44), "wall": "timber", "label": "LODGE", "seed": 79, "windows": [10, 22, 50, 62], "gable": 36, "chimney": 56, "pitch": 12},
 }
 
-const PROPS := ["umacha", "chuckah", "big_boulder", "picnic_table", "bear_box", "gear_tarp", "shuttle_stop", "climber_tent_0", "climber_tent_1", "climber_tent_2"]
+const PROPS := ["umacha", "chuckah", "bear_box", "shuttle_stop"]
 const FILES := ["village_store", "welcome_center", "museum", "bests_studio", "degnans", "wilderness_center", "valley_lodge",
-	"umacha", "chuckah", "big_boulder", "picnic_table", "bear_box", "gear_tarp", "shuttle_stop",
-	"climber_tent_0", "climber_tent_1", "climber_tent_2",
+	"umacha", "chuckah", "bear_box", "shuttle_stop",
 	"village_store_glow", "welcome_center_glow", "museum_glow", "bests_studio_glow", "degnans_glow", "wilderness_center_glow", "valley_lodge_glow"]
 
 
@@ -39,14 +38,8 @@ func save_all() -> void:
 		_write(built[1], sprite_name + "_glow")
 	_write(umacha(), "umacha")
 	_write(chuckah(), "chuckah")
-	_write(big_boulder(), "big_boulder")
-	_write(picnic_table(), "picnic_table")
 	_write(bear_box(), "bear_box")
-	_write(gear_tarp(), "gear_tarp")
 	_write(shuttle_stop(), "shuttle_stop")
-	var tents := [["d9a23e", "f0cd72"], ["3a78a8", "6aa2cc"], ["b0492a", "dc7a52"]]
-	for i in tents.size():
-		_write(dome_tent(Color(tents[i][0]), Color(tents[i][1]), i), "climber_tent_%d" % i)
 
 
 func _write(im: Image, sprite_name: String) -> void:
@@ -359,34 +352,7 @@ func chuckah() -> Image:
 	return im
 
 
-# ---------------------------------------------------------------- Camp 4 and street props
-
-func big_boulder() -> Image:
-	return FloraArt.new().rock(56, 40, 9, 0.12, 0.7, false, 1.2)
-
-
-func picnic_table() -> Image:
-	var im := K.make(24, 14)
-	K.shadow(im, 12, 12, 11.5, 2.2, 0.3)
-	# legs and benches
-	for lx in [3, 19]:
-		post(im, lx, 6, 6, 400 + lx, 2)
-	for by in [0, 11]:
-		K.rect(im, 1, by, 22, 2, timber[4] if by == 0 else timber[3])
-		K.hline(im, 1, by, 22, timber[5])
-		K.hline(im, 1, by + 1, 22, timber[1])
-	# tabletop planks
-	for ty in range(3, 9):
-		var idx := 4 if ty % 2 == 1 else 3
-		for tx in range(1, 23):
-			var n := K.hash2(tx, ty, 41)
-			K.px(im, tx, ty, timber[clampi(idx + (1 if n > 0.9 else 0) - (1 if n < 0.1 else 0), 0, 5)])
-		K.hline(im, 1, ty, 22, timber[5] if ty == 3 else timber[idx])
-	K.hline(im, 1, 8, 22, timber[1])
-	shade(im, 12, 3, 11, 6, timber[0], 0.0, 0.7, 0.25, false)
-	K.outline(im, Color("231a16"))
-	return im
-
+# ---------------------------------------------------------------- street props
 
 ## A steel bear-proof food box: olive paint, latch, and a worn lid edge.
 func bear_box() -> Image:
@@ -403,35 +369,6 @@ func bear_box() -> Image:
 	K.hline(im, 6, 5, 4, granite[6])
 	K.vline(im, 8, 6, 2, iron[1])
 	K.hline(im, 1, 9, 14, iron[0])
-	K.outline(im, Color("231a16"))
-	return im
-
-
-## A tarp spread with gear for trade: rope coil, cams, carabiners.
-func gear_tarp() -> Image:
-	var im := K.make(28, 16)
-	for yy in 12:
-		for xx in 26:
-			var t := 0.5 + (K.hash2(xx, yy, 61) - 0.5) * 0.14 + (0.5 - float(yy) / 12.0) * 0.14
-			K.px(im, 1 + xx, 2 + yy, sky[clampi(roundi(t * 3.0), 0, 3)].darkened(0.25))
-	K.hline(im, 1, 2, 26, sky[3])
-	for fold in [[6, 4, 5, 1], [18, 11, 3, 1]]:
-		for i in fold[2]:
-			K.px(im, fold[0] + i, fold[1] + (i / 3), sky[0].darkened(0.1))
-	# rope coil
-	K.ellipse(im, 7, 8, 4.4, 3.3, Color("a8372a"))
-	K.ellipse(im, 7, 8, 3.0, 2.0, Color("c8553c"))
-	K.ellipse(im, 7, 8, 1.4, 0.9, sky[1].darkened(0.25))
-	K.hline(im, 4, 6, 3, Color("e8836a"))
-	# cams: stem, lobes
-	for cx in [14, 17, 20]:
-		K.rect(im, cx, 5, 2, 4, granite[5])
-		K.px(im, cx, 5, granite[6])
-		K.px(im, cx, 9, warm[5])
-		K.px(im, cx + 1, 9, warm[3])
-	for cx in [14, 18, 22]:
-		K.rect(im, cx, 11, 2, 1, granite[6])
-		K.px(im, cx + 1, 11, granite[3])
 	K.outline(im, Color("231a16"))
 	return im
 
@@ -457,31 +394,5 @@ func shuttle_stop() -> Image:
 	K.rect(im, 5, 5, 6, 2, leaf[2])
 	K.px(im, 5, 7, iron[0])
 	K.px(im, 10, 7, iron[0])
-	K.outline(im, Color("231a16"))
-	return im
-
-
-## A dome tent: shaded nylon, a darker vestibule, and guy lines.
-func dome_tent(color: Color, light: Color, v: int) -> Image:
-	var im := K.make(20, 14)
-	K.shadow(im, 10, 12, 9.5, 2.0, 0.3)
-	for yy in range(2, 13):
-		for xx in range(1, 19):
-			var dx := (xx + 0.5 - 10.0) / 9.0
-			var dy := (yy + 0.5 - 9.5) / 7.5
-			var d := dx * dx + dy * dy
-			if d > 1.0 or yy > 12:
-				continue
-			var t := 0.55 - dx * 0.34 - dy * 0.4 + (K.hash2(xx, yy, 81 + v) - 0.5) * 0.1
-			var col := color.lerp(light, clampf(t * 1.4 - 0.2, 0.0, 1.0)).darkened(clampf(0.5 - t, 0.0, 0.5) * 0.7)
-			K.px(im, xx, yy, col)
-	# the pole arcs
-	for yy in range(3, 12):
-		K.px(im, 10 + (yy - 8) / 3, yy, color.darkened(0.4))
-		K.px(im, 6 + (yy - 8) / 4, yy, color.darkened(0.3))
-	K.rect(im, 8, 8, 4, 5, color.darkened(0.62))
-	K.hline(im, 8, 8, 4, color.darkened(0.3))
-	for g in [[1, 12], [18, 12]]:
-		K.px(im, g[0] - 1, g[1], granite[3])
 	K.outline(im, Color("231a16"))
 	return im

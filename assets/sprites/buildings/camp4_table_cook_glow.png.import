@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c87mpdrobgsrk"
-path="res://.godot/imported/climber_tent_0.png-10d5913e0785b75eed4710745bda948e.ctex"
+uid="uid://djm0seqha2hf1"
+path="res://.godot/imported/camp4_table_cook_glow.png-7c3e48daec1044aae4e5666d12655858.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/buildings/climber_tent_0.png"
-dest_files=["res://.godot/imported/climber_tent_0.png-10d5913e0785b75eed4710745bda948e.ctex"]
+source_file="res://assets/sprites/buildings/camp4_table_cook_glow.png"
+dest_files=["res://.godot/imported/camp4_table_cook_glow.png-7c3e48daec1044aae4e5666d12655858.ctex"]
 
 [params]
 

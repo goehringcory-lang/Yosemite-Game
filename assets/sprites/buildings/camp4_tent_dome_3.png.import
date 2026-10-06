@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8d33mxmoq4mt"
-path="res://.godot/imported/gear_tarp.png-84c1c5d2f8f0ccdf05ea3587cde53956.ctex"
+uid="uid://dmt0h8xsmv46j"
+path="res://.godot/imported/camp4_tent_dome_3.png-bcdf15849fa14a1926ee5c9d5449337a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/buildings/gear_tarp.png"
-dest_files=["res://.godot/imported/gear_tarp.png-84c1c5d2f8f0ccdf05ea3587cde53956.ctex"]
+source_file="res://assets/sprites/buildings/camp4_tent_dome_3.png"
+dest_files=["res://.godot/imported/camp4_tent_dome_3.png-bcdf15849fa14a1926ee5c9d5449337a.ctex"]
 
 [params]
 
