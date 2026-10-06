@@ -945,9 +945,16 @@ func _draw_reachable() -> void:
 			label += " rest"
 		elif hold.get("fixed", false):
 			label += " fixed"
-		UI.text(_canvas, p + Vector2(9, -1), label, color, 10)
+		# Left ring's label goes left, the middle one above, the right one right.
+		match dx:
+			-1:
+				UI.text(_canvas, p + Vector2(-9, -1), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_RIGHT)
+			0:
+				UI.text(_canvas, p + Vector2(0, -11), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+			_:
+				UI.text(_canvas, p + Vector2(9, -1), label, color, 10)
 		if state.stamina - cost <= 0 and not hold.get("crux", false):
-			UI.text(_canvas, p + Vector2(9, 9), "fall!", UI.WARN, 10)
+			UI.text(_canvas, p + Vector2(0, 17), "fall!", UI.WARN, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _cost_color(cost: int) -> Color:

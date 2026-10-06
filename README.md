@@ -21,7 +21,8 @@ godot project.godot         # opens the editor; press F5 to play
 | Back out of a menu | Esc | B |
 | Menus: choose / confirm | Up/Down / E or Enter | Stick or D-pad / A |
 | Climbing: climb up, up-left, up-right | W / A / D (or arrows) | Stick up / left / right |
-| Climbing: place a cam / eat at a ledge / retreat | Space or C / E / Esc | X / A / B |
+| Climbing: place a cam or clip / eat at a ledge, or chalk up / retreat | Space or C / E / Esc | X / A / B |
+| Climbing: aid a hard move, or jug a fixed rope | Shift + arrow | Y + stick |
 | *Debug:* skip 1 hour / sleep now | F2 / F3 | |
 
 A prompt above the player's head shows what the interact button will do ("E  Read: Camp 4"), and it switches to gamepad button names when you use a gamepad.
@@ -144,16 +145,49 @@ Rebuild both with `godot --headless --path . res://tools/hubs/build_ahwahnee.tsc
 ## The climbing screen
 
 ![Firefall Slab at dawn](docs/climb_firefall_slab_dawn.png)
-![Firefall Slab at dusk](docs/climb_firefall_slab_dusk.png)
+![The route card](docs/climb_route_card.png)
+![The Great Roof](docs/climb_great_roof.png)
+![Reaching the Glacier Point rim](docs/climb_glacier_point_rim.png)
+![A night on El Capitan](docs/climb_night_on_the_wall.png)
+![Lyell Glacier](docs/climb_lyell_glacier.png)
 
-Climbs are a face-on granite wall with its ragged edge against the sky, the valley's ridgelines behind (they sink as you gain height), and clouds drifting past. The light follows the game clock: purple and pink at dawn, blue at midday, orange at dusk, stars at night. Your climber works up the face on a rope that runs down through every quickdraw or cam to your belayer on the ledge. Rings mark the holds you can reach, with what each move costs after your shoes and chalk. Bottom left is the altimeter (feet climbed), stamina, food, and the pieces left on your rack; the bar on the right edge is the whole route, a notch per pitch.
+Each of the 13 routes is its own little game, set where the real climb is. Before you start, a **route card** shows a postcard of the view, the pitches (marked where there's a crux), the gear you need (and what you have) and how much food to bring. Then you climb: a granite wall with its ragged edge against the sky, the real skyline behind it (Half Dome from the Apron, El Capitan and Bridalveil from the Nose, the Cockscomb from Cathedral Peak, Mount Lyell from the glacier), the valley floor far below sinking as you gain height, and clouds drifting past. The light follows the game clock: pink at dawn, blue at midday, orange at dusk, stars and a headlamp at night. Afternoon thunderstorms build over the high country after 2 pm.
 
-- **Bolted routes** (Firefall Slab) have a bolt every 2 moves beside the line. Press Space to clip one with a quickdraw from your hold or the one next to it.
-- **Crack routes** take cams in the cracks (Space).
-- **E** eats at a ledge, or chalks up on the wall (once a pitch: the next 2 moves cost 3 less). Climbing shoes take 1 off every move.
-- **Partners:** a route with `partner_quest` set (Firefall Slab: Wren) only starts while that quest is underway or done, and the partner belays you.
+Your climber works up the face on a rope that runs through every quickdraw, cam or old piton to your belayer, who is the person from the story who sent you (Wren, Dick Leonard, Jules Eichorn, Royal Robbins, John Salathé, Beverly Johnson, Warren Harding, George Anderson, John Muir...). The climber shows what you own: red climbing shoes, a chalk bag, a harness with your cams (colored by size) and quickdraws, a belay device, aiders, a portaledge roll, an ice axe and crampons.
 
-The rules are in `scripts/climb/climb_state.gd`, the screen in `climb_minigame.gd`, and the pictures in `climb_scenery.gd`. To photograph it: `SHOT_ROUTE=firefall_slab SHOT_HOURS=7,19 godot --path . res://tools/shots/climb_shot.tscn` (needs a window).
+**Controls:** arrows climb (up, up-left, up-right); **Space** clips a bolt or places a cam; **E** eats at a belay ledge or chalks up on the wall; **Shift + an arrow** aids a hard move (aiders) or jugs a fixed rope (ascenders); **Esc** asks if you want to retreat. Rings mark the holds you can reach, with what each costs after your shoes and chalk; the toolbar at the bottom is your rack, and lights up what you can do right now.
+
+**What each piece of gear does** (so the gear you earn in the story changes how you climb):
+
+| Gear | In the climb |
+|---|---|
+| Climbing shoes | Every move costs 1 less (not on ice); wider crux windows |
+| Chalk bag | Once a pitch, the next 2 moves cost 3 less; wider crux windows while chalked |
+| Harness + rope | You can lead. A top rope (Swan Slab) makes falls safe |
+| Quickdraws | Clip bolts on slabs, and the old 1934 pitons on the Spire and other cam routes |
+| Cams | Place in cracks; fewer cams means longer runouts |
+| Belay device | Your partner's catches are soft (+10 stamina after a fall), the belay restful (+6), and you rappel to retreat |
+| Aiders | On a wall (the Great Roof, Changing Corners), pull through a hard move for a cam and 12 minutes; it costs you a free ascent |
+| Ascenders | Jug a fixed rope (the Nose's first pitches): safe, steady, slow |
+| Haul bag + portaledge | On the Nose: the bag swings below you, and nights on the wall (El Cap Tower's ledge, the Great Roof's hanging camp) need a real meal |
+| Ice axe + crampons | On the glacier: kick steps for cheap moves, and the axe stops a slide |
+
+**Pitch styles** change the rules as well as the art: friction **slab** (Firefall Slab, Swan Slab), **crack** and **flake** (the Grack, Nutcracker, Astroman), **chimney** (Steck-Salathé's Chockstone Chimney and Narrows, Astroman's Harding Slot: alternate Left and Right), **roof** (Separate Reality, the Great Roof: the picture runs sideways), **dike** (Snake Dike: stay on the ribbon, bolts are far apart), **knobs** (Cathedral Peak), **snow** and **ice** (Lyell Glacier: crevasses, and slush after noon).
+
+**Crux moves** ask for a short skill check: stop a marker in the green zone (Firefall Slab's bulge, Separate Reality's lip), tap Up for a mantel (Nutcracker), or alternate Left and Right to the beat (the Narrows, the King Swing, the Pendulum). Do it well for stamina back; slip and you lose some. Nothing is timed against you otherwise, and checks never block a story climb.
+
+**Style** is rated on the result card: an *onsight* (no falls), *hard-won* (falls but free), or *aided*. The Nose can be done free, as the story asks, or with aid.
+
+Where things are:
+
+| What | File |
+|---|---|
+| Rules (stamina, protection, cruxes, aid, nights, weather) | `scripts/climb/climb_state.gd` |
+| Each route's place, rock, skyline, belayer, facts and pitches | `scripts/climb/climb_profiles.gd` |
+| The screen (input, phases, effects) | `scripts/climb/climb_minigame.gd` |
+| Pictures | `scripts/climb/art/`: `climb_rock.gd` (granite, cracks, dikes, roofs, ice), `climb_landscape.gd` (the skyline), `climb_scenes.gd` and `climb_props.gd` (bases and summits), `climb_sprites.gd` (climber, belayers, hardware), `climb_hud.gd`, `climb_ui.gd`, `climb_night.gd` |
+
+The font is Tiny5 (SIL Open Font License, `assets/fonts/`). To photograph a route: `SHOT_ROUTE=the_nose SHOT_PITCH=6 SHOT_HOURS=7,19 godot --path . res://tools/shots/climb_shot.tscn` (needs a window; `SHOT_INTRO=1` shoots the route card, `SHOT_SPECIAL=crux|result|pause|night` the others). `tools/shots/climb_walls.tscn`, `climb_landmarks.tscn` and `climb_figures.tscn` show the rock, the skyline and the people on their own. More in [docs/CLIMBING_MINIGAME.md](docs/CLIMBING_MINIGAME.md).
 
 ## Story
 
@@ -258,6 +292,8 @@ It walks the way from the homestead's north gate through Stoneman Meadow, over S
 godot --headless --path . res://tests/story_test.tscn
 godot --headless --path . res://tests/world_story_test.tscn
 godot --headless --path . res://tests/cast_test.tscn
+godot --headless --path . res://tests/climb_test.tscn   # every route, every piece of gear
+xvfb-run -a godot --path . res://tests/climb_screen_test.tscn   # plays all 13 on the real screen (needs a window)
 ```
 
 The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground.

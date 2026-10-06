@@ -1,127 +1,74 @@
-# Climbing minigame: first design
+# Climbing minigame
 
-Status: standalone interaction prototype and proposed rules. The existing Godot minigame remains the live implementation. Since this was written, the Godot screen has been redrawn (a scrolling face-on wall against a time-of-day sky, a climber on a rope, an altimeter HUD) and has gained bolts with quickdraws, climbing shoes (-1 per move), and chalk (once a pitch, -3 on the next 2 moves). See the README's "The climbing screen". Open [climbing-prototype.html](climbing-prototype.html) in a browser to play this study; it uses sample inventory and never touches game saves.
+Status: shipped. Every route in the guidebook has its own climb, set in the real place, and the gear you earn in the story changes how you climb. The browser study in [climbing-prototype.html](climbing-prototype.html) is kept as the original interaction sketch; the Godot screen is the real thing.
 
 ## Experience
 
-Climbing is a short sequence of deliberate decisions: read the wall, choose a hold, decide where to protect, then reach a ledge with enough energy for the next pitch. The satisfaction comes from recognizing how a new piece of story-earned equipment changes the available line.
-
-Use a side-on granite wall with a visible climber, rope, equipment placements, and ledges. Decisions have no real-time deadline. A move plays a short animation after confirmation. Target roughly one to three minutes of player time per pitch, to be tuned through playtesting. Game time advances only when an action succeeds.
-
-The prototype is an interaction study with browser controls and simplified geometry. Its terrain layouts are invented for testing the mechanic; they are not reconstructions of real routes. Godot's final screen must be composed for the existing 480 × 270 viewport, with a scrolling wall and a collapsible equipment panel rather than a shrunken browser layout.
+A climb is a short sequence of decisions: read the wall, choose a hold, decide where to protect, then reach the ledge with enough stamina for the next pitch. Nothing is timed against you, apart from three small, forgiving skill checks at cruxes. The satisfaction is in feeling a new piece of gear change the line: cams open up a crack, quickdraws clip the old pitons on the Spire, a belay device softens a fall, ascenders jug the Nose's fixed lines, aiders get you past the Great Roof, and an ice axe stops a slide on the glacier.
 
 ## Play loop
 
-1. **At the base:** show route identity, pitch count, required gear, expected food, night requirements, and the destination unlocked. Display missing equipment by name. Start with a snapshot of owned equipment and the food selected for the climb.
-2. **Read:** highlight reachable holds. Focus previews effort, stamina afterward, terrain, compatible equipment, and the consequence of exhaustion. Readability cannot depend on color alone.
-3. **Move:** choose up-left, up, or up-right. Ordinary moves cost stamina and six game minutes. Terrain can require a specific equipment action.
-4. **Protect:** stop at cracks or bolts and place a piece. The rack count falls and the rope visibly runs through the placement. Equipment remains on the pitch until recovered.
-5. **Belay:** recover ten stamina, recover the rack when changing pitches, choose food, and explicitly continue. Big walls can require a haul or overnight stop.
-6. **Finish or retreat:** show elapsed time, food eaten, and the outcome. Return control to the caller, which updates the story and map once.
+1. **Route card.** A postcard of the view, the pitches (a `*` marks a crux), the gear you need and have, the food you carry and what's worth bringing. `E` starts, `Esc` backs out without spending time.
+2. **Pitch banner.** Each pitch announces its name and a line of beta ("Chalk up before the bulge").
+3. **Read.** Rings mark the holds within reach with what each move costs now (shoes, chalk, chimney rhythm, weather and slush included). Rests and cruxes are labelled.
+4. **Move.** Up, up-left, up-right. A move costs stamina and six game minutes. Run out and you fall.
+5. **Protect.** `Space` clips a bolt (or an old piton) with a quickdraw, or places a cam in a crack. The rope runs through every piece; runouts of four moves or more end the climb safely.
+6. **Crux.** One hard move on some pitches asks for a short skill check. Perfect gives stamina back; a slip costs some.
+7. **Belay.** At a ledge you recover 10 stamina (16 with a belay device), can eat (`E`), and the next pitch starts. Rope and gear are recovered by your partner.
+8. **Nights.** On a wall, a night needs a real meal (30+ energy); the night scene plays, and you wake rested.
+9. **Top out or retreat.** The result card shows time, falls, style (onsight, hard-won, aided), how the cruxes went and a fact about the route. Retreating keeps your gear; the tick only comes with the top. The caller records the tick once and applies the elapsed time once.
 
-Do not require a timing challenge for every handhold. A later optional timing mode should not alter whether story destinations are accessible.
+## Gear and what it does
 
-## Equipment and story progression
+| Gear | When you get it | In the climb |
+|---|---|---|
+| Climbing shoes | Marty's kit | -1 stamina on every move (not on ice); wider crux windows |
+| Chalk bag | Marty's kit | Once a pitch: next 2 moves -3; wider crux windows while chalked |
+| Harness, rope | Marty's kit; Leonard | Lead climbing; top-rope practice on Swan Slab |
+| Quickdraws | Marty's kit, then Eichorn, Robbins... | Clip bolts, and fixed pitons on cam routes |
+| Cams | Leonard onward | Place in cracks; the rack refills each pitch |
+| Belay device | Robbins (Nutcracker) | Soft catches (+10 stamina after a fall), restful belays (+6), rappel retreat |
+| Aiders | Harding | Pull through a hard move on a wall pitch for a cam and 12 minutes (costs the free ascent) |
+| Ascenders | Johnson (Astroman) | Jug fixed ropes: 3 stamina, 8 minutes, you can't fall |
+| Haul bag, portaledge | Harding, Johnson | The bag swings below you (+10 minutes a pitch); a hanging night in a portaledge is a full night |
+| Ice axe, crampons | Muir | Snow and ice moves cost less; the axe stops a slide (self-arrest) |
 
-| Existing gear ID | Proposed use during a climb | First teaching moment |
-| --- | --- | --- |
-| `approach_shoes` | Passive: ordinary rock moves cost one less stamina, reflected in the preview. | Starting kit at Swan Slab. |
-| `chalk_bag` | Active: spend two game minutes; next two ordinary rock/crack/bolt moves cost three less. One use per pitch in this study; no new consumable inventory. | Before the practice crux. |
-| `rope` | Enables leading with a harness. Show rope through placements and catches. Pitch-length variants are deferred because current gear resources have no length property. | Leonard's existing reward. |
-| `harness` | Enables roped movement with the rope; represented on the character, without a repeated equip prompt. | Leonard's existing reward. |
-| `cam` | Place at a crack for one stamina and two minutes. One piece leaves the rack until the next pitch. | Two cams awarded by Leonard; Apron teaches placement spacing. |
-| `quickdraw` | Clip a marked bolt for one stamina and two minutes. Shares the protection system with cams, with separate remaining counts. | Proposed later slab chapter; no such reward quest exists yet. |
-| `belay_device` | Enables authored rappel exits and later route requirements. The browser study lists it but does not simulate a rappel branch. | Proposed multi-pitch chapter. Earlier climbs retain their existing partner-assisted retreat. |
-| `aiders` | Select aid mode for an authored aid section. Spend one cam and five stamina, take twelve minutes, and create protection at the new position. Reuse the ladders. | Proposed big-wall chapter. |
-| `ascenders` | Select ascender mode on an authored fixed-rope section: four stamina and eight minutes. A secured section has zero local runout. | Proposed big-wall chapter. |
-| `haul_bag` | Enables extra provisions on expedition routes. Between pitches, hauling costs ten minutes; the study models that time but has no capacity system yet. | Proposed supply-planning quest. |
-| `portaledge` | At a marked hanging bivy, consume a chosen substantial meal and spend the night; restore stamina. Prototype night costs one meal and 600 minutes. | Proposed overnight wall chapter. |
-| `ice_axe` | Select axe mode for authored snow sections; six stamina per move when combined with crampons. | Proposed high-country chapter. |
-| `crampons` | Passive requirement for those snow footholds, visibly equipped. | Proposed high-country chapter. |
+## Pitch styles
 
-Only starting shoes/chalk and Leonard's rope/harness/two-cam reward are currently available through the implemented progression. Later sample kits deliberately demonstrate the design without claiming those quests already exist. The alpine pack mentioned in the older design is not an existing gear resource and is not required here.
+| Style | Rules | Where |
+|---|---|---|
+| slab | Friction; bolts every 2 moves on bolted routes | Firefall Slab, Swan Slab, the Apron's friction |
+| crack, flake | Cracks take cams; flakes are long cracks | The Grack, Nutcracker, Spire, Astroman, Nose |
+| chimney | A narrow slot: alternate sides (-1 stamina) or lose the rhythm (+2); big back-and-foot cracks | Steck-Salathé, Harding Slot, Rotten Chimney |
+| roof | The picture runs sideways under a ceiling, cams all along the crack, the lip is the crux | Separate Reality, the Great Roof |
+| dike | Stay on the dike (cheap); off it it's blank; bolts are 3 moves apart | Snake Dike |
+| knobs | Big holds everywhere, a few cracks | Cathedral Peak |
+| snow, ice | Kicked steps and chipped holds; crevasses with snow bridges; slush after noon; a fall slides 2 to 3 moves | Lyell Glacier |
 
-The first lead route must remain playable with Leonard's exact reward. Do not retroactively require quickdraws or a belay device for it. Top-rope practice uses the instructor's equipment even though the player does not yet own a rope and harness.
+## Crux checks
 
-## Rules for the first playable version
+| Kind | How | Where |
+|---|---|---|
+| timing | A marker sweeps a bar; `Space` in the green (center is perfect). The green is wider with shoes, chalk, and on a top rope | Firefall Slab's bulge, Swan Slab's polished wave, Separate Reality's lip, Astroman's Boulder Problem... |
+| mash | Tap Up quickly | Nutcracker's mantel |
+| rhythm | Alternate Left and Right to the beat | The Narrows, Harding Slot, the King Swing, the Pendulum |
 
-- Maximum stamina: 100. Every destination hold displays its final cost after equipment effects; clamp non-ledge costs to at least one.
-- A player decision that is unavailable spends nothing. Pausing, inspecting, and selecting tools spend nothing.
-- No random slips in the initial version. Stamina reaching zero triggers a fall, including after a placement. Warn before committing a move that exhausts the player.
-- A short fall costs twenty game minutes and restores stamina to thirty. Keep placements and remaining rack counts; do not duplicate gear after a fall.
-- Use the existing simplified runout model initially: four or more rows above protection, or three falls on a pitch, ends the attempt safely. A short lead fall returns to `max(0, protection_row - runout)`. A top-rope fall leaves the player at the same hold. These are game abstractions.
-- Runout is never negative when the climber is below placed protection. Recovery movements beneath the highest placement do not require another piece.
-- A retreat keeps all owned equipment. Spent food and game time remain spent. The study uses fifteen minutes for a voluntary retreat; the game should author descent time per route.
-- Food is chosen at ledges; display its energy and remaining supply. Preserve a meal for mandatory nights. The prototype uses three +25 snacks and two +40 meals as fixtures; production uses `FoodDB` values and actual inventory quantities.
-- The study requires a portaledge night after pitch two of the three-pitch big wall. Without a meal, the next pitch stays unavailable and retreat remains available. Production should prevent an obviously under-supplied departure at the route preview and explain the required meal reserve.
-- Racks refill only at pitch transitions, representing the partner recovering protection. Gear is never removed from the player's permanent ownership merely because it is placed.
-- Whole-route success requires the final ledge. Intermediate pitches and failed attempts never award route completion or unlock destinations.
+Bots and tests resolve cruxes as an average move; the screen sets `ClimbState.interactive`.
 
-## Authored opening lesson
+## Economy
 
-**Swan Slab:** borrowed top rope; one short pitch. Teach destination cost, chalk, and the belay. After the climb, the existing `leonard_belay` quest still requires carrying thirty food energy before granting equipment.
+Each hold costs `2 + round(grade * 1.2) + 0..2` (grade is the pitch's 1-5 difficulty), reduced by shoes and chalk. A pitch is 7 to 12 moves. Stamina is 100; belays give +10; a wall night restores it all. So short early routes cost nothing to eat for, and the long ones (Steck-Salathé, Astroman, the Nose) need real provisions: `food` in each route's profile is what a careful climber needs, and the route card says so. `tests/climb_test.tscn` plays every route with a bot and exactly that food and checks 85 % tops out.
 
-**Apron study:** three pitches, with cracks on the center line at rows two and five. The outer left line is less tiring but bypasses the cracks. A player must return toward the center to protect the next stretch. The right line costs more and serves as a preview comparison. Later production layouts should vary between pitches; repeated layouts in the browser are intentional control samples.
+## Real places
 
-Example center-line pitch using the browser study's costs:
+`scripts/climb/climb_profiles.gd` holds each route's place, the rock, the skyline you see (Half Dome, El Capitan, the Three Brothers, Bridalveil, Sentinel Rock, Glacier Point, the Cockscomb, Mount Lyell...), the ground at its foot, its summit, its belayer, descent, facts for the result card, and the real names of its pitches where known (the Grack, Bathtub, Wilson Overhang, the Narrows, Boulder Problem, Enduro Corner, Harding Slot, Sickle Ledge, El Cap Tower, King Swing, Great Roof, Changing Corners...). Where a guidebook disagrees or I could not verify, the text stays general.
 
-| Decision | Stamina afterward | Cams left |
-| --- | --- | --- |
-| Start | 100 | 2 |
-| Row 1: ordinary rock, cost 8 | 92 | 2 |
-| Row 2: crack, cost 9; place cam, cost 1 | 82 | 1 |
-| Row 3: rock, cost 8 | 74 | 1 |
-| Row 4: rock, cost 8 | 66 | 1 |
-| Row 5: crack, cost 9; place cam, cost 1 | 56 | 0 |
-| Chalk, then row 6 crux: cost 9 | 47 | 0 |
-| Row 7: chalked rock, cost 5 | 42 | 0 |
-| Row 8: rock, cost 8 | 34 | 0 |
-| Reach intermediate ledge, recover 10 | 44 | Rack recovered on continue |
+## Verification
 
-This demonstrates a complete pitch with the starter rack and no fall. Meals and snacks support the later pitches. Extra cams enable additional protection on routes with more placement opportunities; they are not a generic stamina upgrade.
+- `tests/climb_test.tscn`: every route has a profile and authored pitches, every pitch has a line, a careful bot tops every route, each piece of gear does its job, cruxes, weather, nights.
+- `tests/climb_screen_test.tscn` (needs a window): plays every route on the real screen, through crux checks, nights and the result card.
+- Screenshots: see the README.
 
-## Screen and controls
+## Not done yet
 
-The wall is the primary view. Show the next several moves and the last protection; scroll as the player climbs. Keep stamina, rack, pitch, and current tool visible. Preview details appear near the selected hold. Show a clear exhaustion warning and an explicit retreat confirmation in the production UI.
-
-| Intent | Browser study | Proposed Godot mapping |
-| --- | --- | --- |
-| Choose next hold | Click/tap, or left/up/right arrows | Existing movement actions; D-pad/left stick with discrete selection |
-| Preview | Hover or keyboard focus | Focus a hold before confirm; pointer hover |
-| Place or clip | Space or button | `use_tool`, based on selected equipment |
-| Select equipment | Buttons; C/A/U/I shortcuts | Compact equipment selector; bind a dedicated cycle action after reviewing existing controller bindings |
-| Eat | Snack/meal buttons at ledges | `interact` opens food choices |
-| Next pitch | E or button | `interact` in the belay menu |
-| Retreat | Esc or button, immediate in study | `ui_cancel` opens retreat confirmation |
-
-The prototype supports keyboard and pointer interaction. It has no gamepad input or animation polish. Production should use semantic Control nodes for HUD/buttons, preserve keyboard focus after actions, support input remapping, and avoid repeating a climb action when a key is held.
-
-## Integration plan for later
-
-Keep the public `ClimbMinigame.setup(route, seed)` and `finished(success, minutes)` contract for the initial single-day implementation. `ClimbStart` already pauses world actions and time, receives the result, records success in `QuestLog`, and unlocks/transports to the destination. The design prototype does not change those call sites.
-
-Extend `ClimbState` to receive an equipment-count snapshot instead of only a cam count. Keep rules independent of drawing. Represent holds with terrain type, cost, and allowed actions; represent placements with gear type and cell. Preserve the current `cam` count and `required_gear` IDs rather than creating another permanent gear inventory. Add a pitch-belayed phase so food, recovery, and continuing are explicit.
-
-Add optional authored pitch resources to `RouteData`, with hold layout, supported gear, belay type, fixed sections, and night stops. Keep existing `pitches`, `moves_per_pitch`, and `top_rope` working as defaults during migration. Use authored layouts for the opening lessons before extending procedural generation.
-
-The present generator guarantees a geometric line but its crack check only finds a crack somewhere in each band. That does not prove a continuous, protectable line using the actual rack. Later generation must validate reachability, equipment consumption, energy/rest budget, and protection spacing together; retry generation or use an authored fallback if no viable line exists.
-
-Single-day food transactions can initially follow the existing inventory consumption path. Before expeditions, introduce a reserved expedition food bag with an ordered action record and one owner for commit/return, so inventory cannot be consumed both by the screen and by its caller. Keep item age consistent across bivys; calculate spoilage before offering the next day's food.
-
-Multi-day integration needs a separate clock change: `GameClock.advance_minutes()` currently clamps at 2 AM and emits the world's pass-out event. Returning an aggregated 600-minute bivy duration cannot represent nights correctly. Process expedition days explicitly, advance `day_started` once per day, suppress the ordinary world rescue while on the wall, and coordinate food aging with the expedition bag. Store the settled world date/time in the expedition result or apply time incrementally; never also apply the old total-minutes update. Single-day and expedition callers must share an explicit ownership rule for time.
-
-If mid-route saving is added, save route ID/layout seed, pitch, position, stamina, placements, rack, food reservation, tool effects, night state, and applied time. Until then, clearly make climbs complete attempts; the standalone study resets on reload.
-
-## Implementation order and acceptance criteria
-
-1. Port the practice and starter-lead interaction into an isolated Godot scene. Preserve existing scene entry/exit contracts. Demonstrate completion with starting gear and Leonard's reward respectively.
-2. Add contextual cam/quickdraw actions, chalk, explicit belays, food choices, and short-fall recovery. Check that invalid actions spend nothing, gear does not duplicate after falling, and reaching the last ledge while exhausted cannot award success.
-3. Wire the isolated scene into the route caller. Confirm one quest event per success, no event on retreat, one application of elapsed time, restored movement/pause state on exit, and correct destination spawn. Re-run the existing story and world-story checks when making that integration.
-4. Add authored aid/fixed-rope sections and their equipment. Confirm all required pieces are available before entry and that safe retreat is always possible.
-5. Implement expedition time, provisions, nights, save policy, and high-country terrain. Confirm midnight does not invoke the normal pass-out rescue or apply time/food twice.
-
-Review the study for whether tool choices feel useful, whether two cams create understandable choices, and whether three pitches remain enjoyable. Numerical tuning, final art, later reward quests, and actual route layouts remain future work.
-
-## Prototype verification
-
-The embedded JavaScript was executed in Node with a minimal document stub. All five sample chapters completed using their fixture kits; checks also passed for unavailable aid actions spending nothing, protected falls preserving placement/rack counts, long runouts ending without success, and missing night meals blocking progression while allowing retreat. These check game rules, not browser rendering or Godot integration. A browser preview was attempted but blocked by the browser's local-file URL security policy, so visual review remains outstanding.
+Rappel and descent scenes (the profiles record each descent), save-in-the-middle, gamepad glyphs on the hints, sound, and tribal review of anything on these routes that touches Native places (none of the current text does).

@@ -302,11 +302,11 @@ static func _meal(ci: CanvasItem, cx: float, cy: float, time: float) -> void:
 static func _card(ci: CanvasItem, info: Dictionary, age: float, hanging: bool) -> void:
 	var r := Rect2(300, 24, 170, 100)
 	UI.panel(ci, r)
-	UI.ink(ci, Vector2(r.position.x + 5, r.position.y + 20), "Night %d on the wall" % info.get("night", 1), UI.INK, 16, 160.0, HORIZONTAL_ALIGNMENT_CENTER)
-	UI.ink(ci, Vector2(r.position.x + 5, r.position.y + 34), "%s" % ("A portaledge on the wall." if hanging else "A ledge to sleep on."), UI.INK_SOFT, 10, 160.0, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.ink(ci, Vector2(r.position.x + 85, r.position.y + 20), "Night %d on the wall" % info.get("night", 1), UI.INK, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.ink(ci, Vector2(r.position.x + 85, r.position.y + 34), "%s" % ("A portaledge on the wall." if hanging else "A ledge to sleep on."), UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 	var meal: String = info.get("meal", "a meal")
 	var lines := UI.wrap_lines("You and your partner share %s by headlamp. The Valley's campfires glow far below." % meal, 150.0, 10)
 	for i in lines.size():
 		UI.ink(ci, Vector2(r.position.x + 10, r.position.y + 50 + i * 11), lines[i], UI.INK, 10)
 	if age > 0.8:
-		UI.ink(ci, Vector2(r.position.x + 5, r.end.y - 8), "E: sleep until dawn", UI.WARN_DARK, 10, 160.0, HORIZONTAL_ALIGNMENT_CENTER)
+		UI.ink(ci, Vector2(r.position.x + 85, r.end.y - 8), "E: sleep until dawn", UI.WARN_DARK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)

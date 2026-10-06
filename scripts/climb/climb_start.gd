@@ -15,9 +15,22 @@ func _ready() -> void:
 
 
 func _draw() -> void:
-	# Placeholder: a rope coiled at the base of the wall.
-	draw_arc(Vector2(0, -4), 5.0, 0, TAU, 12, Color(0.85, 0.3, 0.25), 2.0)
-	draw_arc(Vector2(0, -4), 2.5, 0, TAU, 10, Color(0.85, 0.3, 0.25), 1.0)
+	# A trail sign with a grade plate (green easy, red hard, blue for ice) and
+	# a coil of rope at its foot.
+	var yds := Guidebook.yds(route.grade) if route else 0.0
+	var plate := Color("5aa8e0")
+	if yds > 0.0:
+		plate = Color("7ac24a") if yds < 7.5 else (Color("e8c040") if yds < 10.5 else (Color("e8863a") if yds < 12.5 else Color("d8452e")))
+	var wood := Color("7a4a24")
+	draw_rect(Rect2(-1, -15, 3, 15), Color("2a1f1a"))
+	draw_rect(Rect2(0, -14, 1, 14), wood)
+	draw_rect(Rect2(-7, -16, 15, 8), Color("2a1f1a"))
+	draw_rect(Rect2(-6, -15, 13, 6), plate)
+	draw_rect(Rect2(-6, -15, 13, 1), plate.lightened(0.4))
+	draw_rect(Rect2(-6, -10, 13, 1), plate.darkened(0.3))
+	draw_arc(Vector2(7, -3), 4.0, 0, TAU, 12, Color("2a1f1a"), 3.0)
+	draw_arc(Vector2(7, -3), 4.0, 0, TAU, 12, Color(0.85, 0.3, 0.25), 2.0)
+	draw_arc(Vector2(7, -3), 2.0, 0, TAU, 8, Color(0.85, 0.3, 0.25), 1.0)
 
 
 func interact(player: Player) -> void:
@@ -34,7 +47,10 @@ func interact(player: Player) -> void:
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s (%s). You need more gear to climb this: %s." % [
 			route.display_name, route.grade, ", ".join(missing)]}])
 		return
+	var place: String = ClimbProfiles.get_profile(route.id).get("place", "")
 	var info := "%s, %s, %d pitch%s" % [route.display_name, route.grade, route.pitches.size(), "" if route.pitches.size() == 1 else "es"]
+	if place != "":
+		info += " (%s)" % place
 	if route.nights > 0:
 		info += ", %d night%s on the wall" % [route.nights, "" if route.nights == 1 else "s"]
 	if partner != "":

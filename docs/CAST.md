@@ -148,7 +148,7 @@ Gear arrives in the order the routes need it, and a quest can hand over gear as 
 
 After the Nose the scale stops mattering: the high country is alpine climbing, where the hard part is altitude, weather, and ice, not the grade. Cathedral Peak is only 5.6.
 
-Geography is part of the progression. You leave the Lamon Homestead: south to Curry Village (guidebook, then the Apron behind it), north to the Ahwahnee (Robbins), then out across the Valley (Nutcracker across from El Cap, the Spire near Bridalveil, Sentinel Rock above the Four Mile Trail, Washington Column past the Royal Arches, the roof crack at the west end, El Capitan Meadow) and finally up the Tioga Road.
+Geography is part of the progression. You leave the Lamon Homestead: south to Curry Village (guidebook, then the Apron behind it), north to the Ahwahnee (Robbins), then out across the Valley (Nutcracker above the Church Bowl, the Spire near Bridalveil, Sentinel Rock above the Four Mile Trail, Washington Column past the Royal Arches, the roof crack at the west end, El Capitan Meadow) and finally up the Tioga Road.
 
 ### Side stories
 
