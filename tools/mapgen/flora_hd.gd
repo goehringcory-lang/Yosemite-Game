@@ -434,3 +434,95 @@ func _canopy(im: Image, s: int) -> void:
 		FA.blob(im, cl[0], cl[1], cl[2], cl[3], leaf, s + i * 7, 0.08, 0.16, 0.2)
 		FA.leaf_specks(im, cl[0], cl[1], cl[2], cl[3], leaf, s + i, 6)
 	FA.rim(im, 0.6)
+
+
+# ---------------------------------------------------------------- signs
+
+const POST := ["2a1a12", "44301f", "5f4429", "7c5a36", "9a7444"]
+
+
+func _post(im: Image, x: int, y0: int, y1: int, w: int, s: int) -> void:
+	for y in range(y0, y1 + 1):
+		for dx in w:
+			var t := 0.82 - float(dx) / maxf(1.0, w - 1.0) * 0.7 + (K.hash2(x + dx, y / 2, s) - 0.5) * 0.25
+			K.px(im, x + dx, y, FA.shade(ramp(POST), t, x + dx, y))
+
+
+func _plank(im: Image, x: int, y: int, w: int, h: int, s: int) -> void:
+	var r := ramp(POST)
+	K.rect(im, x, y, w, h, r[3])
+	K.hline(im, x, y, w, r[4])
+	K.hline(im, x, y + h - 1, w, r[1])
+	K.vline(im, x + w - 1, y, h, r[2])
+	for i in 3:
+		K.px(im, x + 1 + int(K.hash2(i, 1, s) * (w - 3)), y + 1 + int(K.hash2(i, 2, s) * (h - 2)), r[2])
+
+
+func info_sign() -> Image:
+	var im := K.make(16, 16)
+	K.shadow(im, 8.0, 15.0, 6.0, 1.2, 0.26)
+	_post(im, 3, 9, 14, 2, 11)
+	_post(im, 11, 9, 14, 2, 12)
+	_plank(im, 1, 2, 14, 8, 13)
+	# routed face with cream lettering and a green park badge
+	K.rect(im, 2, 3, 12, 6, c_hex("2f2218"))
+	K.hline(im, 2, 3, 12, c_hex("1a120c"))
+	for y in [4, 6]:
+		K.hline(im, 3, y, 7 if y == 4 else 5, c_hex("e4d8b8"))
+	K.hline(im, 3, 7, 3, c_hex("b8ac90"))
+	K.rect(im, 11, 4, 2, 3, c_hex("6c9a48"))
+	K.px(im, 11, 4, c_hex("9cc86c"))
+	FA.rim(im, 0.5)
+	return im
+
+
+func trailhead() -> Image:
+	var im := K.make(16, 24)
+	K.shadow(im, 8.0, 23.0, 5.5, 1.2, 0.26)
+	_post(im, 7, 3, 22, 3, 21)
+	# two arrow planks pointing opposite ways
+	var r := ramp(POST)
+	for row: Array in [[3, 2, 11, 1], [10, 5, 10, -1]]:
+		var y: int = row[0]
+		var x: int = row[1]
+		var w: int = row[2]
+		_plank(im, x, y, w, 5, 30 + y)
+		if row[3] > 0:
+			for k in 3:
+				K.vline(im, x + w + k, y + k, 5 - k * 2, r[3])
+				K.px(im, x + w + k, y + k, r[4])
+		else:
+			for k in 3:
+				K.vline(im, x - 1 - k, y + k, 5 - k * 2, r[2])
+		K.hline(im, x + 2, y + 2, w - 4, c_hex("e4d8b8"))
+	FA.rim(im, 0.5)
+	return im
+
+
+func map_kiosk() -> Image:
+	var im := K.make(16, 24)
+	K.shadow(im, 8.0, 23.0, 7.0, 1.4, 0.26)
+	_post(im, 2, 12, 22, 2, 41)
+	_post(im, 12, 12, 22, 2, 42)
+	# the notice board: a frame around a little painted map
+	var r := ramp(POST)
+	K.rect(im, 1, 5, 14, 10, r[2])
+	K.hline(im, 1, 5, 14, r[4])
+	K.vline(im, 1, 5, 10, r[3])
+	K.hline(im, 1, 14, 14, r[0])
+	K.rect(im, 3, 6, 10, 8, c_hex("b8c88a"))
+	for y in range(6, 14):
+		for x in range(3, 13):
+			if K.hash2(x, y, 43) > 0.82:
+				K.px(im, x, y, c_hex("9db070"))
+	K.hline(im, 3, 10, 6, c_hex("5a96c8"))
+	K.px(im, 9, 9, c_hex("5a96c8"))
+	K.px(im, 10, 8, c_hex("5a96c8"))
+	K.vline(im, 6, 6, 8, c_hex("d4b878"))
+	K.px(im, 10, 12, c_hex("d8323c"))
+	K.px(im, 10, 11, c_hex("f06a6a"))
+	# a little shingled roof
+	K.shingles(im, 0, 1, 16, 5, c_hex("5a3e2a"), 44, 0.18, 2)
+	K.hline(im, 0, 5, 16, c_hex("2a1a10"))
+	FA.rim(im, 0.5)
+	return im

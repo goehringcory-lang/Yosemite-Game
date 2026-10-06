@@ -331,7 +331,7 @@ func _refresh() -> void:
 	_acts_label.text = "\n".join(Array(hub.activities).map(func(a: String) -> String: return "- " + a))
 	_route_label.text = _route_text(hub)
 	_route_label.modulate = GOLD if _legs.has(_selected) and _legs[_selected].open else (TEXT if _selected == _hub_here else CLOSED)
-	var tab_hint := "[Tab] Area map"
+	var tab_hint := "[Tab] Area"
 	if _travel:
 		_hint_label.text = "[Arrows] Choose   [E] Travel   [Esc] Close   %s" % tab_hint
 	else:
@@ -680,7 +680,7 @@ func _build() -> void:
 	box.add_theme_constant_override("separation", 4)
 	panel.add_child(box)
 	_name_label = _label(box)
-	_name_label.add_theme_font_size_override("font_size", 16)
+	_name_label.add_theme_font_size_override("font_size", 20)
 	_name_label.add_theme_color_override("font_color", GOLD)
 	_sub_label = _label(box)
 	_sub_label.modulate = DIM
@@ -731,6 +731,6 @@ func _label(parent: Control) -> Label:
 	var label := Label.new()
 	if parent is VBoxContainer:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.custom_minimum_size.x = INFO_RECT.size.x - 8
+		label.custom_minimum_size.x = INFO_RECT.size.x - 14
 	parent.add_child(label)
 	return label

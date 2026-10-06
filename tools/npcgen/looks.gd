@@ -29,6 +29,15 @@ const SKIN_TAN := "c8905e"
 const SKIN_BROWN := "a8703f"
 const SKIN_DEEP := "7e4c2a"
 
+## The player: a ranger-naturalist's wide hat, a green work shirt and a small
+## pack. Drawn to assets/sprites/player.png (not a character id, so it is not
+## in LOOKS).
+const PLAYER := {
+	"skin": SKIN_FAIR, "hair": "5a3a22", "hat": "wide", "hat_color": "7a5232", "hat_band": "3a2a20",
+	"top": "6b7d4a", "top_style": "shirt", "bottom": "3b4660", "shoes": "3a2a20",
+	"pack": "pack", "pack_color": "8a5a30",
+}
+
 const LOOKS := {
 	# ------------------------------------------------ Valley floor, Chapter 1
 	"galen_clark": {

@@ -305,47 +305,15 @@ func paint_flora() -> Image:
 # ---------------------------------------------------------------- objects
 
 func paint_info_sign() -> Image:
-	var im := Image.create_empty(16, 16, false, Image.FORMAT_RGBA8)
-	shadow(im, 8, 15, 6, 1)
-	rect(im, 3, 9, 2, 6, c("5a3e28"))
-	rect(im, 11, 9, 2, 6, c("5a3e28"))
-	rect(im, 1, 3, 14, 7, c("6b4a2f"))
-	rect(im, 2, 4, 12, 5, c("3a2a1c"))
-	for y in [5, 7]:
-		rect(im, 3, y, 7, 1, c("d8ccb0"))
-	rect(im, 11, 5, 2, 3, c("7fa05a"))
-	outline(im, Rect2i(0, 0, 16, 16), OUTLINE)
-	return im
+	return FloraHd.new().info_sign()
 
 
 func paint_trailhead() -> Image:
-	var im := Image.create_empty(16, 24, false, Image.FORMAT_RGBA8)
-	shadow(im, 8, 23, 5, 1)
-	rect(im, 7, 4, 2, 19, c("6b4a2f"))
-	rect(im, 2, 5, 11, 4, c("8a6a44"))
-	rect(im, 12, 6, 2, 2, c("8a6a44"))
-	rect(im, 4, 11, 11, 4, c("8a6a44"))
-	rect(im, 3, 12, 1, 2, c("8a6a44"))
-	for y in [6, 12]:
-		rect(im, 4, y + 1, 7, 1, c("e8dcb8"))
-	outline(im, Rect2i(0, 0, 16, 24), OUTLINE)
-	return im
+	return FloraHd.new().trailhead()
 
 
 func paint_map_kiosk() -> Image:
-	var im := Image.create_empty(16, 24, false, Image.FORMAT_RGBA8)
-	shadow(im, 8, 23, 7, 1)
-	rect(im, 2, 12, 2, 11, c("5a3e28"))
-	rect(im, 12, 12, 2, 11, c("5a3e28"))
-	rect(im, 1, 2, 14, 3, c("45301f"))
-	rect(im, 0, 4, 16, 1, c("5a3e2a"))
-	rect(im, 2, 5, 12, 9, c("6b4a2f"))
-	rect(im, 3, 6, 10, 7, c("7fa05a"))
-	rect(im, 3, 9, 10, 1, c("4f86c0"))
-	rect(im, 6, 6, 1, 7, c("c8a060"))
-	px(im, 9, 8, c("d8323c"))
-	outline(im, Rect2i(0, 0, 16, 24), OUTLINE)
-	return im
+	return FloraHd.new().map_kiosk()
 
 
 func paint_blocker() -> Image:

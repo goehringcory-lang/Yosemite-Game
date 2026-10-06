@@ -39,7 +39,7 @@ func _ready() -> void:
 	_panel.add_child(column)
 	var title := Label.new()
 	title.text = "Paused"
-	title.add_theme_font_size_override("font_size", 16)
+	title.add_theme_font_size_override("font_size", 20)
 	title.add_theme_color_override("font_color", HEADING)
 	column.add_child(title)
 	var grid := GridContainer.new()
