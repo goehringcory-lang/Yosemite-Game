@@ -929,7 +929,9 @@ func _draw_reachable() -> void:
 		var hold := state.hold_at(r, c)
 		var cost := state.move_cost(r, c)
 		if r == state.top_row:
-			UI.text(_canvas, p + Vector2(-12, -4), "ledge", UI.GOOD)
+			_canvas.draw_arc(p, 7.0, 0, TAU, 16, Color(UI.GOOD, pulse), 1.0)
+			if dx == 0 or state.hold_at(r, state.col).is_empty():
+				UI.text(_canvas, p + Vector2(-12, -10), "ledge", UI.GOOD)
 			continue
 		var color := _cost_color(cost)
 		if hold.get("rest", false):
