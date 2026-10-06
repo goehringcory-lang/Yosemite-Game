@@ -224,6 +224,7 @@ func building(sprite_name: String) -> Array:
 		awning(im, door_cx - aw / 2, wall_top + 1, aw, 5, Color(o.get("awning_a", "3f6b4a")), Color(o.get("awning_b", "e6d8b0")))
 	sign_board(im, door_cx, wall_top - 8 if not o.get("awning", false) else wall_top - 9, o["label"])
 
+	_dress(im, o, sd, wall_top, win_h, door_cx, o.get("awning", false))
 	# Ambient occlusion on the sunless side, and a lit lip on the near side.
 	shade(im, w - 8, wall_top, 7, body_h + 1, timber[0], 0.0, 0.85, 0.34, false)
 	shade(im, 1, wall_top + 2, 4, body_h, granite[6], 0.5, 0.0, 0.12, false)
@@ -231,6 +232,38 @@ func building(sprite_name: String) -> Array:
 	var glow := _glow_image(im, w, h)
 	roof = base_roof
 	return [im, glow]
+
+
+## Small touches that make a building lived in: flower boxes under some
+## windows, a wall lantern by the door, and a downspout down the near corner.
+func _dress(im: Image, o: Dictionary, sd: int, wall_top: int, win_h: int, door_cx: int, awning: bool) -> void:
+	var wins: Array = o["windows"]
+	var blooms: Array = [
+		[Color("e86a8a"), Color("f6b0c2")], [Color("f0c84a"), Color("fbe9a0")],
+		[Color("d8503a"), Color("f08a6a")], [Color("9a7ad8"), Color("c8b4f0")]]
+	var pick: Array = blooms[sd % blooms.size()]
+	for i in wins.size():
+		if wins.size() >= 4 and i % 2 == 1:
+			continue
+		var wx: int = wins[i]
+		var by := wall_top + 3 + win_h + 1
+		K.rect(im, wx - 4, by, 8, 2, timber[1])
+		K.hline(im, wx - 4, by, 8, timber[3])
+		for fx in range(wx - 3, wx + 4):
+			var tall := K.hash2(fx, sd, 7) > 0.45
+			K.px(im, fx, by - 1, leaf[3])
+			if tall:
+				K.px(im, fx, by - 2, pick[0] if (fx + sd) % 2 == 0 else pick[1])
+			elif K.hash2(fx, sd, 8) > 0.5:
+				K.px(im, fx, by - 1, pick[0])
+	# a wall lantern beside the door
+	var lx := door_cx + 7
+	var ly := wall_top + 4
+	K.rect(im, lx - 1, ly - 1, 3, 1, iron[3])
+	K.rect(im, lx - 1, ly, 3, 4, iron[1])
+	K.rect(im, lx, ly + 1, 1, 2, warm[6])
+	K.px(im, lx, ly + 1, warm[7])
+	K.hline(im, lx - 1, ly + 4, 3, iron[3])
 
 
 ## Lit windows and a soft halo, drawn over the finished building (for night).

@@ -383,6 +383,44 @@ func tent_cabin(variant: int) -> Image:
 			if x == x0 - 2 + inset:
 				tone += 0.12
 			K.px(im, x, y, canvas[clampi(roundi(tone * 5.0), 0, 5)])
+	# worn canvas: darker, stained lower corners and eave, a lit seam beside each
+	# dark one, pine-needle litter and a stitched patch
+	for y in wall_top:
+		var t2 := float(y) / wall_top
+		var inset2 := int((1.0 - t2) * 11.0)
+		for x in range(x0 - 2 + inset2, x0 + bw + 2 - inset2):
+			var col := im.get_pixel(x, y)
+			if (x - x0 - 3) % 9 == 1:
+				col = col.lightened(0.06)
+			var stain := smoothstep(0.55, 1.0, t2) * (0.1 + 0.18 * K.hash2(x / 4, y / 3, 170 + variant))
+			if x < x0 + 5 or x > x0 + bw - 6:
+				stain += 0.05
+			col = col.darkened(stain)
+			if K.hash2(x, y, 171 + variant) > 0.985 and t2 > 0.3:
+				col = mat.leaf[1] if K.hash2(x, y, 172) > 0.5 else mat.timber[2]
+			im.set_pixel(x, y, col)
+	# sag creases running from the ridge toward the corners
+	for side in [-1, 1]:
+		for k in 12:
+			var cx2: int = w / 2 + side * (3 + k)
+			var cy2: int = 2 + k
+			if cx2 > x0 - 2 and cx2 < x0 + bw + 2 and cy2 < wall_top - 2:
+				im.set_pixel(cx2, cy2, im.get_pixel(cx2, cy2).darkened(0.12))
+	if variant % 3 == 0:
+		var px0 := x0 + 8 + (variant % 4) * 4
+		K.rect(im, px0, 9, 7, 5, canvas[4])
+		for sx in range(px0, px0 + 7, 2):
+			K.px(im, sx, 9, canvas[1])
+			K.px(im, sx, 13, canvas[1])
+		K.vline(im, px0, 9, 5, canvas[1])
+		K.vline(im, px0 + 6, 9, 5, canvas[1])
+	if variant % 4 == 1:
+		# a stovepipe with a cap and flashing
+		var sx2 := w - 15
+		K.rect(im, sx2, 1, 3, 9, mat.iron[1])
+		K.vline(im, sx2, 1, 9, mat.iron[3])
+		K.rect(im, sx2 - 1, 0, 5, 2, mat.iron[2])
+		K.rect(im, sx2 - 1, 9, 5, 2, mat.iron[0])
 	for x in range(x0 - 2, x0 + bw + 2):
 		var hem := trim if ((x - x0) / 3) % 2 == 0 else trim.darkened(0.2)
 		K.px(im, x, wall_top - 2, hem)
