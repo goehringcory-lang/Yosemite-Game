@@ -16,3 +16,4 @@ destination_spawn = "apron_top"
 guide_chapter = "Curry Village"
 guide_order = 20
 guide_tip = "Up the Grack, a long flake on the Apron. Smear, trust your feet, and it tops out at Glacier Point."
+height_ft = 900

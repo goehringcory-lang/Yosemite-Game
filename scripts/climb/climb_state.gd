@@ -6,13 +6,22 @@ extends RefCounted
 ## A pitch is a grid of holds [member COLUMNS] wide. Row 0 is the belay ledge
 ## at the bottom, and the last row is the ledge at the top. Each move goes up
 ## one row: straight up, up-left, or up-right, onto a hold. Moves cost stamina.
-## Some holds are cracks, where you can place a cam. On bolted routes there are
-## bolts beside the line instead, and you clip each with a quickdraw. If
-## stamina runs out you fall to your last piece (or the belay). A short fall
-## only costs time; a long one ends the climb, and you lower off safely.
+## Some holds are cracks, where you can place a cam. On bolted pitches there
+## are bolts beside the line instead, and old pitons on some cam routes, and
+## you clip each with a quickdraw. If stamina runs out you fall to your last
+## piece (or the belay). A short fall only costs time; a long one ends the
+## climb, and you lower off safely.
 ##
-## The kit helps too: climbing shoes make every move a little cheaper, and a
-## chalk bag lets you chalk up once a pitch for a couple of easier moves.
+## The kit helps too: climbing shoes make every move a little cheaper, a chalk
+## bag lets you chalk up once a pitch for a couple of easier moves, a belay
+## device makes your partner's catches soft and the belay restful, aiders let
+## you pull through a hard move on a wall, ascenders let you jug fixed ropes,
+## and on snow an ice axe stops a slide.
+##
+## Each pitch comes from ClimbProfiles: its style (slab, crack, chimney, roof,
+## dike, knobs, snow, ice), where its crux and rests and fixed pieces are.
+## The crux asks for a short skill check when the screen sets [member
+## interactive]; otherwise (tests, bots) it resolves as an average move.
 
 enum Status { CLIMBING, TOPPED_OUT, RETREATED }
 
@@ -20,14 +29,20 @@ const COLUMNS := 5
 const MAX_STAMINA := 100
 ## Stamina regained resting at each belay ledge.
 const BELAY_REST := 10
+## ...and a belay device makes the hanging belay much more restful.
+const DEVICE_REST := 6
 ## Stamina you have back after hanging on the rope following a fall.
 const AFTER_FALL_STAMINA := 30
+## ...or after a soft catch from a belay device.
+const DEVICE_CATCH := 10
 ## Falling from this many moves above your protection (or more) ends the climb.
 const DANGEROUS_RUNOUT := 4
 ## After this many falls on one pitch, your arms are done and you lower off.
 const MAX_FALLS_PER_PITCH := 3
 ## A night on the wall needs a meal worth at least this much energy.
 const BIVY_MEAL_ENERGY := 30
+## Stamina a night in a portaledge gives (a ledge gives a full night too).
+const COLD_NIGHT_STAMINA := 70
 ## In-game minutes each action takes.
 const MINUTES_PER_MOVE := 6
 const MINUTES_PER_CAM := 2
@@ -35,6 +50,9 @@ const MINUTES_PER_FALL := 20
 const MINUTES_TO_EAT := 5
 const MINUTES_PER_CLIP := 2
 const MINUTES_TO_CHALK := 2
+const MINUTES_PER_AID := 12
+const MINUTES_PER_JUG := 8
+const MINUTES_PER_HAUL := 10
 ## On bolted routes: the first bolt is this many moves up, then one every
 ## BOLT_SPACING moves below the top ledge.
 const BOLT_FIRST := 2
@@ -44,6 +62,20 @@ const SHOE_BONUS := 1
 ## Chalking up takes this much off each of the next CHALK_MOVES moves.
 const CHALK_BONUS := 3
 const CHALK_MOVES := 2
+## A good stance (a rest hold) gives this much stamina back.
+const REST_STANCE := 6
+## Each step up the grades adds this much to what a hold costs.
+const COST_PER_GRADE := 1.2
+## Aiding a hard move, and jugging a fixed rope, cost this much stamina.
+const AID_STAMINA := 3
+const JUG_STAMINA := 3
+## Climbing a chimney: alternate sides, or lose the rhythm.
+const CHIMNEY_BONUS := 1
+const CHIMNEY_PENALTY := 2
+## Weather and snow: wet rock and slush make every move cost more.
+const STORM_PENALTY := 1
+const STORM_HOUR := 14.5
+const SLUSH_HOUR := 12.0
 
 var route: RouteData
 var status := Status.CLIMBING
@@ -62,12 +94,21 @@ var placed_cams: Array[Vector2i] = []
 ## Bolts clipped this pitch (their cells).
 var clipped_bolts: Array[Vector2i] = []
 ## Every piece the rope runs through this pitch, lowest first:
-## {"cell": Vector2i, "kind": "cam" or "draw"}.
+## {"cell": Vector2i, "kind": "cam" or "draw", "hw": "cam", "bolt" or "pin"}.
 var protection: Array[Dictionary] = []
-## Row -> column of the bolt on that row, on bolted routes.
+## Row -> column of the bolt (or old piton) on that row.
 var bolts: Dictionary = {}
+## Row -> "bolt" or "pin", for the fixed pieces in [member bolts].
+var bolt_kinds: Dictionary = {}
 var has_shoes := false
 var has_chalk := false
+var has_device := false
+var has_aiders := false
+var has_ascenders := false
+var has_haul_bag := false
+var has_portaledge := false
+var has_axe := false
+var has_crampons := false
 ## Moves left that get the chalk bonus.
 var chalk_moves := 0
 var chalked_this_pitch := false
@@ -75,33 +116,57 @@ var falls := 0
 var falls_this_pitch := 0
 var nights_spent := 0
 var minutes := 0
+## Hard moves pulled through on aiders, and fixed-rope moves jugged.
+var aid_moves := 0
+var jug_moves := 0
+## Crux moves done well, and slipped.
+var perfect_cruxes := 0
+var slipped_cruxes := 0
 ## What just happened, for the UI.
 var message := ""
-## Row -> {column -> {"cost": int, "crack": bool}} for the current pitch.
+## Row -> {column -> hold} for the current pitch. A hold has "cost" and
+## "crack", and sometimes "crux", "rest", "fixed", "hard", "dike", "kind".
 var holds: Dictionary = {}
+## The current pitch's spec (see ClimbProfiles).
+var spec: Dictionary = {}
+## The screen sets this to get a skill check at the crux; without it a crux
+## resolves as an average move.
+var interactive := false
+## A crux waiting on the player: {"kind", "name", "window", "row", "cell"}.
+var pending: Dictionary = {}
+## The in-game hour the climb started, for weather and snow.
+var start_minutes := 8 * 60
+## Things that happened since the screen last looked: {"type": String, ...}.
+var events: Array[Dictionary] = []
+var top_row := 8
+var last_dx := 0
 
 var _rng := RandomNumberGenerator.new()
+var _rested_rows := {}
 
 
 ## [param seed] makes the wall the same every time (tests use this).
 ## [param kit] is the rest of the player's gear (gear id -> count, like
-## Gear.owned): quickdraws, climbing shoes, and a chalk bag.
+## Gear.owned): quickdraws, climbing shoes, and a chalk bag, and the big-wall
+## and glacier gear.
 func _init(p_route: RouteData, cams: int, seed := -1, kit := {}) -> void:
 	route = p_route
 	cams_per_pitch = 99 if route.top_rope else cams
 	quickdraws_per_pitch = 99 if route.top_rope else int(kit.get("quickdraw", 0))
 	has_shoes = int(kit.get("climbing_shoes", 0)) > 0
 	has_chalk = int(kit.get("chalk_bag", 0)) > 0
+	has_device = int(kit.get("belay_device", 0)) > 0
+	has_aiders = int(kit.get("aiders", 0)) > 0
+	has_ascenders = int(kit.get("ascenders", 0)) > 0
+	has_haul_bag = int(kit.get("haul_bag", 0)) > 0
+	has_portaledge = int(kit.get("portaledge", 0)) > 0
+	has_axe = int(kit.get("ice_axe", 0)) > 0
+	has_crampons = int(kit.get("crampons", 0)) > 0
 	if seed >= 0:
 		_rng.seed = seed
 	else:
 		_rng.randomize()
 	_start_pitch()
-
-
-var top_row: int:
-	get:
-		return route.moves_per_pitch
 
 
 func runout() -> int:
@@ -116,12 +181,46 @@ func is_at_belay() -> bool:
 	return row == 0
 
 
+## Bolted pitch: bolts sit on the line.
 func is_bolted() -> bool:
-	return route.protection == "bolts"
+	return spec.get("bolts", "") == "line"
+
+
+## Any pitch with fixed pieces to clip (bolts or old pitons).
+func has_fixed_pieces() -> bool:
+	return not bolts.is_empty()
+
+
+func style() -> String:
+	return spec.get("style", "crack")
+
+
+func is_snow() -> bool:
+	return style() == "snow" or style() == "ice"
+
+
+## The in-game hour right now.
+func hour() -> float:
+	return fposmod((start_minutes + minutes) / 60.0, 24.0)
+
+
+## True when it's raining on the high country, or the snow has gone slushy.
+func is_stormy() -> bool:
+	var weather: String = ClimbProfiles.get_profile(route.id).get("weather", "valley")
+	return weather == "alpine" and hour() >= STORM_HOUR and hour() < 20.0
+
+
+func pitch_name() -> String:
+	return spec.get("name", "Pitch %d" % (pitch + 1))
+
+
+func crux_row() -> int:
+	return int(spec.get("crux", 0))
 
 
 ## What moving onto the hold at ([param r], [param c]) costs right now, after
-## climbing shoes and chalk. Ledges are free; other holds cost at least 1.
+## climbing shoes, chalk, chimney rhythm and the weather. Ledges are free;
+## other holds cost at least 1.
 func move_cost(r: int, c: int) -> int:
 	var hold := hold_at(r, c)
 	if hold.is_empty():
@@ -129,42 +228,164 @@ func move_cost(r: int, c: int) -> int:
 	var cost := int(hold.cost)
 	if cost <= 0:
 		return 0
-	if has_shoes:
+	if has_shoes and not is_snow():
 		cost -= SHOE_BONUS
-	if chalk_moves > 0:
+	if chalk_moves > 0 and not is_snow():
 		cost -= CHALK_BONUS
+	if style() == "chimney":
+		var dx := c - col
+		if dx != 0 and dx == -last_dx:
+			cost -= CHIMNEY_BONUS
+		elif dx == last_dx and dx != 0:
+			cost += CHIMNEY_PENALTY
+	if is_stormy():
+		cost += STORM_PENALTY
+	if is_snow() and hour() >= SLUSH_HOUR and hour() < 20.0:
+		cost += 1
 	return maxi(cost, 1)
 
 
-## Bolts per pitch on this route: how many quickdraws it takes to clip them all.
+## Fixed pieces per pitch: how many quickdraws it takes to clip them all.
 func bolts_per_pitch() -> int:
 	return bolts.size()
 
 
 ## Moves up one row. [param dx] is -1 (up-left), 0 (straight up), or 1 (up-right).
 func move(dx: int) -> bool:
-	if status != Status.CLIMBING:
+	if status != Status.CLIMBING or not pending.is_empty():
 		return false
 	var target := hold_at(row + 1, col + dx)
 	if target.is_empty():
 		message = "No hold there."
 		return false
 	var cost := move_cost(row + 1, col + dx)
+	_step(dx, cost, MINUTES_PER_MOVE)
+	return true
+
+
+## Moves up with the aiders: hard holds on a wall pitch only. Costs a cam
+## (placed at the new hold), a little stamina, and a lot of time.
+func can_aid(dx: int) -> bool:
+	if status != Status.CLIMBING or not pending.is_empty() or not has_aiders or route.top_rope:
+		return false
+	var target := hold_at(row + 1, col + dx)
+	return not target.is_empty() and spec.get("hard_aid", false) and (target.get("hard", false) or target.get("crux", false)) \
+		and cams_left > 0 and row + 1 < top_row
+
+
+func aid_step(dx: int) -> bool:
+	if not can_aid(dx):
+		message = "Aiders work on the hard moves of a wall, with a cam to stand on." if has_aiders else "You need aiders for that."
+		return false
+	cams_left -= 1
+	# The cam goes in at the new hold, so it catches you if the move fails.
+	var cell := Vector2i(col + dx, row + 1)
+	protection_row = row + 1
+	placed_cams.append(cell)
+	protection.append({"cell": cell, "kind": "cam", "hw": "cam", "aid": true})
+	_step(dx, AID_STAMINA, MINUTES_PER_AID, true)
+	aid_moves += 1
+	if status == Status.CLIMBING:
+		message = "You place a cam and stand in your aiders. Pulled through (+1 aid move)."
+	events.append({"type": "aid"})
+	return true
+
+
+## Jugs up a fixed rope with the ascenders: safe, steady, and slow.
+func can_jug(dx: int) -> bool:
+	if status != Status.CLIMBING or not pending.is_empty() or not has_ascenders:
+		return false
+	var target := hold_at(row + 1, col + dx)
+	return not target.is_empty() and target.get("fixed", false)
+
+
+func jug(dx: int) -> bool:
+	if not can_jug(dx):
+		message = "There's no fixed rope there to jug." if has_ascenders else "You need ascenders to jug a fixed rope."
+		return false
+	_step(dx, JUG_STAMINA, MINUTES_PER_JUG, true)
+	# You can't fall off a fixed rope.
+	if status == Status.CLIMBING:
+		stamina = maxi(stamina, 1)
+	jug_moves += 1
+	events.append({"type": "jug"})
+	return true
+
+
+## Shared by moves, aid steps and jugs.
+func _step(dx: int, cost: int, mins: int, safe := false) -> void:
+	var hold := hold_at(row + 1, col + dx)
 	row += 1
 	col += dx
+	last_dx = dx
 	stamina -= cost
-	minutes += MINUTES_PER_MOVE
+	minutes += mins
 	chalk_moves = maxi(chalk_moves - 1, 0)
 	message = ""
+	if hold.get("rest", false) and row < top_row and not _rested_rows.has(row):
+		_rested_rows[row] = true
+		stamina = mini(stamina + REST_STANCE, MAX_STAMINA)
+		message = "A good stance. You shake out (+%d)." % REST_STANCE
+		events.append({"type": "rest"})
+	if hold.get("crux", false) and row < top_row and not safe:
+		pending = {
+			"kind": spec.get("crux_kind", "timing"),
+			"name": spec.get("crux_name", "The crux"),
+			"window": crux_window(),
+			"row": row,
+			"cell": Vector2i(col, row),
+		}
+		if not interactive:
+			resolve_crux("good")
+		return
+	_settle()
+
+
+## After a move: fall, finish the pitch, or carry on.
+func _settle() -> void:
 	if stamina <= 0:
 		_fall()
 	elif row == top_row:
 		_finish_pitch()
-	return true
+
+
+## How wide the green zone of the crux meter is, 0..1 of the bar. The
+## better your kit and your hands, the more forgiving the move.
+func crux_window() -> float:
+	var window := 0.30 - 0.025 * int(spec.get("diff", 2))
+	if has_shoes:
+		window += 0.05
+	if chalk_moves > 0:
+		window += 0.07
+	if route.top_rope:
+		window += 0.12
+	return clampf(window, 0.12, 0.5)
+
+
+## Finishes a crux with "perfect", "good" or "slip".
+func resolve_crux(result: String) -> void:
+	if pending.is_empty():
+		return
+	var name: String = pending.name
+	pending = {}
+	var diff := int(spec.get("diff", 2))
+	match result:
+		"perfect":
+			stamina = mini(stamina + 3 + diff, MAX_STAMINA)
+			perfect_cruxes += 1
+			message = "Sent! Perfect through %s (+%d)." % [name.to_lower(), 3 + diff]
+		"slip":
+			stamina -= 2 + diff
+			slipped_cruxes += 1
+			message = "You slip on %s! (-%d)" % [name.to_lower(), 2 + diff]
+		_:
+			message = "You make %s." % name.to_lower()
+	events.append({"type": "crux", "result": result, "name": name})
+	_settle()
 
 
 func can_place_cam() -> bool:
-	return status == Status.CLIMBING and not route.top_rope and cams_left > 0 \
+	return status == Status.CLIMBING and pending.is_empty() and not route.top_rope and cams_left > 0 \
 		and hold_at(row, col).get("crack", false) and protection_row < row
 
 
@@ -175,17 +396,18 @@ func place_cam() -> bool:
 	cams_left -= 1
 	protection_row = row
 	placed_cams.append(Vector2i(col, row))
-	protection.append({"cell": Vector2i(col, row), "kind": "cam"})
+	protection.append({"cell": Vector2i(col, row), "kind": "cam", "hw": "cam"})
 	stamina -= 1
 	minutes += MINUTES_PER_CAM
 	message = "Cam placed."
+	events.append({"type": "cam"})
 	return true
 
 
 ## True if there's a bolt on this row within arm's reach (your column or the
 ## next one over) that you haven't clipped, and a quickdraw to clip it with.
 func can_clip() -> bool:
-	return status == Status.CLIMBING and not route.top_rope and quickdraws_left > 0 \
+	return status == Status.CLIMBING and pending.is_empty() and not route.top_rope and quickdraws_left > 0 \
 		and bolts.has(row) and absi(int(bolts[row]) - col) <= 1 and protection_row < row
 
 
@@ -201,13 +423,15 @@ func clip_bolt() -> bool:
 			message = "You've already clipped that bolt."
 		return false
 	var bolt := Vector2i(int(bolts[row]), row)
+	var hw: String = bolt_kinds.get(row, "bolt")
 	quickdraws_left -= 1
 	protection_row = row
 	clipped_bolts.append(bolt)
-	protection.append({"cell": bolt, "kind": "draw"})
+	protection.append({"cell": bolt, "kind": "draw", "hw": hw})
 	stamina -= 1
 	minutes += MINUTES_PER_CLIP
-	message = "Clipped. The rope runs through the quickdraw."
+	message = "Clipped the old piton." if hw == "pin" else "Clipped. The rope runs through the quickdraw."
+	events.append({"type": "clip", "hw": hw})
 	return true
 
 
@@ -219,7 +443,7 @@ func protect() -> bool:
 ## Dips your hands in the chalk bag: the next CHALK_MOVES moves cost less.
 ## Once a pitch, anywhere but a ledge.
 func chalk_up() -> bool:
-	if status != Status.CLIMBING:
+	if status != Status.CLIMBING or not pending.is_empty():
 		return false
 	if not has_chalk:
 		message = "You don't have a chalk bag."
@@ -231,6 +455,7 @@ func chalk_up() -> bool:
 	chalk_moves = CHALK_MOVES
 	minutes += MINUTES_TO_CHALK
 	message = "You chalk up. Dry hands: the next %d moves are easier." % CHALK_MOVES
+	events.append({"type": "chalk"})
 	return true
 
 
@@ -246,25 +471,58 @@ func eat(item_id: String) -> bool:
 	minutes += MINUTES_TO_EAT
 	var item := ItemDB.get_item(item_id)
 	message = "Ate %s (+%d)." % [item.display_name if item else item_id, energy]
+	events.append({"type": "eat"})
 	return true
 
 
-## Gives up and lowers off. Your gear comes with you.
-func retreat(reason := "You lower off and head back down.") -> void:
+## Gives up and lowers off (or rappels, with a belay device). Your gear comes
+## with you.
+func retreat(reason := "") -> void:
 	status = Status.RETREATED
+	pending = {}
+	minutes += 15 + 10 * pitch
+	if reason == "":
+		reason = "You rappel down and head back." if has_device and pitch > 0 else "You lower off and head back down."
 	message = reason
+	events.append({"type": "retreat"})
+
+
+## How the climb went: "Onsight" (no falls, no aid), "Hard-won" (falls but
+## free), or "Aided" (pulled on gear).
+func style_rating() -> String:
+	if aid_moves > 0:
+		return "Aided"
+	if falls == 0:
+		return "Onsight"
+	return "Hard-won"
+
+
+## True if the whole route went without pulling on gear.
+func is_free() -> bool:
+	return aid_moves == 0
 
 
 func _fall() -> void:
 	falls += 1
 	falls_this_pitch += 1
 	minutes += MINUTES_PER_FALL
+	events.append({"type": "fall"})
 	if falls_this_pitch >= MAX_FALLS_PER_PITCH:
 		retreat("That's %d falls on this pitch. Your arms are done, so you lower off and head down." % falls_this_pitch)
 		return
+	var catch_stamina := AFTER_FALL_STAMINA + (DEVICE_CATCH if has_device else 0)
 	if route.top_rope:
-		stamina = AFTER_FALL_STAMINA
+		stamina = catch_stamina
 		message = "You slip, and the rope catches you right away. Rest, then keep going."
+		return
+	if is_snow():
+		# You slide, then dig in your ice axe and stop.
+		var slide := 2 if style() == "snow" else 3
+		row = maxi(row - slide, 0)
+		col = COLUMNS / 2 if row == 0 else _nearest_hold_column(row, col)
+		stamina = catch_stamina
+		chalk_moves = 0
+		message = "You slide, then self-arrest with your ice axe. Catch your breath." if has_axe else "You slide a long way before you stop."
 		return
 	var distance := runout()
 	if distance >= DANGEROUS_RUNOUT:
@@ -274,41 +532,63 @@ func _fall() -> void:
 	row = maxi(protection_row - distance, 0)
 	# Back on the ledge you're lowered to the belay; otherwise you grab the nearest hold.
 	col = COLUMNS / 2 if row == 0 else _nearest_hold_column(row, col)
-	stamina = AFTER_FALL_STAMINA
+	stamina = catch_stamina
 	chalk_moves = 0
 	var catcher := "belay"
 	if protection_row > 0 and not protection.is_empty():
-		catcher = "quickdraw" if protection.back().kind == "draw" else "cam"
+		var last: Dictionary = protection.back()
+		catcher = "quickdraw" if last.kind == "draw" else "cam"
 	message = "You fall, and your %s catches you. Shake it out and try again." % catcher
 
 
 func _finish_pitch() -> void:
 	pitch += 1
+	events.append({"type": "pitch_done", "pitch": pitch})
 	if pitch >= route.pitches.size():
 		status = Status.TOPPED_OUT
 		message = "You top out!"
+		events.append({"type": "topout"})
 		return
-	# A night on the wall after an equal share of the pitches.
-	if route.nights > 0 and nights_spent < route.nights:
-		var pitches_per_day := ceili(route.pitches.size() / float(route.nights + 1))
-		if pitch % pitches_per_day == 0:
-			if not _bivy():
-				return
-	stamina = mini(stamina + BELAY_REST, MAX_STAMINA)
+	var finished_spec := spec
+	var haul_note := ""
+	if route.nights > 0 and has_haul_bag:
+		minutes += MINUTES_PER_HAUL
+		haul_note = " You haul the bag (+%d min)." % MINUTES_PER_HAUL
+	if _night_after(finished_spec):
+		var place: String = finished_spec.get("night", "ledge") if finished_spec.has("night") else finished_spec.get("bivy", "ledge")
+		if not _bivy(place):
+			return
+	stamina = mini(stamina + BELAY_REST + (DEVICE_REST if has_device else 0), MAX_STAMINA)
 	_start_pitch()
-	message = "Belay ledge. Pitch %d of %d." % [pitch + 1, route.pitches.size()] if message == "" else message
+	message = ("Belay ledge. Pitch %d of %d." % [pitch + 1, route.pitches.size()] + haul_note) if message == "" else message + haul_note
+
+
+func _night_after(finished_spec: Dictionary) -> bool:
+	if route.nights <= 0 or nights_spent >= route.nights:
+		return false
+	# Some routes mark where the nights fall; otherwise an equal share of pitches.
+	var marked := false
+	for i in route.pitches.size():
+		if ClimbProfiles.pitch_spec(route, i).has("night"):
+			marked = true
+	if marked:
+		return finished_spec.has("night")
+	var pitches_per_day := ceili(route.pitches.size() / float(route.nights + 1))
+	return pitch % pitches_per_day == 0
 
 
 ## Spends a night on the wall. Returns false if there's no real meal to eat.
-func _bivy() -> bool:
+func _bivy(place: String) -> bool:
 	for id in FoodDB.edible_in_inventory():
 		if FoodDB.energy(id) >= BIVY_MEAL_ENERGY:
 			Inventory.remove(id)
 			nights_spent += 1
-			stamina = MAX_STAMINA
+			stamina = MAX_STAMINA if (has_portaledge or place == "ledge") else COLD_NIGHT_STAMINA
 			minutes += 10 * 60
 			var item := ItemDB.get_item(id)
-			message = "You spend the night on the wall and eat %s. You wake up rested." % (item.display_name if item else id)
+			var meal := item.display_name if item else id
+			message = "You spend the night on the wall and eat %s. You wake up rested." % meal
+			events.append({"type": "bivy", "night": nights_spent, "place": place, "meal": meal})
 			return true
 	retreat("Night is falling and you have no real meal for the wall. You rappel down hungry.")
 	return false
@@ -317,6 +597,7 @@ func _bivy() -> bool:
 func _start_pitch() -> void:
 	row = 0
 	col = COLUMNS / 2
+	last_dx = 0
 	cams_left = cams_per_pitch
 	quickdraws_left = quickdraws_per_pitch
 	protection_row = 0
@@ -326,64 +607,153 @@ func _start_pitch() -> void:
 	protection.clear()
 	chalk_moves = 0
 	chalked_this_pitch = false
-	_generate_holds(route.pitches[pitch])
+	pending = {}
+	_rested_rows = {}
+	spec = ClimbProfiles.pitch_spec(route, pitch)
+	top_row = int(spec.rows)
+	_generate_holds()
+	events.append({"type": "pitch_start", "pitch": pitch, "name": spec.name})
 
 
-func _generate_holds(difficulty: int) -> void:
+## Columns that have holds on this pitch.
+func allowed_cols() -> Array:
+	var cols: Array = spec.get("cols", [])
+	if cols.is_empty():
+		cols = range(COLUMNS)
+	return cols
+
+
+func _crack_chance() -> float:
+	if spec.has("cracks"):
+		return float(spec.cracks)
+	return 0.0 if is_bolted() else 0.3
+
+
+func _generate_holds() -> void:
 	holds = {}
 	bolts = {}
+	bolt_kinds = {}
+	var difficulty := int(spec.diff)
+	var cols := allowed_cols()
 	var path := {}
 	var ledge := {}
 	for c in COLUMNS:
 		ledge[c] = {"cost": 0, "crack": false}
 	holds[0] = ledge
-	holds[top_row] = ledge.duplicate()
-	var path_col := COLUMNS / 2
+	holds[top_row] = ledge.duplicate(true)
+	var path_col := clampi(COLUMNS / 2, cols.min(), cols.max())
+	var st := style()
 	for r in range(1, top_row):
 		var rowd := {}
-		# A guaranteed line: each row has a hold within reach of the one below.
-		path_col = clampi(path_col + _rng.randi_range(-1, 1), 0, COLUMNS - 1)
+		if st == "dike":
+			# The dike snakes across the face; the line follows it.
+			var sign := -1.0 if pitch % 2 == 1 else 1.0
+			var target := 2.0 + sign * 1.7 * sin(r * 0.55) * minf(r / 2.0, 1.0)
+			path_col = clampi(roundi(target), cols.min(), cols.max())
+		else:
+			# A guaranteed line: each row has a hold within reach of the one below.
+			path_col = clampi(path_col + _rng.randi_range(-1, 1), cols.min(), cols.max())
 		path[r] = path_col
-		rowd[path_col] = _make_hold(difficulty)
-		for i in _rng.randi_range(1, 2):
-			var c := _rng.randi_range(0, COLUMNS - 1)
-			if not rowd.has(c):
-				rowd[c] = _make_hold(difficulty)
+		rowd[path_col] = _make_hold(difficulty, true)
+		if st == "chimney":
+			# Both walls close in: every column has something to push on.
+			for c: int in cols:
+				if not rowd.has(c):
+					rowd[c] = _make_hold(difficulty, false)
+		elif st == "ice" and r % 3 == 0:
+			pass # a crevasse bridge: only the line crosses
+		else:
+			for i in _rng.randi_range(1, 2):
+				var c: int = cols[_rng.randi_range(0, cols.size() - 1)]
+				if not rowd.has(c):
+					rowd[c] = _make_hold(difficulty, false)
 		holds[r] = rowd
-	_remove_dead_ends(difficulty)
+	_remove_dead_ends(difficulty, cols)
+	_apply_features(path, difficulty)
 	if is_bolted():
 		# Bolts sit on the line, so the easy way up passes every one of them.
-		for r in range(BOLT_FIRST, top_row, BOLT_SPACING):
+		var gap := int(spec.get("bolt_gap", BOLT_SPACING))
+		for r in range(BOLT_FIRST if gap == BOLT_SPACING else gap, top_row, gap):
 			bolts[r] = path[r]
-	else:
-		_ensure_cracks(difficulty)
+			bolt_kinds[r] = "bolt"
+	for r: int in spec.get("pins", []):
+		if r > 0 and r < top_row and path.has(r):
+			bolts[r] = path[r]
+			bolt_kinds[r] = spec.get("pin_kind", "pin")
+	if _crack_chance() > 0.0 and not is_snow():
+		_ensure_cracks()
 
 
 ## Gives every hold at least one hold within reach above it, so the player
 ## can never climb into a dead end.
-func _remove_dead_ends(difficulty: int) -> void:
+func _remove_dead_ends(difficulty: int, cols: Array) -> void:
 	for r in range(1, top_row - 1):
 		for c: int in holds[r].keys():
 			var reachable := false
 			for dx in [-1, 0, 1]:
 				reachable = reachable or holds[r + 1].has(c + dx)
 			if not reachable:
-				holds[r + 1][clampi(c + _rng.randi_range(-1, 1), 0, COLUMNS - 1)] = _make_hold(difficulty)
+				var nc := clampi(c + _rng.randi_range(-1, 1), cols.min(), cols.max())
+				holds[r + 1][nc] = _make_hold(difficulty, false)
 
 
-func _make_hold(difficulty: int) -> Dictionary:
-	var cost := 2 + difficulty * 2 + _rng.randi_range(0, 3)
-	var crack := _rng.randf() < 0.3
-	# Bolted slabs are blank granite: no cracks to protect.
-	return {"cost": cost, "crack": crack and not is_bolted()}
+func _make_hold(difficulty: int, on_line: bool) -> Dictionary:
+	var cost := 2 + roundi(difficulty * COST_PER_GRADE) + _rng.randi_range(0, 2)
+	var crack := _rng.randf() < _crack_chance()
+	var hold := {"cost": cost, "crack": crack}
+	match style():
+		"knobs":
+			hold.cost = maxi(cost - 1, 2)
+		"snow":
+			hold.cost = 1 + difficulty + _rng.randi_range(0, 2)
+			hold.crack = false
+			hold["kind"] = "snow"
+		"ice":
+			hold.cost = 2 + difficulty + _rng.randi_range(0, 3)
+			hold.crack = false
+			hold["kind"] = "ice"
+		"chimney":
+			hold.cost = maxi(cost - 1, 3)
+		"dike":
+			# On the dike it's easy; off it, it's blank slab.
+			hold.cost = maxi(cost - 2, 2) if on_line else cost + 3
+			hold["dike"] = on_line
+			hold.crack = hold.crack and not on_line
+		"roof":
+			hold.cost = cost
+	var base := 2 + difficulty + 1
+	if hold.cost >= base + 3:
+		hold["hard"] = true
+	return hold
+
+
+## Marks the crux, stances and fixed ropes the pitch's spec asks for.
+func _apply_features(path: Dictionary, difficulty: int) -> void:
+	var crux := crux_row()
+	if crux > 0 and crux < top_row:
+		for c: int in holds[crux]:
+			var hold: Dictionary = holds[crux][c]
+			hold.cost = int(hold.cost) + 3 + difficulty
+			hold["crux"] = true
+			hold["hard"] = true
+	for r: int in spec.get("rest", []):
+		if r > 0 and r < top_row:
+			for c: int in holds[r]:
+				holds[r][c].cost = 2
+				holds[r][c]["rest"] = true
+				holds[r][c].erase("hard")
+	for r: int in spec.get("fixed", []):
+		if r > 0 and r < top_row and path.has(r):
+			holds[r][path[r]]["fixed"] = true
 
 
 ## Makes sure a careful climber can protect every stretch of DANGEROUS_RUNOUT
-## moves, so no pitch is impossible to climb safely.
-func _ensure_cracks(difficulty: int) -> void:
+## moves, so no pitch is impossible to climb safely. Fixed pieces count.
+func _ensure_cracks() -> void:
 	for start in range(1, top_row, DANGEROUS_RUNOUT - 1):
 		var has_crack := false
 		for r in range(start, mini(start + DANGEROUS_RUNOUT - 1, top_row)):
+			has_crack = has_crack or bolts.has(r)
 			for c: int in holds[r]:
 				has_crack = has_crack or holds[r][c].crack
 		if not has_crack:
@@ -400,3 +770,10 @@ func _nearest_hold_column(r: int, from_col: int) -> int:
 			best = c
 			best_distance = absi(c - from_col)
 	return best
+
+
+## Takes the events the screen hasn't seen yet.
+func take_events() -> Array[Dictionary]:
+	var out := events.duplicate()
+	events.clear()
+	return out
