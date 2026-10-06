@@ -28,8 +28,9 @@ Gear comes two ways, and there's no money in the game:
 
 | Tier | Gear | Example routes | Opens up |
 |---|---|---|---|
-| 0 | Approach shoes, chalk bag | Camp 4 boulders | Valley floor |
-| 1 | Rope, harness, 2 cams | Glacier Point Apron | **Glacier Point** |
+| 0 | Approach shoes | Camp 4 boulders | Valley floor |
+| 0½ | Climbing shoes, chalk bag, harness, 5 quickdraws (the Mountain Shop's starter kit; your partner brings the rope) | Firefall Slab (bolted) | Your first tick |
+| 1 | + Rope, 2 cams | Glacier Point Apron | **Glacier Point** |
 | 2 | More cams, quickdraws, belay/rappel device | Royal Arches, Snake Dike | North Dome rim, **Half Dome** |
 | 3 | Aiders, ascenders, haul bag, portaledge | The Nose, Salathé Wall | **El Capitan**, the north rim |
 | 4 | Ice axe, crampons, alpine pack | Cathedral Peak, Lyell Glacier | **Tuolumne Meadows**, high country, **Mono Lake** |
@@ -37,6 +38,8 @@ Gear comes two ways, and there's no money in the game:
 How the gear affects the climbing minigame:
 - **Rope length** sets how long each pitch can be.
 - **Number of cams** sets how many placements you get per pitch. Too few means long runouts and a riskier climb.
+- **Quickdraws** clip the bolts on bolted routes, one per bolt. A bolted pitch has a bolt every 2 moves, and you can clip one from your hold or the next one over.
+- **Climbing shoes** take 1 stamina off every move. A **chalk bag** lets you chalk up once a pitch (E on the wall) for 2 moves that cost 3 less.
 - **Big wall gear** lets a climb last several days, with nights on a portaledge. Multi-day climbs are where food matters most.
 
 ## Food, storage & cooking
@@ -184,17 +187,18 @@ All of this is wired into the World. Each region's people, climbs, and cooking s
 
 | System | Files | Notes |
 |---|---|---|
-| Gear | `scripts/story/gear.gd`, `data/gear/*.tres` | Autoload `Gear`. You start with approach shoes and a chalk bag. |
-| Quests & dialogue | `scripts/story/quest_log.gd`, `quest_data.gd`, `character_data.gd`, `dialogue_box.gd`, `npc.gd` | Autoload `QuestLog`. Quest steps: have, have_food, talk, chuckah, stored, made, climbed. |
+| Gear | `scripts/story/gear.gd`, `data/gear/*.tres` | Autoload `Gear`. You start with approach shoes. The Mountain Shop's *Fitted Out* quest gives climbing shoes, a chalk bag, a harness, and 5 quickdraws. |
+| Quests & dialogue | `scripts/story/quest_log.gd`, `quest_data.gd`, `character_data.gd`, `dialogue_box.gd`, `npc.gd` | Autoload `QuestLog`. Quest steps: have, have_food, pay, talk, chuckah, stored, made, climbed, return. Mountain Shop staff are in `QuestLog.STAFF`. |
 | Food & spoilage | `scripts/story/food_db.gd`, `larder.gd`, `data/food/*.tres` | Autoloads `FoodDB` (energy, shelf life) and `Larder` (spoils food overnight). |
 | Chuckah | `scripts/story/granary.gd`, `chuckah.gd` | Autoload `Granary`. Stored acorns never spoil, and one chuckah holds 40. |
 | Cooking | `scripts/story/recipes.gd`, `station.gd`, `data/recipes/*.tres` | Stations: campfire, bedrock mortar, leaching basin. Acorn chain: 4 acorns → flour → leached meal → mush or cakes. |
-| Climbing | `scripts/climb/*`, `scenes/climb/*`, `data/routes/*.tres` | Rules are in `ClimbState`. Routes: Swan Slab (top-rope practice) and Glacier Point Apron (rope, harness, 2 cams). |
+| Climbing | `scripts/climb/*`, `scenes/climb/*`, `data/routes/*.tres` | Rules are in `ClimbState`, pictures in `ClimbScenery`. Cams in cracks, or quickdraws on bolts (`RouteData.protection`). A route can need a partner (`RouteData.partner_quest`). |
 | Journal | `scripts/story/journal.gd` | Press J. Shows quests, gear, food with days left, the chuckah, and climbs. Pauses the clock. |
 | Tests | `tests/story_test.tscn`, `tests/world_story_test.tscn` | Run headless. The world test uses its own save file. |
 
 First playable stretch:
-1. **Dick Leonard:** climb Swan Slab and carry some trail food. The reward is a rope, a harness, and 2 cams.
+1. **The Mountain Shop:** trade food for a guidebook, then return the lost rental shoes and trade more food for a starter kit. **Wren Alvarez**, the new hire, belays you up **Firefall Slab**, a bolted route on the Apron.
+1. **Dick Leonard:** climb Swan Slab and carry some trail food. The reward is a rope and 2 cams.
 2. **Tabuce:** gather 12 acorns in fall. She then shows you how to build a chuckah. Build it and store the acorns, and she teaches you the acorn recipes.
 3. **The Glacier Point Apron** leads to Glacier Point.
 

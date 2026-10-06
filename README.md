@@ -30,7 +30,7 @@ Controls are set in **Project > Project Settings > Input Map**.
 
 ## The core loop
 
-Start at the Mountain Shop in Curry Village for a climbing guidebook. It lists every route, its grade, and the gear it needs, and you tick a route off when you top it out. The main story is that tick list: each main quest ends on a climb. Talk to people around the valley. Their quests reward you with climbing gear, recipes, and skills, and the climbers at Camp 4 trade more gear for food. Each climbing route needs certain gear before you can start it. Climbs lead to new parts of the park: the Glacier Point Apron, for example, opens Glacier Point.
+Start at the Mountain Shop in Curry Village. The clerk, Marty Kessler, trades you a climbing guidebook for food (after you fetch the new printing from the Registration porch), then fits you with your first kit: climbing shoes, a chalk bag, a harness, and five quickdraws. Marty sends you to Wren Alvarez, a new hire looking for a partner, and the two of you climb **Firefall Slab**, a bolted route on the Glacier Point Apron, for your first tick. The guidebook lists every route, its grade, and the gear it needs, and you tick a route off when you top it out. The main story is that tick list: each main quest ends on a climb. Talk to people around the valley. Their quests reward you with climbing gear, recipes, and skills, and the climbers at Camp 4 trade more gear for food. Each climbing route needs certain gear before you can start it. Climbs lead to new parts of the park: the Glacier Point Apron, for example, opens Glacier Point.
 
 Climbing runs on food. Each morning, wild forage appears around your camp, depending on the season and habitat. Fresh greens and berries give quick energy but spoil in days. In fall, gather black oak acorns and store them in a chuckah (a granary) where they never spoil. Then grind them at the bedrock mortar, leach them at the basin, and cook them into mush or long-lasting acorn cakes at the campfire. Press J to open the Journal, which shows your quests, gear, and food.
 
@@ -99,7 +99,7 @@ Leave the Lamon Homestead by its gate and you walk out of the old apple orchard 
 - **The village green**: the Registration Office, the Pavilion, the **Camp Curry Store**, the **Mountain Shop**, a pizza deck, the pool (an ice rink in winter), the Camp Curry amphitheater with the Firefall board, a fire pit you can cook at, patio tables, planters, string lights, and a flagpole.
 - **The Camp Curry Store** and **Mountain Shop** have insides you walk into. The store clerk trades food that keeps (pilot bread, cheddar, apricots, jerky, chocolate, trail mix) for forage that doesn't. The Mountain Shop clerk trades quickdraws, cams, a belay device, and big-wall gear for food. Like the Camp 4 traders, the shop only rounds out a rack: every offer needs gear you already own, so the piece that opens a tier still comes from a quest. Offers are in `data/shops/curry_store.tres` and `curry_mountain_shop.tres`.
 - **The way in and out**: the Camp Curry arch and parking lot with a map kiosk and a shuttle stop, roads west and east onto the Valley map, the trail up to the Glacier Point Apron, and the homestead gate.
-- **People**: Jennie Curry, a camper, the Pavilion cook, a ranger-naturalist and a tourist outside; a shopper in the store and a climber in the Mountain Shop. The overlays are `scenes/story/content/curry_village.tscn`, `curry_store.tscn` and `curry_mountain_shop.tscn`.
+- **People**: Jennie Curry, a camper, the Pavilion cook, a ranger-naturalist and a tourist outside; a shopper in the store and a climber in the Mountain Shop. Wren Alvarez waits with a rope at the foot of **Firefall Slab**, beside the Apron trail, and a pair of lost rental shoes lies out front of the upper tent cabins. The overlays are `scenes/story/content/curry_village.tscn`, `curry_store.tscn` and `curry_mountain_shop.tscn`.
 - **After dark** lamps, windows, tents and the fire pit glow (`scripts/world/night_light.gd`), chimneys smoke in the cold months, mist rises at the foot of Staircase Falls, and fireflies come out over the meadow (`scripts/world/ambient_fx.gd`).
 
 Rebuild it with `godot --headless --path . res://tools/hubs/build_curry.tscn`. That redraws every sprite (`tools/hubs/curry_art.gd`, `interior_art.gd`, on `pixel_kit.gd`), paints the whole ground as one picture (`tools/hubs/ground_art.gd`), and rewrites `curry_village.tscn`, `curry_store.tscn` and `curry_mountain_shop.tscn`. The layout is in `tools/hubs/build_curry_village.gd`. To look at a region the way the player sees it, run `SHOT_REGION=curry_village SHOT_SPAWNS=arrival,plaza godot --path . res://tools/shots/region_shot.tscn` (it needs a window). `SHOT_HOUR=21` shoots at night. In-game pictures are in `docs/curry_village_plaza.png`, `curry_village_cabins_dusk.png` and `curry_mountain_shop.png`, and every sprite is laid out in `docs/curry_art_preview.png` (`tools/hubs/preview_art.gd`).
@@ -140,6 +140,20 @@ Rebuild both with `godot --headless --path . res://tools/hubs/build_ahwahnee.tsc
 **Trading.** Money is gone, so traders take food instead. The Camp Curry Store and the Mountain Shop (see Curry Village above) work the same way. A price is an amount of food energy, and they take whatever in your pack spoils soonest first. The Village Store swaps fresh forage for trail mix and dried apples, which keep much longer. The Camp 4 traders round out a rack you already have (extra cams, quickdraws, a belay device, and big-wall gear once you can aid climb), but the piece that opens a new climbing tier still comes from a quest. Offers are in `data/shops/*.tres`, each with the gear it requires and a maximum you can own.
 
 **Bridges.** When a river cuts off a walkable area on a generated hub map, the map generator builds a bridge at the shortest crossing (`MIN_CUT_OFF_AREA` and `MAX_BRIDGE` in `tools/mapgen/region_builder.gd`).
+
+## The climbing screen
+
+![Firefall Slab at dawn](docs/climb_firefall_slab_dawn.png)
+![Firefall Slab at dusk](docs/climb_firefall_slab_dusk.png)
+
+Climbs are a face-on granite wall with its ragged edge against the sky, the valley's ridgelines behind (they sink as you gain height), and clouds drifting past. The light follows the game clock: purple and pink at dawn, blue at midday, orange at dusk, stars at night. Your climber works up the face on a rope that runs down through every quickdraw or cam to your belayer on the ledge. Rings mark the holds you can reach, with what each move costs after your shoes and chalk. Bottom left is the altimeter (feet climbed), stamina, food, and the pieces left on your rack; the bar on the right edge is the whole route, a notch per pitch.
+
+- **Bolted routes** (Firefall Slab) have a bolt every 2 moves beside the line. Press Space to clip one with a quickdraw from your hold or the one next to it.
+- **Crack routes** take cams in the cracks (Space).
+- **E** eats at a ledge, or chalks up on the wall (once a pitch: the next 2 moves cost 3 less). Climbing shoes take 1 off every move.
+- **Partners:** a route with `partner_quest` set (Firefall Slab: Wren) only starts while that quest is underway or done, and the partner belays you.
+
+The rules are in `scripts/climb/climb_state.gd`, the screen in `climb_minigame.gd`, and the pictures in `climb_scenery.gd`. To photograph it: `SHOT_ROUTE=firefall_slab SHOT_HOURS=7,19 godot --path . res://tools/shots/climb_shot.tscn` (needs a window).
 
 ## Story
 

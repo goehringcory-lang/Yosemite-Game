@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "shop_guidebook"
+title = "A Guidebook of Your Own"
+main_line = true
+giver = "mountain_shop"
+requires = PackedStringArray("clark_register")
+intro = PackedStringArray("Problem is, the shelf's empty. The new printing came in on this morning's supply truck, and the box is sitting on the Registration porch with the rest of the camp's mail.", "Do me a favor and haul it over from Jennie Curry. Then a copy's yours for some trail food. Nobody up here pays in money, and guidebooks don't feed the people who write them.")
+steps = [{"type": "talk", "target": "jennie_curry", "objective": "Pick up the box of guidebooks from Jennie Curry on the Registration porch", "reminder": "The box is on the Registration porch, across the green. Jennie Curry's minding it.", "done": ["The Mountain Shop's box? It's been sitting by my door since breakfast. Mind your back: it's heavier than it looks.", "Every route in the Valley in there, and not one page on how to feed forty campers. Go on, Marty's waiting."]}, {"type": "return", "objective": "Carry the box of guidebooks back to Marty at the Mountain Shop", "reminder": "Bring the box back here to the counter.", "done": ["That's the one. Fresh off the press, you can still smell the ink."]}, {"type": "pay", "energy": 20, "unlock": "guidebook", "objective": "Trade Marty food worth 20 energy for a guidebook", "reminder": "One copy, twenty energy of food. Berries, greens, whatever's in season. Forage around your camp in the morning.", "done": ["Pleasure doing business. Every route in the Valley is in there: the grade, the gear it takes, and a box to tick. A route only counts when you've topped it out.", "No ticks, no stories. That's how the old-timers see it."]}]
+outro = PackedStringArray("Now look at you, guidebook in hand and approach shoes on your feet. You can't smear a slab in those.", "Talk to me again when you're ready to get properly fitted out.")

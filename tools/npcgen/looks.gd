@@ -189,6 +189,12 @@ const LOOKS := {
 		"top": "3a6a8a", "top_style": "jacket", "top2": "27485e", "bottom": "8a6a48", "bottom_style": "pants",
 		"beard": "short", "beard_color": "2a1a14", "carry": ["rope"],
 	},
+	# ------------------------------------------------ Mountain Shop staff (invented, not historical)
+	"wren_alvarez": {
+		"skin": SKIN_TAN, "hair": "3a2418", "hair_style": "braid", "hat": "headband", "hat_color": "e8b040",
+		"top": "4a8a8a", "top_style": "shirt", "top2": "2f6464", "bottom": "7a6a52", "bottom_style": "knickers",
+		"socks": "c8402e", "shoes": "c8502e", "pack": "pack", "pack_color": "8a5a3a", "carry": ["rope"],
+	},
 	# ------------------------------------------------ Curry Village visitors
 	"visitor_pavilion_cook": {
 		"skin": SKIN_FAIR, "hair": "5a4030", "hat": "cap", "hat_color": "f0ece0",
@@ -228,4 +234,5 @@ const ITEMS := [
 	"model_a_axle",
 	"anderson_eyebolt",
 	"sourdough_starter",
+	"rental_shoes",
 ]

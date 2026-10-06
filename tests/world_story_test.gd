@@ -27,13 +27,19 @@ func _ready() -> void:
 	world._enter_region("yosemite_valley", "apron_base")
 	await get_tree().process_frame
 	check(find_named(world.region, "GlacierPointApron") != null, "Apron climb start is placed")
+	world._enter_region("curry_village", "apron_trailhead")
+	await get_tree().process_frame
+	check(find_named(world.region, "FirefallSlab") != null and find_named(world.region, "WrenAlvarez") != null,
+		"Firefall Slab and Wren are at the foot of the Apron in Curry Village")
+	check(find_named(world.region, "CurryRentalShoes") != null, "the lost rental shoes are in Curry Village")
 	world._enter_region("yosemite_village", "camp_4")
 	await get_tree().process_frame
 	var leonard = find_named(world.region, "DickLeonard")
 	check(leonard != null and leonard.get_parent() == world.region.entities, "Dick Leonard is in Camp 4's Entities (Yosemite Village)")
 	# talk to Leonard: quest starts
 	QuestLog.unlocks.append("guidebook")
-	QuestLog.completed.append("clark_register")
+	QuestLog.completed.append_array(["clark_register", "shop_guidebook", "shop_outfit", "partner_apron"])
+	Gear.add("harness") # the Mountain Shop's first kit
 	var lines = QuestLog.talk_to("dick_leonard")
 	check(QuestLog.active.has("leonard_belay"), "talking to Leonard starts his quest")
 	QuestLog.record_climb("swan_slab")

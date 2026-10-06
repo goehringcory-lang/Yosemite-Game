@@ -8,6 +8,7 @@ signal changed
 
 const GEAR: Array[GearData] = [
 	preload("res://data/gear/approach_shoes.tres"),
+	preload("res://data/gear/climbing_shoes.tres"),
 	preload("res://data/gear/chalk_bag.tres"),
 	preload("res://data/gear/rope.tres"),
 	preload("res://data/gear/harness.tres"),
@@ -22,7 +23,9 @@ const GEAR: Array[GearData] = [
 	preload("res://data/gear/crampons.tres"),
 ]
 
-const STARTING_GEAR := {"approach_shoes": 1, "chalk_bag": 1}
+## You arrive with approach shoes. The Mountain Shop fits you with your
+## first climbing kit (see the "shop_outfit" quest).
+const STARTING_GEAR := {"approach_shoes": 1}
 
 var owned: Dictionary = {}
 

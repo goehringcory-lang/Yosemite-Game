@@ -6,6 +6,7 @@ extends Node
 
 const APRON := preload("res://data/routes/glacier_point_apron.tres")
 const SWAN := preload("res://data/routes/swan_slab.tres")
+const FIREFALL := preload("res://data/routes/firefall_slab.tres")
 
 var failures := 0
 
@@ -25,6 +26,8 @@ func _ready() -> void:
 	test_tabuce_and_acorns()
 	test_spoilage()
 	test_save_round_trip()
+	test_firefall_slab()
+	test_pay_step()
 	await test_dialogue_and_minigame_scenes()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
@@ -43,10 +46,14 @@ func new_game() -> void:
 func test_leonard_quest() -> void:
 	check(not Gear.has_all(APRON.required_gear), "can't climb the Apron with starting gear")
 	check(Gear.missing(APRON.required_gear).size() == 3, "missing rope, harness, cams: %s" % [Gear.missing(APRON.required_gear)])
+	Gear.add("harness") # from the Mountain Shop's first kit
 	check(QuestLog.talk_to("dick_leonard").size() > 0 and not QuestLog.active.has("leonard_belay"),
 		"Leonard won't start the lessons before you have the guidebook")
 	QuestLog.unlocks.append("guidebook")
-	QuestLog.completed.append("clark_register")
+	QuestLog.completed.append_array(["clark_register", "shop_guidebook", "shop_outfit"])
+	check(QuestLog.talk_to("dick_leonard").size() > 0 and not QuestLog.active.has("leonard_belay"),
+		"Leonard waits until you've climbed with Wren")
+	QuestLog.completed.append("partner_apron")
 	var lines := QuestLog.talk_to("dick_leonard")
 	check(QuestLog.active.has("leonard_belay") and lines.size() == 4, "Dick Leonard offers his quest")
 	lines = QuestLog.talk_to("dick_leonard")
@@ -63,8 +70,8 @@ func test_leonard_quest() -> void:
 	check(QuestLog.tick_report("swan_slab").size() == 2, "the tick report names the waiting quest")
 	lines = QuestLog.talk_to("dick_leonard")
 	check(QuestLog.is_completed("leonard_belay"), "reporting the tick finishes the quest")
-	check(Gear.count("rope") == 1 and Gear.count("harness") == 1 and Gear.count("cam") == 2, "reward: rope, harness, 2 cams")
-	check("Received Rope, Harness, 2 Cams" in lines[-1].text, "reward line: %s" % lines[-1].text)
+	check(Gear.count("rope") == 1 and Gear.count("harness") == 1 and Gear.count("cam") == 2, "reward: rope, 2 cams")
+	check("Received Rope, 2 Cams" in lines[-1].text, "reward line: %s" % lines[-1].text)
 	check(Gear.has_all(APRON.required_gear), "now geared for the Apron")
 	check(Inventory.count("miners_lettuce") == 4, "have_food steps don't take the food")
 
@@ -127,6 +134,118 @@ func test_apron_is_climbable() -> void:
 		if state.status == ClimbState.Status.TOPPED_OUT:
 			hungry += 1
 	check(hungry < tops, "climbing without eating is harder (%d of 20 topped out)" % hungry)
+
+
+## Firefall Slab: bolted friction. You clip bolts with quickdraws, climbing
+## shoes and chalk make moves cheaper, and Wren has to be your partner.
+func test_firefall_slab() -> void:
+	var kit := {"climbing_shoes": 1, "chalk_bag": 1, "harness": 1, "quickdraw": 5}
+	var state := ClimbState.new(FIREFALL, 0, 11, kit)
+	check(state.is_bolted() and state.bolts_per_pitch() == 5, "Firefall Slab has 5 bolts a pitch (%d)" % state.bolts_per_pitch())
+	check(state.bolts_per_pitch() <= int(FIREFALL.required_gear.quickdraw), "the route asks for enough draws to clip every bolt")
+	var cracks := 0
+	for r in state.holds:
+		for c in state.holds[r]:
+			if state.holds[r][c].crack:
+				cracks += 1
+	check(cracks == 0 and not state.can_place_cam(), "a bolted slab has no cracks for cams")
+	# Climbing shoes take a point off every move.
+	var bare := ClimbState.new(FIREFALL, 0, 11, {"quickdraw": 5})
+	var r1: int = bare.holds[1].keys()[0]
+	check(state.move_cost(1, r1) == maxi(int(bare.holds[1][r1].cost) - ClimbState.SHOE_BONUS, 1), "climbing shoes make moves cheaper")
+	# Follow the bolt line, clipping as you go.
+	while state.row < ClimbState.BOLT_FIRST:
+		state.stamina = 100
+		state.move(int(state.bolts.get(state.row + 1, state.col + _toward(state, state.row + 1))) - state.col)
+	check(state.can_clip() and state.clip_bolt(), "you can clip the first bolt from the line")
+	check(state.quickdraws_left == 4 and state.protection_row == state.row and state.protection.back().kind == "draw", "a quickdraw goes on the bolt")
+	check(not state.clip_bolt() and state.quickdraws_left == 4, "a bolt is only clipped once")
+	# Chalk: once a pitch, off the ledge.
+	var next := Vector2i(state.col + _toward(state, state.row + 1), state.row + 1)
+	var before := state.move_cost(next.y, next.x)
+	check(state.chalk_up() and state.chalk_moves == ClimbState.CHALK_MOVES, "chalking up on the wall")
+	var after := state.move_cost(next.y, next.x)
+	check(after < before or after == 1, "chalk makes the next move cheaper (%d -> %d)" % [before, after])
+	check(not state.chalk_up(), "only once a pitch")
+	var no_chalk := ClimbState.new(FIREFALL, 0, 11, {"quickdraw": 5})
+	no_chalk.move(first_reachable(no_chalk))
+	check(not no_chalk.chalk_up(), "no chalk bag, no chalk")
+	# A fall is caught by the quickdraw.
+	state.stamina = 1
+	state.move(first_reachable(state))
+	check(state.status == ClimbState.Status.CLIMBING and state.falls == 1 and "quickdraw" in state.message, "a fall is caught by your quickdraw (%s)" % state.message)
+	# A careful climber who clips every bolt tops out.
+	var tops := 0
+	for seed in 20:
+		Inventory.add("trail_mix", 1)
+		var s2 := ClimbState.new(FIREFALL, 0, seed, kit)
+		play_bolts(s2)
+		if s2.status == ClimbState.Status.TOPPED_OUT:
+			tops += 1
+		if Inventory.count("trail_mix") > 0:
+			Inventory.remove("trail_mix", Inventory.count("trail_mix"))
+	check(tops >= 19, "clipping every bolt, Firefall Slab goes (%d of 20)" % tops)
+	# Wren has to be your partner.
+	QuestLog.start_new_game()
+	QuestLog.unlocks.append("guidebook")
+	var start: ClimbStart = load("res://scenes/climb/climb_start.tscn").instantiate()
+	start.route = FIREFALL
+	check(not start.has_partner() and start.partner_name() == "Wren Alvarez", "you can't start Firefall Slab without a partner")
+	QuestLog.active["partner_apron"] = 0
+	check(start.has_partner(), "with Wren's quest underway, Wren belays you")
+	start.free()
+	QuestLog.active.erase("partner_apron")
+
+
+func _toward(state: ClimbState, r: int) -> int:
+	for dx in [0, -1, 1]:
+		if not state.hold_at(r, state.col + dx).is_empty():
+			return dx
+	return 0
+
+
+## A bot for bolted routes: keeps near the bolt line and clips every bolt.
+func play_bolts(state: ClimbState) -> void:
+	var guard := 0
+	while state.status == ClimbState.Status.CLIMBING and guard < 500:
+		guard += 1
+		if state.is_at_belay() and state.stamina < 60:
+			var foods := FoodDB.edible_in_inventory()
+			if not foods.is_empty():
+				state.eat(foods[0])
+		if state.can_clip():
+			state.clip_bolt()
+		var r := state.row + 1
+		var best := 0
+		var best_score := 9999
+		for dx in [-1, 0, 1]:
+			if state.hold_at(r, state.col + dx).is_empty():
+				continue
+			var score := state.move_cost(r, state.col + dx)
+			var next_bolt := r + 1 if state.bolts.has(r + 1) else r
+			if state.bolts.has(next_bolt):
+				score += 10 * absi(int(state.bolts[next_bolt]) - (state.col + dx))
+			if score < best_score:
+				best = dx
+				best_score = score
+		state.move(best)
+
+
+## A "pay" step takes the food when you turn it in.
+func test_pay_step() -> void:
+	QuestLog.start_new_game()
+	Inventory.items.clear()
+	QuestLog.completed.append("clark_register")
+	QuestLog.talk_to("mountain_shop", "Marty Kessler")
+	QuestLog.talk_to("jennie_curry")
+	Inventory.add("lamon_apple", 1)
+	QuestLog.talk_to("mountain_shop", "Marty Kessler")
+	check(not QuestLog.has_guidebook() and Inventory.count("lamon_apple") == 1, "not enough food: nothing is taken")
+	Inventory.add("lamon_apple", 2)
+	var lines := QuestLog.talk_to("mountain_shop", "Marty Kessler")
+	check(QuestLog.has_guidebook() and Inventory.count("lamon_apple") == 1, "20 energy buys the guidebook: 2 apples go")
+	check(lines.any(func(l): return l.text.begins_with("You hand over 2 Lamon")), "the trade is announced")
+	Inventory.items.clear()
 
 
 func test_tabuce_and_acorns() -> void:

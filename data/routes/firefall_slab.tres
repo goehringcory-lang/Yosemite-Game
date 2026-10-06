@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "firefall_slab"
+display_name = "Firefall Slab"
+grade = "5.7 slab"
+description = "Two pitches of clean friction on the lower Glacier Point Apron, right above the Curry Village cabins, under the cliff the Firefall used to pour from. Bolted the whole way: bring quickdraws, not cams, and a partner with a rope."
+required_gear = {"climbing_shoes": 1, "chalk_bag": 1, "harness": 1, "quickdraw": 5}
+guide_chapter = "Curry Village"
+guide_order = 15
+guide_tip = "Bolted friction. Sticky shoes, five draws, and a partner with a rope. Chalk up before the bulge on pitch two."
+pitches = Array[int]([1, 2])
+moves_per_pitch = 11
+protection = "bolts"
+partner_quest = "partner_apron"
+height_ft = 200

@@ -24,6 +24,11 @@ func interact(player: Player) -> void:
 	if not Guidebook.has_book():
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s. You don't know this route yet. Pick up a climbing guidebook at the Mountain Shop in Curry Village, so you have a tick list to log it in." % route.display_name}])
 		return
+	var partner := partner_name()
+	if route.partner_quest != "" and not has_partner():
+		DialogueBox.say_to(player, [{"speaker": "", "text": "%s (%s). You can't lead this alone: you need a partner with a rope to belay you. %s" % [
+			route.display_name, route.grade, "%s is looking for one." % partner if partner != "" else "Ask around."]}])
+		return
 	var missing := Gear.missing(route.required_gear)
 	if not missing.is_empty():
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s (%s). You need more gear to climb this: %s." % [
@@ -32,6 +37,8 @@ func interact(player: Player) -> void:
 	var info := "%s, %s, %d pitch%s" % [route.display_name, route.grade, route.pitches.size(), "" if route.pitches.size() == 1 else "es"]
 	if route.nights > 0:
 		info += ", %d night%s on the wall" % [route.nights, "" if route.nights == 1 else "s"]
+	if partner != "":
+		info += ", %s on belay" % partner
 	if QuestLog.has_climbed(route.id):
 		info += " (already ticked)"
 	info += ". You're carrying %d energy of food." % FoodDB.carried_energy()
@@ -65,6 +72,19 @@ func climb(player: Player) -> void:
 		await DialogueBox.say_to(player, report)
 	if success and route.destination_hub != "":
 		_travel_to_top()
+
+
+## True if the route needs no partner, or your partner's quest is underway or done.
+func has_partner() -> bool:
+	var quest := route.partner_quest
+	return quest == "" or QuestLog.active.has(quest) or QuestLog.is_completed(quest)
+
+
+## The display name of the person who belays you here, or "".
+func partner_name() -> String:
+	var quest := QuestLog.get_quest(route.partner_quest) if route.partner_quest != "" else null
+	var who := QuestLog.get_character(quest.giver) if quest else null
+	return who.display_name if who else ""
 
 
 ## Unlocks the hub at the top of the route and moves the player there.

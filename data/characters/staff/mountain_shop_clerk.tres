@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/curry_shop_clerk.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "mountain_shop"
+display_name = "Marty Kessler"
+years = "1970s"
+affiliation = "Curry Village Mountain Shop"
+bio = "Runs the counter at the Curry Village Mountain Shop. An invented character, not a historical figure."
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.227, 0.416, 0.541, 1)
+home = "Mountain Shop, Curry Village"
+staff = true
+sources = "Invented for the game. The Mountain Shop stands in for the real Curry Village shop and the Yosemite Mountaineering School (founded 1969)."

@@ -96,9 +96,10 @@ func _offer(kind_name: String, id: String, price: int, requires := {}, max_owned
 	return offer
 
 
-func _shop(keeper: String, greeting: String, nothing_yet: String, offers: Array) -> ShopData:
+func _shop(keeper: String, greeting: String, nothing_yet: String, offers: Array, talk_target := "") -> ShopData:
 	var shop := ShopData.new()
 	shop.keeper = keeper
+	shop.talk_target = talk_target
 	shop.greeting = greeting
 	shop.nothing_yet = nothing_yet
 	for offer: ShopOffer in offers:
@@ -117,15 +118,16 @@ func _build_shops() -> void:
 		_offer("item", "cheddar_wedge", 40), _offer("item", "beef_jerky", 46), _offer("item", "trail_mix", 40),
 		_offer("item", "dried_apples", 20)]),
 		"res://data/shops/curry_store.tres")
-	save_resource(_shop("Mountain Shop clerk",
+	# The clerk, Marty Kessler, is also a quest giver (data/characters/staff/).
+	save_resource(_shop("Marty Kessler",
 		"Welcome to the Mountain Shop. We outfit half the climbers in the Valley. Rope, cams, draws... we take food in trade, same as everyone up here.",
-		"You'll want a rope and a couple of cams before I can help. Talk to the folks at Camp 4, or ask around the Valley.",
+		"That's all I can trade you today. Once you've got a rope of your own, come back and I'll round out your rack.",
 		[_offer("gear", "quickdraw", 28, {"rope": 1}, 12, 2),
 		_offer("gear", "cam", 48, {"cam": 2}, 10),
 		_offer("gear", "belay_device", 36, {"rope": 1, "harness": 1}, 1),
 		_offer("gear", "haul_bag", 76, {"aiders": 1}, 1),
 		_offer("gear", "ascenders", 60, {"aiders": 1}, 1),
-		_offer("gear", "portaledge", 130, {"haul_bag": 1, "ascenders": 1}, 1)]),
+		_offer("gear", "portaledge", 130, {"haul_bag": 1, "ascenders": 1}, 1)], "mountain_shop"),
 		"res://data/shops/curry_mountain_shop.tres")
 
 

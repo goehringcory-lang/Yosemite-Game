@@ -29,7 +29,7 @@ A newcomer with a tent and a pair of approach shoes. They have no destiny and no
 
 ## The main storyline: the tick list
 
-The player's way through the story is the **climbing guidebook**. Clark's first errand sends them to the Mountain Shop in Curry Village, where the clerk hands over a guidebook listing every route, its grade, and the gear it takes. A route counts only when the player tops it out and ticks it. Every main-line quest after the first ends on a tick, and the person who gave the quest hands over the next piece of gear when they hear about it. The routes in order: Swan Slab, the Glacier Point Apron, Higher Cathedral Spire, Royal Arches, Snake Dike, the Nose, Cathedral Peak, and the Lyell Glacier. The full chain is in [docs/CAST.md](docs/CAST.md#quest-chains). Side stories (the people who aren't on the main line) come alongside it.
+The player's way through the story is the **climbing guidebook**. Clark's first errand sends them to the Mountain Shop in Curry Village. The clerk, Marty Kessler, has them fetch the new printing from the Registration porch and trade food for a guidebook listing every route, its grade, and the gear it takes. Then Marty fits them with a starter kit (climbing shoes, a chalk bag, a harness, and five quickdraws) in exchange for food and a pair of lost rental shoes, and sends them to Wren Alvarez, a new hire looking for a climbing partner. Wren belays the player up **Firefall Slab**, a bolted route on the Glacier Point Apron, and that's the first tick. A route counts only when the player tops it out and ticks it. Every main-line quest after the shop errands ends on a tick, and the person who gave the quest hands over the next piece of gear when they hear about it. The routes in order: Firefall Slab, Swan Slab, the Glacier Point Apron, Higher Cathedral Spire, Royal Arches, Snake Dike, the Nose, Cathedral Peak, and the Lyell Glacier. The full chain is in [docs/CAST.md](docs/CAST.md#quest-chains). Side stories (the people who aren't on the main line) come alongside it.
 
 ## Story arc
 
@@ -43,11 +43,12 @@ The full cast (who lives where, with sprites) and every quest chain, with the ge
 - **James Lamon**, whose cabin and apple orchard became the player's camp, tells how he settled in the valley in the late 1850s.
 - **Tenaya's** story comes early and is told plainly. The Ahwahneechee were living in Ahwahnee when the Mariposa Battalion entered it in 1851, and they were forced out. The Grant was signed 13 years later. Clark's first pages leave this out, and noticing that gap sets the direction of the game.
 - **Tabuce (Maggie Howard)** teaches the player to gather acorns, build a chuckah, and prepare acorn food. The skill starts now but pays off in the fall (quests: *Acorns for the Winter*, *The Chuckah*).
+- At the Mountain Shop the player earns a guidebook and a starter kit, and leads **Firefall Slab** with **Wren Alvarez** on belay. Marty and Wren are invented shop staff, not historical figures: they never appear in the Register.
 - The player boulders at Camp 4 and climbs Swan Slab, where **Dick Leonard** belays them from above.
 
 ### 2. The rim: Glacier Point (Tier 1, late Spring)
 
-- **Dick Leonard, Jules Eichorn, and Bestor Robinson** of the Sierra Club Rock Climbing Section teach the player to belay. Then they hand over a rope, a harness, and 2 cams (quest: *The Rock Climbing Section*).
+- **Dick Leonard, Jules Eichorn, and Bestor Robinson** of the Sierra Club Rock Climbing Section teach the player to belay. Then they hand over a rope and 2 cams (quest: *The Rock Climbing Section*).
 - The **Glacier Point Apron** leads up to the rim.
 - At the top: **David and Jennie Curry** and the Firefall (which ended in 1968). People in the game disagree about whether it was a wonder or a spectacle, and the game doesn't pick a side.
 - **Clare Marie Hodges**, the first woman ranger (1918), and **Enid Michael**, a naturalist who teaches which plants can be gathered and which should be left alone.

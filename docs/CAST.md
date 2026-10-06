@@ -62,6 +62,15 @@ NPCs go in a hub's story overlay (`scenes/story/content/<hub>.tscn`). Each NPC h
 
 Dates marked blank are unconfirmed. Every character's `sources` field lists what to verify. Royal Robbins died recently (2017), so confirm his portrayal with his family, following the living and recently deceased rule in STORY.md.
 
+### Mountain Shop staff
+
+Two invented people work at the Curry Village Mountain Shop. They're not historical figures and never appear in the Register, but unlike visitors they give quests (`staff = true`, listed in `QuestLog.STAFF`, in `data/characters/staff/`):
+
+- **Marty Kessler** runs the counter (the shop's Vendor; quests reach him through the shop's `talk_target`, `mountain_shop`). He trades you the guidebook and fits you with your first kit.
+- **Wren Alvarez** started at the shop this week, doesn't know anyone in the Valley, and waits at the foot of Firefall Slab with a rope, looking for a partner.
+
+**Firefall Slab** is an invented route too: a stand-in for the many bolted friction climbs on the lower Glacier Point Apron, named for the Firefall that poured from the cliff above.
+
 ### Visitors
 
 Visitors are everyday people from each era who wander the trails and roads: a stagecoach couple at Wawona (1880s), a railroad passenger at El Portal (1910s), a motorist (1920s), a CCC worker and an angler (1930s), a camper (1950s), a Camp 4 climber and a backpacker (1970s), and a landscape painter (1900s) at Glacier Point.
@@ -92,6 +101,7 @@ Talking to a visitor gets one random line.
 | The Ahwahnee grounds (walk north from the homestead: `ahwahnee_trail`, then `the_ahwahnee`) | the_ahwahnee · `front_door`, `rose_garden`, `tea_lawn`, `cascade`, `ahwahnee_meadow` | Royal Robbins and the Royal Arches start behind the hotel. The hotel's doors are still a sign, with no inside. |
 | Mirror Lake | yosemite_valley · `mirror_lake` | Tenaya |
 | Glacier Point Apron | yosemite_valley · `apron_base` | the Apron climb |
+| Firefall Slab | curry_village · `apron_trailhead` | Wren Alvarez; the Firefall Slab climb. The lost rental shoes lie out front of the upper tent cabins. |
 | Glacier Point | glacier_point | McCauley, Enid Michael, a painter |
 | Tuolumne Meadows | tuolumne_meadows | Muir, Carrie Bethel, a backpacker; Cathedral Peak, Lyell Glacier |
 | El Portal railyard | el_portal | The Model A axle (pickup), a railroad passenger |
@@ -108,9 +118,13 @@ The main storyline is one chain of quests (marked ★ in the Journal). Each one 
 Gear arrives in the order the routes need it, and a quest can hand over gear as each of its steps is finished (a step's `gear` key). `tests/cast_test.tscn` plays the chain and checks every climb's gear is in hand when it comes up.
 
 ```
-★ 1  The Guidebook ........ Clark sends you to the Curry Village Mountain Shop. The clerk hands over the guidebook.
+★ 1  The Guidebook ........ Clark sends you to the Curry Village Mountain Shop.
+★ 1a A Guidebook of Your Own  Marty Kessler (Mountain Shop) ... fetch the box from Jennie Curry, trade 20 energy of food → guidebook
                               Without it no route will start: you have no tick list to log it in.
-★ 2  Rock Climbing Section  Leonard, Swan Slab ................ food, then TICK Swan Slab → rope, harness, 2 cams
+★ 1b Fitted Out ............ Marty Kessler .................... lost rental shoes + 40 energy of food → climbing shoes,
+                              chalk bag, harness, 5 quickdraws. Marty points you to Wren.
+★ 1c Looking for a Partner . Wren Alvarez, foot of the Apron .. food, then TICK Firefall Slab (Wren belays, brings the rope)
+★ 2  Rock Climbing Section  Leonard, Swan Slab ................ food, then TICK Swan Slab → rope, 2 cams
 ★ 3  Up the Apron .......... Eichorn, at Curry Village ........ TICK Glacier Point Apron → 2 cams, 2 quickdraws (and opens Glacier Point)
 ★ 4  The Cathedral Spires .. Eichorn; Robinson's story first .. TICK Higher Cathedral Spire → 2 quickdraws
 ★ 5  Clean Climbing ........ Robbins, at the Ahwahnee ......... TICK Royal Arches → belay device, 2 cams, 2 quickdraws
@@ -150,8 +164,9 @@ Other:
 
 | Route | Needs | Comes from |
 |---|---|---|
+| Firefall Slab | climbing shoes, chalk bag, harness, 5 quickdraws (Wren brings the rope) | Marty Kessler (Mountain Shop) |
 | Swan Slab | nothing (top rope) | start |
-| Glacier Point Apron | rope, harness, 2 cams | Leonard |
+| Glacier Point Apron | rope, harness, 2 cams | + Leonard |
 | Higher Cathedral Spire | rope, harness, 4 cams, 2 quickdraws | + Eichorn (Apron) |
 | Royal Arches | + 4 cams, 4 quickdraws | + Eichorn (Spires) |
 | Snake Dike | 2 cams, 6 quickdraws, belay device | + Robbins |
@@ -168,6 +183,7 @@ The Mountain Shop and Camp 4 traders sell more of the same pieces for food, but 
 | Lamon apple | Lamon, Jennie Curry | Climbing food (12 energy, keeps 12 days) |
 | Degnan's bread | Degnan, McCauley | Climbing food (25 energy, keeps 4 days) |
 | Sourdough starter | Degnan | Jennie Curry's quest |
+| Rental climbing shoes | Pickup by the Curry Village tent cabins | Marty Kessler's *Fitted Out* |
 | Anderson's eyebolt | Anderson | Robbins's quest (shown, not taken; a keepsake) |
 | Model A axle | Pickup at the El Portal railyard | Salathé forges it into cams |
 | Pine nuts | Carrie Bethel, Muir | High-country food (20 energy, keeps 30 days) |
@@ -175,6 +191,9 @@ The Mountain Shop and Camp 4 traders sell more of the same pieces for food, but 
 ### New quest mechanics
 
 - **Guidebook and ticks:** `Guidebook` (`scripts/story/guidebook.gd`) lists every route with its grade and gear. A step with `"unlock": "guidebook"` hands it over, and `ClimbStart` won't start a route without it. `QuestData.main_line` marks the main story. A step can also carry `gear`, `unlock`, or `items` to hand over when it's done. A shop's `talk_target` lets a quest send you to a shopkeeper.
+- **`pay` step:** trade food worth `energy` when you turn it in (the soonest to spoil goes first). The Mountain Shop uses it to sell the guidebook and the starter kit.
+- **Partners:** `RouteData.partner_quest` names a quest whose giver is your partner. The route only starts while that quest is underway or done (Firefall Slab: Wren's *Looking for a Partner*).
+- **Bolted routes:** `RouteData.protection = "bolts"` puts a bolt every 2 moves on the line; each takes a quickdraw.
 - **`return` step:** done as soon as you talk to the quest giver again. It closes delivery rounds ("take bread to Leonard and Curry, then come back").
 - **`hub:<id>` unlock reward:** opens a locked hub. Harding's *The Nose* uses `hub:tuolumne_meadows`.
 - **Story pickups** (`scenes/story/pickup.tscn`): a one-of-a-kind item lying in the park, picked up once and remembered in the save. Give each one a unique node name.

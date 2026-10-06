@@ -19,6 +19,9 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/tabuce_chuckah.tres"),
 	# The full storyline (see STORY.md, "Quest chains")
 	preload("res://data/quests/clark_register.tres"),
+	preload("res://data/quests/shop_guidebook.tres"),
+	preload("res://data/quests/shop_outfit.tres"),
+	preload("res://data/quests/partner_apron.tres"),
 	preload("res://data/quests/lamon_orchard.tres"),
 	preload("res://data/quests/tenaya_ahwahnee.tres"),
 	preload("res://data/quests/degnan_bread.tres"),
@@ -66,6 +69,14 @@ const CHARACTERS: Array[CharacterData] = [
 	preload("res://data/characters/carrie_bethel.tres"),
 ]
 
+## Invented Mountain Shop staff (CharacterData.staff). They give shop quests
+## and partner on climbs, but they aren't in the Register's cast above. The
+## clerk's id is the shop's talk_target, so talking at the counter reaches them.
+const STAFF: Array[CharacterData] = [
+	preload("res://data/characters/staff/mountain_shop_clerk.tres"),
+	preload("res://data/characters/staff/wren_alvarez.tres"),
+]
+
 ## Quest id -> index of the current step. Missing = not started.
 var active: Dictionary = {}
 var completed: Array[String] = []
@@ -80,7 +91,7 @@ func _ready() -> void:
 	add_to_group("persist")
 	for quest: QuestData in QUESTS:
 		_quests_by_id[quest.id] = quest
-	for character: CharacterData in CHARACTERS:
+	for character: CharacterData in CHARACTERS + STAFF:
 		_characters_by_id[character.id] = character
 
 
@@ -189,6 +200,8 @@ func is_step_done(step: Dictionary) -> bool:
 			return Inventory.count(step.item) >= int(step.get("count", 1))
 		"have_food":
 			return FoodDB.carried_energy() >= int(step.energy)
+		"pay":
+			return Barter.can_afford(int(step.energy))
 		"chuckah":
 			return Granary.chuckahs_built >= int(step.get("count", 1))
 		"stored":
@@ -249,6 +262,9 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 				break
 			if step.get("type") == "have" and step.get("consume", false):
 				Inventory.remove(step.item, int(step.get("count", 1)))
+			if step.get("type") == "pay":
+				var paid := Barter.pay(int(step.energy))
+				lines.append({"speaker": "", "text": "You hand over %s." % Barter.describe(paid)})
 			_add_lines(lines, speaker, step.get("done", []))
 			_advance(quest, lines)
 			progressed = true

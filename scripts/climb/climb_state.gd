@@ -6,9 +6,13 @@ extends RefCounted
 ## A pitch is a grid of holds [member COLUMNS] wide. Row 0 is the belay ledge
 ## at the bottom, and the last row is the ledge at the top. Each move goes up
 ## one row: straight up, up-left, or up-right, onto a hold. Moves cost stamina.
-## Some holds are cracks, where you can place a cam. If stamina runs out you
-## fall to your last cam (or the belay). A short fall only costs time; a long
-## one ends the climb, and you lower off safely.
+## Some holds are cracks, where you can place a cam. On bolted routes there are
+## bolts beside the line instead, and you clip each with a quickdraw. If
+## stamina runs out you fall to your last piece (or the belay). A short fall
+## only costs time; a long one ends the climb, and you lower off safely.
+##
+## The kit helps too: climbing shoes make every move a little cheaper, and a
+## chalk bag lets you chalk up once a pitch for a couple of easier moves.
 
 enum Status { CLIMBING, TOPPED_OUT, RETREATED }
 
@@ -29,6 +33,17 @@ const MINUTES_PER_MOVE := 6
 const MINUTES_PER_CAM := 2
 const MINUTES_PER_FALL := 20
 const MINUTES_TO_EAT := 5
+const MINUTES_PER_CLIP := 2
+const MINUTES_TO_CHALK := 2
+## On bolted routes: the first bolt is this many moves up, then one every
+## BOLT_SPACING moves below the top ledge.
+const BOLT_FIRST := 2
+const BOLT_SPACING := 2
+## Climbing shoes take this much off every move.
+const SHOE_BONUS := 1
+## Chalking up takes this much off each of the next CHALK_MOVES moves.
+const CHALK_BONUS := 3
+const CHALK_MOVES := 2
 
 var route: RouteData
 var status := Status.CLIMBING
@@ -38,10 +53,24 @@ var col := COLUMNS / 2
 var stamina := MAX_STAMINA
 var cams_per_pitch := 0
 var cams_left := 0
-## Row of the highest cam placed this pitch (the belay ledge counts as row 0).
+var quickdraws_per_pitch := 0
+var quickdraws_left := 0
+## Row of the highest piece placed this pitch (the belay ledge counts as row 0).
 var protection_row := 0
 ## Cells with a placed cam this pitch, for drawing.
 var placed_cams: Array[Vector2i] = []
+## Bolts clipped this pitch (their cells).
+var clipped_bolts: Array[Vector2i] = []
+## Every piece the rope runs through this pitch, lowest first:
+## {"cell": Vector2i, "kind": "cam" or "draw"}.
+var protection: Array[Dictionary] = []
+## Row -> column of the bolt on that row, on bolted routes.
+var bolts: Dictionary = {}
+var has_shoes := false
+var has_chalk := false
+## Moves left that get the chalk bonus.
+var chalk_moves := 0
+var chalked_this_pitch := false
 var falls := 0
 var falls_this_pitch := 0
 var nights_spent := 0
@@ -55,9 +84,14 @@ var _rng := RandomNumberGenerator.new()
 
 
 ## [param seed] makes the wall the same every time (tests use this).
-func _init(p_route: RouteData, cams: int, seed := -1) -> void:
+## [param kit] is the rest of the player's gear (gear id -> count, like
+## Gear.owned): quickdraws, climbing shoes, and a chalk bag.
+func _init(p_route: RouteData, cams: int, seed := -1, kit := {}) -> void:
 	route = p_route
 	cams_per_pitch = 99 if route.top_rope else cams
+	quickdraws_per_pitch = 99 if route.top_rope else int(kit.get("quickdraw", 0))
+	has_shoes = int(kit.get("climbing_shoes", 0)) > 0
+	has_chalk = int(kit.get("chalk_bag", 0)) > 0
 	if seed >= 0:
 		_rng.seed = seed
 	else:
@@ -82,6 +116,31 @@ func is_at_belay() -> bool:
 	return row == 0
 
 
+func is_bolted() -> bool:
+	return route.protection == "bolts"
+
+
+## What moving onto the hold at ([param r], [param c]) costs right now, after
+## climbing shoes and chalk. Ledges are free; other holds cost at least 1.
+func move_cost(r: int, c: int) -> int:
+	var hold := hold_at(r, c)
+	if hold.is_empty():
+		return 0
+	var cost := int(hold.cost)
+	if cost <= 0:
+		return 0
+	if has_shoes:
+		cost -= SHOE_BONUS
+	if chalk_moves > 0:
+		cost -= CHALK_BONUS
+	return maxi(cost, 1)
+
+
+## Bolts per pitch on this route: how many quickdraws it takes to clip them all.
+func bolts_per_pitch() -> int:
+	return bolts.size()
+
+
 ## Moves up one row. [param dx] is -1 (up-left), 0 (straight up), or 1 (up-right).
 func move(dx: int) -> bool:
 	if status != Status.CLIMBING:
@@ -90,10 +149,12 @@ func move(dx: int) -> bool:
 	if target.is_empty():
 		message = "No hold there."
 		return false
+	var cost := move_cost(row + 1, col + dx)
 	row += 1
 	col += dx
-	stamina -= int(target.cost)
+	stamina -= cost
 	minutes += MINUTES_PER_MOVE
+	chalk_moves = maxi(chalk_moves - 1, 0)
 	message = ""
 	if stamina <= 0:
 		_fall()
@@ -114,9 +175,62 @@ func place_cam() -> bool:
 	cams_left -= 1
 	protection_row = row
 	placed_cams.append(Vector2i(col, row))
+	protection.append({"cell": Vector2i(col, row), "kind": "cam"})
 	stamina -= 1
 	minutes += MINUTES_PER_CAM
 	message = "Cam placed."
+	return true
+
+
+## True if there's a bolt on this row within arm's reach (your column or the
+## next one over) that you haven't clipped, and a quickdraw to clip it with.
+func can_clip() -> bool:
+	return status == Status.CLIMBING and not route.top_rope and quickdraws_left > 0 \
+		and bolts.has(row) and absi(int(bolts[row]) - col) <= 1 and protection_row < row
+
+
+func clip_bolt() -> bool:
+	if not can_clip():
+		if not bolts.has(row):
+			message = "No bolt here. They're every couple of moves: watch for the glint."
+		elif absi(int(bolts[row]) - col) > 1:
+			message = "The bolt's out of reach. Stay closer to the line."
+		elif quickdraws_left <= 0:
+			message = "You're out of quickdraws for this pitch."
+		else:
+			message = "You've already clipped that bolt."
+		return false
+	var bolt := Vector2i(int(bolts[row]), row)
+	quickdraws_left -= 1
+	protection_row = row
+	clipped_bolts.append(bolt)
+	protection.append({"cell": bolt, "kind": "draw"})
+	stamina -= 1
+	minutes += MINUTES_PER_CLIP
+	message = "Clipped. The rope runs through the quickdraw."
+	return true
+
+
+## The protect button: clips a bolt within reach, or places a cam in a crack.
+func protect() -> bool:
+	return clip_bolt() if is_bolted() or can_clip() else place_cam()
+
+
+## Dips your hands in the chalk bag: the next CHALK_MOVES moves cost less.
+## Once a pitch, anywhere but a ledge.
+func chalk_up() -> bool:
+	if status != Status.CLIMBING:
+		return false
+	if not has_chalk:
+		message = "You don't have a chalk bag."
+		return false
+	if chalked_this_pitch:
+		message = "You've already chalked up on this pitch. Save it for the next one."
+		return false
+	chalked_this_pitch = true
+	chalk_moves = CHALK_MOVES
+	minutes += MINUTES_TO_CHALK
+	message = "You chalk up. Dry hands: the next %d moves are easier." % CHALK_MOVES
 	return true
 
 
@@ -161,7 +275,11 @@ func _fall() -> void:
 	# Back on the ledge you're lowered to the belay; otherwise you grab the nearest hold.
 	col = COLUMNS / 2 if row == 0 else _nearest_hold_column(row, col)
 	stamina = AFTER_FALL_STAMINA
-	message = "You fall, and your %s catches you. Shake it out and try again." % ("belay" if protection_row == 0 else "cam")
+	chalk_moves = 0
+	var catcher := "belay"
+	if protection_row > 0 and not protection.is_empty():
+		catcher = "quickdraw" if protection.back().kind == "draw" else "cam"
+	message = "You fall, and your %s catches you. Shake it out and try again." % catcher
 
 
 func _finish_pitch() -> void:
@@ -200,14 +318,21 @@ func _start_pitch() -> void:
 	row = 0
 	col = COLUMNS / 2
 	cams_left = cams_per_pitch
+	quickdraws_left = quickdraws_per_pitch
 	protection_row = 0
 	falls_this_pitch = 0
 	placed_cams.clear()
+	clipped_bolts.clear()
+	protection.clear()
+	chalk_moves = 0
+	chalked_this_pitch = false
 	_generate_holds(route.pitches[pitch])
 
 
 func _generate_holds(difficulty: int) -> void:
 	holds = {}
+	bolts = {}
+	var path := {}
 	var ledge := {}
 	for c in COLUMNS:
 		ledge[c] = {"cost": 0, "crack": false}
@@ -218,6 +343,7 @@ func _generate_holds(difficulty: int) -> void:
 		var rowd := {}
 		# A guaranteed line: each row has a hold within reach of the one below.
 		path_col = clampi(path_col + _rng.randi_range(-1, 1), 0, COLUMNS - 1)
+		path[r] = path_col
 		rowd[path_col] = _make_hold(difficulty)
 		for i in _rng.randi_range(1, 2):
 			var c := _rng.randi_range(0, COLUMNS - 1)
@@ -225,7 +351,12 @@ func _generate_holds(difficulty: int) -> void:
 				rowd[c] = _make_hold(difficulty)
 		holds[r] = rowd
 	_remove_dead_ends(difficulty)
-	_ensure_cracks(difficulty)
+	if is_bolted():
+		# Bolts sit on the line, so the easy way up passes every one of them.
+		for r in range(BOLT_FIRST, top_row, BOLT_SPACING):
+			bolts[r] = path[r]
+	else:
+		_ensure_cracks(difficulty)
 
 
 ## Gives every hold at least one hold within reach above it, so the player
@@ -241,7 +372,10 @@ func _remove_dead_ends(difficulty: int) -> void:
 
 
 func _make_hold(difficulty: int) -> Dictionary:
-	return {"cost": 2 + difficulty * 2 + _rng.randi_range(0, 3), "crack": _rng.randf() < 0.3}
+	var cost := 2 + difficulty * 2 + _rng.randi_range(0, 3)
+	var crack := _rng.randf() < 0.3
+	# Bolted slabs are blank granite: no cracks to protect.
+	return {"cost": cost, "crack": crack and not is_bolted()}
 
 
 ## Makes sure a careful climber can protect every stretch of DANGEROUS_RUNOUT

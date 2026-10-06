@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/wren_alvarez.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "wren_alvarez"
+display_name = "Wren Alvarez"
+years = "1970s"
+affiliation = "Curry Village Mountain Shop (new hire)"
+bio = "Started at the Mountain Shop this week. Climbed every weekend back home, but doesn't know anyone in the Valley yet. An invented character, not a historical figure."
+idle_lines = PackedStringArray("Heels low, trust the rubber. That's all slab is. Well, that and not looking down.", "Marty says I'm allowed to climb on my lunch break if I'm back by one. I have never once been back by one.", "Everybody here talks about El Cap. I just want to learn every slab on the Apron first.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.29, 0.541, 0.541, 1)
+home = "Curry Village, foot of Firefall Slab"
+staff = true
+sources = "Invented for the game."
