@@ -268,8 +268,8 @@ func _dress(im: Image, o: Dictionary, sd: int, wall_top: int, win_h: int, door_c
 	K.hline(im, lx - 1, ly + 4, 3, iron[3])
 
 
-## The Welcome Center's own touches: a cut-stone arch over the door, an
-## NPS-green pennant on a bracket, a bench and two planters by the entrance.
+## The Welcome Center's own touches: a cut-stone arch over the door and
+## two planters by the entrance.
 func _visitor_details(im: Image, wall_top: int, door_cx: int, sd: int) -> void:
 	var h := im.get_height()
 	# arch of voussoirs over the door
@@ -277,15 +277,6 @@ func _visitor_details(im: Image, wall_top: int, door_cx: int, sd: int) -> void:
 		var ay := wall_top + 10 - int(sqrt(maxf(0.0, 30.0 - k * k)) * 0.8)
 		K.px(im, door_cx + k, ay, granite[6] if k % 2 == 0 else granite[4])
 		K.px(im, door_cx + k, ay + 1, granite[2])
-	# pennant: green field with a pale arrowhead
-	var px0 := door_cx - 18
-	K.vline(im, px0, wall_top + 2, 8, iron[2])
-	for yy in 7:
-		var flen: int = 7 - yy / 2
-		K.hline(im, px0 + 1, wall_top + 3 + yy, flen, leaf[2] if yy % 2 == 0 else leaf[3])
-	K.px(im, px0 + 3, wall_top + 5, Color("e8dcb0"))
-	K.px(im, px0 + 3, wall_top + 6, Color("e8dcb0"))
-	K.px(im, px0 + 2, wall_top + 6, Color("c8b888"))
 	# planters flanking the step
 	for side in [-1, 1]:
 		var bx: int = door_cx + side * 9 - 2
