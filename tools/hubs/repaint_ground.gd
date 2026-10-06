@@ -4,8 +4,8 @@ extends Node
 ## every node id). Use it after changing tools/hubs/ahwahnee_ground.gd.
 ##   godot --headless --path . res://tools/hubs/repaint_ground.tscn -- [hub ids]
 ## Hubs: yosemite_village, curry_village, lamon_homestead, ahwahnee_trail.
-## The hotel grounds are skipped: they carry the gravel drive and flower-bed
-## shapes that only build_ahwahnee.gd knows. Run
+## The hotel grounds (the_ahwahnee) are laid out by calling build_ahwahnee.gd
+## for its terrain, gravel ring and flower-bed shapes. Run
 ## `godot --headless --path . --import` afterwards.
 
 const Ground = preload("res://tools/hubs/ahwahnee_ground.gd")
@@ -23,6 +23,8 @@ const HUBS := {
 
 func _ready() -> void:
 	var wanted := Array(OS.get_cmdline_user_args())
+	if wanted.is_empty() or "the_ahwahnee" in wanted:
+		_repaint_hotel()
 	for hub_id: String in HUBS:
 		if not wanted.is_empty() and hub_id not in wanted:
 			continue
@@ -52,3 +54,17 @@ func _repaint(hub_id: String, file_name: String, seed_value: int, lawn: Rect2i) 
 	var im := painter.paint(kind, w, h, seed_value)
 	im.save_png(ProjectSettings.globalize_path("res://assets/sprites/ahwahnee/%s.png" % file_name))
 	region.free()
+
+
+func _repaint_hotel() -> void:
+	var builder = load("res://tools/hubs/build_ahwahnee.gd").new()
+	builder._load_art()
+	builder._layout_grounds()
+	var painter := Ground.new()
+	painter.rings = [builder._ring]
+	painter.soils = builder._soils
+	painter.road_shoulders = true
+	var im := painter.paint(builder.kind, builder.w, builder.h, 1927)
+	im.save_png(ProjectSettings.globalize_path("res://assets/sprites/ahwahnee/ground_hotel.png"))
+	print("the_ahwahnee repainted")
+	builder.free()

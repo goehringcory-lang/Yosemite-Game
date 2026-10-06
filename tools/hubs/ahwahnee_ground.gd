@@ -414,19 +414,34 @@ func _alpine(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 
 
 func _lawn(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	var stripe := (x / 20 + y / 320) % 2 == 0
-	var col := c("4c9445").lerp(c("5aa54c"), b)
-	if stripe:
-		col = col.lightened(0.055)
+	# Mown in wide alternating swaths, each swath slightly warmer on one side
+	# (the grass lies toward the mower), over broad drifts of tone.
+	var swath := (x / 24) % 2 == 0
+	var along := float(x % 24) / 24.0
+	var col := c("489043").lerp(c("5aa44c"), b)
+	col = col.lerp(c("37783c"), smooth(0.55, 0.15, a) * 0.6)
+	col = col.lerp(c("74bc5c"), smooth(0.55, 0.9, a) * 0.4)
+	if swath:
+		col = col.lightened(0.045 + 0.02 * along)
 	else:
-		col = col.darkened(0.03)
-	col = col.lerp(c("6cb45a"), smooth(0.62, 0.9, a) * 0.22)
-	if r < 0.05:
-		col = col.lightened(0.09)
-	elif r < 0.09:
-		col = col.darkened(0.08)
+		col = col.darkened(0.035 - 0.015 * along)
+	# clover and moss patches, drier tan where the lawn thins
+	var patch := smooth(0.72, 0.9, float(_nb[(y * _pw + x + 11 * _pw + 5) % _nb.size()]) / 255.0 * 0.6 + n * 0.5 * 0.4 + a * 0.3)
+	col = col.lerp(c("5fa04a"), patch * 0.35)
+	var dry := smooth(0.78, 0.95, a * 0.5 + b * 0.5)
+	col = col.lerp(c("8aa850"), dry * 0.18)
+	# blades: short strokes, lit on the upper-left
+	var stroke := hash2(x, y / 3, 52)
+	if stroke < 0.06 and y % 3 != 2:
+		col = col.lightened(0.12) if y % 3 == 0 else col.darkened(0.1)
+	elif r < 0.04:
+		col = col.lightened(0.07)
+	elif r < 0.075:
+		col = col.darkened(0.07)
 	elif r > 0.9997:
 		col = c("f0ecd8") # daisy
+	elif r > 0.9985 and patch > 0.4:
+		col = c("f4f0e0") if hash2(x, y, 53) > 0.5 else c("e8d868")
 	return col
 
 
@@ -684,7 +699,8 @@ func _road_shoulders(im: Image) -> void:
 ## A pixel of formal ground (paved, gravel, plaza) that sits against natural
 ## ground gets a curb; see [member edge_trim].
 func _edge_trim(im: Image) -> void:
-	var trim := [Terrain.PAVED, Terrain.PARKING, Terrain.BUILT]
+	# A painted ring has its own curb, so its gravel is left alone.
+	var trim := [Terrain.PAVED, Terrain.BUILT] if not rings.is_empty() else [Terrain.PAVED, Terrain.PARKING, Terrain.BUILT]
 	var edits := {}
 	for y in range(2, _ph - 2):
 		for x in range(2, _pw - 2):
@@ -694,7 +710,7 @@ func _edge_trim(im: Image) -> void:
 				var out := 0
 				for o: int in [1, -1, _pw, -_pw]:
 					var nk := _pk[i + o]
-					if nk not in trim and nk != Terrain.ROAD and nk != Terrain.BRIDGE and not _is_water(nk):
+					if nk not in trim and nk != Terrain.PARKING and nk != Terrain.ROAD and nk != Terrain.BRIDGE and not _is_water(nk):
 						out += 1
 				if out > 0:
 					edits[i] = im.get_pixel(x, y).darkened(0.34)
@@ -702,7 +718,7 @@ func _edge_trim(im: Image) -> void:
 					var inner := 0
 					for o: int in [2, -2, 2 * _pw, -2 * _pw]:
 						var nk := _pk[i + o]
-						if nk not in trim and nk != Terrain.ROAD and nk != Terrain.BRIDGE and not _is_water(nk):
+						if nk not in trim and nk != Terrain.PARKING and nk != Terrain.ROAD and nk != Terrain.BRIDGE and not _is_water(nk):
 							inner += 1
 					if inner > 0:
 						edits[i] = im.get_pixel(x, y).lightened(0.07)
