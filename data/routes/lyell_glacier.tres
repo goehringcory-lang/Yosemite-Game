@@ -16,3 +16,4 @@ nights = 0
 guide_chapter = "The high country"
 guide_order = 80
 guide_tip = "You'll need the ice axe and crampons from Muir."
+height_ft = 1000

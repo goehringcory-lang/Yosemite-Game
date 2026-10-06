@@ -284,6 +284,8 @@ func _after_action(before: Vector3i) -> void:
 		_move_dur = FALL_TIME if _fell else MOVE_TIME
 		_reach = state.col - before.x if before.y < state.row else 0
 		_step += 1
+		_belay_frame = 2 if _fell else 1
+		_belay_frame_t = 0.3
 		if _fell:
 			_pose_mode = "fall"
 		else:
@@ -508,6 +510,8 @@ func _paint_scenery() -> void:
 func _screen(r: float, c: float) -> Vector2:
 	if _roof:
 		return Vector2(L.ROOF_X + (r - _view_row) * L.ROOF_ROW_W, L.ROOF_Y + (c - 2.0) * 4.0 - L.roof_lift(state.top_row, r))
+	if state.style() == "chimney":
+		return Vector2(L.CHIMNEY_X + (c - 2.0) * 9.0, L.ANCHOR_Y - (r - _view_row) * L.ROW_H)
 	return Vector2(L.GRID_X + (c + 0.5) * L.COL_W, L.ANCHOR_Y - (r - _view_row) * L.ROW_H)
 
 
@@ -587,7 +591,7 @@ func _draw_screen() -> void:
 		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0, 0, 0, _fade))
 	match _phase:
 		Phase.INTRO:
-			ClimbHud.route_card(_canvas, state, profile, belayer_look, _recommended_food(), _card_age)
+			ClimbHud.route_card(_canvas, state, profile, belayer_look, _recommended_food(), _card_age, {"sky": _sky_tex, "layers": _layers})
 		Phase.CRUX:
 			ClimbHud.crux(_canvas, _crux.kind, _crux.name, _crux, _time)
 		Phase.PAUSE:
@@ -755,17 +759,30 @@ func _coil(p: Vector2) -> void:
 		_canvas.draw_arc(p + Vector2(i, 0), 6.0 - i, 0.0, TAU, 14, ROPE, 2.0)
 
 
+var _belay_frame := 0
+var _belay_frame_t := 0.0
+
+
 func _draw_belayer() -> void:
 	var p := _belay_spot()
 	if p.y < -30 or p.y > SCREEN.y + 40:
 		return
-	var mode := "sit" if route.top_rope else "belay"
-	var frame := int(_time * 1.5) % 2
+	var mode := "belay"
+	if route.top_rope or (state.pitch > 0 and route.pitches.size() >= 5) or _roof:
+		mode = "anchor"
+	elif state.row > 0 and state.status == ClimbState.Status.CLIMBING:
+		mode = "look_up"
+	# A pay-out hop when you move, a quick take-in on a catch.
+	var frame := 0
+	if _belay_frame_t > 0.0:
+		frame = _belay_frame
+		_belay_frame_t -= get_process_delta_time()
 	if state.status == ClimbState.Status.TOPPED_OUT:
 		mode = "cheer"
+		frame = int(_time * 2.0) % 3
 	var tex := ClimbSprites.belayer(belayer_look, mode, frame)
 	var sz := tex.get_size()
-	var pos := Vector2(p.x - sz.x * 0.5, p.y - sz.y + 4 + (2 if mode == "sit" else 0))
+	var pos := Vector2(p.x - sz.x * 0.5, p.y - sz.y + 4 + (2 if mode == "anchor" else 0))
 	# A soft shadow on the ledge.
 	_canvas.draw_rect(Rect2(p + Vector2(-9, 0), Vector2(18, 2)), Color(0, 0, 0, 0.25))
 	_canvas.draw_texture(tex, pos.round())
@@ -779,89 +796,82 @@ func _draw_climber() -> void:
 		"snow": state.is_snow()}
 	var tex := ClimbSprites.climber(pose, _kit, flags)
 	var o := ClimbSprites.ORIGIN
-	var pos := _torso() - o
-	_canvas.draw_rect(Rect2(_torso() + Vector2(-8, 24), Vector2(16, 2)), Color(0, 0, 0, 0.0))
+	var torso := _torso()
+	if pose.get("mode", "") == "chimney":
+		torso.x = roundf(L.CHIMNEY_X + int(pose.side) * 6.0)
+	var pos := torso - o
 	_canvas.draw_texture(tex, pos.round())
 	# The haul bag swings below on a big wall.
 	if route.nights > 0 and state.has_haul_bag and _shown.y > 0.5:
-		var hp := _torso() + Vector2(-14, 46 + sin(_time * 1.3) * 2.0)
-		_canvas.draw_line(_torso() + Vector2(-2, 6), hp + Vector2(0, -4), ROPE_DARK, 2.0)
+		var hp := torso + Vector2(-14, 46 + sin(_time * 1.3) * 2.0)
+		_canvas.draw_line(torso + Vector2(-2, 6), hp + Vector2(0, -4), ROPE_DARK, 2.0)
 		_canvas.draw_texture(UI.icon_texture("haul_bag"), (hp + Vector2(-6, -6)).round())
-		_canvas.draw_texture(UI.icon_texture("haul_bag"), (hp + Vector2(-6, -6)).round(), Color(1, 1, 1, 0))
 	# Headlamp glow after dark.
 	if _pal.night:
 		for i in 6:
-			_canvas.draw_circle(_torso() + Vector2(0, -14), 52.0 - i * 8.0, Color(1.0, 0.92, 0.7, 0.045))
+			_canvas.draw_circle(torso + Vector2(0, -14), 52.0 - i * 8.0, Color(1.0, 0.92, 0.7, 0.045))
 
 
+## The pose to draw now: a stance that eases into the next one while a move
+## plays, with the special poses (fall, hang, cheer, chalk, protect, eat,
+## roof, chimney) from ClimbSprites.
 func _pose() -> Dictionary:
 	var step := _step
 	var a := ClimbSprites.stance(step)
-	if _move_t < 1.0:
-		var b := ClimbSprites.stance(step - 1)
-		var t := _move_t * _move_t * (3.0 - 2.0 * _move_t)
-		for k in ["hr", "hl", "fr", "fl"]:
-			a[k] = (b[k] as Vector2).lerp(a[k], t)
-		# The hand that's reaching goes up over the next hold first.
-		var arc := sin(t * PI) * 5.0
-		a["hr"] += Vector2(0, -arc) if (step % 2) == 0 else Vector2.ZERO
-		a["hl"] += Vector2(0, -arc) if (step % 2) != 0 else Vector2.ZERO
-		a["lean"] = _reach * sin(t * PI) * 2.0
-	else:
-		a["lean"] = roundf(sin(_time * 2.0) * 0.6) + (1.0 if state.stamina <= 25 and fmod(_time, 1.2) < 0.15 else 0.0)
 	if _roof:
-		# Hanging under the ceiling: hands up on the crack, feet swung back.
-		var fwd := 1.0 if (step % 2) == 0 else -1.0
-		a["hr"] = Vector2(13 if fwd > 0 else 4, -24)
-		a["hl"] = Vector2(-4 if fwd > 0 else -13, -24)
-		a["fr"] = Vector2(-2, 19)
-		a["fl"] = Vector2(-11, 15)
-		a["lean"] = 2.0 + sin(_time * 2.0) * 0.5
+		a = ClimbSprites.roof_pose(step)
+	elif state.style() == "chimney":
+		a = ClimbSprites.chimney_pose(-1 if step % 2 == 0 else 1)
+	if _move_t < 1.0:
+		var b: Dictionary = ClimbSprites.stance(step - 1)
+		if _roof:
+			b = ClimbSprites.roof_pose(step - 1)
+		elif state.style() == "chimney":
+			b = ClimbSprites.chimney_pose(-1 if (step - 1) % 2 == 0 else 1)
+		var t := _move_t * _move_t * (3.0 - 2.0 * _move_t)
+		var lean_move := _reach * sin(t * PI) * 2.0
+		if a.get("mode", "") == "chimney":
+			# Hop across the slot: the pose flips at the halfway point.
+			a = a if t > 0.5 else b
+		else:
+			a = ClimbSprites.blend_pose(b, a, t)
+			# The hand that's reaching goes up over the next hold first.
+			var arc := sin(t * PI) * 5.0
+			if not _roof:
+				a["hr" if (step % 2) == 0 else "hl"] += Vector2(0, -arc)
+			a["lean"] = float(a.get("lean", 0)) + lean_move
+	elif a.get("mode", "") != "chimney":
+		a["lean"] = float(a.get("lean", 0)) + roundf(sin(_time * 2.0) * 0.6) + (1.0 if state.stamina <= 25 and fmod(_time, 1.2) < 0.15 else 0.0)
 	var mode := _pose_mode
 	var on_ledge := _shown.y < 0.45 or _shown.y > state.top_row - 0.45
 	if on_ledge and mode == "wall" and state.status == ClimbState.Status.CLIMBING:
 		mode = "stand"
 	match mode:
 		"stand":
-			a["hr"] = Vector2(9, 5)
-			a["hl"] = Vector2(-9, 5)
-			a["fr"] = Vector2(5, 22)
-			a["fl"] = Vector2(-5, 22)
+			a = ClimbSprites.stand_pose()
 		"fall":
-			a["hr"] = Vector2(11, -21 + sin(_time * 30.0) * 2.0)
-			a["hl"] = Vector2(-11, -21 + cos(_time * 30.0) * 2.0)
-			a["fr"] = Vector2(8, 21)
-			a["fl"] = Vector2(-8, 24)
+			a = ClimbSprites.fall_pose()
+			a["hr"] += Vector2(0, sin(_time * 30.0) * 2.0)
 			if _move_t >= 1.0:
 				_pose_mode = "hang"
 		"hang":
-			a["hr"] = Vector2(8, -10)
-			a["hl"] = Vector2(-8, -10)
-			a["fr"] = Vector2(5, 22)
-			a["fl"] = Vector2(-5, 24)
-			if _act_t >= 1.0 and _time > 0.0 and _move_t >= 1.0 and fmod(_time, 1.0) > 0.99:
+			a = ClimbSprites.hang_pose()
+			if _move_t >= 1.0 and fmod(_time, 2.5) > 2.45:
 				_pose_mode = "wall"
 		"cheer":
-			a["hr"] = Vector2(12, -23)
-			a["hl"] = Vector2(-12, -23)
-			a["fr"] = Vector2(6, 22)
-			a["fl"] = Vector2(-6, 22)
+			a = ClimbSprites.cheer_pose()
 			a["lean"] = roundf(sin(_time * 9.0))
 	# Other short actions.
-	if _act_t < 1.0 and mode in ["wall", "stand", "hang"]:
+	if _act_t < 1.0 and mode in ["wall", "stand", "hang"] and a.get("mode", "") != "chimney":
 		match _act_kind:
 			"chalk":
-				a["hr"] = Vector2(3, 6)
-				a["chalk"] = true
+				a = ClimbSprites.chalk_pose(step)
 			"protect":
-				a["hr"] = Vector2(12, -10 + sin(_act_t * PI * 3.0) * 3.0)
+				a = ClimbSprites.protect_pose(step)
 			"eat":
-				a["hr"] = Vector2(3, -12)
+				a = ClimbSprites.eat_pose()
 	if state.chalk_moves > 0:
 		a["chalk"] = true
-	# After a fall the climber hangs there until the next move.
-	if mode == "hang" and _move_t >= 1.0:
-		a["tilt"] = 2
 	return a
 
 

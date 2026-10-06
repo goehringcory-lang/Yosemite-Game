@@ -43,18 +43,29 @@ static func font() -> Font:
 	return _font
 
 
-## Text with a dark drop shadow, for use over the wall and sky.
+## For center/right alignment, [param pos] is the center or right edge of
+## the text (Godot itself only aligns text inside a box): returns its left.
+static func _aligned(pos: Vector2, s: String, size: int, align: int) -> Vector2:
+	if align == HORIZONTAL_ALIGNMENT_LEFT:
+		return pos
+	var w := text_width(s, size)
+	return pos - Vector2(w * 0.5 if align == HORIZONTAL_ALIGNMENT_CENTER else w, 0)
+
+
+## Text with a dark drop shadow, for use over the wall and sky. A positive
+## [param width] clips it.
 static func text(ci: CanvasItem, pos: Vector2, s: String, color := CREAM, size := 10, width := -1.0, align := HORIZONTAL_ALIGNMENT_LEFT) -> void:
-	var p := pos.round()
-	ci.draw_string(font(), p + Vector2(0, 1), s, align, width, size, SHADOW)
-	ci.draw_string(font(), p + Vector2(1, 0), s, align, width, size, SHADOW)
-	ci.draw_string(font(), p + Vector2(1, 1), s, align, width, size, SHADOW)
-	ci.draw_string(font(), p, s, align, width, size, color)
+	var p := _aligned(pos, s, size, align).round()
+	var left := HORIZONTAL_ALIGNMENT_LEFT
+	ci.draw_string(font(), p + Vector2(0, 1), s, left, width, size, SHADOW)
+	ci.draw_string(font(), p + Vector2(1, 0), s, left, width, size, SHADOW)
+	ci.draw_string(font(), p + Vector2(1, 1), s, left, width, size, SHADOW)
+	ci.draw_string(font(), p, s, left, width, size, color)
 
 
 ## Ink on parchment: no shadow.
 static func ink(ci: CanvasItem, pos: Vector2, s: String, color := INK, size := 10, width := -1.0, align := HORIZONTAL_ALIGNMENT_LEFT) -> void:
-	ci.draw_string(font(), pos.round(), s, align, width, size, color)
+	ci.draw_string(font(), _aligned(pos, s, size, align).round(), s, HORIZONTAL_ALIGNMENT_LEFT, width, size, color)
 
 
 static func wrapped(ci: CanvasItem, pos: Vector2, s: String, width: float, color := INK, size := 10, shadow := false, line_gap := 2) -> int:

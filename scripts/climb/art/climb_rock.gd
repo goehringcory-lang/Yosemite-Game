@@ -426,8 +426,8 @@ static func _knobs(im: Image, c: Dictionary, rng: RandomNumberGenerator) -> void
 static func _chimney(im: Image, c: Dictionary, rng: RandomNumberGenerator, deco: Array, state: ClimbState) -> Dictionary:
 	var w := im.get_width()
 	var h := im.get_height()
-	var left := int(L.GRID_X + 0.5 * L.COL_W) - 4
-	var right := int(L.GRID_X + 3.5 * L.COL_W) + 4
+	var left := int(L.CHIMNEY_X) - L.CHIMNEY_HALF
+	var right := int(L.CHIMNEY_X) + L.CHIMNEY_HALF
 	# Both walls are ordinary granite; the right-hand one is in shadow.
 	_face(im, c, rng, "crack", deco, state, "dark")
 	for yy in h:
@@ -670,6 +670,22 @@ static func _paint_holds(im: Image, c: Dictionary, rng: RandomNumberGenerator, s
 		if y >= 0 and y < edge.size():
 			e = edge[y] + 4
 		_ledge(im, c, rng, y, e, r == top, style)
+	if style == "chimney":
+		# Footholds on alternating walls, one per row, and the odd chockstone.
+		var lx := int(L.CHIMNEY_X) - L.CHIMNEY_HALF
+		var rx := int(L.CHIMNEY_X) + L.CHIMNEY_HALF
+		for r in range(1, top):
+			var y := int(L.wall_px(top, r, 0).y)
+			if r % 2 == 0:
+				P.rect(im, lx, y, 6, 2, tone(c, 3.6))
+				P.rect(im, lx, y + 2, 6, 1, c.deep)
+			else:
+				P.rect(im, rx - 5, y, 6, 2, tone(c, 3.0))
+				P.rect(im, rx - 5, y + 2, 6, 1, c.deep)
+			if state.holds[r].values().any(func(hd): return hd.get("crux", false)):
+				for i in 6:
+					P.px(im, int(L.CHIMNEY_X) + rng.randi_range(-10, 10), y + rng.randi_range(-4, 4), c.chalk)
+		return
 	var base := 2 + int(state.spec.diff) + 1
 	for r in range(1, top):
 		for col: int in state.holds.get(r, {}):

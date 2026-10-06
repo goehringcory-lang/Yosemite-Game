@@ -19,6 +19,11 @@ const ROWS_BELOW := 6
 const ROWS_ABOVE := 9
 
 
+## A chimney's slot is just wide enough for a person: its center and half width.
+const CHIMNEY_X := GRID_X + 2.5 * COL_W
+const CHIMNEY_HALF := 12
+
+
 static func wall_height(top_row: int) -> int:
 	return int((top_row + ROWS_ABOVE + ROWS_BELOW) * ROW_H)
 
