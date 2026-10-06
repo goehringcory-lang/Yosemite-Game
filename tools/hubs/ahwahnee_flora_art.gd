@@ -155,6 +155,9 @@ const PINE_NEEDLE := ["1f3a2c", "2b4d33", "3a6438", "4e7d3c", "679644", "84b04c"
 const CEDAR_LEAF := ["1a3524", "24472c", "305c34", "3f7440", "528e4a", "6ca85a", "8cc272"]
 const FIR_LEAF := ["16323a", "1e453f", "2a5c4b", "3a7659", "4f9068", "6aac7c", "8cc796"]
 const OAK_LEAF := ["1c3a2e", "26482f", "345f34", "487a3a", "639441", "84ae4b", "a9c95f", "cfe486"]
+## The oak's leaves in spring (new pink-green growth) and fall (gold and rust).
+const OAK_LEAF_SPRING := ["2a4a30", "3a6538", "559040", "76b150", "9ccd66", "bfe284", "dcf2a4", "f0fac4"]
+const OAK_LEAF_FALL := ["3a1c12", "5a2a16", "86401c", "b0601f", "d4842c", "eca43e", "fcc660", "ffe48c"]
 const WILLOW_LEAF := ["2f5238", "417146", "5b8f4f", "7aab5a", "9cc56d", "bfdc8b", "dcef b0"]
 const BARK_PINE := ["2a1a14", "44291d", "5f3a26", "7c5232", "98693c", "b4844e", "cfa06a"]
 const BARK_CEDAR := ["331912", "4f281c", "6e3a27", "8c4f34", "a86845", "c58559"]
@@ -362,6 +365,11 @@ func _all() -> Dictionary:
 		out["tree_incense_cedar_" + "ab"[i]] = tree_cedar(i)
 	for i in 3:
 		out["tree_black_oak_" + "abc"[i]] = tree_oak(i)
+	# the Lamon Homestead's oaks: four seasons side by side
+	var seasons := K.make(92 * 4, 96)
+	for s in 4:
+		K.stamp(seasons, tree_oak(2, s), 92 * s, 0)
+	out["tree_oak_seasons"] = seasons
 	for i in 2:
 		out["tree_dogwood_bloom_" + "ab"[i]] = tree_dogwood(i)
 	out["tree_white_fir"] = tree_fir()
@@ -544,7 +552,9 @@ func tree_fir() -> Image:
 	return im
 
 
-func tree_oak(v: int) -> Image:
+## [param season] is 0 spring, 1 summer (the default), 2 fall, 3 winter: bare
+## limbs and twigs with a few brown leaves still clinging.
+func tree_oak(v: int, season := 1) -> Image:
 	var w := 92
 	var h := 96
 	var im := K.make(w, h)
@@ -554,7 +564,7 @@ func tree_oak(v: int) -> Image:
 	var cx := 46.0
 	var base := h - 4
 	var bark := ramp(BARK_OAK)
-	var leaf := ramp(OAK_LEAF)
+	var leaf := ramp(OAK_LEAF if season != 0 and season != 2 else (OAK_LEAF_SPRING if season == 0 else OAK_LEAF_FALL))
 	var spread := [1.0, 0.86, 1.12][v] as float
 	var lean := [-2.0, 2.4, 0.0][v] as float
 	K.shadow(im, cx + 5.0, base + 0.5, 27.0 * spread, 5.0, 0.28)
@@ -568,6 +578,24 @@ func tree_oak(v: int) -> Image:
 	]
 	for l: Array in limbs:
 		limb(im, fx, float(fork_y) + 2.0, fx + float(l[0]), float(l[1]), 6.0, 2.2, bark, seed_value + int(l[1]), 3.0)
+	if season == 3:
+		# bare: twigs fan out from every limb tip, a few dead leaves cling
+		for l: Array in limbs:
+			var ex := fx + float(l[0])
+			var ey := float(l[1])
+			for t in 5:
+				var ang := (t - 2.0) * 0.62 + (K.hash2(t, int(ex), seed_value) - 0.5) * 0.4
+				var reach := 9.0 + K.hash2(t, int(ey), seed_value + 3) * 7.0
+				limb(im, ex, ey, ex + sin(ang) * reach, ey - cos(ang) * reach, 2.4, 0.8, bark, seed_value + t * 31 + int(ey), 1.6)
+		for i in 26:
+			var a := rng.randf() * TAU
+			var d := 0.3 + 0.7 * sqrt(rng.randf())
+			var lx := fx + cos(a) * d * 30.0 * spread
+			var ly := 38.0 + v * 1.5 + sin(a) * d * 24.0
+			K.px(im, int(lx), int(ly), Color("7a5a38") if i % 3 else Color("a08052"))
+			K.px(im, int(lx) + 1, int(ly), Color("5a4028"))
+		rim(im, 0.5)
+		return im
 	# canopy clumps, sorted so lower ones overlap the ones behind them
 	var clumps: Array[Vector3] = []
 	var dome_cx := fx
