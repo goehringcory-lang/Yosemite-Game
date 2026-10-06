@@ -31,6 +31,10 @@ var tint := PackedFloat32Array()
 ## Gives roads a dark edge line and a worn gravel shoulder (the generated hubs'
 ## roads are plain tile runs, so this keeps them from looking like gray blocks).
 var road_shoulders := false
+## Trims gravel, flagstone and plaza edges where they meet natural ground: a
+## dark edge line, a lit inner line, and a thin contact shadow on the ground
+## outside. Reads as a curb instead of a hard-cut rectangle.
+var edge_trim := true
 
 var _na := PackedByteArray() # large scale
 var _nb := PackedByteArray() # medium scale
@@ -127,6 +131,8 @@ func paint(grid: PackedInt32Array, width: int, height: int, seed_v: int) -> Imag
 			out[o + 3] = 255
 	var im := Image.create_from_data(_pw, _ph, false, Image.FORMAT_RGBA8, out)
 	_shore_and_edges(im)
+	if edge_trim:
+		_edge_trim(im)
 	if road_shoulders:
 		_road_shoulders(im)
 	return im
@@ -269,12 +275,14 @@ func _color(k: int, x: int, y: int, i: int, tx: int, ty: int) -> Color:
 			return _meadow(x, y, i, a, b, n, r, true)
 		Terrain.LAWN:
 			return _lawn(x, y, a, b, n, r)
-		Terrain.TRAIL, Terrain.CAMP:
+		Terrain.CAMP:
+			return _duff(x, y, a, b, n, r)
+		Terrain.TRAIL:
 			return _trail(x, y, a, b, n, r)
 		Terrain.PAVED, Terrain.BUILT:
 			return _flagstone(x, y, a, n, r)
 		Terrain.PARKING:
-			return _gravel(x, y, a, b, n, r)
+			return _lot(x, y, a, b, n, r)
 		Terrain.ROAD:
 			return _asphalt(x, y, a, n, r)
 		Terrain.SAND:
@@ -332,7 +340,7 @@ func _meadow(x: int, y: int, i: int, a: float, b: float, n: float, r: float, wet
 		var pick := hash2(x / 30, y / 30, 34)
 		var fc := c("f0d24a") if pick < 0.3 else (c("9b6fca") if pick < 0.55 else (c("f4f0e0") if pick < 0.72 else (c("e0713a") if pick < 0.88 else c("d95a88"))))
 		col = fc if (x + y) % 2 == 0 else fc.darkened(0.12)
-	elif wet and r < 0.03:
+	elif wet and r < 0.008:
 		col = c("9fc7c0")
 	return col
 
@@ -439,6 +447,27 @@ func _trail(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 	return col
 
 
+## Campground ground: trampled duff, pine-needle litter, grit and the odd
+## root-dark patch, with the packed lighter dirt worn where feet go.
+func _duff(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
+	var col := c("8a6c44").lerp(c("a78856"), smooth(0.3, 0.75, b))
+	col = col.lerp(c("6c5434"), smooth(0.55, 0.9, a) * 0.55)
+	col = col.lerp(c("b89a68"), smooth(0.7, 0.95, n * 0.5 + b * 0.5) * 0.22)
+	# needle litter: short slanted strokes
+	var sx := (x + y / 2) / 3
+	if hash2(sx, y / 2, 15) < 0.07 and (x + y) % 3 != 0:
+		col = c("5c3f24") if hash2(x, y, 16) < 0.5 else c("c9a96e")
+	if r < 0.04:
+		col = c("6e6658")
+	elif r < 0.055:
+		col = c("c8bca0")
+	elif r < 0.09:
+		col = col.darkened(0.1)
+	elif r > 0.985:
+		col = c("6c8a3e")
+	return col
+
+
 func _flagstone(x: int, y: int, a: float, n: float, r: float) -> Color:
 	var row_h := 12
 	var row := y / row_h
@@ -477,6 +506,21 @@ func _gravel(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 	# raked lines
 	if y % 5 == 0 and float(_nb[(y * _pw + x) % _nb.size()]) / 255.0 > 0.42:
 		col = col.darkened(0.06)
+	return col
+
+
+## A gravel lot: the raked gravel with packed, darker tire lanes, oil-stained
+## patches and a few weeds along the margins.
+func _lot(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
+	var col := _gravel(x, y, a, b, n, r)
+	col = col.lerp(c("8e8574"), smooth(0.58, 0.85, a) * 0.5)
+	# worn parking bays: faint darker lanes every 24 px
+	if (x / 3) % 8 == 0 and b > 0.4:
+		col = col.darkened(0.07)
+	if smooth(0.7, 0.82, b * 0.7 + n * 0.3) > 0.5 and r < 0.6:
+		col = col.lerp(c("5f5a52"), 0.35)
+	if r > 0.9985:
+		col = c("6c8a3e")
 	return col
 
 
@@ -633,5 +677,41 @@ func _road_shoulders(im: Image) -> void:
 						near += 1 if absi(d.x) + absi(d.y) == 1 else 0
 				if near > 0 and hash2(x, y, 88) < 0.78:
 					edits[i] = im.get_pixel(x, y).lerp(c("8c7a5a"), 0.55)
+	for i: int in edits:
+		im.set_pixel(i % _pw, i / _pw, edits[i])
+
+
+## A pixel of formal ground (paved, gravel, plaza) that sits against natural
+## ground gets a curb; see [member edge_trim].
+func _edge_trim(im: Image) -> void:
+	var trim := [Terrain.PAVED, Terrain.PARKING, Terrain.BUILT]
+	var edits := {}
+	for y in range(2, _ph - 2):
+		for x in range(2, _pw - 2):
+			var i := y * _pw + x
+			var k := _pk[i]
+			if k in trim:
+				var out := 0
+				for o: int in [1, -1, _pw, -_pw]:
+					var nk := _pk[i + o]
+					if nk not in trim and nk != Terrain.ROAD and nk != Terrain.BRIDGE and not _is_water(nk):
+						out += 1
+				if out > 0:
+					edits[i] = im.get_pixel(x, y).darkened(0.34)
+				else:
+					var inner := 0
+					for o: int in [2, -2, 2 * _pw, -2 * _pw]:
+						var nk := _pk[i + o]
+						if nk not in trim and nk != Terrain.ROAD and nk != Terrain.BRIDGE and not _is_water(nk):
+							inner += 1
+					if inner > 0:
+						edits[i] = im.get_pixel(x, y).lightened(0.07)
+			elif k not in FORMAL and not _is_water(k) and k != Terrain.CLIFF and k != Terrain.GRANITE:
+				# contact shadow, heavier on the south and east sides of a curb
+				for d: Vector2i in [Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(1, 0)]:
+					if _pk[i + d.y * _pw + d.x] in trim:
+						var amount := 0.2 if d.y == -1 or d.x == -1 else 0.1
+						edits[i] = im.get_pixel(x, y).darkened(amount)
+						break
 	for i: int in edits:
 		im.set_pixel(i % _pw, i / _pw, edits[i])

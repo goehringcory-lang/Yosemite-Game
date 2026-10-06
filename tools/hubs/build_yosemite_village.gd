@@ -539,6 +539,10 @@ func _place_village_life() -> void:
 	var mortar := _instance("res://scenes/story/station.tscn", _tile_pos(52, 17) + Vector2(0, 4), "GrindingRock")
 	mortar.set("station", "mortar")
 	mortar.set("display_name", "Grinding rock")
+	mortar.set("texture", texture("res://assets/sprites/lamon/mortar_slab.png"))
+	mortar.set("ground_inset", 5)
+	mortar.set("body_size", Vector2(50, 10))
+	mortar.set("reach_size", Vector2(60, 26))
 	_sign_prop("IndianVillageSign", "res://assets/sprites/info_sign.png", _tile_pos(58, 18) + Vector2(0, 4), Vector2(12, 4), "Indian Village",
 		"This village behind the Yosemite Museum shows how Native families lived in the Valley: bark homes, acorn granaries, and grinding rocks worn into the granite.")
 	# The Village Store clerk trades trail food for forage.

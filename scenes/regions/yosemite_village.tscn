@@ -1,6 +1,7 @@
 [gd_scene format=4]
 
 [ext_resource type="Script" path="res://scripts/world/region.gd" id="1_2ne25"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lamon/mortar_slab.png" id="99_mortar"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/ground_yosemite_village.png" id="2_35s6a"]
 [ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="3_tiat4"]
 [ext_resource type="Script" path="res://scripts/world/seasonal_canopy.gd" id="4_kb3n7"]
@@ -2166,6 +2167,10 @@ shape = SubResource("RectangleShape2D_no8bl")
 position = Vector2(840, 284)
 station = "mortar"
 display_name = "Grinding rock"
+texture = ExtResource("99_mortar")
+ground_inset = 5
+body_size = Vector2(50, 10)
+reach_size = Vector2(60, 26)
 
 [node name="IndianVillageSign" type="StaticBody2D" parent="Entities" unique_id=1570017268]
 position = Vector2(936, 300)
