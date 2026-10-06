@@ -27,7 +27,7 @@ func _init() -> void:
 		row_h = maxi(row_h, im.get_height())
 	x = 6
 	y += row_h + 8
-	for sprite_name: String in ["umacha", "chuckah", "big_boulder", "picnic_table", "bear_box", "gear_tarp", "shuttle_stop", "climber_tent_0", "climber_tent_1", "climber_tent_2"]:
+	for sprite_name: String in ["umacha", "chuckah", "bear_box", "shuttle_stop"]:
 		var im: Image = load_sprite.call(sprite_name)
 		sheet.blend_rect(im, Rect2i(Vector2i.ZERO, im.get_size()), Vector2i(x, y))
 		x += im.get_width() + 8

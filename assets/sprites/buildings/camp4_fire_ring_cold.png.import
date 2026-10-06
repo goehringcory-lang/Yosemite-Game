@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://tjriv5u6rn3j"
-path="res://.godot/imported/big_boulder.png-a78cdbbfcf7b4102bc2183f6131ac773.ctex"
+uid="uid://dq3uly8clb61h"
+path="res://.godot/imported/camp4_fire_ring_cold.png-b47d21daa1179ff907ea7dff4ac6ec61.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/buildings/big_boulder.png"
-dest_files=["res://.godot/imported/big_boulder.png-a78cdbbfcf7b4102bc2183f6131ac773.ctex"]
+source_file="res://assets/sprites/buildings/camp4_fire_ring_cold.png"
+dest_files=["res://.godot/imported/camp4_fire_ring_cold.png-b47d21daa1179ff907ea7dff4ac6ec61.ctex"]
 
 [params]
 

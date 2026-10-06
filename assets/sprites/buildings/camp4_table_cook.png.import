@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://gich7h1us81m"
-path="res://.godot/imported/picnic_table.png-a2df19cbe83416467af6ca844e025d98.ctex"
+uid="uid://b68qy0f70t8ci"
+path="res://.godot/imported/camp4_table_cook.png-bcc3ccd0f214ca401e32b9ffe8c5123a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/buildings/picnic_table.png"
-dest_files=["res://.godot/imported/picnic_table.png-a2df19cbe83416467af6ca844e025d98.ctex"]
+source_file="res://assets/sprites/buildings/camp4_table_cook.png"
+dest_files=["res://.godot/imported/camp4_table_cook.png-bcc3ccd0f214ca401e32b9ffe8c5123a.ctex"]
 
 [params]
 

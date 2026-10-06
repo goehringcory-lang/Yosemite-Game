@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bmymq6bjimo06"
-path="res://.godot/imported/climber_tent_1.png-f9f7e180fcdd810abfc8b46e3bf3ceeb.ctex"
+uid="uid://cxusnsyc05nm2"
+path="res://.godot/imported/camp4_columbia_boulder.png-6a2deb7e8db3236299de6b4e11fe33ed.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/buildings/climber_tent_1.png"
-dest_files=["res://.godot/imported/climber_tent_1.png-f9f7e180fcdd810abfc8b46e3bf3ceeb.ctex"]
+source_file="res://docs/camp4_columbia_boulder.png"
+dest_files=["res://.godot/imported/camp4_columbia_boulder.png-6a2deb7e8db3236299de6b4e11fe33ed.ctex"]
 
 [params]
 

@@ -83,13 +83,13 @@ Labels and their hand-placed positions are in `tools/mapgen/oblique/points.js`. 
 
 Driving to Yosemite Valley brings you to **Yosemite Village**, a walking-scale central hub. It fits the real layout of the Valley between Camp 4 and the Village into one map, from the granite north wall down to the Merced River:
 
-- **Camp 4**: the climbers' campground, with tents, Columbia Boulder, a fire ring for cooking, and two gear traders.
+- **Camp 4**: the climbers' walk-in campground, laid out as real sites under the pines. Each has its tents, a Park Service picnic table, a bear box and a steel fire ring, and they sit around a shared fire where you cook. The tents span the camp's history: 1950s canvas wall tents, a 1970s climber's tarp shelter, and modern domes. **Columbia Boulder** stands at the back by the talus, with **Midnight Lightning** (Ron Kauk, 1978) chalked up its overhanging face, the lightning bolt beside the start and a crash pad below. There's also a slackline between two pines (slacklining started here around 1980), the bulletin board where the walk-in path arrives, the Park Service sign, the two gear traders, and a 1970s van in the lot. After dark the fires burn and throw sparks, and lanterns glow in the tents and on the cook tables.
 - **Lower Yosemite Fall** and **Yosemite Creek**, crossed by a footbridge and the Northside Drive bridge.
 - **The Village**: the Village Store, Welcome Center, Yosemite Museum, Best's Studio, Degnan's, and the Wilderness Center.
 - **The Indian Village** behind the museum: umachas (bark homes), a chuckah (acorn granary), and a grinding rock you can use. Its text is a placeholder until tribal review.
 - **Cook's Meadow** with its boardwalk, and the Merced with **Sentinel Bridge** and **Swinging Bridge**.
 
-Roads out of the hub lead back onto the full Valley map, and doors on that map (at the Village, Camp 4, and Cook's Meadow) lead back in. Rebuild the hub with `godot --headless --path . res://tools/hubs/build_hubs.tscn`. That rewrites the hub scene, so put NPCs in `scenes/story/content/yosemite_village.tscn` and place them by marker name. The village is drawn in the Ahwahnee's style (see below): granite-footed timber buildings with mossy shingle roofs and lit windows at dusk (`tools/hubs/valley_art.gd`), the granite wall of the Valley with Lower Yosemite Fall animated down it (`valley_land_art.gd`), and the painted ground, trees, plants and boulders shared with the hotel grounds.
+Roads out of the hub lead back onto the full Valley map, and doors on that map (at the Village, Camp 4, and Cook's Meadow) lead back in. Rebuild the hub with `godot --headless --path . res://tools/hubs/build_hubs.tscn`. That rewrites the hub scene, so put NPCs in `scenes/story/content/yosemite_village.tscn` and place them by marker name. The village is drawn in the Ahwahnee's style (see below): granite-footed timber buildings with mossy shingle roofs and lit windows at dusk (`tools/hubs/valley_art.gd`), Camp 4's boulders, tents, fire rings and camp gear (`camp4_art.gd`), the granite wall of the Valley with Lower Yosemite Fall animated down it (`valley_land_art.gd`), and the painted ground, trees, plants and boulders shared with the hotel grounds.
 
 ### Curry Village: your first stop
 
@@ -113,14 +113,16 @@ The Ahwahnee's art is the reference for the whole Valley: ramp-shaded, ordered-d
 | Lamon Homestead | `res://tools/hubs/build_homestead.tscn` | painted ground, a tree line and boulders round the edge, meadow flowers; the five oaks show all four seasons (`tree_oak_seasons.png`) and still drop acorns |
 | Curry Village | `res://tools/hubs/build_curry.tscn` | painted ground with a mown green, Registration, Pavilion, Store, Mountain Shop, Pizza Deck, amphitheater, entrance arch, tent and wood cabins (`curry_ahwahnee_art.gd`), the granite wall with Staircase Falls, trees and plants, wrought-iron lamps |
 | Camp Curry Store and Mountain Shop (insides) | `build_curry.tscn` | stained plank floors, window frames and wrought lanterns (`interior_ahwahnee_art.gd`) |
-| Yosemite Village and Camp 4 | `res://tools/hubs/build_hubs.tscn` | the Village, Welcome Center, Museum, Best's Studio, Degnan's, Wilderness Center and Lodge, the Indian Village shapes, camp props, the wall and Lower Yosemite Fall, trees, plants, lamps |
+| Yosemite Village and Camp 4 | `res://tools/hubs/build_hubs.tscn` | the Village, Welcome Center, Museum, Best's Studio, Degnan's, Wilderness Center and Lodge, the Indian Village shapes, Camp 4 (Columbia Boulder, tents, fire rings, tables, board, sign, slackline, van), the wall and Lower Yosemite Fall, trees, plants, lamps |
 | The Ahwahnee and Stoneman Meadow | `res://tools/hubs/build_ahwahnee.tscn` | the original |
 
 ![Yosemite Village](docs/yosemite_village_ahwahnee_style.png)
 ![Curry Village](docs/curry_village_ahwahnee_style.png)
 ![Lamon Homestead](docs/lamon_homestead_ahwahnee_style.png)
+![Camp 4 and Columbia Boulder](docs/camp4_columbia_boulder.png)
+![Camp 4 after dark](docs/camp4_night.png)
 
-Rebuilding rewrites each area's scene, so story NPCs stay in `scenes/story/content/`. To look at the village art on its own: `godot --headless --path . -s res://tools/hubs/preview_valley_art.gd` writes `docs/valley_art_preview.png`.
+Rebuilding rewrites each area's scene, so story NPCs stay in `scenes/story/content/`. To look at the village art on its own: `godot --headless --path . -s res://tools/hubs/preview_valley_art.gd` writes `docs/valley_art_preview.png`, and `preview_camp4_art.gd` writes `docs/camp4_art_preview.png`.
 
 ### The Ahwahnee: north from the homestead
 

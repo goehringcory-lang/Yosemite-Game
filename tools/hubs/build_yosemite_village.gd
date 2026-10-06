@@ -7,8 +7,9 @@ extends AhwahneeStyle
 ##   godot --headless --path . res://tools/hubs/build_hubs.tscn
 ##
 ## It rewrites scenes/regions/yosemite_village.tscn, the art in
-## assets/sprites/buildings/ (valley_art.gd draws the buildings and camp props,
-## valley_land_art.gd the wall of the Valley and Lower Yosemite Fall, both in
+## assets/sprites/buildings/ (valley_art.gd draws the buildings and street
+## props, camp4_art.gd Camp 4's boulders, tents, fire rings and camp gear,
+## valley_land_art.gd the wall of the Valley and Lower Yosemite Fall, all in
 ## the Ahwahnee's style), the painted ground in assets/sprites/ahwahnee/, the
 ## shuttle stop scene, the store foods, and the shop data. Trees, plants,
 ## rocks and logs are the Ahwahnee sprites (see ahwahnee_style.gd). Put story
@@ -21,6 +22,7 @@ extends AhwahneeStyle
 
 const HubArt = preload("res://tools/hubs/hub_art.gd")
 const ValleyArt = preload("res://tools/hubs/valley_art.gd")
+const Camp4Art = preload("res://tools/hubs/camp4_art.gd")
 const ValleyLandArt = preload("res://tools/hubs/valley_land_art.gd")
 const HotelArt = preload("res://tools/hubs/ahwahnee_hotel_art.gd")
 
@@ -43,6 +45,7 @@ func _ready() -> void:
 	HubArt.new().save_all()
 	HotelArt.new().save_all()
 	ValleyArt.new().save_all()
+	Camp4Art.new().save_all()
 	load_flora()
 	import_assets()
 	print("== data")
@@ -176,6 +179,9 @@ func _layout() -> void:
 	# Camp 4: walk-in campground at the foot of the wall, and its parking.
 	_rect(3, 10, 33, 30, Terrain.CAMP)
 	_rect(20, 32, 32, 36, Terrain.PARKING)
+	# Keep the shared fire and Columbia Boulder in the open.
+	_clear_trees(13, 17, 22, 26)
+	_clear_trees(4, 9, 15, 16)
 	# Yosemite Valley Lodge, between Camp 4 and the creek.
 	_rect(34, 26, 42, 35, Terrain.PAVED)
 	# The Indian Village behind the museum, in the oaks.
@@ -369,31 +375,118 @@ func _place_buildings() -> void:
 		"The lodge stands near the foot of Yosemite Falls, a short walk from Camp 4.")
 
 
+## Camp 4 as it is laid out on the ground: walk-in sites under the pines,
+## each with its tents, a picnic table, a bear box and a steel fire ring,
+## around a shared fire; Columbia Boulder at the back by the talus, with
+## Midnight Lightning chalked on its face; a slackline, the gear traders, the
+## bulletin board where the walk-in path arrives, and a van in the lot.
+const CAMP4_SITES := [
+	# [tile x, tile y, tents [[kind, dx, dy]...], table, fire ring lit]
+	[5, 20, [["canvas", -14, -26]], "cook", true],
+	[5, 27, [["dome_0", -16, -24], ["tarp", 16, -28]], "", false],
+	[12, 20, [["dome_2", -12, -24]], "rack", false],
+	[9, 28, [["canvas", -14, -26]], "", true],
+	[21, 28, [["dome_1", -12, -24]], "cook", true],
+	[28, 26, [["canvas", -18, -26], ["dome_3", 18, -24]], "", false],
+	[31, 29, [["tarp", -12, -26]], "rack", false],
+	[31, 16, [["dome_0", -10, -24]], "", true],
+	[16, 14, [["canvas", -16, -26]], "cook", false],
+]
+
+
 func _place_camp_4() -> void:
-	_sign_prop("ColumbiaBoulder", B + "big_boulder.png", _tile_pos(8, 14), Vector2(48, 14), "Columbia Boulder",
-		"Climbers have practiced hard moves on the boulders here since the 1950s. Midnight Lightning, on this boulder, is one of the most famous boulder problems in the world.")
-	_decor("Boulder2", B + "big_boulder.png", _tile_pos(27, 12), Vector2(48, 14))
-	var tents := [[5, 19], [10, 23], [14, 18], [18, 26], [24, 21], [29, 17], [6, 28], [30, 27], [21, 15], [12, 29]]
-	for i in tents.size():
-		var t: Array = tents[i]
-		_decor("Tent%d" % i, B + "climber_tent_%d.png" % (i % 3), _tile_pos(t[0], t[1]), Vector2(16, 6))
-	for i in 4:
-		var p: Array = [[9, 21], [20, 22], [26, 26], [16, 13]][i]
-		_decor("PicnicTable%d" % i, B + "picnic_table.png", _tile_pos(p[0], p[1]), Vector2(22, 6))
-		_decor("BearBox%d" % i, B + "bear_box.png", _tile_pos(p[0] + 2, p[1] - 1), Vector2(14, 6))
+	# Columbia Boulder and the chalk of Midnight Lightning on its south face.
+	var columbia_at := foot(9, 14)
+	decor("ColumbiaBoulderRock", B + "camp4_columbia_boulder.png", columbia_at, Vector2(104, 16))
+	_info("ColumbiaBoulder", columbia_at + Vector2(-40, 0), Vector2(40, 26), "Columbia Boulder",
+		"A house-sized block of granite that came down from the wall above, long ago. Climbers have practiced hard moves on the Camp 4 boulders since the 1950s, and Columbia Boulder is the most famous of them.")
+	_info("MidnightLightning", columbia_at + Vector2(Camp4Art.BOLT_AT.x, 0), Vector2(38, 26), "Midnight Lightning",
+		"The chalk lightning bolt marks Midnight Lightning, the boulder problem up this overhanging face. Ron Kauk made the first ascent in 1978. Graded V8, it was one of the hardest boulder problems in the world, and the mantel onto the top still turns most climbers back. Climbers keep the bolt redrawn.")
+	decor("CrashPad", B + "camp4_crash_pad.png", columbia_at + Vector2(10, 14))
+	decor("WarmupBoulder", B + "camp4_boulder.png", foot(26, 12), Vector2(46, 12))
+
+	# The campsites.
+	for i in CAMP4_SITES.size():
+		var site: Array = CAMP4_SITES[i]
+		var at_pos := foot(site[0], site[1])
+		for t: Array in site[2]:
+			_camp_tent("Site%dTent%s" % [i, t[0].capitalize().replace(" ", "")], t[0], at_pos + Vector2(t[1], t[2]))
+		var table_sprite: String = "camp4_table" + ("_" + site[3] if site[3] != "" else "")
+		var table := decor("Site%dTable" % i, B + table_sprite + ".png", at_pos + Vector2(8, 0), Vector2(32, 8))
+		if site[3] == "cook":
+			night_light(table, Vector2(9, -18), 26.0, 0.8, 0.1)
+			_glow(table_sprite + "_glow", at_pos + Vector2(8 - 18, -26), 1.0, B)
+		decor("Site%dBearBox" % i, B + "bear_box.png", at_pos + Vector2(34, -8), Vector2(14, 6))
+		_fire_ring("Site%dFireRing" % i, at_pos + Vector2(-14, 24), site[4])
+
+	# The shared fire, where people cook, with stumps to sit on.
 	var fire := _instance("res://scenes/story/station.tscn", _tile_pos(17, 21), "Camp4FireRing")
 	fire.set("station", "campfire")
 	fire.set("display_name", "Camp 4 fire ring")
-	_sign_prop("RouteBoard", "res://assets/sprites/info_sign.png", _tile_pos(15, 30), Vector2(12, 4), "Camp 4 bulletin board",
-		"Notes pinned three deep: partners wanted for Royal Arches, a rack for trade, and a weather report for the week.")
-	_sign_prop("Camp4Sign", "res://assets/sprites/info_sign.png", _tile_pos(31, 21), Vector2(12, 4), "Camp 4",
-		"Climbers have camped here since the 1950s, the golden age of big-wall climbing. Camp 4 was added to the National Register of Historic Places in 2003.")
+	fire.set("texture", texture(B + "camp4_fire_ring.png"))
+	fire.set("frames", Camp4Art.FIRE_FRAMES)
+	fire.set("fps", 8.0)
+	fire.set("ground_inset", Camp4Art.FIRE_INSET)
+	fire.set("body_size", Vector2(24, 8))
+	fire.set("reach_size", Vector2(28, 16))
+	ambient(fire, "smoke", Vector2(0, -16), Vector2(2, 1))
+	for stump in [Vector2(-24, 2), Vector2(24, 6)]:
+		_prop("log_stump", _tile_pos(17, 21) + stump)
+
+	# A slackline between two pines: Camp 4 climbers started walking slack
+	# lines here on rest days around 1980.
+	var slack_at := foot(24.5, 20)
+	_prop(_pick("tree_ponderosa"), slack_at + Vector2(-Camp4Art.SLACK_SPAN / 2.0, 0))
+	_prop(_pick("tree_ponderosa"), slack_at + Vector2(Camp4Art.SLACK_SPAN / 2.0, 0))
+	decor("Slackline", B + "camp4_slackline.png", slack_at + Vector2(0, 2))
+	_info("SlacklineInfo", slack_at + Vector2(0, 4), Vector2(40, 10), "Slackline",
+		"Flat webbing strung between two pines. Camp 4 climbers began walking slack chains and lines here on rest days around 1980, and slacklining spread around the world from this campground.")
+
+	# Notes for partners and rides where the walk-in path arrives, and the sign.
+	sign_prop("RouteBoard", B + "camp4_board.png", foot(13.5, 30), Vector2(36, 6), "Camp 4 bulletin board",
+		"Notes pinned three deep: partners wanted for Royal Arches, a rack for trade, rides to the Tuolumne, and a weather report for the week. Climbers have found partners on this board for generations.")
+	sign_prop("Camp4Sign", B + "camp4_sign.png", _tile_pos(31, 21), Vector2(36, 5), "Camp 4",
+		"Climbers have camped here since the 1950s, the golden age of big-wall climbing, when Royal Robbins, Warren Harding and their friends lived here for whole seasons. In the late 1990s climbers fought a plan to build lodging on the site, and Camp 4 was added to the National Register of Historic Places in 2003.")
+	_info("OldCanvasTent", foot(5, 20) + Vector2(-14, -22), Vector2(36, 14), "Canvas wall tent",
+		"In the 1950s and 60s climbers lived in Camp 4 for months at a time in canvas tents like this one, or under tarps, on almost no money, between climbs on the big walls.")
+
 	# Gear traders with their gear spread out on tarps.
-	_decor("TarpRack", B + "gear_tarp.png", _tile_pos(22, 17), Vector2.ZERO)
+	decor("TarpRack", B + "camp4_tarp_rack.png", _tile_pos(22, 17) + Vector2(0, 4))
 	_vendor("RackTrader", "res://data/shops/camp4_rack.tres", _tile_pos(24, 17) + Vector2(0, 2), Color(0.8, 0.45, 0.2))
-	_decor("TarpBigWall", B + "gear_tarp.png", _tile_pos(11, 25), Vector2.ZERO)
+	decor("TarpBigWall", B + "camp4_tarp_bigwall.png", _tile_pos(11, 25) + Vector2(0, 4))
 	_vendor("BigWallTrader", "res://data/shops/camp4_bigwall.tres", _tile_pos(13, 25) + Vector2(0, 2), Color(0.35, 0.5, 0.75))
+	decor("Van", B + "camp4_van.png", foot(30, 34), Vector2(54, 10))
 	_shuttle("ShuttleCamp4", "Camp 4", _tile_pos(24, 37) + Vector2(0, 4))
+
+	# Pine needles and cones over the camp's dirt.
+	for i in 24:
+		var tx := rng.randi_range(4, 32)
+		var ty := rng.randi_range(11, 30)
+		if at(tx, ty) != Terrain.CAMP:
+			continue
+		_backdrop("camp4_duff_%d" % (i % 3), Vector2(tx * T - 12 + rng.randf_range(0, 8), ty * T - 6 + rng.randf_range(0, 8)), -8, B)
+
+
+## A tent at a campsite; most have a lantern lit inside after dark.
+func _camp_tent(node_name: String, kind_name: String, at_pos: Vector2) -> void:
+	var sprite := "camp4_tent_" + kind_name
+	var tex := texture(B + sprite + ".png")
+	decor(node_name, B + sprite + ".png", at_pos + Vector2(0, 4), Vector2(tex.get_width() - 10, 8))
+	if _has(sprite + "_glow", B) and rng.randf() > 0.25:
+		_glow(sprite + "_glow", at_pos + Vector2(-tex.get_width() / 2.0, 4 - tex.get_height()), 0.9, B)
+
+
+## A campsite's steel fire ring. A lit one burns, smokes and throws sparks,
+## and lights the ground around it after dark.
+func _fire_ring(node_name: String, at_pos: Vector2, lit: bool) -> void:
+	var sprite := "camp4_fire_ring" if lit else "camp4_fire_ring_cold"
+	var ring := decor(node_name, B + sprite + ".png", at_pos + Vector2(0, Camp4Art.FIRE_INSET), Vector2(22, 6))
+	if not lit:
+		return
+	animate(ring, Camp4Art.FIRE_FRAMES, 8.0)
+	night_light(ring, Vector2(0, -10), 60.0, 0.9, 0.35)
+	ambient(ring, "sparks", Vector2(0, -14), Vector2(3, 1))
+	ambient(ring, "smoke", Vector2(0, -18), Vector2(2, 1))
 
 
 func _vendor(node_name: String, shop_path: String, at: Vector2, color: Color) -> void:
@@ -600,7 +693,7 @@ func _dress_village() -> void:
 		_prop(_pick("plant_fern"), Vector2(FALL_CX + rng.randf_range(-72.0, 72.0), FALL_ROWS * T + rng.randf_range(0.0, 44.0)))
 	# Wrought-iron lamps along the Village mall, the plaza and the lodge walk,
 	# and benches where people sit.
-	var lamps := [[52, 22], [60, 22], [68, 22], [76, 22], [84, 22], [92, 22], [64, 32], [76, 32], [38, 37], [34, 22], [42, 22], [24, 22]]
+	var lamps := [[52, 22], [60, 22], [68, 22], [76, 22], [84, 22], [92, 22], [64, 32], [76, 32], [38, 37], [34, 22], [42, 22]]
 	for l: Array in lamps:
 		if _has("lamp_wrought"):
 			decor("Lamp%d_%d" % [l[0], l[1]], S + "lamp_wrought.png", foot(l[0], l[1]), Vector2(6, 4))
