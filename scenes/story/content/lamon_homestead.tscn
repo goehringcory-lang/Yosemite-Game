@@ -56,5 +56,5 @@ offset = Vector2(24, -16)
 
 [node name="JamesLamon" parent="." instance=ExtResource("3_r")]
 character = ExtResource("5_r")
-spot = "cabin"
-offset = Vector2(0, 0)
+spot = "home"
+offset = Vector2(40, 0)

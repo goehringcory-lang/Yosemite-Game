@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "lamon_winter"
+title = "Laying By"
+giver = "james_lamon"
+requires = PackedStringArray("lamon_orchard", "eichorn_apron")
+intro = PackedStringArray("Most folks leave the Valley when the snow comes. I stayed. Snow to the eaves, and nobody to talk to but the jays.", "You learn to lay food by in the summer, or you go hungry in January. Roots and berries, dried and stored up off the floor.", "Bring me some yampah roots and a few handfuls of manzanita berries. I'll dry them with the apples, and you'll get your share.")
+steps = [{"type": "have", "item": "yampah", "count": 3, "consume": true, "objective": "Bring James Lamon 3 yampah roots", "reminder": "Yampah grows in the wet meadows. White flowers, like lace, and a root that tastes a bit like a carrot.", "done": ["Good roots. Those'll dry nicely by the stove."]}, {"type": "have", "item": "manzanita_berries", "count": 4, "consume": true, "objective": "Bring James Lamon 4 manzanita berries", "reminder": "Manzanita, the shrub with the red bark. The berries look like little apples.", "done": ["Little apples, the Spanish name means. Fitting, at my place."]}]
+outro = PackedStringArray("Dried apples, from my trees. They'll keep all season in a pack.", "I didn't learn to lay food by on my own, you know. The people here had been doing it for a very long time before I ever cut a log.")
+reward_items = {"dried_apples": 4, "lamon_apple": 3}

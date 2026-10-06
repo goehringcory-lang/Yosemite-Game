@@ -64,6 +64,38 @@ static func main_quest_for(route_id: String) -> QuestData:
 	return null
 
 
+## A grade's number on the Yosemite Decimal System, for comparing routes:
+## "5.5" -> 5.0, "5.10b" -> 10.25, "VI 5.13+, 31 pitches" -> 13.9.
+## Grades off the scale (glaciers, "easy") return 0.
+static func yds(grade: String) -> float:
+	var regex := RegEx.create_from_string("5\\.(\\d+)([abcd])?(\\+)?")
+	var found := regex.search(grade)
+	if found == null:
+		return 0.0
+	var value := float(found.get_string(1))
+	var letter := found.get_string(2)
+	if letter != "":
+		value += "abcd".find(letter) * 0.25
+	elif found.get_string(3) != "":
+		value += 0.9
+	return value
+
+
+## Just the decimal part of a grade: "VI 5.13+, 31 pitches" -> "5.13+".
+static func yds_label(grade: String) -> String:
+	var found := RegEx.create_from_string("5\\.\\d+[abcd+]?").search(grade)
+	return found.get_string() if found else grade
+
+
+## The ticked route with the highest decimal grade, or null.
+static func hardest_tick() -> RouteData:
+	var best: RouteData = null
+	for route in routes():
+		if QuestLog.has_climbed(route.id) and yds(route.grade) > 0.0 and (best == null or yds(route.grade) > yds(best.grade)):
+			best = route
+	return best
+
+
 ## "Swan Slab, easy" with the gear it needs, for the tick list.
 static func gear_text(route: RouteData) -> String:
 	if route.required_gear.is_empty():

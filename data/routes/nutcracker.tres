@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "nutcracker"
+display_name = "Nutcracker"
+grade = "5.8, 5 pitches"
+description = "Cracks, flakes, and a famous mantel up the Manure Pile Buttress, across the road from El Capitan. Royal and Liz Robbins put it up using only nuts, to show the Valley that a good route doesn't need a hammer."
+first_ascent = "Royal and Liz Robbins, 1967"
+required_gear = {"rope": 1, "harness": 1, "cam": 4, "quickdraw": 2}
+guide_chapter = "The Valley walls"
+guide_order = 25
+guide_tip = "The Valley's first clean climb. Every piece you place, you take back out. Save something for the mantel at the top."
+pitches = Array[int]([2, 2, 3, 2, 3])
+moves_per_pitch = 8
+height_ft = 500

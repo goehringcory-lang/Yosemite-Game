@@ -14,5 +14,5 @@ pitches = Array[int]([2, 3, 3, 2, 3])
 moves_per_pitch = 9
 nights = 0
 guide_chapter = "Half Dome"
-guide_order = 50
+guide_order = 33
 guide_tip = "Runout. Place gear when the dike lets you."

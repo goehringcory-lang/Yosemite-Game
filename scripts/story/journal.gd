@@ -74,6 +74,13 @@ func _refresh() -> void:
 	elif not QuestLog.has_guidebook():
 		_heading("Main story")
 		_line("Pick up a climbing guidebook at the Mountain Shop in Curry Village.")
+	elif QuestLog.final_entry_pending():
+		_heading("Main story")
+		_line("The Last Page: talk to Galen Clark and write your entry.")
+	elif QuestLog.final_entry >= 0:
+		_heading("The last page")
+		var entry: String = QuestLog.FINAL_ENTRIES[QuestLog.final_entry].entry
+		_line("\"%s\"" % entry if entry != "" else "Left blank.", DIM if entry == "" else Color.WHITE)
 
 	_heading("Quests")
 	var objectives := QuestLog.objectives()
@@ -121,6 +128,9 @@ func _guidebook() -> void:
 		_line("You don't have one yet. The Mountain Shop in Curry Village sells them.", DIM)
 		return
 	_heading("Guidebook: tick list (%d of %d)" % [Guidebook.ticked_count(), Guidebook.routes().size()])
+	var hardest := Guidebook.hardest_tick()
+	_line("Hardest grade: %s (%s). The Nose, climbed free, is 5.13." % [Guidebook.yds_label(hardest.grade), hardest.display_name] if hardest
+		else "Grades run from 5.5 (a ladder with good holds) to 5.13 (the Nose, climbed free).", DIM)
 	var chapter := ""
 	for entry in Guidebook.entries():
 		var route: RouteData = entry.route

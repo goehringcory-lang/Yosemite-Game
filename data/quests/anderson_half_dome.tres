@@ -10,5 +10,5 @@ giver = "george_anderson"
 requires = PackedStringArray("leonard_belay")
 intro = PackedStringArray("You see Half Dome up there? I'm drilling my way up the back of it. A hole, an eyebolt, a step, another hole.", "Trouble is, a man can't drill on an empty stomach, and I ate my last beans on Tuesday.", "Bring me some real food, enough for a long day, and I'll give you something to remember the climb by.")
 steps = [{"type": "have_food", "energy": 60, "objective": "Bring food worth 60 energy to George Anderson", "reminder": "Something that sticks to your ribs. Apples, bread, anything but more beans.", "done": ["Now that's a meal. I could drill all the way to the top on that."]}]
-outro = PackedStringArray("Here's a spare eyebolt from the Dome. Iron from Scotland, drilled into California granite.", "Show it to those young climbers at Camp 4. They'll have opinions about it, I expect.")
+outro = PackedStringArray("Here's a spare eyebolt from the Dome. Iron from Scotland, drilled into California granite.", "Show it to the young climbers. There's one with a stern face who hangs about the big hotel. He'll have opinions about it, I expect.")
 reward_items = {"anderson_eyebolt": 1}

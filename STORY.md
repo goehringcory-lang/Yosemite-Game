@@ -29,7 +29,7 @@ A newcomer with a tent and a pair of approach shoes. They have no destiny and no
 
 ## The main storyline: the tick list
 
-The player's way through the story is the **climbing guidebook**. Clark's first errand sends them to the Mountain Shop in Curry Village. The clerk, Marty Kessler, has them fetch the new printing from the Registration porch and trade food for a guidebook listing every route, its grade, and the gear it takes. Then Marty fits them with a starter kit (climbing shoes, a chalk bag, a harness, and five quickdraws) in exchange for food and a pair of lost rental shoes, and sends them to Wren Alvarez, a new hire looking for a climbing partner. Wren belays the player up **Firefall Slab**, a bolted route on the Glacier Point Apron, and that's the first tick. A route counts only when the player tops it out and ticks it. Every main-line quest after the shop errands ends on a tick, and the person who gave the quest hands over the next piece of gear when they hear about it. The routes in order: Firefall Slab, Swan Slab, the Glacier Point Apron, Higher Cathedral Spire, Royal Arches, Snake Dike, the Nose, Cathedral Peak, and the Lyell Glacier. The full chain is in [docs/CAST.md](docs/CAST.md#quest-chains). Side stories (the people who aren't on the main line) come alongside it.
+The player's way through the story is the **climbing guidebook**. Clark's first errand sends them to the Mountain Shop in Curry Village. The clerk, Marty Kessler, has them fetch the new printing from the Registration porch and trade food for a guidebook listing every route, its grade, and the gear it takes. Then Marty fits them with a starter kit (climbing shoes, a chalk bag, a harness, and five quickdraws) in exchange for food and a pair of lost rental shoes, and sends them to Wren Alvarez, a new hire looking for a climbing partner. Wren belays the player up **Firefall Slab**, a bolted route on the Glacier Point Apron, and that's the first tick. A route counts only when the player tops it out and ticks it. Every main-line quest after the shop errands ends on a tick, and the person who gave the quest hands over the next piece of gear when they hear about it. The ticks climb the Yosemite Decimal System one grade at a time, so the player feels themselves getting stronger: Firefall Slab (5.5), Swan Slab (5.6), the Glacier Point Apron (5.7), Nutcracker (5.8), Higher Cathedral Spire (5.9), the Steck-Salathé on Sentinel Rock (5.10b), Astroman on Washington Column (5.11c), Separate Reality (5.12a), and the Nose of El Capitan, climbed free (5.13). Then the high country: Cathedral Peak and the Lyell Glacier, where the grade matters less than the altitude. Royal Arches and Snake Dike are side stories, classics off the ladder. The full chain is in [docs/CAST.md](docs/CAST.md#quest-chains). Side stories (the people who aren't on the main line) come alongside it.
 
 ## Story arc
 
@@ -53,18 +53,20 @@ The full cast (who lives where, with sprites) and every quest chain, with the ge
 - At the top: **David and Jennie Curry** and the Firefall (which ended in 1968). People in the game disagree about whether it was a wonder or a spectacle, and the game doesn't pick a side.
 - **Clare Marie Hodges**, the first woman ranger (1918), and **Enid Michael**, a naturalist who teaches which plants can be gathered and which should be left alone.
 
-### 3. Domes: North Dome and Half Dome (Tier 2, Summer)
+### 3. Domes and walls: 5.8 to 5.10 (Tier 2, Summer)
 
-- **Royal Arches**, one of the valley's classic early routes, up to the north rim.
+- **Royal Robbins** and the clean-climbing ethic ask whether you can climb without damaging the rock. He sends the player up **Nutcracker** (5.8) with nothing but removable protection, explains how the decimal grades were worked out, and gives them more cams and a belay and rappel device.
+- **Higher Cathedral Spire** (5.9), the Rock Climbing Section's 1934 route.
+- **John Salathé's** own route, the **Steck-Salathé** on Sentinel Rock (5.10b).
+- **Royal Arches** and **Snake Dike** are side stories: long, easy classics off the ladder.
 - **George Anderson** drilled his way up Half Dome in 1875. His story is about the marks people leave: bolts, cables, trails, and place names.
-- **Royal Robbins** and the clean-climbing ethic ask whether you can climb without damaging the rock. He gives the player more cams and a belay and rappel device.
-- **Snake Dike** leads to the top of Half Dome.
 
-### 4. The big walls: El Capitan (Tier 3, Summer into Fall)
+### 4. The big walls: 5.11 to 5.13 (Tier 3, Summer into Fall)
 
 - **John Salathé**, the blacksmith who forged hard steel pitons.
-- **Warren Harding** and the Nose (1958). He hands over aiders and a haul bag and makes the case for fixed ropes and siege tactics.
-- **Beverly Johnson**, the first woman to solo El Cap (1978), teaches self-reliance. She gives the player ascenders and a portaledge.
+- **Beverly Johnson**, the first woman to solo El Cap (1978), teaches self-reliance. She sends the player up **Astroman** (5.11c), then gives them ascenders and a portaledge.
+- **Royal Robbins** sends them out a roof: **Separate Reality** (5.12a).
+- **Warren Harding** and the Nose (1958). He hands over aiders and a haul bag and makes the case for fixed ropes and siege tactics. Then he dares the player to climb it free, at 5.13.
 - Climbs that last several days make food matter. The acorns stored in the chuckah in fall become the acorn cakes that get the player up the wall.
 - **Lucy Telles** at the Yosemite Museum, with her weaving and the work of feeding a family.
 
@@ -78,7 +80,7 @@ The full cast (who lives where, with sprites) and every quest chain, with the ge
 
 The player brings the Register back to Galen Clark. The ending is **not** the player becoming the next Guardian. Instead, the player sees how the book has changed: Clark's single account has become many voices that don't always agree. It includes stories told in full, stories told in part, and blank spaces for the stories people chose not to share.
 
-The player adds one final entry of their own and can choose what it says. Then the season turns. Looking after the valley doesn't end, and it was never one person's job.
+The player adds one final entry of their own and can choose what it says: every voice they heard, a thank-you, the tick list, or a blank page like the ones Tabuce and Maria Lebrado asked for. Then the season turns. Looking after the valley doesn't end, and it was never one person's job.
 
 ## The seven associated tribes
 
@@ -119,5 +121,5 @@ The game doesn't invent Native characters. Present-day tribal voices come throug
 - Maria Lebrado's 1929 visit and the sites she identified.
 - Maggie "Tabuce" Howard, Lucy Telles, and Carrie Bethel: dates and their work at the Yosemite Museum.
 - David and Jennie Curry, and the Firefall's dates and end (1968).
-- Rock Climbing Section history and the first ascent of Higher Cathedral Spire (1934), Royal Arches (1936), Anderson on Half Dome (1875), Robbins on the NW Face (1957), Harding on the Nose (1958), Snake Dike (1965), Johnson's solo (1978).
+- Rock Climbing Section history and the first ascent of Higher Cathedral Spire (1934), Royal Arches (1936), Anderson on Half Dome (1875), Robbins on the NW Face (1957), Harding on the Nose (1958), Snake Dike (1965), Johnson's solo (1978). Nutcracker (Royal and Liz Robbins, 1967), the Steck-Salathé (1950), the East Face of Washington Column (1959) and its free ascent as Astroman (1975), Separate Reality's free ascent (1978) and its grade (5.11d or 5.12a), and the Nose's first free ascent (1993) and grade.
 - Muir on Cathedral Peak (1869) and his glacier work (early 1870s).

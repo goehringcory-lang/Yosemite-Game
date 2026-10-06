@@ -36,11 +36,21 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/robbins_clean.tres"),
 	preload("res://data/quests/lucy_basket.tres"),
 	preload("res://data/quests/salathe_steel.tres"),
+	preload("res://data/quests/johnson_astroman.tres"),
+	preload("res://data/quests/robbins_roof.tres"),
 	preload("res://data/quests/harding_summit.tres"),
 	preload("res://data/quests/muir_cathedral.tres"),
 	preload("res://data/quests/bethel_trade.tres"),
 	preload("res://data/quests/muir_glacier.tres"),
 	preload("res://data/quests/lebrado_villages.tres"),
+	# More side stories, one or two per chapter
+	preload("res://data/quests/wren_apron.tres"),
+	preload("res://data/quests/lamon_winter.tres"),
+	preload("res://data/quests/robbins_eyebolt.tres"),
+	preload("res://data/quests/anderson_summit.tres"),
+	preload("res://data/quests/bestor_arches.tres"),
+	preload("res://data/quests/johnson_solo.tres"),
+	preload("res://data/quests/ansel_high_country.tres"),
 	preload("res://data/quests/clark_last_page.tres"),
 ]
 
@@ -77,11 +87,32 @@ const STAFF: Array[CharacterData] = [
 	preload("res://data/characters/staff/wren_alvarez.tres"),
 ]
 
+## What the player can write on the Register's last page, after The Last Page.
+## "choice" is the menu option, "entry" what goes in the book, "reply" Clark's
+## answer.
+const LAST_PAGE_QUEST := "clark_last_page"
+const FINAL_ENTRIES: Array[Dictionary] = [
+	{"choice": "Write down every voice you heard",
+		"entry": "Many people looked after this valley, and they didn't all agree. I wrote down what they told me.",
+		"reply": "Many hands, and not one of them mine alone. Good."},
+	{"choice": "Write a thank-you",
+		"entry": "Thank you to everyone who shared a story, and to everyone who chose not to.",
+		"reply": "Thanks is a fine thing to end a book on. Most of mine forgot it."},
+	{"choice": "List the climbs, route by route",
+		"entry": "Firefall Slab to the Lyell Glacier. Every pitch was somebody's gift: a rope, a rack, a meal, a story.",
+		"reply": "A tick list. Ha. Muir would call it a hymn."},
+	{"choice": "Leave it blank",
+		"entry": "",
+		"reply": "Another blank page. Some things are better kept than written."},
+]
+
 ## Quest id -> index of the current step. Missing = not started.
 var active: Dictionary = {}
 var completed: Array[String] = []
 var climbed: Array[String] = []
 var unlocks: Array[String] = []
+## Index into FINAL_ENTRIES once the player has written the last page, or -1.
+var final_entry := -1
 
 var _quests_by_id: Dictionary = {}
 var _characters_by_id: Dictionary = {}
@@ -100,6 +131,7 @@ func start_new_game() -> void:
 	completed = []
 	climbed = []
 	unlocks = []
+	final_entry = -1
 	changed.emit()
 
 
@@ -141,8 +173,15 @@ func tick_report(route_id: String) -> Array[Dictionary]:
 	for route in Guidebook.routes():
 		if route.id == route_id:
 			route_name = route.display_name
-	lines.append({"speaker": "", "text": "Ticked! %s goes in your tick list (%d of %d routes in the guidebook)." % [
-		route_name, Guidebook.ticked_count(), Guidebook.routes().size()]})
+	var grade := ""
+	var hardest := Guidebook.hardest_tick()
+	for route in Guidebook.routes():
+		if route.id == route_id:
+			grade = " (%s)" % route.grade
+			if hardest == route and Guidebook.yds(route.grade) > 0.0:
+				grade += ", your hardest grade yet"
+	lines.append({"speaker": "", "text": "Ticked! %s%s goes in your tick list (%d of %d routes in the guidebook)." % [
+		route_name, grade, Guidebook.ticked_count(), Guidebook.routes().size()]})
 	for quest: QuestData in QUESTS:
 		var step := current_step(quest)
 		if step.get("type") == "climbed" and step.route == route_id and quest.steps.back() == step:
@@ -169,13 +208,43 @@ func main_objective() -> Dictionary:
 		if not unmet.is_empty() and unmet.all(func(r: String) -> bool: return not get_quest(r).main_line):
 			var titles := PackedStringArray()
 			for r: String in unmet:
-				titles.append(get_quest(r).title)
-			return {"quest": quest, "objective": "Before the last page, hear everyone out: %s" % ", ".join(titles)}
+				var side := get_quest(r)
+				var side_giver := get_character(side.giver)
+				titles.append("%s from %s" % [side.title, side_giver.display_name if side_giver else side.giver])
+			if quest.id == LAST_PAGE_QUEST:
+				return {"quest": quest, "objective": "Before the last page, hear everyone out: %s" % ", ".join(titles)}
+			var next_giver := get_character(quest.giver)
+			return {"quest": quest, "objective": "Before %s will take you on, finish %s" % [
+				next_giver.display_name if next_giver else quest.giver, ", ".join(titles)]}
 		if unmet.is_empty():
 			var giver := get_character(quest.giver)
 			var where := " (%s)" % giver.home if giver and giver.home != "" else ""
 			return {"quest": quest, "objective": "Talk to %s%s" % [giver.display_name if giver else quest.giver, where]}
 	return {}
+
+
+## True once The Last Page is done and the player hasn't written their entry.
+func final_entry_pending() -> bool:
+	return is_completed(LAST_PAGE_QUEST) and final_entry < 0
+
+
+## Writes the player's last page (an index into FINAL_ENTRIES) and returns
+## the epilogue lines. The game carries on afterwards: the season turns.
+func write_final_entry(index: int) -> Array[Dictionary]:
+	var lines: Array[Dictionary] = []
+	if not final_entry_pending() or index < 0 or index >= FINAL_ENTRIES.size():
+		return lines
+	final_entry = index
+	var choice: Dictionary = FINAL_ENTRIES[index]
+	var clark := get_character("galen_clark")
+	if choice.entry != "":
+		lines.append({"speaker": "", "text": "You write: \"%s\"" % choice.entry})
+	else:
+		lines.append({"speaker": "", "text": "You close the book and leave the last page blank."})
+	lines.append({"speaker": clark.display_name if clark else "Galen Clark", "text": choice.reply})
+	lines.append({"speaker": "", "text": "The season turns. Looking after the valley doesn't end, and it was never one person's job."})
+	changed.emit()
+	return lines
 
 
 ## The next quest this person would offer, or null.
@@ -251,10 +320,14 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 			_add_lines(lines, speaker, step.get("done", []))
 			_advance(quest, lines)
 
-	# This person's own quest, in progress.
+	# This person's own quests, in progress. Someone can carry a side story
+	# and a main-line quest at the same time.
+	var had_own := false
+	var finished_now := false
 	for quest: QuestData in QUESTS:
 		if quest.giver != character_id or not active.has(quest.id):
 			continue
+		had_own = true
 		var progressed := false
 		while active.has(quest.id):
 			var step := current_step(quest)
@@ -268,12 +341,15 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 			_add_lines(lines, speaker, step.get("done", []))
 			_advance(quest, lines)
 			progressed = true
+		finished_now = finished_now or not active.has(quest.id)
 		if not progressed and active.has(quest.id):
 			_add_lines(lines, speaker, [current_step(quest).get("reminder", "")])
-		return lines
 
-	# A new quest from this person.
+	# A new quest from this person, next time you talk. A side story in
+	# progress never holds up the main line, but otherwise one at a time.
 	var offer := available_from(character_id)
+	if had_own and (finished_now or not (offer and offer.main_line)):
+		return lines
 	if offer:
 		_add_lines(lines, speaker, offer.intro)
 		active[offer.id] = 0
@@ -366,7 +442,7 @@ func _add_lines(lines: Array[Dictionary], speaker: String, texts) -> void:
 
 
 func save_data() -> Dictionary:
-	return {"active": active, "completed": completed, "climbed": climbed, "unlocks": unlocks}
+	return {"active": active, "completed": completed, "climbed": climbed, "unlocks": unlocks, "final_entry": final_entry}
 
 
 func load_data(data: Dictionary) -> void:
@@ -377,4 +453,5 @@ func load_data(data: Dictionary) -> void:
 	completed.assign(data.get("completed", []))
 	climbed.assign(data.get("climbed", []))
 	unlocks.assign(data.get("unlocks", []))
+	final_entry = int(data.get("final_entry", -1))
 	changed.emit()

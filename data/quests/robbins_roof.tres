@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "robbins_roof"
+title = "Separate Reality"
+main_line = true
+giver = "royal_robbins"
+requires = PackedStringArray("johnson_astroman")
+intro = PackedStringArray("Astroman? Then you've climbed 5.11, and you didn't leave anything behind doing it. Good.", "Out at the west end of the Valley there's a crack that runs straight out a twenty-foot roof, high above the river. They call it Separate Reality. When I started climbing, nobody would have believed anybody could free it. Now people argue over whether it's 5.11d or 5.12a.", "It's one pitch, and you'll be upside down for most of it. That's 5.12. If you can hang on there, El Cap is next.")
+steps = [{"type": "climbed", "route": "separate_reality", "objective": "Tick Separate Reality, 5.12a (the roof crack at the Valley's west end)", "reminder": "Separate Reality is out at the west end, above the river near Valley View. Chalk up before you leave the wall.", "done": ["You turned the lip? With the whole canyon under your heels? That is the hardest thing in your book that isn't El Cap."]}]
+outro = PackedStringArray("Two more cams. You'll need ten on the Nose.", "Warren Harding is at El Capitan Meadow. He climbed the Nose with hammers and bolts. Go and tell him you want to climb it free.")
+reward_gear = {"cam": 2}

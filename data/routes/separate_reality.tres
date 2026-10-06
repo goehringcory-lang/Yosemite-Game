@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "separate_reality"
+display_name = "Separate Reality"
+grade = "5.12a, 1 pitch"
+description = "A single crack splitting a twenty-foot roof, hundreds of feet above the Merced River at the Valley's west end. You hang upside down from your hands and feet, then turn the lip with the whole canyon under your heels. Older guidebooks call it 5.11d. Most climbers now call it 5.12a."
+first_ascent = "First free ascent 1978"
+required_gear = {"rope": 1, "harness": 1, "cam": 6, "quickdraw": 2, "chalk_bag": 1}
+guide_chapter = "The west end"
+guide_order = 45
+guide_tip = "One pitch, all roof. Chalk up before you leave the wall, and don't look down until you've turned the lip."
+pitches = Array[int]([5])
+moves_per_pitch = 12
+height_ft = 120

@@ -126,4 +126,20 @@ func interact(player: Player) -> void:
 		await DialogueBox.say_to(player, [{"speaker": character.display_name, "text": line}])
 	else:
 		await DialogueBox.say_to(player, QuestLog.talk_to(character.id))
+		if QuestLog.final_entry_pending() and character.id == "galen_clark":
+			await _write_last_page(player)
 	_talking = false
+
+
+## After The Last Page, Clark hands you the Register to write your own entry.
+func _write_last_page(player: Player) -> void:
+	player.can_act = false
+	var box := DialogueBox.open(player)
+	var options := PackedStringArray()
+	for entry: Dictionary in QuestLog.FINAL_ENTRIES:
+		options.append(entry.choice)
+	var pick := await box.choose("What do you write on the last page?", options)
+	if pick >= 0:
+		await box.say(QuestLog.write_final_entry(pick))
+	box.close()
+	player.can_act = true

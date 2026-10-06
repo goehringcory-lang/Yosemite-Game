@@ -29,10 +29,10 @@ Gear comes two ways, and there's no money in the game:
 | Tier | Gear | Example routes | Opens up |
 |---|---|---|---|
 | 0 | Approach shoes | Camp 4 boulders | Valley floor |
-| 0½ | Climbing shoes, chalk bag, harness, 5 quickdraws (the Mountain Shop's starter kit; your partner brings the rope) | Firefall Slab (bolted) | Your first tick |
-| 1 | + Rope, 2 cams | Glacier Point Apron | **Glacier Point** |
-| 2 | More cams, quickdraws, belay/rappel device | Royal Arches, Snake Dike | North Dome rim, **Half Dome** |
-| 3 | Aiders, ascenders, haul bag, portaledge | The Nose, Salathé Wall | **El Capitan**, the north rim |
+| 0½ | Climbing shoes, chalk bag, harness, 5 quickdraws (the Mountain Shop's starter kit; your partner brings the rope) | Firefall Slab (5.5, bolted) | Your first tick |
+| 1 | + Rope, 2 cams | Swan Slab (5.6), Glacier Point Apron (5.7) | **Glacier Point** |
+| 2 | More cams, quickdraws, belay/rappel device | Nutcracker (5.8), Higher Cathedral Spire (5.9), Steck-Salathé (5.10b); Royal Arches, Snake Dike | North Dome rim, **Half Dome**, Sentinel Rock |
+| 3 | Ascenders, portaledge, then aiders and a haul bag | Astroman (5.11c), Separate Reality (5.12a), the Nose free (5.13) | **El Capitan**, the north rim |
 | 4 | Ice axe, crampons, alpine pack | Cathedral Peak, Lyell Glacier | **Tuolumne Meadows**, high country, **Mono Lake** |
 
 How the gear affects the climbing minigame:

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "steck_salathe"
+display_name = "Steck-Salathé"
+grade = "V 5.10b, 15 pitches"
+description = "A dark, deep chimney system splitting the north face of Sentinel Rock. The Narrows pitch squeezes you so tight you have to breathe out to move. In 1950 it took five days, and the two men who climbed it rationed their water by the mouthful."
+first_ascent = "Allen Steck and John Salathé, July 1950"
+required_gear = {"rope": 1, "harness": 1, "cam": 6, "quickdraw": 6, "belay_device": 1}
+guide_chapter = "The Valley walls"
+guide_order = 35
+guide_tip = "Up the Four Mile Trail to the base of Sentinel Rock. Chimneys all day. Exhale for the Narrows."
+pitches = Array[int]([3, 3, 4, 3, 4, 4, 3])
+moves_per_pitch = 9
+height_ft = 1600

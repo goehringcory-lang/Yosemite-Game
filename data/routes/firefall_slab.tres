@@ -6,11 +6,11 @@
 script = ExtResource("1_route")
 id = "firefall_slab"
 display_name = "Firefall Slab"
-grade = "5.7 slab"
+grade = "5.5 slab, 2 pitches"
 description = "Two pitches of clean friction on the lower Glacier Point Apron, right above the Curry Village cabins, under the cliff the Firefall used to pour from. Bolted the whole way: bring quickdraws, not cams, and a partner with a rope."
 required_gear = {"climbing_shoes": 1, "chalk_bag": 1, "harness": 1, "quickdraw": 5}
 guide_chapter = "Curry Village"
-guide_order = 15
+guide_order = 10
 guide_tip = "Bolted friction. Sticky shoes, five draws, and a partner with a rope. Chalk up before the bulge on pitch two."
 pitches = Array[int]([1, 2])
 moves_per_pitch = 11
