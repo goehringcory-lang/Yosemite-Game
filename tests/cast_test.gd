@@ -43,6 +43,11 @@ func _check_characters() -> void:
 		if character.sources.strip_edges() == "":
 			missing_sources.append(character.id)
 		check(not character.visitor, "%s is a historical person, not a visitor" % character.id)
+	for character: CharacterData in QuestLog.STAFF:
+		var sheet := character.sprite_sheet
+		check(character.staff and not character.visitor and sheet != null and sheet.get_size() == Vector2(48, 96),
+			"%s is invented Mountain Shop staff, with art" % character.id)
+		check(not QuestLog.CHARACTERS.has(character), "%s isn't in the Register's cast" % character.id)
 	check(missing_art.is_empty(), "every character has a 48×96 sprite sheet %s" % [missing_art])
 	check(missing_sources.is_empty(), "every character lists sources %s" % [missing_sources])
 	for id: String in NATIVE_IDS:
@@ -135,7 +140,7 @@ func _check_gear_curve() -> void:
 	for route: RouteData in _load_dir(ROUTE_DIR):
 		routes[route.id] = route
 	var done := {}
-	var gear := {"approach_shoes": 1, "chalk_bag": 1}
+	var gear := Gear.STARTING_GEAR.duplicate()
 	var progressed := true
 	while progressed:
 		progressed = false
@@ -209,7 +214,8 @@ func _check_placements() -> void:
 		region.free()
 	var unplaced: Array[String] = []
 	for quest: QuestData in QuestLog.QUESTS:
-		if not placed.has(quest.giver):
+		# A shopkeeper's quests are given across the counter (ShopData.talk_target).
+		if not placed.has(quest.giver) and not _shop_targets().has(quest.giver):
 			unplaced.append(quest.giver)
 		for s: Dictionary in quest.steps:
 			if s.type == "talk" and not placed.has(s.target) and not _shop_targets().has(s.target):
@@ -223,18 +229,21 @@ func _check_main_line() -> void:
 	var main: Array[QuestData] = QuestLog.QUESTS.filter(func(q: QuestData) -> bool: return q.main_line)
 	check(main.size() >= 10, "the main line has its quests (%d)" % main.size())
 	for quest in main:
-		if quest.id in ["clark_register", "clark_last_page"]:
-			continue # the guidebook errand and the ending
+		if quest.id in ["clark_register", "shop_guidebook", "shop_outfit", "clark_last_page"]:
+			continue # the errands for the guidebook and the first kit, and the ending
 		check(quest.steps.back().type == "climbed", "%s finishes on a tick in the guidebook" % quest.id)
 	for route in Guidebook.routes():
 		check(Guidebook.main_quest_for(route.id) != null or route.id == "swan_slab" or route.id == "glacier_point_apron",
 			"%s is on the main line" % route.id)
 		check(route.guide_chapter != "" and route.guide_tip != "", "%s has a guidebook chapter and tip" % route.id)
 	var first := QuestLog.get_quest("clark_register")
-	check(first.giver == "galen_clark" and first.steps[0].unlock == "guidebook" and first.steps[0].target == "mountain_shop",
-		"the first quest sends you to the Mountain Shop for the guidebook")
+	check(first.giver == "galen_clark" and first.steps[0].target == "mountain_shop",
+		"the first quest sends you to the Mountain Shop")
+	var book := QuestLog.get_quest("shop_guidebook")
+	check(book.giver == "mountain_shop" and book.steps.any(func(st): return st.get("unlock") == "guidebook" and st.type == "pay"),
+		"the guidebook is traded for at the Mountain Shop")
 	# The chain runs in one line from the guidebook to the glacier.
-	var order := ["clark_register", "leonard_belay", "eichorn_apron", "eichorn_spires", "robbins_clean",
+	var order := ["clark_register", "shop_guidebook", "shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron", "eichorn_spires", "robbins_clean",
 		"salathe_steel", "harding_summit", "muir_cathedral", "muir_glacier"]
 	for i in range(1, order.size()):
 		var quest := QuestLog.get_quest(order[i])
@@ -258,10 +267,43 @@ func _play_first_chapter() -> void:
 	var lines := QuestLog.talk_to("galen_clark")
 	check(QuestLog.active.has("clark_register") and QuestLog.main_objective().objective.contains("Mountain Shop"), "Galen Clark sends you to the Mountain Shop")
 	check(QuestLog.talk_to("dick_leonard").size() > 0 and not QuestLog.active.has("leonard_belay"), "no lessons before the guidebook")
-	lines = QuestLog.talk_to("mountain_shop", "Mountain Shop clerk")
-	check(Guidebook.has_book() and QuestLog.is_completed("clark_register"), "the clerk hands over the guidebook")
-	check(lines[0].speaker == "Mountain Shop clerk", "the clerk is the one speaking")
+	var firefall: RouteData = load("res://data/routes/firefall_slab.tres")
+	lines = QuestLog.talk_to("mountain_shop", "Marty Kessler")
+	check(QuestLog.is_completed("clark_register") and QuestLog.active.has("shop_guidebook"), "the clerk sets you an errand for the guidebook")
+	check(lines[0].speaker == "Marty Kessler", "the clerk is the one speaking")
+	check(not Guidebook.has_book(), "no guidebook yet: it's a trade")
+	QuestLog.talk_to("jennie_curry")
+	check(QuestLog.current_step(QuestLog.get_quest("shop_guidebook")).type == "return", "Jennie Curry hands over the box of guidebooks")
+	QuestLog.talk_to("mountain_shop", "Marty Kessler")
+	check(not Guidebook.has_book(), "no guidebook without food to trade")
+	Inventory.add("wild_strawberry", 3)
+	lines = QuestLog.talk_to("mountain_shop", "Marty Kessler")
+	check(Guidebook.has_book() and QuestLog.is_completed("shop_guidebook"), "food buys the guidebook")
+	check(Inventory.count("wild_strawberry") == 1, "the trade takes 20 energy of food (2 strawberries)")
 	check("guidebook" in lines.filter(func(l): return l.text.begins_with("Received"))[0].text, "the pickup is announced")
+	check(QuestLog.main_objective().objective.contains("Marty Kessler"), "the journal points you back to the clerk")
+	QuestLog.talk_to("mountain_shop", "Marty Kessler")
+	check(QuestLog.active.has("shop_outfit"), "the clerk offers to fit you out")
+	check(QuestLog.talk_to("wren_alvarez").size() > 0 and not QuestLog.active.has("partner_apron"), "Wren isn't looking for you until you have a kit")
+	Inventory.add("trail_mix", 2)
+	QuestLog.talk_to("mountain_shop", "Marty Kessler")
+	check(not QuestLog.is_completed("shop_outfit") and Gear.count("harness") == 0, "the kit waits on the rental shoes")
+	Inventory.add("rental_shoes")
+	lines = QuestLog.talk_to("mountain_shop", "Marty Kessler")
+	check(QuestLog.is_completed("shop_outfit") and Inventory.count("rental_shoes") == 0, "returning the shoes and trading food finishes the fitting")
+	check(Gear.has_all(firefall.required_gear), "the kit is exactly what Firefall Slab takes (%s)" % [Gear.missing(firefall.required_gear)])
+	check(not Gear.has_all(load("res://data/routes/glacier_point_apron.tres").required_gear), "the shop kit doesn't open the cam routes")
+	check(lines.any(func(l): return "Wren" in l.text), "the clerk points you to Wren")
+	QuestLog.talk_to("wren_alvarez")
+	check(QuestLog.active.has("partner_apron"), "Wren asks you to be their partner")
+	QuestLog.talk_to("wren_alvarez")
+	check(QuestLog.current_step(QuestLog.get_quest("partner_apron")).type == "climbed", "with food in your pack, only the climb is left")
+	QuestLog.talk_to("wren_alvarez")
+	check(not QuestLog.is_completed("partner_apron"), "talking isn't climbing")
+	QuestLog.record_climb("firefall_slab")
+	check(QuestLog.tick_report("firefall_slab").size() == 2, "the tick report says Wren is waiting")
+	QuestLog.talk_to("wren_alvarez")
+	check(QuestLog.is_completed("partner_apron") and QuestLog.has_climbed("firefall_slab"), "the tick finishes Wren's quest")
 	check(QuestLog.main_objective().objective.contains("Dick Leonard"), "the journal points you to Dick Leonard next")
 	QuestLog.talk_to("dick_leonard")
 	Inventory.add("lamon_apple", 3)
@@ -271,10 +313,11 @@ func _play_first_chapter() -> void:
 	check(not QuestLog.is_completed("leonard_belay"), "you have to climb Swan Slab first")
 	QuestLog.record_climb("swan_slab")
 	QuestLog.talk_to("dick_leonard")
-	check(QuestLog.is_completed("leonard_belay") and Gear.count("rope") == 1, "the tick finishes Leonard's quest and pays out the rack")
+	check(QuestLog.is_completed("leonard_belay") and Gear.count("rope") == 1 and Gear.count("cam") == 2, "the tick finishes Leonard's quest and pays out the rack")
+	check(Gear.has_all(load("res://data/routes/glacier_point_apron.tres").required_gear), "the shop's harness and Leonard's rope and cams open the Apron")
 	QuestLog.talk_to("jules_eichorn")
 	check(QuestLog.active.has("eichorn_apron"), "Jules Eichorn sets the Apron")
-	check(Guidebook.entries().filter(func(e): return e.ticked).size() == 1, "one route is ticked")
+	check(Guidebook.entries().filter(func(e): return e.ticked).size() == 2, "two routes are ticked")
 	# Side stories still work: Degnan's delivery round.
 	QuestLog.talk_to("bridget_degnan")
 	QuestLog.talk_to("dick_leonard")

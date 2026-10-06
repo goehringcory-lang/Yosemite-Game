@@ -650,6 +650,18 @@ func draw_items() -> Image:
 				rect(4, 4, 8, 10, "c8c0b0")
 				rect(4, 4, 8, 2, "7a5a3a")
 				rect(5, 7, 6, 5, "f0e8d0")
+			"rental_shoes":
+				# A pair of rental climbing shoes tied together by the laces, with a shop tag.
+				rect(1, 7, 7, 4, "c8502e")
+				rect(1, 10, 8, 2, "222226")
+				rect(8, 9, 7, 3, "c8502e")
+				rect(8, 12, 7, 1, "222226")
+				rect(1, 7, 7, 1, "e8784a")
+				px(4, 8, "f0e8d8")
+				px(11, 10, "f0e8d8")
+				rect(6, 3, 1, 5, "f0e8d8")
+				rect(9, 4, 4, 3, "e8dcb0")
+				px(10, 5, "5a3a24")
 		outline_frame16()
 	return im
 

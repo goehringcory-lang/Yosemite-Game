@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/story_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(96, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_item")
+id = "rental_shoes"
+display_name = "Rental Climbing Shoes"
+description = "A pair of the Mountain Shop's rental shoes, tied together by the laces. The tag says to return them by 6 PM."
+icon = SubResource("AtlasTexture_icon")

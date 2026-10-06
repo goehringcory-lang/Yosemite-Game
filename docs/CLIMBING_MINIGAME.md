@@ -1,6 +1,6 @@
 # Climbing minigame: first design
 
-Status: standalone interaction prototype and proposed rules. The existing Godot minigame remains the live implementation. Open [climbing-prototype.html](climbing-prototype.html) in a browser to play this study; it uses sample inventory and never touches game saves.
+Status: standalone interaction prototype and proposed rules. The existing Godot minigame remains the live implementation. Since this was written, the Godot screen has been redrawn (a scrolling face-on wall against a time-of-day sky, a climber on a rope, an altimeter HUD) and has gained bolts with quickdraws, climbing shoes (-1 per move), and chalk (once a pitch, -3 on the next 2 moves). See the README's "The climbing screen". Open [climbing-prototype.html](climbing-prototype.html) in a browser to play this study; it uses sample inventory and never touches game saves.
 
 ## Experience
 

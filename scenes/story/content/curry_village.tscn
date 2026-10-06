@@ -8,6 +8,10 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_tourist.tres" id="6_r"]
 [ext_resource type="Resource" path="res://data/characters/jules_eichorn.tres" id="7_r"]
 [ext_resource type="Resource" path="res://data/characters/bestor_robinson.tres" id="8_r"]
+[ext_resource type="Resource" path="res://data/characters/staff/wren_alvarez.tres" id="9_r"]
+[ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="10_r"]
+[ext_resource type="Resource" path="res://data/routes/firefall_slab.tres" id="11_r"]
+[ext_resource type="PackedScene" path="res://scenes/story/pickup.tscn" id="12_r"]
 
 [node name="CurryVillageStory" type="Node2D"]
 
@@ -49,3 +53,17 @@ character = ExtResource("8_r")
 spot = "apron_trailhead"
 offset = Vector2(14, 44)
 wander_radius = 12.0
+
+[node name="WrenAlvarez" parent="." instance=ExtResource("1_r")]
+character = ExtResource("9_r")
+spot = "apron_trailhead"
+offset = Vector2(-84, -32)
+
+[node name="FirefallSlab" parent="." instance=ExtResource("10_r")]
+position = Vector2(1150, 132)
+route = ExtResource("11_r")
+
+[node name="CurryRentalShoes" parent="." instance=ExtResource("12_r")]
+position = Vector2(820, 330)
+item_id = "rental_shoes"
+found_text = "Somebody's rental shoes from the Mountain Shop, left outside a tent cabin. Marty will want these back."

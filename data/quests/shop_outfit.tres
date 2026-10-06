@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "shop_outfit"
+title = "Fitted Out"
+main_line = true
+giver = "mountain_shop"
+requires = PackedStringArray("shop_guidebook")
+intro = PackedStringArray("Let's get you a real starter kit: climbing shoes, a chalk bag, a harness, and five quickdraws. That's everything a bolted slab takes. Your partner brings the rope.", "Two things first. One of our guests went home and left a pair of rental shoes outside a tent cabin, up in the rows by the wall. Fetch them back for me.", "And the kit's a trade, same as the book. Bring food worth 40 energy and I'll fit you myself.")
+steps = [{"type": "have", "item": "rental_shoes", "count": 1, "consume": true, "objective": "Find the rental shoes left outside a tent cabin and bring them to Marty", "reminder": "Red suede, tied together by the laces. Somewhere out front of the cabins in the upper rows, toward the wall.", "done": ["That's them. Smells like somebody's whole summer. Thanks."]}, {"type": "pay", "energy": 40, "gear": {"climbing_shoes": 1, "chalk_bag": 1, "harness": 1, "quickdraw": 5}, "objective": "Trade Marty food worth 40 energy for your first climbing kit", "reminder": "Forty energy of food for the whole kit. That's a deal, believe me.", "done": ["Sit down, let's size these shoes. Tighter. Tighter. Yes, they're supposed to hurt a little.", "Chalk bag on the back of your harness, draws on the gear loops, five a side... well, five total. You look like a climber."]}]
+outro = PackedStringArray("One more thing. We hired somebody new this week: Wren Alvarez. Just moved to the Valley, doesn't know a soul, and has been out at the foot of the Apron since breakfast with a rope, looking for a partner.", "Go say hi. Firefall Slab starts right there by the trail post, and it's page one for a reason.")

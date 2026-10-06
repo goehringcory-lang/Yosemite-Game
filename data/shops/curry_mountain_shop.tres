@@ -62,8 +62,8 @@ max_owned = 1
 
 [resource]
 script = ExtResource("2_1mfbe")
-keeper = "Mountain Shop clerk"
+keeper = "Marty Kessler"
 talk_target = "mountain_shop"
 greeting = "Welcome to the Mountain Shop. We outfit half the climbers in the Valley. Rope, cams, draws... we take food in trade, same as everyone up here."
-nothing_yet = "You'll want a rope and a couple of cams before I can help. Talk to the folks at Camp 4, or ask around the Valley."
+nothing_yet = "That's all I can trade you today. Once you've got a rope of your own, come back and I'll round out your rack."
 offers = Array[ExtResource("1_7sdry")]([SubResource("Resource_3eq6e"), SubResource("Resource_4xbnm"), SubResource("Resource_d0yrh"), SubResource("Resource_vjimg"), SubResource("Resource_hxv0q"), SubResource("Resource_wddds")])

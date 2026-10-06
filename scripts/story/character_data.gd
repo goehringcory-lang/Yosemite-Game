@@ -1,6 +1,7 @@
 class_name CharacterData
 extends Resource
-## A real historical person the player can meet.
+## A real historical person the player can meet (or, with [member visitor] or
+## [member staff], an invented one).
 ##
 ## Every character must be researched before their dialogue ships. Native
 ## characters also need review by the tribes traditionally associated with
@@ -26,6 +27,10 @@ extends Resource
 ## An everyday park visitor from one of the park's eras, not a historical figure. Visitors
 ## only chat: they never give quests or appear in the Register.
 @export var visitor := false
+## Invented Mountain Shop staff, not historical figures. Unlike visitors they
+## can give shop quests and partner on climbs, but they never appear in the
+## Register. They live in QuestLog.STAFF, not QuestLog.CHARACTERS.
+@export var staff := false
 
 @export_group("Review")
 ## True until the associated tribes have reviewed this character and their dialogue.
