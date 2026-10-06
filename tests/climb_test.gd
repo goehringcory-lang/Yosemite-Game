@@ -29,17 +29,13 @@ func kit_for(r: RouteData) -> Dictionary:
 
 func food_for(r: RouteData) -> void:
 	Inventory.items.clear()
-	if r.top_rope:
+	var energy := int(ClimbProfiles.get_profile(r.id).get("food", 0))
+	if energy <= 0:
 		return
-	var yds := Guidebook.yds(r.grade)
 	if r.nights > 0:
-		Inventory.add("acorn_cake", 6)
-		Inventory.add("trail_mix", 3)
-	elif r.pitches.size() >= 6 or yds >= 10.0:
-		Inventory.add("trail_mix", 3)
-		Inventory.add("acorn_cake", 1)
+		Inventory.add("acorn_cake", ceili(energy / 45.0))
 	else:
-		Inventory.add("trail_mix", 2)
+		Inventory.add("trail_mix", ceili(energy / 30.0))
 
 
 func _ready() -> void:
@@ -89,21 +85,26 @@ func test_pitch_generation() -> void:
 		check(bad == 0, "%s: every pitch has a line from the belay to the top" % r.id)
 
 
-## CLIMB_STATS=1 sweeps how much food you carry (trail mix, 30 energy each).
+## CLIMB_STATS=1 sweeps how much food you carry (trail mix, 30 energy each) and
+## prints the least that gets a careful climber up 90 % of the time.
 func print_food_sweep() -> void:
 	for r in Guidebook.routes():
 		var line := "SWEEP %-24s" % r.id
-		for mixes in [0, 1, 2, 3, 5, 8]:
+		var first := -1
+		for mixes in [0, 1, 2, 3, 4, 5, 6, 8, 10, 12]:
 			var tops := 0
-			for seed in 30:
+			var runs := 60
+			for seed in runs:
 				Inventory.items.clear()
 				if mixes > 0:
 					Inventory.add("trail_mix", mixes)
 				var state := ClimbState.new(r, int(kit_for(r).get("cam", 0)), seed, kit_for(r))
 				ClimbBot.new().play(state)
 				tops += 1 if state.status == ClimbState.Status.TOPPED_OUT else 0
-			line += "  %dmix:%3d%%" % [mixes, tops * 100 / 30]
-		print(line)
+			line += "  %d:%3d%%" % [mixes, tops * 100 / runs]
+			if first < 0 and tops * 100 / runs >= 90:
+				first = mixes
+		print(line + "   -> %d mix (%d energy)" % [first, first * 30])
 	Inventory.items.clear()
 
 
@@ -130,7 +131,7 @@ func test_every_route_is_climbable() -> void:
 		var rate := tops / float(runs)
 		if stats:
 			print("STATS %-24s %-12s tops %2d/%d  falls/top %.1f  hours %.1f  aided %d" % [r.id, r.grade.substr(0, 12), tops, runs, falls / float(maxi(tops, 1)), minutes / 60.0 / maxi(tops, 1), aided])
-		check(rate >= 0.8, "a careful climber tops out %s (%d of %d)" % [r.id, tops, runs])
+		check(rate >= 0.85, "a careful climber with the recommended food tops out %s (%d of %d)" % [r.id, tops, runs])
 
 
 func test_gear_verbs() -> void:

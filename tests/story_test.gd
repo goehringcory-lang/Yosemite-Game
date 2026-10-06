@@ -127,13 +127,21 @@ func test_apron_is_climbable() -> void:
 			tops += 1
 		Inventory.remove("acorn_cake", Inventory.count("acorn_cake"))
 	check(tops >= 18, "a careful climber with food tops out the Apron (%d of 20)" % tops)
+	# Food matters on a longer route: Nutcracker is five pitches.
+	var nutcracker: RouteData = load("res://data/routes/nutcracker.tres")
+	var kit := {"rope": 1, "harness": 1, "cam": 4, "quickdraw": 5, "climbing_shoes": 1, "chalk_bag": 1}
+	var fed := 0
 	var hungry := 0
 	for seed in 20:
-		var state := ClimbState.new(APRON, 2, seed)
-		play(state, false)
-		if state.status == ClimbState.Status.TOPPED_OUT:
-			hungry += 1
-	check(hungry < tops, "climbing without eating is harder (%d of 20 topped out)" % hungry)
+		Inventory.add("trail_mix", 2)
+		var state := ClimbState.new(nutcracker, 4, seed, kit)
+		play(state)
+		fed += 1 if state.status == ClimbState.Status.TOPPED_OUT else 0
+		Inventory.remove("trail_mix", Inventory.count("trail_mix"))
+		var empty := ClimbState.new(nutcracker, 4, seed, kit)
+		play(empty, false)
+		hungry += 1 if empty.status == ClimbState.Status.TOPPED_OUT else 0
+	check(hungry < fed, "climbing a long route without food is harder (%d fed, %d hungry of 20)" % [fed, hungry])
 
 
 ## Firefall Slab: bolted friction. You clip bolts with quickdraws, climbing

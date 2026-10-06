@@ -28,6 +28,10 @@ extends RefCounted
 ##   bivy        "ledge" or "hanging": where you sleep if the night falls here
 ##   deco        decoration hints for the painter
 ##   beta        one line of advice, shown at the pitch start
+##
+## Route keys: food (energy worth bringing; tests check a careful climber
+## tops out with it), place, rock, ground, finish, weather, belayer, descent,
+## view (skyline landmarks), facts, pitches.
 
 const BELAYERS := {
 	"wren_alvarez": {"name": "Wren", "skin": "c8905e", "hair": "3a2418", "hat": "e8b040", "hat_kind": "headband", "top": "4a8a8a", "bottom": "7a6a52", "pack": "8a5a3a"},
@@ -58,6 +62,7 @@ const BANTER := {
 
 const PROFILES := {
 	"firefall_slab": {
+		"food": 30,
 		"place": "Camp Curry, lower Glacier Point Apron",
 		"rock": "apron",
 		"ground": "curry",
@@ -82,6 +87,7 @@ const PROFILES := {
 		],
 	},
 	"swan_slab": {
+		"food": 0,
 		"place": "Swan Slab Gully, below Yosemite Falls",
 		"rock": "polished",
 		"ground": "camp4",
@@ -104,6 +110,7 @@ const PROFILES := {
 		],
 	},
 	"glacier_point_apron": {
+		"food": 30,
 		"place": "Glacier Point Apron, above Curry Village",
 		"rock": "apron",
 		"ground": "curry",
@@ -129,6 +136,7 @@ const PROFILES := {
 		],
 	},
 	"nutcracker": {
+		"food": 60,
 		"place": "Manure Pile Buttress, south wall of the Valley",
 		"rock": "golden",
 		"ground": "valley_forest",
@@ -156,6 +164,7 @@ const PROFILES := {
 		],
 	},
 	"higher_cathedral_spire": {
+		"food": 60,
 		"place": "Higher Cathedral Spire, Cathedral Rocks",
 		"rock": "orange",
 		"ground": "bridalveil_talus",
@@ -184,6 +193,7 @@ const PROFILES := {
 		],
 	},
 	"steck_salathe": {
+		"food": 150,
 		"place": "Sentinel Rock, above the Four Mile Trail",
 		"rock": "dark",
 		"ground": "valley_forest",
@@ -214,6 +224,7 @@ const PROFILES := {
 		],
 	},
 	"astroman": {
+		"food": 180,
 		"place": "Washington Column, east face",
 		"rock": "pale",
 		"ground": "valley_forest",
@@ -244,6 +255,7 @@ const PROFILES := {
 		],
 	},
 	"separate_reality": {
+		"food": 30,
 		"place": "Mist Wall, west end of the Valley",
 		"rock": "roof",
 		"ground": "mist_wall",
@@ -265,6 +277,7 @@ const PROFILES := {
 		],
 	},
 	"the_nose": {
+		"food": 360,
 		"place": "The Nose of El Capitan",
 		"rock": "elcap",
 		"ground": "el_cap_meadow",
@@ -296,6 +309,7 @@ const PROFILES := {
 		],
 	},
 	"royal_arches": {
+		"food": 90,
 		"place": "Royal Arches, behind the Ahwahnee",
 		"rock": "arches",
 		"ground": "ahwahnee",
@@ -324,6 +338,7 @@ const PROFILES := {
 		],
 	},
 	"snake_dike": {
+		"food": 60,
 		"place": "Half Dome, southwest face",
 		"rock": "dome",
 		"ground": "half_dome_forest",
@@ -352,6 +367,7 @@ const PROFILES := {
 		],
 	},
 	"cathedral_peak": {
+		"food": 30,
 		"place": "Cathedral Peak, Tuolumne Meadows",
 		"rock": "knobby",
 		"ground": "tuolumne",
@@ -380,6 +396,7 @@ const PROFILES := {
 		],
 	},
 	"lyell_glacier": {
+		"food": 60,
 		"place": "Lyell Glacier, Mount Lyell",
 		"rock": "ice",
 		"ground": "moraine",

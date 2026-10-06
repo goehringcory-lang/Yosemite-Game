@@ -231,7 +231,7 @@ func _climb_input(event: InputEvent) -> void:
 		dx = -1
 	elif event.is_action_pressed("move_right"):
 		dx = 1
-	var assist := Input.is_key_pressed(KEY_SHIFT)
+	var assist := Input.is_action_pressed("assist")
 	if dx != 99:
 		if assist and state.can_jug(dx):
 			state.jug(dx)
@@ -598,16 +598,7 @@ func _draw_screen() -> void:
 
 ## About how much food energy this route wants, for the route card.
 func _recommended_food() -> int:
-	if route.top_rope:
-		return 0
-	var total := 0.0
-	for i in route.pitches.size():
-		var spec := ClimbProfiles.pitch_spec(route, i)
-		total += (2 + roundi(int(spec.diff) * ClimbState.COST_PER_GRADE) + 1.0) * int(spec.rows) * 0.9
-	var resources := 100.0 + route.pitches.size() * (ClimbState.BELAY_REST + 4)
-	if route.nights > 0:
-		resources += route.nights * 80.0
-	return maxi(int(ceil((total - resources) / 5.0)) * 5, 0) + (30 * route.nights if route.nights > 0 else 0)
+	return int(profile.get("food", 0))
 
 
 func _draw_clouds(height: float) -> void:

@@ -14,18 +14,18 @@ const L := preload("res://scripts/climb/art/climb_layout.gd")
 
 ## Daylight ramps, dark to light: deep, shade, base, lit, highlight.
 const ROCKS := {
-	"apron": ["5f5a62", "807a80", "a29c98", "c8c0b2", "e8dfca"],
-	"polished": ["58606a", "7a828c", "9ea2a8", "c4c6c4", "e6e4da"],
-	"golden": ["62503e", "86705a", "b09a78", "d6c094", "f0e0b0"],
-	"orange": ["63483a", "8a6a54", "b08c6a", "d6b088", "f0d0a0"],
-	"dark": ["2e3040", "4c4e5e", "70727e", "9a9caa", "c4c6d0"],
-	"pale": ["6a6460", "948c84", "bcb4a6", "e0d6c0", "f4ecd8"],
-	"roof": ["34323e", "504e5a", "6e6c78", "908e98", "b4b2bc"],
-	"elcap": ["4a4a52", "74747a", "a2a2a2", "c8c8c4", "e6e4da"],
-	"arches": ["58545a", "7c7880", "9c9892", "c6bea8", "e6dcc0"],
-	"dome": ["6e6a68", "98948e", "bcb8b0", "dcd8cc", "f2eee0"],
-	"knobby": ["5a5448", "84806e", "b0aa98", "d4ccb4", "eee6cc"],
-	"ice": ["5a7ab0", "86a6d0", "b8d0e8", "dceaf6", "f6fbff"],
+	"apron": ["56525e", "7c7884", "a29ea8", "cac6cc", "ece8ec"],
+	"polished": ["4e5864", "727e8c", "9aa4b0", "c4cad0", "e8ecee"],
+	"golden": ["5a4430", "82603e", "ac8654", "d6ac70", "f2d492"],
+	"orange": ["5c3a30", "86543e", "b27a54", "daa270", "f6ca92"],
+	"dark": ["262a3c", "44485c", "6a6e82", "9498ac", "c0c4d6"],
+	"pale": ["6c665e", "968e82", "c4bcac", "e6dec8", "faf4e0"],
+	"roof": ["2e2c3a", "4c4a5a", "6c6a7c", "908e9e", "b6b4c4"],
+	"elcap": ["3e3e4c", "6a6a7a", "9e9ea4", "cacac6", "eeeadc"],
+	"arches": ["54505a", "787480", "a09c98", "ccc4b0", "ece2c6"],
+	"dome": ["68646a", "928e96", "bcb8bc", "e0dcd8", "f6f2ea"],
+	"knobby": ["564e44", "7e7662", "aca088", "d4c8a6", "f0e6c4"],
+	"ice": ["4a6ca8", "7a9ccc", "b0cce6", "dcecf8", "f8fcff"],
 }
 
 const STREAK := Color("2e2a34")
@@ -121,21 +121,21 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 		lut.append(tone(c, i * 0.25))
 	var out := PackedByteArray()
 	out.resize(w * h * 4)
-	var k_light := 1.15 if not smooth else 0.8
+	var k_light := 1.45 if not smooth else 1.0
 	for y in h:
 		var row := y * w
 		for x in w:
 			var i := row + x
-			var xl := relief[i - 1] if x > 0 else relief[i]
-			var xr := relief[i + 1] if x < w - 1 else relief[i]
-			var yu := relief[i - w] if y > 0 else relief[i]
-			var yd := relief[i + w] if y < h - 1 else relief[i]
+			var xl := relief[i - 3] if x > 2 else relief[i]
+			var xr := relief[i + 3] if x < w - 3 else relief[i]
+			var yu := relief[i - 3 * w] if y > 2 else relief[i]
+			var yd := relief[i + 3 * w] if y < h - 3 else relief[i]
 			# Light from the upper left: surfaces facing left and up are lit.
-			var s_light := ((xl - xr) * 0.8 + (yu - yd) * 0.55) / 255.0 * 6.0
+			var s_light := ((xl - xr) * 0.8 + (yu - yd) * 0.55) / 255.0 * 4.0
 			var sun := float(x) / w
-			var t := 2.0 + s_light * k_light + (sun - 0.5) * 0.9 + (relief[i] / 255.0 - 0.5) * 0.9
+			var t := 2.0 + s_light * k_light + (sun - 0.5) * 1.1 + (relief[i] / 255.0 - 0.5) * 1.2
 			var bay: float = P.BAYER[y & 3][x & 3] / 16.0 - 0.5
-			var idx := clampi(roundi((t + bay * 0.35) * 4.0), 0, 19)
+			var idx := clampi(roundi((t + bay * 0.16) * 3.0) * 4 / 3, 0, 19)
 			var col: Color = lut[idx]
 			var o := i * 4
 			out[o] = int(col.r8)
@@ -147,7 +147,7 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 	_stains(im, c, rng, deco)
 	_lichen(im, c, rng, deco, h)
 	# Speckles: feldspar glints and dark crystals.
-	for i in w * h / 90:
+	for i in w * h / 160:
 		var p := Vector2i(rng.randi_range(0, w - 1), rng.randi_range(0, h - 1))
 		var col := im.get_pixelv(p)
 		im.set_pixelv(p, col.lightened(0.14) if rng.randf() < 0.55 else col.darkened(0.18))
@@ -158,9 +158,9 @@ static func _relief(w: int, h: int, seed_value: int, smooth: bool) -> PackedByte
 	var fbm := FastNoiseLite.new()
 	fbm.seed = seed_value
 	fbm.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
-	fbm.frequency = 0.035 if not smooth else 0.02
-	fbm.fractal_octaves = 4
-	fbm.fractal_gain = 0.55
+	fbm.frequency = 0.022 if not smooth else 0.013
+	fbm.fractal_octaves = 3
+	fbm.fractal_gain = 0.45
 	var squash := 3 if not smooth else 2
 	var a := fbm.get_image(w, maxi(h / squash, 8), false, false, true)
 	a.resize(w, h, Image.INTERPOLATE_BILINEAR)
@@ -169,7 +169,7 @@ static func _relief(w: int, h: int, seed_value: int, smooth: bool) -> PackedByte
 	cells.noise_type = FastNoiseLite.TYPE_CELLULAR
 	cells.cellular_return_type = FastNoiseLite.RETURN_CELL_VALUE
 	cells.cellular_jitter = 0.9
-	cells.frequency = 0.016 if not smooth else 0.009
+	cells.frequency = 0.014 if not smooth else 0.008
 	cells.domain_warp_enabled = true
 	cells.domain_warp_amplitude = 18.0
 	cells.domain_warp_frequency = 0.02
@@ -178,9 +178,9 @@ static func _relief(w: int, h: int, seed_value: int, smooth: bool) -> PackedByte
 	var db := b.get_data()
 	var out := PackedByteArray()
 	out.resize(w * h)
-	var wa := 0.62 if not smooth else 0.5
+	var wa := 0.5 if not smooth else 0.42
 	for i in w * h:
-		out[i] = int(da[i] * wa + db[i] * (1.0 - wa) * 0.7)
+		out[i] = int(da[i] * wa + db[i] * (1.0 - wa) * 0.9)
 	return out
 
 
@@ -322,7 +322,8 @@ static func _corner(im: Image, c: Dictionary, rng: RandomNumberGenerator, state:
 	P.rect(im, seam_x + 3, 0, 1, h, c.deep)
 
 
-## Big flakes standing off the face: a lit plate with a dark gap behind it.
+## Big flakes standing off the face: a tapered lit plate with a dark gap
+## behind it, leaning a little.
 static func _flakes(im: Image, c: Dictionary, rng: RandomNumberGenerator, state: ClimbState) -> void:
 	var top := state.top_row
 	for r in range(1, top, 3):
@@ -331,62 +332,92 @@ static func _flakes(im: Image, c: Dictionary, rng: RandomNumberGenerator, state:
 			continue
 		var cc: int = cols[0]
 		var p := L.wall_px(top, r, cc)
-		var fx := int(p.x) - 8
-		var fy := int(p.y) - 30
-		var fh := rng.randi_range(46, 80)
-		var fw := rng.randi_range(8, 14)
-		P.rect(im, fx - 1, fy, fw + 3, fh, c.seam)
-		P.rect(im, fx, fy, fw, fh, tone(c, 2.9))
-		P.rect(im, fx, fy, 2, fh, tone(c, 3.9))
-		P.rect(im, fx + fw - 2, fy, 2, fh, tone(c, 1.8))
-		P.rect(im, fx + fw + 1, fy + 2, 2, fh - 2, c.deep)
-		P.hline(im, fx, fy, fw, tone(c, 4.0))
+		_flake_shape(im, c, int(p.x) - 6, int(p.y) + 26, rng.randi_range(56, 92), rng.randi_range(8, 13), rng.randf_range(-0.12, 0.12))
 
 
-## The dike: a pale or dark ribbon of different rock snaking up the face,
-## following the line the holds make.
+static func _flake_shape(im: Image, c: Dictionary, x: int, bottom_y: int, height: int, max_w: int, lean: float) -> void:
+	var w_main := maxi(int(max_w * 0.6), 4)
+	for k in height:
+		var t := float(k) / height
+		# Square body, pointed ends.
+		var taper := minf(minf(t, 1.0 - t) * 7.0, 1.0)
+		var half := maxi(int(w_main * (0.35 + 0.65 * taper)), 1)
+		var cx := x + int(lean * (height - k))
+		var y := bottom_y - k
+		P.rect(im, cx - half - 1, y, half * 2 + 4, 1, c.seam)
+		P.rect(im, cx - half, y, half * 2 + 1, 1, tone(c, 2.5))
+		P.rect(im, cx - half, y, mini(2, half + 1), 1, tone(c, 3.6))
+		P.rect(im, cx + half - 1, y, 2, 1, tone(c, 1.6))
+		P.px(im, cx + half + 1, y, c.deep)
+		P.px(im, cx + half + 2, y, c.deep)
+	var tx := x + int(lean * height)
+	P.rect(im, tx - 2, bottom_y - height, 5, 1, tone(c, 3.9))
+
+
+## The dike: a ribbon of different rock snaking up the face, following the
+## line the holds make, drawn as a smooth curve with ragged, lit edges.
 static func _dike(im: Image, c: Dictionary, rng: RandomNumberGenerator, state: ClimbState) -> void:
 	var top := state.top_row
-	var pts: Array[Vector2] = []
-	pts.append(L.wall_px(top, 0, 2) + Vector2(0, 40))
+	var xs := PackedFloat32Array()
+	var ys := PackedFloat32Array()
+	var p0 := L.wall_px(top, 0, 2)
+	xs.append(p0.x)
+	ys.append(p0.y + 70)
 	for r in range(1, top):
-		var cols: Array = state.holds[r].keys()
-		for cc: int in cols:
+		for cc: int in state.holds[r].keys():
 			if state.holds[r][cc].get("dike", false):
-				pts.append(L.wall_px(top, r, cc))
+				var p := L.wall_px(top, r, cc)
+				xs.append(p.x)
+				ys.append(p.y)
 				break
-	pts.append(L.wall_px(top, top, 2) + Vector2(0, -60))
-	# Interpolate x for every y between points.
-	var dark: Color = c.deep.lerp(c.shade, 0.35)
-	var lit := tone(c, 1.3)
-	for i in pts.size() - 1:
-		var a := pts[i]
-		var b := pts[i + 1]
-		var steps := int(absf(a.y - b.y)) + 1
-		for k in steps:
-			var t := float(k) / steps
-			var p := a.lerp(b, t)
-			var wob := sin(p.y * 0.07) * 1.5
-			var x := int(p.x + wob)
-			P.rect(im, x - 4, int(p.y), 9, 1, dark)
-			P.px(im, x - 5, int(p.y), c.seam)
-			P.px(im, x + 5, int(p.y), c.seam)
-			P.px(im, x - 3, int(p.y), lit)
-			if (int(p.y) + x) % 5 == 0:
-				P.px(im, x + 1, int(p.y), tone(c, 1.0))
+	var pt := L.wall_px(top, top, 2)
+	xs.append(pt.x)
+	ys.append(pt.y - 100)
+	var dark: Color = c.deep.lerp(c.shade, 0.45)
+	var mid := tone(c, 1.2)
+	var lit := tone(c, 2.6)
+	var y_start := int(ys[ys.size() - 1])
+	var y_end := int(ys[0])
+	for y in range(y_start, y_end):
+		# Find the segment this y falls in and ease between its points.
+		var seg := 0
+		for i in range(ys.size() - 1):
+			if y <= ys[i] and y >= ys[i + 1]:
+				seg = i
+				break
+		var t := inverse_lerp(ys[seg], ys[seg + 1], float(y))
+		t = t * t * (3.0 - 2.0 * t)
+		var x := lerpf(xs[seg], xs[seg + 1], t) + sin(y * 0.05) * 2.0
+		var wobble := int(P.noise(y / 3, 0, 4) * 3.0)
+		var half := 5 + wobble
+		P.rect(im, int(x) - half - 1, y, half * 2 + 3, 1, c.seam)
+		P.rect(im, int(x) - half, y, half * 2 + 1, 1, dark)
+		P.rect(im, int(x) - half, y, 2, 1, mid)
+		P.px(im, int(x) - half, y, lit)
+		P.rect(im, int(x) + half - 2, y, 2, 1, c.deep)
+		if P.noise(int(x), y, 8) < 0.12:
+			P.px(im, int(x) + int(P.noise(y, 3, 8) * 6.0) - 3, y, mid)
 
 
-## Round granite knobs of feldspar scattered over the face (decoration; the
-## holds are drawn as bigger knobs on top).
+## Round granite knobs of feldspar standing out of the face, in loose
+## clusters (decoration; the holds are drawn as bigger knobs on top).
 static func _knobs(im: Image, c: Dictionary, rng: RandomNumberGenerator) -> void:
 	var w := im.get_width()
 	var h := im.get_height()
-	for i in w * h / 900:
-		var x := rng.randi_range(4, w - 34)
-		var y := rng.randi_range(4, h - 4)
-		var r := rng.randi_range(2, 4)
-		P.ellipse(im, x, y + 1, r + 1, r * 0.7 + 1, c.seam)
-		P.shaded_ellipse(im, x, y, r, r * 0.7, tone(c, 2.9), tone(c, 4.0), tone(c, 1.5))
+	for k in w * h / 5200:
+		var cx := rng.randi_range(8, w - 40)
+		var cy := rng.randi_range(8, h - 8)
+		for i in rng.randi_range(2, 5):
+			var x := cx + rng.randi_range(-12, 12)
+			var y := cy + rng.randi_range(-9, 9)
+			var r := rng.randi_range(2, 4)
+			P.ellipse(im, x + 1, y + 2, r + 1, r * 0.7 + 1, c.seam)
+			P.shaded_ellipse(im, x, y, r, r * 0.7, tone(c, 2.9), tone(c, 4.1), tone(c, 1.6))
+	# Salt-and-pepper crystals of the coarse porphyritic granite.
+	for i in w * h / 55:
+		var p := Vector2i(rng.randi_range(0, w - 1), rng.randi_range(0, h - 1))
+		var col := im.get_pixelv(p)
+		im.set_pixelv(p, col.lightened(0.22) if rng.randf() < 0.5 else col.darkened(0.28))
 
 
 # ---------------------------------------------------------------- chimney
@@ -441,66 +472,99 @@ static func _face_into(im: Image, c: Dictionary, rng: RandomNumberGenerator, r: 
 
 # ---------------------------------------------------------------- glacier
 
+## Snow and ice, lit like the rock: broad sastrugi and sun cups for snow,
+## bubbled blue ice with white fractures, crevasses with snow bridges.
 static func _glacier(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: String, deco: Array, state: ClimbState) -> void:
 	var w := im.get_width()
 	var h := im.get_height()
 	var snow := style == "snow"
-	for yy in h:
-		for xx in w:
-			var n := P.smooth_noise(xx * 0.09, yy * 0.05, 3) + 0.5 * P.smooth_noise(xx * 0.23, yy * 0.17, 9)
-			var t := 3.2 + (n - 0.75) * (1.1 if snow else 1.6)
-			if not snow:
-				t = 2.1 + (n - 0.75) * 1.6 + (xx / float(w) - 0.4) * 0.6
-			im.set_pixel(xx, yy, tone(c, t))
-	# Sun cups: little scoops in the snow, lit on one side.
-	if snow:
-		for i in w * h / 260:
+	var relief := _relief(w, h, rng.randi(), true)
+	var lut: Array[Color] = []
+	for i in 20:
+		lut.append(tone(c, i * 0.25))
+	var out := PackedByteArray()
+	out.resize(w * h * 4)
+	for y in h:
+		for x in w:
+			var i := y * w + x
+			var xl := relief[i - 3] if x > 2 else relief[i]
+			var xr := relief[i + 3] if x < w - 3 else relief[i]
+			var yu := relief[i - 3 * w] if y > 2 else relief[i]
+			var yd := relief[i + 3 * w] if y < h - 3 else relief[i]
+			var s_light := ((xl - xr) * 0.7 + (yu - yd) * 0.7) / 255.0 * 4.0
+			var t := (3.0 if snow else 1.7) + s_light * (1.1 if snow else 1.2) + (relief[i] / 255.0 - 0.5) * 0.7 + (float(x) / w - 0.5) * 0.5
+			var bay: float = P.BAYER[y & 3][x & 3] / 16.0 - 0.5
+			var col: Color = lut[clampi(roundi((t + bay * 0.14) * 3.0) * 4 / 3, 0, 19)]
+			var o := i * 4
+			out[o] = int(col.r8)
+			out[o + 1] = int(col.g8)
+			out[o + 2] = int(col.b8)
+			out[o + 3] = 255
+	im.set_data(w, h, false, Image.FORMAT_RGBA8, out)
+	if not snow:
+		# White fractures through the ice, and trapped air bubbles.
+		for i in h / 24:
+			var x := float(rng.randi_range(8, w - 50))
+			var y := rng.randi_range(0, h)
+			for k in rng.randi_range(14, 44):
+				x += rng.randf_range(-1.4, 1.8)
+				y += rng.randi_range(0, 1) - (1 if rng.randf() < 0.2 else 0)
+				P.px(im, int(x), y, tone(c, 4.6))
+				if k % 4 == 0:
+					P.px(im, int(x) + 1, y + 1, tone(c, 1.0))
+		for i in w * h / 4200:
+			var p := Vector2i(rng.randi_range(2, w - 32), rng.randi_range(2, h - 2))
+			P.ellipse(im, p.x, p.y, 1.5, 1.0, tone(c, 4.4))
+	else:
+		# Sun cups and wind ridges.
+		for i in w * h / 420:
 			var x := rng.randi_range(4, w - 30)
 			var y := rng.randi_range(4, h - 4)
 			var r := rng.randi_range(3, 6)
-			P.ellipse(im, x, y, r, r * 0.5, tone(c, 2.5))
-			P.hline(im, x - r + 1, y + 1, r * 2 - 1, tone(c, 4.0))
+			P.ellipse(im, x, y, r, r * 0.5, tone(c, 2.6))
 			P.hline(im, x - r + 1, y - 1, r * 2 - 2, tone(c, 2.0))
-	# Wind-sculpted ridges and blue ice windows.
-	for i in h / 40:
-		var y := rng.randi_range(0, h - 4)
-		var x0 := rng.randi_range(0, w - 90)
-		for k in rng.randi_range(30, 90):
-			P.px(im, x0 + k, y + int(sin(k * 0.12 + i) * 2.0), tone(c, 4.1 if snow else 3.4))
-	# Rubble blown onto the surface (moraine grit) and crevasses on the ice.
+			P.hline(im, x - r + 1, y + 1, r * 2 - 2, tone(c, 4.4))
+		for i in h / 36:
+			var y := rng.randi_range(0, h - 4)
+			var x0 := rng.randi_range(0, w - 90)
+			for k in rng.randi_range(30, 90):
+				P.px(im, x0 + k, y + int(sin(k * 0.12 + i) * 2.0), tone(c, 4.4))
 	if "moraine" in deco:
-		for i in w * h / 700:
+		for i in w * h / 900:
 			var x := rng.randi_range(4, w - 30)
 			var y := rng.randi_range(4, h - 4)
-			P.rect(im, x, y, rng.randi_range(2, 4), rng.randi_range(1, 3), Color("6a6a70").lerp(c.tint, 0.2))
+			P.rect(im, x, y, rng.randi_range(2, 5), rng.randi_range(1, 3), Color("6a6a70").lerp(c.tint, 0.2))
 	if "crevasse" in deco:
 		var top := state.top_row
 		for r in range(1, top):
 			if r % 3 == 0:
 				var p := L.wall_px(top, r, 2)
-				var gx := int(p.x) - 78
-				var gy := int(p.y) - 4
-				P.rect(im, gx, gy - 1, 160, 9, c.seam)
-				P.rect(im, gx, gy, 160, 8, tone(c, 0.2))
-				P.rect(im, gx + 6, gy + 2, 148, 5, c.deep)
-				for k in 160:
-					if (k + r) % 4 == 0:
-						P.px(im, gx + k, gy - 1, tone(c, 4.4))
-				# Icicles hanging in.
-				for k in 12:
-					P.vline(im, gx + 8 + k * 12, gy + 1, 2 + (k * 7 + r) % 3, tone(c, 3.6))
-				# The bridge that carries the line across.
-				var bx := int(L.wall_px(top, r, state.holds[r].keys()[0]).x) - 10
-				P.rect(im, bx, gy - 2, 20, 12, tone(c, 3.8))
-				P.rect(im, bx, gy - 2, 20, 1, tone(c, 4.6))
-				P.rect(im, bx, gy + 9, 20, 1, tone(c, 2.6))
+				var gx := int(p.x) - 86
+				var gy := int(p.y) - 5
+				# A curved slot, blue in the depths, with a lit upper lip.
+				for k in 172:
+					var arc := int(sin(k * 0.027 + r) * 3.0)
+					var depth_t := sin(float(k) / 172.0 * PI)
+					var hh := 3 + int(depth_t * 6.0)
+					P.rect(im, gx + k, gy + arc - 1, 1, hh + 2, c.seam)
+					P.rect(im, gx + k, gy + arc, 1, hh, tone(c, 0.3 + depth_t * 0.6))
+					P.px(im, gx + k, gy + arc - 2, tone(c, 4.6))
+					if k % 5 == 0:
+						P.px(im, gx + k, gy + arc + hh, tone(c, 3.6))
+				# The snow bridge carrying the line across.
+				var bx := int(L.wall_px(top, r, state.holds[r].keys()[0]).x) - 12
+				P.rect(im, bx, gy - 3, 24, 13, tone(c, 3.8))
+				P.rect(im, bx, gy - 3, 24, 2, tone(c, 4.8))
+				P.rect(im, bx, gy + 8, 24, 2, tone(c, 2.8))
+				P.rect(im, bx - 1, gy - 3, 1, 13, c.seam)
+				P.rect(im, bx + 24, gy - 3, 1, 13, c.seam)
 
 
 # ---------------------------------------------------------------- roof
 
 ## A roof pitch, side-on: the cliff on the left, a ceiling jutting out to the
 ## right with its crack, the lip, a ledge above it, and the belay ledge under
-## the start. Returns {"image", "lip_x"}.
+## the start. Returns {"image", "lip_x", ...}.
 static func paint_roof(state: ClimbState, rock_key: String, pal: Dictionary, seed_value: int) -> Dictionary:
 	var top := state.top_row
 	var w := L.roof_width(top)
@@ -535,17 +599,17 @@ static func paint_roof(state: ClimbState, rock_key: String, pal: Dictionary, see
 				continue
 			var i := y * w + x
 			mask[i] = 1
-			var xl := relief[i - 1] if x > 0 else relief[i]
-			var xr := relief[i + 1] if x < w - 1 else relief[i]
-			var yu := relief[i - w] if y > 0 else relief[i]
-			var yd := relief[i + w] if y < h - 1 else relief[i]
-			var s_light := ((xl - xr) * 0.6 + (yu - yd) * 0.7) / 255.0 * 6.0
-			var t := 1.9 + s_light * 1.0 + (relief[i] / 255.0 - 0.5) * 0.8
+			var xl := relief[i - 3] if x > 2 else relief[i]
+			var xr := relief[i + 3] if x < w - 3 else relief[i]
+			var yu := relief[i - 3 * w] if y > 2 else relief[i]
+			var yd := relief[i + 3 * w] if y < h - 3 else relief[i]
+			var s_light := ((xl - xr) * 0.6 + (yu - yd) * 0.7) / 255.0 * 4.0
+			var t := 1.9 + s_light * 1.2 + (relief[i] / 255.0 - 0.5) * 1.0
 			# The underside of a roof sits in shade.
 			if x >= wall_x and x < lip_x and depth_under < 22:
 				t -= (22 - depth_under) * 0.045
 			var bay: float = P.BAYER[y & 3][x & 3] / 16.0 - 0.5
-			im.set_pixel(x, y, lut[clampi(roundi((t + bay * 0.35) * 4.0), 0, 19)])
+			im.set_pixel(x, y, lut[clampi(roundi((t + bay * 0.16) * 3.0) * 4 / 3, 0, 19)])
 	# The edge of the rock: a dark outline, and a lit rim on the lip and shelf.
 	for x in range(wall_x, w):
 		var under := int(L.ROOF_Y + 14 + sin(x * 0.07) * 2.0 + P.noise(x / 3, 0, 2) * 3.0)
@@ -558,15 +622,9 @@ static func paint_roof(state: ClimbState, rock_key: String, pal: Dictionary, see
 			P.px(im, x, shelf_top, tone(c, 4.0))
 			P.px(im, x, shelf_top + 1, tone(c, 3.4))
 			P.px(im, x, shelf_top - 1, c.seam)
-	for y in h:
-		P.px(im, lip_x + 120, y, Color(0, 0, 0, 0))
 	# The cliff face on the left: lit edge, and the ledge you belay from.
 	P.rect(im, wall_x - 2, 0, 2, h, c.seam)
 	P.rect(im, wall_x - 4, 0, 2, h, tone(c, 3.8))
-	var ledge_y := int(L.ROOF_Y) + 62
-	P.rect(im, wall_x, ledge_y, 74, 3, tone(c, 3.6))
-	P.rect(im, wall_x, ledge_y + 3, 74, 6, tone(c, 1.8))
-	P.rect(im, wall_x, ledge_y + 9, 70, 2, c.deep)
 	_stains(im, c, rng, ["streaks"])
 	_lichen(im, c, rng, ["lichen"], h)
 	# Stains and lichen only belong on rock.
@@ -574,6 +632,8 @@ static func paint_roof(state: ClimbState, rock_key: String, pal: Dictionary, see
 		for x in w:
 			if mask[y * w + x] == 0:
 				im.set_pixel(x, y, Color(0, 0, 0, 0))
+	var ledge_y := int(L.ROOF_Y) + 62
+	_ledge(im, c, rng, ledge_y, wall_x + 74, false, "crack")
 	# The crack along the ceiling: a dark slit with a lit lip below.
 	var x0 := int(L.roof_px(top, 0, 2).x)
 	var x1 := int(L.roof_px(top, top - 1, 2).x)
@@ -584,7 +644,7 @@ static func paint_roof(state: ClimbState, rock_key: String, pal: Dictionary, see
 		P.px(im, x, yy, c.deep)
 		P.px(im, x, yy + 1, tone(c, 3.7))
 		P.px(im, x, yy + 2, c.seam if x % 3 == 0 else tone(c, 1.5))
-	# Holds along it, and hanging stains.
+	# Holds along it, and chalk where the crux is.
 	for r in range(1, top):
 		for col: int in state.holds.get(r, {}):
 			var p := Vector2i(L.roof_px(top, r, col))
@@ -594,7 +654,7 @@ static func paint_roof(state: ClimbState, rock_key: String, pal: Dictionary, see
 			if hold.get("crux", false):
 				for i in 5:
 					P.px(im, p.x + rng.randi_range(-4, 4), p.y + rng.randi_range(2, 8), c.chalk)
-	return {"image": im, "lip_x": lip_x, "ledge_y": ledge_y, "wall_x": wall_x, "shelf_top": shelf_top}
+	return {"image": im, "lip_x": lip_x, "ledge_y": ledge_y + 1, "wall_x": wall_x, "shelf_top": shelf_top}
 
 
 # ---------------------------------------------------------------- holds
@@ -630,32 +690,56 @@ static func _paint_holds(im: Image, c: Dictionary, rng: RandomNumberGenerator, s
 						break
 
 
+## A crack running from [param a] to [param b]: meandering, a dark core, a lit
+## lip on the left and a shaded one on the right, pinching at the ends.
 static func _crack_line(im: Image, c: Dictionary, a: Vector2, b: Vector2) -> void:
 	var steps := int(a.distance_to(b)) + 1
 	for k in steps:
-		var p := a.lerp(b, float(k) / steps)
-		var x := int(p.x)
+		var t := float(k) / steps
+		var p := a.lerp(b, t)
+		var x := int(p.x + sin(p.y * 0.21) * 1.0)
 		var y := int(p.y)
-		P.px(im, x, y, c.deep)
-		P.px(im, x - 1, y, tone(c, 3.6))
-		P.px(im, x + 1, y, c.seam)
+		var wide := 1 + int(sin(t * PI) * 1.2)
+		P.px(im, x - 1, y, tone(c, 3.8))
+		P.rect(im, x, y, wide, 1, c.deep)
+		P.px(im, x + wide, y, c.seam)
+		P.px(im, x + wide + 1, y, tone(c, 1.9))
 
 
+## A belay ledge: a rough shelf with a lit, uneven top, a chipped front, a dark
+## underside, rubble and a tuft or two. At the top it carries the anchor.
 static func _ledge(im: Image, c: Dictionary, rng: RandomNumberGenerator, y: int, e: int, is_top: bool, style: String) -> void:
-	var top_col := tone(c, 3.4)
-	var face := tone(c, 1.8)
+	var top_col := tone(c, 3.6)
+	var face := tone(c, 2.1)
+	var low := tone(c, 1.3)
 	if style == "snow" or style == "ice":
-		top_col = tone(c, 4.4)
-		face = tone(c, 3.0)
-	# A shelf: lit top, thick front, dark underside and a shadow below.
-	P.rect(im, 0, y, e, 2, top_col)
-	P.rect(im, 0, y + 2, e, 4, face)
-	P.rect(im, 0, y + 2, e, 1, tone(c, 3.0))
-	P.rect(im, 0, y + 6, e - 3, 2, c.deep)
-	P.rect(im, 0, y + 8, e - 5, 2, Color(0, 0, 0, 0.18))
-	for i in 7:
-		var x := rng.randi_range(2, maxi(e - 8, 4))
-		P.rect(im, x, y + 2 + rng.randi_range(0, 3), 1, 1, c.seam)
+		top_col = tone(c, 4.5)
+		face = tone(c, 3.2)
+		low = tone(c, 2.2)
+	for x in range(0, e):
+		var jy := int(P.smooth_noise(x * 0.09, 1.0, 6) * 3.0)
+		var thick := 5 + int(P.smooth_noise(x * 0.06, 4.0, 7) * 4.0)
+		P.px(im, x, y + jy - 1, c.seam)
+		P.px(im, x, y + jy, top_col)
+		P.px(im, x, y + jy + 1, top_col.darkened(0.08))
+		P.rect(im, x, y + jy + 2, 1, thick - 2, face)
+		P.px(im, x, y + jy + 2, tone(c, 3.0))
+		P.px(im, x, y + jy + thick, low)
+		P.px(im, x, y + jy + thick + 1, c.deep)
+		P.px(im, x, y + jy + thick + 2, Color(0, 0, 0, 0.3))
+		if P.noise(x, 3, 9) < 0.06:
+			P.px(im, x, y + jy + 3, c.seam)
+	for i in 5:
+		var x := rng.randi_range(4, maxi(e - 10, 6))
+		P.rect(im, x, y - 2, rng.randi_range(2, 3), 2, tone(c, 2.6))
+		P.px(im, x, y - 2, tone(c, 3.6))
+	if is_top:
+		# Anchor bolts with a shiny chain.
+		for i in 2:
+			var bx := int(L.GRID_X + 1.6 * L.COL_W) + i * 26
+			P.rect(im, bx, y - 3, 3, 3, Color("c8ccd4"))
+			P.px(im, bx, y - 3, Color("f4f6fa"))
+			P.px(im, bx + 1, y - 1, Color("505868"))
 
 
 static func _hold(im: Image, c: Dictionary, rng: RandomNumberGenerator, p: Vector2i, hold: Dictionary, base: int, style: String) -> void:
@@ -673,11 +757,7 @@ static func _hold(im: Image, c: Dictionary, rng: RandomNumberGenerator, p: Vecto
 			P.px(im, p.x + 2, p.y + 1, tone(c, 4.8))
 		return
 	if hold.crack:
-		# A seam splitting the face: dark inside, a lit lip on the left.
-		P.rect(im, p.x + 3, p.y - 11, 3, 22, c.seam)
-		P.rect(im, p.x + 4, p.y - 10, 1, 20, c.deep)
-		P.rect(im, p.x + 2, p.y - 11, 1, 22, tone(c, 3.8))
-		P.rect(im, p.x + 6, p.y - 10, 1, 20, tone(c, 2.0))
+		_crack_line(im, c, Vector2(p.x + 3, p.y - 12), Vector2(p.x + 3, p.y + 12))
 	var chalk: Color = c.chalk
 	match style:
 		"knobs":
