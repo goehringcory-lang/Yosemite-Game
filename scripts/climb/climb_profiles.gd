@@ -277,7 +277,7 @@ const PROFILES := {
 		],
 	},
 	"the_nose": {
-		"food": 360,
+		"food": 300,
 		"place": "The Nose of El Capitan",
 		"rock": "elcap",
 		"ground": "el_cap_meadow",

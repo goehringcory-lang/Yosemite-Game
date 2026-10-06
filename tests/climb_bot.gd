@@ -51,7 +51,7 @@ func _eat(state: ClimbState) -> void:
 			var meals := 0
 			for id in foods:
 				if FoodDB.energy(id) >= ClimbState.BIVY_MEAL_ENERGY:
-					meals += 1
+					meals += Inventory.count(id)
 			if meals <= state.route.nights - state.nights_spent:
 				break
 		state.eat(pick)
