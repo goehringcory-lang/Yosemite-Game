@@ -96,6 +96,10 @@ Talking to a visitor gets one random line.
 | The black oaks | yosemite_valley | Tabuce |
 | Camp Curry | curry_village · `registration_porch`, `apron_trailhead` | Jennie Curry, Jules Eichorn and Bestor Robinson (at the foot of the Apron trail), a camper, the Pavilion cook, a ranger-naturalist, a tourist; a shopper in the store and a climber in the Mountain Shop |
 | El Capitan Meadow | yosemite_valley · `el_capitan_meadow` | Harding, Johnson; The Nose |
+| Manure Pile Buttress | yosemite_valley, west of Camp 4 on the north side | Nutcracker |
+| Sentinel Rock | yosemite_valley, up from the Four Mile trailhead | Steck-Salathé |
+| Washington Column | yosemite_valley, east of the Royal Arches | Astroman |
+| The west end | yosemite_valley, near Valley View | Separate Reality |
 | Happy Isles | yosemite_valley · `happy_isles` | Anderson; Snake Dike |
 | The Ahwahnee / Royal Arches | yosemite_valley · `the_ahwahnee` | Maria Lebrado; Royal Arches |
 | The Ahwahnee grounds (walk north from the homestead: `ahwahnee_trail`, then `the_ahwahnee`) | the_ahwahnee · `front_door`, `rose_garden`, `tea_lawn`, `cascade`, `ahwahnee_meadow` | Royal Robbins and the Royal Arches start behind the hotel. The hotel's doors are still a sign, with no inside. |
@@ -115,6 +119,8 @@ Yosemite Village is the hand-made hub you arrive at when you drive to the Valley
 
 The main storyline is one chain of quests (marked ★ in the Journal). Each one ends on a **tick**: a route topped out and logged in the climbing guidebook. The giver hands over the reward when you report back, so no main quest finishes without a climb. The only exceptions are the first (fetching the guidebook) and the last (the ending).
 
+The main-line climbs climb the **Yosemite Decimal System** one grade at a time, from 5.5 on Firefall Slab to 5.13 on the Nose, climbed free. Marty explains the scale when he sells you the guidebook, Dick Leonard explains the Sierra Club's classes, and Robbins tells how the decimals were worked out at Tahquitz. The tick report and the journal show your hardest grade so far (`Guidebook.yds()` turns a grade into a number). `tests/cast_test.tscn` checks the ladder: one main-line climb per grade, each harder than the last.
+
 Gear arrives in the order the routes need it, and a quest can hand over gear as each of its steps is finished (a step's `gear` key). `tests/cast_test.tscn` plays the chain and checks every climb's gear is in hand when it comes up.
 
 ```
@@ -123,21 +129,26 @@ Gear arrives in the order the routes need it, and a quest can hand over gear as 
                               Without it no route will start: you have no tick list to log it in.
 ★ 1b Fitted Out ............ Marty Kessler .................... lost rental shoes + 40 energy of food → climbing shoes,
                               chalk bag, harness, 5 quickdraws. Marty points you to Wren.
-★ 1c Looking for a Partner . Wren Alvarez, foot of the Apron .. food, then TICK Firefall Slab (Wren belays, brings the rope)
-★ 2  Rock Climbing Section  Leonard, Swan Slab ................ food, then TICK Swan Slab → rope, 2 cams
-★ 3  Up the Apron .......... Eichorn, at Curry Village ........ TICK Glacier Point Apron → 2 cams, 2 quickdraws (and opens Glacier Point)
-★ 4  The Cathedral Spires .. Eichorn; Robinson's story first .. TICK Higher Cathedral Spire → 2 quickdraws
-★ 5  Clean Climbing ........ Robbins, at the Ahwahnee ......... TICK Royal Arches → belay device, 2 cams, 2 quickdraws
-★ 6  Hard Steel ............ Salathé, Camp 4 ................. Model A axle from El Portal, then TICK Snake Dike → 2 cams
-★ 7  The Nose .............. Harding, El Capitan Meadow ....... acorn cakes → aiders; food → haul bag;
-                              then Beverly Johnson → ascenders + portaledge; then TICK The Nose → the road to Tuolumne
-★ 8  Cathedral Peak ........ Muir, Tuolumne ................... TICK Cathedral Peak → ice axe, crampons
-★ 9  Living Ice ............ Muir ............................ TICK Lyell Glacier
-★ 10 The Last Page ......... Clark: after Lucy Telles's and Maria Lebrado's stories → you write the last page
+                                                                  grade
+★ 1c Looking for a Partner . Wren Alvarez, foot of the Apron .. 5.5   food, then TICK Firefall Slab (Wren belays, brings the rope)
+★ 2  Rock Climbing Section  Leonard, Swan Slab ................ 5.6   food, then TICK Swan Slab (top rope) → rope, 2 cams
+★ 3  Up the Apron .......... Eichorn, at Curry Village ........ 5.7   TICK Glacier Point Apron (the Grack) → 2 cams, 2 quickdraws (opens Glacier Point)
+★ 4  Clean Climbing ........ Robbins, at the Ahwahnee ......... 5.8   TICK Nutcracker, leaving no trace → belay device, 2 cams, 2 quickdraws
+★ 5  The Cathedral Spires .. Eichorn; Robinson's story first .. 5.9   TICK Higher Cathedral Spire → 2 quickdraws
+★ 6  Hard Steel ............ Salathé, Camp 4 ................. 5.10b Model A axle from El Portal, then TICK Steck-Salathé (Sentinel Rock) → 2 cams
+★ 7  The East Face ......... Beverly Johnson, El Cap Meadow ... 5.11c food, then TICK Astroman (Washington Column) → 2 ascenders, portaledge
+★ 8  Separate Reality ...... Robbins .......................... 5.12a TICK Separate Reality (the west-end roof crack) → 2 cams
+★ 9  The Nose .............. Harding, El Capitan Meadow ....... 5.13  acorn cakes → aiders; food → haul bag; 30 acorns stored;
+                              (free)  then TICK The Nose, free → the road to Tuolumne
+★ 10 Cathedral Peak ........ Muir, Tuolumne ................... 5.6   TICK Cathedral Peak → ice axe, crampons
+★ 11 Living Ice ............ Muir ............................ ice   TICK Lyell Glacier
+★ 12 The Last Page ......... Clark: after Lucy Telles's and Maria Lebrado's stories → you write the last page
                               (pick one of four entries, or leave it blank; it's saved and shown in the journal)
 ```
 
-Geography is part of the progression. You leave the Lamon Homestead: south to Curry Village (guidebook, then the Apron behind it), north to the Ahwahnee (Royal Arches), then out across the Valley (Camp 4, Happy Isles, El Capitan Meadow) and finally up the Tioga Road.
+After the Nose the scale stops mattering: the high country is alpine climbing, where the hard part is altitude, weather, and ice, not the grade. Cathedral Peak is only 5.6.
+
+Geography is part of the progression. You leave the Lamon Homestead: south to Curry Village (guidebook, then the Apron behind it), north to the Ahwahnee (Robbins), then out across the Valley (Nutcracker across from El Cap, the Spire near Bridalveil, Sentinel Rock above the Four Mile Trail, Washington Column past the Royal Arches, the roof crack at the west end, El Capitan Meadow) and finally up the Tioga Road.
 
 ### Side stories
 
@@ -159,9 +170,10 @@ After the Apron:
   McCauley: The Fall of Fire ...... ask Curry about the Firefall → 2 bread, Register entry
   Enid Michael: Leave Some Behind . 2 yerba buena → elderberry sauce, toasted toyon, manzanita cider recipes
   Hodges: Mounted Patrol .......... check on Anderson and Michael → 2 quickdraws
-After Royal Arches:
+After Nutcracker (the classics off the ladder):
+  Bestor Robinson: The Long Way Up  food, climb the Royal Arches (5.7 A0, 16 pitches), tell him → cheese, dried apples
+  Anderson: The Top of the Dome ... climb Snake Dike (5.7 R), tell him about the summit → pilot bread
   Robbins: Old Iron ............... show him Anderson's eyebolt, ask Harding about bolts, report back → wall food
-  Anderson: The Top of the Dome ... climb Snake Dike, tell him about the summit → pilot bread
 After the Nose (Tuolumne open):
   Beverly Johnson: Ten Days Alone . 4 pine nuts from the high country, pack 60 energy → apricots, chocolate
   Ansel Adams: High Country Light . ask Muir, climb to the Lyell Glacier, report back → trail mix, cheese
@@ -175,13 +187,16 @@ Other:
 
 | Route | Needs | Comes from |
 |---|---|---|
-| Firefall Slab | climbing shoes, chalk bag, harness, 5 quickdraws (Wren brings the rope) | Marty Kessler (Mountain Shop) |
-| Swan Slab | nothing (top rope) | start |
-| Glacier Point Apron | rope, harness, 2 cams | + Leonard |
-| Higher Cathedral Spire | rope, harness, 4 cams, 2 quickdraws | + Eichorn (Apron) |
-| Royal Arches | + 4 cams, 4 quickdraws | + Eichorn (Spires) |
-| Snake Dike | 2 cams, 6 quickdraws, belay device | + Robbins |
-| The Nose | 8 cams, 6 quickdraws, 2 aiders, 2 ascenders, haul bag, portaledge | + Salathé, Harding, Johnson |
+| Firefall Slab (5.5) | climbing shoes, chalk bag, harness, 5 quickdraws (Wren brings the rope) | Marty Kessler (Mountain Shop) |
+| Swan Slab (5.6) | nothing (top rope) | start |
+| Glacier Point Apron (5.7) | rope, harness, 2 cams | + Leonard |
+| Nutcracker (5.8) | rope, harness, 4 cams, 2 quickdraws | + Eichorn (Apron) |
+| Higher Cathedral Spire (5.9) | rope, harness, 6 cams, 4 quickdraws, belay device | + Robbins (Nutcracker) |
+| Steck-Salathé (5.10b) | rope, harness, 6 cams, 6 quickdraws, belay device | + Eichorn (Spires) |
+| Astroman (5.11c) | rope, harness, 8 cams, 6 quickdraws, belay device | + Salathé |
+| Separate Reality (5.12a) | rope, harness, chalk bag, 6 cams, 2 quickdraws | (already have) |
+| The Nose (5.13) | 10 cams, 6 quickdraws, 2 aiders, 2 ascenders, haul bag, portaledge | + Johnson (Astroman), Robbins (Separate Reality), Harding |
+| Royal Arches, Snake Dike (side) | 4 cams + 4 quickdraws; 2 cams + 6 quickdraws + belay device | (after Nutcracker) |
 | Cathedral Peak | 4 cams, 4 quickdraws | (already have) |
 | Lyell Glacier | + ice axe, crampons | + Muir |
 

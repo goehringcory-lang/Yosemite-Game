@@ -128,6 +128,9 @@ func _guidebook() -> void:
 		_line("You don't have one yet. The Mountain Shop in Curry Village sells them.", DIM)
 		return
 	_heading("Guidebook: tick list (%d of %d)" % [Guidebook.ticked_count(), Guidebook.routes().size()])
+	var hardest := Guidebook.hardest_tick()
+	_line("Hardest grade: %s (%s). The Nose, climbed free, is 5.13." % [Guidebook.yds_label(hardest.grade), hardest.display_name] if hardest
+		else "Grades run from 5.5 (a ladder with good holds) to 5.13 (the Nose, climbed free).", DIM)
 	var chapter := ""
 	for entry in Guidebook.entries():
 		var route: RouteData = entry.route

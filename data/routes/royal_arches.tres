@@ -14,5 +14,5 @@ pitches = Array[int]([2, 2, 3, 2, 3, 3])
 moves_per_pitch = 8
 nights = 0
 guide_chapter = "The Ahwahnee"
-guide_order = 40
-guide_tip = "Start behind the hotel. Save energy for the friction traverse at the top."
+guide_order = 32
+guide_tip = "A Valley classic, off the main tick list. Start behind the hotel and save energy for the friction traverse at the top."

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "johnson_astroman"
+title = "The East Face"
+main_line = true
+giver = "beverly_johnson"
+requires = PackedStringArray("salathe_steel")
+intro = PackedStringArray("Salathé sent you? Then you've done 5.10. Welcome to the part of the scale where your hands start bleeding.", "Warren nailed his way up the east face of Washington Column in 1959, with hammers and pitons. A couple of years ago some kids climbed it free and called it Astroman. Eleven pitches of 5.11, steep all the way, and a squeeze chimney they named after Warren, because of course they did.", "Pack food and water for a long day. Then go and climb it. If you can do Astroman, you can live on a big wall.")
+steps = [{"type": "have_food", "energy": 50, "objective": "Pack food worth 50 energy for a long day on Washington Column", "reminder": "Food for a long day. You won't want to stop once you're on it.", "done": ["Good. Tape your hands. You'll thank me."]}, {"type": "climbed", "route": "astroman", "objective": "Tick Astroman, 5.11c (Washington Column, past the Royal Arches)", "reminder": "Washington Column's up the canyon past the Ahwahnee. The Harding Slot is near the top. Breathe out and wriggle.", "done": ["You got through the Harding Slot? Warren will be insufferable when he hears."]}]
+outro = PackedStringArray("You're ready for the big walls. Here's my wall kit: ascenders for jumaring the fixed lines, and a portaledge to sleep on. Count everything twice.", "One more step before El Cap. Royal Robbins has been talking about a roof crack out at the west end. Go and ask him.")
+reward_gear = {"ascenders": 2, "portaledge": 1}

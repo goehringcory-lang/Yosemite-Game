@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "astroman"
+display_name = "Astroman"
+grade = "5.11c, 11 pitches"
+description = "The steep east face of Washington Column, up the canyon from the Ahwahnee. Warren Harding nailed his way up it in 1959. Climbed free in 1975, it became the hardest long free climb in the Valley: thin hands, a squeeze chimney called the Harding Slot, and no rest from bottom to top."
+first_ascent = "East Face: Warren Harding, Glen Denny, and Chuck Pratt, 1959 (aid). First free ascent, as Astroman, 1975"
+required_gear = {"rope": 1, "harness": 1, "cam": 8, "quickdraw": 6, "belay_device": 1}
+guide_chapter = "The Ahwahnee"
+guide_order = 40
+guide_tip = "Washington Column, past the Royal Arches. Tape your hands, and don't stop in the Harding Slot."
+pitches = Array[int]([3, 4, 4, 4, 3, 4, 4])
+moves_per_pitch = 9
+height_ft = 1000

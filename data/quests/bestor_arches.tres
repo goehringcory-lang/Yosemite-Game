@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "bestor_arches"
+title = "The Long Way Up"
+giver = "bestor_robinson"
+requires = PackedStringArray("robbins_clean")
+intro = PackedStringArray("You climbed Nutcracker clean? Then you can do the Royal Arches the way they ought to be done.", "Some of our Section friends, Morgan Harris, Ken Adam, and Hervey Voge, worked out the Arches in 1936. Sixteen pitches, wandering up the arches behind the hotel to the north rim. It's only 5.7 with a little aid, but it is long, and the friction traverse at the top has made strong people cry.", "It's not a step up the scale. It's a step out. Go and have a long day on easy rock, and then tell me about it. I'll write it in my notebook.")
+steps = [{"type": "have_food", "energy": 40, "objective": "Pack food worth 40 energy for sixteen pitches", "reminder": "Sixteen pitches. Bring lunch, and a second lunch.", "done": ["Good. Now don't hurry. The Arches reward patience."]}, {"type": "climbed", "route": "royal_arches", "objective": "Climb the Royal Arches, 5.7 A0 (behind the Ahwahnee)", "reminder": "The Arches start behind the Ahwahnee. Save something for the friction traverse.", "done": []}, {"type": "return", "objective": "Tell Bestor Robinson about the Royal Arches", "reminder": "I'm here by the Apron trail with my notebook. Come and tell me all of it.", "done": ["The pendulum, the long chimney, the traverse. Yes, yes, yes. That's going in the notebook word for word.", "Hard climbing is grand. But most of the climbing anyone does is days like that one: long, easy, and beautiful."]}]
+outro = PackedStringArray("Here's my emergency ration. Jules ate half of it on the Spire in '34, so consider it a debt repaid.")
+reward_items = {"cheddar_wedge": 2, "dried_apples": 2}

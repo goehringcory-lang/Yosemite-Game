@@ -17,6 +17,10 @@
 
 [ext_resource type="Resource" path="res://data/routes/higher_cathedral_spire.tres" id="spire_r"]
 [ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="door_r"]
+[ext_resource type="Resource" path="res://data/routes/nutcracker.tres" id="nut_r"]
+[ext_resource type="Resource" path="res://data/routes/steck_salathe.tres" id="steck_r"]
+[ext_resource type="Resource" path="res://data/routes/astroman.tres" id="astro_r"]
+[ext_resource type="Resource" path="res://data/routes/separate_reality.tres" id="sepr_r"]
 
 [node name="YosemiteValleyStory" type="Node2D"]
 
@@ -88,3 +92,19 @@ target_spawn = "west_road"
 [node name="HigherCathedralSpire" parent="." instance=ExtResource("3_r")]
 position = Vector2(1780, 1530)
 route = ExtResource("spire_r")
+
+[node name="Nutcracker" parent="." instance=ExtResource("3_r")]
+position = Vector2(2232, 856)
+route = ExtResource("nut_r")
+
+[node name="SteckSalathe" parent="." instance=ExtResource("3_r")]
+position = Vector2(2560, 1144)
+route = ExtResource("steck_r")
+
+[node name="Astroman" parent="." instance=ExtResource("3_r")]
+position = Vector2(3568, 616)
+route = ExtResource("astro_r")
+
+[node name="SeparateReality" parent="." instance=ExtResource("3_r")]
+position = Vector2(672, 1744)
+route = ExtResource("sepr_r")

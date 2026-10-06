@@ -9,6 +9,9 @@ extends Node
 const CONTENT_DIR := "res://scenes/story/content/"
 const ROUTE_DIR := "res://data/routes/"
 const VISITOR_DIR := "res://data/characters/visitors/"
+## The main storyline in order, from Clark's errand to the ending.
+const MAIN_ORDER := ["clark_register", "shop_guidebook", "shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron", "robbins_clean",
+	"eichorn_spires", "salathe_steel", "johnson_astroman", "robbins_roof", "harding_summit", "muir_cathedral", "muir_glacier", "clark_last_page"]
 const NATIVE_IDS := ["tenaya", "maggie_howard", "lucy_telles", "maria_lebrado", "carrie_bethel"]
 
 var failures := 0
@@ -237,8 +240,9 @@ func _check_main_line() -> void:
 			continue # the errands for the guidebook and the first kit, and the ending
 		check(quest.steps.back().type == "climbed", "%s finishes on a tick in the guidebook" % quest.id)
 	for route in Guidebook.routes():
-		check(Guidebook.main_quest_for(route.id) != null or route.id == "swan_slab" or route.id == "glacier_point_apron",
-			"%s is on the main line" % route.id)
+		var side_climb := QuestLog.QUESTS.any(func(q: QuestData) -> bool:
+			return not q.main_line and q.steps.any(func(st): return st.get("route") == route.id))
+		check(Guidebook.main_quest_for(route.id) != null or side_climb, "%s is on the main line or a side story" % route.id)
 		check(route.guide_chapter != "" and route.guide_tip != "", "%s has a guidebook chapter and tip" % route.id)
 	var first := QuestLog.get_quest("clark_register")
 	check(first.giver == "galen_clark" and first.steps[0].target == "mountain_shop",
@@ -247,11 +251,33 @@ func _check_main_line() -> void:
 	check(book.giver == "mountain_shop" and book.steps.any(func(st): return st.get("unlock") == "guidebook" and st.type == "pay"),
 		"the guidebook is traded for at the Mountain Shop")
 	# The chain runs in one line from the guidebook to the glacier.
-	var order := ["clark_register", "shop_guidebook", "shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron", "eichorn_spires", "robbins_clean",
-		"salathe_steel", "harding_summit", "muir_cathedral", "muir_glacier"]
+	var order := MAIN_ORDER.slice(0, MAIN_ORDER.size() - 1)
 	for i in range(1, order.size()):
 		var quest := QuestLog.get_quest(order[i])
-		check(quest != null and quest.main_line and not quest.requires.is_empty(), "%s follows %s" % [order[i], order[i - 1]])
+		check(quest != null and quest.main_line and order[i - 1] in quest.requires, "%s follows %s" % [order[i], order[i - 1]])
+	_check_grade_ladder()
+
+
+## The main line climbs the Yosemite Decimal System one grade at a time,
+## from 5.5 on Firefall Slab to 5.13 on the Nose.
+func _check_grade_ladder() -> void:
+	var grades: Array[float] = []
+	var routes: Array[String] = []
+	for id in MAIN_ORDER:
+		var quest := QuestLog.get_quest(id)
+		for st: Dictionary in quest.steps:
+			if st.type == "climbed":
+				var route: RouteData = load(ROUTE_DIR + st.route + ".tres")
+				if route.id == "the_nose" or grades.is_empty() or grades.back() < 13.0:
+					grades.append(Guidebook.yds(route.grade))
+					routes.append(route.id)
+	check(routes.front() == "firefall_slab" and is_equal_approx(grades.front(), 5.0), "the ladder starts at 5.5 on Firefall Slab (%s)" % [grades])
+	check(routes.back() == "the_nose" and floori(grades.back()) == 13, "the ladder tops out at 5.13 on the Nose")
+	var whole := grades.map(func(g: float) -> int: return floori(g))
+	check(whole == [5, 6, 7, 8, 9, 10, 11, 12, 13], "one main-line climb per grade from 5.5 to 5.13 %s" % [routes])
+	for i in range(1, grades.size()):
+		check(grades[i] > grades[i - 1], "%s is harder than %s" % [routes[i], routes[i - 1]])
+	check(Guidebook.yds("5.10b") > Guidebook.yds("5.9") and Guidebook.yds("5.13+") > Guidebook.yds("5.13a"), "decimal grades sort as numbers, not text")
 
 
 func _shop_targets() -> Dictionary:
@@ -343,11 +369,31 @@ func _play_the_nose() -> void:
 	Gear.start_new_game()
 	Gear.add("rope")
 	Gear.add("harness")
+	Gear.add("chalk_bag")
+	Gear.add("belay_device")
 	Gear.add("cam", 8)
 	Gear.add("quickdraw", 6)
-	QuestLog.completed.append_array(["salathe_steel", "tabuce_chuckah"])
+	QuestLog.completed.append_array(MAIN_ORDER.slice(0, MAIN_ORDER.find("johnson_astroman")))
+	QuestLog.completed.append("tabuce_chuckah")
 	var nose: RouteData = load("res://data/routes/the_nose.tres")
 	check(not Park.is_hub_unlocked("tuolumne_meadows"), "Tuolumne starts locked")
+	# 5.11: Beverly Johnson and Astroman.
+	check(QuestLog.talk_to("warren_harding").size() > 0 and not QuestLog.active.has("harding_summit"), "Harding won't take you up the Nose before 5.12")
+	QuestLog.talk_to("beverly_johnson")
+	check(QuestLog.active.has("johnson_astroman"), "Beverly Johnson sets Astroman, 5.11")
+	Inventory.add("degnan_loaf", 2)
+	QuestLog.talk_to("beverly_johnson")
+	QuestLog.record_climb("astroman")
+	QuestLog.talk_to("beverly_johnson")
+	check(QuestLog.is_completed("johnson_astroman") and Gear.count("ascenders") == 2 and Gear.count("portaledge") == 1,
+		"Astroman earns Beverly Johnson's wall kit")
+	# 5.12: Robbins and Separate Reality.
+	QuestLog.talk_to("royal_robbins")
+	check(QuestLog.active.has("robbins_roof"), "Royal Robbins sets Separate Reality, 5.12")
+	QuestLog.record_climb("separate_reality")
+	QuestLog.talk_to("royal_robbins")
+	check(QuestLog.is_completed("robbins_roof") and Gear.count("cam") == 10, "the roof crack earns the last two cams")
+	# 5.13: the Nose.
 	QuestLog.talk_to("warren_harding")
 	check(QuestLog.active.has("harding_summit"), "Harding starts The Nose")
 	check(not Gear.has_all(nose.required_gear), "the Nose needs the big-wall kit")
@@ -358,25 +404,23 @@ func _play_the_nose() -> void:
 	Granary.acorns = 30
 	QuestLog.talk_to("warren_harding")
 	check(Gear.count("haul_bag") == 1, "enough food earns the haul bag")
-	check(QuestLog.current_step(QuestLog.get_quest("harding_summit")).type == "talk", "then Beverly Johnson is next")
-	QuestLog.talk_to("beverly_johnson")
-	check(Gear.count("ascenders") == 2 and Gear.count("portaledge") == 1, "Beverly Johnson hands over the ascenders and portaledge")
 	check(Gear.has_all(nose.required_gear), "the rack is complete for the Nose")
 	check(not QuestLog.is_completed("harding_summit") and QuestLog.current_step(QuestLog.get_quest("harding_summit")).type == "climbed",
 		"only the climb is left")
 	QuestLog.talk_to("warren_harding")
 	check(not Park.is_hub_unlocked("tuolumne_meadows"), "talking isn't enough to open Tuolumne")
 	QuestLog.record_climb("the_nose")
+	check("hardest grade yet" in QuestLog.tick_report("the_nose")[0].text, "the tick report calls the Nose your hardest grade")
 	var lines := QuestLog.talk_to("warren_harding")
 	check(QuestLog.is_completed("harding_summit") and Park.is_hub_unlocked("tuolumne_meadows"), "climbing the Nose opens Tuolumne Meadows")
 	check(lines.back().text.contains("Tuolumne"), "the reward line names the new area (%s)" % lines.back().text)
+	check(Guidebook.hardest_tick().id == "the_nose", "the Nose is the hardest tick")
 
 
 ## Every main-line quest tells you who to see next, so the story never
 ## stalls with nobody to talk to.
 func _check_hand_offs() -> void:
-	var order := ["clark_register", "shop_guidebook", "shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron", "eichorn_spires",
-		"robbins_clean", "salathe_steel", "harding_summit", "muir_cathedral", "muir_glacier", "clark_last_page"]
+	var order := MAIN_ORDER
 	for i in range(order.size() - 1):
 		var quest := QuestLog.get_quest(order[i])
 		var next := QuestLog.get_quest(order[i + 1])
@@ -415,7 +459,7 @@ func _play_side_stories() -> void:
 	QuestLog.talk_to("wren_alvarez")
 	check(QuestLog.is_completed("wren_apron") and Inventory.count("chocolate_bar") == 2, "Wren shares the shop's snacks")
 
-	QuestLog.completed.append_array(["eichorn_apron", "eichorn_spires", "robbins_clean"])
+	QuestLog.completed.append_array(["eichorn_apron", "robbins_clean"])
 	Inventory.items.clear()
 	check(QuestLog.available_from("royal_robbins") == null, "Robbins has nothing to say about iron until you have some")
 	QuestLog.completed.append("anderson_half_dome")
@@ -429,8 +473,7 @@ func _play_side_stories() -> void:
 
 	# The journal names the side story that's holding up the main line.
 	QuestLog.start_new_game()
-	QuestLog.completed.append_array(["clark_register", "shop_guidebook", "shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron",
-		"eichorn_spires", "robbins_clean", "salathe_steel"])
+	QuestLog.completed.append_array(MAIN_ORDER.slice(0, MAIN_ORDER.find("harding_summit")))
 	var hint: String = QuestLog.main_objective().objective
 	check("Tabuce" in hint and not "last page" in hint, "before the Nose, the journal sends you to Tabuce (%s)" % hint)
 
@@ -438,8 +481,8 @@ func _play_side_stories() -> void:
 ## Clark's last page: the player writes their own entry, and it's saved.
 func _play_last_page() -> void:
 	QuestLog.start_new_game()
-	QuestLog.completed.append_array(["clark_register", "shop_guidebook", "shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron",
-		"eichorn_spires", "robbins_clean", "salathe_steel", "harding_summit", "muir_cathedral", "lebrado_villages", "muir_glacier", "lucy_basket"])
+	QuestLog.completed.append_array(MAIN_ORDER.slice(0, MAIN_ORDER.find("clark_last_page")))
+	QuestLog.completed.append_array(["lebrado_villages", "lucy_basket"])
 	check(QuestLog.main_objective().objective.contains("Galen Clark"), "the journal sends you back to Clark at the end")
 	QuestLog.talk_to("galen_clark")
 	QuestLog.talk_to("maggie_howard")

@@ -6,11 +6,11 @@
 script = ExtResource("1_route")
 id = "swan_slab"
 display_name = "Swan Slab"
-grade = "easy"
+grade = "5.6, top rope"
 description = "A low-angle slab a short walk from Camp 4, where generations of climbers have learned the basics."
 pitches = Array[int]([1])
 moves_per_pitch = 7
 top_rope = true
 guide_chapter = "Valley floor"
-guide_order = 10
-guide_tip = "Top rope, nothing to carry. Dick Leonard runs the practice day."
+guide_order = 15
+guide_tip = "Top rope up the Swan Slab Gully, nothing to carry. Dick Leonard runs the practice day."

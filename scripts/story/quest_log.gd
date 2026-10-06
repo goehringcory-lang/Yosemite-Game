@@ -36,6 +36,8 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/robbins_clean.tres"),
 	preload("res://data/quests/lucy_basket.tres"),
 	preload("res://data/quests/salathe_steel.tres"),
+	preload("res://data/quests/johnson_astroman.tres"),
+	preload("res://data/quests/robbins_roof.tres"),
 	preload("res://data/quests/harding_summit.tres"),
 	preload("res://data/quests/muir_cathedral.tres"),
 	preload("res://data/quests/bethel_trade.tres"),
@@ -46,6 +48,7 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/lamon_winter.tres"),
 	preload("res://data/quests/robbins_eyebolt.tres"),
 	preload("res://data/quests/anderson_summit.tres"),
+	preload("res://data/quests/bestor_arches.tres"),
 	preload("res://data/quests/johnson_solo.tres"),
 	preload("res://data/quests/ansel_high_country.tres"),
 	preload("res://data/quests/clark_last_page.tres"),
@@ -170,8 +173,15 @@ func tick_report(route_id: String) -> Array[Dictionary]:
 	for route in Guidebook.routes():
 		if route.id == route_id:
 			route_name = route.display_name
-	lines.append({"speaker": "", "text": "Ticked! %s goes in your tick list (%d of %d routes in the guidebook)." % [
-		route_name, Guidebook.ticked_count(), Guidebook.routes().size()]})
+	var grade := ""
+	var hardest := Guidebook.hardest_tick()
+	for route in Guidebook.routes():
+		if route.id == route_id:
+			grade = " (%s)" % route.grade
+			if hardest == route and Guidebook.yds(route.grade) > 0.0:
+				grade += ", your hardest grade yet"
+	lines.append({"speaker": "", "text": "Ticked! %s%s goes in your tick list (%d of %d routes in the guidebook)." % [
+		route_name, grade, Guidebook.ticked_count(), Guidebook.routes().size()]})
 	for quest: QuestData in QUESTS:
 		var step := current_step(quest)
 		if step.get("type") == "climbed" and step.route == route_id and quest.steps.back() == step:
@@ -310,10 +320,14 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 			_add_lines(lines, speaker, step.get("done", []))
 			_advance(quest, lines)
 
-	# This person's own quest, in progress.
+	# This person's own quests, in progress. Someone can carry a side story
+	# and a main-line quest at the same time.
+	var had_own := false
+	var finished_now := false
 	for quest: QuestData in QUESTS:
 		if quest.giver != character_id or not active.has(quest.id):
 			continue
+		had_own = true
 		var progressed := false
 		while active.has(quest.id):
 			var step := current_step(quest)
@@ -327,12 +341,15 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 			_add_lines(lines, speaker, step.get("done", []))
 			_advance(quest, lines)
 			progressed = true
+		finished_now = finished_now or not active.has(quest.id)
 		if not progressed and active.has(quest.id):
 			_add_lines(lines, speaker, [current_step(quest).get("reminder", "")])
-		return lines
 
-	# A new quest from this person.
+	# A new quest from this person, next time you talk. A side story in
+	# progress never holds up the main line, but otherwise one at a time.
 	var offer := available_from(character_id)
+	if had_own and (finished_now or not (offer and offer.main_line)):
+		return lines
 	if offer:
 		_add_lines(lines, speaker, offer.intro)
 		active[offer.id] = 0
