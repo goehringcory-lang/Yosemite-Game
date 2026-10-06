@@ -15,9 +15,9 @@ const OUT := "res://assets/sprites/buildings/"
 
 ## Building name -> size and look.
 const BUILDINGS := {
-	"village_store": {"size": Vector2i(80, 56), "wall": "timber", "label": "VILLAGE STORE", "seed": 11, "roof": ["2a2a22", "3a3c2c", "4d5238", "62684a", "7b815b", "989d76"], "windows": [14, 66], "gable": 20, "chimney": 60, "awning": true},
+	"village_store": {"goods": true, "size": Vector2i(80, 56), "wall": "timber", "label": "VILLAGE STORE", "seed": 11, "roof": ["2a2a22", "3a3c2c", "4d5238", "62684a", "7b815b", "989d76"], "windows": [14, 66], "gable": 20, "chimney": 60, "awning": true},
 	"welcome_center": {"flag": true, "size": Vector2i(64, 46), "wall": "stone", "label": "WELCOME", "seed": 23, "roof": ["24262a", "34383e", "484e56", "5e666e", "7a828a", "9aa2a8"], "windows": [11, 53], "gable": 32, "chimney": 46},
-	"museum": {"size": Vector2i(56, 46), "wall": "stone", "label": "MUSEUM", "seed": 37, "roof": ["2c2822", "443c32", "5e5242", "786a54", "948468", "b0a07e"], "windows": [9, 19, 37, 47], "chimney": 8, "low": true},
+	"museum": {"portico": true, "size": Vector2i(56, 46), "wall": "stone", "label": "MUSEUM", "seed": 37, "roof": ["2c2822", "443c32", "5e5242", "786a54", "948468", "b0a07e"], "windows": [9, 19, 37, 47], "chimney": 8, "low": true},
 	"bests_studio": {"size": Vector2i(44, 38), "wall": "board", "label": "BEST'S", "seed": 41, "roof": ["2e2218", "4a3422", "644630", "7e5c3e", "9a7650", "b89468"], "windows": [9, 35], "gable": 22, "tone": 3},
 	"degnans": {"size": Vector2i(48, 40), "wall": "stucco", "label": "DEGNAN'S", "seed": 53, "roof": ["34201a", "55301f", "74402a", "92583a", "ae7248", "c98c5c"], "windows": [9, 39], "chimney": 36, "awning": true, "awning_a": "9a3a2a", "awning_b": "e8d8b0"},
 	"wilderness_center": {"size": Vector2i(40, 36), "wall": "board", "label": "PERMITS", "seed": 67, "roof": ["1c2a22", "2a4030", "3a5640", "4d6e50", "658a64", "84a67c"], "windows": [8, 32], "tone": 2, "green": true},
@@ -258,6 +258,10 @@ func _dress(im: Image, o: Dictionary, sd: int, wall_top: int, win_h: int, door_c
 				K.px(im, fx, by - 1, pick[0])
 	if o.get("flag", false):
 		_visitor_details(im, wall_top, door_cx, sd)
+	if o.get("goods", false):
+		_store_goods(im, door_cx, sd)
+	if o.get("portico", false):
+		_museum_details(im, wall_top, door_cx, sd)
 	# a wall lantern beside the door
 	var lx := door_cx + 7
 	var ly := wall_top + 4
@@ -266,6 +270,56 @@ func _dress(im: Image, o: Dictionary, sd: int, wall_top: int, win_h: int, door_c
 	K.rect(im, lx, ly + 1, 1, 2, warm[6])
 	K.px(im, lx, ly + 1, warm[7])
 	K.hline(im, lx - 1, ly + 4, 3, iron[3])
+
+
+## The Village Store's goods out front: stacked crates of produce and a
+## sack-and-barrel corner either side of the door, and a hanging trade sign.
+func _store_goods(im: Image, door_cx: int, sd: int) -> void:
+	var h := im.get_height()
+	var fruit := [Color("d04a3a"), Color("e8b83a"), Color("7aa84a"), Color("c87a3a")]
+	for side in [-1, 1]:
+		var bx: int = door_cx + side * 14 - 4
+		for row in 1:
+			var cw := 9
+			var cx := bx + row
+			var cy := h - 11 - row * 4
+			K.rect(im, cx, cy, cw, 4, timber[3])
+			K.hline(im, cx, cy, cw, timber[4])
+			K.hline(im, cx, cy + 3, cw, timber[0])
+			K.vline(im, cx + cw - 1, cy, 4, timber[1])
+			for k in cw - 2:
+				K.px(im, cx + 1 + k, cy - 1, fruit[(k + row + (sd + side) % 4) % 4])
+				if k % 2 == 0:
+					K.px(im, cx + 1 + k, cy - 2, fruit[(k + sd) % 4].lightened(0.2))
+	# a flour sack leaning by the left crates
+	var sx: int = door_cx - 25
+	K.rect(im, sx, h - 12, 4, 6, stucco[4])
+	K.vline(im, sx + 3, h - 12, 6, stucco[2])
+	K.hline(im, sx + 1, h - 13, 2, stucco[3])
+	K.px(im, sx + 1, h - 9, Color("a8382a"))
+
+
+## The Museum: a broad granite step with a low wall, two gate lamps, and an
+## interpretive panel on a post by the door.
+func _museum_details(im: Image, wall_top: int, door_cx: int, sd: int) -> void:
+	var h := im.get_height()
+	var w := im.get_width()
+	K.rect(im, door_cx - 7, h - 5, 14, 3, granite[4])
+	K.hline(im, door_cx - 7, h - 5, 14, granite[6])
+	K.hline(im, door_cx - 7, h - 3, 14, granite[1])
+	for side in [-1, 1]:
+		var lx: int = door_cx + side * 11
+		K.vline(im, lx, h - 10, 6, iron[2])
+		K.rect(im, lx - 1, h - 13, 3, 3, iron[1])
+		K.px(im, lx, h - 12, warm[6])
+		K.px(im, lx, h - 11, warm[7])
+		K.hline(im, lx - 1, h - 14, 3, iron[3])
+	# interpretive panel
+	var px0: int = w - 8
+	K.vline(im, px0 + 2, h - 12, 8, timber[1])
+	K.rect(im, px0, h - 16, 6, 5, timber[0])
+	K.rect(im, px0 + 1, h - 15, 4, 3, Color("d8c898"))
+	K.hline(im, px0 + 1, h - 14, 4, Color("8a7a58"))
 
 
 ## The Welcome Center's own touches: a cut-stone arch over the door and
