@@ -16,7 +16,7 @@ const OUT := "res://assets/sprites/buildings/"
 ## Building name -> size and look.
 const BUILDINGS := {
 	"village_store": {"size": Vector2i(80, 56), "wall": "timber", "label": "VILLAGE STORE", "seed": 11, "roof": ["2a2a22", "3a3c2c", "4d5238", "62684a", "7b815b", "989d76"], "windows": [14, 66], "gable": 20, "chimney": 60, "awning": true},
-	"welcome_center": {"size": Vector2i(64, 46), "wall": "stone", "label": "WELCOME", "seed": 23, "roof": ["24262a", "34383e", "484e56", "5e666e", "7a828a", "9aa2a8"], "windows": [11, 53], "gable": 32, "chimney": 46},
+	"welcome_center": {"flag": true, "size": Vector2i(64, 46), "wall": "stone", "label": "WELCOME", "seed": 23, "roof": ["24262a", "34383e", "484e56", "5e666e", "7a828a", "9aa2a8"], "windows": [11, 53], "gable": 32, "chimney": 46},
 	"museum": {"size": Vector2i(56, 46), "wall": "stone", "label": "MUSEUM", "seed": 37, "roof": ["2c2822", "443c32", "5e5242", "786a54", "948468", "b0a07e"], "windows": [9, 19, 37, 47], "chimney": 8, "low": true},
 	"bests_studio": {"size": Vector2i(44, 38), "wall": "board", "label": "BEST'S", "seed": 41, "roof": ["2e2218", "4a3422", "644630", "7e5c3e", "9a7650", "b89468"], "windows": [9, 35], "gable": 22, "tone": 3},
 	"degnans": {"size": Vector2i(48, 40), "wall": "stucco", "label": "DEGNAN'S", "seed": 53, "roof": ["34201a", "55301f", "74402a", "92583a", "ae7248", "c98c5c"], "windows": [9, 39], "chimney": 36, "awning": true, "awning_a": "9a3a2a", "awning_b": "e8d8b0"},
@@ -256,6 +256,8 @@ func _dress(im: Image, o: Dictionary, sd: int, wall_top: int, win_h: int, door_c
 				K.px(im, fx, by - 2, pick[0] if (fx + sd) % 2 == 0 else pick[1])
 			elif K.hash2(fx, sd, 8) > 0.5:
 				K.px(im, fx, by - 1, pick[0])
+	if o.get("flag", false):
+		_visitor_details(im, wall_top, door_cx, sd)
 	# a wall lantern beside the door
 	var lx := door_cx + 7
 	var ly := wall_top + 4
@@ -264,6 +266,35 @@ func _dress(im: Image, o: Dictionary, sd: int, wall_top: int, win_h: int, door_c
 	K.rect(im, lx, ly + 1, 1, 2, warm[6])
 	K.px(im, lx, ly + 1, warm[7])
 	K.hline(im, lx - 1, ly + 4, 3, iron[3])
+
+
+## The Welcome Center's own touches: a cut-stone arch over the door, an
+## NPS-green pennant on a bracket, a bench and two planters by the entrance.
+func _visitor_details(im: Image, wall_top: int, door_cx: int, sd: int) -> void:
+	var h := im.get_height()
+	# arch of voussoirs over the door
+	for k in range(-5, 6):
+		var ay := wall_top + 10 - int(sqrt(maxf(0.0, 30.0 - k * k)) * 0.8)
+		K.px(im, door_cx + k, ay, granite[6] if k % 2 == 0 else granite[4])
+		K.px(im, door_cx + k, ay + 1, granite[2])
+	# pennant: green field with a pale arrowhead
+	var px0 := door_cx - 18
+	K.vline(im, px0, wall_top + 2, 8, iron[2])
+	for yy in 7:
+		var flen: int = 7 - yy / 2
+		K.hline(im, px0 + 1, wall_top + 3 + yy, flen, leaf[2] if yy % 2 == 0 else leaf[3])
+	K.px(im, px0 + 3, wall_top + 5, Color("e8dcb0"))
+	K.px(im, px0 + 3, wall_top + 6, Color("e8dcb0"))
+	K.px(im, px0 + 2, wall_top + 6, Color("c8b888"))
+	# planters flanking the step
+	for side in [-1, 1]:
+		var bx: int = door_cx + side * 9 - 2
+		K.rect(im, bx, h - 9, 5, 4, timber[2])
+		K.hline(im, bx, h - 9, 5, timber[4])
+		for k in 5:
+			K.px(im, bx + k, h - 10, leaf[3])
+			if K.hash2(k, side + sd, 3) > 0.4:
+				K.px(im, bx + k, h - 11, Color("e86a8a") if side < 0 else Color("f0c84a"))
 
 
 ## Lit windows and a soft halo, drawn over the finished building (for night).

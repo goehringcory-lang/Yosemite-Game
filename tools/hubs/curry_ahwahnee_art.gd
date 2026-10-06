@@ -636,7 +636,7 @@ func wood_cabin(variant: int) -> Image:
 	var h := im.get_height()
 	# chimney on the right of the roof
 	var cx := w - 12
-	for y in range(1, 14):
+	for y in range(2, 14):
 		for x in range(cx, cx + 5):
 			if im.get_pixel(x, y).a < 0.5 or y < 9:
 				var u := float(x - cx) / 4.0
@@ -645,12 +645,12 @@ func wood_cabin(variant: int) -> Image:
 				if (y + (x / 2)) % 4 == 0:
 					col = col.darkened(0.18)
 				im.set_pixel(x, y, col)
-	K.hline(im, cx - 1, 1, 7, mat.granite[6])
-	K.hline(im, cx - 1, 2, 7, mat.granite[1])
-	K.rect(im, cx + 1, 0, 3, 1, Color(0.8, 0.8, 0.84, 0.5))
-	# split firewood stacked against the left wall
-	for row in 3:
-		for col_i in 4:
+	K.hline(im, cx - 1, 2, 7, mat.granite[6])
+	K.hline(im, cx - 1, 3, 7, mat.granite[1])
+	K.rect(im, cx + 1, 1, 3, 1, Color(0.8, 0.8, 0.84, 0.5))
+	# a short stack of split firewood tucked at the left corner
+	for row in 2:
+		for col_i in 2:
 			var lx := 1 + col_i * 3 + (row % 2)
 			var ly := h - 8 - row * 3
 			K.rect(im, lx, ly, 3, 3, mat.timber[3 - (row + col_i) % 2])
