@@ -264,46 +264,76 @@ func _glow_image(final: Image, w: int, h: int) -> Image:
 # ---------------------------------------------------------------- Indian Village
 
 ## A cone of incense-cedar bark slabs over a pole frame, with a doorway.
+## Each course of slabs overlaps the one below it and throws a shadow, the
+## apex is sooted by the fire inside, and the doorway has a lintel pole and a
+## hanging woven mat. A worn patch of earth and a ring of stones sit at the base.
 ## TRIBAL REVIEW NEEDED: a placeholder shape until the tribes have reviewed it.
 func umacha() -> Image:
 	var w := 32
 	var h := 44
 	var im := K.make(w, h)
 	K.shadow(im, 16, 42, 14.5, 2.4, 0.3)
+	# packed earth worn round the door
+	K.ellipse(im, 16, 42, 13.0, 2.2, Color("7a6044"))
+	K.ellipse(im, 15, 41.6, 10.0, 1.4, Color("94784f"))
+	var courses := [5, 12, 19, 26, 33, 42]
 	for y in range(5, 42):
 		var half := (y - 3) * 0.41
+		var course := 0
+		while course < courses.size() - 1 and y >= courses[course + 1]:
+			course += 1
+		var cy: int = y - courses[course]
 		for x in range(floori(16 - half), ceili(16 + half)):
 			var u := (x - (16 - half)) / maxf(1.0, half * 2.0)
-			var slab := (x + (y / 8) * 2) / 3
-			var n := K.hash2(slab, y / 6, 17)
-			var t := 0.55 + (n - 0.5) * 0.34 - u * 0.5 + (0.5 - float(y) / h) * 0.12
+			# slabs are tall strips, staggered between courses
+			var slab := (x + course * 2) / 3
+			var n := K.hash2(slab, course, 17)
+			var t := 0.58 + (n - 0.5) * 0.3 - u * 0.62 + (0.5 - float(y) / h) * 0.1
+			# each course is lit at its top edge and shadowed under the next
+			if cy == 0:
+				t += 0.2
+			elif cy >= 6:
+				t -= 0.24
+			elif cy >= 5:
+				t -= 0.1
 			var idx := clampi(roundi(t * 4.0) + 1, 0, 5)
 			var col := timber[idx]
 			# bark furrows and the seams between slabs
-			if (x + (y / 8) * 2) % 3 == 0:
+			if (x + course * 2) % 3 == 0:
 				col = col.darkened(0.2)
-			elif K.hash2(x, y, 18) > 0.93:
+			elif K.hash2(x, y / 2, 18) > 0.92:
 				col = col.lightened(0.14)
 			K.px(im, x, y, col)
-	# seam between layers of slabs
-	for ly in [14, 23, 32]:
-		var half2: float = (ly - 3) * 0.41
-		for x in range(floori(16 - half2), ceili(16 + half2)):
-			K.px(im, x, ly, timber[0])
-	# pole tips crossing at the apex
+	# soot streaks down from the smoke hole
+	for y in range(5, 17):
+		var half := (y - 3) * 0.41
+		for x in range(floori(16 - half), ceili(16 + half)):
+			var k := K.hash2(x, y, 23)
+			var fade := 1.0 - float(y - 5) / 12.0
+			if k < 0.42 * fade:
+				K.px(im, x, y, im.get_pixel(x, y).darkened(0.32 * fade + 0.1))
+	# pole tips crossing at the apex, with a wisp of smoke
 	for pole in [[14, 0, -1], [17, 1, 1], [19, 0, 1], [12, 1, -1]]:
 		for k in 7:
 			K.px(im, pole[0] + pole[2] * (k / 4), pole[1] + k, timber[1] if k % 2 == 0 else timber[0])
 	K.px(im, 15, 0, timber[3])
 	K.px(im, 18, 1, timber[3])
-	# doorway
-	K.rect(im, 12, 31, 8, 11, timber[0])
-	K.rect(im, 13, 30, 6, 1, timber[0])
-	K.rect(im, 13, 32, 6, 9, Color("1a110c"))
-	shade(im, 12, 41, 8, 1, timber[0], 1.0, 1.0, 0.5)
-	# a few granite stones holding the base down
-	for sx in [4, 9, 23, 27]:
-		boulder(im, sx + 1, 41, 2.6, 1.8, sd_for(sx))
+	K.px(im, 16, 2, Color(0.8, 0.8, 0.82, 0.55))
+	K.px(im, 17, 1, Color(0.85, 0.85, 0.88, 0.4))
+	K.px(im, 16, 0, Color(0.85, 0.85, 0.88, 0.3))
+	# doorway: lintel pole, dark opening, a woven mat folded back at one side
+	K.rect(im, 11, 31, 10, 11, timber[0])
+	K.rect(im, 12, 30, 8, 1, timber[0])
+	K.rect(im, 13, 32, 6, 9, Color("120a07"))
+	K.hline(im, 11, 31, 10, timber[3])
+	K.hline(im, 12, 30, 8, timber[2])
+	for my in range(32, 41):
+		K.px(im, 13, my, stucco[2] if my % 2 == 0 else stucco[3])
+		K.px(im, 14, my, stucco[1] if my % 2 == 0 else stucco[2])
+	shade(im, 11, 41, 10, 1, timber[0], 1.0, 1.0, 0.5)
+	# granite stones holding the base down
+	for sx in [4, 8, 24, 28]:
+		boulder(im, sx + 1, 41, 2.8, 1.9, sd_for(sx))
 	K.outline(im, Color("231a16"))
 	return im
 
@@ -312,7 +342,9 @@ func sd_for(v: int) -> int:
 	return 200 + v
 
 
-## An acorn granary: a tall woven store on poles under a thatched cap.
+## An acorn granary: a tall woven store on poles under a thatched cap, with
+## flat stones under the cap to keep out mice, a basket-weave body and cord
+## bands, and thatch in layered rings. The poles stand on stones.
 ## TRIBAL REVIEW NEEDED: a placeholder shape until the tribes have reviewed it.
 func chuckah() -> Image:
 	var w := 20
@@ -321,54 +353,93 @@ func chuckah() -> Image:
 	K.shadow(im, 10, 38.5, 8.5, 1.8, 0.3)
 	for px_ in [4, 9, 15]:
 		post(im, px_, 26, 12, 300 + px_, 2)
+	# footing stones
+	for px_ in [5, 10, 16]:
+		boulder(im, px_, 38, 2.2, 1.4, 310 + px_)
 	K.hline(im, 3, 26, 15, timber[1])
-	# woven body: horizontal strands, lit on the left
+	# woven body: a diagonal basket weave, lit on the left, bellied at the middle
 	for y in range(12, 27):
 		var half := 6.4 + sin((y - 12) / 14.0 * PI) * 1.2
 		for x in range(floori(10 - half), ceili(10 + half)):
 			var u := (x - (10 - half)) / (half * 2.0)
-			var strand := (y + (x / 3) % 2) % 3
-			var t := 0.58 + (K.hash2(x, y, 31) - 0.5) * 0.2 - u * 0.45
+			var weave := ((x + y) % 4 < 2) != ((x - y + 40) % 6 < 3)
+			var t := 0.62 + (K.hash2(x, y, 31) - 0.5) * 0.14 - u * 0.55
 			var col := stucco[clampi(roundi(t * 4.0), 0, 4)]
-			if strand == 0:
-				col = col.darkened(0.2)
+			if weave:
+				col = col.darkened(0.16)
+			elif (x + y) % 4 == 0:
+				col = col.lightened(0.08)
 			K.px(im, x, y, col)
-	for y in [16, 21]:
-		K.hline(im, 4, y, 12, timber[1])
-	# thatched cap
+	# willow cord bands
+	for y in [14, 19, 24]:
+		for x in range(4, 17):
+			if im.get_pixel(x, y).a > 0.5:
+				var u := float(x - 4) / 12.0
+				K.px(im, x, y, timber[clampi(3 - int(u * 3.0), 0, 3)])
+		for x in range(4, 17):
+			if im.get_pixel(x, y + 1).a > 0.5:
+				K.px(im, x, y + 1, timber[0])
+	# the cap: layered rings of thatch, each lit on top, and a ridge knot
 	for y in range(3, 13):
 		var half := (y - 1) * 0.8
+		var ring := (y - 3) / 3
 		for x in range(floori(10 - half), ceili(10 + half)):
 			var u := (x - (10 - half)) / maxf(1.0, half * 2.0)
-			var t := 0.7 - u * 0.4 + (K.hash2(x, y, 32) - 0.5) * 0.3
+			var t := 0.72 - u * 0.45 + (K.hash2(x, y, 32) - 0.5) * 0.26
+			if (y - 3) % 3 == 0:
+				t += 0.16
+			elif (y - 3) % 3 == 2:
+				t -= 0.14
 			var col := warm[clampi(roundi(t * 3.0) + 2, 2, 5)].lerp(stucco[3], 0.5)
-			if (x + y * 2) % 4 == 0:
-				col = col.darkened(0.2)
+			if (x + y * 2 + ring) % 4 == 0:
+				col = col.darkened(0.18)
 			K.px(im, x, y, col)
+	# the overhang's shadow on the body
+	for x in range(5, 16):
+		K.px(im, x, 13, Color(0, 0, 0, 0.3))
+		K.px(im, x, 14, Color(0, 0, 0, 0.14))
 	K.hline(im, 3, 12, 14, timber[0])
 	K.px(im, 10, 2, stucco[3])
 	K.px(im, 10, 1, stucco[2])
+	K.px(im, 10, 0, timber[1])
 	K.outline(im, Color("231a16"))
 	return im
 
 
 # ---------------------------------------------------------------- street props
 
-## A steel bear-proof food box: olive paint, latch, and a worn lid edge.
+## A steel bear-proof food box: olive paint over riveted panels, a heavy lid
+## with a latch and hasp, a worn edge, a dent, and a lit top.
 func bear_box() -> Image:
 	var im := K.make(16, 12)
 	K.shadow(im, 8, 10.5, 7.5, 1.4, 0.28)
 	for yy in 9:
 		for xx in 14:
-			var t := 0.55 + (K.hash2(xx, yy, 51) - 0.5) * 0.14 - float(xx) / 14.0 * 0.3
-			K.px(im, 1 + xx, 1 + yy, moss[clampi(roundi(t * 2.0), 0, 2)].darkened(0.1))
-	K.rect(im, 1, 1, 14, 2, iron[3])
-	K.hline(im, 1, 1, 14, iron[3].lightened(0.3))
-	K.hline(im, 1, 3, 14, iron[0])
-	K.rect(im, 6, 5, 4, 3, granite[5])
+			var t := 0.6 + (K.hash2(xx, yy, 51) - 0.5) * 0.1 - float(xx) / 14.0 * 0.32 + (0.5 - float(yy) / 9.0) * 0.1
+			K.px(im, 1 + xx, 1 + yy, moss[clampi(roundi(t * 2.0), 0, 2)].darkened(0.08))
+	# the lid: a steel band with a lit top edge, and a shadow under it
+	K.rect(im, 1, 1, 14, 3, iron[3])
+	K.hline(im, 1, 1, 14, iron[3].lightened(0.35))
+	K.hline(im, 1, 3, 14, iron[1])
+	K.hline(im, 1, 4, 14, iron[0])
+	# paint worn through to steel along the lid edge
+	for xx in [3, 4, 9, 12]:
+		K.px(im, 1 + xx, 5, iron[2])
+	# hasp and latch
+	K.rect(im, 6, 5, 4, 4, granite[5])
 	K.hline(im, 6, 5, 4, granite[6])
+	K.rect(im, 7, 7, 2, 2, iron[0])
+	K.px(im, 7, 6, iron[1])
 	K.vline(im, 8, 6, 2, iron[1])
+	# rivets and a dent
+	for rv in [[2, 6], [13, 6], [2, 8], [13, 8]]:
+		K.px(im, rv[0], rv[1], granite[6])
+	K.px(im, 11, 7, moss[0])
+	K.px(im, 12, 7, moss[0].darkened(0.2))
 	K.hline(im, 1, 9, 14, iron[0])
+	# a bear-warning decal
+	K.px(im, 3, 7, Color("e8d08a"))
+	K.px(im, 4, 7, Color("e8d08a"))
 	K.outline(im, Color("231a16"))
 	return im
 
