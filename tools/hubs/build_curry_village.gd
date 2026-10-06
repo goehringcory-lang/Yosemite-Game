@@ -1,4 +1,4 @@
-extends HubBuilder
+extends AhwahneeStyle
 ## Builds Curry Village, the first place you walk into after the Lamon
 ## Homestead gate: the tent cabins, the Camp Curry plaza with its Registration
 ## Office, Pavilion, Store and Pizza Deck, the Mountain Shop, the pool and the
@@ -19,16 +19,17 @@ extends HubBuilder
 ## cabins below it, the Camp Curry buildings in the middle, Stoneman Meadow and
 ## the Merced in front.
 
-const CurryArt = preload("res://tools/hubs/curry_art.gd")
-const InteriorArt = preload("res://tools/hubs/interior_art.gd")
-const S := "res://assets/sprites/curry/"
+const CurryArt = preload("res://tools/hubs/curry_ahwahnee_art.gd")
+const HotelArt = preload("res://tools/hubs/ahwahnee_hotel_art.gd")
+const ValleyLandArt = preload("res://tools/hubs/valley_land_art.gd")
+const InteriorArt = preload("res://tools/hubs/interior_ahwahnee_art.gd")
+const CS := "res://assets/sprites/curry/"
 const I := "res://assets/sprites/curry/interiors/"
 const VILLAGE_SCENE := "res://scenes/regions/curry_village.tscn"
 const STORE_SCENE := "res://scenes/regions/curry_store.tscn"
 const SHOP_SCENE := "res://scenes/regions/curry_mountain_shop.tscn"
 const GEO := Vector2(-119.5728, 37.7385)
 
-const GroundArt = preload("res://tools/hubs/ground_art.gd")
 ## The three curving rows of tent cabins: base y at x = 0, then how far the
 ## row swings and how fast.
 const ROWS := [[14.0, 1.3, 0.085, 0.0], [19.6, 1.4, 0.07, 1.9], [25.2, 1.2, 0.09, 3.7]]
@@ -44,9 +45,9 @@ func _ready() -> void:
 	print("== Curry Village art")
 	CurryArt.new().save_all()
 	InteriorArt.new().save_all()
-	print("== ground painting")
+	HotelArt.new().save_all()
+	load_flora()
 	_layout()
-	GroundArt.new().paint(_paint_kind, w, h, _paths, 1899, [{"type": "firepit", "x": 52 * T + 8, "y": 42 * T + 12}]).save_png(ProjectSettings.globalize_path(S + "ground_village.png"))
 	import_assets()
 	print("== data")
 	_build_foods()
@@ -64,7 +65,7 @@ func _ready() -> void:
 # ---------------------------------------------------------------- data
 
 func _build_foods() -> void:
-	var sheet := texture(S + "store_foods.png")
+	var sheet := texture(CS + "store_foods.png")
 	var foods := [
 		["pilot_bread", "Pilot Bread", "Big round crackers, hard as a board and just as durable. Climbers have carried them up walls since before the war.", 0],
 		["cheddar_wedge", "Cheddar Wedge", "A wedge of sharp cheddar in wax paper. Rich, dense and worth its weight on a long pitch.", 1],
@@ -237,9 +238,9 @@ func _layout() -> void:
 			vpts.append(Vector2(cx + sin(y * 0.4 + cx) * 0.8, y))
 		_add_path(_curve(vpts), 1.6)
 	_add_path(_curve([Vector2(6, 27), Vector2(6, 38), Vector2(5, 44)]), 1.6)
-	# Keep trees off paths, greens, water, and open meadow.
+	# Keep trees and plants off paths, paving, roads, and water.
 	for k in w * h:
-		if water[k] or kind[k] in [Terrain.PARKING, Terrain.PAVED, Terrain.BUILT, Terrain.SAND, Terrain.ROAD, Terrain.MEADOW, Terrain.WET_MEADOW]:
+		if water[k] or kind[k] in [Terrain.PARKING, Terrain.PAVED, Terrain.BUILT, Terrain.ROAD, Terrain.TRAIL]:
 			no_trees[k] = 1
 	clear_trees(28, 28, 78, 50)
 
@@ -247,32 +248,93 @@ func _layout() -> void:
 func _build_village() -> void:
 	start_region("CurryVillage", "curry_village", "Curry Village", GEO)
 	paint_ground()
-	add_ground_painting(S + "ground_village.png")
+	# The village green is a mown lawn in the picture (it stays meadow in the
+	# terrain grid, which drives foraging).
+	var real_kind := kind.duplicate()
+	for y in range(28, 51):
+		for x in range(26, 79):
+			if at(x, y) == Terrain.MEADOW:
+				put(x, y, Terrain.LAWN)
+	_save_ground_art("ground_curry_village", 1899)
+	kind = real_kind
+	_place_wall()
 	_place_plaza()
 	_place_cabins()
 	_place_life()
 	_place_orchard()
 	_place_markers_and_exits()
-	place_trees(
-		{Terrain.FOREST: [[Terrain.Flora.PONDEROSA, 4], [Terrain.Flora.INCENSE_CEDAR, 4], [Terrain.Flora.BLACK_OAK_TRUNK, 3], [Terrain.Flora.WHITE_FIR, 1], [Terrain.Flora.DOGWOOD, 1]],
-		Terrain.TALUS: [[Terrain.Flora.INCENSE_CEDAR, 1], [Terrain.Flora.LIVE_OAK, 1]],
-		Terrain.MEADOW: [[Terrain.Flora.BLACK_OAK_TRUNK, 1]]},
-		{Terrain.FOREST: 0.42, Terrain.TALUS: 0.08, Terrain.MEADOW: 0.012}, Vector2i(2, 1))
+	_dress_village()
 	place_blockers()
 	add_forage("curry_village", 3.0)
 	pack(_root, VILLAGE_SCENE)
 
 
+## The granite wall below Glacier Point, drawn for the cliff outline above,
+## with Staircase Falls animated down it and mist where it lands.
+func _place_wall() -> void:
+	var prof := PackedInt32Array()
+	prof.resize(w * T)
+	for x in w:
+		var rows := 0
+		while rows < h and kind[rows * w + x] in [Terrain.CLIFF, Terrain.FALLS]:
+			rows += 1
+		for px_ in T:
+			prof[x * T + px_] = rows * T
+	var fall_cx := 71 * T + 8
+	var fall_h := 6 * T
+	ValleyLandArt.new().save_village(prof, fall_cx, CS, "curry", fall_h)
+	import_assets()
+	_backdrop("curry_wall", Vector2.ZERO, -8, CS)
+	_animation("StaircaseFalls", "curry_fall", 8.0, Vector2(fall_cx - ValleyLandArt.FALL_W / 2.0, 0), -7, CS)
+	_animation("FallMist", "curry_mist", 5.0, Vector2(fall_cx - 32, fall_h - 28 + 6), -6, CS)
+
+
+## Trees, plants, rocks and logs: the same dressing as the Ahwahnee grounds,
+## laid over this map's terrain.
+func _dress_village() -> void:
+	_reserve_entities(1, 2)
+	var forest_table := [["tree_ponderosa", 4.0], ["tree_incense_cedar", 3.5], ["tree_black_oak", 3.2], ["tree_white_fir", 1.2], ["tree_dogwood", 1.4]]
+	_fringe_trees([Terrain.FOREST], 3, 0.7, forest_table, 2, 22.0)
+	_fringe_trees([Terrain.TALUS], 4, 0.4, [["tree_incense_cedar", 2.0], ["tree_snag", 0.6], ["tree_white_fir", 1.0]], 0, 30.0)
+	_fringe_trees([Terrain.MEADOW], 8, 0.3, [["tree_black_oak", 3.0], ["tree_dogwood", 1.0]], 2, 70.0)
+	# Stoneman Meadow and the old orchard: wildflowers and tall grass.
+	var meadow := Rect2i(0, 52, 100, 8)
+	_scatter_decor("plant_wildflowers", [Terrain.MEADOW], 55, meadow, 1)
+	_scatter_decor("plant_lupine", [Terrain.MEADOW], 14, meadow, 1)
+	_scatter_decor("plant_paintbrush", [Terrain.MEADOW], 8, meadow, 1)
+	_scatter_decor("plant_tall_grass", [Terrain.MEADOW, Terrain.WET_MEADOW], 30, meadow, 1)
+	_scatter_decor("plant_cattails", [Terrain.WET_MEADOW], 6, meadow, 0)
+	var orchard := Rect2i(79, 26, 21, 23)
+	_scatter_decor("plant_wildflowers", [Terrain.MEADOW], 30, orchard, 1)
+	_scatter_decor("plant_tall_grass", [Terrain.MEADOW], 24, orchard, 1)
+	# The forest floor between the cabins and along the wall.
+	var all := Rect2i(0, 0, w, h)
+	_scatter_decor("plant_fern", [Terrain.FOREST], 90, all, 1)
+	_scatter_decor("plant_bracken", [Terrain.FOREST], 36, all, 1)
+	_scatter_decor("plant_shrub", [Terrain.FOREST], 64, all, 2)
+	_scatter_decor("plant_manzanita", [Terrain.TALUS], 8, Rect2i(0, 3, w, 10), 0)
+	_scatter_decor("plant_mushrooms", [Terrain.FOREST], 8, all, 2)
+	_scatter_decor("rock_granite", [Terrain.FOREST, Terrain.TALUS], 26, all, 2)
+	_scatter_decor("rock_mossy", [Terrain.FOREST], 14, all, 2)
+	_scatter_decor("rock_river", [Terrain.SAND], 14, all, 0)
+	_scatter_decor("log_fallen", [Terrain.FOREST], 5, all, 2)
+	_scatter_decor("tree_snag", [Terrain.FOREST], 3, all, 3)
+	# Specimen oaks on the green for shade.
+	for oak in [[31, 41, "a"], [70, 43, "b"], [56, 49, "c"], [77, 49, "a"], [27, 47, "b"]]:
+		_prop("tree_black_oak_" + oak[2], foot(oak[0], oak[1]))
+	_ambient("OrchardFireflies", "fireflies", Vector2(90, 38) * T, Vector2(18, 20) * T)
+
+
 func _place_plaza() -> void:
 	# The Camp Curry buildings, in a row along the top of the green. Two of
 	# them have doors you can walk through.
-	building("Registration", S + "registration.png", 34, 35, "Registration Office",
+	building("Registration", CS + "registration.png", 34, 35, "Registration Office",
 		"Camp Curry's front desk, where every guest signs in. It stands about where David and Jennie Curry pitched their first seven tents in 1899.")
-	building("Pavilion", S + "pavilion.png", 46, 35, "Pavilion",
+	building("Pavilion", CS + "pavilion.png", 46, 35, "Pavilion",
 		"The Pavilion is Curry Village's big dining hall, with long tables and a menu that changes with the season. Its steep roof sheds the heavy Valley snows.")
-	building("CurryStore", S + "store.png", 56, 35, "Camp Curry Store",
+	building("CurryStore", CS + "store.png", 56, 35, "Camp Curry Store",
 		"Groceries, ice, postcards and camp supplies. Bring forage and the clerk will trade you food that keeps.", 12, 0)
-	building("MountainShop", S + "mountain_shop.png", 66, 35, "Mountain Shop",
+	building("MountainShop", CS + "mountain_shop.png", 66, 35, "Mountain Shop",
 		"The Mountain Shop outfits climbers for the Valley walls and hosts the Yosemite Mountaineering School. The ropes, cams and slings inside are for trade.", 14, 0)
 	for glow in [["Registration", Vector2(0, -22), 60.0], ["Pavilion", Vector2(0, -22), 84.0], ["CurryStore", Vector2(0, -18), 46.0], ["MountainShop", Vector2(0, -20), 54.0]]:
 		night_light(_entities.get_node(glow[0]), glow[1], glow[2], 0.9)
@@ -289,15 +351,15 @@ func _place_plaza() -> void:
 	shop_door.set("open_hour", 8)
 	shop_door.set("close_hour", 18)
 	# South of the green: the pizza deck, the pool, the amphitheater.
-	building("PizzaDeck", S + "pizza_deck.png", 40, 50, "Pizza Deck",
+	building("PizzaDeck", CS + "pizza_deck.png", 40, 50, "Pizza Deck",
 		"Wood-fired pizza on a deck under the wall, with a view across the green. A Curry Village favorite for a generation.", 0, 0, 0.5)
-	var pool := decor("Pool", S + "pool.png", foot(29, 49), Vector2(64, 30))
+	var pool := decor("Pool", CS + "pool.png", foot(29, 49), Vector2(64, 30))
 	var pool_sprite := pool.get_node("Sprite") as Sprite2D
 	pool_sprite.set_script(load("res://scripts/world/seasonal_sprite.gd"))
-	pool_sprite.set("winter_texture", texture(S + "ice_rink.png"))
-	building("Amphitheater", S + "amphitheater.png", 66, 50, "Camp Curry Amphitheater",
+	pool_sprite.set("winter_texture", texture(CS + "ice_rink.png"))
+	building("Amphitheater", CS + "amphitheater.png", 66, 50, "Camp Curry Amphitheater",
 		"Ranger programs and campfire talks are held here most summer evenings.", 0, 0, 0.2)
-	sign_prop("FirefallBoard", S + "firefall_board.png", foot(57, 48), Vector2(24, 6), "The Firefall",
+	sign_prop("FirefallBoard", CS + "firefall_board.png", foot(57, 48), Vector2(24, 6), "The Firefall",
 		"From 1872 to 1968, embers from a bonfire were pushed off Glacier Point at nightfall, and Camp Curry crowds cheered from below. David Curry's call went up to the rim: 'Hello, Glacier!' and then, 'Let the fire fall!' The Park Service ended the show in 1968.")
 	# The green's centre: a fire pit ringed by benches, the flag, lamps.
 	var fire := instance_scene("res://scenes/story/station.tscn", Vector2(52 * T + 8, 42.3 * T + 8), "PlazaFirePit")
@@ -305,35 +367,30 @@ func _place_plaza() -> void:
 	fire.set("display_name", "Curry Village fire pit")
 	night_light(fire, Vector2(0, -6), 70.0, 1.2, 0.35)
 	ambient(fire, "sparks", Vector2(0, -8), Vector2(3, 1))
-	animate(decor("Flagpole", S + "flagpole.png", foot(45.5, 39), Vector2(6, 4)), 3, 2.5)
+	animate(decor("Flagpole", CS + "flagpole.png", foot(45.5, 39), Vector2(6, 4)), 3, 2.5)
 	for lamp in [[33, 38.6], [47, 38.6], [61, 38.6], [72, 38.6], [40.2, 44.5], [65.5, 44.5], [30, 45], [74, 46], [52, 47.5]]:
 		_lamp("Lamp%d_%d" % [lamp[0], int(lamp[1] * 10)], lamp[0], lamp[1])
 	for bench in [[46.5, 43.6, 0], [57.5, 43.6, 1], [52, 46.6, 2], [52, 39.6, 3]]:
-		decor("Bench%d" % bench[2], S + "bench.png", foot(bench[0], bench[1]), Vector2(24, 5))
+		_prop("garden_bench", foot(bench[0], bench[1]) + Vector2(0, 2), "Bench%d" % bench[2])
 	for planter in [[30, 36.2], [37.5, 36.2], [43, 36.2], [50, 36.2], [52.2, 36.2], [60.2, 36.2], [62, 36.2], [70, 36.2], [74.5, 36.2]]:
-		decor("Planter%d" % int(planter[0] * 10), S + "planter.png", foot(planter[0], planter[1]), Vector2(12, 5))
-	decor("BikeRack", S + "bike_rack.png", foot(46, 48.4), Vector2(30, 5))
-	decor("Fountain", S + "fountain.png", foot(74.5, 42), Vector2(10, 5))
+		decor("Planter%d" % int(planter[0] * 10), CS + "planter.png", foot(planter[0], planter[1]), Vector2(12, 5))
+	decor("BikeRack", CS + "bike_rack.png", foot(46, 48.4), Vector2(30, 5))
+	decor("Fountain", CS + "fountain.png", foot(74.5, 42), Vector2(10, 5))
 	# Patio tables in front of the Pavilion and the pizza deck.
 	for tbl in [[44, 40.6], [49, 40.8], [37, 47], [44.6, 47.6], [61, 41]]:
-		decor("PatioTable%d" % int(tbl[0] * 10), S + "patio_table.png", foot(tbl[0], tbl[1]), Vector2(14, 6))
+		decor("PatioTable%d" % int(tbl[0] * 10), CS + "patio_table.png", foot(tbl[0], tbl[1]), Vector2(14, 6))
 	# Strings of lights between the lamp posts along the shop fronts and over the green.
 	for span in [[33, 47], [47, 61], [61, 72]]:
-		overhead("Lights%d" % span[0], S + "string_lights_%d.png" % ((span[1] - span[0]) * T), Vector2((span[0] + span[1]) / 2.0 * T + 8, 38.6 * T + 8))
-	overhead("LightsGreen", S + "string_lights_112.png", Vector2(46.5 * T, 44.5 * T + 8))
-	# A few big oaks on the green for shade.
-	for oak in [[31, 41], [70, 43], [56, 49], [77, 49], [27, 47]]:
-		_oak(oak[0], oak[1])
+		overhead("Lights%d" % span[0], CS + "string_lights_%d.png" % ((span[1] - span[0]) * T), Vector2((span[0] + span[1]) / 2.0 * T + 8, 38.6 * T + 8))
+	overhead("LightsGreen", CS + "string_lights_112.png", Vector2(46.5 * T, 44.5 * T + 8))
 
 
+## A wrought-iron lamp, as at the Ahwahnee, with its dusk glow and a light
+## that falls on the ground around it.
 func _lamp(lamp_name: String, x: float, y: float) -> void:
-	var post := decor(lamp_name, S + "lamp_post.png", foot(x, y), Vector2(6, 4))
+	var post := decor(lamp_name, S + "lamp_wrought.png", foot(x, y), Vector2(6, 4))
 	night_light(post, Vector2(0, -26), 50.0, 1.0)
-
-
-func _oak(tx: int, ty: int) -> void:
-	_flora.set_cell(Vector2i(tx, ty), Art.SOURCE_FLORA, Terrain.frame_coords(Terrain.Flora.BLACK_OAK_TRUNK))
-	_canopy.set_cell(Vector2i(tx, ty), Art.SOURCE_FLORA, Terrain.frame_coords(Terrain.Flora.BLACK_OAK_CANOPY))
+	_glow("lamp_wrought_glow", foot(x, y) - Vector2(5, texture(S + "lamp_wrought.png").get_height()))
 
 
 func _place_cabins() -> void:
@@ -373,15 +430,15 @@ func _place_cabins() -> void:
 		_tents += 1
 	# Wood cabins along the west and east edges.
 	for spot in [[5, 28], [82, 27], [4, 34], [88, 28]]:
-		var cabin := prop_body("Cabin%d_%d" % [spot[0], spot[1]], S + "cabin_%s.png" % ["a", "b"][int(spot[0]) % 2], [base_rect(Vector2(34, 10))])
+		var cabin := prop_body("Cabin%d_%d" % [spot[0], spot[1]], CS + "cabin_%s.png" % ["a", "b"][int(spot[0]) % 2], [base_rect(Vector2(34, 10))])
 		cabin.position = foot(spot[0], spot[1])
 		_entities.add_child(cabin)
 	# The closed cabins: a rope, and a sign about the rockfalls.
 	for i in 5:
-		decor("CabinRope%d" % i, S + "rope_fence.png", foot(62.5 + i * 3.6, 12.4), Vector2(14, 3))
-	sign_prop("ClosedSign", S + "trail_post_closed.png", foot(60, 13.5), Vector2(8, 4), "Cabins closed",
+		decor("CabinRope%d" % i, CS + "rope_fence.png", foot(62.5 + i * 3.6, 12.4), Vector2(14, 3))
+	sign_prop("ClosedSign", CS + "trail_post_closed.png", foot(60, 13.5), Vector2(8, 4), "Cabins closed",
 		"The cabins nearest the wall have stood empty since rockfalls. Granite slabs peel off the cliff without warning. In 2008 a fall from the wall above led the Park Service to close the cabins closest to it.")
-	sign_prop("CabinRowsSign", S + "trail_post_cabins.png", foot(38.2, 22), Vector2(8, 4), "Tent cabin rows",
+	sign_prop("CabinRowsSign", CS + "trail_post_cabins.png", foot(38.2, 22), Vector2(8, 4), "Tent cabin rows",
 		"Row after row of canvas tent cabins, each with a wood platform and a bed frame inside. In summer every one is booked. Curry Village started with seven tents in 1899.")
 	# Woodpiles, coolers, stumps and clotheslines beside the tents.
 	for i in 22:
@@ -392,13 +449,13 @@ func _place_cabins() -> void:
 			continue
 		match rng.randi() % 4:
 			0:
-				decor("Woodpile%d" % i, S + "woodpile.png", foot(cx, cy), Vector2(18, 6))
+				decor("Woodpile%d" % i, CS + "woodpile.png", foot(cx, cy), Vector2(18, 6))
 			1:
-				decor("Cooler%d" % i, S + "cooler.png", foot(cx, cy), Vector2(12, 5))
+				decor("Cooler%d" % i, CS + "cooler.png", foot(cx, cy), Vector2(12, 5))
 			2:
-				decor("Stump%d" % i, S + "stump.png", foot(cx, cy), Vector2(10, 5))
+				decor("Stump%d" % i, CS + "stump.png", foot(cx, cy), Vector2(10, 5))
 			3:
-				decor("Clothesline%d" % i, S + "clothesline.png", foot(cx, cy), Vector2(32, 5))
+				decor("Clothesline%d" % i, CS + "clothesline.png", foot(cx, cy), Vector2(32, 5))
 	for lamp in [[9, 17], [27, 22], [59, 17], [79, 22], [41.6, 22], [41.6, 14], [9, 27], [28, 27], [59, 27]]:
 		_lamp("PathLamp%d_%d" % [lamp[0], int(lamp[1] * 10)], lamp[0], lamp[1])
 	for bear in [[12, 22], [32, 17], [50, 26], [72, 23], [24, 28]]:
@@ -406,13 +463,13 @@ func _place_cabins() -> void:
 
 
 func _cabin(tx: float, ty: float, index: int, closed: bool) -> void:
-	var body := prop_body("TentCabin%d" % index, S + "tent_cabin_%d.png" % (index % CurryArt.TENT_SPRITES), [Rect2(-15, -9, 30, 9)])
+	var body := prop_body("TentCabin%d" % index, CS + "tent_cabin_%d.png" % (index % CurryArt.TENT_SPRITES), [Rect2(-15, -9, 30, 9)])
 	body.position = foot(tx, ty)
 	_entities.add_child(body)
 	if not closed and rng.randf() < 0.55:
 		night_light(body, Vector2(0, -20), 26.0, 0.7)
 	if not closed and rng.randf() < 0.45:
-		decor("Chair%d" % index, S + "chair_%d.png" % (index % 4), foot(tx + 2.3, ty + 0.3), Vector2(8, 4))
+		decor("Chair%d" % index, CS + "chair_%d.png" % (index % 4), foot(tx + 2.3, ty + 0.3), Vector2(8, 4))
 
 
 func _place_cars() -> void:
@@ -423,7 +480,7 @@ func _place_cars() -> void:
 			if rng.randf() < 0.42:
 				continue
 			var px_x := (4.5 + slot * 3.0) * T + rng.randf_range(-3.0, 3.0)
-			var car := prop_body("Car%d" % i, S + "car_%d.png" % (rng.randi() % 12), [Rect2(-11, -30, 22, 30)])
+			var car := prop_body("Car%d" % i, CS + "car_%d.png" % (rng.randi() % 12), [Rect2(-11, -30, 22, 30)])
 			car.position = Vector2(px_x, (row_y + 1.0) * T + 6.0)
 			_entities.add_child(car)
 			i += 1
@@ -437,20 +494,20 @@ func _place_life() -> void:
 	_arch()
 	sign_prop("PoolSign", "res://assets/sprites/info_sign.png", foot(24, 44), Vector2(12, 4), "Swimming pool",
 		"A stone deck, cold water, and a lot of kids on a hot afternoon. In winter the pool is drained and the deck becomes an ice rink.")
-	sign_prop("ApronSign", S + "trail_post_apron.png", foot(76, 9.5), Vector2(8, 4), "Glacier Point Apron",
+	sign_prop("ApronSign", CS + "trail_post_apron.png", foot(76, 9.5), Vector2(8, 4), "Glacier Point Apron",
 		"A sweep of smooth granite slabs rises from behind the cabins toward Glacier Point, 3,200 feet above. The trail at the top corner climbs the talus to its foot.")
 	sign_prop("StonemanSign", "res://assets/sprites/info_sign.png", foot(40, 54), Vector2(12, 4), "Stoneman Meadow",
 		"In spring the meadow floods, and Half Dome shows up upside down in the pools. Stay on the trail: the grass here is easy to trample.")
 	sign_prop("MercedSign", "res://assets/sprites/info_sign.png", foot(20, 58), Vector2(12, 4), "The Merced River",
 		"The Merced flows from Yosemite's high country, through the Valley, and on to the San Joaquin. It is a National Wild and Scenic River.")
-	sign_prop("GateSign", S + "trail_post_home.png", foot(94, 36.2), Vector2(8, 4), "Lamon Homestead",
+	sign_prop("GateSign", CS + "trail_post_home.png", foot(94, 36.2), Vector2(8, 4), "Lamon Homestead",
 		"James Lamon's cabin and apple orchard stood near here in the 1860s. The gate ahead leads to your camp.")
 
 
 ## The Camp Curry arch over the way into the parking lot. Only its two posts
 ## are solid, so you walk under it.
 func _arch() -> void:
-	var body := prop_body("EntranceArch", S + "entrance_sign.png", [Rect2(-33, -5, 7, 5), Rect2(26, -5, 7, 5)], Vector2(60, 14))
+	var body := prop_body("EntranceArch", CS + "entrance_sign.png", [Rect2(-33, -5, 7, 5), Rect2(26, -5, 7, 5)], Vector2(60, 14))
 	body.set_script(load("res://scripts/objects/info_sign.gd"))
 	body.set("title", "Camp Curry")
 	body.set("text", "David and Jennie Curry opened Camp Curry in 1899 with seven tents and a promise of a clean bed and a hot supper at a price working families could pay. After David died in 1917 Jennie ran the camp for decades. Today it is called Curry Village.")
@@ -466,15 +523,13 @@ func _place_orchard() -> void:
 				continue
 			var ox: float = gx + rng.randf_range(-0.6, 0.6)
 			var oy: float = gy + rng.randf_range(-0.5, 0.5)
-			var tree := prop_body("AppleTree%d" % i, S + "apple_tree.png", [Rect2(-3, -5, 6, 5)])
-			tree.position = foot(ox, oy)
-			_entities.add_child(tree)
+			_prop("tree_apple_old", foot(ox, oy), "AppleTree%d" % i)
 			i += 1
 	# A split-rail fence along the orchard's edge, with a gap at the gate.
 	for fy in range(26, 48):
 		if fy in range(36, 41):
 			continue
-		decor("OrchardFence%d" % fy, S + "fence_v.png", foot(99.2, fy), Vector2(4, 4))
+		decor("OrchardFence%d" % fy, CS + "fence_v.png", foot(99.2, fy), Vector2(4, 4))
 
 
 func _place_markers_and_exits() -> void:

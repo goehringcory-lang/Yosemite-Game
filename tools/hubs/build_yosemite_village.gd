@@ -1,4 +1,4 @@
-extends Node
+extends AhwahneeStyle
 ## Builds the Yosemite Valley central hub: Yosemite Village and Camp 4 at
 ## walking scale, with their stores, the Indian Village, the gear traders,
 ## the creek and river bridges, and exits back to the full Valley map.
@@ -7,36 +7,44 @@ extends Node
 ##   godot --headless --path . res://tools/hubs/build_hubs.tscn
 ##
 ## It rewrites scenes/regions/yosemite_village.tscn, the art in
-## assets/sprites/buildings/, the shuttle stop scene, the store foods, and
-## the shop data. Put story NPCs in scenes/story/content/yosemite_village.tscn
-## (placed by Marker name), not in the region scene, so a rebuild keeps them.
+## assets/sprites/buildings/ (valley_art.gd draws the buildings and camp props,
+## valley_land_art.gd the wall of the Valley and Lower Yosemite Fall, both in
+## the Ahwahnee's style), the painted ground in assets/sprites/ahwahnee/, the
+## shuttle stop scene, the store foods, and the shop data. Trees, plants,
+## rocks and logs are the Ahwahnee sprites (see ahwahnee_style.gd). Put story
+## NPCs in scenes/story/content/yosemite_village.tscn (placed by Marker name),
+## not in the region scene, so a rebuild keeps them.
 ##
 ## The layout is not to scale: it squeezes the 1.5 km from Camp 4 to the
 ## Village into one walkable map, keeping the real order of things west to
 ## east and north (the Valley wall) to south (the Merced).
 
-const Terrain = preload("res://tools/mapgen/terrain.gd")
-const Art = preload("res://tools/mapgen/art.gd")
 const HubArt = preload("res://tools/hubs/hub_art.gd")
+const ValleyArt = preload("res://tools/hubs/valley_art.gd")
+const ValleyLandArt = preload("res://tools/hubs/valley_land_art.gd")
+const HotelArt = preload("res://tools/hubs/ahwahnee_hotel_art.gd")
 
 const W := 100
 const H := 60
-const T := 16
 const SCENE := "res://scenes/regions/yosemite_village.tscn"
 const SHUTTLE_SCENE := "res://scenes/objects/shuttle_stop.tscn"
-const TILESET := preload("res://assets/tiles/world_tileset.tres")
 const B := "res://assets/sprites/buildings/"
+const GEO := Vector2(-119.5873, 37.7475)
 
-var kind := PackedInt32Array()
-var no_trees := PackedByteArray()
-var rng := RandomNumberGenerator.new()
-var noise := FastNoiseLite.new()
+## Where Lower Yosemite Fall lands: the fall tiles are x 43..45, rows 0..7.
+const FALL_CX := 44 * 16 + 8
+const FALL_ROWS := 8
 
 
 func _ready() -> void:
+	w = W
+	h = H
 	print("== Yosemite Village art")
 	HubArt.new().save_all()
-	_import()
+	HotelArt.new().save_all()
+	ValleyArt.new().save_all()
+	load_flora()
+	import_assets()
 	print("== data")
 	_build_store_foods()
 	_build_shops()
@@ -47,19 +55,12 @@ func _ready() -> void:
 	get_tree().quit()
 
 
-func _import() -> void:
-	var output := []
-	OS.execute(OS.get_executable_path(), ["--headless", "--path", ProjectSettings.globalize_path("res://"), "--import"], output, true)
-
-
 func _save(res: Resource, path: String) -> void:
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(path.get_base_dir()))
-	assert(ResourceSaver.save(res, path) == OK, "Could not save " + path)
-	res.take_over_path(path)
+	save_resource(res, path)
 
 
 func _texture(path: String) -> Texture2D:
-	return ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_REPLACE)
+	return texture(path)
 
 
 # ---------------------------------------------------------------- data
@@ -131,7 +132,7 @@ func _build_shops() -> void:
 func _build_shuttle_scene() -> void:
 	var body := _prop_body("ShuttleStop", B + "shuttle_stop.png", Vector2(6, 4), Vector2(16, 26))
 	body.set_script(load("res://scripts/objects/shuttle_stop.gd"))
-	_pack(body, SHUTTLE_SCENE)
+	pack(body, SHUTTLE_SCENE)
 
 
 # ---------------------------------------------------------------- layout
@@ -245,9 +246,9 @@ func _layout() -> void:
 	_rect(40, 8, 41, 10, Terrain.GRANITE)
 	_rect(47, 8, 48, 9, Terrain.GRANITE)
 
-	# Keep trees off paths, buildings, water, and the meadow.
+	# Keep trees and plants off paths, paving, and water.
 	for k in W * H:
-		if path[k] or water[k] or kind[k] in [Terrain.PARKING, Terrain.PAVED, Terrain.MEADOW, Terrain.WET_MEADOW, Terrain.SAND]:
+		if path[k] or water[k] or kind[k] in [Terrain.PARKING, Terrain.PAVED]:
 			no_trees[k] = 1
 	_clear_trees(34, 24, 42, 36)
 	_clear_trees(62, 10, 96, 31)
@@ -255,79 +256,25 @@ func _layout() -> void:
 
 # ---------------------------------------------------------------- scene
 
-var _root: Region
-var _entities: Node2D
-var _markers: Node2D
-var _places: Node2D
-var _exits: Node2D
-
-
 func _build_region() -> void:
 	_layout()
-	_root = Region.new()
-	_root.name = "YosemiteVillage"
-	_root.y_sort_enabled = true
-	_root.region_id = "yosemite_village"
-	_root.hub_id = "yosemite_valley"
-	_root.display_name = "Yosemite Village"
-	_root.geo_anchor = Vector2(-119.5873, 37.7475)
-
-	var ground := _layer("Ground")
-	ground.z_index = -10
-	var blocker := _layer("Blocker")
-	blocker.visible = false
-	var flora := _layer("Flora")
-	flora.y_sort_enabled = true
-	var canopy := _layer("OakCanopy")
-	canopy.y_sort_enabled = true
-	canopy.set_script(load("res://scripts/world/seasonal_canopy.gd"))
-	for layer in [ground, blocker, flora, canopy]:
-		_root.add_child(layer)
-	_entities = _group("Entities", true)
-	_markers = _group("Markers")
-	_places = _group("Places")
-	_exits = _group("Exits")
-
-	for y in H:
-		for x in W:
-			ground.set_cell(Vector2i(x, y), Art.SOURCE_TERRAIN, Vector2i((x * 7 + y * 13 + (x * y) % 5) % Art.VARIANTS, kind[y * W + x]))
+	start_region("YosemiteVillage", "yosemite_village", "Yosemite Village", GEO)
+	paint_ground()
+	_save_ground_art("ground_yosemite_village", 1851)
+	_place_wall()
 
 	_place_buildings()
 	_place_camp_4()
 	_place_village_life()
 	_place_markers_and_places()
 	_place_exits()
-	_place_trees(flora, canopy)
-	_place_blockers(blocker)
-
-	var forage := Node2D.new()
-	forage.name = "Forage_yosemite_village"
-	forage.y_sort_enabled = true
-	forage.set_script(load("res://scripts/world/forage_spawner.gd"))
-	_entities.add_child(forage)
-	forage.set("ground", ground)
-	forage.set("flora", flora)
-	forage.set("oak_canopy", canopy)
-	forage.set("amount_scale", 2.0)
+	_dress_village()
+	place_blockers()
+	add_forage("yosemite_village", 2.0)
 
 	for child in _root.get_children():
 		_own(child, _root)
-	_pack(_root, SCENE)
-
-
-func _layer(layer_name: String) -> TileMapLayer:
-	var layer := TileMapLayer.new()
-	layer.name = layer_name
-	layer.tile_set = TILESET
-	return layer
-
-
-func _group(group_name: String, y_sort := false) -> Node2D:
-	var node := Node2D.new()
-	node.name = group_name
-	node.y_sort_enabled = y_sort
-	_root.add_child(node)
-	return node
+	pack(_root, SCENE)
 
 
 func _tile_pos(x: float, y: float) -> Vector2:
@@ -394,6 +341,7 @@ func _building(prop_name: String, sprite_name: String, tile_x: float, base_y: in
 	var tex := _texture(B + sprite_name + ".png")
 	var footprint := Vector2(tex.get_width() - 4, tex.get_height() * 0.38)
 	_sign_prop(prop_name, B + sprite_name + ".png", Vector2(tile_x * T + T / 2.0, base_y * T), footprint, title, text)
+	_glow_building(sprite_name, tile_x, base_y)
 
 
 func _instance(path: String, at: Vector2, node_name: String) -> Node2D:
@@ -590,81 +538,76 @@ func _place_exits() -> void:
 		_exits.add_child(area)
 
 
-func _place_trees(flora: TileMapLayer, canopy: TileMapLayer) -> void:
-	var F := Terrain.Flora
-	var reserved := {}
-	for child in _entities.get_children():
-		if child is Node2D:
-			var c := Vector2i((child as Node2D).position / T)
-			for dy in range(-3, 2):
-				for dx in range(-3, 4):
-					reserved[c + Vector2i(dx, dy)] = true
-	for y in H:
-		for x in W:
-			var k := y * W + x
-			if no_trees[k] or reserved.has(Vector2i(x, y)):
-				continue
-			var t := kind[k]
-			var density := 0.0
-			var options: Array = []
-			match t:
-				Terrain.FOREST:
-					density = 0.3
-					options = [[F.PONDEROSA, 4], [F.INCENSE_CEDAR, 3], [F.BLACK_OAK_TRUNK, 4], [F.DOGWOOD, 1], [F.WHITE_FIR, 1]]
-				Terrain.CAMP:
-					density = 0.14
-					options = [[F.PONDEROSA, 3], [F.BLACK_OAK_TRUNK, 3], [F.INCENSE_CEDAR, 2]]
-				Terrain.TALUS:
-					density = 0.08
-					options = [[F.INCENSE_CEDAR, 1], [F.LIVE_OAK, 1]]
-			if density <= 0.0 or rng.randf() > density * (0.6 + noise.get_noise_2d(x, y)):
-				continue
-			var total := 0.0
-			for o: Array in options:
-				total += o[1]
-			var roll := rng.randf() * total
-			var pick: int = options[-1][0]
-			for o: Array in options:
-				roll -= o[1]
-				if roll <= 0.0:
-					pick = o[0]
-					break
-			flora.set_cell(Vector2i(x, y), Art.SOURCE_FLORA, Terrain.frame_coords(pick))
-			if pick == F.BLACK_OAK_TRUNK:
-				canopy.set_cell(Vector2i(x, y), Art.SOURCE_FLORA, Terrain.frame_coords(F.BLACK_OAK_CANOPY))
+# ---------------------------------------------------------------- Ahwahnee dressing
+
+## Sprite names of the buildings and where their top-left corner sits.
+func _glow_building(sprite_name: String, tile_x: float, base_y: int) -> void:
+	var tex := texture(B + sprite_name + ".png")
+	_glow(sprite_name + "_glow", Vector2(tile_x * T + T / 2.0 - tex.get_width() / 2.0, base_y * T - tex.get_height()), 1.0, B)
 
 
-## Walls where unwalkable ground (cliff, talus, water) meets walkable
-## ground, and a ring around the map. Road exits sit inside the ring.
-func _place_blockers(blocker: TileMapLayer) -> void:
-	for y in range(-1, H + 1):
-		for x in range(-1, W + 1):
-			var inside := x >= 0 and y >= 0 and x < W and y < H
-			if inside and not Terrain.is_solid(kind[y * W + x]):
-				continue
-			var touches := false
-			for dy in range(-1, 2):
-				for dx in range(-1, 2):
-					var nx := x + dx
-					var ny := y + dy
-					if nx >= 0 and ny >= 0 and nx < W and ny < H and not Terrain.is_solid(kind[ny * W + nx]):
-						touches = true
-			if touches:
-				blocker.set_cell(Vector2i(x, y), Art.SOURCE_BLOCKER, Vector2i.ZERO)
+## The wall of the Valley drawn for the cliff outline, with Lower Yosemite
+## Fall animated down its gully and mist where it lands.
+func _place_wall() -> void:
+	var prof := PackedInt32Array()
+	prof.resize(W * T)
+	for x in W:
+		var rows := 0
+		while rows < H and kind[rows * W + x] in [Terrain.CLIFF, Terrain.FALLS]:
+			rows += 1
+		for px_ in T:
+			prof[x * T + px_] = rows * T
+	ValleyLandArt.new().save_village(prof, FALL_CX)
+	import_assets()
+	_backdrop("village_wall", Vector2.ZERO, -8, B)
+	_animation("LowerYosemiteFall", "village_fall", 8.0, Vector2(FALL_CX - ValleyLandArt.FALL_W / 2.0, 0), -7, B)
+	_animation("FallMist", "village_mist", 5.0, Vector2(FALL_CX - 32, FALL_ROWS * T - 28 + 6), -6, B)
+	_ambient("FallSpray", "mist", Vector2(FALL_CX, FALL_ROWS * T + 4), Vector2(28, 6))
 
 
-func _own(node: Node, owner: Node) -> void:
-	node.owner = owner
-	if node.scene_file_path != "":
-		return
-	for child in node.get_children():
-		_own(child, owner)
-
-
-func _pack(root: Node, path: String) -> void:
-	for child in root.get_children():
-		_own(child, root)
-	var packed := PackedScene.new()
-	assert(packed.pack(root) == OK)
-	_save(packed, path)
-	root.free()
+## Trees, plants, rocks, logs and the hotel's wrought-iron lamps: the same
+## dressing as the Ahwahnee grounds, laid over this map's terrain.
+func _dress_village() -> void:
+	_reserve_entities(1)
+	var forest_table := [["tree_ponderosa", 4.0], ["tree_incense_cedar", 3.5], ["tree_black_oak", 3.2], ["tree_white_fir", 1.2], ["tree_dogwood", 1.4]]
+	_fringe_trees([Terrain.FOREST], 3, 0.7, forest_table, 2, 22.0)
+	_fringe_trees([Terrain.CAMP], 4, 0.5, [["tree_ponderosa", 3.0], ["tree_black_oak", 3.0], ["tree_incense_cedar", 2.0]], 1, 34.0)
+	_fringe_trees([Terrain.TALUS], 4, 0.4, [["tree_incense_cedar", 2.0], ["tree_snag", 0.6], ["tree_white_fir", 1.0]], 0, 30.0)
+	_fringe_trees([Terrain.MEADOW], 8, 0.3, [["tree_black_oak", 3.0], ["tree_dogwood", 1.0]], 2, 70.0)
+	# Cook's Meadow: wildflowers, tall grass and lupine in drifts.
+	var meadow := Rect2i(46, 39, 52, 9)
+	_scatter_decor("plant_wildflowers", [Terrain.MEADOW], 60, meadow, 1)
+	_scatter_decor("plant_lupine", [Terrain.MEADOW], 18, meadow, 1)
+	_scatter_decor("plant_paintbrush", [Terrain.MEADOW], 10, meadow, 1)
+	_scatter_decor("plant_tall_grass", [Terrain.MEADOW, Terrain.WET_MEADOW], 40, meadow, 1)
+	_scatter_decor("plant_cattails", [Terrain.WET_MEADOW], 6, meadow, 0)
+	# The forest floor.
+	var all := Rect2i(0, 0, W, H)
+	_scatter_decor("plant_fern", [Terrain.FOREST], 90, all, 1)
+	_scatter_decor("plant_bracken", [Terrain.FOREST], 40, all, 1)
+	_scatter_decor("plant_shrub", [Terrain.FOREST, Terrain.CAMP], 70, all, 2)
+	_scatter_decor("plant_manzanita", [Terrain.TALUS], 8, Rect2i(0, 4, W, 10), 0)
+	_scatter_decor("plant_mushrooms", [Terrain.FOREST], 10, all, 2)
+	_scatter_decor("rock_granite", [Terrain.FOREST, Terrain.CAMP, Terrain.MEADOW], 26, all, 2)
+	_scatter_decor("rock_mossy", [Terrain.FOREST], 14, all, 2)
+	_scatter_decor("rock_river", [Terrain.SAND], 20, all, 0)
+	_scatter_decor("log_fallen", [Terrain.FOREST], 6, all, 2)
+	_scatter_decor("tree_snag", [Terrain.FOREST], 4, all, 3)
+	# Boulders and ferns where the fall lands.
+	for i in 8:
+		_prop(_pick("rock_granite" if i % 2 == 0 else "rock_mossy"), Vector2(FALL_CX + rng.randf_range(-60.0, 60.0), FALL_ROWS * T + rng.randf_range(8.0, 40.0)))
+	for i in 10:
+		_prop(_pick("plant_fern"), Vector2(FALL_CX + rng.randf_range(-72.0, 72.0), FALL_ROWS * T + rng.randf_range(0.0, 44.0)))
+	# Wrought-iron lamps along the Village mall, the plaza and the lodge walk,
+	# and benches where people sit.
+	var lamps := [[52, 22], [60, 22], [68, 22], [76, 22], [84, 22], [92, 22], [64, 32], [76, 32], [38, 37], [34, 22], [42, 22], [24, 22]]
+	for l: Array in lamps:
+		if _has("lamp_wrought"):
+			decor("Lamp%d_%d" % [l[0], l[1]], S + "lamp_wrought.png", foot(l[0], l[1]), Vector2(6, 4))
+			_glow("lamp_wrought_glow", foot(l[0], l[1]) - Vector2(5, texture(S + "lamp_wrought.png").get_height()))
+	for p in [[56, 22], [72, 22], [88, 22], [66, 31], [78, 31], [58, 41], [62, 45], [36, 28], [41, 33]]:
+		_prop("garden_bench", foot(p[0], p[1]) + Vector2(0, 2))
+	for p in [[50, 22], [94, 22], [63, 23], [81, 23]]:
+		_prop(_pick("garden_urn"), foot(p[0], p[1]) + Vector2(0, -2))
+	_ambient("MeadowFireflies", "fireflies", Vector2(72, 43) * T, Vector2(24, 4) * T)
+	_ambient("CreekFireflies", "fireflies", Vector2(46, 28) * T, Vector2(3, 14) * T)

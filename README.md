@@ -89,7 +89,7 @@ Driving to Yosemite Valley brings you to **Yosemite Village**, a walking-scale c
 - **The Indian Village** behind the museum: umachas (bark homes), a chuckah (acorn granary), and a grinding rock you can use. Its text is a placeholder until tribal review.
 - **Cook's Meadow** with its boardwalk, and the Merced with **Sentinel Bridge** and **Swinging Bridge**.
 
-Roads out of the hub lead back onto the full Valley map, and doors on that map (at the Village, Camp 4, and Cook's Meadow) lead back in. Rebuild the hub with `godot --headless --path . res://tools/hubs/build_hubs.tscn`. That rewrites the hub scene, so put NPCs in `scenes/story/content/yosemite_village.tscn` and place them by marker name.
+Roads out of the hub lead back onto the full Valley map, and doors on that map (at the Village, Camp 4, and Cook's Meadow) lead back in. Rebuild the hub with `godot --headless --path . res://tools/hubs/build_hubs.tscn`. That rewrites the hub scene, so put NPCs in `scenes/story/content/yosemite_village.tscn` and place them by marker name. The village is drawn in the Ahwahnee's style (see below): granite-footed timber buildings with mossy shingle roofs and lit windows at dusk (`tools/hubs/valley_art.gd`), the granite wall of the Valley with Lower Yosemite Fall animated down it (`valley_land_art.gd`), and the painted ground, trees, plants and boulders shared with the hotel grounds.
 
 ### Curry Village: your first stop
 
@@ -103,6 +103,24 @@ Leave the Lamon Homestead by its gate and you walk out of the old apple orchard 
 - **After dark** lamps, windows, tents and the fire pit glow (`scripts/world/night_light.gd`), chimneys smoke in the cold months, mist rises at the foot of Staircase Falls, and fireflies come out over the meadow (`scripts/world/ambient_fx.gd`).
 
 Rebuild it with `godot --headless --path . res://tools/hubs/build_curry.tscn`. That redraws every sprite (`tools/hubs/curry_art.gd`, `interior_art.gd`, on `pixel_kit.gd`), paints the whole ground as one picture (`tools/hubs/ground_art.gd`), and rewrites `curry_village.tscn`, `curry_store.tscn` and `curry_mountain_shop.tscn`. The layout is in `tools/hubs/build_curry_village.gd`. To look at a region the way the player sees it, run `SHOT_REGION=curry_village SHOT_SPAWNS=arrival,plaza godot --path . res://tools/shots/region_shot.tscn` (it needs a window). `SHOT_HOUR=21` shoots at night. In-game pictures are in `docs/curry_village_plaza.png`, `curry_village_cabins_dusk.png` and `curry_mountain_shop.png`, and every sprite is laid out in `docs/curry_art_preview.png` (`tools/hubs/preview_art.gd`).
+
+### The Ahwahnee look: one style for every Valley area
+
+The Ahwahnee's art is the reference for the whole Valley: ramp-shaded, ordered-dithered pixel art lit from the upper left, warm highlights over cool shadows, granite and stained timber, moss on the shingles, a dark rim round every sprite, and a ground painted as one picture from the terrain grid. Every hand-made Valley area now uses it, through one shared base (`tools/hubs/ahwahnee_style.gd`, which holds the tree, plant and rock scattering and the ground painting):
+
+| Area | Rebuild with | What is drawn in the Ahwahnee style |
+|---|---|---|
+| Lamon Homestead | `res://tools/hubs/build_homestead.tscn` | painted ground, a tree line and boulders round the edge, meadow flowers; the five oaks show all four seasons (`tree_oak_seasons.png`) and still drop acorns |
+| Curry Village | `res://tools/hubs/build_curry.tscn` | painted ground with a mown green, Registration, Pavilion, Store, Mountain Shop, Pizza Deck, amphitheater, entrance arch, tent and wood cabins (`curry_ahwahnee_art.gd`), the granite wall with Staircase Falls, trees and plants, wrought-iron lamps |
+| Camp Curry Store and Mountain Shop (insides) | `build_curry.tscn` | stained plank floors, window frames and wrought lanterns (`interior_ahwahnee_art.gd`) |
+| Yosemite Village and Camp 4 | `res://tools/hubs/build_hubs.tscn` | the Village, Welcome Center, Museum, Best's Studio, Degnan's, Wilderness Center and Lodge, the Indian Village shapes, camp props, the wall and Lower Yosemite Fall, trees, plants, lamps |
+| The Ahwahnee and Stoneman Meadow | `res://tools/hubs/build_ahwahnee.tscn` | the original |
+
+![Yosemite Village](docs/yosemite_village_ahwahnee_style.png)
+![Curry Village](docs/curry_village_ahwahnee_style.png)
+![Lamon Homestead](docs/lamon_homestead_ahwahnee_style.png)
+
+Rebuilding rewrites each area's scene, so story NPCs stay in `scenes/story/content/`. To look at the village art on its own: `godot --headless --path . -s res://tools/hubs/preview_valley_art.gd` writes `docs/valley_art_preview.png`.
 
 ### The Ahwahnee: north from the homestead
 
