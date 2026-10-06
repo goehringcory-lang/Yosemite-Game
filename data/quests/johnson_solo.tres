@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "johnson_solo"
+title = "Ten Days Alone"
+giver = "beverly_johnson"
+requires = PackedStringArray("harding_summit")
+intro = PackedStringArray("You topped out on the Nose. Now let me tell you about the part nobody sees.", "I'm planning another long solo. Ten days on the wall, every bite of food hauled by me alone. It has to be light, it has to keep, and it has to taste like something on day nine.", "The Paiute and Mono people up over the crest trade pine nuts. They weigh nothing and they keep for a month. Bring me some from the high country, and I'll show you how I pack a haul bag.")
+steps = [{"type": "have", "item": "pine_nuts", "count": 4, "consume": true, "objective": "Bring Beverly Johnson 4 pine nuts from the high country", "reminder": "Pine nuts, four handfuls. You'll find them up the Tioga Road, in Tuolumne.", "done": ["Perfect. Light, rich, and they won't go off."]}, {"type": "have_food", "energy": 60, "objective": "Pack food worth 60 energy, the way Bev showed you", "reminder": "Heaviest food at the bottom, what you'll eat today on top. Pack it, and show me.", "done": ["Look at that. You'd last a week up there.", "On a solo there's nobody to blame and nobody to thank. You learn to count everything twice."]}]
+outro = PackedStringArray("Here's some of what I've been saving for the wall. You've earned a share.", "When you go up alone, people ask if you were scared. Of course I was. Scared and ready aren't opposites.")
+reward_items = {"dried_apricots": 3, "chocolate_bar": 2}

@@ -29,6 +29,10 @@ func _ready() -> void:
 	_check_main_line()
 	_play_first_chapter()
 	_play_the_nose()
+	_check_hand_offs()
+	_check_side_stories()
+	_play_side_stories()
+	_play_last_page()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
 
@@ -366,6 +370,90 @@ func _play_the_nose() -> void:
 	var lines := QuestLog.talk_to("warren_harding")
 	check(QuestLog.is_completed("harding_summit") and Park.is_hub_unlocked("tuolumne_meadows"), "climbing the Nose opens Tuolumne Meadows")
 	check(lines.back().text.contains("Tuolumne"), "the reward line names the new area (%s)" % lines.back().text)
+
+
+## Every main-line quest tells you who to see next, so the story never
+## stalls with nobody to talk to.
+func _check_hand_offs() -> void:
+	var order := ["clark_register", "shop_guidebook", "shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron", "eichorn_spires",
+		"robbins_clean", "salathe_steel", "harding_summit", "muir_cathedral", "muir_glacier", "clark_last_page"]
+	for i in range(order.size() - 1):
+		var quest := QuestLog.get_quest(order[i])
+		var next := QuestLog.get_quest(order[i + 1])
+		if quest.giver == next.giver or quest.steps.back().get("target") == next.giver:
+			continue # the same person, or the last step already takes you there
+		var surname: String = QuestLog.get_character(next.giver).display_name.split(" ")[-1]
+		check(surname in " ".join(quest.outro), "%s's ending points you to %s" % [quest.id, surname])
+
+
+## Side stories come in every chapter, not just the first.
+func _check_side_stories() -> void:
+	var side: Array = QuestLog.QUESTS.filter(func(q: QuestData) -> bool: return not q.main_line)
+	check(side.size() >= 18, "there are plenty of side stories (%d)" % side.size())
+	# The main-line quest each chapter opens with: side stories that unlock there.
+	for gate in ["clark_register", "leonard_belay", "eichorn_apron", "robbins_clean", "harding_summit"]:
+		var opened := side.filter(func(q: QuestData) -> bool: return gate in q.requires)
+		check(opened.size() >= 2, "at least two side stories open after %s (%d)" % [gate, opened.size()])
+	for quest: QuestData in side:
+		var gives := not (quest.reward_gear.is_empty() and quest.reward_items.is_empty() and quest.reward_recipes.is_empty() and quest.reward_unlocks.is_empty())
+		check(gives or quest.giver in ["tenaya", "maria_lebrado"], "%s gives something back" % quest.id)
+
+
+## Wren's promise of the rest of the Apron, and Anderson's eyebolt going to
+## Robbins and Harding.
+func _play_side_stories() -> void:
+	QuestLog.start_new_game()
+	Inventory.items.clear()
+	QuestLog.completed.append_array(["clark_register", "shop_guidebook", "shop_outfit", "partner_apron", "leonard_belay"])
+	QuestLog.talk_to("wren_alvarez")
+	check(QuestLog.active.has("wren_apron"), "Wren asks you back for the rest of the Apron")
+	QuestLog.talk_to("jules_eichorn")
+	Inventory.add("lamon_apple", 3)
+	QuestLog.talk_to("wren_alvarez")
+	QuestLog.record_climb("glacier_point_apron")
+	check(QuestLog.tick_report("glacier_point_apron").size() == 3, "one Apron tick finishes both Eichorn's and Wren's quests")
+	QuestLog.talk_to("wren_alvarez")
+	check(QuestLog.is_completed("wren_apron") and Inventory.count("chocolate_bar") == 2, "Wren shares the shop's snacks")
+
+	QuestLog.completed.append_array(["eichorn_apron", "eichorn_spires", "robbins_clean"])
+	Inventory.items.clear()
+	check(QuestLog.available_from("royal_robbins") == null, "Robbins has nothing to say about iron until you have some")
+	QuestLog.completed.append("anderson_half_dome")
+	Inventory.add("anderson_eyebolt")
+	QuestLog.talk_to("royal_robbins")
+	QuestLog.talk_to("royal_robbins")
+	check(QuestLog.current_step(QuestLog.get_quest("robbins_eyebolt")).get("target") == "warren_harding", "Robbins sends you to Harding about bolts")
+	QuestLog.talk_to("warren_harding")
+	QuestLog.talk_to("royal_robbins")
+	check(QuestLog.is_completed("robbins_eyebolt") and Inventory.count("anderson_eyebolt") == 1, "both views are heard, and you keep the eyebolt")
+
+	# The journal names the side story that's holding up the main line.
+	QuestLog.start_new_game()
+	QuestLog.completed.append_array(["clark_register", "shop_guidebook", "shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron",
+		"eichorn_spires", "robbins_clean", "salathe_steel"])
+	var hint: String = QuestLog.main_objective().objective
+	check("Tabuce" in hint and not "last page" in hint, "before the Nose, the journal sends you to Tabuce (%s)" % hint)
+
+
+## Clark's last page: the player writes their own entry, and it's saved.
+func _play_last_page() -> void:
+	QuestLog.start_new_game()
+	QuestLog.completed.append_array(["clark_register", "shop_guidebook", "shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron",
+		"eichorn_spires", "robbins_clean", "salathe_steel", "harding_summit", "muir_cathedral", "lebrado_villages", "muir_glacier", "lucy_basket"])
+	check(QuestLog.main_objective().objective.contains("Galen Clark"), "the journal sends you back to Clark at the end")
+	QuestLog.talk_to("galen_clark")
+	QuestLog.talk_to("maggie_howard")
+	QuestLog.talk_to("maria_lebrado")
+	check(not QuestLog.final_entry_pending(), "no last page until Clark has the book back")
+	QuestLog.talk_to("galen_clark")
+	check(QuestLog.is_completed("clark_last_page") and QuestLog.final_entry_pending(), "The Last Page leaves you the last page to write")
+	var lines := QuestLog.write_final_entry(1)
+	check(QuestLog.final_entry == 1 and not QuestLog.final_entry_pending() and lines.size() == 3, "you write your entry, and the season turns")
+	check(QuestLog.write_final_entry(0).is_empty() and QuestLog.final_entry == 1, "the last page is written once")
+	var saved := QuestLog.save_data()
+	QuestLog.start_new_game()
+	QuestLog.load_data(saved)
+	check(QuestLog.final_entry == 1, "the last page is saved")
 
 
 func _overlays() -> Array[Node]:

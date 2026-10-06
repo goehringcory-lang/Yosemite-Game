@@ -38,7 +38,7 @@ NPCs go in a hub's story overlay (`scenes/story/content/<hub>.tscn`). Each NPC h
 | Person | Years | Where | Gives |
 |---|---|---|---|
 | **Galen Clark** | 1814–1910 | Lamon Homestead gate | The Register (start), The Last Page (ending) |
-| **James Lamon** | 1817–1875 | Lamon Homestead | Lamon apples |
+| **James Lamon** | 1817–1875 | Lamon Homestead | Lamon apples, dried apples |
 | **Tenaya** ✦ | d. 1853 | Tenaya Creek, near Mirror Lake | A Register entry |
 | **Tabuce (Maggie Howard)** ✦ | | The black oaks | Chuckah and acorn recipes |
 | **Bridget Degnan** | | Degnan's Bakery | Bread, sourdough starter |
@@ -56,7 +56,7 @@ NPCs go in a hub's story overlay (`scenes/story/content/<hub>.tscn`). Each NPC h
 | **John Salathé** | 1899–1992 | Camp 4 | 2 cams (hard steel) |
 | **Warren Harding** | 1924–2002 | El Capitan Meadow | Aiders, haul bag, the road to Tuolumne |
 | **Beverly Johnson** | 1947–1994 | El Capitan Meadow | 2 ascenders, portaledge |
-| **Maria Lebrado (Totuya)** ✦ | c. 1840–1931 | Near the Ahwahnee | A Register entry |
+| **Maria Lebrado (Totuya)** ✦ | c. 1840–1931 | The meadow by the Ahwahnee | A Register entry |
 | **John Muir** | 1838–1914 | Cathedral Lakes trailhead | Ice axe, crampons, pine nuts |
 | **Carrie Bethel** ✦ | 1898–1974 | Soda Springs | Pine nuts |
 
@@ -86,7 +86,7 @@ Talking to a visitor gets one random line.
 
 | Place | Region · spot | Who's there |
 |---|---|---|
-| Lamon Homestead (your camp) | lamon_homestead | Clark, Lamon |
+| Lamon Homestead (your camp) | lamon_homestead · `gate`, `home` | Clark, Lamon (by your tent) |
 | Camp 4 and Swan Slab | yosemite_village · `camp_4` | Leonard, Salathé, a Camp 4 climber; Swan Slab |
 | Degnan's Bakery | yosemite_village · `degnans_bakery` | Bridget Degnan |
 | Best's Studio | yosemite_village · `bests_studio` | Ansel Adams |
@@ -133,28 +133,39 @@ Gear arrives in the order the routes need it, and a quest can hand over gear as 
                               then Beverly Johnson → ascenders + portaledge; then TICK The Nose → the road to Tuolumne
 ★ 8  Cathedral Peak ........ Muir, Tuolumne ................... TICK Cathedral Peak → ice axe, crampons
 ★ 9  Living Ice ............ Muir ............................ TICK Lyell Glacier
-★ 10 The Last Page ......... Clark: after Lucy Telles's and Maria Lebrado's stories → ending
+★ 10 The Last Page ......... Clark: after Lucy Telles's and Maria Lebrado's stories → you write the last page
+                              (pick one of four entries, or leave it blank; it's saved and shown in the journal)
 ```
 
 Geography is part of the progression. You leave the Lamon Homestead: south to Curry Village (guidebook, then the Apron behind it), north to the Ahwahnee (Royal Arches), then out across the Valley (Camp 4, Happy Isles, El Capitan Meadow) and finally up the Tioga Road.
 
 ### Side stories
 
-These stay available alongside the main line. The ones that start at the rim (McCauley, Enid Michael, Hodges, Adams) open after the Apron.
+These stay available alongside the main line, and every chapter opens at least two (`tests/cast_test.tscn` checks this). The ones that start at the rim (McCauley, Enid Michael, Hodges) open after the Apron.
 
 ```
 Clark's guidebook errand ─┬─ Lamon: Lamon's Garden ............ onions + berries → 4 apples
+                          │     └─ (after the Apron) Lamon: Laying By ... yampah + manzanita → dried apples, apples
                           ├─ Tenaya: Ahwahnee ✦ ............... carry his account to Clark → Register entry
                           └─ Degnan: Bread for the Valley ...... deliver to Leonard + Curry → 3 bread, starter
                                 └─ Curry: Let the Bread Rise ... starter → 6 apples
 Tabuce: Acorns for the Winter → The Chuckah ✦ .................. acorns → chuckah + acorn recipes (needed for the Nose)
+After Swan Slab:
+  Wren Alvarez: The Rest of the Apron ... food, then climb the Apron with Wren → chocolate, apricots
+                                          (pays off Wren's promise; the same tick finishes Eichorn's quest)
+  Ansel Adams: Monolith ........... climb the Apron to the rim, report back → 2 quickdraws
+  Anderson: Anderson's Iron ....... food worth 60 energy → Anderson's eyebolt (keepsake)
 After the Apron:
   McCauley: The Fall of Fire ...... ask Curry about the Firefall → 2 bread, Register entry
   Enid Michael: Leave Some Behind . 2 yerba buena → elderberry sauce, toasted toyon, manzanita cider recipes
   Hodges: Mounted Patrol .......... check on Anderson and Michael → 2 quickdraws
-  Ansel Adams: Monolith ........... climb the Apron, report back → 2 quickdraws
+After Royal Arches:
+  Robbins: Old Iron ............... show him Anderson's eyebolt, ask Harding about bolts, report back → wall food
+  Anderson: The Top of the Dome ... climb Snake Dike, tell him about the summit → pilot bread
+After the Nose (Tuolumne open):
+  Beverly Johnson: Ten Days Alone . 4 pine nuts from the high country, pack 60 energy → apricots, chocolate
+  Ansel Adams: High Country Light . ask Muir, climb to the Lyell Glacier, report back → trail mix, cheese
 Other:
-  Anderson: Anderson's Iron ....... food worth 60 energy → Anderson's eyebolt (keepsake)
   Lucy Telles: The Big Basket ✦ ... her name in the Register → 2 acorn cakes
   Carrie Bethel: Over the Crest ✦ . 4 acorn flour → 10 pine nuts
   Maria Lebrado: Where the Villages Were ✦ ... carry her account to Clark → Register entry
@@ -184,7 +195,7 @@ The Mountain Shop and Camp 4 traders sell more of the same pieces for food, but 
 | Degnan's bread | Degnan, McCauley | Climbing food (25 energy, keeps 4 days) |
 | Sourdough starter | Degnan | Jennie Curry's quest |
 | Rental climbing shoes | Pickup by the Curry Village tent cabins | Marty Kessler's *Fitted Out* |
-| Anderson's eyebolt | Anderson | Robbins's quest (shown, not taken; a keepsake) |
+| Anderson's eyebolt | Anderson | Robbins's *Old Iron* (shown, not taken; a keepsake) |
 | Model A axle | Pickup at the El Portal railyard | Salathé forges it into cams |
 | Pine nuts | Carrie Bethel, Muir | High-country food (20 energy, keeps 30 days) |
 

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "wren_apron"
+title = "The Rest of the Apron"
+giver = "wren_alvarez"
+requires = PackedStringArray("leonard_belay")
+intro = PackedStringArray("You found Dick Leonard! Did he make you watch him coil a rope? He does that.", "I promised you the rest of the Apron. Firefall Slab only goes two pitches. The real Apron keeps going, past the bolts, all the way up toward the rim.", "Now you've got a rope and some cams of your own, so you can lead it. I'll come up behind you and clean the gear. Bring something to eat for both of us.")
+steps = [{"type": "have_food", "energy": 30, "objective": "Pack food worth 30 energy for you and Wren", "reminder": "Food for two, please. I always forget lunch on shop days.", "done": ["Ooh, a picnic. Okay, rack up."]}, {"type": "climbed", "route": "glacier_point_apron", "objective": "Climb the Glacier Point Apron with Wren and tick it", "reminder": "Same trail post, but we keep going up. You lead with cams where the cracks are, and I'll clean.", "done": ["That last pitch! I didn't think I'd ever see the rim from the Apron.", "A month ago I didn't know a single person in this Valley."]}]
+outro = PackedStringArray("Jules asked me to help at the Section's practice days, and Bev wants a hand sorting haul bags at El Cap Meadow. I know people now. Funny how that happens.", "Take these from the shop's snack shelf. Marty won't notice. Okay, Marty will notice, but he'll pretend not to.")
+reward_items = {"chocolate_bar": 2, "dried_apricots": 2}

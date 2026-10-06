@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "ansel_high_country"
+title = "High Country Light"
+giver = "ansel_adams"
+requires = PackedStringArray("ansel_monolith", "harding_summit")
+intro = PackedStringArray("The Tioga Road's open to you now? Then you're going to the part of the park I love best.", "I've led Sierra Club outings up there for years. Granite and water and sky, and the light comes in sideways in the evening.", "John Muir knows that country better than anyone. Ask him where to go, then go up high and look. Come back and tell me.")
+steps = [{"type": "talk", "target": "john_muir", "objective": "Ask John Muir where the light is best in the high country", "reminder": "Muir is at the Cathedral Lakes trailhead in Tuolumne. You'll hear him before you see him.", "done": ["The light? Go up Lyell Canyon to the ice. In the evening the whole glacier glows like the inside of a shell.", "Tell your photographer friend to bring a stronger pair of boots."]}, {"type": "climbed", "route": "lyell_glacier", "objective": "Climb to the Lyell Glacier and see the evening light", "reminder": "Up Lyell Canyon to the glacier. Muir's right about the light up there.", "done": []}, {"type": "return", "objective": "Tell Ansel Adams about the light on the Lyell Glacier", "reminder": "Come and tell me about it at Best's Studio.", "done": ["It glowed? Like the inside of a shell. Yes. That's Muir all over, and he's right.", "I spend my life trying to get that onto paper. Some days I nearly manage it."]}]
+outro = PackedStringArray("Take these for your next trip up. You can't look at mountains properly when you're hungry.", "And look at the people up there too. That country was never empty. It only looked empty to some of us.")
+reward_items = {"trail_mix": 2, "cheddar_wedge": 2}

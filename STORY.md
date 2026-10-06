@@ -78,7 +78,7 @@ The full cast (who lives where, with sprites) and every quest chain, with the ge
 
 The player brings the Register back to Galen Clark. The ending is **not** the player becoming the next Guardian. Instead, the player sees how the book has changed: Clark's single account has become many voices that don't always agree. It includes stories told in full, stories told in part, and blank spaces for the stories people chose not to share.
 
-The player adds one final entry of their own and can choose what it says. Then the season turns. Looking after the valley doesn't end, and it was never one person's job.
+The player adds one final entry of their own and can choose what it says: every voice they heard, a thank-you, the tick list, or a blank page like the ones Tabuce and Maria Lebrado asked for. Then the season turns. Looking after the valley doesn't end, and it was never one person's job.
 
 ## The seven associated tribes
 

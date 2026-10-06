@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "anderson_summit"
+title = "The Top of the Dome"
+giver = "george_anderson"
+requires = PackedStringArray("anderson_half_dome", "robbins_clean")
+intro = PackedStringArray("They tell me you're climbing Half Dome by the other side. No holes, no eyebolts, just a seam of rock running up the face like a snake.", "I made the top in October of '75, the first man to stand there, and my hands didn't stop shaking for a week.", "Go on up. When you come down, tell me if it was worth all my drilling to get there first.")
+steps = [{"type": "climbed", "route": "snake_dike", "objective": "Climb Snake Dike to the top of Half Dome", "reminder": "Snake Dike starts up the trail from here, on the far side of the Dome. Go and see the top for yourself.", "done": []}, {"type": "return", "objective": "Tell George Anderson what the top of Half Dome was like", "reminder": "Come back to Happy Isles when you've been on top.", "done": ["Flat as a ballroom and big as a farm, isn't it? Everybody expects a point.", "Worth the drilling? I'll let you decide. People will be walking up my route for a hundred years, I expect. That's my mark on it, for better or worse."]}]
+outro = PackedStringArray("Here's ship's biscuit from my sailing days. It's hard as granite, but it'll keep until the end of the world.")
+reward_items = {"pilot_bread": 3}

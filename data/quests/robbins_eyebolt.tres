@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "robbins_eyebolt"
+title = "Old Iron"
+giver = "royal_robbins"
+requires = PackedStringArray("robbins_clean", "anderson_half_dome")
+intro = PackedStringArray("Is that an eyebolt in your pack? Hand-forged, by the look of it. Where did you get that?", "George Anderson's? From the back of Half Dome, 1875? I've clipped holes like that. Every one of them is still in the rock.", "That's the question, isn't it. Every bolt is somebody deciding the rock should change for them. Go and ask Warren Harding what he thinks of bolts. Then come back and tell me what he said.")
+steps = [{"type": "have", "item": "anderson_eyebolt", "count": 1, "consume": false, "objective": "Show Anderson's eyebolt to Royal Robbins", "reminder": "Bring that eyebolt of Anderson's. I'd like a closer look.", "done": ["Heavy. He swung a hammer for every inch of this."]}, {"type": "talk", "target": "warren_harding", "objective": "Ask Warren Harding what he thinks of bolts", "reminder": "Harding's out at El Capitan Meadow, staring up at the Nose.", "done": ["Bolts? We put about a hundred and twenty-five of them in the Nose. There wasn't any other way up those blank sections.", "Royal thinks a route should be climbed the way the rock allows. I think it should be climbed. Tell him I said so. He'll make that face."]}, {"type": "return", "objective": "Tell Royal Robbins what Harding said", "reminder": "Come back and tell me what Warren said. I can guess, but tell me anyway.", "done": ["He said that? Of course he did.", "Write both down. He's not wrong that the wall got climbed, and I'm not wrong that it costs the rock something. People can argue about it for the next hundred years."]}]
+outro = PackedStringArray("Keep the eyebolt. Anderson earned his mark on the Dome, and you should remember what it took.", "Here, wall food. Climb something today that you could climb again tomorrow without leaving a trace.")
+reward_items = {"beef_jerky": 2, "cheddar_wedge": 1}
