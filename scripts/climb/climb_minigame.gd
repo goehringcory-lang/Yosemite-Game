@@ -965,8 +965,8 @@ func _cost_color(cost: int) -> Color:
 ## Weather and the dark: rain, a gray cast, lightning, a night vignette.
 func _weather(delta: float) -> void:
 	if state.is_stormy() and _phase in [Phase.CLIMB, Phase.CRUX]:
-		for i in 2:
-			_fx.spawn(Vector2(randf_range(0, SCREEN.x + 60), -4), Vector2(-40, 220), 1.2, Color(0.75, 0.82, 0.95, 0.65), 1, 0.0, true)
+		for i in 5:
+			_fx.spawn(Vector2(randf_range(0, SCREEN.x + 60), -4), Vector2(-50, 240), 1.2, Color(0.8, 0.88, 1.0, 0.85), 1, 0.0, true)
 		_next_lightning -= delta
 		if _next_lightning <= 0.0:
 			_lightning = 1.0
@@ -975,7 +975,7 @@ func _weather(delta: float) -> void:
 
 func _draw_atmosphere() -> void:
 	if state.is_stormy():
-		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.1, 0.12, 0.2, 0.28))
+		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.08, 0.1, 0.18, 0.36))
 	if _lightning > 0.0:
 		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(1, 1, 1, 0.5 * _lightning))
 	if _pal.night:

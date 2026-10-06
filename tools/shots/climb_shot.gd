@@ -64,6 +64,15 @@ func _ready() -> void:
 			"crux":
 				game.state.pending = {"kind": "timing", "name": "The crux", "window": 0.3}
 				game._start_crux()
+			"rhythm", "mash":
+				game.state.pending = {"kind": _env("SHOT_SPECIAL", ""), "name": "The Narrows", "window": 0.3}
+				game._start_crux()
+				game._crux.done = 4
+			"storm":
+				game.state.start_minutes = 15 * 60
+				for k in 60:
+					game._weather(0.05)
+					game._fx.update(0.05)
 			"result":
 				game.state.status = ClimbState.Status.TOPPED_OUT
 				game._phase = ClimbMinigame.Phase.RESULT
