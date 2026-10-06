@@ -103,7 +103,45 @@ static func paint(state: ClimbState, rock_key: String, pal: Dictionary, seed_val
 	var edge: PackedInt32Array = result.edge
 	_features(im, c, rng, state, style, deco, edge)
 	_paint_holds(im, c, rng, state, style, edge)
+	if style not in ["chimney", "snow", "ice"] and edge.size() == h:
+		_finish(im, edge)
 	return result
+
+
+## Last pass over the finished wall: a gentle contrast curve with warm lights
+## and cool shadows, the face turning away into shade toward the corner on the
+## right, and a soft fall-off at the left screen edge.
+static func _finish(im: Image, edge: PackedInt32Array) -> void:
+	var w := im.get_width()
+	var h := im.get_height()
+	var data := im.get_data()
+	for y in h:
+		var e := edge[y]
+		var row := y * w * 4
+		for x in range(0, mini(e + 1, w)):
+			var o := row + x * 4
+			if data[o + 3] < 128:
+				continue
+			var r := data[o] / 255.0
+			var g := data[o + 1] / 255.0
+			var b := data[o + 2] / 255.0
+			var lum := r * 0.3 + g * 0.55 + b * 0.15
+			var k := 1.1
+			var shade := 0.93
+			var turn := float(x - (e - 22)) / 18.0
+			if turn > 0.0:
+				shade -= minf(turn, 1.0) * 0.14
+			if x < 16:
+				shade -= (16.0 - x) / 16.0 * 0.1
+			# warm the lights, cool the shadows
+			var warm := (lum - 0.5) * 0.05
+			r = ((r - 0.5) * k + 0.5 + warm) * shade
+			g = ((g - 0.5) * k + 0.5 + warm * 0.4) * shade
+			b = ((b - 0.5) * k + 0.5 - warm) * shade
+			data[o] = int(clampf(r, 0.0, 1.0) * 255.0)
+			data[o + 1] = int(clampf(g, 0.0, 1.0) * 255.0)
+			data[o + 2] = int(clampf(b, 0.0, 1.0) * 255.0)
+	im.set_data(w, h, false, Image.FORMAT_RGBA8, data)
 
 
 # ---------------------------------------------------------------- the face

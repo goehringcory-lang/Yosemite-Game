@@ -507,9 +507,12 @@ func _draw_point(canvas: Control, font: Font, point: Dictionary, selected: bool,
 		ink = BROWN
 		canvas.draw_rect(Rect2(pos - Vector2(1, 1), size + Vector2(2, 3)), TEXT)
 	var alpha := 0.55 if dimmed else 1.0
+	# a soft drop shadow, then the box with a lit top edge
+	canvas.draw_rect(Rect2(pos + Vector2(1, 2), size), Color(0.05, 0.03, 0.02, 0.3 * alpha))
 	canvas.draw_rect(Rect2(pos + Vector2(0, 1), size), Color(border, alpha))
 	canvas.draw_rect(Rect2(pos, size), Color(border, alpha))
 	canvas.draw_rect(Rect2(pos + Vector2(1, 1), size - Vector2(2, 2)), Color(fill, alpha))
+	canvas.draw_rect(Rect2(pos + Vector2(1, 1), Vector2(size.x - 2, 1)), Color(fill.lightened(0.35), alpha))
 	canvas.draw_rect(Rect2(pos + Vector2(1, size.y - 3), Vector2(size.x - 2, 2)), Color(shade, alpha))
 	var text_x := pos.x + 4.0 + icon
 	if ribbon:
@@ -718,6 +721,7 @@ func _build() -> void:
 	_area_footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_area_footer.custom_minimum_size.x = 462
 	_area_footer.size.x = 462
+	_area_footer.add_theme_font_size_override("font_size", 8)
 	_area_hint = _label(_area_view)
 	_area_hint.position = Vector2(290, 4)
 	_area_hint.size = Vector2(184, 12)
