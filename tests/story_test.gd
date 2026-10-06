@@ -137,7 +137,7 @@ func test_apron_is_climbable() -> void:
 		var state := ClimbState.new(nutcracker, 4, seed, kit)
 		play(state)
 		fed += 1 if state.status == ClimbState.Status.TOPPED_OUT else 0
-		Inventory.remove("trail_mix", Inventory.count("trail_mix"))
+		Inventory.items.erase("trail_mix")
 		var empty := ClimbState.new(nutcracker, 4, seed, kit)
 		play(empty, false)
 		hungry += 1 if empty.status == ClimbState.Status.TOPPED_OUT else 0
