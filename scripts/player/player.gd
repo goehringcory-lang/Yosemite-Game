@@ -44,7 +44,7 @@ func _physics_process(_delta: float) -> void:
 	var input := Vector2.ZERO
 	if can_act:
 		input = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	velocity = input * SPEED
+	velocity = input * SPEED * (1.0 + Perks.bonus("muirs_stride"))
 	move_and_slide()
 
 	if input != Vector2.ZERO:

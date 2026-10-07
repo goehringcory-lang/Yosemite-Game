@@ -29,6 +29,7 @@ Granary="*res://scripts/story/granary.gd"
 Recipes="*res://scripts/story/recipes.gd"
 QuestLog="*res://scripts/story/quest_log.gd"
 Larder="*res://scripts/story/larder.gd"
+Perks="*res://scripts/story/perks.gd"
 
 [display]
 

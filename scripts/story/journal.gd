@@ -140,6 +140,8 @@ func _refresh() -> void:
 
 	_guidebook()
 
+	_perks()
+
 	_heading("Climbing gear")
 	var any_gear := false
 	for item: GearData in Gear.GEAR:
@@ -210,6 +212,20 @@ func _guidebook() -> void:
 				_line("     Needs %s. You're ready." % need, DIM)
 			else:
 				_line("     Needs %s. Still missing: %s." % [need, ", ".join(entry.missing)], DIM)
+
+
+## Perks: what people and experience have taught you. Earned ones show their
+## effect and a line of history; the rest show how to earn them.
+func _perks() -> void:
+	_heading("Perks: what the valley taught you (%d of %d)" % [Perks.earned.size(), Perks.PERKS.size()])
+	for perk: Dictionary in Perks.PERKS:
+		if Perks.has(perk.id):
+			_line("%s: %s" % [perk.name, perk.effect], Color(0.7, 1.0, 0.7))
+			_line("     " + perk.flavor + (" (Placeholder pending tribal review.)" if perk.get("review", false) else ""), DIM)
+		else:
+			var p := Perks.progress(perk)
+			var count := " (%d of %d)" % [p[0], p[1]] if p[1] > 1 else ""
+			_line("[ ] %s: %s%s" % [perk.name, perk.how, count], DIM)
 
 
 func _gear_line(item: GearData, count: int) -> void:

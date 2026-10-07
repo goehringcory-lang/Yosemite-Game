@@ -54,7 +54,9 @@ func energy(id: String) -> int:
 
 
 func shelf_life(id: String) -> int:
-	return FOODS.get(id, {}).get("shelf_life", 0)
+	var days: int = FOODS.get(id, {}).get("shelf_life", 0)
+	# Lamon's Cellar (a perk): food keeps a day longer. 0 still means never spoils.
+	return days + int(Perks.bonus("lamons_cellar")) if days > 0 else days
 
 
 func is_edible(id: String) -> bool:
