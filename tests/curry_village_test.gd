@@ -40,6 +40,7 @@ func _ready() -> void:
 
 	var region: Region = world.region
 	_check_region(region)
+	await _check_seasons(region)
 	await _check_night(world, region)
 	_check_map(world, region)
 
@@ -115,6 +116,39 @@ func _ready() -> void:
 	world.free()
 	SaveManager.delete_save()
 	get_tree().quit(failures)
+
+
+## The hand-built village follows the seasons: its black oaks change texture
+## (gold in fall, bare in winter), wildflowers are gone in winter, and the
+## painted ground is graded.
+func _check_seasons(region: Region) -> void:
+	var oak := region.find_child("TreeBlackOak*", true, false).get_node("Sprite") as Sprite2D
+	var flower := region.find_child("PlantWildflowers*", true, false).get_node("Sprite") as Sprite2D
+	var ground := region.get_node("GroundArt") as Sprite2D
+	var start_season: int = GameClock.season
+	GameClock.season = GameClock.Season.SUMMER
+	await _frames()
+	var summer_tex := oak.texture
+	check(flower.visible and not summer_tex.resource_path.contains("seasons"), "the oaks are green and the wildflowers out in summer")
+	GameClock.season = GameClock.Season.FALL
+	await _frames()
+	check(oak.texture != summer_tex and oak.texture.resource_path.ends_with("_fall.png"), "the oaks turn in fall (%s)" % oak.texture.resource_path)
+	var fall_grade: Variant = (ground.material as ShaderMaterial).get_shader_parameter("tint_amount")
+	GameClock.season = GameClock.Season.WINTER
+	await _frames()
+	check(oak.texture != summer_tex and oak.texture.resource_path.ends_with("_winter.png"), "the oaks are bare in winter (%s)" % oak.texture.resource_path)
+	check(not flower.visible, "the wildflowers are gone in winter")
+	check(ground.material is ShaderMaterial and (ground.material as ShaderMaterial).get_shader_parameter("frost") > 0.0 and fall_grade > 0.0, "the painted ground is frosted in winter and golden in fall")
+	GameClock.season = GameClock.Season.SUMMER
+	await _frames()
+	check(oak.texture == summer_tex and flower.visible, "the oaks and flowers come back")
+	GameClock.season = start_season
+	await _frames()
+
+
+func _frames() -> void:
+	for i in 2:
+		await get_tree().process_frame
 
 
 func _offer(vendor: Vendor, id: String) -> ShopOffer:

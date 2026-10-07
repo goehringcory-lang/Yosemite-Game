@@ -145,6 +145,8 @@ The four generated hubs (El Portal, Wawona, Glacier Point, Tuolumne Meadows) and
 ![Glacier Point](docs/glacier_point_painted.png)
 ![Pause menu](docs/ui_pause_menu.png)
 
+The hand-built areas follow the seasons too, without being rebuilt. When a region loads, `scripts/world/seasonal_dressing.gd` swaps its black oaks, dogwoods, garden beds, meadow grass and conifers for the season's drawing (in `assets/sprites/ahwahnee/seasons/`, made by `godot --headless --path . -s res://tools/hubs/build_seasonal_art.gd`), hides lupine, paintbrush and wildflowers in winter and dries them in fall, and grades the painted ground with `assets/shaders/seasonal_ground.gdshader`: dry and golden in fall, cool and frosted in winter. Only sprites change, so collision and foraging stay the same.
+
 ### The Ahwahnee: north from the homestead
 
 The Lamon Homestead has a second gate, in the hedge at its north side, opening onto a trail that runs to the **Ahwahnee Hotel**. It is two hand-made regions, and nothing in them is to scale:
@@ -234,7 +236,7 @@ Every item is a native Sierra plant or food, with a short natural-history note t
 | Black Oak Acorn | Fall | under black oaks | leach first | 14 days, forever in a chuckah |
 | Toyon Berries | Fall, Winter | beside manzanita shrubs | toast first | 5 days |
 
-Black oaks change color with the seasons.
+Black oaks change color with the seasons: new pale leaves in spring, gold and rust in fall, bare in winter.
 
 ## Project layout
 
