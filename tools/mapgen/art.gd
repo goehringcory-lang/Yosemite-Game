@@ -11,6 +11,7 @@ const T := 16
 const TILESET_PATH := "res://assets/tiles/world_tileset.tres"
 const TERRAIN_PNG := "res://assets/sprites/terrain.png"
 const FLORA_PNG := "res://assets/sprites/flora.png"
+const FLORA_GLOW_PNG := "res://assets/sprites/flora_glow.png"
 const BLOCKER_PNG := "res://assets/sprites/blocker.png"
 ## TileSet source ids. Source 0 is the starter atlas and stays as is.
 const SOURCE_TERRAIN := 1
@@ -302,6 +303,11 @@ func paint_flora() -> Image:
 	return FloraHd.new().paint()
 
 
+## The lit windows of the flora atlas's buildings, for the night glow.
+func paint_flora_glow() -> Image:
+	return FloraHd.new().paint_glow()
+
+
 # ---------------------------------------------------------------- objects
 
 func paint_info_sign() -> Image:
@@ -330,6 +336,7 @@ func paint_blocker() -> Image:
 func save_images() -> void:
 	_save_png(paint_terrain(), TERRAIN_PNG)
 	_save_png(paint_flora(), FLORA_PNG)
+	_save_png(paint_flora_glow(), FLORA_GLOW_PNG)
 	_save_png(paint_blocker(), BLOCKER_PNG)
 	_save_png(paint_info_sign(), "res://assets/sprites/info_sign.png")
 	_save_png(paint_trailhead(), "res://assets/sprites/trailhead.png")

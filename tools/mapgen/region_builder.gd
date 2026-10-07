@@ -7,6 +7,7 @@ extends RefCounted
 
 const Terrain = preload("res://tools/mapgen/terrain.gd")
 const Art = preload("res://tools/mapgen/art.gd")
+const Buildings = preload("res://tools/mapgen/hub_buildings.gd")
 const Dem = preload("res://tools/mapgen/dem.gd")
 const BlackOak = preload("res://scripts/objects/black_oak.gd")
 
@@ -379,6 +380,9 @@ func _osm_line(pts: PackedVector2Array, tags: Dictionary) -> void:
 				road_names[k] = [rank, tags.name]
 
 
+## Marks the footprint's cells and gives each a building style. The cells only
+## say where buildings are and what kind: hub_buildings.gd turns them into one
+## building to a footprint when the scene is written.
 func _osm_building(rings: Array, tags: Dictionary) -> void:
 	var cells := _fill(rings, F_BUILDING)
 	if cells.is_empty():
@@ -992,13 +996,19 @@ func _save_scenes(report: Dictionary) -> void:
 	for layer in [below_layer, ground, blocker, flora_layer, canopy]:
 		map.add_child(layer)
 
+	# Building cells are not stamped as tiles: a cell is 35 to 45 m, so a
+	# sprite on each made dense grids. hub_buildings.gd places one building to
+	# a footprint after the spawns and objects are known.
+	var building_cells := {}
 	for j in h:
 		for i in w:
 			var k := j * w + i
 			var atlas := Vector2i(_variant(i, j), kind[k])
 			var target := below_layer if below[k] else ground
 			target.set_cell(Vector2i(i, j), Art.SOURCE_TERRAIN, atlas, _shade_alt(k))
-			if flora[k] >= 0:
+			if flora[k] >= 0 and Buildings.is_building(flora[k]):
+				building_cells[Vector2i(i, j)] = flora[k]
+			elif flora[k] >= 0:
 				var frame := Terrain.frame_coords(flora[k])
 				flora_layer.set_cell(Vector2i(i, j), Art.SOURCE_FLORA, frame)
 				if flora[k] == Terrain.Flora.BLACK_OAK_TRUNK:
@@ -1077,6 +1087,11 @@ func _save_scenes(report: Dictionary) -> void:
 		shape.shape = rect
 		area.add_child(shape)
 		exits.add_child(area)
+
+	var hotel_at := Vector2(-1, -1)
+	if content.get("style", "") == "wawona" and _spawns.has("wawona_hotel"):
+		hotel_at = cell_center(_spawns["wawona_hotel"])
+	Buildings.add_to(map, building_cells, hotel_at)
 
 	for child in map.get_children():
 		_own(child, map)
