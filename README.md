@@ -16,7 +16,7 @@ godot project.godot         # opens the editor; press F5 to play
 | Move | WASD / arrow keys | Left stick / D-pad |
 | Talk, read, pick up, use | E, Space, X, C, or click | A or X |
 | Park and area map | M (Tab or mouse wheel switches tabs) | Back (LB / RB switch tabs) |
-| Journal (quests, gear, food) | J | Y |
+| Journal (quests, perks, gear, food) | J | Y |
 | Pause menu with every control | Esc | Start |
 | Back out of a menu | Esc | B |
 | Menus: choose / confirm | Up/Down / E or Enter | Stick or D-pad / A |
@@ -34,6 +34,8 @@ Controls are set in **Project > Project Settings > Input Map**.
 Start at the Mountain Shop in Curry Village. The clerk, Marty Kessler, trades you a climbing guidebook for food (after you fetch the new printing from the Registration porch), then fits you with your first kit: climbing shoes, a chalk bag, a harness, and five quickdraws. Marty sends you to Wren Alvarez, a new hire looking for a partner, and the two of you climb **Firefall Slab**, a bolted route on the Glacier Point Apron, for your first tick. The guidebook lists every route, its grade, and the gear it needs, and you tick a route off when you top it out. The main story is that tick list: each main quest ends on a climb. Talk to people around the valley. Their quests reward you with climbing gear, recipes, and skills, and the climbers at Camp 4 trade more gear for food. Each climbing route needs certain gear before you can start it. Climbs lead to new parts of the park: the Glacier Point Apron, for example, opens Glacier Point.
 
 Climbing runs on food. Each morning, wild forage appears around your camp, depending on the season and habitat. Fresh greens and berries give quick energy but spoil in days. In fall, gather black oak acorns and store them in a chuckah (a granary) where they never spoil. Then grind them at the bedrock mortar, leach them at the basin, and cook them into mush or long-lasting acorn cakes at the campfire. Press J to open the Journal, which shows your quests, gear, and food.
+
+As you play, the valley teaches you **perks**: small, permanent bonuses earned from people and experience, never bought. Foraging 25 finds earns *Enid's Eye* (one more find each morning), learning to belay from Dick Leonard earns *Leonard's Belay* (more rest at each ledge), two weeks of mornings earns *Muir's Stride* (a quicker walk), and so on. The Journal lists all eight and how to earn the rest. They're in `scripts/story/perks.gd`, and [docs/DESIGN.md](docs/DESIGN.md#perks) has the table.
 
 Sleep in the tent to end the day, which also saves the game. If you're still up at 2 AM you pass out, and the game moves to the next day anyway.
 
@@ -268,7 +270,7 @@ scripts/
   ui/park_map.gd         park and area map screens
   world/day_night.gd     time-of-day lighting (edit the gradient in the Inspector)
   player/player.gd       movement, facing, interaction
-  story/                 quests, gear, food, chuckah, recipes, dialogue, journal (autoloads: Gear, QuestLog, FoodDB, Larder, Granary, Recipes)
+  story/                 quests, gear, food, chuckah, recipes, dialogue, journal, perks (autoloads: Gear, QuestLog, FoodDB, Larder, Granary, Recipes, Perks)
   climb/                 climbing rules (climb_state.gd) and screen
   data/item_data.gd      ItemData resource definition (name, description, icon, forage rules)
 data/items/*.tres        one file per forage item
@@ -320,9 +322,10 @@ godot --headless --path . res://tests/cast_test.tscn
 godot --headless --path . res://tests/climb_test.tscn   # every route, every piece of gear
 xvfb-run -a godot --path . res://tests/climb_screen_test.tscn   # plays all 13 on the real screen (needs a window)
 godot --headless --path . res://tests/eggs_test.tscn
+godot --headless --path . res://tests/perks_test.tscn
 ```
 
-The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds).
+The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds). The perks test earns each perk, checks its effect where it's hooked in, the HUD message and Journal section, and that perks survive a save.
 
 ## Map data credits
 

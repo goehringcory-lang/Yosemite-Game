@@ -63,6 +63,7 @@ func _ready() -> void:
 		Granary.start_new_game()
 		Recipes.start_new_game()
 		QuestLog.start_new_game()
+		Perks.start_new_game()
 		if forage:
 			forage.respawn()
 	hud.bind_player(player)

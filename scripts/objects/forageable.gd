@@ -18,6 +18,7 @@ func interact(_player: Player) -> void:
 	if not is_inside_tree() or is_queued_for_deletion():
 		return
 	Inventory.add(item.id)
+	Perks.note("forage")
 	get_tree().call_group("hud", "show_message", "Found %s! %s" % [item.display_name, item.description])
 	get_parent().remove_child(self)
 	queue_free()

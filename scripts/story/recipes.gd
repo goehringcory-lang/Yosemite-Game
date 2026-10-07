@@ -93,7 +93,7 @@ func make(recipe: RecipeData) -> bool:
 		Inventory.remove(id, int(recipe.inputs[id]))
 	Inventory.add(recipe.output_id, recipe.output_count)
 	times_made[recipe.id] = times_made.get(recipe.id, 0) + 1
-	GameClock.advance_minutes(recipe.minutes)
+	GameClock.advance_minutes(Perks.recipe_minutes(recipe))
 	made.emit(recipe)
 	return true
 

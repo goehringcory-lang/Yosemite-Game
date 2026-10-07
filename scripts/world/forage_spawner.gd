@@ -86,6 +86,26 @@ func respawn() -> void:
 					taken[cell] = true
 					spawn(item.id, cell)
 					break
+	for i in int(Perks.bonus("enids_eye")):
+		_spawn_extra(habitats, taken)
+
+
+## Enid's Eye (a perk): one more find of something in season, on a free spot.
+func _spawn_extra(habitats: Dictionary, taken: Dictionary) -> void:
+	var choices: Array[ItemData] = []
+	for item in ItemDB.forage_items():
+		if item.is_forageable_in(GameClock.season) and not habitats.get(item.habitat, []).is_empty():
+			choices.append(item)
+	if choices.is_empty():
+		return
+	var item := choices[_rng.randi_range(0, choices.size() - 1)]
+	var cells: Array = habitats[item.habitat]
+	for attempt in PLACE_TRIES:
+		var cell: Vector2i = cells[_rng.randi_range(0, cells.size() - 1)]
+		if not taken.has(cell) and _is_unblocked(cell):
+			taken[cell] = true
+			spawn(item.id, cell)
+			return
 
 
 func spawn(item_id: String, cell: Vector2i) -> void:
