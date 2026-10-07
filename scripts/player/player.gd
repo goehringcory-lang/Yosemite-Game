@@ -14,6 +14,7 @@ var can_act := true
 
 func _ready() -> void:
 	add_to_group("persist")
+	add_child(Footfall.new())
 
 
 ## The interactable in front of the player, or null.
