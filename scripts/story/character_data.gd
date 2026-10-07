@@ -23,6 +23,12 @@ extends Resource
 @export var rare_lines: PackedStringArray
 @export var rare_after_quest := ""
 @export_range(0.0, 1.0) var rare_chance := 0.2
+## Story beats: what they say as the main line moves on, each heard once in
+## place of [member idle_lines]. Each is a Dictionary
+## {"after": quest id, "lines": [...]}, in story order. Only the latest beat
+## whose quest is done is offered, so a player who rushes ahead never hears
+## stale news. A beat after "clark_last_page" is their epilogue.
+@export var story_beats: Array = []
 ## 48×96 walking sheet (3 frames × 4 facings, like the player's). Drawn by
 ## tools/npcgen; the NPC falls back to a plain figure in [member color] without one.
 @export var sprite_sheet: Texture2D
@@ -51,3 +57,14 @@ func idle_lines_for(rare_unlocked: bool, roll := randf()) -> PackedStringArray:
 	if not rare_lines.is_empty() and rare_unlocked and roll < rare_chance:
 		return rare_lines
 	return idle_lines
+
+
+## The latest story beat whose quest [param is_done] reports finished, as
+## {"key", "lines"}, or {} before the first. "key" names the beat, so the
+## QuestLog can remember it was heard.
+func latest_beat(is_done: Callable) -> Dictionary:
+	for i in range(story_beats.size() - 1, -1, -1):
+		var beat: Dictionary = story_beats[i]
+		if is_done.call(beat.after):
+			return {"key": "%s:%s" % [id, beat.after], "lines": PackedStringArray(beat.lines)}
+	return {}

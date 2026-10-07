@@ -11,6 +11,7 @@ years = "1947–1994"
 affiliation = "Climber"
 bio = "Big-wall climber who in 1973 made the first all-woman ascent of El Capitan with Sibylle Hechtel. In 1978 she became the first woman to climb El Capitan solo, spending ten days alone on the Dihedral Wall."
 idle_lines = PackedStringArray("Alone up there, nobody catches your mistakes but you. So you don't make many.", "Count your food twice. Count your water three times.")
+story_beats = [{"after": "harding_summit", "lines": ["You slept on the portaledge? First night on a wall, nobody sleeps. Second night, you sleep like a stone. Third night, you start talking to the swifts."]}, {"after": "clark_last_page", "lines": ["Clark says you finished the book. Funny how the biggest climbs end with you walking back down to talk to somebody."]}]
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.784, 0.290, 0.227, 1)
 home = "El Capitan Meadow"

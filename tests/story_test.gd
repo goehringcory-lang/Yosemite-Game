@@ -28,6 +28,8 @@ func _ready() -> void:
 	test_save_round_trip()
 	test_firefall_slab()
 	test_pay_step()
+	test_register_notes()
+	test_story_beats()
 	await test_dialogue_and_minigame_scenes()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
@@ -254,6 +256,69 @@ func test_pay_step() -> void:
 	check(QuestLog.has_guidebook() and Inventory.count("lamon_apple") == 1, "20 energy buys the guidebook: 2 apples go")
 	check(lines.any(func(l): return l.text.begins_with("You hand over 2 Lamon")), "the trade is announced")
 	Inventory.items.clear()
+
+
+## Every story that writes a Register page ends with a Register note saying
+## what's documented and what's dramatized (STORY.md).
+func test_register_notes() -> void:
+	for page: Dictionary in RegisterPages.PAGES:
+		check(QuestLog.get_quest(page.quest) != null, "Register page %s comes from a real quest" % page.by)
+		check(RegisterPages.HISTORY.has(page.quest), "%s's page (%s) has a Register note" % [page.by, page.quest])
+		if page.get("review", false):
+			check("tribal review" in RegisterPages.HISTORY.get(page.quest, ""), "%s's Register note is flagged for tribal review" % page.by)
+	for quest_id: String in RegisterPages.HISTORY:
+		check(QuestLog.get_quest(quest_id) != null, "Register note %s belongs to a real quest" % quest_id)
+	# Finishing a quest writes its page, with the note, before the rewards.
+	new_game()
+	QuestLog.completed.append_array(["clark_register", "shop_guidebook", "shop_outfit", "partner_apron"])
+	QuestLog.talk_to("dick_leonard")
+	Inventory.add("miners_lettuce", 4)
+	QuestLog.talk_to("dick_leonard")
+	QuestLog.record_climb("swan_slab")
+	var lines := QuestLog.talk_to("dick_leonard")
+	var texts := lines.map(func(l: Dictionary) -> String: return l.text)
+	var note := texts.find("Register note: " + RegisterPages.HISTORY.leonard_belay)
+	check(texts.has("New in the Register: a page from Dick Leonard.") and note >= 0, "Leonard's page goes in the Register with its note")
+	check(note >= 0 and lines[-1].text.begins_with("Quest complete") and note < lines.size() - 1, "the note comes before the rewards")
+	var page: Dictionary = RegisterPages.written().filter(func(p: Dictionary) -> bool: return p.by == "Dick Leonard")[0]
+	check(page.history == RegisterPages.HISTORY.leonard_belay and page.notes[-1].begins_with("Register note: "), "the journal page carries the note too")
+	# A quest with two pages names both, and its note goes on the first only.
+	check(RegisterPages.on_completed("clark_last_page")[0].text.contains(" and "), "the last page names both blank pages")
+	check(RegisterPages.on_completed("degnan_bread").size() == 2 and RegisterPages.on_completed("shop_outfit").is_empty(),
+		"only Register stories get a page (the Mountain Shop isn't in the Register)")
+	new_game()
+
+
+## Between quests, people react to the main line once (the latest news
+## only), and remember it in the save; after the last page, they say goodbye.
+func test_story_beats() -> void:
+	for character: CharacterData in QuestLog.CHARACTERS + QuestLog.STAFF:
+		for beat: Dictionary in character.story_beats:
+			check(QuestLog.get_quest(beat.after) != null and QuestLog.get_quest(beat.after).main_line and not beat.lines.is_empty(),
+				"%s's beat after %s follows a main-line quest" % [character.id, beat.after])
+		check(not (character.needs_tribal_review and not character.story_beats.is_empty()), "%s has no unreviewed story beats" % character.id)
+	new_game()
+	var clark := QuestLog.get_character("galen_clark")
+	var idle := QuestLog.talk_to("galen_clark") # starts The Guidebook
+	QuestLog.active.erase("clark_register")
+	QuestLog.completed.append_array(["clark_register", "shop_guidebook"])
+	var first := QuestLog.talk_to("galen_clark")
+	check(first.size() == 1 and "two books" in first[0].text, "Clark has news after the guidebook")
+	var second := QuestLog.talk_to("galen_clark")
+	check(second.size() > 0 and String(second[0].text) in clark.idle_lines, "and then goes back to his usual lines")
+	QuestLog.completed.append_array(["shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron"])
+	var news := QuestLog.talk_to("galen_clark")
+	check(news.size() > 0 and "Glacier Point" in news[0].text, "skipping ahead, Clark only has the latest news (%s)" % news[0].text)
+	var saved := QuestLog.save_data()
+	QuestLog.start_new_game()
+	QuestLog.load_data(saved)
+	check(QuestLog.heard_beats.has("galen_clark:eichorn_apron"), "heard news is saved")
+	check(String(QuestLog.talk_to("galen_clark")[0].text) in clark.idle_lines, "and isn't repeated after loading")
+	QuestLog.completed.append("clark_last_page")
+	var goodbye := QuestLog.talk_to("dick_leonard")
+	check(goodbye.size() == 2 and "held the rope" in goodbye[1].text, "after the last page, Leonard says goodbye")
+	check(idle.size() > 0, "Clark starts the story")
+	new_game()
 
 
 func test_tabuce_and_acorns() -> void:

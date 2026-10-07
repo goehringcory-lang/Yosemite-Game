@@ -11,6 +11,7 @@ years = "1912–2000"
 affiliation = "Sierra Club Rock Climbing Section"
 bio = "Climber and music teacher who studied piano with Ansel Adams as a teenager. With Dick Leonard and Bestor Robinson he made the first ascent of Higher Cathedral Spire in 1934, and he made many first ascents in the High Sierra."
 idle_lines = PackedStringArray("Ansel taught me piano. The mountains taught me the rest.", "The Spires look impossible from the road. That's why we had to try.")
+story_beats = [{"after": "salathe_steel", "lines": ["Salathé's chimneys! Bestor owes me a dollar. He bet you'd turn around at the Narrows."]}, {"after": "clark_last_page", "lines": ["Ansel always says you have to wait for the light. You waited for every story in that book. Good."]}]
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.478, 0.478, 0.447, 1)
 home = "Curry Village, foot of the Apron trail"

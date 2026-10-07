@@ -11,6 +11,7 @@ years = "1899–1992"
 affiliation = "Climber and blacksmith"
 bio = "Swiss-born blacksmith who forged hard steel pitons, reportedly from old Model A Ford axles, that held where soft iron ones bent. He climbed the Lost Arrow Chimney in 1947 and the Sentinel's north face with Allen Steck in 1950."
 idle_lines = PackedStringArray("Soft iron bends. Good steel sings when you drive it.", "A piton is only as good as the man who forged it, and the crack you give it.")
+story_beats = [{"after": "johnson_astroman", "lines": ["Astroman? Ja, the young ones climb with only their hands now. I climbed with steel. Both are good, if you climb honest."]}, {"after": "clark_last_page", "lines": ["My steel is in your book now. Good steel, good book. Both will last."]}]
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.541, 0.541, 0.478, 1)
 home = "Camp 4"

@@ -144,7 +144,10 @@ Gear arrives in the order the routes need it, and a quest can hand over gear as 
 ★ 11 Living Ice ............ Muir ............................ ice   TICK Lyell Glacier
 ★ 12 The Last Page ......... Clark: after Lucy Telles's and Maria Lebrado's stories → you write the last page
                               (pick one of four entries, or leave it blank; it's saved and shown in the journal)
+                              → Clark leafs back through the book, the season turns, and the game says the story is over
 ```
+
+Every main-line quest except the shop errands writes a page in the Register, and its Register note (what's documented, what's dramatized) is read out before the rewards. Between quests, the people you keep passing react to the main line once each (story beats), and after the last page Clark, the climbing mentors, Wren, Lamon, Jennie Curry, Bridget Degnan, and Muir each say goodbye.
 
 After the Nose the scale stops mattering: the high country is alpine climbing, where the hard part is altitude, weather, and ice, not the grade. Cathedral Peak is only 5.6.
 
@@ -222,6 +225,8 @@ The Mountain Shop and Camp 4 traders sell more of the same pieces for food (cams
 - **Bolted routes:** `RouteData.protection = "bolts"` puts a bolt every 2 moves on the line; each takes a quickdraw.
 - **`return` step:** done as soon as you talk to the quest giver again. It closes delivery rounds ("take bread to Leonard and Curry, then come back").
 - **`hub:<id>` unlock reward:** opens a locked hub. Harding's *The Nose* uses `hub:tuolumne_meadows`.
+- **Register pages and notes:** `RegisterPages.PAGES` (`scripts/story/register_pages.gd`) lists the page each finished quest writes, with margin notes added by later quests. `RegisterPages.HISTORY` holds each story's Register note, keyed by quest. When the quest finishes, the narrator announces the page and reads the note, and the journal shows the note under the page. A new page needs a note: `tests/story_test.tscn` checks this, and that Native people's notes say they're pending tribal review.
+- **Story beats:** `CharacterData.story_beats` is a list of `{"after": main-line quest id, "lines": [...]}` in story order. When someone has no quest business with you, they tell you the latest beat whose quest is done, once (remembered in the save as `QuestLog.heard_beats`), then go back to their idle lines. A beat after `clark_last_page` is their epilogue. Native characters get no beats until tribal review (the test checks this).
 - **Story pickups** (`scenes/story/pickup.tscn`): a one-of-a-kind item lying in the park, picked up once and remembered in the save. Give each one a unique node name.
 
 ## Before release
@@ -229,4 +234,6 @@ The Mountain Shop and Camp 4 traders sell more of the same pieces for food (cams
 - **Tribal review** for Tenaya, Tabuce, Lucy Telles, Maria Lebrado, and Carrie Bethel: their looks, dialogue, the acorn and pine nut practices, and the Register entries about Ahwahnee and the village sites. It covers whether each person appears at all.
 - **Verify** every character's `sources`, and fill in the blank dates (Degnan, McCauley, Tabuce).
 - **Permission:** Royal Robbins's family (he died in 2017).
+- **Check the Register notes** in `RegisterPages.HISTORY` against the sources, since they're the game's statements of fact. Notes on Native people's pages go through tribal review with their pages.
+- **Confirm** the Royal Arches first-ascent party: Bestor Robinson's side story names Ken Davis as the third climber, and other accounts name Hervey Voge. The Register note names only Harris and Adam until that's settled.
 - **Confirm** the Firefall's origin story (McCauley's family is the usual account, and it's told several ways).
