@@ -6,6 +6,9 @@ extends Node
 ##   SHOT_DIR     folder for the PNGs (default user://)
 ##   SHOT_SCALE   integer upscale for the saved PNG (default 2)
 ##   SHOT_HOUR    game hour to shoot at (default 12)
+##   SHOT_MINUTE  minutes past the hour (default 0)
+##   SHOT_WAIT    real seconds to let animations run before the shot (default 0)
+##   SHOT_DAY     day of the season (default: leave as is)
 ##   SHOT_SEASON  0 spring, 1 summer, 2 fall, 3 winter (default 1)
 ## Run: SHOT_REGION=curry_village SHOT_SPAWNS=arrival godot --path . res://tools/shots/region_shot.tscn
 
@@ -17,7 +20,9 @@ func _ready() -> void:
 	add_child(world)
 	await get_tree().process_frame
 	await get_tree().process_frame
-	GameClock.minutes = (int(OS.get_environment("SHOT_HOUR")) if OS.get_environment("SHOT_HOUR") != "" else 12) * 60
+	GameClock.minutes = (int(OS.get_environment("SHOT_HOUR")) if OS.get_environment("SHOT_HOUR") != "" else 12) * 60 + int(OS.get_environment("SHOT_MINUTE"))
+	if OS.get_environment("SHOT_DAY") != "":
+		GameClock.day = int(OS.get_environment("SHOT_DAY"))
 	GameClock.season = int(OS.get_environment("SHOT_SEASON")) if OS.get_environment("SHOT_SEASON") != "" else 1
 	GameClock.paused = true
 	var dir := OS.get_environment("SHOT_DIR") if OS.get_environment("SHOT_DIR") != "" else "user://"
@@ -36,6 +41,8 @@ func _ready() -> void:
 		GameClock.paused = true
 		for i in 12:
 			await get_tree().process_frame
+		if OS.get_environment("SHOT_WAIT") != "":
+			await get_tree().create_timer(float(OS.get_environment("SHOT_WAIT"))).timeout
 		var image := get_viewport().get_texture().get_image()
 		if scale > 1:
 			image.resize(image.get_width() * scale, image.get_height() * scale, Image.INTERPOLATE_NEAREST)

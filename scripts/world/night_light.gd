@@ -9,6 +9,9 @@ extends PointLight2D
 @export var radius := 40.0
 ## 0 is steady; higher flickers like a flame.
 @export_range(0.0, 1.0) var flicker := 0.0
+## Only lit during these hours, from (included) to (excluded), wrapping past
+## midnight: (0, 4) is midnight until 4 AM. (-1, -1) means all night.
+@export var lit_hours := Vector2i(-1, -1)
 
 static var _glow: GradientTexture2D
 
@@ -46,6 +49,8 @@ func _process(delta: float) -> void:
 		var lum := (_tint.color.r + _tint.color.g + _tint.color.b) / 3.0
 		dark = clampf((0.9 - lum) / 0.45, 0.0, 1.0)
 	var level := strength * dark
+	if lit_hours.x >= 0 and not GameClock.hour_in_range(lit_hours.x, lit_hours.y):
+		level = 0.0
 	if flicker > 0.0 and level > 0.0:
 		_phase += delta * 9.0
 		level *= 1.0 - flicker * (0.5 + 0.5 * sin(_phase) * sin(_phase * 0.37 + 1.0))

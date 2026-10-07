@@ -11,6 +11,7 @@
 [ext_resource type="Resource" path="res://data/characters/lucy_telles.tres" id="12_r"]
 [ext_resource type="Resource" path="res://data/characters/clare_hodges.tres" id="13_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_motorist.tres" id="14_r"]
+[ext_resource type="Script" path="res://scripts/world/moonbow.gd" id="15_r"]
 
 [node name="YosemiteVillageStory" type="Node2D"]
 
@@ -61,3 +62,7 @@ character = ExtResource("14_r")
 spot = "cooks_meadow"
 offset = Vector2(0, 0)
 wander_radius = 48.0
+
+[node name="Moonbow" type="Node2D" parent="."]
+position = Vector2(704, 120)
+script = ExtResource("15_r")

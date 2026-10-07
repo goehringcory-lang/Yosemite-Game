@@ -217,6 +217,8 @@ The story is in [STORY.md](STORY.md), and the mechanics are in [docs/DESIGN.md](
 
 [docs/CAST.md](docs/CAST.md) lists the cast (22 historical people and 15 visitors from different eras), where each one lives, and the quest chains from the first morning to the last page. The character sprites are drawn by `tools/npcgen/`.
 
+There are a few hidden touches in the valley (night, moon, and season events). Developers can find them in the "Easter eggs" section of [docs/DESIGN.md](docs/DESIGN.md).
+
 ## Yosemite items
 
 Every item is a native Sierra plant or food, with a short natural-history note that shows when you find it. Energy is what it restores on a climb, and "keeps" is how many days it lasts in your pack (see `scripts/story/food_db.gd`).
@@ -316,9 +318,10 @@ godot --headless --path . res://tests/world_story_test.tscn
 godot --headless --path . res://tests/cast_test.tscn
 godot --headless --path . res://tests/climb_test.tscn   # every route, every piece of gear
 xvfb-run -a godot --path . res://tests/climb_screen_test.tscn   # plays all 13 on the real screen (needs a window)
+godot --headless --path . res://tests/eggs_test.tscn
 ```
 
-The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground.
+The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds).
 
 ## Map data credits
 
