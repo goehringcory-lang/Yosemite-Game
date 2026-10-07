@@ -488,8 +488,16 @@ func _hour() -> float:
 func _paint_scenery() -> void:
 	_pal = ClimbSky.palette(_hour())
 	var seed_value := hash(route.id)
+	# The far landscape paints on a worker thread while this one paints the
+	# sky and the wall; both are plain Image work with their own seeds.
+	var land := {}
+	var pal := _pal.duplicate(true)
+	var land_profile := profile.duplicate(true)
+	var land_task := WorkerThreadPool.add_task(func() -> void:
+		land.merge(ClimbLandscape.build(land_profile, pal, seed_value)))
 	_sky_tex = ImageTexture.create_from_image(ClimbSky.sky(_pal))
-	var land := ClimbLandscape.build(profile, _pal, seed_value)
+	_paint_wall(seed_value)
+	WorkerThreadPool.wait_for_task_completion(land_task)
 	_layers.clear()
 	for layer: Dictionary in land.layers:
 		_layers.append({"tex": ImageTexture.create_from_image(layer.image), "sink": layer.sink, "pad": layer.pad})
@@ -497,6 +505,10 @@ func _paint_scenery() -> void:
 	_clouds.clear()
 	for i in 4:
 		_clouds.append(ImageTexture.create_from_image(ClimbSky.cloud(_pal, seed_value + i)))
+
+
+## Paints this pitch's wall (or roof) for the current light.
+func _paint_wall(seed_value: int) -> void:
 	var rock: String = profile.get("rock", "apron")
 	_roof = state.style() == "roof"
 	if _roof:

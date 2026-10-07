@@ -279,7 +279,7 @@ func move(dx: int) -> bool:
 		message = "No hold there."
 		return false
 	var cost := move_cost(row + 1, col + dx)
-	_step(dx, cost, MINUTES_PER_MOVE)
+	_step(dx, cost, MINUTES_PER_MOVE - int(Perks.bonus("light_rack")))
 	return true
 
 
@@ -377,6 +377,7 @@ func crux_window() -> float:
 		window += 0.07
 	if route.top_rope:
 		window += 0.12
+	window += Perks.bonus("steady_breath")
 	return clampf(window, 0.12, 0.5)
 
 
@@ -557,6 +558,7 @@ func eat(item_id: String) -> bool:
 	var energy := FoodDB.energy(item_id)
 	if energy <= 0 or Inventory.count(item_id) <= 0:
 		return false
+	energy += int(Perks.bonus("trail_cook"))
 	if is_reserved_meal(item_id):
 		message = "Save this for the night on the wall."
 		return false
@@ -651,7 +653,7 @@ func _finish_pitch() -> void:
 	if _night_after(finished_spec):
 		if not _bivy(finished_spec.get("bivy", "ledge")):
 			return
-	stamina = mini(stamina + BELAY_REST + (DEVICE_REST if has_device else 0), MAX_STAMINA)
+	stamina = mini(stamina + BELAY_REST + (DEVICE_REST if has_device else 0) + int(Perks.bonus("leonards_belay")), MAX_STAMINA)
 	_start_pitch()
 	message = ("Belay ledge. Pitch %d of %d." % [pitch + 1, route.pitches.size()] + haul_note) if message == "" else message + haul_note
 

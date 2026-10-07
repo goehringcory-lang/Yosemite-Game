@@ -124,6 +124,7 @@ func test_muir_line() -> void:
 	check(told == 0, "idle talks before the glacier quest never tell it")
 	QuestLog.active.erase("muir_glacier") # he offered it above; finish it
 	QuestLog.completed.append("muir_glacier")
+	QuestLog.completed.append("muir_soda_springs") # and his campfire side story, so only idle talk is left
 	told = 0
 	var talks := 400
 	for i in talks:

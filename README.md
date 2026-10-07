@@ -16,16 +16,20 @@ godot project.godot         # opens the editor; press F5 to play
 | Move | WASD / arrow keys | Left stick / D-pad |
 | Talk, read, pick up, use | E, Space, X, C, or click | A or X |
 | Park and area map | M (Tab or mouse wheel switches tabs) | Back (LB / RB switch tabs) |
-| Journal (quests, gear, food) | J | Y |
-| Pause menu with every control | Esc | Start |
+| Journal (quests, perks, gear, food) | J | Y |
+| Pause menu (settings, every control) | Esc | Start |
 | Back out of a menu | Esc | B |
 | Menus: choose / confirm | Up/Down / E or Enter | Stick or D-pad / A |
+| Settings: change a value | Left/Right (or E) | Stick or D-pad left/right (or A) |
+| Dialogue: show the whole page / next | E (first press / second press) | A |
 | Climbing: climb up, up-left, up-right | W / A / D (or arrows) | Stick up / left / right |
 | Climbing: place a cam or clip / eat at a ledge, or chalk up / retreat | Space or C / E / Esc | X / A / B |
 | Climbing: aid a hard move, or jug a fixed rope | Shift + arrow | Y + stick |
 | *Debug:* skip 1 hour / sleep now | F2 / F3 | |
 
-A prompt above the player's head shows what the interact button will do ("E  Read: Camp 4"), and it switches to gamepad button names when you use a gamepad.
+A prompt above the player's head shows what the interact button will do ("E  Read: Camp 4"), and it switches to gamepad button names when you use a gamepad. Every menu's hint line (pause menu, journal, conversations, maps) follows the same switch.
+
+**Settings** are on the pause menu (Esc, then Settings) and are kept in `user://settings.cfg`, apart from your save: text speed (Slow, Normal, Fast, Instant), full screen, window size (whole steps of 480x270, up to what fits your screen), whether your next main-story step shows under the clock, and button prompts (Auto, or always keyboard or always gamepad). There is no audio yet, so there are no volume settings. The code is `scripts/ui/settings.gd`.
 
 Controls are set in **Project > Project Settings > Input Map**.
 
@@ -34,6 +38,8 @@ Controls are set in **Project > Project Settings > Input Map**.
 Start at the Mountain Shop in Curry Village. The clerk, Marty Kessler, trades you a climbing guidebook for food (after you fetch the new printing from the Registration porch), then fits you with your first kit: climbing shoes, a chalk bag, a harness, and five quickdraws. Marty sends you to Wren Alvarez, a new hire looking for a partner, and the two of you climb **Firefall Slab**, a bolted route on the Glacier Point Apron, for your first tick. The guidebook lists every route, its grade, and the gear it needs, and you tick a route off when you top it out. The main story is that tick list: each main quest ends on a climb. Talk to people around the valley. Their quests reward you with climbing gear, recipes, and skills, and the climbers at Camp 4 trade more gear for food. Each climbing route needs certain gear before you can start it. Climbs lead to new parts of the park: the Glacier Point Apron, for example, opens Glacier Point.
 
 Climbing runs on food. Each morning, wild forage appears around your camp, depending on the season and habitat. Fresh greens and berries give quick energy but spoil in days. In fall, gather black oak acorns and store them in a chuckah (a granary) where they never spoil. Then grind them at the bedrock mortar, leach them at the basin, and cook them into mush or long-lasting acorn cakes at the campfire. Press J to open the Journal, which shows your quests, gear, and food.
+
+As you play, the valley teaches you **perks**: small, permanent bonuses earned from people and experience, never bought. Foraging 25 finds earns *Enid's Eye* (one more find each morning), learning to belay from Dick Leonard earns *Leonard's Belay* (more rest at each ledge), two weeks of mornings earns *Muir's Stride* (a quicker walk), and so on. The Journal lists all eight and how to earn the rest. They're in `scripts/story/perks.gd`, and [docs/DESIGN.md](docs/DESIGN.md#perks) has the table.
 
 Sleep in the tent to end the day, which also saves the game. If you're still up at 2 AM you pass out, and the game moves to the next day anyway.
 
@@ -139,14 +145,21 @@ The four generated hubs (El Portal, Wawona, Glacier Point, Tuolumne Meadows) and
 - **Camp 4 and the Indian Village.** Umachas have overlapping bark courses with shadows, a sooted smoke hole, a lintel and a woven door mat; the chuckah has a basket-weave body, cord bands and layered thatch; the bear boxes are riveted steel with a latch and worn paint. Redraw with `res://tools/hubs/repaint_village_art.tscn`.
 - **Village buildings and Curry cabins.** Every Valley village building gets window flower boxes and a wall lantern; the tent cabins have stained, worn canvas, sag creases, patches and stovepipes. Redraw with `repaint_village_art.tscn`.
 - **Curry Village buildings and wood cabins.** The Registration Office, Store, Mountain Shop, Pavilion and Pizza Deck have roof lichen and moss, rain streaks under the eaves, moss at the footing, porch lanterns and hanging flower baskets. The wood cabins gain a stone chimney, a firewood stack, a log step and a lantern.
-- **UI.** Panels are a nine-slice timber frame with a brass line (`tools/ui/ui_art.gd` writes `assets/ui/panel.png`), and the whole UI uses the Tiny5 pixel font at size 10, set in `assets/ui/theme.tres`. `tools/shots/ui_shot.tscn` saves screenshots of the HUD, journal, pause menu, conversation and maps.
+- **UI.** Panels are a nine-slice timber frame with a brass line (`tools/ui/ui_art.gd` writes `assets/ui/panel.png`), and the whole UI uses the Tiny5 pixel font at size 10, set in `assets/ui/theme.tres`. `tools/shots/ui_shot.tscn` saves screenshots of the HUD, journal, the pause menu with its Settings and Controls pages, a conversation and a choice, and the maps (`SHOT_DIR=/tmp/shots xvfb-run -a godot --path . res://tools/shots/ui_shot.tscn`). The HUD shows your next main-story step in a Goal panel under the clock. Conversations type out at the chosen text speed with a blinking "[E] Next"; menu choices are marked with "> " as well as gold, so they read without the color.
 - **People.** `tools/npcgen/npcgen.gd` now lights each figure from the upper left, tints the outline from the color it touches, and bakes in a ground shadow. The player is drawn by the same script (`Looks.PLAYER`).
 
 ![El Portal](docs/el_portal_painted.png)
 ![Glacier Point](docs/glacier_point_painted.png)
 ![Pause menu](docs/ui_pause_menu.png)
+![Settings](docs/ui_pause_settings.png)
+![HUD with the goal panel](docs/ui_hud_goal.png)
+![A choice in a conversation](docs/ui_dialogue_choice.png)
 
 The hand-built areas follow the seasons too, without being rebuilt. When a region loads, `scripts/world/seasonal_dressing.gd` swaps its black oaks, dogwoods, garden beds, meadow grass and conifers for the season's drawing (in `assets/sprites/ahwahnee/seasons/`, made by `godot --headless --path . -s res://tools/hubs/build_seasonal_art.gd`), hides lupine, paintbrush and wildflowers in winter and dries them in fall, and grades the painted ground with `assets/shaders/seasonal_ground.gdshader`: dry and golden in fall, cool and frosted in winter. Only sprites change, so collision and foraging stay the same.
+
+**Weather and atmosphere.** Each day's weather comes from the date (`Weather.today()` in `scripts/world/weather.gd`), so it survives a reload: most winter days it snows, now and then a spring or fall day rains, and the rest are fair. Outdoors, `Weather` drifts a few dozen hand-simulated pixels through the air in world space (they wrap round the camera, so you walk through the snow rather than dragging it along): snowflakes at three depths, slanted rain, tumbling apple-blossom petals in spring, cottonwood fluff on summer days and blinking fireflies on summer nights, and swinging gold and red leaves in fall. On fair days, cloud shadows slide over everything (`scripts/world/cloud_shadows.gd` with `assets/shaders/cloud_shadows.gdshader`, sampled per world pixel in two flat steps of shade so the art stays crisp); they fade at dusk and vanish when it's overcast. `day_night.gd` grades the light a touch by season (warm summer, golden fall, cool winter) and greys it on wet and snowy days. The player kicks up a little dust at each step (snow on snowy days, a splash in the rain, nothing on frozen ground) and breathes fog on cold mornings and all winter (`scripts/player/footfall.gd`). All of it is skipped indoors. Shoot it with `region_shot.tscn` and `SHOT_SEASON`, `SHOT_DAY` and `SHOT_WAIT=1`.
+
+![Snow at the Lamon Homestead](docs/weather_winter_snow.png)
 
 ### The Ahwahnee: north from the homestead
 
@@ -266,9 +279,10 @@ scripts/
   world/world.gd         loads regions, travel, sleep sequence
   world/region.gd        a map the player can be in (hub or smaller area)
   ui/park_map.gd         park and area map screens
-  world/day_night.gd     time-of-day lighting (edit the gradient in the Inspector)
+  world/day_night.gd     time-of-day lighting (edit the gradient in the Inspector), graded by season and weather
+  world/weather.gd       each day's weather and the snow, rain, petals, leaves and fireflies in the air
   player/player.gd       movement, facing, interaction
-  story/                 quests, gear, food, chuckah, recipes, dialogue, journal (autoloads: Gear, QuestLog, FoodDB, Larder, Granary, Recipes)
+  story/                 quests, gear, food, chuckah, recipes, dialogue, journal, perks (autoloads: Gear, QuestLog, FoodDB, Larder, Granary, Recipes, Perks)
   climb/                 climbing rules (climb_state.gd) and screen
   data/item_data.gd      ItemData resource definition (name, description, icon, forage rules)
 data/items/*.tres        one file per forage item
@@ -320,9 +334,23 @@ godot --headless --path . res://tests/cast_test.tscn
 godot --headless --path . res://tests/climb_test.tscn   # every route, every piece of gear
 xvfb-run -a godot --path . res://tests/climb_screen_test.tscn   # plays all 13 on the real screen (needs a window)
 godot --headless --path . res://tests/eggs_test.tscn
+godot --headless --path . res://tests/perks_test.tscn
+godot --headless --path . res://tests/settings_test.tscn
+godot --headless --path . res://tests/side_quests_test.tscn   # seasonal and time-of-day side stories
 ```
 
-The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds).
+The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds). The perks test earns each perk, checks its effect where it's hooked in, the HUD message and Journal section, and that perks survive a save. The settings test saves and reloads the settings (in its own file), drives the pause menu's Settings page with keys, and checks the goal panel, pinned button prompts, and the dialogue reveal and skip. The side quests test plays the side stories that depend on the season or the hour (Clark at the Mariposa Grove, Enid Michael at dawn, Hodges in fall, Degnan in winter, Muir after dark) and checks their Register pages say what is real.
+
+### Performance bench
+
+```bash
+godot --headless --fixed-fps 60 --path . res://tools/perf/bench.tscn
+godot --headless --fixed-fps 60 --path . res://tools/perf/bench.tscn -- only=wawona frames=300   # one region
+```
+
+It boots the real world, visits every region, and prints a table: first-visit load time, the first frame there, a return visit, a new day's forage, opening the map, and frame times (average, 99th percentile, peak) by day and at night. Then it opens the climbing screen on four routes and times painting it and its frames. The numbers also go to `user://bench.json`. Headless has no GPU, so these are CPU costs (scripts, physics, scenes); run it before and after a change on the same machine and compare. It takes about a minute.
+
+Things that keep it fast: World loads the regions next door on a background thread (`_preload_neighbors`), a forage spawner reads its map's habitats once, a Region keeps its list of Places, the map keeps each hub's sign layout, and the climbing screen paints the far landscape on a worker thread while it paints the wall.
 
 ## Map data credits
 

@@ -77,6 +77,27 @@ They spoil fast (in a day or two), so they're good for short climbs or as a boos
 | Cooked seasonal dish | Medium | 2–3 days | Day climbs, short multi-pitch |
 | Acorn mush / cakes | High | Many days | Big walls, expeditions |
 
+## Perks
+
+Perks are small things the valley teaches you: knowledge from the people you meet, and habits from doing the work. They aren't stats to grind or points to spend. Each one is earned by playing (finishing someone's story, foraging, cooking, climbing, living in the valley), never chosen or bought, and each gives a gentle, permanent bonus. A message on the HUD says when you earn one ("New perk: ..."), and the Journal's **Perks** section lists every perk: earned ones with their effect and a line of history, the rest with how to earn them and your progress.
+
+| Perk | How you earn it | Effect | Hooked in |
+|---|---|---|---|
+| **Muir's Stride** | Wake up in the valley 14 mornings | Walk 8% faster | `player.gd` |
+| **Enid's Eye** | Pick up 25 wild finds | One more piece of forage each morning, in every area | `forage_spawner.gd` |
+| **Tabuce's Patience** | Cook acorn mush or cakes 3 times | The mortar and leaching basin take a quarter less time | `recipes.gd` (`Perks.recipe_minutes`) |
+| **Lamon's Cellar** | Finish James Lamon's *lamon_winter* story | Food you pick up keeps one more day (food that never spoils still never does) | `food_db.gd` |
+| **Trail Cook** | Make 12 dishes at any station | Food eaten at a belay ledge gives 2 more energy | `climb_state.gd` `eat()` |
+| **Leonard's Belay** | Finish Dick Leonard's *leonard_belay* | 3 more stamina at every belay ledge | `climb_state.gd` `_finish_pitch()` |
+| **Steady Breath** | Climb 5 crux moves perfectly | The crux green zone is 0.03 wider | `climb_state.gd` `crux_window()` |
+| **Light Rack** | Tick 6 routes | A move on the wall takes 5 minutes, not 6 | `climb_state.gd` `move()` |
+
+Each effect is smaller than a piece of gear's (climbing shoes widen the crux zone by 0.05 and take a whole stamina off every move), so gear still sets the pace of the story and the climbing tests' gear curve holds without perks. Tabuce's Patience is Native content and carries the same tribal-review placeholder as her dialogue.
+
+How it works: the autoload `Perks` (`scripts/story/perks.gd`) holds the definitions (`PERKS`), what's been earned, and the counts no other system keeps (`stats`: forage picked up, mornings, perfect cruxes; cooking and ticks are read from `Recipes` and `QuestLog`). It checks for new perks when quests change, a dish is made, a day starts, or `Perks.note(...)` counts something, and emits `unlocked(perk)`. Effects are read at the call site with `Perks.bonus("id")`, which is 0 until the perk is earned. It saves through the `persist` group; a save from before perks catches up quietly on load. Messages wait until no conversation, menu or climb covers the HUD. Tested in `tests/perks_test.gd`.
+
+To add a perk: add an entry to `Perks.PERKS` (an `unlock` of `{"quest": id}` or `{"stat": name, "count": n}`, plus `amount`, `how`, `effect`, `flavor`), and read `Perks.bonus("id")` where it applies. A new kind of count goes in `Perks.progress()`, or is counted with `Perks.note("name")`.
+
 ## Climbing minigame
 
 The next design is in [Climbing minigame: first design](CLIMBING_MINIGAME.md), with a [standalone playable browser study](climbing-prototype.html). It explores equipment actions and later progression separately from the current Godot implementation, for integration later.
@@ -209,6 +230,7 @@ All of this is wired into the World. Each region's people, climbs, and cooking s
 | Cooking | `scripts/story/recipes.gd`, `station.gd`, `data/recipes/*.tres` | Stations: campfire, bedrock mortar, leaching basin. Acorn chain: 4 acorns → flour → leached meal → mush or cakes. |
 | Climbing | `scripts/climb/*`, `scenes/climb/*`, `data/routes/*.tres` | Rules are in `ClimbState`, pictures in `ClimbScenery`. Cams in cracks, or quickdraws on bolts (`RouteData.protection`). A route can need a partner (`RouteData.partner_quest`). |
 | Journal | `scripts/story/journal.gd` | Press J. Shows quests, gear, food with days left, the chuckah, and climbs. Pauses the clock. |
+| Perks | `scripts/story/perks.gd` | Autoload `Perks`. Eight gentle bonuses earned from people and experience; see **Perks** above. |
 | Tests | `tests/story_test.tscn`, `tests/world_story_test.tscn` | Run headless. The world test uses its own save file. |
 
 First playable stretch:

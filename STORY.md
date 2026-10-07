@@ -17,7 +17,7 @@ People from 1851 to the 1970s share a single season. Tenaya, John Muir, Dick Leo
 Rules that keep this honest:
 - **Everyone is equally "out of time."** Native people are never presented as spirits, memories, or a vanished people while settlers and climbers are presented as real. Everyone is a living person going about their work.
 - **People speak from their own era.** Muir doesn't know about the Nose, and Leonard doesn't know about cams. When the player gets gear from someone, it's described as "what they can spare from their kit." The game simplifies gear to its modern version so the mechanics stay clear.
-- **Every story ends with a Register note** that says what really happened and what was dramatized, with sources.
+- **Every story ends with a Register note** that says what really happened and what was dramatized, with sources. When a quest writes a page in the Register, the narrator says so ("New in the Register: a page from Dick Leonard.") and reads its note before the rewards, and the journal shows the note under the page. The notes live in `RegisterPages.HISTORY` (`scripts/story/register_pages.gd`): documented dates and events first, then what's dramatized. Living people aren't named in them, and notes on Native people's pages say they're placeholders pending tribal review. `tests/story_test.tscn` checks that every page has one.
 
 ## Tone
 
@@ -39,7 +39,7 @@ The full cast (who lives where, with sprites) and every quest chain, with the ge
 
 ### 1. Arrival: the Valley floor (Tier 0, Spring)
 
-- **Galen Clark** gives the player the Register and his own account of the 1864 Yosemite Grant.
+- **Galen Clark** gives the player the Register and his own account of the 1864 Yosemite Grant: Lincoln signing the valley and the Big Tree Grove over to California "for public use, resort and recreation," and the State making him Guardian two years later. He asks the player to write down who told them each story, not just what.
 - **James Lamon**, whose cabin and apple orchard became the player's camp, tells how he settled in the valley in the late 1850s.
 - **Tenaya's** story comes early and is told plainly. The Ahwahneechee were living in Ahwahnee when the Mariposa Battalion entered it in 1851, and they were forced out. The Grant was signed 13 years later. Clark's first pages leave this out, and noticing that gap sets the direction of the game.
 - **Tabuce (Maggie Howard)** teaches the player to gather acorns, build a chuckah, and prepare acorn food. The skill starts now but pays off in the fall (quests: *Acorns for the Winter*, *The Chuckah*).
@@ -72,7 +72,7 @@ The full cast (who lives where, with sprites) and every quest chain, with the ge
 
 ### 5. High country: Tuolumne and Mono Lake (Tier 4, the next Summer)
 
-- **John Muir** on Cathedral Peak (1869) and the living glaciers he found. He gives the player an ice axe and crampons.
+- **John Muir** on Cathedral Peak (1869), which he called his first time at church in California, and the living glaciers he found: he staked the Maclure ice in 1872 and watched it move, against Josiah Whitney's claim that the Valley floor simply sank. He came up that first summer with a sheep drive, and says so. He gives the player an ice axe and crampons. His Register page admits what he didn't see, and its note says plainly that his writing often dismissed Native people.
 - Over the crest are the **Mono Lake Kutzadika'a** and Paiute trade routes, with pine nuts carried over the passes. **Carrie Bethel's** weaving shows that the valley was always connected to places far beyond it.
 - **Maria Lebrado (Totuya)**, Tenaya's granddaughter, returned to the valley in 1929 and identified the village sites. Her story is the emotional turning point: the record gets corrected by the people it left out.
 
@@ -80,7 +80,13 @@ The full cast (who lives where, with sprites) and every quest chain, with the ge
 
 The player brings the Register back to Galen Clark. The ending is **not** the player becoming the next Guardian. Instead, the player sees how the book has changed: Clark's single account has become many voices that don't always agree. It includes stories told in full, stories told in part, and blank spaces for the stories people chose not to share.
 
-The player adds one final entry of their own and can choose what it says: every voice they heard, a thank-you, the tick list, or a blank page like the ones Tabuce and Maria Lebrado asked for. Then the season turns. Looking after the valley doesn't end, and it was never one person's job.
+Clark's last talk is personal: he came up into these mountains in 1856 expecting to die of his lungs, lived another fifty years, and spent them thinking he was the one looking after the place. He sends the player to ask Tabuce and Maria Lebrado whether they want anything written, and both ask for blank pages.
+
+The player adds one final entry of their own and can choose what it says: every voice they heard, a thank-you, the tick list, or a blank page like the ones Tabuce and Maria Lebrado asked for. Clark leafs back through the book (how many pages, in how many hands, with Tenaya's still at the front), hands it back ("when you read it, start at the front"), and the season turns. Looking after the valley doesn't end, and it was never one person's job. A closing line tells the player the story is over and that the valley stays open: the tick list isn't finished, and the people they met still have things to say.
+
+### Between the chapters: story beats
+
+People don't only speak when they have a quest. As the main line moves on, the people the player keeps passing react to it, once each, before going back to their usual lines (`CharacterData.story_beats`; only the latest piece of news is told, so someone who rushes ahead never hears stale news). Galen Clark, at the homestead gate, carries most of these: he reacts to the guidebook, the first tick, Glacier Point, Robbins's "leave no mark" (his own name is on Mount Clark, though every peak had a name before the surveyors), Salathé's steel, the Nose, and the return from the glacier, where he reminds the player that not everybody walks up to the gate. The climbing mentors, Wren, Lamon, Jennie Curry, Bridget Degnan, and Muir also have beats, and after the last page each of them says goodbye in their own voice, so the whole valley acknowledges the ending. Native characters have no story beats yet: any new lines for them wait on tribal review.
 
 ## The seven associated tribes
 
@@ -122,4 +128,7 @@ The game doesn't invent Native characters. Present-day tribal voices come throug
 - Maggie "Tabuce" Howard, Lucy Telles, and Carrie Bethel: dates and their work at the Yosemite Museum.
 - David and Jennie Curry, and the Firefall's dates and end (1968).
 - Rock Climbing Section history and the first ascent of Higher Cathedral Spire (1934), Royal Arches (1936), Anderson on Half Dome (1875), Robbins on the NW Face (1957), Harding on the Nose (1958), Snake Dike (1965), Johnson's solo (1978). Nutcracker (Royal and Liz Robbins, 1967), the Steck-Salathé (1950), the East Face of Washington Column (1959) and its free ascent as Astroman (1975), Separate Reality's free ascent (1978) and its grade (5.11d or 5.12a), and the Nose's first free ascent (1993) and grade.
-- Muir on Cathedral Peak (1869) and his glacier work (early 1870s).
+- Muir on Cathedral Peak (1869) and his glacier work (early 1870s): the Maclure Glacier stakes (1872), the Whitney dispute, and the "mere sheepherder" remark as it's usually told.
+- Clark's own account of coming to the mountains in 1856 to die, his 1857 count of the Mariposa Grove, and Mount Clark's naming.
+- Harding's summit night on the Nose (bolts up the final headwall, topping out November 12, 1958) and his "who was conqueror" line, from his own account.
+- The Royal Arches first-ascent party (1936). Bestor Robinson's side story names Morgan Harris, Ken Adam, and Ken Davis, and other accounts name Hervey Voge as the third; check it against the sources.

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/side_quest_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(0, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_item")
+id = "sequoia_cone"
+display_name = "Giant Sequoia Cone"
+description = "A green cone no bigger than a hen's egg, from a tree that can live three thousand years. It can hang on the branch, sealed, for twenty years."
+icon = SubResource("AtlasTexture_icon")

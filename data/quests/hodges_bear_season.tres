@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hodges_bear_season"
+title = "Bear Season"
+giver = "clare_hodges"
+requires = PackedStringArray("hodges_patrol", "tabuce_chuckah")
+offered_in = 4
+out_of_season = PackedStringArray("Come and see me in the fall, when the acorns drop. That's when the bears get bold, and I could use a hand.")
+intro = PackedStringArray("Fall. The bears know it before we do. This time of year they eat all day and half the night, fattening up for winter.", "Acorns, apples, a sack of oats left on a porch. A bear that learns where people keep food doesn't forget it, and then it's trouble for the bear as much as for us.", "Start with your own camp. Get your acorns stored up in your chuckah, off the ground and covered. Then go and warn Mr. Lamon about his orchard.")
+steps = [{"type": "stored", "count": 20, "objective": "Store 20 acorns in your chuckah", "reminder": "Twenty acorns in your chuckah at the homestead, up off the ground. A bear can smell a pocketful from across the meadow.", "done": ["Good. Up off the ground and covered over. People here were keeping their food from bears long before there was a ranger to tell anybody how."]}, {"type": "talk", "target": "james_lamon", "objective": "Warn James Lamon about bears in his orchard", "reminder": "Mr. Lamon's cabin is at the homestead, near your tent.", "done": ["Bears? I've had a sow and two cubs up in the trees every night this week. They break the branches climbing for the high ones.", "I pick up the windfalls every morning now, and I don't leave a crumb in the cabin. Tell the ranger I'm learning."]}, {"type": "return", "objective": "Report back to Clare Hodges at the ranger station", "reminder": "Come back to the ranger station once you've seen him.", "done": ["Learning. Good. That's all any of us can do with bears: learn faster than they do."]}]
+outro = PackedStringArray("There were grizzlies in this valley once. They're gone now, shot out years ago. The black bears are what's left, and they're clever.", "Take some jerky from the patrol stores. It keeps, and it's wrapped tight. Keep your food that way and the bears will leave you be.")
+reward_items = {"beef_jerky": 3}

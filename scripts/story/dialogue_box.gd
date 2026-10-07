@@ -9,14 +9,22 @@ extends CanvasLayer
 ##   box.close()
 ##
 ## Or, for a one-off conversation: DialogueBox.say_to(player, lines)
+##
+## Text appears letter by letter at the Text speed setting (Settings); confirm
+## while it's still appearing shows the whole page, and confirm again goes on.
 
 const NAME_COLOR := Color(1.0, 0.85, 0.5)
 const CURSOR := "> "
+const HINT_COLOR := Color(1, 1, 1, 0.6)
 
 var _panel: PanelContainer
 var _name_label: Label
 var _text_label: Label
 var _options_box: VBoxContainer
+var _hint_label: Label
+## Letters shown so far on this page (fractional while revealing).
+var _shown := 0.0
+var _hint_time := 0.0
 var _options: PackedStringArray = []
 var _cursor := 0
 var _opened_frame := 0
@@ -75,6 +83,18 @@ func _ready() -> void:
 	_options_box = VBoxContainer.new()
 	_options_box.add_theme_constant_override("separation", 0)
 	column.add_child(_options_box)
+	# Pushes the hint to the bottom edge of the box.
+	var filler := Control.new()
+	filler.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	filler.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(filler)
+	_hint_label = Label.new()
+	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_hint_label.add_theme_color_override("font_color", HINT_COLOR)
+	column.add_child(_hint_label)
+	var hud := get_tree().get_first_node_in_group("hud") as HUD
+	if hud:
+		hud.device_changed.connect(_refresh_hint)
 
 
 ## Longest text shown at once. Longer lines are split at sentence breaks so
@@ -127,7 +147,51 @@ func _show(speaker: String, text: String, options: Array) -> void:
 	_name_label.visible = speaker != ""
 	_text_label.text = text
 	_options = PackedStringArray(options)
+	_shown = 0.0 if Settings.chars_per_second() > 0.0 else float(text.length())
+	_text_label.visible_characters = -1 if is_revealed() else 0
+	_hint_time = 0.0
 	_refresh_options()
+	_refresh_hint()
+
+
+## True once the whole page is showing.
+func is_revealed() -> bool:
+	return _shown >= _text_label.text.length()
+
+
+## Shows the rest of the page at once.
+func reveal_all() -> void:
+	_shown = float(_text_label.text.length())
+	_text_label.visible_characters = -1
+	_refresh_hint()
+
+
+func _process(delta: float) -> void:
+	if not is_revealed():
+		_shown += delta * Settings.chars_per_second()
+		if is_revealed():
+			reveal_all()
+		else:
+			_text_label.visible_characters = int(_shown)
+	elif _options.is_empty() and _hint_label.text != "":
+		# A slow blink on "Next", so the box reads as waiting for you.
+		_hint_time += delta
+		_hint_label.modulate.a = 1.0 if fmod(_hint_time, 1.2) < 0.8 else 0.35
+
+
+## "[E] Next", or the choice controls, in the current device's buttons.
+func _refresh_hint() -> void:
+	_hint_label.modulate.a = 1.0
+	var tree := get_tree()
+	if _text_label.text == "" and _options.is_empty():
+		_hint_label.text = ""
+	elif not _options.is_empty():
+		_hint_label.text = "[%s] Choose   [%s] OK   [%s] Cancel" % [
+			MenuInput.button(tree, "Up/Down", "D-pad"), MenuInput.button(tree, "E", "A"), MenuInput.button(tree, "Esc", "B")]
+	elif not is_revealed():
+		_hint_label.text = "[%s] Skip" % MenuInput.button(tree, "E", "A")
+	else:
+		_hint_label.text = "[%s] Next" % MenuInput.button(tree, "E", "A")
 
 
 func _refresh_options() -> void:
@@ -154,9 +218,12 @@ func _input(event: InputEvent) -> void:
 	# Ignore the key press that opened the box.
 	if Engine.get_process_frames() == _opened_frame:
 		return
-	if event.is_action_pressed("interact") or event.is_action_pressed("use_tool") or event.is_action_pressed("ui_accept"):
+	if MenuInput.confirm(event):
 		get_viewport().set_input_as_handled()
-		_answer = 1
+		if not is_revealed():
+			reveal_all() # the first press finishes the page
+		else:
+			_answer = 1
 	elif event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_answer = -1
@@ -172,4 +239,5 @@ func _input(event: InputEvent) -> void:
 
 ## For tests: act as if the player pressed confirm (true) or cancel (false).
 func press(confirm := true) -> void:
+	reveal_all()
 	_answer = 1 if confirm else -1

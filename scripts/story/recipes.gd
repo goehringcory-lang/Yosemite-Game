@@ -19,6 +19,9 @@ const RECIPES: Array[RecipeData] = [
 	preload("res://data/recipes/roasted_morels.tres"),
 	preload("res://data/recipes/toasted_toyon.tres"),
 	preload("res://data/recipes/yerba_buena_tea.tres"),
+	preload("res://data/recipes/spring_greens.tres"),
+	preload("res://data/recipes/bread_pudding.tres"),
+	preload("res://data/recipes/dry_crusts.tres"),
 ]
 
 const STARTING_RECIPES := ["yerba_buena_tea", "roasted_morels"]
@@ -93,7 +96,7 @@ func make(recipe: RecipeData) -> bool:
 		Inventory.remove(id, int(recipe.inputs[id]))
 	Inventory.add(recipe.output_id, recipe.output_count)
 	times_made[recipe.id] = times_made.get(recipe.id, 0) + 1
-	GameClock.advance_minutes(recipe.minutes)
+	GameClock.advance_minutes(Perks.recipe_minutes(recipe))
 	made.emit(recipe)
 	return true
 

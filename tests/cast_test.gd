@@ -483,6 +483,7 @@ func _play_last_page() -> void:
 	QuestLog.start_new_game()
 	QuestLog.completed.append_array(MAIN_ORDER.slice(0, MAIN_ORDER.find("clark_last_page")))
 	QuestLog.completed.append_array(["lebrado_villages", "lucy_basket"])
+	QuestLog.completed.append("clark_big_trees") # his side story would have come up long before the end
 	check(QuestLog.main_objective().objective.contains("Galen Clark"), "the journal sends you back to Clark at the end")
 	QuestLog.talk_to("galen_clark")
 	QuestLog.talk_to("maggie_howard")
@@ -491,14 +492,19 @@ func _play_last_page() -> void:
 	QuestLog.talk_to("galen_clark")
 	check(QuestLog.is_completed("clark_last_page") and QuestLog.final_entry_pending(), "The Last Page leaves you the last page to write")
 	var lines := QuestLog.write_final_entry(1)
-	check(QuestLog.final_entry == 1 and not QuestLog.final_entry_pending() and lines.size() == 3, "you write your entry, and the season turns")
+	check(QuestLog.final_entry == 1 and not QuestLog.final_entry_pending() and lines.size() == 5 + QuestLog.EPILOGUE.size(), "you write your entry, and the season turns")
+	check(lines.any(func(l: Dictionary) -> bool: return l.text.begins_with("Clark turns back through the book")), "Clark leafs back through the Register")
+	check(lines.back().text.begins_with("The end of The Guardian's Register"), "the game says the story is over (%s)" % lines.back().text)
 	check(QuestLog.write_final_entry(0).is_empty() and QuestLog.final_entry == 1, "the last page is written once")
 	var after := QuestLog.talk_to("galen_clark")
 	check(after.size() == 2 and after[0].text == QuestLog.AFTER_LAST_PAGE[0], "Clark talks about the finished book")
 	QuestLog.completed.append("tenaya_ahwahnee") # skipped by this shortcut through the story
 	var pages := RegisterPages.written()
 	check(pages.size() > 10 and pages[0].by == "Tenaya", "the Register is full, Tenaya's page at the front")
-	check(pages.any(func(p: Dictionary) -> bool: return p.by == "Galen Clark" and p.notes.size() == 2), "Clark's own page carries his corrections")
+	check(pages.any(func(p: Dictionary) -> bool: return p.by == "Galen Clark" and p.notes.size() == 3 and p.notes[2].begins_with("Register note")),
+		"Clark's own page carries his corrections, then its Register note")
+	check(pages.all(func(p: Dictionary) -> bool: return p.history != "" or p.by in ["Maria Lebrado (Totuya)", "Tabuce (Maggie Howard)"]),
+		"every page carries a Register note (the second blank page shares the first's)")
 	var saved := QuestLog.save_data()
 	QuestLog.start_new_game()
 	QuestLog.load_data(saved)

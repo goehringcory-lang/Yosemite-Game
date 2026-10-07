@@ -58,17 +58,23 @@ func _ready() -> void:
 			check(forage._touches_tile(f.cell, ForageSpawner.MANZANITA_TILE), "toyon grows in the chaparral")
 
 	# Pick up an acorn
+	# Forage lands at random, and a spot beside an acorn can be blocked (a trunk,
+	# a rock), so try each acorn from each side until the player can reach one.
 	var acorn: Forageable
 	for f: Forageable in forage.get_children():
-		if f.item.id == "black_oak_acorn":
-			acorn = f
-	player.global_position = acorn.global_position + Vector2(0, 14)
-	player.facing = Vector2i.UP
-	player.interaction_area.position = Vector2(0, -12)
-	await get_tree().physics_frame
-	await get_tree().physics_frame
-	player._interact()
-	check(Inventory.count("black_oak_acorn") == 1 and acorn.is_queued_for_deletion(), "acorn picked up")
+		if f.item.id != "black_oak_acorn" or Inventory.count("black_oak_acorn") > 0:
+			continue
+		for facing: Vector2i in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
+			player.global_position = f.global_position - Vector2(facing) * 14.0
+			player.facing = facing
+			player.interaction_area.position = Vector2(facing) * 12.0
+			await get_tree().physics_frame
+			await get_tree().physics_frame
+			player._interact()
+			if Inventory.count("black_oak_acorn") > 0:
+				acorn = f
+				break
+	check(Inventory.count("black_oak_acorn") == 1 and acorn != null and acorn.is_queued_for_deletion(), "acorn picked up")
 	check(world.hud.bag_panel.visible and world.hud.bag_list.get_child_count() == 1, "bag panel lists the acorn")
 	Inventory.add("acorn_cake", 2)
 	check(world.hud.bag_list.get_child_count() == 2, "bag panel lists cooked food too")
@@ -107,10 +113,18 @@ func _ready() -> void:
 
 	# Curfew
 	GameClock.advance_minutes(GameClock.PASS_OUT_HOUR * 60)
-	await get_tree().create_timer(3.0).timeout
+	await get_tree().create_timer(0.5).timeout
+	# Wait for the pass-out sleep to finish; a fixed wait raced it on a busy machine.
+	var waited := 0.0
+	while world._busy and waited < 15.0:
+		await get_tree().create_timer(0.1).timeout
+		waited += 0.1
 	check(GameClock.day == saved_day + 1 and GameClock.hour == 6, "passing out at 2 AM starts next day")
 
-	# Season rollover
+	# Season rollover. On a busy machine the pass-out morning can still be
+	# fading in, and sleep() does nothing while World is busy.
+	while world._busy:
+		await get_tree().process_frame
 	GameClock.day = 28
 	GameClock.season = GameClock.Season.SPRING
 	await world.sleep()

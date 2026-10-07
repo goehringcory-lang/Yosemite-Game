@@ -85,6 +85,7 @@ func climb(player: Player) -> void:
 	var result: Array = await minigame.finished
 	var success: bool = result[0]
 	GameClock.paused = was_paused
+	Perks.note("perfect_cruxes", state.perfect_cruxes)
 	var report: Array[Dictionary] = []
 	if success and QuestLog.record_climb(route.id):
 		report = QuestLog.tick_report(route.id)

@@ -11,6 +11,7 @@ years = "1861–1948"
 affiliation = "Camp Curry"
 bio = "Jennie Foster Curry and her husband David opened Camp Curry in 1899, renting tents to visitors at a price working families could afford. After David died in 1917, 'Mother Curry' ran the camp for decades. The camp stands beside James Lamon's old orchard."
 idle_lines = PackedStringArray("A clean tent, a hot supper, and a fair price. That's all Camp Curry ever promised.", "David could shout louder than anyone in California. You'd hear him at Glacier Point.")
+story_beats = [{"after": "clark_last_page", "lines": ["Mr. Clark's book, finished! David would have stood on the porch and announced it to the whole camp. I'll just say well done, and supper's at six."]}]
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.165, 0.165, 0.220, 1)
 home = "Camp Curry"

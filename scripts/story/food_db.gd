@@ -29,6 +29,9 @@ const FOODS := {
 	"roasted_morels": {"energy": 20, "shelf_life": 1},
 	"toasted_toyon": {"energy": 12, "shelf_life": 5},
 	"yerba_buena_tea": {"energy": 8, "shelf_life": 1},
+	"spring_greens": {"energy": 36, "shelf_life": 1},
+	"bread_pudding": {"energy": 30, "shelf_life": 6},
+	"dry_crusts": {"energy": 9, "shelf_life": 30},
 	# Gifts and trades from quests
 	"lamon_apple": {"energy": 12, "shelf_life": 12},
 	"degnan_loaf": {"energy": 25, "shelf_life": 4},
@@ -54,7 +57,9 @@ func energy(id: String) -> int:
 
 
 func shelf_life(id: String) -> int:
-	return FOODS.get(id, {}).get("shelf_life", 0)
+	var days: int = FOODS.get(id, {}).get("shelf_life", 0)
+	# Lamon's Cellar (a perk): food keeps a day longer. 0 still means never spoils.
+	return days + int(Perks.bonus("lamons_cellar")) if days > 0 else days
 
 
 func is_edible(id: String) -> bool:

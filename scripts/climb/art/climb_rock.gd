@@ -123,33 +123,48 @@ static func _finish(im: Image, edge: PackedInt32Array) -> void:
 	var w := im.get_width()
 	var h := im.get_height()
 	var data := im.get_data()
+	# Most of the face gets the plain 0.93 shade, and the wall is painted in a
+	# few hundred colors, so each color's result is worked out once.
+	var plain := {}
 	for y in h:
 		var e := edge[y]
 		var row := y * w * 4
 		for x in range(0, mini(e + 1, w)):
 			var o := row + x * 4
-			if data[o + 3] < 128:
+			var px := data.decode_u32(o)
+			if px >> 24 < 128:
 				continue
-			var r := data[o] / 255.0
-			var g := data[o + 1] / 255.0
-			var b := data[o + 2] / 255.0
-			var lum := r * 0.3 + g * 0.55 + b * 0.15
-			var k := 1.1
 			var shade := 0.93
 			var turn := float(x - (e - 22)) / 18.0
+			if turn <= 0.0 and x >= 16:
+				var rgb: int = plain.get(px & 0xffffff, -1)
+				if rgb < 0:
+					rgb = _finish_rgb(px, shade)
+					plain[px & 0xffffff] = rgb
+				data.encode_u32(o, rgb | (px & 0xff000000))
+				continue
 			if turn > 0.0:
 				shade -= minf(turn, 1.0) * 0.14
 			if x < 16:
 				shade -= (16.0 - x) / 16.0 * 0.1
-			# warm the lights, cool the shadows
-			var warm := (lum - 0.5) * 0.05
-			r = ((r - 0.5) * k + 0.5 + warm) * shade
-			g = ((g - 0.5) * k + 0.5 + warm * 0.4) * shade
-			b = ((b - 0.5) * k + 0.5 - warm) * shade
-			data[o] = int(clampf(r, 0.0, 1.0) * 255.0)
-			data[o + 1] = int(clampf(g, 0.0, 1.0) * 255.0)
-			data[o + 2] = int(clampf(b, 0.0, 1.0) * 255.0)
+			data.encode_u32(o, _finish_rgb(px, shade) | (px & 0xff000000))
 	im.set_data(w, h, false, Image.FORMAT_RGBA8, data)
+
+
+## _finish()'s curve for one pixel (RGBA8 packed little-endian, as
+## decode_u32 reads it): returns the new red, green and blue, packed the same.
+static func _finish_rgb(px: int, shade: float) -> int:
+	var r := (px & 0xff) / 255.0
+	var g := ((px >> 8) & 0xff) / 255.0
+	var b := ((px >> 16) & 0xff) / 255.0
+	var lum := r * 0.3 + g * 0.55 + b * 0.15
+	var k := 1.1
+	# warm the lights, cool the shadows
+	var warm := (lum - 0.5) * 0.05
+	r = ((r - 0.5) * k + 0.5 + warm) * shade
+	g = ((g - 0.5) * k + 0.5 + warm * 0.4) * shade
+	b = ((b - 0.5) * k + 0.5 - warm) * shade
+	return int(clampf(r, 0.0, 1.0) * 255.0) | int(clampf(g, 0.0, 1.0) * 255.0) << 8 | int(clampf(b, 0.0, 1.0) * 255.0) << 16
 
 
 # ---------------------------------------------------------------- the face
@@ -162,32 +177,40 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 	var h := im.get_height()
 	var smooth := style == "slab" or style == "dike" or rock_key == "polished" or rock_key == "dome"
 	var relief := _relief(w, h, rng.randi(), smooth)
-	var lut: Array[Color] = []
-	for i in 20:
-		lut.append(tone(c, i * 0.25))
+	var lut := _packed_tones(c)
 	var out := PackedByteArray()
 	out.resize(w * h * 4)
 	var k_light := 1.45 if not smooth else 1.0
+	# The terms of the shading that depend on one input each, worked out once
+	# (the same arithmetic as per pixel, so the picture doesn't change).
+	var light_x := _scaled_diffs(0.8)
+	var light_y := _scaled_diffs(0.55)
+	var sun_x := PackedFloat64Array()
+	sun_x.resize(w)
+	for x in w:
+		var sun := float(x) / w
+		sun_x[x] = (sun - 0.5) * 1.1
+	var height := PackedFloat64Array()
+	height.resize(256)
+	for v in 256:
+		height[v] = (v / 255.0 - 0.5) * 1.2
+	var bayer := _bayer_terms(0.16)
 	for y in h:
 		var row := y * w
+		var brow := (y & 3) << 2
+		var up := y > 2
+		var down := y < h - 3
 		for x in w:
 			var i := row + x
-			var xl := relief[i - 3] if x > 2 else relief[i]
-			var xr := relief[i + 3] if x < w - 3 else relief[i]
-			var yu := relief[i - 3 * w] if y > 2 else relief[i]
-			var yd := relief[i + 3 * w] if y < h - 3 else relief[i]
+			var here := relief[i]
+			var xl := relief[i - 3] if x > 2 else here
+			var xr := relief[i + 3] if x < w - 3 else here
+			var yu := relief[i - 3 * w] if up else here
+			var yd := relief[i + 3 * w] if down else here
 			# Light from the upper left: surfaces facing left and up are lit.
-			var s_light := ((xl - xr) * 0.8 + (yu - yd) * 0.55) / 255.0 * 4.0
-			var sun := float(x) / w
-			var t := 2.0 + s_light * k_light + (sun - 0.5) * 1.1 + (relief[i] / 255.0 - 0.5) * 1.2
-			var bay: float = P.BAYER[y & 3][x & 3] / 16.0 - 0.5
-			var idx := clampi(roundi((t + bay * 0.16) * 3.0) * 4 / 3, 0, 19)
-			var col: Color = lut[idx]
-			var o := i * 4
-			out[o] = int(col.r8)
-			out[o + 1] = int(col.g8)
-			out[o + 2] = int(col.b8)
-			out[o + 3] = 255
+			var s_light := (light_x[xl - xr + 255] + light_y[yu - yd + 255]) / 255.0 * 4.0
+			var t := 2.0 + s_light * k_light + sun_x[x] + height[here]
+			out.encode_u32(i * 4, lut[clampi(roundi((t + bayer[brow | (x & 3)]) * 3.0) * 4 / 3, 0, 19)])
 	im.set_data(w, h, false, Image.FORMAT_RGBA8, out)
 	_joints(im, c, rng, smooth)
 	_stains(im, c, rng, deco)
@@ -197,6 +220,38 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 		var p := Vector2i(rng.randi_range(0, w - 1), rng.randi_range(0, h - 1))
 		var col := im.get_pixelv(p)
 		im.set_pixelv(p, col.lightened(0.14) if rng.randf() < 0.55 else col.darkened(0.18))
+
+
+## The 20 quarter-steps of the rock ramp as opaque RGBA8 pixels, packed for
+## PackedByteArray.encode_u32.
+static func _packed_tones(c: Dictionary) -> PackedInt64Array:
+	var lut := PackedInt64Array()
+	for i in 20:
+		var col := tone(c, i * 0.25)
+		lut.append(col.r8 | col.g8 << 8 | col.b8 << 16 | 255 << 24)
+	return lut
+
+
+## [param k] times every difference of two relief values (-255..255), indexed
+## by the difference + 255.
+static func _scaled_diffs(k: float) -> PackedFloat64Array:
+	var out := PackedFloat64Array()
+	out.resize(511)
+	for d in range(-255, 256):
+		out[d + 255] = d * k
+	return out
+
+
+## The ordered-dither offset times [param k] for each (x & 3, y & 3), indexed
+## by (y & 3) * 4 + (x & 3).
+static func _bayer_terms(k: float) -> PackedFloat64Array:
+	var out := PackedFloat64Array()
+	out.resize(16)
+	for yy in 4:
+		for xx in 4:
+			var bay: float = P.BAYER[yy][xx] / 16.0 - 0.5
+			out[yy * 4 + xx] = bay * k
+	return out
 
 
 ## A height map, 0..255 per pixel: fluted noise plus plates cut by joints.
@@ -225,8 +280,16 @@ static func _relief(w: int, h: int, seed_value: int, smooth: bool) -> PackedByte
 	var out := PackedByteArray()
 	out.resize(w * h)
 	var wa := 0.5 if not smooth else 0.42
+	# Each source is a byte, so weigh the 256 values once.
+	var weigh_a := PackedFloat64Array()
+	var weigh_b := PackedFloat64Array()
+	weigh_a.resize(256)
+	weigh_b.resize(256)
+	for v in 256:
+		weigh_a[v] = v * wa
+		weigh_b[v] = v * (1.0 - wa) * 0.9
 	for i in w * h:
-		out[i] = int(da[i] * wa + db[i] * (1.0 - wa) * 0.9)
+		out[i] = int(weigh_a[da[i]] + weigh_b[db[i]])
 	return out
 
 
@@ -525,30 +588,38 @@ static func _glacier(im: Image, c: Dictionary, rng: RandomNumberGenerator, style
 	var h := im.get_height()
 	var snow := style == "snow"
 	var relief := _relief(w, h, rng.randi(), true)
-	var lut: Array[Color] = []
-	for i in 20:
-		lut.append(tone(c, i * 0.25))
+	var lut := _packed_tones(c)
 	var out := PackedByteArray()
 	out.resize(w * h * 4)
+	# Per-input terms worked out once, as in _face().
+	var light := _scaled_diffs(0.7)
+	var height := PackedFloat64Array()
+	height.resize(256)
+	for v in 256:
+		height[v] = (v / 255.0 - 0.5) * 0.7
+	var across := PackedFloat64Array()
+	across.resize(w)
+	for x in w:
+		across[x] = (float(x) / w - 0.5) * 0.5
+	var bayer := _bayer_terms(0.14)
+	var base := 2.1 if snow else 1.7
+	var band_k := 0.8 if snow else 0.35
+	var light_k := 1.0 if snow else 1.2
 	for y in h:
+		var brow := (y & 3) << 2
 		for x in w:
 			var i := y * w + x
-			var xl := relief[i - 3] if x > 2 else relief[i]
-			var xr := relief[i + 3] if x < w - 3 else relief[i]
-			var yu := relief[i - 3 * w] if y > 2 else relief[i]
-			var yd := relief[i + 3 * w] if y < h - 3 else relief[i]
-			var s_light := ((xl - xr) * 0.7 + (yu - yd) * 0.7) / 255.0 * 4.0
+			var here := relief[i]
+			var xl := relief[i - 3] if x > 2 else here
+			var xr := relief[i + 3] if x < w - 3 else here
+			var yu := relief[i - 3 * w] if y > 2 else here
+			var yd := relief[i + 3 * w] if y < h - 3 else here
+			var s_light := (light[xl - xr + 255] + light[yu - yd + 255]) / 255.0 * 4.0
 			# Broad blue-white bands across the face, so it reads as layered snow
 			# and ice rather than a white sheet.
-			var band := sin(y * 0.05 + sin(x * 0.018 + y * 0.004) * 1.6) * (0.8 if snow else 0.35)
-			var t := (2.1 if snow else 1.7) + band + s_light * (1.0 if snow else 1.2) + (relief[i] / 255.0 - 0.5) * 0.7 + (float(x) / w - 0.5) * 0.5
-			var bay: float = P.BAYER[y & 3][x & 3] / 16.0 - 0.5
-			var col: Color = lut[clampi(roundi((t + bay * 0.14) * 3.0) * 4 / 3, 0, 19)]
-			var o := i * 4
-			out[o] = int(col.r8)
-			out[o + 1] = int(col.g8)
-			out[o + 2] = int(col.b8)
-			out[o + 3] = 255
+			var band := sin(y * 0.05 + sin(x * 0.018 + y * 0.004) * 1.6) * band_k
+			var t := base + band + s_light * light_k + height[here] + across[x]
+			out.encode_u32(i * 4, lut[clampi(roundi((t + bayer[brow | (x & 3)]) * 3.0) * 4 / 3, 0, 19)])
 	im.set_data(w, h, false, Image.FORMAT_RGBA8, out)
 	if not snow:
 		# White fractures through the ice, and trapped air bubbles.
@@ -695,10 +766,11 @@ static func paint_roof(state: ClimbState, rock_key: String, pal: Dictionary, see
 	_stains(im, c, rng, ["streaks"])
 	_lichen(im, c, rng, ["lichen"], h)
 	# Stains and lichen only belong on rock.
-	for y in h:
-		for x in w:
-			if mask[y * w + x] == 0:
-				im.set_pixel(x, y, Color(0, 0, 0, 0))
+	var data := im.get_data()
+	for i in w * h:
+		if mask[i] == 0:
+			data.encode_u32(i * 4, 0)
+	im.set_data(w, h, false, Image.FORMAT_RGBA8, data)
 	var ledge_y := int(L.ROOF_Y) + 62
 	_ledge(im, c, rng, ledge_y, wall_x + 74, false, "crack")
 	# The crack along the ceiling: a dark slit with a lit lip below.
