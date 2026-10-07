@@ -45,6 +45,14 @@ static func colors(rock_key: String, pal: Dictionary) -> Dictionary:
 	var names := ["deep", "shade", "base", "lit", "hi"]
 	for i in names.size():
 		out[names[i]] = _light(Color(hexes[i]), tint, lum)
+	# Alpenglow lights the sunlit tones (base, lit, highlight) more than the shade.
+	var glow: float = pal.get("glow", 0.0)
+	if glow > 0.0:
+		var glow_col: Color = pal.get("glow_col", Color.WHITE)
+		for i in range(2, 5):
+			var col: Color = out[names[i]]
+			var v := col.r * 0.3 + col.g * 0.55 + col.b * 0.15
+			out[names[i]] = col.lerp(Color(glow_col.r * v * 1.3, glow_col.g * v * 1.3, glow_col.b * v * 1.3).clamp(), glow * [0.18, 0.32, 0.45][i - 2])
 	out["seam"] = _light(Color(hexes[0]).darkened(0.35), tint, lum)
 	out["streak"] = _light(STREAK, tint, lum)
 	out["lichen_o"] = _light(LICHEN_ORANGE, tint, lum)
@@ -530,7 +538,10 @@ static func _glacier(im: Image, c: Dictionary, rng: RandomNumberGenerator, style
 			var yu := relief[i - 3 * w] if y > 2 else relief[i]
 			var yd := relief[i + 3 * w] if y < h - 3 else relief[i]
 			var s_light := ((xl - xr) * 0.7 + (yu - yd) * 0.7) / 255.0 * 4.0
-			var t := (3.0 if snow else 1.7) + s_light * (1.1 if snow else 1.2) + (relief[i] / 255.0 - 0.5) * 0.7 + (float(x) / w - 0.5) * 0.5
+			# Broad blue-white bands across the face, so it reads as layered snow
+			# and ice rather than a white sheet.
+			var band := sin(y * 0.05 + sin(x * 0.018 + y * 0.004) * 1.6) * (0.8 if snow else 0.35)
+			var t := (2.1 if snow else 1.7) + band + s_light * (1.0 if snow else 1.2) + (relief[i] / 255.0 - 0.5) * 0.7 + (float(x) / w - 0.5) * 0.5
 			var bay: float = P.BAYER[y & 3][x & 3] / 16.0 - 0.5
 			var col: Color = lut[clampi(roundi((t + bay * 0.14) * 3.0) * 4 / 3, 0, 19)]
 			var o := i * 4
@@ -555,23 +566,41 @@ static func _glacier(im: Image, c: Dictionary, rng: RandomNumberGenerator, style
 			P.ellipse(im, p.x, p.y, 1.5, 1.0, tone(c, 4.4))
 	else:
 		# Sun cups and wind ridges.
-		for i in w * h / 420:
+		for i in w * h / 900:
 			var x := rng.randi_range(4, w - 30)
 			var y := rng.randi_range(4, h - 4)
 			var r := rng.randi_range(3, 6)
-			P.ellipse(im, x, y, r, r * 0.5, tone(c, 2.6))
-			P.hline(im, x - r + 1, y - 1, r * 2 - 2, tone(c, 2.0))
+			P.ellipse(im, x, y, r, r * 0.5, tone(c, 2.8))
+			P.hline(im, x - r + 1, y - 1, r * 2 - 2, tone(c, 2.3))
 			P.hline(im, x - r + 1, y + 1, r * 2 - 2, tone(c, 4.4))
 		for i in h / 36:
 			var y := rng.randi_range(0, h - 4)
 			var x0 := rng.randi_range(0, w - 90)
 			for k in rng.randi_range(30, 90):
 				P.px(im, x0 + k, y + int(sin(k * 0.12 + i) * 2.0), tone(c, 4.4))
+	# A few crevasse lines: thin blue cracks wandering across the face.
+	for i in maxi(h / 240, 2):
+		var x := rng.randi_range(0, w - 120)
+		var y := rng.randi_range(8, h - 8)
+		var phase := rng.randf_range(0.0, 6.0)
+		for k in rng.randi_range(60, 150):
+			var yy := y + int(sin(k * 0.05 + phase) * 3.0 + k * 0.04)
+			P.px(im, x + k, yy, tone(c, 0.9))
+			P.px(im, x + k, yy + 1, tone(c, 4.2))
+			if k % 7 == 0:
+				P.px(im, x + k, yy - 1, tone(c, 1.6))
 	if "moraine" in deco:
-		for i in w * h / 900:
+		# Rubble from the rock above, in drifts at the foot of the snow, with a
+		# lit top to each stone.
+		var rock := Color("6a6a70").lerp(c.tint, 0.2)
+		for i in w * 150 / 1100:
 			var x := rng.randi_range(4, w - 30)
-			var y := rng.randi_range(4, h - 4)
-			P.rect(im, x, y, rng.randi_range(2, 5), rng.randi_range(1, 3), Color("6a6a70").lerp(c.tint, 0.2))
+			var y := rng.randi_range(h - 150, h - 4)
+			var sw := rng.randi_range(2, 5)
+			var sh := rng.randi_range(2, 3)
+			P.rect(im, x, y, sw, sh, rock)
+			P.rect(im, x, y, sw, 1, rock.lightened(0.3))
+			P.rect(im, x, y + sh, sw, 1, rock.darkened(0.3))
 	if "crevasse" in deco:
 		var top := state.top_row
 		for r in range(1, top):

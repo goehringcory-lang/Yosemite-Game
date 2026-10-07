@@ -52,6 +52,7 @@ func _ready() -> void:
 	test_late_starts()
 	test_snow_rules()
 	test_fixed_ropes()
+	await test_climb_ending_past_the_curfew()
 	print("\nOK: %d failure(s)" % failures)
 	get_tree().quit(failures)
 
@@ -463,3 +464,52 @@ func test_fixed_ropes() -> void:
 				jugged = state.jug(dx)
 				break
 		check(jugged and state.status == ClimbState.Status.CLIMBING and state.falls == 0 and state.stamina >= 1, "jugging a fixed rope at %d stamina doesn't fall (%d left)" % [stamina, state.stamina])
+
+
+## The probe: a climb that ends past 2 AM sends the player home mid-way through
+## ClimbStart.climb(). The travel to the top must not call on the detached node.
+func test_climb_ending_past_the_curfew() -> void:
+	SaveManager.save_path = "user://climb_test_save.json"
+	SaveManager.delete_save()
+	var world: Node = load("res://scenes/world/world.tscn").instantiate()
+	get_tree().root.add_child(world)
+	await get_tree().process_frame
+	world._enter_region("yosemite_valley", "apron_base")
+	await get_tree().process_frame
+	var start: ClimbStart = world.find_child("GlacierPointApron", true, false)
+	check(start != null and start.route.destination_hub != "", "the Apron's start is in the Valley and leads somewhere")
+	QuestLog.record_climb(start.route.id) # no tick report to wait on
+	Gear.owned = kit_for(start.route)
+	var day := GameClock.day
+	GameClock.paused = false
+	GameClock.minutes = 23 * 60 + 30
+	var done := [false]
+	var run := func():
+		await start.climb(world.player)
+		done[0] = true
+	run.call()
+	await get_tree().process_frame
+	var screen: ClimbMinigame = null
+	for child in get_tree().root.get_children():
+		if child is ClimbMinigame:
+			screen = child
+	check(screen != null and GameClock.paused, "the climbing screen is up and the clock waits")
+	if screen == null:
+		world.queue_free()
+		return
+	screen.state.status = ClimbState.Status.TOPPED_OUT
+	screen.finished.emit(true, 300)
+	screen.queue_free()
+	for i in 6:
+		await get_tree().process_frame
+	check(done[0], "the climb finishes without an error when it ends past the curfew")
+	# The player is passed out and sent home to a new day.
+	var waited := 0.0
+	while world.region.region_id != Park.HOME_REGION and waited < 6.0:
+		await get_tree().create_timer(0.25).timeout
+		waited += 0.25
+	check(world.region.region_id == Park.HOME_REGION and GameClock.day == day + 1, "a climb that runs past 2 AM ends with the player passed out at home")
+	world.queue_free()
+	await get_tree().process_frame
+	SaveManager.delete_save()
+	Inventory.items.clear()

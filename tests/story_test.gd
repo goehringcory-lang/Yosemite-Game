@@ -363,6 +363,12 @@ func test_dialogue_and_minigame_scenes() -> void:
 	var done := [false]
 	minigame.finished.connect(func(_s, _m): done[0] = true)
 	minigame.state.retreat()
+	minigame._events()
+	# The result card comes up after the retreat plays, and can't be skipped at once.
+	minigame._result_delay = 0.0
+	await get_tree().process_frame
+	await get_tree().process_frame
+	minigame._result_age = 1.0
 	var ev := InputEventAction.new()
 	ev.action = "interact"
 	ev.pressed = true

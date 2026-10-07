@@ -119,6 +119,12 @@ static func _body(pal: Dictionary, l: int) -> Dictionary:
 	var ramp: Array[Color] = []
 	for k in 5:
 		var col := _lit(Color(GRANITE[k]), pal, GRANITE_TINT[k], fade)
+		# Alpenglow on the sunlit faces, less on the distant ones.
+		var glow: float = pal.get("glow", 0.0)
+		if glow > 0.0 and k < 3:
+			var glow_col: Color = pal.get("glow_col", Color.WHITE)
+			var v := col.r * 0.3 + col.g * 0.55 + col.b * 0.15
+			col = col.lerp(Color(glow_col.r * v * 1.3, glow_col.g * v * 1.3, glow_col.b * v * 1.3).clamp(), glow * [0.65, 0.5, 0.3][k] * (1.0 - fade * 0.6))
 		if k == 0:
 			col = col.lerp(pal.rim, 0.3 * (1.0 - fade))
 		ramp.append(col)

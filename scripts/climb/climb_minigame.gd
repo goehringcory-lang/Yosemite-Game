@@ -32,6 +32,9 @@ const MOVE_TIME := 0.2
 const FALL_TIME := 0.55
 ## A crux check ignores input for this long when it starts.
 const CRUX_GRACE := 0.35
+## The top of the gear tray along the bottom. A belayer whose feet sink below
+## this is off the bottom of the picture, not half hidden behind the tray.
+const TRAY_TOP := 237.0
 
 const ROPE := Color("d8452e")
 const ROPE_LIT := Color("f07a5a")
@@ -741,8 +744,8 @@ func _draw_rope() -> void:
 		_sag(points[i], points[i + 1], sag)
 	if not route.top_rope:
 		# The tail piled below the belayer.
-		var b := points[0]
-		_coil(b + Vector2(-4, 22))
+		if _belayer_in_view():
+			_coil(points[0] + Vector2(-4, 22))
 
 
 func _sag(a: Vector2, b: Vector2, amount: float) -> void:
@@ -770,9 +773,15 @@ var _belay_frame := 0
 var _belay_frame_t := 0.0
 
 
+## False once the belay ledge has sunk below the gear tray as you climb.
+func _belayer_in_view() -> bool:
+	var p := _belay_spot()
+	return p.y >= -30 and p.y <= TRAY_TOP + 6.0
+
+
 func _draw_belayer() -> void:
 	var p := _belay_spot()
-	if p.y < -30 or p.y > SCREEN.y + 40:
+	if not _belayer_in_view():
 		return
 	var mode := "belay"
 	if route.top_rope or (state.pitch > 0 and route.pitches.size() >= 5) or _roof:
@@ -904,7 +913,8 @@ func _hint() -> String:
 			parts.append("Shift+arrow: aid")
 			break
 	if parts.is_empty():
-		return "Arrows: climb     Esc: retreat"
+		# The reminder is for the first minute; after that it just covers the wall.
+		return "Arrows: climb     Esc: retreat" if _time < 40.0 and state.pitch == 0 else ""
 	return "     ".join(parts)
 
 
@@ -952,16 +962,21 @@ func _draw_reachable() -> void:
 			label += " rest"
 		elif hold.get("fixed", false):
 			label += " fixed"
-		# Left ring's label goes left, the middle one above, the right one right.
-		match dx:
-			-1:
-				UI.text(_canvas, p + Vector2(-9, -1), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_RIGHT)
-			0:
-				UI.text(_canvas, p + Vector2(0, -11), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
-			_:
-				UI.text(_canvas, p + Vector2(9, -1), label, color, 10)
+		# Left ring's label goes left, the middle one above, the right one
+		# right. Under a roof the three rings sit almost on top of each other,
+		# so their labels stack in a list beside them instead.
+		if _roof:
+			UI.outlined(_canvas, p + Vector2(9, -7 + (dx + 1) * 10), label, color, 10)
+		else:
+			match dx:
+				-1:
+					UI.outlined(_canvas, p + Vector2(-9, -1), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_RIGHT)
+				0:
+					UI.outlined(_canvas, p + Vector2(0, -11), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+				_:
+					UI.outlined(_canvas, p + Vector2(9, -1), label, color, 10)
 		if state.stamina - cost <= 0 and not hold.get("crux", false):
-			UI.text(_canvas, p + Vector2(0, 17), "fall!", UI.WARN, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+			UI.outlined(_canvas, p + Vector2(0, 17), "fall!", UI.WARN, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _cost_color(cost: int) -> Color:

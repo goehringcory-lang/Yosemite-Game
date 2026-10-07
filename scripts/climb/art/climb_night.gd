@@ -11,8 +11,11 @@ const WALL_W := 330
 
 const PLAYER_LOOK := {"id": "player", "skin": "f0c088", "hair": "6a4428", "hat": "8a5a2a", "hat_kind": "fedora", "top": "6a8a4a", "bottom": "3a4466"}
 
+const GLOW_RADIUS := 150
+
 static var _wall_tex: ImageTexture
 static var _sky_tex: ImageTexture
+static var _glow_tex: ImageTexture
 
 
 static func draw(ci: CanvasItem, info: Dictionary, state: ClimbState, route: RouteData, profile: Dictionary, age: float, time: float, kit: Dictionary) -> void:
@@ -180,10 +183,31 @@ static func _wall(ci: CanvasItem) -> void:
 
 
 static func _glow(ci: CanvasItem, at: Vector2, time: float) -> void:
-	# Stepped rings, so the light falls off in bands like painted pixel art.
-	var f := 0.04 + 0.006 * sin(time * 7.0) + 0.004 * sin(time * 13.0)
-	for i in 7:
-		ci.draw_circle(at, 150.0 - i * 18.0, Color(1.0, 0.62, 0.28, f * 1.25))
+	# The lamplight falls off smoothly into the dark: a few levels of warmth
+	# dithered together (see _glow_image), not rings, and it flickers.
+	if _glow_tex == null:
+		_glow_tex = ImageTexture.create_from_image(_glow_image())
+	var flicker := 0.9 + 0.07 * sin(time * 7.0) + 0.04 * sin(time * 13.0)
+	ci.draw_texture(_glow_tex, (at - Vector2(GLOW_RADIUS, GLOW_RADIUS)).round(), Color(1, 1, 1, clampf(flicker, 0.0, 1.0)))
+
+
+## A warm radial glow: six levels of light with an ordered dither between
+## them, so it fades out pixel by pixel instead of in stepped rings.
+static func _glow_image() -> Image:
+	var size := GLOW_RADIUS * 2 + 1
+	var im := Image.create_empty(size, size, false, Image.FORMAT_RGBA8)
+	var levels := 6.0
+	for y in size:
+		for x in size:
+			var d := Vector2(x - GLOW_RADIUS, y - GLOW_RADIUS).length() / GLOW_RADIUS
+			if d >= 1.0:
+				continue
+			var strength := pow(1.0 - d, 1.5) * levels
+			var bayer: float = P.BAYER[y & 3][x & 3] / 16.0
+			var level := floorf(strength + bayer)
+			if level > 0.0:
+				im.set_pixel(x, y, Color(1.0, 0.62, 0.28, minf(level, levels) * 0.06))
+	return im
 
 
 static func _ledge(ci: CanvasItem, cx: float, cy: float) -> void:

@@ -63,6 +63,17 @@ static func text(ci: CanvasItem, pos: Vector2, s: String, color := CREAM, size :
 	ci.draw_string(font(), p, s, left, width, size, color)
 
 
+## Text with a 1 px dark outline all round, for labels over busy rock.
+static func outlined(ci: CanvasItem, pos: Vector2, s: String, color := CREAM, size := 10, width := -1.0, align := HORIZONTAL_ALIGNMENT_LEFT) -> void:
+	var p := _aligned(pos, s, size, align).round()
+	var left := HORIZONTAL_ALIGNMENT_LEFT
+	for dy in [-1, 0, 1]:
+		for dx in [-1, 0, 1]:
+			if dx != 0 or dy != 0:
+				ci.draw_string(font(), p + Vector2(dx, dy), s, left, width, size, SHADOW)
+	ci.draw_string(font(), p, s, left, width, size, color)
+
+
 ## Ink on parchment: no shadow.
 static func ink(ci: CanvasItem, pos: Vector2, s: String, color := INK, size := 10, width := -1.0, align := HORIZONTAL_ALIGNMENT_LEFT) -> void:
 	ci.draw_string(font(), _aligned(pos, s, size, align).round(), s, HORIZONTAL_ALIGNMENT_LEFT, width, size, color)
