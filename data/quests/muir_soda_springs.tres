@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "muir_soda_springs"
+title = "A Fire at Soda Springs"
+giver = "john_muir"
+requires = PackedStringArray("muir_cathedral")
+intro = PackedStringArray("You've stood on Cathedral Peak. Now let me give you the other half of this country: the night.", "I camped across the meadow at Soda Springs with a friend once, and tonight I mean to build a fire like that one. I'll see to the wood if you bring the supper.", "Food enough for two, and then come and sit with me after dark. The stars up here are worth the cold.")
+steps = [{"type": "pay", "energy": 40, "objective": "Bring John Muir supper for two (food worth 40 energy)", "reminder": "Bread, nuts, berries, anything. I've lived a week on bread and tea, but a guest deserves better.", "done": ["A feast! I'll put the kettle on."]}, {"type": "time", "from": 20, "to": 2, "objective": "Sit by Muir's campfire after dark (8 PM to 2 AM)", "reminder": "Come back after dark, when the fire's going and the stars are out.", "done": ["Look up. Above the valley's haze you can see the Milky Way's dark lanes, like rivers in it.", "In 1889 I sat by a fire at Soda Springs, just over there, with Robert Underwood Johnson, an editor from New York. We'd walked all day through meadows the sheep had eaten down to dust. I herded sheep up here myself in '69, so I knew what they do. Hoofed locusts.", "Johnson asked why this country wasn't a national park, like Yellowstone. So I wrote it up for his magazine, and he carried it to Congress. The next year, 1890, they made one, all around the valley."]}]
+outro = PackedStringArray("This is how I travel: a tin cup, a pinch of tea, and bread dried hard by the fire. It weighs nothing and keeps for weeks.", "Take these loaves and dry them yourself. And remember we didn't draw those park lines around an empty place. People lived in these meadows and came over these passes long before Johnson and I did, and nobody asked them.")
+reward_recipes = PackedStringArray("dry_crusts")
+reward_items = {"degnan_loaf": 2}

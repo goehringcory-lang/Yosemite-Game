@@ -8,7 +8,9 @@ extends RefCounted
 ## same of Maria Lebrado's. "notes" are later hands in the margin, so a page
 ## can be annotated or contradicted as the player hears more people.
 ## "review" pages carry Native people's words and are placeholders until
-## tribal review, like their dialogue.
+## tribal review, like their dialogue. "history" is the Register's own note on
+## what's documented and what the game made up, shown under the page's
+## margin notes.
 
 const PAGES: Array[Dictionary] = [
 	{"quest": "tenaya_ahwahnee", "front": true, "review": true, "by": "Tenaya",
@@ -72,6 +74,25 @@ const PAGES: Array[Dictionary] = [
 		"text": "Glaciers made this valley. I didn't always see the people who lived here, and they saw a great deal I missed."},
 	{"quest": "bethel_trade", "review": true, "by": "Carrie Bethel",
 		"text": "The valley was never cut off. People came and went over the passes long before any road."},
+	# Side stories for the seasons, the hours, and the hubs past the Valley.
+	{"quest": "clark_big_trees", "by": "Galen Clark",
+		"text": "The Mariposa Grove, 1857: I counted the big trees and built a cabin among them. Few young ones come up, and I can't say why.",
+		"history": "Real: Clark settled at Wawona in 1856 and explored the Mariposa Grove in 1857, and the 1864 Grant protected the valley and the grove together. Dramatized: the cone and his words. The answer came a century later: studies in the 1960s found sequoias need fire to open their cones and clear the ground for seedlings, and the park has set careful fires in its groves since the early 1970s."},
+	{"quest": "enid_dawn_chorus", "by": "Enid Michael",
+		"text": "A dawn count at Sentinel Dome: chickadees, juncos, a Clark's nutcracker. Ordinary days are worth writing down.",
+		"history": "Real: Enid Michael was one of the first women ranger-naturalists in the Park Service, from 1921, and wrote hundreds of short pieces on Yosemite's birds and flowers for Yosemite Nature Notes. Dramatized: this count, and its trip to Clare Hodges, whose one season as a ranger (1918) came before Michael's."},
+	{"quest": "hodges_bear_season", "by": "Clare Marie Hodges",
+		"text": "Fall is bear season. Store food high and covered, pick up the windfalls, and don't teach a bear where you keep your supper.",
+		"notes": [
+			{"quest": "hodges_bear_season", "text": "Below, from James Lamon: a sow and two cubs in the orchard every night. I pick up the windfalls now."},
+		],
+		"history": "Real: Yosemite's black bears feed hard in fall, and the old orchard by Curry Village still draws them. Bears were fed for crowds in the park from the 1920s until 1940; today every campsite has a bear box. Grizzlies are gone from the park; the last is usually dated to the 1890s. Dramatized: this patrol, and Lamon's bears."},
+	{"quest": "degnan_snowbound", "by": "Bridget Degnan",
+		"text": "Winter: the stage roads close, but the railroad runs. The flour comes up the canyon to El Portal.",
+		"history": "Real: the Yosemite Valley Railroad ran from Merced up the Merced River canyon to El Portal from 1907 to 1945, all year, and made winter trips to the valley practical. The Degnans' bakery fed the valley from the 1880s. Dramatized: this sack of flour, the toyon on the loaves, and the pudding."},
+	{"quest": "muir_soda_springs", "by": "John Muir",
+		"text": "Soda Springs, 1889: a campfire with Robert Underwood Johnson. He asked why this country wasn't a park. In 1890 it was.",
+		"history": "Real: Muir and Johnson camped in Tuolumne Meadows in 1889 and planned a campaign; Johnson's Century Magazine printed Muir's articles, and Congress created Yosemite National Park around the state-held valley in 1890. Muir herded sheep here in 1869 and later called them hoofed locusts. Dramatized: the supper and Muir's words. Those park lines were drawn without asking the Native people whose homeland it was."},
 	{"quest": "clark_last_page", "review": true, "by": "Tabuce",
 		"text": "A blank page, kept at her request. Some things stay with her family."},
 	{"quest": "clark_last_page", "review": true, "by": "Maria Lebrado (Totuya)",
@@ -91,6 +112,8 @@ static func written() -> Array[Dictionary]:
 		for note: Dictionary in page.get("notes", []):
 			if QuestLog.is_completed(note.quest):
 				notes.append(note.text)
+		if page.has("history"):
+			notes.append("Register note: " + page.history)
 		var shown := {"by": page.by, "text": page.text, "notes": notes, "review": page.get("review", false)}
 		(front if page.get("front", false) else rest).append(shown)
 	return front + rest

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "clark_big_trees"
+title = "The Big Trees"
+giver = "galen_clark"
+requires = PackedStringArray("leonard_belay")
+intro = PackedStringArray("Before I ever kept this valley I kept a station at Wawona, on the road in. Travelers ate at my table and slept under my roof.", "In 1857 I went up the hill behind it and found the big trees. Sequoias, hundreds of them. I counted every one I could find and built a cabin among them.", "Go and see them. Drive the Wawona Road to the Mariposa Grove and find the Grizzly Giant. Bring me back one of its cones.")
+steps = [{"type": "have", "item": "sequoia_cone", "count": 1, "consume": true, "objective": "Find a cone under the Grizzly Giant in the Mariposa Grove (Wawona) and bring it to Galen Clark", "reminder": "Take the Wawona Road south. The Grizzly Giant stands by itself at the bottom of the grove. Look around its feet.", "done": ["There it is. Small, isn't it? A tree as old as Rome, and its cone fits in your palm.", "Two hundred seeds in there, each one as thin as a fish scale. They named a tree up there for me. I'd rather they'd named it for the man who planted it, if anyone had.", "I counted those trees for years, and I never worked out why so few young ones come up. The old giants stand there and hardly any children grow under them."]}]
+outro = PackedStringArray("That question is too big for one Guardian. Write it in the Register, and leave room for whoever answers it.", "The Grant of 1864 set aside this valley and the grove together, on the same page. People forget the trees were in it from the start.", "Here, take some of what I keep for the road. I fed every traveler who came through Wawona, and I'm not going to stop now.")
+reward_items = {"pilot_bread": 2, "dried_apricots": 2}

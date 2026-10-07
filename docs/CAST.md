@@ -16,7 +16,7 @@ This is the full cast of people the player meets, where they live in the park, a
   ```
   You can replace any PNG with hand-drawn art in the same layout.
 - Looks follow each person's era and period photographs. Native people are drawn in the everyday clothes they wore in photos from their time, **never regalia**. Their looks are placeholders pending tribal review, like their dialogue.
-- Story item icons are in `assets/sprites/story_items.png`, drawn by the same tool.
+- Story item icons are in `assets/sprites/story_items.png`, drawn by the same tool. The sequoia cone and the flour sack are hand-drawn in `assets/sprites/side_quest_items.png`.
 
 ## Placing people
 
@@ -37,18 +37,18 @@ NPCs go in a hub's story overlay (`scenes/story/content/<hub>.tscn`). Each NPC h
 
 | Person | Years | Where | Gives |
 |---|---|---|---|
-| **Galen Clark** | 1814–1910 | Lamon Homestead gate | The Register (start), The Last Page (ending) |
+| **Galen Clark** | 1814–1910 | Lamon Homestead gate | The Register (start), The Last Page (ending), pilot bread and apricots (The Big Trees) |
 | **James Lamon** | 1817–1875 | Lamon Homestead | Lamon apples, dried apples |
 | **Tenaya** ✦ | d. 1853 | Tenaya Creek, near Mirror Lake | A Register entry |
 | **Tabuce (Maggie Howard)** ✦ | | The black oaks | Chuckah and acorn recipes |
-| **Bridget Degnan** | | Degnan's Bakery | Bread, sourdough starter |
+| **Bridget Degnan** | | Degnan's Bakery | Bread, sourdough starter, apple bread pudding recipe (winter) |
 | **Dick Leonard** | 1908–1993 | Swan Slab, Camp 4 | Rope, 2 cams |
 | **Jules Eichorn** | 1912–2000 | Curry Village, foot of the Apron trail | 2 cams, 2 quickdraws |
 | **Bestor Robinson** | 1898–1987 | Curry Village, foot of the Apron trail | Cheddar, dried apples (Royal Arches) |
 | **Jennie Curry** | 1861–1948 | Camp Curry | Lamon apples |
 | **James McCauley** | | Glacier Point | Bread, a Firefall entry |
-| **Enid Michael** | 1883–1966 | Sentinel Dome | 3 cooking recipes |
-| **Clare Marie Hodges** | 1890–1970 | Ranger station | 2 quickdraws |
+| **Enid Michael** | 1883–1966 | Sentinel Dome | 4 cooking recipes |
+| **Clare Marie Hodges** | 1890–1970 | Ranger station | 2 quickdraws, jerky (fall) |
 | **Ansel Adams** | 1902–1984 | Best's Studio | 2 quickdraws |
 | **George Anderson** | d. 1884 | Happy Isles | Anderson's eyebolt |
 | **Royal Robbins** | 1935–2017 | The Ahwahnee | Belay device, 2 cams, 2 quickdraws |
@@ -57,7 +57,7 @@ NPCs go in a hub's story overlay (`scenes/story/content/<hub>.tscn`). Each NPC h
 | **Warren Harding** | 1924–2002 | El Capitan Meadow | Aiders, haul bag, the road to Tuolumne |
 | **Beverly Johnson** | 1947–1994 | El Capitan Meadow | 2 ascenders, portaledge |
 | **Maria Lebrado (Totuya)** ✦ | c. 1840–1931 | The meadow by the Ahwahnee | A Register entry |
-| **John Muir** | 1838–1914 | Cathedral Lakes trailhead | Ice axe, crampons, pine nuts |
+| **John Muir** | 1838–1914 | Cathedral Lakes trailhead | Ice axe, crampons, pine nuts, dry crusts recipe |
 | **Carrie Bethel** ✦ | 1898–1974 | Soda Springs | Pine nuts |
 
 Dates marked blank are unconfirmed. Every character's `sources` field lists what to verify. Royal Robbins died recently (2017), so confirm his portrayal with his family, following the living and recently deceased rule in STORY.md.
@@ -108,8 +108,9 @@ Talking to a visitor gets one random line.
 | Firefall Slab | curry_village · `apron_trailhead` | Wren Alvarez; the Firefall Slab climb. The lost rental shoes lie out front of the upper tent cabins. |
 | Glacier Point | glacier_point | McCauley, Enid Michael, a painter |
 | Tuolumne Meadows | tuolumne_meadows | Muir, Carrie Bethel, a backpacker; Cathedral Peak, Lyell Glacier |
-| El Portal railyard | el_portal | The Model A axle (pickup), a railroad passenger |
-| Wawona Hotel | wawona | The stagecoach couple |
+| El Portal railyard | el_portal · `railroad` | The Model A axle and Degnan's sack of flour (pickups), a railroad passenger |
+| Wawona Hotel | wawona · `wawona_hotel` | The stagecoach couple |
+| Mariposa Grove | wawona · `grizzly_giant` | A sequoia cone at the foot of the Grizzly Giant (pickup, for Clark's *The Big Trees*) |
 
 Yosemite Village is the hand-made hub you arrive at when you drive to the Valley. Its buildings, the Village Store clerk, and the Camp 4 traders come from `tools/hubs`. Rebuilding that hub never touches the story overlay, `scenes/story/content/yosemite_village.tscn`.
 
@@ -152,7 +153,7 @@ Geography is part of the progression. You leave the Lamon Homestead: south to Cu
 
 ### Side stories
 
-These stay available alongside the main line, and every chapter opens at least two (`tests/cast_test.tscn` checks this). The ones that start at the rim (McCauley, Enid Michael, Hodges) open after the Apron.
+These stay available alongside the main line, and every chapter opens at least two (`tests/cast_test.tscn` checks this). The seasonal and hour-of-day ones are played through in `tests/side_quests_test.tscn`. The ones that start at the rim (McCauley, Enid Michael, Hodges) open after the Apron.
 
 ```
 Clark's guidebook errand ─┬─ Lamon: Lamon's Garden ............ onions + berries → 4 apples
@@ -177,6 +178,18 @@ After Nutcracker (the classics off the ladder):
 After the Nose (Tuolumne open):
   Beverly Johnson: Ten Days Alone . 4 pine nuts from the high country, pack 60 energy → apricots, chocolate
   Ansel Adams: High Country Light . ask Muir, climb to the Lyell Glacier, report back → trail mix, cheese
+After Tuolumne (Muir's glacier first):
+  Muir: A Fire at Soda Springs .... supper for two (40 energy), then sit by his fire after dark
+                                    (8 PM to 2 AM) → dry crusts recipe, 2 bread
+The seasons, the hours, and the hubs past the Valley:
+  Clark: The Big Trees ............ (after Swan Slab) a sequoia cone from the Grizzly Giant,
+                                    Mariposa Grove at Wawona → pilot bread, apricots
+  Enid Michael: The Dawn Chorus ... (after Leave Some Behind) count birds with her at Sentinel Dome
+                                    between 6 and 10 AM, take the count to Hodges → spring greens recipe, strawberries
+  Hodges: Bear Season ............. (fall only; after Mounted Patrol and The Chuckah) 20 acorns stored
+                                    in your chuckah, warn Lamon about bears → 3 jerky
+  Degnan: Snowbound ............... (winter only; after Bread for the Valley and Leave Some Behind)
+                                    her flour from the El Portal railyard + toasted toyon → bread pudding recipe, 2 bread
 Other:
   Lucy Telles: The Big Basket ✦ ... her name in the Register → 2 acorn cakes
   Carrie Bethel: Over the Crest ✦ . 4 acorn flour → 10 pine nuts
@@ -212,6 +225,11 @@ The Mountain Shop and Camp 4 traders sell more of the same pieces for food (cams
 | Rental climbing shoes | Pickup by the Curry Village tent cabins | Marty Kessler's *Fitted Out* |
 | Anderson's eyebolt | Anderson | Robbins's *Old Iron* (shown, not taken; a keepsake) |
 | Model A axle | Pickup at the El Portal railyard | Salathé forges it into cams |
+| Sack of flour | Pickup at the El Portal railyard | Degnan's *Snowbound* |
+| Giant sequoia cone | Pickup at the Grizzly Giant, Mariposa Grove (Wawona) | Clark's *The Big Trees* |
+| Spring greens | Campfire: 3 miner's lettuce + 1 wild onion (Enid Michael) | 36 energy, keeps 1 day |
+| Apple bread pudding | Campfire: 1 bread + 2 apples → 2 (Degnan) | 30 energy each, keeps 6 days |
+| Dry crusts | Campfire: 1 bread → 3 (Muir) | 9 energy each, keeps 30 days: bread for long trips |
 | Pine nuts | Carrie Bethel, Muir | High-country food (20 energy, keeps 30 days) |
 
 ### New quest mechanics
@@ -220,6 +238,9 @@ The Mountain Shop and Camp 4 traders sell more of the same pieces for food (cams
 - **`pay` step:** trade food worth `energy` when you turn it in (the soonest to spoil goes first). The Mountain Shop uses it to sell the guidebook and the starter kit.
 - **Partners:** `RouteData.partner_quest` names a quest whose giver is your partner. The route only starts while that quest is underway or done (Firefall Slab: Wren's *Looking for a Partner*).
 - **Bolted routes:** `RouteData.protection = "bolts"` puts a bolt every 2 moves on the line; each takes a quickdraw.
+- **Seasonal quests:** `QuestData.offered_in` (season flags) limits when the giver offers a quest; none ticked means any season. Once started it can be finished in any season. Until its season comes round, the giver says the quest's `out_of_season` line instead of small talk ("Come and see me in the fall"). Hodges's *Bear Season* (fall) and Degnan's *Snowbound* (winter) use it.
+- **`time` step:** talk to the giver between the hours `from` and `to` (the range wraps past midnight, so 20 to 2 is 8 PM to 2 AM). Enid Michael's dawn count and Muir's campfire use it.
+- **Register notes:** a page in `RegisterPages.PAGES` can carry `history`, the Register's own note on what's documented and what the game dramatized. It shows under the page's margin notes. Every new page should have one.
 - **`return` step:** done as soon as you talk to the quest giver again. It closes delivery rounds ("take bread to Leonard and Curry, then come back").
 - **`hub:<id>` unlock reward:** opens a locked hub. Harding's *The Nose* uses `hub:tuolumne_meadows`.
 - **Story pickups** (`scenes/story/pickup.tscn`): a one-of-a-kind item lying in the park, picked up once and remembered in the save. Give each one a unique node name.
@@ -227,6 +248,8 @@ The Mountain Shop and Camp 4 traders sell more of the same pieces for food (cams
 ## Before release
 
 - **Tribal review** for Tenaya, Tabuce, Lucy Telles, Maria Lebrado, and Carrie Bethel: their looks, dialogue, the acorn and pine nut practices, and the Register entries about Ahwahnee and the village sites. It covers whether each person appears at all.
+- **Tribal review, side stories:** Hodges's *Bear Season* speaks of storing acorns in a chuckah (part of the acorn-practice review), and Muir's *A Fire at Soda Springs* and its Register note say the 1890 park was drawn without asking the Native people who lived there. Neither puts words in a Native person's mouth, but both describe Native life and should go through the same review.
 - **Verify** every character's `sources`, and fill in the blank dates (Degnan, McCauley, Tabuce).
+- **Verify the side-story Register notes:** Clark in the Mariposa Grove (1857) and the start of prescribed fire in the groves (early 1970s); Enid Michael's start as a ranger-naturalist (1921) and her Yosemite Nature Notes; bear feeding shows (1920s to 1940) and the date of the last Yosemite grizzly (usually given as 1895); the Yosemite Valley Railroad (1907 to 1945, year-round to El Portal); Muir and Robert Underwood Johnson at Soda Springs (1889); the tin cup, tea, and dried bread Muir is said to have carried.
 - **Permission:** Royal Robbins's family (he died in 2017).
 - **Confirm** the Firefall's origin story (McCauley's family is the usual account, and it's told several ways).

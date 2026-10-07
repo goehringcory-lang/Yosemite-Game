@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/side_quest_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(16, 0, 16, 16)
+
+[resource]
+script = ExtResource("2_item")
+id = "flour_sack"
+display_name = "Sack of Flour"
+description = "Fifty pounds of flour, shipped up the Merced canyon on the Yosemite Valley Railroad for Degnan's Bakery."
+icon = SubResource("AtlasTexture_icon")

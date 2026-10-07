@@ -27,6 +27,9 @@ const ITEMS := [
 	preload("res://data/food/roasted_morels.tres"),
 	preload("res://data/food/toasted_toyon.tres"),
 	preload("res://data/food/yerba_buena_tea.tres"),
+	preload("res://data/food/spring_greens.tres"),
+	preload("res://data/food/bread_pudding.tres"),
+	preload("res://data/food/dry_crusts.tres"),
 	# Story items: gifts, trades, and materials from quests
 	preload("res://data/story_items/lamon_apple.tres"),
 	preload("res://data/story_items/degnan_loaf.tres"),
@@ -34,6 +37,8 @@ const ITEMS := [
 	preload("res://data/story_items/model_a_axle.tres"),
 	preload("res://data/story_items/anderson_eyebolt.tres"),
 	preload("res://data/story_items/sourdough_starter.tres"),
+	preload("res://data/story_items/sequoia_cone.tres"),
+	preload("res://data/story_items/flour_sack.tres"),
 	preload("res://data/story_items/rental_shoes.tres"),
 	# Village Store trail food (see data/shops/village_store.tres)
 	preload("res://data/food/trail_mix.tres"),

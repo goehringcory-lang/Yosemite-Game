@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_stage_lady.tres" id="2_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_stage_gent.tres" id="3_r"]
+[ext_resource type="PackedScene" path="res://scenes/story/pickup.tscn" id="4_r"]
 
 [node name="WawonaStory" type="Node2D"]
 
@@ -17,3 +18,8 @@ character = ExtResource("3_r")
 spot = "wawona_hotel"
 offset = Vector2(36, 20)
 wander_radius = 24.0
+
+[node name="SequoiaCone" parent="." instance=ExtResource("4_r")]
+position = Vector2(2472, 2088)
+item_id = "sequoia_cone"
+found_text = "It lay among the duff at the foot of the Grizzly Giant, one of the thousands of cones the old tree carries. Galen Clark asked for one."

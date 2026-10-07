@@ -320,9 +320,10 @@ godot --headless --path . res://tests/cast_test.tscn
 godot --headless --path . res://tests/climb_test.tscn   # every route, every piece of gear
 xvfb-run -a godot --path . res://tests/climb_screen_test.tscn   # plays all 13 on the real screen (needs a window)
 godot --headless --path . res://tests/eggs_test.tscn
+godot --headless --path . res://tests/side_quests_test.tscn   # seasonal and time-of-day side stories
 ```
 
-The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds).
+The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds). The side quests test plays the side stories that depend on the season or the hour (Clark at the Mariposa Grove, Enid Michael at dawn, Hodges in fall, Degnan in winter, Muir after dark) and checks their Register pages say what is real.
 
 ## Map data credits
 

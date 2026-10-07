@@ -29,6 +29,9 @@ const FOODS := {
 	"roasted_morels": {"energy": 20, "shelf_life": 1},
 	"toasted_toyon": {"energy": 12, "shelf_life": 5},
 	"yerba_buena_tea": {"energy": 8, "shelf_life": 1},
+	"spring_greens": {"energy": 36, "shelf_life": 1},
+	"bread_pudding": {"energy": 30, "shelf_life": 6},
+	"dry_crusts": {"energy": 9, "shelf_life": 30},
 	# Gifts and trades from quests
 	"lamon_apple": {"energy": 12, "shelf_life": 12},
 	"degnan_loaf": {"energy": 25, "shelf_life": 4},
