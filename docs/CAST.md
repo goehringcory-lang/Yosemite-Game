@@ -42,16 +42,16 @@ NPCs go in a hub's story overlay (`scenes/story/content/<hub>.tscn`). Each NPC h
 | **Tenaya** ✦ | d. 1853 | Tenaya Creek, near Mirror Lake | A Register entry |
 | **Tabuce (Maggie Howard)** ✦ | | The black oaks | Chuckah and acorn recipes |
 | **Bridget Degnan** | | Degnan's Bakery | Bread, sourdough starter |
-| **Dick Leonard** | 1908–1993 | Swan Slab, Camp 4 | Rope, harness, 2 cams |
-| **Jules Eichorn** | 1912–2000 | Camp 4 | 2 cams, 2 quickdraws |
-| **Bestor Robinson** | 1898–1987 | Camp 4 | (story only) |
+| **Dick Leonard** | 1908–1993 | Swan Slab, Camp 4 | Rope, 2 cams |
+| **Jules Eichorn** | 1912–2000 | Curry Village, foot of the Apron trail | 2 cams, 2 quickdraws |
+| **Bestor Robinson** | 1898–1987 | Curry Village, foot of the Apron trail | Cheddar, dried apples (Royal Arches) |
 | **Jennie Curry** | 1861–1948 | Camp Curry | Lamon apples |
 | **James McCauley** | | Glacier Point | Bread, a Firefall entry |
 | **Enid Michael** | 1883–1966 | Sentinel Dome | 3 cooking recipes |
 | **Clare Marie Hodges** | 1890–1970 | Ranger station | 2 quickdraws |
 | **Ansel Adams** | 1902–1984 | Best's Studio | 2 quickdraws |
 | **George Anderson** | d. 1884 | Happy Isles | Anderson's eyebolt |
-| **Royal Robbins** | 1935–2017 | Camp 4 | Belay device, 2 cams, 2 quickdraws |
+| **Royal Robbins** | 1935–2017 | The Ahwahnee | Belay device, 2 cams, 2 quickdraws |
 | **Lucy Telles** ✦ | c. 1885–1955 | Yosemite Museum | Acorn cakes, a Register entry |
 | **John Salathé** | 1899–1992 | Camp 4 | 2 cams (hard steel) |
 | **Warren Harding** | 1924–2002 | El Capitan Meadow | Aiders, haul bag, the road to Tuolumne |
@@ -73,7 +73,7 @@ Two invented people work at the Curry Village Mountain Shop. They're not histori
 
 ### Visitors
 
-Visitors are everyday people from each era who wander the trails and roads: a stagecoach couple at Wawona (1880s), a railroad passenger at El Portal (1910s), a motorist (1920s), a CCC worker and an angler (1930s), a camper (1950s), a Camp 4 climber and a backpacker (1970s), and a landscape painter (1900s) at Glacier Point.
+Visitors are everyday people from each era who wander the trails and roads: a stagecoach couple at Wawona (1880s), a railroad passenger at El Portal (1910s), a motorist (1920s), a CCC worker and an angler (1930s), a camper (1950s), a Camp 4 climber, a climber in the Mountain Shop, and a backpacker (1970s), a landscape painter (1900s) at Glacier Point, and around Curry Village a tourist (1930s), a Pavilion cook, a ranger-naturalist, and a shopper in the store (1950s).
 
 They're the **only** people in the game who aren't historical figures. So they:
 - never give quests or appear in the Register (`visitor = true`),
@@ -148,7 +148,7 @@ Gear arrives in the order the routes need it, and a quest can hand over gear as 
 
 After the Nose the scale stops mattering: the high country is alpine climbing, where the hard part is altitude, weather, and ice, not the grade. Cathedral Peak is only 5.6.
 
-Geography is part of the progression. You leave the Lamon Homestead: south to Curry Village (guidebook, then the Apron behind it), north to the Ahwahnee (Robbins), then out across the Valley (Nutcracker above the Church Bowl, the Spire near Bridalveil, Sentinel Rock above the Four Mile Trail, Washington Column past the Royal Arches, the roof crack at the west end, El Capitan Meadow) and finally up the Tioga Road.
+Geography is part of the progression. You leave the Lamon Homestead: south to Curry Village (guidebook, then the Apron behind it), north to the Ahwahnee (Robbins), then out across the Valley (Nutcracker near El Capitan, the Spire near Bridalveil, Sentinel Rock above the Four Mile Trail, Washington Column past the Royal Arches, the roof crack at the west end, El Capitan Meadow) and finally up the Tioga Road.
 
 ### Side stories
 
@@ -200,7 +200,7 @@ Other:
 | Cathedral Peak | 4 cams, 4 quickdraws | (already have) |
 | Lyell Glacier | + ice axe, crampons | + Muir |
 
-The Mountain Shop and Camp 4 traders sell more of the same pieces for food, but never the one that opens a new tier.
+The Mountain Shop and Camp 4 traders sell more of the same pieces for food (cams, quickdraws, and big-wall gear once you have aiders), but not the belay device, which opens the 5.9 tier and comes from Royal Robbins.
 
 ### Materials
 
