@@ -1,7 +1,7 @@
 extends Node
 ## Redraws assets/sprites/flora.png (the generated hubs' trees, shrubs,
-## boulders and buildings), the info sign, trailhead and map kiosk, and a
-## zoomed preview sheet of the flora:
+## boulders and buildings), flora_glow.png (the buildings' lit windows), the
+## info sign, trailhead and map kiosk, and a zoomed preview sheet of the flora:
 ##   godot --headless --path . res://tools/mapgen/paint_flora.tscn
 ## The preview goes to docs/generated_flora_preview.png.
 
@@ -11,6 +11,7 @@ const Art = preload("res://tools/mapgen/art.gd")
 func _ready() -> void:
 	var image := Art.new().paint_flora()
 	image.save_png(ProjectSettings.globalize_path(Art.FLORA_PNG))
+	Art.new()._save_png(Art.new().paint_flora_glow(), Art.FLORA_GLOW_PNG)
 	var sheet := Image.create_empty(image.get_width(), image.get_height(), false, Image.FORMAT_RGBA8)
 	sheet.fill(Color("7c9a5c"))
 	sheet.blend_rect(image, Rect2i(Vector2i.ZERO, image.get_size()), Vector2i.ZERO)
