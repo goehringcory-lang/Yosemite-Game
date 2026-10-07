@@ -130,7 +130,7 @@ func _check_region(region: Region) -> void:
 		check(region.get_spawn(spawn) != null, "Curry Village has a %s spot" % spawn)
 	var ground := region.get_ground()
 	check(ground.get_used_rect().size == Vector2i(100, 64), "the village is 100 x 64 tiles")
-	var painting := region.get_node_or_null("GroundPainting") as Sprite2D
+	var painting := region.get_node_or_null("GroundArt") as Sprite2D
 	check(painting != null and painting.texture.get_size() == Vector2(1600, 1024), "the ground is one painted picture")
 	check(not ground.visible, "the tile ground underneath stays hidden")
 	var tents := region.find_children("TentCabin*", "StaticBody2D", true, false)
