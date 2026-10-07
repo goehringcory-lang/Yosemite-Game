@@ -183,11 +183,21 @@ func _check_unstick(world: Node) -> void:
 	world._enter_region("el_portal", "arrival")
 	for i in 3:
 		await get_tree().physics_frame
-	var old_arrival := Vector2(1032, 1080) # the generated spawn, inside a tree
-	check(player.test_move(Transform2D(0.0, old_arrival), Vector2.ZERO), "the old El Portal arrival spot is solid")
-	player.global_position = old_arrival
+	# Find something solid near the arrival (a tree or a building) to drop the player in.
+	var origin := player.global_position
+	var solid := Vector2.INF
+	for r in range(16, 320, 8):
+		for i in 16:
+			var p := origin + Vector2.from_angle(i * TAU / 16.0) * r
+			if player.test_move(Transform2D(0.0, p), Vector2.ZERO):
+				solid = p
+				break
+		if solid != Vector2.INF:
+			break
+	check(solid != Vector2.INF, "found a solid spot near the El Portal arrival")
+	player.global_position = solid
 	await world._unstick_player()
-	check(not player.test_move(player.global_transform, Vector2.ZERO) and player.global_position.distance_to(old_arrival) <= 96.0,
+	check(not player.test_move(player.global_transform, Vector2.ZERO) and player.global_position.distance_to(solid) <= 96.0,
 		"a player dropped in a tree is moved to open ground (%s)" % player.global_position)
 	world._enter_region(Park.HOME_REGION, Park.HOME_SPAWN)
 
