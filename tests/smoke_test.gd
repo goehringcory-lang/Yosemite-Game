@@ -107,7 +107,12 @@ func _ready() -> void:
 
 	# Curfew
 	GameClock.advance_minutes(GameClock.PASS_OUT_HOUR * 60)
-	await get_tree().create_timer(3.0).timeout
+	await get_tree().create_timer(0.5).timeout
+	# Wait for the pass-out sleep to finish; a fixed wait raced it on a busy machine.
+	var waited := 0.0
+	while world._busy and waited < 15.0:
+		await get_tree().create_timer(0.1).timeout
+		waited += 0.1
 	check(GameClock.day == saved_day + 1 and GameClock.hour == 6, "passing out at 2 AM starts next day")
 
 	# Season rollover
