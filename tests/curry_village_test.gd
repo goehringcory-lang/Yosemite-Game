@@ -40,6 +40,7 @@ func _ready() -> void:
 
 	var region: Region = world.region
 	_check_region(region)
+	await _check_seasons(region)
 	await _check_night(world, region)
 	_check_map(world, region)
 
@@ -90,7 +91,7 @@ func _ready() -> void:
 	Gear.add("rope")
 	Gear.add("harness")
 	var stock := keeper.available_offers().map(func(o: ShopOffer) -> String: return o.id)
-	check("quickdraw" in stock and "belay_device" in stock, "a rope and harness bring out quickdraws and a belay device %s" % [stock])
+	check("quickdraw" in stock and not "belay_device" in stock, "a rope brings out quickdraws, but the belay device comes from Royal Robbins %s" % [stock])
 	check(not ("cam" in stock), "cams only come once you have two: the shop can't hand you a tier")
 	var apron: RouteData = load("res://data/routes/glacier_point_apron.tres")
 	Inventory.add("trail_mix", 10)
@@ -117,6 +118,39 @@ func _ready() -> void:
 	get_tree().quit(failures)
 
 
+## The hand-built village follows the seasons: its black oaks change texture
+## (gold in fall, bare in winter), wildflowers are gone in winter, and the
+## painted ground is graded.
+func _check_seasons(region: Region) -> void:
+	var oak := region.find_child("TreeBlackOak*", true, false).get_node("Sprite") as Sprite2D
+	var flower := region.find_child("PlantWildflowers*", true, false).get_node("Sprite") as Sprite2D
+	var ground := region.get_node("GroundArt") as Sprite2D
+	var start_season: int = GameClock.season
+	GameClock.season = GameClock.Season.SUMMER
+	await _frames()
+	var summer_tex := oak.texture
+	check(flower.visible and not summer_tex.resource_path.contains("seasons"), "the oaks are green and the wildflowers out in summer")
+	GameClock.season = GameClock.Season.FALL
+	await _frames()
+	check(oak.texture != summer_tex and oak.texture.resource_path.ends_with("_fall.png"), "the oaks turn in fall (%s)" % oak.texture.resource_path)
+	var fall_grade: Variant = (ground.material as ShaderMaterial).get_shader_parameter("tint_amount")
+	GameClock.season = GameClock.Season.WINTER
+	await _frames()
+	check(oak.texture != summer_tex and oak.texture.resource_path.ends_with("_winter.png"), "the oaks are bare in winter (%s)" % oak.texture.resource_path)
+	check(not flower.visible, "the wildflowers are gone in winter")
+	check(ground.material is ShaderMaterial and (ground.material as ShaderMaterial).get_shader_parameter("frost") > 0.0 and fall_grade > 0.0, "the painted ground is frosted in winter and golden in fall")
+	GameClock.season = GameClock.Season.SUMMER
+	await _frames()
+	check(oak.texture == summer_tex and flower.visible, "the oaks and flowers come back")
+	GameClock.season = start_season
+	await _frames()
+
+
+func _frames() -> void:
+	for i in 2:
+		await get_tree().process_frame
+
+
 func _offer(vendor: Vendor, id: String) -> ShopOffer:
 	for o: ShopOffer in vendor.shop.offers:
 		if o.id == id:
@@ -130,7 +164,7 @@ func _check_region(region: Region) -> void:
 		check(region.get_spawn(spawn) != null, "Curry Village has a %s spot" % spawn)
 	var ground := region.get_ground()
 	check(ground.get_used_rect().size == Vector2i(100, 64), "the village is 100 x 64 tiles")
-	var painting := region.get_node_or_null("GroundPainting") as Sprite2D
+	var painting := region.get_node_or_null("GroundArt") as Sprite2D
 	check(painting != null and painting.texture.get_size() == Vector2(1600, 1024), "the ground is one painted picture")
 	check(not ground.visible, "the tile ground underneath stays hidden")
 	var tents := region.find_children("TentCabin*", "StaticBody2D", true, false)

@@ -59,6 +59,28 @@ func get_item(id: String) -> ItemData:
 	return _by_id.get(id)
 
 
+## Words that don't take an "s": "3 Trail Mix", "2 Pilot Bread".
+const MASS_NOUNS := ["Mix", "Jerky", "Tea", "Mush", "Flour", "Meal", "Cider", "Sauce", "Lettuce", "Yampah", "Buena", "Toyon", "Pilot Bread"]
+## Names with their own plural.
+const PLURALS := {"Degnan's Bread": "loaves of Degnan's Bread"}
+
+
+## "1 Cam", "2 Cams", "3 Wild Strawberries", "2 Trail Mix": a count and a
+## name for messages. Names already plural ("Aiders", "Pine Nuts") stay put.
+static func count_name(n: int, name: String) -> String:
+	if n == 1:
+		return "1 %s" % name
+	if PLURALS.has(name):
+		return "%d %s" % [n, PLURALS[name]]
+	if name.ends_with("s") or MASS_NOUNS.any(func(word: String) -> bool: return name.ends_with(word)):
+		return "%d %s" % [n, name]
+	if name.ends_with("y") and not name.ends_with("ey"):
+		return "%d %sies" % [n, name.left(-1)]
+	if name.ends_with("ss") or name.ends_with("x") or name.ends_with("sh"):
+		return "%d %ses" % [n, name]
+	return "%d %ss" % [n, name]
+
+
 func forage_items() -> Array[ItemData]:
 	var result: Array[ItemData] = []
 	for item: ItemData in ITEMS:

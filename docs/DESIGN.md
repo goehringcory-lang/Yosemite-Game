@@ -33,7 +33,7 @@ Gear comes two ways, and there's no money in the game:
 | 1 | + Rope, 2 cams | Swan Slab (5.6), Glacier Point Apron (5.7) | **Glacier Point** |
 | 2 | More cams, quickdraws, belay/rappel device | Nutcracker (5.8), Higher Cathedral Spire (5.9), Steck-Salathé (5.10b); Royal Arches, Snake Dike | North Dome rim, **Half Dome**, Sentinel Rock |
 | 3 | Ascenders, portaledge, then aiders and a haul bag | Astroman (5.11c), Separate Reality (5.12a), the Nose free (5.13) | **El Capitan**, the north rim |
-| 4 | Ice axe, crampons, alpine pack | Cathedral Peak, Lyell Glacier | **Tuolumne Meadows**, high country, **Mono Lake** |
+| 4 | Ice axe, crampons | Cathedral Peak, Lyell Glacier | **Tuolumne Meadows** and the high country (Mono Lake and the east side are planned, not built) |
 
 How the gear affects the climbing minigame:
 - **Rope length** sets how long each pitch can be.
@@ -168,6 +168,21 @@ These people lived from before 1851 through the 1990s, and the gear they used ch
 - **Tribal consultation.** Before any Native story, character, food practice, or place name ships, it should be reviewed by the associated tribes. The NPS tribal liaison is a good first contact. Until then, their dialogue is placeholder text marked `TRIBAL REVIEW NEEDED`.
 - **Naming.** Use each tribe's own preferred spelling (Miwuk, Miwok, and Me-Wuk all appear). Avoid depicting ceremonies or sacred objects unless the tribes invite it.
 - **Real people.** Deceased historical figures are generally fine to portray respectfully. Living people (Chouinard, Jardine, Hill) and people who died recently (Julia Parker) need permission, or should be left out. This matters especially for a game sold on Steam.
+
+## Easter eggs
+
+Hidden touches, for developers (spoilers). None of them edits a generated hub scene: the moving effects are placed by the story overlays, and the sign changes are added when a region first loads (`scripts/story/easter_eggs.gd`, called from `StoryContent.attach`). All of them are tested in `tests/eggs_test.gd`.
+
+- **Live Firefall** (`scripts/world/firefall.gd`, placed in `scenes/story/content/curry_village.tscn`). Summer nights from 9:00 to 9:15 PM (`GameClock.is_firefall_time()`), a ribbon of orange-gold embers falls down the granite wall above Camp Curry, from a glow pool at the rim where Glacier Point sits. It is drawn in whole pixels with additive blending, so nothing blurs. If the player is in Curry Village, a message announces it once ("Someone calls up to the rim: 'Let the fire fall!'") and the embers start a moment later. The FirefallBoard sign gains a line while it runs. The real show ran from the 1870s until January 25, 1968; in the game's timeless valley Jennie Curry and James McCauley are alive in this shared season, so it still happens. See `docs/curry_village_firefall.png`.
+- **Moonbow** (`scripts/world/moonbow.gd`, in `scenes/story/content/yosemite_village.tscn`). The moon is full on day 14 of each 28-day season (`GameClock.moon_phase()`, `is_full_moon()` for days 13 to 15). On a spring full-moon night from 9 PM until 2 AM, a faint white arc forms in the mist at the foot of Lower Yosemite Fall, and the Lower Yosemite Fall sign adds a line about it.
+- **Camp 4 at night.** From midnight to 4 AM the Columbia Boulder sign (Midnight Lightning) adds a line about fresh chalk and a headlamp, and a small headlamp glow (`scripts/world/headlamp.gd`) appears on the ledge. The clock stops at 2 AM, so in play this runs from midnight to 2 AM. Bear boxes at Camp 4 and Curry Village become readable signs: food storage is required, and Yosemite has only black bears (no grizzlies since the 1920s).
+- **Clark's note.** Once `tenaya_ahwahnee` is done, the Clark's Station sign in Wawona adds a line about a note pinned in the window.
+- **Muir's windstorm.** `CharacterData` has optional `rare_lines`, `rare_after_quest` and `rare_chance` fields. After `muir_glacier`, about one idle talk in five has John Muir tell two lines of his windstorm story, a paraphrase of "A Wind-Storm in the Forests" (1878; in *The Mountains of California*, 1894). `QuestLog.talk_to` picks them through `CharacterData.idle_lines_for()`.
+- **Bear tracks.** After passing out at the 2 AM curfew (and not after an ordinary night), the next morning shows "Bear tracks by the fence this morning. Your pack was zipped." once, a few seconds after the usual passed-out message (`World._show_bear_tracks`). Nothing is lost and nothing is saved.
+
+To add another conditional sign line, set the `extra_*` fields on `InfoSign` (`extra_text`, `extra_hours`, `extra_season`, `extra_full_moon`, `extra_after_quest`, or an `extra_when` callable). A sign that leaves them alone behaves as before. `NightLight` has a matching `lit_hours` field for lights that only burn at set hours.
+
+To look at the effects: `SHOT_REGION=curry_village SHOT_SPAWNS=campsite_center@58:5 SHOT_HOUR=21 SHOT_MINUTE=5 SHOT_SEASON=1 SHOT_WAIT=7 godot --path . res://tools/shots/region_shot.tscn` (`SHOT_MINUTE`, `SHOT_DAY` and `SHOT_WAIT` are in `tools/shots/region_shot.gd`).
 
 ## What changes in the code
 

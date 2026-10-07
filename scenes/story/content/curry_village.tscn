@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="10_r"]
 [ext_resource type="Resource" path="res://data/routes/firefall_slab.tres" id="11_r"]
 [ext_resource type="PackedScene" path="res://scenes/story/pickup.tscn" id="12_r"]
+[ext_resource type="Script" path="res://scripts/world/firefall.gd" id="13_r"]
 
 [node name="CurryVillageStory" type="Node2D"]
 
@@ -67,3 +68,7 @@ route = ExtResource("11_r")
 position = Vector2(820, 330)
 item_id = "rental_shoes"
 found_text = "Somebody's rental shoes from the Mountain Shop, left outside a tent cabin. Marty will want these back."
+
+[node name="Firefall" type="Node2D" parent="."]
+position = Vector2(980, 8)
+script = ExtResource("13_r")

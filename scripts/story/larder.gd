@@ -8,6 +8,9 @@ extends Node
 
 ## Item id -> Array of days left for each unit, oldest (smallest) first.
 var batches: Dictionary = {}
+## What spoiled in the most recent night ("Spoiled overnight: ..."), or "".
+## World adds it to the wake-up message, since the screen is black when it happens.
+var last_spoiled := ""
 
 
 func _ready() -> void:
@@ -40,6 +43,7 @@ func _reconcile() -> void:
 
 
 func _on_day_started() -> void:
+	last_spoiled = ""
 	var spoiled := {}
 	for id: String in batches:
 		var list: Array = batches[id]
@@ -54,8 +58,8 @@ func _on_day_started() -> void:
 	for id: String in spoiled:
 		Inventory.remove(id, spoiled[id])
 		var item := ItemDB.get_item(id)
-		names.append("%d %s" % [spoiled[id], item.display_name if item else id])
-	get_tree().call_group("hud", "show_message", "Spoiled overnight: %s." % ", ".join(names))
+		names.append(ItemDB.count_name(spoiled[id], item.display_name if item else id))
+	last_spoiled = "Spoiled overnight: %s." % ", ".join(names)
 
 
 func save_data() -> Dictionary:

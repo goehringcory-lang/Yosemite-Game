@@ -174,9 +174,11 @@ func awning(im: Image, x: int, y: int, w: int, depth: int, a: Color, b: Color) -
 # ---------------------------------------------------------------- buildings
 
 ## Returns [sprite, glow]: a village building seen from the front and above
-## with the style set in [constant BUILDINGS].
-func building(sprite_name: String) -> Array:
-	var o: Dictionary = BUILDINGS[sprite_name]
+## with the style set in [constant BUILDINGS], or in [param options] (same
+## keys) for a building that isn't in the table. Options with no "label" get
+## no sign, and "dark" leaves the wall lantern off.
+func building(sprite_name: String, options := {}) -> Array:
+	var o: Dictionary = options if not options.is_empty() else BUILDINGS[sprite_name]
 	var size: Vector2i = o["size"]
 	var w := size.x
 	var h := size.y
@@ -222,7 +224,8 @@ func building(sprite_name: String) -> Array:
 	if o.get("awning", false):
 		var aw := mini(w - 18, 38)
 		awning(im, door_cx - aw / 2, wall_top + 1, aw, 5, Color(o.get("awning_a", "3f6b4a")), Color(o.get("awning_b", "e6d8b0")))
-	sign_board(im, door_cx, wall_top - 8 if not o.get("awning", false) else wall_top - 9, o["label"])
+	if o.has("label"):
+		sign_board(im, door_cx, wall_top - 8 if not o.get("awning", false) else wall_top - 9, o["label"])
 
 	_dress(im, o, sd, wall_top, win_h, door_cx, o.get("awning", false))
 	# Ambient occlusion on the sunless side, and a lit lip on the near side.
@@ -262,6 +265,8 @@ func _dress(im: Image, o: Dictionary, sd: int, wall_top: int, win_h: int, door_c
 		_store_goods(im, door_cx, sd)
 	if o.get("portico", false):
 		_museum_details(im, wall_top, door_cx, sd)
+	if o.get("dark", false):
+		return
 	# a wall lantern beside the door
 	var lx := door_cx + 7
 	var ly := wall_top + 4

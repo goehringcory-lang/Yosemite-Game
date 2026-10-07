@@ -75,12 +75,12 @@ func can_make(recipe: RecipeData) -> bool:
 	return true
 
 
-## "4 Black Oak Acorn" style list of the ingredients.
+## "4 Black Oak Acorns" style list of the ingredients.
 func describe_inputs(recipe: RecipeData) -> String:
 	var parts := PackedStringArray()
 	for id: String in recipe.inputs:
 		var item := ItemDB.get_item(id)
-		parts.append("%d %s" % [int(recipe.inputs[id]), item.display_name if item else id])
+		parts.append(ItemDB.count_name(int(recipe.inputs[id]), item.display_name if item else id))
 	return ", ".join(parts)
 
 

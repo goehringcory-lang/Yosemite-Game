@@ -19,8 +19,15 @@ extends Node2D
 ## Inside a building: the day and night tint doesn't apply.
 @export var indoors := false
 
+const SeasonalDressing = preload("res://scripts/world/seasonal_dressing.gd")
+
 @onready var map: RegionMap = get_node_or_null("Map")
 @onready var entities: Node2D = $Entities
+
+
+func _ready() -> void:
+	if not indoors:
+		add_child(SeasonalDressing.new())
 
 
 func get_ground() -> TileMapLayer:

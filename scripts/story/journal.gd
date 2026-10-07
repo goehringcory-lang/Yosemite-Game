@@ -7,9 +7,16 @@ extends CanvasLayer
 
 const HEADING := Color(1.0, 0.85, 0.5)
 const DIM := Color(1, 1, 1, 0.6)
+## Pixels one Up/Down press scrolls, and how long a held key waits before it
+## repeats, then how often it repeats.
+const SCROLL_STEP := 24
+const REPEAT_DELAY := 0.35
+const REPEAT_EVERY := 0.06
 
 var _panel: PanelContainer
+var _scroll: ScrollContainer
 var _body: VBoxContainer
+var _repeat := 0.0
 
 
 func _ready() -> void:
@@ -20,14 +27,14 @@ func _ready() -> void:
 	_panel.custom_minimum_size = Vector2(400, 230)
 	_panel.visible = false
 	add_child(_panel)
-	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(392, 222)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_panel.add_child(scroll)
+	_scroll = ScrollContainer.new()
+	_scroll.custom_minimum_size = Vector2(392, 222)
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_panel.add_child(_scroll)
 	_body = VBoxContainer.new()
 	_body.add_theme_constant_override("separation", 0)
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(_body)
+	_scroll.add_child(_body)
 
 
 func is_open() -> bool:
@@ -38,6 +45,8 @@ func open() -> void:
 	if is_open():
 		return
 	_refresh()
+	_scroll.scroll_vertical = 0
+	_repeat = REPEAT_DELAY
 	_panel.visible = true
 	GameClock.paused = true
 	_set_player_can_act(false)
@@ -59,6 +68,44 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif toggle and _player_can_act():
 		open()
 		get_viewport().set_input_as_handled()
+	elif is_open():
+		# Up/Down (or the stick) scroll the page; holding repeats in _process.
+		var step := _scroll_direction(event)
+		if step != 0:
+			scroll_by(step * SCROLL_STEP)
+			_repeat = REPEAT_DELAY
+			get_viewport().set_input_as_handled()
+		elif event.is_action_pressed("ui_page_down", true) or event.is_action_pressed("ui_page_up", true):
+			scroll_by((1 if event.is_action_pressed("ui_page_down", true) else -1) * (int(_scroll.size.y) - SCROLL_STEP))
+			get_viewport().set_input_as_handled()
+
+
+func _process(delta: float) -> void:
+	if not is_open():
+		return
+	var held := int(Input.is_action_pressed("move_down") or Input.is_action_pressed("ui_down")) \
+			- int(Input.is_action_pressed("move_up") or Input.is_action_pressed("ui_up"))
+	if held == 0:
+		_repeat = REPEAT_DELAY
+		return
+	_repeat -= delta
+	if _repeat <= 0.0:
+		_repeat = REPEAT_EVERY
+		scroll_by(held * SCROLL_STEP)
+
+
+## +1 for a fresh Down press, -1 for Up, 0 for anything else.
+func _scroll_direction(event: InputEvent) -> int:
+	if MenuInput.pressed(event, "move_down") or MenuInput.pressed(event, "ui_down"):
+		return 1
+	if MenuInput.pressed(event, "move_up") or MenuInput.pressed(event, "ui_up"):
+		return -1
+	return 0
+
+
+## Scrolls the page by [param pixels] (negative is up).
+func scroll_by(pixels: int) -> void:
+	_scroll.scroll_vertical = maxi(0, _scroll.scroll_vertical + pixels)
 
 
 func _refresh() -> void:
@@ -89,6 +136,8 @@ func _refresh() -> void:
 	for text in objectives:
 		_line("- " + text)
 
+	_register()
+
 	_guidebook()
 
 	_heading("Climbing gear")
@@ -117,7 +166,22 @@ func _refresh() -> void:
 		_line("%d of %d acorns stored. They won't spoil." % [Granary.acorns, Granary.capacity])
 
 	_line("")
-	_line("J or Esc to close (gamepad: Y or B)", DIM)
+	_line("Up/Down to scroll · J or Esc to close (gamepad: stick, Y or B)", DIM)
+
+
+## The Register's pages: the stories you've heard, front pages first, with
+## later hands in the margins. Your own last page shows under Main story.
+func _register() -> void:
+	var pages := RegisterPages.written()
+	if pages.is_empty():
+		return
+	_heading("The Register: %d page%s" % [pages.size(), "" if pages.size() == 1 else "s"])
+	for page: Dictionary in pages:
+		_line("%s: %s" % [page.by, page.text])
+		for note: String in page.notes:
+			_line("     " + note, DIM)
+		if page.review:
+			_line("     (Placeholder pending tribal review.)", DIM)
 
 
 ## The guidebook's tick list: every route, its grade, the gear it needs, and
@@ -160,7 +224,7 @@ func _gear_line(item: GearData, count: int) -> void:
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		row.add_child(icon)
 	var label := Label.new()
-	label.text = item.display_name if count == 1 else "%d %s" % [count, item.display_name]
+	label.text = item.display_name if count == 1 else ItemDB.count_name(count, item.display_name)
 	label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(label)
 	_body.add_child(row)

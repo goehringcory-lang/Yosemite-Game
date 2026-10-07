@@ -6,11 +6,21 @@ extends CanvasLayer
 
 ## Walking this far (pixels) from a sign closes it.
 const INFO_CLOSE_DISTANCE := 24.0
+## Gap (pixels) between the message and the sign panel it sits above.
+const MESSAGE_GAP := 2.0
+## Groups of the screens that hide the HUD while they're open.
+const COVERING_GROUPS := ["journal", "pause_menu", "park_map"]
 
 var _player: Player
 var _status: Label
 var _message_tween: Tween
 var _info_anchor := Vector2.ZERO
+## True while a menu, map or conversation covers the screen.
+var _covered := false
+
+## Sent when the player switches between keyboard and gamepad, so screens
+## showing button names can refresh them.
+signal device_changed
 
 @onready var date_label: Label = %DateLabel
 @onready var time_label: Label = %TimeLabel
@@ -25,6 +35,8 @@ var _info_anchor := Vector2.ZERO
 @onready var info_text: Label = %InfoText
 @onready var prompt_panel: PanelContainer = %PromptPanel
 @onready var prompt_label: Label = %PromptLabel
+@onready var clock_panel: PanelContainer = $ClockPanel
+@onready var location_panel: PanelContainer = %LocationPanel
 
 ## True after the last input came from a gamepad, so prompts name its buttons.
 var _gamepad := false
@@ -38,6 +50,7 @@ func _ready() -> void:
 	Inventory.changed.connect(_refresh_status)
 	Inventory.changed.connect(_refresh_bag)
 	Gear.changed.connect(_refresh_status)
+	device_changed.connect(_refresh_status)
 	var panel := PanelContainer.new()
 	_status = Label.new()
 	panel.add_child(_status)
@@ -83,14 +96,19 @@ func hide_info() -> void:
 func _process(_delta: float) -> void:
 	if info_panel.visible and _player and _player.global_position.distance_to(_info_anchor) > INFO_CLOSE_DISTANCE:
 		hide_info()
+	_update_cover()
+	_update_message_position()
 	_update_prompt()
 
 
 func _input(event: InputEvent) -> void:
+	var was_gamepad := _gamepad
 	if event is InputEventJoypadButton or (event is InputEventJoypadMotion and absf(event.axis_value) > 0.5):
 		_gamepad = true
 	elif event is InputEventKey or event is InputEventMouseButton:
 		_gamepad = false
+	if _gamepad != was_gamepad:
+		device_changed.emit()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -99,9 +117,39 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+## Hides the HUD while the journal, pause menu, map or a conversation is open.
+func _update_cover() -> void:
+	var covered := not get_tree().get_nodes_in_group("dialogue_box").is_empty()
+	for group: String in COVERING_GROUPS:
+		var screen := get_tree().get_first_node_in_group(group)
+		if screen and screen.is_open():
+			covered = true
+	if covered == _covered:
+		return
+	_covered = covered
+	var alpha := 0.0 if covered else 1.0
+	for panel: Control in [clock_panel, location_panel, status_bar, bag_panel, info_panel]:
+		panel.modulate.a = alpha
+	message_label.visible = not covered
+
+
+## The pickup message sits at the bottom left, or above the sign panel while one is open.
+func _update_message_position() -> void:
+	var bottom := -26.0
+	if info_panel.visible:
+		bottom = -30.0 - maxf(info_panel.size.y, info_panel.get_combined_minimum_size().y) - MESSAGE_GAP
+	message_label.offset_bottom = bottom
+	message_label.offset_top = bottom - 12.0
+
+
 ## The name of the interact button on the current device.
 func interact_button() -> String:
-	return "A" if _gamepad else "E"
+	return prompt("E", "A")
+
+
+## Picks the button name to show for the current device: [param keyboard] or [param gamepad].
+func prompt(keyboard: String, gamepad: String) -> String:
+	return gamepad if _gamepad else keyboard
 
 
 ## Shows "E  Talk to ..." above the player when something usable is in front of them.
@@ -136,7 +184,7 @@ func _refresh_status() -> void:
 	var pieces := 0
 	for id: String in Gear.owned:
 		pieces += Gear.count(id)
-	_status.text = "Food %d energy  ·  Gear %d  ·  J: Journal" % [FoodDB.carried_energy(), pieces]
+	_status.text = "Food %d energy  ·  Gear %d  ·  %s: Journal" % [FoodDB.carried_energy(), pieces, prompt("J", "Y")]
 
 
 ## Lists carried forage and food.

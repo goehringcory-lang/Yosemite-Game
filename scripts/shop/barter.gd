@@ -37,7 +37,7 @@ static func describe(taken: Dictionary) -> String:
 	var parts := PackedStringArray()
 	for id: String in taken:
 		var item := ItemDB.get_item(id)
-		parts.append("%d %s" % [taken[id], item.display_name if item else id])
+		parts.append(ItemDB.count_name(taken[id], item.display_name if item else id))
 	if parts.size() <= 1:
 		return "".join(parts)
 	return ", ".join(parts.slice(0, parts.size() - 1)) + " and " + parts[-1]

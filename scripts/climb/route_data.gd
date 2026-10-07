@@ -5,8 +5,12 @@ extends Resource
 
 @export var id: String
 @export var display_name: String
-## Shown to the player, for example "5.9 slab".
+## Shown to the player, for example "5.9 slab". Just the grade: the pitch
+## count is shown separately.
 @export var grade: String
+## How many pitches the real route has, when the game climbs it in fewer
+## (see [member pitches]). 0 means the same as the game's count.
+@export var real_pitches := 0
 @export_multiline var description: String
 ## Who first climbed it and when, if known.
 @export var first_ascent: String
@@ -49,6 +53,16 @@ extends Resource
 @export var destination_hub: String
 ## Spawn marker in that hub.
 @export var destination_spawn: String
+
+
+## "9 pitches", or "31 pitches, climbed here in 9" when the game shortens
+## a long route.
+func pitch_text() -> String:
+	var n := pitches.size()
+	var text := "%d pitch%s" % [n, "" if n == 1 else "es"]
+	if real_pitches > n:
+		text = "%d pitches, climbed here in %d" % [real_pitches, n]
+	return text
 
 
 ## The climb's height in feet (see [member height_ft]).

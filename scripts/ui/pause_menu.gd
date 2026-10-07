@@ -12,9 +12,10 @@ const CONTROLS := [
 	["Pause and controls", "Esc", "Start"],
 	["Back out of a menu", "Esc", "B"],
 	["Menus: choose, confirm", "Up/Down, E or Enter", "Stick or D-pad, A"],
-	["Climbing: move up", "W / Up (A, D for up-left, up-right)", "Stick up / left / right"],
-	["Climbing: place a cam", "Space or C", "X"],
-	["Climbing: eat, retreat", "E / Esc", "A / B"],
+	["Climbing: move up", "W / Up (A, D: diagonal)", "Stick up / left / right"],
+	["Climbing: place a cam or clip a bolt", "Space or C", "X"],
+	["Climbing: eat, chalk up, retreat", "E / Esc", "A / B"],
+	["Climbing: aid or jug", "Shift + arrow", "Y + stick"],
 ]
 const OPTIONS := ["Resume", "Quit to desktop"]
 const HEADING := Color(1.0, 0.85, 0.5)
@@ -91,15 +92,19 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not is_open():
 		if event.is_action_pressed("pause") and _player_can_act():
 			get_viewport().set_input_as_handled()
-			open()
+			var hud := get_tree().get_first_node_in_group("hud") as HUD
+			if hud and hud.info_panel.visible:
+				hud.hide_info() # Esc closes the sign you're reading first
+			else:
+				open()
 		return
 	get_viewport().set_input_as_handled()
 	if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
 		close()
-	elif event.is_action_pressed("move_up") or event.is_action_pressed("ui_up"):
+	elif MenuInput.pressed(event, "move_up") or MenuInput.pressed(event, "ui_up"):
 		_cursor = wrapi(_cursor - 1, 0, OPTIONS.size())
 		_refresh()
-	elif event.is_action_pressed("move_down") or event.is_action_pressed("ui_down"):
+	elif MenuInput.pressed(event, "move_down") or MenuInput.pressed(event, "ui_down"):
 		_cursor = wrapi(_cursor + 1, 0, OPTIONS.size())
 		_refresh()
 	elif event.is_action_pressed("interact") or event.is_action_pressed("use_tool") or event.is_action_pressed("ui_accept"):

@@ -47,6 +47,12 @@ func _ready() -> void:
 	test_crux()
 	test_weather_and_snow()
 	test_nights()
+	test_eating()
+	test_nights_by_the_clock()
+	test_late_starts()
+	test_snow_rules()
+	test_fixed_ropes()
+	await test_climb_ending_past_the_curfew()
 	print("\nOK: %d failure(s)" % failures)
 	get_tree().quit(failures)
 
@@ -280,9 +286,7 @@ func test_nights() -> void:
 	var kit := kit_for(nose)
 	Inventory.items.clear()
 	Inventory.add("acorn_cake", 4)
-	var state := ClimbState.new(nose, 10, 1, kit)
-	state.pitch = 2
-	state.row = state.top_row - 1
+	var state := _nose_at(kit, 2)
 	state.stamina = 60
 	state.move(_up(state))
 	check(state.nights_spent == 1 and state.stamina == ClimbState.MAX_STAMINA, "El Cap Tower: a night on the ledge")
@@ -291,9 +295,221 @@ func test_nights() -> void:
 		night_event = night_event or (e.type == "bivy" and e.place == "ledge")
 	check(night_event, "the night is reported to the screen")
 	Inventory.items.clear()
-	state = ClimbState.new(nose, 10, 1, kit)
-	state.pitch = 2
-	state.row = state.top_row - 1
+	state = _nose_at(kit, 2)
 	state.move(_up(state))
 	check(state.status == ClimbState.Status.RETREATED, "no meal, no night on the wall")
+	Inventory.items.clear()
+
+
+## A Nose climb standing one move below the top of pitch [param index] (0-based).
+func _nose_at(kit: Dictionary, index: int) -> ClimbState:
+	var state := ClimbState.new(route("the_nose"), 10, 1, kit)
+	state.pitch = index
+	state._start_pitch()
+	state.row = state.top_row - 1
+	return state
+
+
+## The food rules: no eating at full stamina, the night meals are kept, small
+## food goes first, and the route card counts meals as well as energy.
+func test_eating() -> void:
+	var nose := route("the_nose")
+	var kit := kit_for(nose)
+	Inventory.items.clear()
+	Inventory.add("acorn_cake", 4)
+	var state := ClimbState.new(nose, 10, 1, kit)
+	check(not state.eat("acorn_cake") and "not hungry" in state.message and Inventory.count("acorn_cake") == 4, "you can't eat at full stamina")
+	check(not state.can_eat(), "no 'E: eat' at full stamina")
+	state.stamina = 20
+	var eaten := 0
+	for i in 6:
+		if state.can_eat() and state.eat(state.next_food()):
+			eaten += 1
+		state.stamina = 20
+	check(eaten == 2 and Inventory.count("acorn_cake") == 2 and state.meals_in_pack() == nose.nights, "eating at every belay leaves a meal for each of the two nights (%d eaten)" % eaten)
+	check(not state.eat("acorn_cake") and "Save this" in state.message, "the last meals are saved for the nights")
+	# Play on from El Cap Tower: the night is still there.
+	state = _nose_at(kit, 2)
+	state.stamina = 60
+	state.move(_up(state))
+	check(state.nights_spent == 1 and Inventory.count("acorn_cake") == 1, "a climber who ate at the belays still gets the first night")
+	# Small food first, and what's a meal.
+	Inventory.items.clear()
+	Inventory.add("trail_mix", 1)
+	Inventory.add("dried_apples", 2)
+	var lunch := ClimbState.new(route("nutcracker"), 4, 1, kit_for(route("nutcracker")))
+	lunch.stamina = 40
+	check(lunch.next_food() == "dried_apples" and lunch.meals_in_pack() == 1, "dried apples go first, trail mix is a real meal")
+	# The route card: energy alone isn't enough for a night on the wall.
+	Inventory.items.clear()
+	Inventory.add("dried_apples", 20)
+	var wall := ClimbState.new(nose, 10, 1, kit)
+	var advice := int(ClimbProfiles.get_profile("the_nose").get("food", 0))
+	check(FoodDB.carried_energy() >= advice and wall.meals_in_pack() == 0 and not wall.food_ready(advice), "20 dried apples have the energy but no night meals")
+	Inventory.items.clear()
+	Inventory.add("acorn_cake", ceili(advice / 45.0))
+	check(wall.food_ready(advice) and wall.meals_in_pack() >= nose.nights, "acorn cakes for the energy and the nights turn the card green")
+	Inventory.items.clear()
+	# The smallest real meal goes for the night.
+	Inventory.add("acorn_cake", 1)
+	Inventory.add("trail_mix", 1)
+	state = _nose_at(kit, 2)
+	state.move(_up(state))
+	check(state.nights_spent == 1 and Inventory.count("trail_mix") == 0 and Inventory.count("acorn_cake") == 1, "the night eats the smallest real meal")
+	Inventory.items.clear()
+
+
+## A night lasts until 6:30 the next morning; the calendar moves on; the nights
+## fall where the profile says.
+func test_nights_by_the_clock() -> void:
+	var nose := route("the_nose")
+	var kit := kit_for(nose)
+	Inventory.items.clear()
+	Inventory.add("acorn_cake", 8)
+	for start_hour in [9.0, 14.0, 19.5, 25.0]:
+		var state := _nose_at(kit, 2)
+		state.start_minutes = int(start_hour * 60)
+		state.move(_up(state))
+		var wake := state.start_minutes + state.minutes
+		check(wake % (24 * 60) == ClimbState.WAKE_MINUTES, "a night starting at %.1f h ends at 6:30 (%d)" % [start_hour, wake % (24 * 60)])
+		check(wake / (24 * 60) == state.start_minutes / (24 * 60) + (0 if start_hour >= 24.0 else 1), "...on the next morning")
+	# Nights land on the pitches the profile marks: El Cap Tower and the Great Roof.
+	var camp := _nose_at(kit, 5)
+	camp.move(_up(camp))
+	check(camp.nights_spent == 0, "Camp IV is a rest, not a night")
+	var roof := _nose_at(kit, 6)
+	roof.move(_up(roof))
+	var places: Array[String] = []
+	for e in roof.take_events():
+		if e.type == "bivy":
+			places.append(e.place)
+	check(roof.nights_spent == 1 and places == ["hanging"], "the Great Roof is the hanging camp")
+	# The whole Nose by the bot: two nights, ending on the third morning or afternoon.
+	food_for(nose)
+	var full := ClimbState.new(nose, 10, 2, kit)
+	full.start_minutes = 6 * 60
+	ClimbBot.new().play(full)
+	places.clear()
+	for e in full.take_events():
+		if e.type == "bivy":
+			places.append(e.place)
+	var end := full.start_minutes + full.minutes - full.nights_spent * 24 * 60
+	check(full.status == ClimbState.Status.TOPPED_OUT and places == ["ledge", "hanging"], "the Nose has its nights at El Cap Tower and the Great Roof")
+	check(end >= ClimbState.WAKE_MINUTES and end < 18 * 60, "a 6 AM start tops out the Nose on the third day, in the morning or afternoon (%d:%02d)" % [end / 60, end % 60])
+	# The calendar: each night is a new day, not a pass-out, and food keeps spoiling.
+	var saved := GameClock.save_data()
+	GameClock.day = 3
+	GameClock.minutes = 6 * 60
+	Inventory.items.clear()
+	Inventory.add("miners_lettuce", 1)
+	Inventory.add("acorn_cake", 1)
+	var passed_out := GameClock.advance_through_nights(full.minutes, full.nights_spent)
+	check(not passed_out and GameClock.day == 5 and GameClock.minutes == end, "the Nose ends two days later, at %d:%02d, without passing out" % [end / 60, end % 60])
+	check(Inventory.count("miners_lettuce") == 0 and Inventory.count("acorn_cake") == 1, "the days on the wall spoil fresh food but not cakes")
+	GameClock.minutes = 6 * 60
+	check(GameClock.advance_through_nights(20 * 60, 0), "a day climb that runs past 2 AM passes you out")
+	GameClock.load_data(saved)
+	Inventory.items.clear()
+
+
+## Climbs that would still be going at 2 AM aren't started.
+func test_late_starts() -> void:
+	var apron := route("glacier_point_apron")
+	check(ClimbState.starts_too_late(apron, 23 * 60 + 30), "a 11:30 PM start on the Apron is refused (about %d min)" % ClimbState.estimate_minutes(apron))
+	check(not ClimbState.starts_too_late(apron, 8 * 60), "...but the morning is fine")
+	check(not ClimbState.starts_too_late(route("the_nose"), 23 * 60), "a climb with nights on the wall isn't held to the curfew")
+	for r in Guidebook.routes():
+		if r.nights > 0:
+			continue
+		var slowest := 0
+		for seed in 12:
+			food_for(r)
+			var state := ClimbState.new(r, int(kit_for(r).get("cam", 0)), seed, kit_for(r))
+			ClimbBot.new().play(state)
+			slowest = maxi(slowest, state.minutes)
+		check(ClimbState.estimate_minutes(r) >= slowest and ClimbState.estimate_minutes(r) < slowest * 2, "%s: the estimate (%d min) covers the slowest climb (%d) without much slack" % [r.id, ClimbState.estimate_minutes(r), slowest])
+	Inventory.items.clear()
+
+
+func test_snow_rules() -> void:
+	var lyell := route("lyell_glacier")
+	var kit := kit_for(lyell)
+	var slush := ClimbState.new(lyell, 0, 2, kit)
+	slush.start_minutes = 13 * 60
+	var storm := ClimbState.new(lyell, 0, 2, kit)
+	storm.start_minutes = 15 * 60
+	var dawn := ClimbState.new(lyell, 0, 2, kit)
+	dawn.start_minutes = 6 * 60
+	var c: int = dawn.holds[1].keys()[0]
+	check(not slush.is_stormy() and storm.is_stormy(), "storms start after STORM_HOUR (2:30 PM), slush after noon")
+	check(slush.move_cost(1, c) == dawn.move_cost(1, c) + 1 and storm.move_cost(1, c) == dawn.move_cost(1, c) + 1, "slush and storm don't stack (%d, %d, %d)" % [dawn.move_cost(1, c), slush.move_cost(1, c), storm.move_cost(1, c)])
+	var minutes_before := dawn.minutes
+	check(not dawn.can_chalk() and not dawn.chalk_up() and dawn.minutes == minutes_before and not dawn.chalked_this_pitch, "chalk does nothing on snow, so it isn't offered")
+	var rock := ClimbState.new(route("nutcracker"), 4, 1, kit_for(route("nutcracker")))
+	check(not rock.can_chalk(), "no chalking on a ledge")
+	rock.move(_up(rock))
+	check(rock.can_chalk() and rock.chalk_up(), "chalk works on rock")
+	var firefall := ClimbState.new(route("firefall_slab"), 0, 1, kit_for(route("firefall_slab")))
+	check(not rock.route_has_fixed_pieces() and firefall.route_has_fixed_pieces(), "only routes with bolts or pitons show the quickdraw slot")
+
+
+func test_fixed_ropes() -> void:
+	var nose := route("the_nose")
+	for stamina in [1, 2, 3]:
+		var state := ClimbState.new(nose, 10, 3, kit_for(nose))
+		state.stamina = stamina
+		var jugged := false
+		for dx in [-1, 0, 1]:
+			if state.can_jug(dx):
+				jugged = state.jug(dx)
+				break
+		check(jugged and state.status == ClimbState.Status.CLIMBING and state.falls == 0 and state.stamina >= 1, "jugging a fixed rope at %d stamina doesn't fall (%d left)" % [stamina, state.stamina])
+
+
+## The probe: a climb that ends past 2 AM sends the player home mid-way through
+## ClimbStart.climb(). The travel to the top must not call on the detached node.
+func test_climb_ending_past_the_curfew() -> void:
+	SaveManager.save_path = "user://climb_test_save.json"
+	SaveManager.delete_save()
+	var world: Node = load("res://scenes/world/world.tscn").instantiate()
+	get_tree().root.add_child(world)
+	await get_tree().process_frame
+	world._enter_region("yosemite_valley", "apron_base")
+	await get_tree().process_frame
+	var start: ClimbStart = world.find_child("GlacierPointApron", true, false)
+	check(start != null and start.route.destination_hub != "", "the Apron's start is in the Valley and leads somewhere")
+	QuestLog.record_climb(start.route.id) # no tick report to wait on
+	Gear.owned = kit_for(start.route)
+	var day := GameClock.day
+	GameClock.paused = false
+	GameClock.minutes = 23 * 60 + 30
+	var done := [false]
+	var run := func():
+		await start.climb(world.player)
+		done[0] = true
+	run.call()
+	await get_tree().process_frame
+	var screen: ClimbMinigame = null
+	for child in get_tree().root.get_children():
+		if child is ClimbMinigame:
+			screen = child
+	check(screen != null and GameClock.paused, "the climbing screen is up and the clock waits")
+	if screen == null:
+		world.queue_free()
+		return
+	screen.state.status = ClimbState.Status.TOPPED_OUT
+	screen.finished.emit(true, 300)
+	screen.queue_free()
+	for i in 6:
+		await get_tree().process_frame
+	check(done[0], "the climb finishes without an error when it ends past the curfew")
+	# The player is passed out and sent home to a new day.
+	var waited := 0.0
+	while world.region.region_id != Park.HOME_REGION and waited < 6.0:
+		await get_tree().create_timer(0.25).timeout
+		waited += 0.25
+	check(world.region.region_id == Park.HOME_REGION and GameClock.day == day + 1, "a climb that runs past 2 AM ends with the player passed out at home")
+	world.queue_free()
+	await get_tree().process_frame
+	SaveManager.delete_save()
 	Inventory.items.clear()

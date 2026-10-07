@@ -7,3 +7,6 @@
 
 # Map generator downloads (elevation tiles, OpenStreetMap extracts)
 /tools/mapgen/cache/
+
+# Claude Code agent worktrees
+/.claude/worktrees/

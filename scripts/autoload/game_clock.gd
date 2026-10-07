@@ -17,6 +17,16 @@ const DAYS_PER_SEASON := 28
 const DAY_START_HOUR := 6
 const PASS_OUT_HOUR := 26 # 2:00 AM the following morning
 const MINUTES_PER_TICK := 10
+## The moon is full on this day of every season (a 28-day lunar cycle).
+const FULL_MOON_DAY := 14
+## The Firefall: summer nights at 9 PM, for [constant FIREFALL_MINUTES].
+const FIREFALL_HOUR := 21
+const FIREFALL_MINUTES := 15
+## The moonbow at Lower Yosemite Fall: spring full-moon nights, 9 PM until 2 AM.
+const MOONBOW_FROM_HOUR := 21
+const MOONBOW_TO_HOUR := 2
+## Drives and rides can't arrive later than this many hours before the pass-out time.
+const TRAVEL_CUTOFF_HOURS := 1
 
 ## Real seconds per clock tick. Stardew Valley uses about 7 seconds per 10 minutes.
 var seconds_per_tick := 7.0
@@ -55,6 +65,24 @@ func advance_minutes(amount: int) -> void:
 		curfew_reached.emit()
 
 
+## True if a trip of [param trip_minutes] would arrive after the travel cutoff.
+func is_too_late_for(trip_minutes: int) -> bool:
+	return minutes + trip_minutes > (PASS_OUT_HOUR - TRAVEL_CUTOFF_HOURS) * 60
+
+
+## Moves the clock on after a climb that took [param elapsed] minutes and spent
+## [param nights] nights on the wall. Each night is a new day (the calendar
+## moves on and the Larder spoils food) rather than a pass-out at the curfew.
+## Returns true if the climb ran past the curfew, so the player passes out.
+func advance_through_nights(elapsed: int, nights: int) -> bool:
+	# The time of day on the last day, counted from that day's midnight.
+	var end := minutes + elapsed - nights * 24 * 60
+	for i in nights:
+		start_new_day()
+	advance_minutes(maxi(end - minutes, 0))
+	return end >= PASS_OUT_HOUR * 60
+
+
 func start_new_day() -> void:
 	day += 1
 	if day > DAYS_PER_SEASON:
@@ -84,6 +112,40 @@ func get_time_string() -> String:
 
 func get_date_string() -> String:
 	return "%s %d (%s)" % [SEASON_NAMES[season], day, WEEKDAY_NAMES[(day - 1) % 7]]
+
+
+## Phase of the moon on [param for_day] (the current day if left out):
+## 0.0 is a new moon, 0.5 is full, and it comes round again every season.
+func moon_phase(for_day := -1) -> float:
+	var d := day if for_day < 0 else for_day
+	return fposmod(float(d) / DAYS_PER_SEASON, 1.0)
+
+
+## True for the full moon and the night either side of it (days 13 to 15).
+func is_full_moon(for_day := -1) -> bool:
+	var d := day if for_day < 0 else for_day
+	return absi(d - FULL_MOON_DAY) <= 1
+
+
+## True when the clock's hour is in [param from_hour], [param to_hour]). The
+## range wraps past midnight, so 21 to 2 means 9 PM until 2 AM.
+func hour_in_range(from_hour: int, to_hour: int) -> bool:
+	if from_hour <= to_hour:
+		return hour >= from_hour and hour < to_hour
+	return hour >= from_hour or hour < to_hour
+
+
+## True while the Firefall is falling from Glacier Point (summer, 9 PM).
+func is_firefall_time() -> bool:
+	if season != Season.SUMMER:
+		return false
+	var start := FIREFALL_HOUR * 60
+	return minutes >= start and minutes < start + FIREFALL_MINUTES
+
+
+## True when a moonbow can form at Lower Yosemite Fall (spring, full moon, late evening).
+func is_moonbow_time() -> bool:
+	return season == Season.SPRING and is_full_moon() and hour_in_range(MOONBOW_FROM_HOUR, MOONBOW_TO_HOUR)
 
 
 func save_data() -> Dictionary:

@@ -209,7 +209,7 @@ func _check_placements() -> void:
 			blocker = region.get_node_or_null("Blocker")
 		var blocked: Array[String] = []
 		for node in region.entities.get_children():
-			if not (node is NPC or node is ClimbStart or node is StoryPickup):
+			if not (node is NPC or node is ClimbStart or node is StoryPickup or node is RegionDoor):
 				continue
 			if node is NPC and node.character:
 				placed[node.character.id] = true
@@ -493,6 +493,12 @@ func _play_last_page() -> void:
 	var lines := QuestLog.write_final_entry(1)
 	check(QuestLog.final_entry == 1 and not QuestLog.final_entry_pending() and lines.size() == 3, "you write your entry, and the season turns")
 	check(QuestLog.write_final_entry(0).is_empty() and QuestLog.final_entry == 1, "the last page is written once")
+	var after := QuestLog.talk_to("galen_clark")
+	check(after.size() == 2 and after[0].text == QuestLog.AFTER_LAST_PAGE[0], "Clark talks about the finished book")
+	QuestLog.completed.append("tenaya_ahwahnee") # skipped by this shortcut through the story
+	var pages := RegisterPages.written()
+	check(pages.size() > 10 and pages[0].by == "Tenaya", "the Register is full, Tenaya's page at the front")
+	check(pages.any(func(p: Dictionary) -> bool: return p.by == "Galen Clark" and p.notes.size() == 2), "Clark's own page carries his corrections")
 	var saved := QuestLog.save_data()
 	QuestLog.start_new_game()
 	QuestLog.load_data(saved)

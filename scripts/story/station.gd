@@ -110,8 +110,8 @@ func interact(player: Player) -> void:
 		var recipe := recipes[choice]
 		if Recipes.make(recipe):
 			var item := ItemDB.get_item(recipe.output_id)
-			await box.say([{"speaker": "", "text": "%s You made %d %s." % [
-				recipe.description, recipe.output_count, item.display_name if item else recipe.output_id]}])
+			await box.say([{"speaker": "", "text": "%s You made %s." % [
+				recipe.description, ItemDB.count_name(recipe.output_count, item.display_name if item else recipe.output_id)]}])
 		else:
 			await box.say([{"speaker": "", "text": "You need %s." % Recipes.describe_inputs(recipe)}])
 	box.close()

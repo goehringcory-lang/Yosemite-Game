@@ -49,7 +49,7 @@ The game has five **hubs**, each its own map:
 | **El Portal** | 2,000 ft | El Portal Road (Hwy 140), 30 min |
 | **Wawona** | 4,000 ft | Wawona Road (Hwy 41), 1 hr |
 | **Glacier Point** | 7,214 ft | Glacier Point Road, 1 hr. Locked until the player climbs the Glacier Point Apron. Road open about May to November. |
-| **Tuolumne Meadows** | 8,600 ft | Big Oak Flat and Tioga roads, 1.5 hr. Locked until high-country climbing. Road open about June to November. |
+| **Tuolumne Meadows** | 8,600 ft | Big Oak Flat and Tioga roads, 1.5 hr. Locked until you climb the Nose for Warren Harding. Road open about June to November. |
 
 To travel, use a map kiosk at a parking area or walk off the edge of a hub on a road. Pick a destination on the park map. Drive times come from the real road distances and match the park's published estimates. Travel advances the clock, and you can't set out if you'd arrive after 1 AM. Press **M** anywhere to see the park map, or press **Tab** for a detailed map of the area you're in. Interpretive signs mark real landmarks; interact to read them. If you pass out away from home, a ranger drives you back to camp.
 
@@ -98,7 +98,7 @@ Leave the Lamon Homestead by its gate and you walk out of the old apple orchard 
 
 - **Tent cabins** in three winding rows, each with a wooden deck, a numbered plate and its own dressing (a chair, a cooler, boots, a lantern), plus a block of wood cabins. The cabins nearest the wall are roped off, with a sign about the rockfalls.
 - **The village green**: the Registration Office, the Pavilion, the **Camp Curry Store**, the **Mountain Shop**, a pizza deck, the pool (an ice rink in winter), the Camp Curry amphitheater with the Firefall board, a fire pit you can cook at, patio tables, planters, string lights, and a flagpole.
-- **The Camp Curry Store** and **Mountain Shop** have insides you walk into. The store clerk trades food that keeps (pilot bread, cheddar, apricots, jerky, chocolate, trail mix) for forage that doesn't. The Mountain Shop clerk trades quickdraws, cams, a belay device, and big-wall gear for food. Like the Camp 4 traders, the shop only rounds out a rack: every offer needs gear you already own, so the piece that opens a tier still comes from a quest. Offers are in `data/shops/curry_store.tres` and `curry_mountain_shop.tres`.
+- **The Camp Curry Store** and **Mountain Shop** have insides you walk into. The store clerk trades food that keeps (pilot bread, cheddar, apricots, jerky, chocolate, trail mix) for forage that doesn't. The Mountain Shop clerk trades quickdraws, cams, and big-wall gear for food. Like the Camp 4 traders, the shop only rounds out a rack: every offer needs gear you already own, so the piece that opens a tier still comes from a quest. Offers are in `data/shops/curry_store.tres` and `curry_mountain_shop.tres`.
 - **The way in and out**: the Camp Curry arch and parking lot with a map kiosk and a shuttle stop, roads west and east onto the Valley map, the trail up to the Glacier Point Apron, and the homestead gate.
 - **People**: Jennie Curry, a camper, the Pavilion cook, a ranger-naturalist and a tourist outside; a shopper in the store and a climber in the Mountain Shop. Wren Alvarez waits with a rope at the foot of **Firefall Slab**, beside the Apron trail, and a pair of lost rental shoes lies out front of the upper tent cabins. The overlays are `scenes/story/content/curry_village.tscn`, `curry_store.tscn` and `curry_mountain_shop.tscn`.
 - **After dark** lamps, windows, tents and the fire pit glow (`scripts/world/night_light.gd`), chimneys smoke in the cold months, mist rises at the foot of Staircase Falls, and fireflies come out over the meadow (`scripts/world/ambient_fx.gd`).
@@ -131,7 +131,8 @@ Rebuilding rewrites each area's scene, so story NPCs stay in `scenes/story/conte
 The four generated hubs (El Portal, Wawona, Glacier Point, Tuolumne Meadows) and the Valley map used to show flat tile ground and simple placeholder trees and huts. They now share the Ahwahnee look:
 
 - **Painted ground.** `tools/mapgen/ground_upgrade.gd` reads each map's terrain tiles and hillshade, paints one detailed picture with `tools/hubs/ahwahnee_ground.gd` (golden foothill grass, chaparral, red-fir needles, granite grit, shaded slopes, rivers with foam, road edges), and adds it to the map scene as `GroundArt`. The tile layer stays underneath, hidden, for collision and foraging. Run `godot --headless --path . res://tools/mapgen/upgrade_hubs.tscn -- paint`, then `godot --headless --path . --import`, then `... upgrade_hubs.tscn -- attach`. Re-run it after regenerating a map. The pictures are in `assets/map/ground/`.
-- **Flora atlas.** `tools/mapgen/flora_hd.gd` draws every tree, shrub, boulder, tent and cabin in `assets/sprites/flora.png` with the Ahwahnee ramps and dithering, in the same 32x48 frames, so no scene changed. Run `godot --headless --path . res://tools/mapgen/paint_flora.tscn` (it also writes the info sign, trailhead and map kiosk, and `docs/generated_flora_preview.png`).
+- **Flora atlas.** `tools/mapgen/flora_hd.gd` draws every tree, shrub, boulder, tent and cabin in `assets/sprites/flora.png` (and their lit windows in `flora_glow.png`) with the Ahwahnee ramps and dithering, in the same 32x48 frames, so no scene changed. Run `godot --headless --path . res://tools/mapgen/paint_flora.tscn` (it also writes the info sign, trailhead and map kiosk, and `docs/generated_flora_preview.png`).
+- **Buildings.** A hub cell is 35 to 45 m, so a cabin on every OpenStreetMap footprint cell made dense overlapping grids. The map generator now leaves building cells out of the Flora layer, and `tools/mapgen/hub_buildings.gd` adds one building to each footprint under `Map/Buildings`: a wide lodge for a run of big-building cells, the long white Wawona Hotel with its verandas beside the hotel marker, and otherwise one cabin, house, tent cabin or cottage to every 3 x 2 cells, never overlapping. Each is a y-sorted sprite with its own collision (`Footprints`), dark glass by day and lit windows that glow after dark (`flora_glow.png`, `assets/sprites/hub_buildings/`). To redo the maps already in the project without regenerating anything: `godot --headless --path . res://tools/mapgen/rebuild_buildings.tscn -- paint`, then `godot --headless --path . --import`, then `... rebuild_buildings.tscn -- place` (a map that already has `Buildings` is skipped).
 - **Valley scenes.** The Village, Camp 4, Curry Village, the homestead and the Stoneman trail got finer ground: trampled-duff campground, a gravel lot with worn lanes, curbs and contact shadows where plazas meet grass, and the Indian Village grinding rock now has its bedrock-mortar sprite. After changing `ahwahnee_ground.gd`, run `godot --headless --path . res://tools/hubs/repaint_ground.tscn` (repaints the pictures without rebuilding scenes).
 - **Shop interiors and hotel grounds.** The Store and Mountain Shop rooms get a lamp-lit vignette, a ceiling-beam shadow, woven lozenge rugs with fringe, and lit furniture (`interior_ahwahnee_art.gd`; redraw with `res://tools/hubs/repaint_interiors.tscn`). The hotel grounds' lawn has wide mown swaths with clover and drier patches, and its road gets shoulders (`repaint_ground.tscn -- the_ahwahnee`).
 - **Climbing and the Valley map.** Every climbing wall gets a final grade pass (`ClimbRock._finish`: contrast, warm lights and cool shadows, shade turning toward the corner). The Valley map picture is color-graded with `python3 tools/mapgen/oblique/grade.py` (run it once after `gen.js`), and its labels have drop shadows and lit edges.
@@ -144,6 +145,8 @@ The four generated hubs (El Portal, Wawona, Glacier Point, Tuolumne Meadows) and
 ![El Portal](docs/el_portal_painted.png)
 ![Glacier Point](docs/glacier_point_painted.png)
 ![Pause menu](docs/ui_pause_menu.png)
+
+The hand-built areas follow the seasons too, without being rebuilt. When a region loads, `scripts/world/seasonal_dressing.gd` swaps its black oaks, dogwoods, garden beds, meadow grass and conifers for the season's drawing (in `assets/sprites/ahwahnee/seasons/`, made by `godot --headless --path . -s res://tools/hubs/build_seasonal_art.gd`), hides lupine, paintbrush and wildflowers in winter and dries them in fall, and grades the painted ground with `assets/shaders/seasonal_ground.gdshader`: dry and golden in fall, cool and frosted in winter. Only sprites change, so collision and foraging stay the same.
 
 ### The Ahwahnee: north from the homestead
 
@@ -158,7 +161,7 @@ Rebuild both with `godot --headless --path . res://tools/hubs/build_ahwahnee.tsc
 
 **Valley shuttle.** Green shuttle stop signs at the Village, Camp 4, the Lamon Homestead, Curry Village, Happy Isles, Mirror Lake, and El Capitan Meadow take you to any other stop in 15 minutes. The stop list is in `scripts/objects/shuttle_stop.gd`.
 
-**Trading.** Money is gone, so traders take food instead. The Camp Curry Store and the Mountain Shop (see Curry Village above) work the same way. A price is an amount of food energy, and they take whatever in your pack spoils soonest first. The Village Store swaps fresh forage for trail mix and dried apples, which keep much longer. The Camp 4 traders round out a rack you already have (extra cams, quickdraws, a belay device, and big-wall gear once you can aid climb), but the piece that opens a new climbing tier still comes from a quest. Offers are in `data/shops/*.tres`, each with the gear it requires and a maximum you can own.
+**Trading.** Money is gone, so traders take food instead. The Camp Curry Store and the Mountain Shop (see Curry Village above) work the same way. A price is an amount of food energy, and they take whatever in your pack spoils soonest first. The Village Store swaps fresh forage for trail mix and dried apples, which keep much longer. The Camp 4 traders round out a rack you already have (extra cams, quickdraws, and big-wall gear once you can aid climb), but the piece that opens a new climbing tier still comes from a quest. Offers are in `data/shops/*.tres`, each with the gear it requires and a maximum you can own.
 
 **Bridges.** When a river cuts off a walkable area on a generated hub map, the map generator builds a bridge at the shortest crossing (`MIN_CUT_OFF_AREA` and `MAX_BRIDGE` in `tools/mapgen/region_builder.gd`).
 
@@ -171,11 +174,11 @@ Rebuild both with `godot --headless --path . res://tools/hubs/build_ahwahnee.tsc
 ![A night on El Capitan](docs/climb_night_on_the_wall.png)
 ![Lyell Glacier](docs/climb_lyell_glacier.png)
 
-Each of the 13 routes is its own little game, set where the real climb is. Before you start, a **route card** shows a postcard of the view, the pitches (marked where there's a crux), the gear you need (and what you have) and how much food to bring. Then you climb: a granite wall with its ragged edge against the sky, the real skyline behind it (Half Dome from the Apron, El Capitan and Bridalveil from the Nose, the Cockscomb from Cathedral Peak, Mount Lyell from the glacier), the valley floor far below sinking as you gain height, and clouds drifting past. The light follows the game clock: pink at dawn, blue at midday, orange at dusk, stars and a headlamp at night. Afternoon thunderstorms build over the high country after 2 pm.
+Each of the 13 routes is its own little game, set where the real climb is. Before you start, a **route card** shows a postcard of the view, the pitches (marked where there's a crux), the gear you need (and what you have) and how much food to bring. Then you climb: a granite wall with its ragged edge against the sky, the real skyline behind it (Half Dome from the Apron, El Capitan and Bridalveil from the Nose, the Cockscomb from Cathedral Peak, Mount Lyell from the glacier), the valley floor far below sinking as you gain height, and clouds drifting past. The light follows the game clock: pink at dawn, blue at midday, orange at dusk, stars and a headlamp at night. Afternoon thunderstorms build over the high country after 2:30 pm, and the glacier's snow goes to slush after noon, so the route card says to start before 10 am.
 
 Your climber works up the face on a rope that runs through every quickdraw, cam or old piton to your belayer, who is the person from the story who sent you (Wren, Dick Leonard, Jules Eichorn, Royal Robbins, John Salathé, Beverly Johnson, Warren Harding, George Anderson, John Muir...). The climber shows what you own: red climbing shoes, a chalk bag, a harness with your cams (colored by size) and quickdraws, a belay device, aiders, a portaledge roll, an ice axe and crampons.
 
-**Controls:** arrows climb (up, up-left, up-right); **Space** clips a bolt or places a cam; **E** eats at a belay ledge or chalks up on the wall; **Shift + an arrow** aids a hard move (aiders) or jugs a fixed rope (ascenders); **Esc** asks if you want to retreat. Rings mark the holds you can reach, with what each costs after your shoes and chalk; the toolbar at the bottom is your rack, and lights up what you can do right now.
+**Controls:** arrows climb (up, up-left, up-right); **Space** clips a bolt or places a cam; **E** eats at a belay ledge (not when you're full) or chalks up on rock; **Shift + an arrow** aids a hard move (aiders) or jugs a fixed rope (ascenders); **Esc** asks if you want to retreat (**E** says yes, **Esc** again keeps climbing). Rings mark the holds you can reach, with what each costs after your shoes and chalk; the toolbar at the bottom is your rack, and lights up what you can do right now.
 
 **What each piece of gear does** (so the gear you earn in the story changes how you climb):
 
@@ -189,7 +192,7 @@ Your climber works up the face on a rope that runs through every quickdraw, cam 
 | Belay device | Your partner's catches are soft (+10 stamina after a fall), the belay restful (+6), and you rappel to retreat |
 | Aiders | On a wall (the Great Roof, Changing Corners), pull through a hard move for a cam and 12 minutes; it costs you a free ascent |
 | Ascenders | Jug a fixed rope (the Nose's first pitches): safe, steady, slow |
-| Haul bag + portaledge | On the Nose: the bag swings below you, and nights on the wall (El Cap Tower's ledge, the Great Roof's hanging camp) need a real meal |
+| Haul bag + portaledge | On the Nose: the bag swings below you, and the two nights on the wall (El Cap Tower's ledge, the Great Roof's hanging camp) each need a real meal, 30 energy or more. Eating at the belays leaves those meals alone, and the route card counts them ("Night meals: 4 of 2"). A night lasts until 6:30 the next morning, so the Nose ends on the third day and the calendar moves on |
 | Ice axe + crampons | On the glacier: kick steps for cheap moves, and the axe stops a slide |
 
 **Pitch styles** change the rules as well as the art: friction **slab** (Firefall Slab, Swan Slab), **crack** and **flake** (the Grack, Nutcracker, Astroman), **chimney** (Steck-Salathé's Chockstone Chimney and Narrows, Astroman's Harding Slot: alternate Left and Right), **roof** (Separate Reality, the Great Roof: the picture runs sideways), **dike** (Snake Dike: stay on the ribbon, bolts are far apart), **knobs** (Cathedral Peak), **snow** and **ice** (Lyell Glacier: crevasses, and slush after noon).
@@ -213,7 +216,9 @@ The font is Tiny5 (SIL Open Font License, `assets/fonts/`). To photograph a rout
 
 The story is in [STORY.md](STORY.md), and the mechanics are in [docs/DESIGN.md](docs/DESIGN.md). Galen Clark gives you the Guardian's Register, and you fill it with the stories of real people from the park's history. Native characters and practices are flagged for review by the tribes traditionally associated with Yosemite.
 
-[docs/CAST.md](docs/CAST.md) lists the cast (22 historical people and 10 visitors from different eras), where each one lives, and the quest chains from the first morning to the last page. The character sprites are drawn by `tools/npcgen/`.
+[docs/CAST.md](docs/CAST.md) lists the cast (22 historical people and 15 visitors from different eras), where each one lives, and the quest chains from the first morning to the last page. The character sprites are drawn by `tools/npcgen/`.
+
+There are a few hidden touches in the valley (night, moon, and season events). Developers can find them in the "Easter eggs" section of [docs/DESIGN.md](docs/DESIGN.md).
 
 ## Yosemite items
 
@@ -234,7 +239,7 @@ Every item is a native Sierra plant or food, with a short natural-history note t
 | Black Oak Acorn | Fall | under black oaks | leach first | 14 days, forever in a chuckah |
 | Toyon Berries | Fall, Winter | beside manzanita shrubs | toast first | 5 days |
 
-Black oaks change color with the seasons.
+Black oaks change color with the seasons: new pale leaves in spring, gold and rust in fall, bare in winter.
 
 ## Project layout
 
@@ -314,9 +319,10 @@ godot --headless --path . res://tests/world_story_test.tscn
 godot --headless --path . res://tests/cast_test.tscn
 godot --headless --path . res://tests/climb_test.tscn   # every route, every piece of gear
 xvfb-run -a godot --path . res://tests/climb_screen_test.tscn   # plays all 13 on the real screen (needs a window)
+godot --headless --path . res://tests/eggs_test.tscn
 ```
 
-The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground.
+The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds).
 
 ## Map data credits
 

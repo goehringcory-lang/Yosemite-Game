@@ -32,6 +32,9 @@ func destinations() -> Array[Dictionary]:
 
 
 func interact(_player: Player) -> void:
+	if GameClock.is_too_late_for(RIDE_MINUTES):
+		get_tree().call_group("hud", "show_message", "The shuttle has stopped running for the night.")
+		return
 	# The Valley map shows where each stop is; pick one there.
 	get_tree().call_group("world", "open_shuttle_map", stop_name)
 

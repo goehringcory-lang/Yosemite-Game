@@ -28,6 +28,9 @@ const MAP_POS := Vector2(6, 7)
 const INFO_RECT := Rect2(212, 7, 262, 256)
 const AREA_BOX := Rect2(6, 18, 468, 222)
 const FONT_SIZE := 8
+## Signs may slide this far (pixels) from their spot to clear a neighbor.
+const NUDGE_X := [0, 4, -4, 8, -8, 12, -12, 16, -16, 24, -24]
+const NUDGE_Y := [0, 3, -3, 6, -6, 9, -9, 12, -12, 15, -15, 18, -18]
 const SCREEN := Vector2(480, 270)
 
 const INK := Color("1a1410")
@@ -37,6 +40,8 @@ const LOCKED := Color("9a948a")
 const HERE := Color("ff4a4a")
 const TEXT := Color("f7f0dc")
 const DIM := Color(0.97, 0.94, 0.86, 0.6)
+## Sub-heading text: light enough to read on the dark panel.
+const SUBHEAD := Color("d9cdb0")
 
 # Illustrated area map: wood frame, parchment signs, slate ribbons.
 const WOOD_PLANK := Color("2a190b")
@@ -58,6 +63,9 @@ const GEAR_LOCKED := Color("6d7488")
 const KIOSK_GREEN := Color("4f9a3c")
 const HERE_RED := Color("ff5a3c")
 
+## The gamepad's name for each keyboard control the map's hints mention.
+const GAMEPAD_BUTTONS := {"Arrows": "D-pad", "E": "A", "Esc": "B", "M": "Back", "Tab": "LB/RB"}
+
 var _tab := Tab.PARK
 var _travel := false
 var _region: Region
@@ -72,6 +80,9 @@ var _legs: Dictionary = {} # destination hub id -> leg
 var _view: Dictionary = {}
 var _relief: Image
 var _points: Array = []
+## Top-left of each point's sign on the area canvas, nudged clear of the
+## other signs and the markers (same order as _points).
+var _sign_at: Array[Vector2] = []
 var _cursor := -1
 ## Name of the shuttle stop the player is riding from, while choosing where to go.
 var _shuttle_from := ""
@@ -97,6 +108,7 @@ var _hint_label: Label
 
 func _ready() -> void:
 	layer = 20
+	add_to_group("park_map")
 	visible = false
 	_build()
 
@@ -141,6 +153,10 @@ func _show(region: Region, player_position: Vector2, travel: bool, preselect: St
 	visible = true
 
 
+func is_open() -> bool:
+	return visible
+
+
 func close() -> void:
 	visible = false
 	_shuttle_from = ""
@@ -171,9 +187,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			_confirm()
 		elif clicked != "":
 			_select(clicked)
-	elif event.is_action_pressed("move_left") or event.is_action_pressed("move_up"):
+	elif MenuInput.pressed(event, "move_left") or MenuInput.pressed(event, "move_up"):
 		_cycle(-1)
-	elif event.is_action_pressed("move_right") or event.is_action_pressed("move_down"):
+	elif MenuInput.pressed(event, "move_right") or MenuInput.pressed(event, "move_down"):
 		_cycle(1)
 	elif event.is_action_pressed("interact") or event.is_action_pressed("use_tool") or event.is_action_pressed("ui_accept"):
 		_confirm()
@@ -221,13 +237,13 @@ func _area_input(event: InputEvent) -> void:
 	if _points.is_empty():
 		return
 	var dir := Vector2.ZERO
-	if event.is_action_pressed("move_left"):
+	if MenuInput.pressed(event, "move_left"):
 		dir = Vector2.LEFT
-	elif event.is_action_pressed("move_right"):
+	elif MenuInput.pressed(event, "move_right"):
 		dir = Vector2.RIGHT
-	elif event.is_action_pressed("move_up"):
+	elif MenuInput.pressed(event, "move_up"):
 		dir = Vector2.UP
-	elif event.is_action_pressed("move_down"):
+	elif MenuInput.pressed(event, "move_down"):
 		dir = Vector2.DOWN
 	if dir != Vector2.ZERO:
 		_move_cursor(dir)
@@ -331,11 +347,11 @@ func _refresh() -> void:
 	_acts_label.text = "\n".join(Array(hub.activities).map(func(a: String) -> String: return "- " + a))
 	_route_label.text = _route_text(hub)
 	_route_label.modulate = GOLD if _legs.has(_selected) and _legs[_selected].open else (TEXT if _selected == _hub_here else CLOSED)
-	var tab_hint := "[Tab] Area"
+	var tab_hint := "[%s] Area" % _button("Tab")
 	if _travel:
-		_hint_label.text = "[Arrows] Choose   [E] Travel   [Esc] Close   %s" % tab_hint
+		_hint_label.text = "[%s] Choose   [%s] Travel   [%s] Close   %s" % [_button("Arrows"), _button("E"), _button("Esc"), tab_hint]
 	else:
-		_hint_label.text = "Travel from a map kiosk or a road out of the area.\n[Arrows] Choose   [M] Close   %s" % tab_hint
+		_hint_label.text = "Travel from a map kiosk or a road out of the area.\n[%s] Choose   [%s] Close   %s" % [_button("Arrows"), _button("M"), tab_hint]
 	_area_title.text = "" if not _view.is_empty() else "%s area map" % Park.get_hub(_hub_here).display_name
 	_refresh_area_text()
 	_park_canvas.queue_redraw()
@@ -343,9 +359,22 @@ func _refresh() -> void:
 	_area_frame.queue_redraw()
 
 
+## The name of a keyboard control on the current device, like the HUD's prompts.
+func _button(keyboard: String) -> String:
+	var hud := get_tree().get_first_node_in_group("hud") as HUD
+	if hud and not hud.device_changed.is_connected(_on_device_changed):
+		hud.device_changed.connect(_on_device_changed)
+	return hud.prompt(keyboard, GAMEPAD_BUTTONS.get(keyboard, keyboard)) if hud else keyboard
+
+
+func _on_device_changed() -> void:
+	if visible:
+		_refresh()
+
+
 func _refresh_area_text() -> void:
 	if _view.is_empty():
-		_area_footer.text = "You are at %s.   [Tab] Park map   [M] Close" % _here_name
+		_area_footer.text = "You are at %s.   [%s] Park map   [%s] Close" % [_here_name, _button("Tab"), _button("M")]
 		_area_hint.text = ""
 		return
 	var selected: Dictionary = _points[_cursor] if _cursor >= 0 else {}
@@ -354,7 +383,7 @@ func _refresh_area_text() -> void:
 		lines = "%s. %s" % [selected.name, selected.blurb]
 		var stop_name: String = selected.get("stop", "")
 		if _shuttle_from != "" and stop_name != "" and stop_name != _shuttle_from:
-			lines += "  [E] Ride here, free, %d min." % ShuttleStop.RIDE_MINUTES
+			lines += "  [%s] Ride here, free, %d min." % [_button("E"), ShuttleStop.RIDE_MINUTES]
 		elif _shuttle_from != "" and stop_name == _shuttle_from:
 			lines += "  You are at this stop."
 		elif stop_name != "":
@@ -363,9 +392,9 @@ func _refresh_area_text() -> void:
 		lines = "You are at %s." % _here_name
 	_area_footer.text = lines
 	if _shuttle_from != "":
-		_area_hint.text = "[Arrows] Stop   [E] Ride   [Esc] Stay"
+		_area_hint.text = "[%s] Stop   [%s] Ride   [%s] Stay" % [_button("Arrows"), _button("E"), _button("Esc")]
 	else:
-		_area_hint.text = "[Arrows] Look   [Tab] Park map   [M] Close"
+		_area_hint.text = "[%s] Look   [%s] Park map   [%s] Close" % [_button("Arrows"), _button("Tab"), _button("M")]
 
 
 func _route_text(hub: HubData) -> String:
@@ -385,13 +414,15 @@ func _draw_park() -> void:
 	var canvas := _park_canvas
 	var font := canvas.get_theme_default_font()
 	var leg: Dictionary = _legs.get(_selected, {})
+	var points := PackedVector2Array()
 	if not leg.is_empty():
-		var points := PackedVector2Array()
 		for lonlat: Vector2 in leg.path:
 			points.append(_map_point(lonlat) + Vector2(0.5, 0.5))
 		var color := GOLD if leg.open else (LOCKED if leg.locked else CLOSED)
 		canvas.draw_polyline(points, INK, 3.0)
 		canvas.draw_polyline(points, color, 1.0)
+	# Markers first, then the names, so no name is hidden under a marker.
+	var markers: Array[Rect2] = []
 	for hub in ParkAtlas.HUBS:
 		var p := _map_point(Vector2(hub.longitude, hub.latitude))
 		var fill := TEXT
@@ -400,13 +431,47 @@ func _draw_park() -> void:
 		var r := 3.0 if hub.id == _selected else 2.0
 		canvas.draw_rect(Rect2(p - Vector2(r + 1, r + 1), Vector2(r * 2 + 3, r * 2 + 3)), INK)
 		canvas.draw_rect(Rect2(p - Vector2(r, r), Vector2(r * 2 + 1, r * 2 + 1)), GOLD if hub.id == _selected else fill)
-		var side: Vector2 = LABEL_SIDE.get(hub.id, Vector2(1, 0))
+		markers.append(Rect2(p - Vector2(r + 1, r + 1), Vector2(r * 2 + 3, r * 2 + 3)))
+	var taken: Array[Rect2] = []
+	for hub in ParkAtlas.HUBS:
+		var p := _map_point(Vector2(hub.longitude, hub.latitude))
 		var width := font.get_string_size(hub.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x
-		var at := p + Vector2(5 if side.x > 0 else -5 - width, 3 + side.y * 6)
+		var at := _park_label_at(p, Vector2(width, FONT_SIZE), LABEL_SIDE.get(hub.id, Vector2(1, 0)), points, markers, taken)
+		taken.append(Rect2(at - Vector2(0, FONT_SIZE - 1), Vector2(width, FONT_SIZE + 2)))
 		_text(canvas, font, at, hub.display_name, GOLD if hub.id == _selected else TEXT)
 	if (Time.get_ticks_msec() / 400) % 2 == 0:
 		var here := _map_point(_here)
 		canvas.draw_rect(Rect2(here - Vector2(1, 1), Vector2(3, 3)), HERE)
+
+
+## Baseline of a hub's name: its preferred side of the marker, or the nearest
+## spot around it that stays off the route, the markers and the other names.
+func _park_label_at(p: Vector2, size: Vector2, side: Vector2, route: PackedVector2Array, markers: Array[Rect2], taken: Array[Rect2]) -> Vector2:
+	var bounds := Rect2(Vector2.ZERO, PARK_MAP.get_size())
+	var best := p
+	var best_cost := INF
+	var tries := 0
+	for sx: float in [side.x, -side.x]:
+		for sy: float in [side.y, -side.y, 0.0, 1.0, -1.0]:
+			var at := p + Vector2(5 if sx > 0 else -5 - size.x, 3 + sy * 6)
+			var rect := Rect2(at - Vector2(0, size.y - 1), size + Vector2(0, 2))
+			var cost := tries * 0.5
+			tries += 1
+			if not bounds.encloses(rect):
+				cost += 1000.0
+			for other: Rect2 in taken:
+				cost += _overlap(rect.grow(2), other) * 4.0
+			for marker: Rect2 in markers:
+				cost += _overlap(rect, marker) * 4.0
+			for i in range(1, route.size()):
+				var steps := ceili(route[i - 1].distance_to(route[i]) / 2.0)
+				for step in maxi(steps, 1):
+					if rect.grow(1).has_point(route[i - 1].lerp(route[i], float(step) / maxi(steps, 1))):
+						cost += 3.0
+			if cost < best_cost:
+				best_cost = cost
+				best = at
+	return best
 
 
 func _draw_area() -> void:
@@ -468,26 +533,94 @@ func _draw_area_illustrated() -> void:
 	var font := canvas.get_theme_default_font()
 	var s := float(_area_scale)
 	var choosing := _shuttle_from != ""
-	for i in _points.size():
-		if i != _cursor:
-			_draw_point(canvas, font, _points[i], false, choosing and not _points[i].has("stop"))
+	# Markers first so the signs stay readable on top of them.
+	for point: Dictionary in _points:
+		_draw_dot(canvas, point)
 	for kiosk: Dictionary in _view.kiosks:
 		_draw_kiosk(canvas, _v2(kiosk.anchor) * s)
 	for climb: Dictionary in _view.climbs:
 		_draw_climb(canvas, _v2(climb.anchor) * s, _route_ready(climb.route))
+	for i in _points.size():
+		if i != _cursor:
+			_draw_point(canvas, font, i, false, choosing and not _points[i].has("stop"))
 	if _cursor >= 0:
-		_draw_point(canvas, font, _points[_cursor], true, false)
+		_draw_point(canvas, font, _cursor, true, false)
 	_draw_here(canvas, _view_point(_here) * s)
 
 
-func _draw_point(canvas: Control, font: Font, point: Dictionary, selected: bool, dimmed: bool) -> void:
+## The size of a point's sign.
+func _sign_size(font: Font, point: Dictionary) -> Vector2:
+	var tier: String = point.tier
+	var icon := 7.0 if tier == "landmark" or tier == "fall" else (8.0 if tier == "home" else 0.0)
+	var width := ceilf(font.get_string_size(point.name, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x)
+	return Vector2(width + 7.0 + icon, 12.0)
+
+
+## Where a point's sign goes before any nudging.
+func _sign_home(font: Font, point: Dictionary) -> Vector2:
+	return (_label_pos(point) * float(_area_scale) - _sign_size(font, point) / 2.0).floor()
+
+
+## Rects (on the area canvas) of everything a sign should stay off of: the
+## dots, kiosks and climb markers.
+func _marker_rects() -> Array[Rect2]:
+	var rects: Array[Rect2] = []
+	var s := float(_area_scale)
+	for point: Dictionary in _points:
+		if point.tier != "landmark" and point.tier != "fall" and point.tier != "home":
+			rects.append(Rect2((_v2(point.anchor) * s).floor() - Vector2(2, 2), Vector2(5, 5)))
+	for kiosk: Dictionary in _view.kiosks:
+		rects.append(Rect2((_v2(kiosk.anchor) * s - Vector2(3, 8)).floor() - Vector2(1, 1), Vector2(9, 10)))
+	for climb: Dictionary in _view.climbs:
+		rects.append(Rect2((_v2(climb.anchor) * s).floor() - Vector2(6, 6), Vector2(13, 13)))
+	return rects
+
+
+## Nudges each sign off its neighbors and the markers, as little as it can.
+## Signs keep their picture-space order; the nearest free spot wins.
+func _place_signs() -> void:
+	_sign_at.clear()
+	if _view.is_empty() or _area_rect.texture == null:
+		return
+	var font := _area_canvas.get_theme_default_font()
+	var bounds := Rect2(Vector2.ZERO, _area_rect.size)
+	var markers := _marker_rects()
+	var placed: Array[Rect2] = []
+	for point: Dictionary in _points:
+		var size := _sign_size(font, point)
+		var home := _sign_home(font, point)
+		var best := home
+		var best_cost := INF
+		for dy: int in NUDGE_Y:
+			for dx: int in NUDGE_X:
+				var rect := Rect2(home + Vector2(dx, dy), size)
+				var cost := absf(dx) * 0.5 + absf(dy) * 0.5
+				if not bounds.encloses(rect):
+					cost += 1000.0
+				for other: Rect2 in placed:
+					cost += _overlap(rect.grow(2), other) * 4.0
+				for marker: Rect2 in markers:
+					cost += _overlap(rect, marker) * 4.0
+				if cost < best_cost:
+					best_cost = cost
+					best = rect.position
+		placed.append(Rect2(best, size))
+		_sign_at.append(best)
+
+
+func _overlap(a: Rect2, b: Rect2) -> float:
+	var common := a.intersection(b)
+	return common.size.x * common.size.y
+
+
+func _draw_point(canvas: Control, font: Font, index: int, selected: bool, dimmed: bool) -> void:
+	var point: Dictionary = _points[index]
 	var text: String = point.name
 	var tier: String = point.tier
 	var ribbon := tier == "landmark" or tier == "fall"
 	var icon := 7.0 if ribbon else (8.0 if tier == "home" else 0.0)
-	var width := ceilf(font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x)
-	var size := Vector2(width + 7.0 + icon, 12.0)
-	var pos := (_label_pos(point) * float(_area_scale) - size / 2.0).floor()
+	var size := _sign_size(font, point)
+	var pos := _sign_at[index] if index < _sign_at.size() else _sign_home(font, point)
 	var fill := PARCHMENT
 	var shade := PARCHMENT_SHADE
 	var border := BROWN
@@ -525,11 +658,15 @@ func _draw_point(canvas: Control, font: Font, point: Dictionary, selected: bool,
 	var ascent := font.get_ascent(FONT_SIZE)
 	var baseline := pos.y + (size.y - 2.0 - (ascent + font.get_descent(FONT_SIZE))) / 2.0 + 1.0 + ascent
 	canvas.draw_string(font, Vector2(text_x, floorf(baseline)), text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, Color(ink, alpha))
-	# Places sit on a dot where they actually are.
-	if not ribbon and tier != "home":
-		var dot := (_v2(point.anchor) * float(_area_scale)).floor()
-		canvas.draw_rect(Rect2(dot - Vector2(1, 1), Vector2(3, 3)), INK)
-		canvas.draw_rect(Rect2(dot, Vector2(1, 1)), TEXT)
+
+
+## Places sit on a dot where they actually are.
+func _draw_dot(canvas: Control, point: Dictionary) -> void:
+	if point.tier == "landmark" or point.tier == "fall" or point.tier == "home":
+		return
+	var dot := (_v2(point.anchor) * float(_area_scale)).floor()
+	canvas.draw_rect(Rect2(dot - Vector2(1, 1), Vector2(3, 3)), INK)
+	canvas.draw_rect(Rect2(dot, Vector2(1, 1)), TEXT)
 
 
 func _draw_kiosk(canvas: Control, at: Vector2) -> void:
@@ -616,6 +753,7 @@ func _load_area_map() -> void:
 	var texture: Texture2D = load(path) if ResourceLoader.exists(path) else null
 	_area_rect.texture = texture
 	_load_view()
+	_sign_at.clear()
 	if texture == null:
 		return
 	var size := texture.get_size()
@@ -626,6 +764,7 @@ func _load_area_map() -> void:
 	_area_canvas.position = _area_rect.position
 	_area_canvas.size = shown
 	_area_footer.position = Vector2(9, 245) if not _view.is_empty() else Vector2(8, 250)
+	_place_signs()
 
 
 ## Reads the illustrated map's data, if this hub has one (<hub>_view.json).
@@ -686,7 +825,7 @@ func _build() -> void:
 	_name_label.add_theme_font_size_override("font_size", 20)
 	_name_label.add_theme_color_override("font_color", GOLD)
 	_sub_label = _label(box)
-	_sub_label.modulate = DIM
+	_sub_label.add_theme_color_override("font_color", SUBHEAD)
 	_desc_label = _label(box)
 	_acts_label = _label(box)
 	var spacer := Control.new()

@@ -8,8 +8,11 @@ extends Node2D
 
 signal region_changed(region: Region)
 
-## Drives can't arrive later than this many hours before the pass-out time.
-const TRAVEL_CUTOFF_HOURS := 1
+## Seen the morning after the player passes out (an Easter egg): the bears
+## came by, and the pack was zipped, so nothing is lost.
+const BEAR_TRACKS_MESSAGE := "Bear tracks by the fence this morning. Your pack was zipped."
+## Seconds to let the "passed out" message show before the tracks message.
+const BEAR_TRACKS_DELAY := 3.8
 
 ## The region the player is in.
 var region: Region
@@ -29,6 +32,9 @@ var forage: ForageSpawner:
 var _regions: Dictionary = {}
 var _busy := false
 var _place_check := 0.0
+## The clock hit the pass-out hour while World or a dialogue was busy; the
+## player passes out as soon as both are done.
+var _curfew_pending := false
 
 @onready var player: Player = $Player
 @onready var hud: HUD = $HUD
@@ -39,7 +45,7 @@ func _ready() -> void:
 	add_to_group("world")
 	add_to_group("persist")
 	add_to_group("persist_provider")
-	GameClock.curfew_reached.connect(sleep.bind(true))
+	GameClock.curfew_reached.connect(_on_curfew)
 	park_map.travel_requested.connect(travel)
 	park_map.shuttle_requested.connect(_on_shuttle_requested)
 	park_map.closed.connect(_set_paused.bind(false))
@@ -73,10 +79,21 @@ func _notification(what: int) -> void:
 
 
 func _process(delta: float) -> void:
+	if _curfew_pending and not _busy and not _dialogue_open():
+		sleep(true)
 	_place_check -= delta
 	if _place_check <= 0.0:
 		_place_check = 0.25
 		_update_location()
+
+
+func _on_curfew() -> void:
+	_curfew_pending = true
+
+
+## True while a conversation, shop, or cooking menu is on screen.
+func _dialogue_open() -> bool:
+	return get_tree().get_nodes_in_group("dialogue_box").any(func(box: Node) -> bool: return not box.is_queued_for_deletion())
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -154,6 +171,7 @@ func go_to_region(id: String, spawn_name := "arrival", minutes := 0) -> void:
 	if minutes > 0:
 		GameClock.advance_minutes(minutes)
 	_enter_region(id, spawn_name)
+	await _unstick_player()
 	await hud.fade_from_black()
 	_set_paused(false)
 	_busy = false
@@ -164,7 +182,7 @@ func travel(leg: Dictionary) -> void:
 	if _busy or not leg.open:
 		return
 	var hub := Park.get_hub(leg.to)
-	if GameClock.minutes + int(leg.minutes) > (GameClock.PASS_OUT_HOUR - TRAVEL_CUTOFF_HOURS) * 60:
+	if GameClock.is_too_late_for(int(leg.minutes)):
 		hud.show_message("It's too late to set out for %s tonight." % hub.display_name)
 		return
 	_busy = true
@@ -173,6 +191,7 @@ func travel(leg: Dictionary) -> void:
 	GameClock.advance_minutes(leg.minutes)
 	# Some hubs greet drivers in a smaller area, like Yosemite Village.
 	_enter_region(hub.arrival_region if hub.arrival_region != "" else leg.to, leg.spawn)
+	await _unstick_player()
 	await hud.fade_from_black()
 	hud.show_message("You drove %s miles to %s (%s)." % [str(leg.miles), hub.display_name, Park.format_minutes(leg.minutes)])
 	_set_paused(false)
@@ -183,6 +202,7 @@ func sleep(passed_out := false) -> void:
 	if _busy:
 		return
 	_busy = true
+	_curfew_pending = false
 	_set_paused(true)
 	await hud.fade_to_black()
 
@@ -195,18 +215,31 @@ func sleep(passed_out := false) -> void:
 		await forage.respawn()
 	player.global_position = region.get_spawn(Park.HOME_SPAWN).global_position
 	player.facing = Vector2i.DOWN
+	player.interaction_area.position = Vector2(player.facing) * 12.0
+	await _unstick_player()
 	_camera().reset_smoothing()
 	SaveManager.save_game()
 
 	await hud.fade_from_black()
+	var message := "Good morning! Your game was saved."
 	if passed_out and fell_asleep_at != "":
-		hud.show_message("You fell asleep at %s. A ranger drove you back to camp." % fell_asleep_at)
+		message = "You fell asleep at %s. A ranger drove you back to camp." % fell_asleep_at
 	elif passed_out:
-		hud.show_message("You stayed out too late and passed out...")
-	else:
-		hud.show_message("Good morning! Your game was saved.")
+		message = "You stayed out too late and passed out..."
+	if Larder.last_spoiled != "":
+		message += "\n" + Larder.last_spoiled
+	hud.show_message(message)
+	if passed_out:
+		_show_bear_tracks() # once per pass-out, so it never repeats on later mornings
 	_set_paused(false)
 	_busy = false
+
+
+## The morning after passing out, once the first message has had its moment.
+func _show_bear_tracks() -> void:
+	await get_tree().create_timer(BEAR_TRACKS_DELAY).timeout
+	if is_inside_tree():
+		hud.show_message(BEAR_TRACKS_MESSAGE)
 
 
 ## Swaps regions right away (no fade). The player lands on [param spawn_name]
@@ -241,6 +274,23 @@ func _enter_region(id: String, spawn_name := "") -> void:
 		forage.refresh()
 	region_changed.emit(region)
 	_update_location()
+
+
+## Makes sure the player isn't standing inside something solid (a spawn that
+## landed in a tree, say): waits for physics, then looks outward in rings for
+## the nearest free spot.
+func _unstick_player() -> void:
+	await get_tree().physics_frame
+	if not player.test_move(player.global_transform, Vector2.ZERO):
+		return
+	var origin := player.global_position
+	for radius in range(4, 100, 4):
+		for dir in 8:
+			var spot := origin + Vector2.from_angle(dir * TAU / 8.0) * radius
+			if not player.test_move(Transform2D(0.0, spot), Vector2.ZERO):
+				player.global_position = spot
+				_camera().reset_smoothing()
+				return
 
 
 func _connect_tents(root: Node) -> void:

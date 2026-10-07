@@ -75,6 +75,17 @@ func _ready() -> void:
 	check(world.hud._status.text.begins_with("Food 90 energy"), "status strip shows food energy (%s)" % world.hud._status.text)
 	check(world.hud.status_bar.size.x <= 472.0, "status strip fits on screen (%.0f px)" % world.hud.status_bar.size.x)
 
+	# Two presses in the same frame (E and Space) must not pick the same thing up twice.
+	var other: Forageable
+	for f: Forageable in forage.get_children():
+		if f.item.id != "black_oak_acorn" and not f.is_queued_for_deletion():
+			other = f
+	var other_id := other.item.id
+	var before := Inventory.count(other_id)
+	other.interact(player)
+	other.interact(player)
+	check(Inventory.count(other_id) == before + 1, "a forageable picked up twice in one frame only counts once")
+
 	# Sleep, then save + reload
 	await world.sleep()
 	check(GameClock.day == 2, "sleeping starts the next day")

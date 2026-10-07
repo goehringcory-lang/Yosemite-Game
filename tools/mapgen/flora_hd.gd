@@ -27,6 +27,13 @@ const SHRUB_LEAF := ["24442e", "326038", "487c42", "62984e", "84b460", "a8d078"]
 const CHAPARRAL_LEAF := ["3a5440", "4e7050", "688c62", "86a678", "a6c298"]
 const WILLOW_RAMP := ["2f5238", "417146", "5b8f4f", "7aab5a", "9cc56d", "bfdc8b"]
 const CANOPY_GRAY := ["76787a", "929496", "aeb0b2", "cbcdcf", "e4e6e8", "f8f9fa"]
+## Window glass by day: a cool sky reflection, so nothing looks lit at noon.
+## The lit windows are in a second atlas (paint_glow) that fades in after dusk.
+const GLASS := "56707f"
+
+## Window rectangles of each building frame, filled in as the frames are drawn.
+var windows := {}
+var _frame_id := -1
 
 
 static func ramp(a: Array) -> Array[Color]:
@@ -44,8 +51,42 @@ func paint() -> Image:
 	return atlas
 
 
+## The lit windows of the building frames, in the layout of the flora atlas
+## (assets/sprites/flora_glow.png): a warm pane with a soft halo round it.
+func paint_glow() -> Image:
+	var cols := Terrain.FLORA_COLUMNS
+	var rows := ceili(float(Terrain.Flora.COUNT) / cols)
+	var atlas := K.make(W * cols, H * rows)
+	for f in range(Terrain.Flora.TENT_CABIN, Terrain.Flora.CAMP_TENT):
+		_frame(f)
+		var at := Terrain.frame_coords(f)
+		for r: Rect2i in windows.get(f, []):
+			var o := Vector2i(at.x * W, at.y * H)
+			for ring in range(3, 0, -1):
+				var a := 0.10 if ring == 3 else (0.16 if ring == 2 else 0.24)
+				for yy in range(r.position.y - ring, r.end.y + ring):
+					for xx in range(r.position.x - ring, r.end.x + ring):
+						if not r.has_point(Vector2i(xx, yy)):
+							K.px(atlas, o.x + xx, o.y + yy, Color(1.0, 0.72, 0.3, a))
+			for yy in range(r.position.y, r.end.y):
+				for xx in range(r.position.x, r.end.x):
+					var t := float(yy - r.position.y) / maxi(1, r.size.y - 1)
+					K.px(atlas, o.x + xx, o.y + yy, Color(1.0, 0.8 - t * 0.12, 0.38, 0.62 - t * 0.2))
+	return atlas
+
+
+## A window with dark day glass (see GLASS), noted for the glow atlas.
+func _win(im: Image, x: int, y: int, w: int, h: int, frame: Color, curtain := Color(0, 0, 0, 0), shutter := Color(0, 0, 0, 0)) -> void:
+	K.window(im, x, y, w, h, frame, c_hex(GLASS), curtain, shutter, false)
+	if not windows.has(_frame_id):
+		windows[_frame_id] = []
+	windows[_frame_id].append(Rect2i(x, y, w, h))
+
+
 func _frame(f: int) -> Image:
 	var F := Terrain.Flora
+	_frame_id = f
+	windows[f] = []
 	var im := K.make(W, H)
 	var s := 4000 + f * 37
 	match f:
@@ -344,8 +385,8 @@ func _tent_cabin(im: Image, s: int) -> void:
 	K.rect(im, x0 + 5, 33, 6, 8, c_hex("6a5036"))
 	K.rect(im, x0 + 6, 34, 4, 7, c_hex("2f2418"))
 	K.rect(im, x0 + 5, 33, 6, 1, c_hex("8a6c48"))
-	# guy ropes and a lantern glow dot
-	K.px(im, x0 + 11, 36, c_hex("f2d070"))
+	# guy ropes and an unlit lantern
+	K.px(im, x0 + 11, 36, c_hex("8a7a5a"))
 	K.hline(im, x0 - 2, 40, 2, c_hex("7a6446"))
 	K.hline(im, x0 + 16, 40, 2, c_hex("7a6446"))
 	FA.rim(im, 0.5)
@@ -359,8 +400,8 @@ func _cabin(im: Image, s: int) -> void:
 	_roof_peaked(im, x0 - 2, 22, 20, 10, c_hex("6a4a32"), s + 2)
 	K.hline(im, x0 - 2, 31, 20, c_hex("3a281c"))
 	K.door(im, x0 + 6, 35, 4, 6, c_hex("5a3c26"), c_hex("2e2018"))
-	K.window(im, x0 + 1, 34, 3, 3, c_hex("3a2a20"), c_hex("f2d88a"), Color(0, 0, 0, 0), Color(0, 0, 0, 0), true)
-	K.window(im, x0 + 12, 34, 3, 3, c_hex("3a2a20"), c_hex("f2d88a"), Color(0, 0, 0, 0), Color(0, 0, 0, 0), true)
+	_win(im, x0 + 1, 34, 3, 3, c_hex("3a2a20"))
+	_win(im, x0 + 12, 34, 3, 3, c_hex("3a2a20"))
 	# stovepipe
 	K.rect(im, x0 + 11, 17, 2, 7, c_hex("4a4a50"))
 	K.px(im, x0 + 11, 17, c_hex("7a7a82"))
@@ -375,8 +416,8 @@ func _house(im: Image, s: int) -> void:
 	_roof_peaked(im, x0 - 2, 21, 22, 11, c_hex("4a6a48"), s + 2)
 	K.hline(im, x0 - 2, 31, 22, c_hex("243a28"))
 	K.door(im, x0 + 7, 35, 4, 6, c_hex("5a3c26"), c_hex("3a2a20"))
-	K.window(im, x0 + 1, 34, 3, 3, c_hex("e8e0d0"), c_hex("6f90a8"), c_hex("d9c9a0"))
-	K.window(im, x0 + 14, 34, 3, 3, c_hex("e8e0d0"), c_hex("6f90a8"), c_hex("d9c9a0"))
+	_win(im, x0 + 1, 34, 3, 3, c_hex("e8e0d0"), c_hex("d9c9a0"))
+	_win(im, x0 + 14, 34, 3, 3, c_hex("e8e0d0"), c_hex("d9c9a0"))
 	K.rect(im, x0 + 13, 17, 3, 7, c_hex("8a5a48"))
 	K.hline(im, x0 + 13, 17, 3, c_hex("b07a62"))
 	FA.rim(im, 0.5)
@@ -389,9 +430,9 @@ func _lodge(im: Image, s: int) -> void:
 	K.boards(im, x0, 30, 22, 7, c_hex("6a4630"), s + 1, 4)
 	_roof_peaked(im, x0 - 3, 17, 28, 14, c_hex("5a3e2a"), s + 2)
 	K.hline(im, x0 - 3, 30, 28, c_hex("2a1c14"))
-	K.door(im, x0 + 9, 37, 4, 7, c_hex("4a3020"), c_hex("2e2018"), true)
+	K.door(im, x0 + 9, 37, 4, 7, c_hex("4a3020"), c_hex("2e2018"))
 	for wx in [x0 + 2, x0 + 16]:
-		K.window(im, wx, 38, 3, 4, c_hex("3a2a20"), c_hex("f2d88a"), Color(0, 0, 0, 0), Color(0, 0, 0, 0), true)
+		_win(im, wx, 38, 3, 4, c_hex("3a2a20"))
 	K.rect(im, x0 + 17, 11, 4, 10, c_hex("807a6e"))
 	K.hline(im, x0 + 17, 11, 4, c_hex("b0a898"))
 	FA.rim(im, 0.5)
@@ -406,7 +447,7 @@ func _white_house(im: Image, s: int) -> void:
 	K.hline(im, x0 - 2, 31, 24, c_hex("1e3224"))
 	K.door(im, x0 + 8, 35, 4, 6, c_hex("3a5a48"), c_hex("f4f0e4"))
 	for wx in [x0 + 1, x0 + 15]:
-		K.window(im, wx, 34, 3, 3, c_hex("f4f0e4"), c_hex("f2d88a"), Color(0, 0, 0, 0), c_hex("3f5a44"), true)
+		_win(im, wx, 34, 3, 3, c_hex("f4f0e4"), Color(0, 0, 0, 0), c_hex("3f5a44"))
 	K.rect(im, x0 + 15, 17, 3, 7, c_hex("a86a50"))
 	K.hline(im, x0 + 15, 17, 3, c_hex("c88a6c"))
 	FA.rim(im, 0.5)

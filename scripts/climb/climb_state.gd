@@ -43,6 +43,8 @@ const MAX_FALLS_PER_PITCH := 3
 const BIVY_MEAL_ENERGY := 30
 ## Stamina a night in a portaledge gives (a ledge gives a full night too).
 const COLD_NIGHT_STAMINA := 70
+## A night on the wall ends at 6:30 the next morning, whenever it began.
+const WAKE_MINUTES := 6 * 60 + 30
 ## In-game minutes each action takes.
 const MINUTES_PER_MOVE := 6
 const MINUTES_PER_CAM := 2
@@ -76,6 +78,11 @@ const CHIMNEY_PENALTY := 2
 const STORM_PENALTY := 1
 const STORM_HOUR := 14.5
 const SLUSH_HOUR := 12.0
+## The route card tells you to start high-country routes before this hour.
+const ALPINE_START_BEFORE := 10
+## For the route card's late-start warning: extra minutes a pitch takes beyond
+## its moves (the belay, a clip or two, and a fall now and then).
+const ESTIMATE_PER_PITCH := 16
 
 var route: RouteData
 var status := Status.CLIMBING
@@ -143,6 +150,8 @@ var last_dx := 0
 
 var _rng := RandomNumberGenerator.new()
 var _rested_rows := {}
+## 1 once [method route_has_fixed_pieces] has found some, 0 if none, -1 unasked.
+var _has_fixed := -1
 
 
 ## [param seed] makes the wall the same every time (tests use this).
@@ -199,6 +208,16 @@ func is_snow() -> bool:
 	return style() == "snow" or style() == "ice"
 
 
+## When storms build, as the route card says it: "2:30 PM".
+static func storm_time_text() -> String:
+	var h := int(STORM_HOUR)
+	var m := roundi((STORM_HOUR - h) * 60.0)
+	var clock := "%d" % (h % 12 if h % 12 != 0 else 12)
+	if m > 0:
+		clock += ":%02d" % m
+	return "%s %s" % [clock, "AM" if h < 12 else "PM"]
+
+
 ## The in-game hour right now.
 func hour() -> float:
 	return fposmod((start_minutes + minutes) / 60.0, 24.0)
@@ -240,7 +259,8 @@ func move_cost(r: int, c: int) -> int:
 			cost += CHIMNEY_PENALTY
 	if is_stormy():
 		cost += STORM_PENALTY
-	if is_snow() and hour() >= SLUSH_HOUR and hour() < 20.0:
+	# Slush and storms don't stack: a storm already makes the snow wet.
+	if is_snow() and not is_stormy() and hour() >= SLUSH_HOUR and hour() < 20.0:
 		cost += 1
 	return maxi(cost, 1)
 
@@ -303,10 +323,8 @@ func jug(dx: int) -> bool:
 	if not can_jug(dx):
 		message = "There's no fixed rope there to jug." if has_ascenders else "You need ascenders to jug a fixed rope."
 		return false
-	_step(dx, JUG_STAMINA, MINUTES_PER_JUG, true)
-	# You can't fall off a fixed rope.
-	if status == Status.CLIMBING:
-		stamina = maxi(stamina, 1)
+	# You can't fall off a fixed rope, so jugging never takes the last stamina.
+	_step(dx, maxi(mini(JUG_STAMINA, stamina - 1), 0), MINUTES_PER_JUG, true)
 	jug_moves += 1
 	events.append({"type": "jug"})
 	return true
@@ -440,6 +458,13 @@ func protect() -> bool:
 	return clip_bolt() if is_bolted() or can_clip() else place_cam()
 
 
+## True if chalking up would help: on rock, once a pitch, anywhere but a
+## ledge. (Chalk does nothing on snow and ice.)
+func can_chalk() -> bool:
+	return status == Status.CLIMBING and pending.is_empty() and has_chalk and not chalked_this_pitch \
+		and not is_at_belay() and not is_snow()
+
+
 ## Dips your hands in the chalk bag: the next CHALK_MOVES moves cost less.
 ## Once a pitch, anywhere but a ledge.
 func chalk_up() -> bool:
@@ -447,6 +472,9 @@ func chalk_up() -> bool:
 		return false
 	if not has_chalk:
 		message = "You don't have a chalk bag."
+		return false
+	if is_snow():
+		message = "Chalk does nothing on snow and ice."
 		return false
 	if chalked_this_pitch:
 		message = "You've already chalked up on this pitch. Save it for the next one."
@@ -459,14 +487,80 @@ func chalk_up() -> bool:
 	return true
 
 
-## Eats one of [param item_id] from the Inventory. Only at belay ledges.
+## Food in the pack that is worth a night on the wall ([constant
+## BIVY_MEAL_ENERGY] or more), one for each unit.
+func meals_in_pack() -> int:
+	var meals := 0
+	for id in FoodDB.edible_in_inventory():
+		if FoodDB.energy(id) >= BIVY_MEAL_ENERGY:
+			meals += Inventory.count(id)
+	return meals
+
+
+## True if the pack holds [param recommended_energy] of food and a real meal
+## for every night on the wall. The route card turns green on this.
+func food_ready(recommended_energy: int) -> bool:
+	return FoodDB.carried_energy() >= recommended_energy and meals_in_pack() >= route.nights
+
+
+## Nights still to spend on the wall.
+func nights_remaining() -> int:
+	return maxi(route.nights - nights_spent, 0)
+
+
+## True if [param item_id] is a night's meal the climb still needs.
+func is_reserved_meal(item_id: String) -> bool:
+	return FoodDB.energy(item_id) >= BIVY_MEAL_ENERGY and meals_in_pack() <= nights_remaining()
+
+
+## What to eat at a belay: smaller foods first, saving the real meals for the
+## nights, and whatever spoils soonest among them. Empty if the pack has no
+## food. If only reserved meals are left, it's one of those (and [method eat]
+## will say to save it).
+func next_food() -> String:
+	var foods := FoodDB.edible_in_inventory()
+	if foods.is_empty():
+		return ""
+	foods.sort_custom(func(a: String, b: String) -> bool:
+		var meal_a := FoodDB.energy(a) >= BIVY_MEAL_ENERGY
+		var meal_b := FoodDB.energy(b) >= BIVY_MEAL_ENERGY
+		if meal_a != meal_b:
+			return meal_b
+		return _freshness(a) < _freshness(b))
+	return foods[0]
+
+
+## Days left before [param item_id] spoils, with food that never spoils last.
+func _freshness(item_id: String) -> int:
+	var days := Larder.days_left(item_id)
+	return days if days > 0 else 9999
+
+
+## True at a belay when there's something to eat and room to eat it, without
+## touching a night's meal.
+func can_eat() -> bool:
+	if status != Status.CLIMBING or not pending.is_empty() or not is_at_belay() or stamina >= MAX_STAMINA:
+		return false
+	var id := next_food()
+	return id != "" and not is_reserved_meal(id)
+
+
+## Eats one of [param item_id] from the Inventory. Only at belay ledges, and
+## not at full stamina. The meals the nights on the wall need are kept.
 func eat(item_id: String) -> bool:
 	if not is_at_belay():
 		message = "You can only eat at a belay ledge."
 		return false
-	var energy := FoodDB.energy(item_id)
-	if energy <= 0 or not Inventory.remove(item_id):
+	if stamina >= MAX_STAMINA:
+		message = "You're not hungry."
 		return false
+	var energy := FoodDB.energy(item_id)
+	if energy <= 0 or Inventory.count(item_id) <= 0:
+		return false
+	if is_reserved_meal(item_id):
+		message = "Save this for the night on the wall."
+		return false
+	Inventory.remove(item_id)
 	stamina = mini(stamina + energy, MAX_STAMINA)
 	minutes += MINUTES_TO_EAT
 	var item := ItemDB.get_item(item_id)
@@ -555,8 +649,7 @@ func _finish_pitch() -> void:
 		minutes += MINUTES_PER_HAUL
 		haul_note = " You haul the bag (+%d min)." % MINUTES_PER_HAUL
 	if _night_after(finished_spec):
-		var place: String = finished_spec.get("night", "ledge") if finished_spec.has("night") else finished_spec.get("bivy", "ledge")
-		if not _bivy(place):
+		if not _bivy(finished_spec.get("bivy", "ledge")):
 			return
 	stamina = mini(stamina + BELAY_REST + (DEVICE_REST if has_device else 0), MAX_STAMINA)
 	_start_pitch()
@@ -566,32 +659,72 @@ func _finish_pitch() -> void:
 func _night_after(finished_spec: Dictionary) -> bool:
 	if route.nights <= 0 or nights_spent >= route.nights:
 		return false
-	# Some routes mark where the nights fall; otherwise an equal share of pitches.
+	# Routes mark where the nights fall ("bivy" in the profile); otherwise an
+	# equal share of pitches.
 	var marked := false
 	for i in route.pitches.size():
-		if ClimbProfiles.pitch_spec(route, i).has("night"):
+		if ClimbProfiles.pitch_spec(route, i).has("bivy"):
 			marked = true
 	if marked:
-		return finished_spec.has("night")
+		return finished_spec.has("bivy")
 	var pitches_per_day := ceili(route.pitches.size() / float(route.nights + 1))
 	return pitch % pitches_per_day == 0
 
 
-## Spends a night on the wall. Returns false if there's no real meal to eat.
+## Spends a night on the wall, eating the smallest real meal in the pack, and
+## wakes at [constant WAKE_MINUTES] the next morning. Returns false if there's
+## no real meal to eat.
 func _bivy(place: String) -> bool:
+	var meal_id := ""
 	for id in FoodDB.edible_in_inventory():
-		if FoodDB.energy(id) >= BIVY_MEAL_ENERGY:
-			Inventory.remove(id)
-			nights_spent += 1
-			stamina = MAX_STAMINA if (has_portaledge or place == "ledge") else COLD_NIGHT_STAMINA
-			minutes += 10 * 60
-			var item := ItemDB.get_item(id)
-			var meal := item.display_name if item else id
-			message = "You spend the night on the wall and eat %s. You wake up rested." % meal
-			events.append({"type": "bivy", "night": nights_spent, "place": place, "meal": meal})
-			return true
-	retreat("Night is falling and you have no real meal for the wall. You rappel down hungry.")
-	return false
+		var energy := FoodDB.energy(id)
+		if energy >= BIVY_MEAL_ENERGY and (meal_id == "" or energy < FoodDB.energy(meal_id)):
+			meal_id = id
+	if meal_id == "":
+		retreat("Night is falling and you have no real meal for the wall. You rappel down hungry.")
+		return false
+	Inventory.remove(meal_id)
+	nights_spent += 1
+	stamina = MAX_STAMINA if (has_portaledge or place == "ledge") else COLD_NIGHT_STAMINA
+	minutes += minutes_until_morning()
+	var item := ItemDB.get_item(meal_id)
+	var meal := item.display_name if item else meal_id
+	message = "You spend the night on the wall and eat %s. You wake up rested." % meal
+	events.append({"type": "bivy", "night": nights_spent, "place": place, "meal": meal})
+	return true
+
+
+## Game minutes from now until 6:30 the next morning (or this morning, if it's
+## still the small hours).
+func minutes_until_morning() -> int:
+	var now := posmod(start_minutes + minutes, 24 * 60)
+	return WAKE_MINUTES - now if now < WAKE_MINUTES else 24 * 60 + WAKE_MINUTES - now
+
+
+## About how long a route takes in game minutes, without any nights on the
+## wall: every move, plus the belay and the odd fall on each pitch.
+static func estimate_minutes(r: RouteData) -> int:
+	var total := 0
+	for i in r.pitches.size():
+		total += int(ClimbProfiles.pitch_spec(r, i).rows) * MINUTES_PER_MOVE + ESTIMATE_PER_PITCH
+	return total
+
+
+## True if a one-day route started at [param clock_minutes] (GameClock.minutes)
+## would still be going at the 2 AM curfew.
+static func starts_too_late(r: RouteData, clock_minutes: int) -> bool:
+	return r.nights == 0 and clock_minutes + estimate_minutes(r) > GameClock.PASS_OUT_HOUR * 60
+
+
+## True if the route has bolts or old pitons to clip on some pitch.
+func route_has_fixed_pieces() -> bool:
+	if _has_fixed < 0:
+		_has_fixed = 1 if route.protection == "bolts" else 0
+		for i in route.pitches.size():
+			var pitch_spec := ClimbProfiles.pitch_spec(route, i)
+			if pitch_spec.get("bolts", "") == "line" or not pitch_spec.get("pins", []).is_empty():
+				_has_fixed = 1
+	return _has_fixed == 1
 
 
 func _start_pitch() -> void:

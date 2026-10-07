@@ -8,14 +8,14 @@ A climb is a short sequence of decisions: read the wall, choose a hold, decide w
 
 ## Play loop
 
-1. **Route card.** A postcard of the view, the pitches (a `*` marks a crux), the gear you need and have, the food you carry and what's worth bringing. `E` starts, `Esc` backs out without spending time.
+1. **Route card.** A postcard of the view, the pitches (a `*` marks a crux), the gear you need and have, the food you carry and what's worth bringing, night meals for routes with nights, and when storms build. `E` or `Space` starts, `Esc` backs out without spending time. A day climb that would still be going at 2 AM can't be started, and the card says so.
 2. **Pitch banner.** Each pitch announces its name and a line of beta ("Chalk up before the bulge").
 3. **Read.** Rings mark the holds within reach with what each move costs now (shoes, chalk, chimney rhythm, weather and slush included). Rests and cruxes are labelled.
 4. **Move.** Up, up-left, up-right. A move costs stamina and six game minutes. Run out and you fall.
 5. **Protect.** `Space` clips a bolt (or an old piton) with a quickdraw, or places a cam in a crack. The rope runs through every piece; runouts of four moves or more end the climb safely.
 6. **Crux.** One hard move on some pitches asks for a short skill check. Perfect gives stamina back; a slip costs some.
-7. **Belay.** At a ledge you recover 10 stamina (16 with a belay device), can eat (`E`), and the next pitch starts. Rope and gear are recovered by your partner.
-8. **Nights.** On a wall, a night needs a real meal (30+ energy); the night scene plays, and you wake rested.
+7. **Belay.** At a ledge you recover 10 stamina (16 with a belay device), can eat (`E`, not at full stamina, smaller foods first, never the real meals a night still needs), and the next pitch starts. Rope and gear are recovered by your partner.
+8. **Nights.** On a wall, a night needs a real meal (30+ energy; the smallest is eaten); the night scene plays, and you wake rested at 6:30 the next morning. Each night is a new day on the calendar (fresh food keeps spoiling), and a night falls where the route's profile says (`bivy`), not at a fixed time.
 9. **Top out or retreat.** The result card shows time, falls, style (onsight, hard-won, aided), how the cruxes went and a fact about the route. Retreating keeps your gear; the tick only comes with the top. The caller records the tick once and applies the elapsed time once.
 
 ## Gear and what it does
@@ -43,7 +43,7 @@ A climb is a short sequence of decisions: read the wall, choose a hold, decide w
 | roof | The picture runs sideways under a ceiling, cams all along the crack, the lip is the crux | Separate Reality, the Great Roof |
 | dike | Stay on the dike (cheap); off it it's blank; bolts are 3 moves apart | Snake Dike |
 | knobs | Big holds everywhere, a few cracks | Cathedral Peak |
-| snow, ice | Kicked steps and chipped holds; crevasses with snow bridges; slush after noon; a fall slides 2 to 3 moves | Lyell Glacier |
+| snow, ice | Kicked steps and chipped holds; crevasses with snow bridges; slush after noon (it doesn't stack with the storm after 2:30 PM); no chalk; a fall slides 2 to 3 moves | Lyell Glacier |
 
 ## Crux checks
 

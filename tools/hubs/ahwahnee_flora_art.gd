@@ -158,6 +158,7 @@ const OAK_LEAF := ["1c3a2e", "26482f", "345f34", "487a3a", "639441", "84ae4b", "
 ## The oak's leaves in spring (new pink-green growth) and fall (gold and rust).
 const OAK_LEAF_SPRING := ["2a4a30", "3a6538", "559040", "76b150", "9ccd66", "bfe284", "dcf2a4", "f0fac4"]
 const OAK_LEAF_FALL := ["3a1c12", "5a2a16", "86401c", "b0601f", "d4842c", "eca43e", "fcc660", "ffe48c"]
+const DOGWOOD_LEAF_FALL := ["3a1424", "5c1c2e", "84283a", "a8404a", "c85c52", "e08060", "f2a874"]
 const WILLOW_LEAF := ["2f5238", "417146", "5b8f4f", "7aab5a", "9cc56d", "bfdc8b", "dcef b0"]
 const BARK_PINE := ["2a1a14", "44291d", "5f3a26", "7c5232", "98693c", "b4844e", "cfa06a"]
 const BARK_CEDAR := ["331912", "4f281c", "6e3a27", "8c4f34", "a86845", "c58559"]
@@ -643,7 +644,9 @@ static func dogwood_flower(im: Image, x: int, y: int, shadowed: bool) -> void:
 	K.px(im, x, y + 3, c("e6c4cc"))
 
 
-func tree_dogwood(v: int) -> Image:
+## [param season] 0 is the spring bloom (the sprite the scenes use), 1 summer
+## (green leaves, no flowers), 2 fall (wine-red leaves), 3 winter (bare).
+func tree_dogwood(v: int, season := 0) -> Image:
 	var w := 48
 	var h := 56
 	var im := K.make(w, h)
@@ -652,11 +655,24 @@ func tree_dogwood(v: int) -> Image:
 	rng.seed = seed_value
 	var cx := 24.0
 	var base := h - 3
-	var leaf := ramp(["1c3a2e", "26482f", "345f34", "487a3a", "639441", "84ae4b"])
+	var leaf := ramp(DOGWOOD_LEAF_FALL if season == 2 else ["1c3a2e", "26482f", "345f34", "487a3a", "639441", "84ae4b"])
 	K.shadow(im, cx + 3.0, base + 0.5, 16.0, 3.2, 0.26)
 	trunk(im, cx, base, 30, 4.4, 2.6, ramp(BARK_OAK), seed_value, 1.0, [-1.5, 1.5][v] as float, 5, 2.6)
 	limb(im, cx, 40.0, cx - 14.0, 30.0, 2.6, 1.4, ramp(BARK_OAK), seed_value + 1, 1.5)
 	limb(im, cx, 36.0, cx + 14.0, 26.0, 2.6, 1.4, ramp(BARK_OAK), seed_value + 2, 1.5)
+	if season == 3:
+		# bare: a few limbs reach out to where each tier of leaves was
+		var tips := [[24.0, 15.0], [17.0, 21.0], [31.0, 23.0], [24.0, 32.0], [11.0, 36.0], [37.0, 37.0]]
+		for i in tips.size():
+			var tx: float = float(tips[i][0]) + (v * 2.0 - 1.0) * (1.0 if i % 2 == 0 else -1.0)
+			var ty: float = float(tips[i][1])
+			limb(im, cx, 40.0 - i * 1.5, tx, ty + 3.0, 2.2, 0.9, ramp(BARK_OAK), seed_value + i * 7, 1.2)
+			for t in 3:
+				var ang := (t - 1.0) * 0.7 + (K.hash2(t, i, seed_value) - 0.5) * 0.4
+				var reach := 4.0 + K.hash2(t, i, seed_value + 3) * 4.0
+				limb(im, tx, ty + 3.0, tx + sin(ang) * reach, ty + 3.0 - cos(ang) * reach, 1.6, 0.7, ramp(BARK_OAK), seed_value + t * 31 + i, 0.8)
+		rim(im, 0.5)
+		return im
 	# layered horizontal tiers, top first so lower tiers overlap
 	var tiers := [[24.0, 15.0, 11.0, 4.6], [17.0, 21.0, 8.5, 4.4], [31.0, 23.0, 9.5, 4.4], [24.0, 32.0, 15.0, 5.4], [11.0, 36.0, 8.0, 4.0], [37.0, 37.0, 8.5, 4.0]]
 	for i in tiers.size():
@@ -665,7 +681,7 @@ func tree_dogwood(v: int) -> Image:
 		var tcy: float = float(t[1])
 		blob(im, tcx, tcy + 1.0, float(t[2]), float(t[3]), leaf, seed_value + i * 11, -0.06, 0.16, 0.18)
 		leaf_specks(im, tcx, tcy, float(t[2]), float(t[3]), leaf, seed_value + i * 3, 6)
-		var n := int(float(t[2]) * 0.5)
+		var n := int(float(t[2]) * 0.5) if season == 0 else 0
 		for k in n:
 			var a := rng.randf() * TAU
 			var d := sqrt(rng.randf()) * 0.9

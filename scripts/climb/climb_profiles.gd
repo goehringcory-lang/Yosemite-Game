@@ -88,7 +88,7 @@ const PROFILES := {
 	},
 	"swan_slab": {
 		"food": 0,
-		"place": "Swan Slab Gully, below Yosemite Falls",
+		"place": "Swan Slab, behind Camp 4",
 		"rock": "polished",
 		"ground": "camp4",
 		"finish": "anchor",
@@ -106,7 +106,7 @@ const PROFILES := {
 			"A top rope means a fall only ever drops you to the rope. It's how everyone learns.",
 		],
 		"pitches": [
-			{"name": "Swan Slab Gully", "style": "slab", "crux": 4, "crux_name": "The polished wave", "deco": ["streaks", "moss"], "beta": "A safe place to learn. Stop the meter in the green on the polished wave."},
+			{"name": "Swan Slab", "style": "slab", "crux": 4, "crux_name": "The polished wave", "deco": ["streaks", "moss"], "beta": "A safe place to learn. Stop the meter in the green on the polished wave."},
 		],
 	},
 	"glacier_point_apron": {
@@ -137,7 +137,7 @@ const PROFILES := {
 	},
 	"nutcracker": {
 		"food": 60,
-		"place": "Manure Pile Buttress, above the Church Bowl",
+		"place": "Manure Pile Buttress, near El Capitan",
 		"rock": "golden",
 		"ground": "valley_forest",
 		"finish": "tree_ledge",
@@ -185,7 +185,7 @@ const PROFILES := {
 		],
 		"pitches": [
 			{"name": "First Base", "style": "crack", "cracks": 0.4, "pins": [4], "deco": ["tree", "lichen"], "beta": "A corner crack to a tree. Their old pitons are still in the rock: clip them."},
-			{"name": "The Bulge", "style": "crack", "cracks": 0.35, "pins": [3, 6], "crux": 5, "crux_name": "5.9 bulge", "deco": ["lichen"], "beta": "Two ways to the next tree, both 5.9. The old pins save cams."},
+			{"name": "The Bulge", "style": "crack", "cracks": 0.35, "pins": [3, 6], "crux": 5, "crux_name": "5.9 bulge", "deco": ["lichen"], "beta": "Two ways to the next tree, both 5.9. The old pitons save cams."},
 			{"name": "Tree Belay", "style": "crack", "cracks": 0.4, "pins": [5], "deco": ["tree"], "beta": "Steady cracks between trees."},
 			{"name": "The Bathtub", "style": "crack", "cracks": 0.4, "rest": [4], "pins": [2], "deco": ["streaks"], "beta": "A deep scoop in the granite: rest here before the top."},
 			{"name": "Friction and Crack", "style": "slab", "cracks": 0.3, "deco": ["streaks"], "beta": "A slabby stretch with just enough cracks."},
@@ -269,7 +269,7 @@ const PROFILES := {
 		],
 		"facts": [
 			"Ron Kauk made the first free ascent in 1978.",
-			"The roof crack is about 20 feet long and 150 feet over the ground.",
+			"The roof crack is about 20 feet long, high above the river canyon.",
 			"In 1986 Wolfgang Güllich free-soloed it, a first.",
 		],
 		"pitches": [
@@ -302,7 +302,7 @@ const PROFILES := {
 			{"name": "El Cap Tower", "style": "crack", "cracks": 0.5, "rest": [7], "bivy": "ledge", "deco": ["tree"], "beta": "A big ledge. A good place to eat and sleep."},
 			{"name": "Texas and Boot Flakes", "style": "flake", "cracks": 0.6, "pins": [3], "deco": ["flake"], "beta": "Big flakes, then a crack in the boot."},
 			{"name": "The King Swing", "style": "crack", "cracks": 0.45, "crux": 5, "crux_kind": "rhythm", "crux_name": "King Swing", "deco": ["streaks"], "beta": "Swing across the wall to the next crack: alternate Left and Right to build momentum."},
-			{"name": "Camp IV", "style": "crack", "cracks": 0.5, "rest": [3], "bivy": "ledge", "deco": ["tree"], "beta": "Eagle Ledge and Camp IV: a big ledge, and the night."},
+			{"name": "Camp IV", "style": "crack", "cracks": 0.5, "rest": [3], "deco": ["tree"], "beta": "Eagle Ledge and Camp IV: a big ledge, and a good rest."},
 			{"name": "The Great Roof", "style": "roof", "cols": [0, 1, 2, 3, 4], "cracks": 0.85, "crux": 6, "crux_name": "Great Roof", "hard_aid": true, "bivy": "hanging", "deco": ["roof"], "beta": "A huge roof. Hold Shift to aid a hard move with your aiders."},
 			{"name": "Pancake Flake", "style": "flake", "cracks": 0.55, "rest": [5], "pins": [3], "deco": ["flake"], "beta": "A huge flake. The rest is mostly climbing."},
 			{"name": "Changing Corners", "style": "crack", "cracks": 0.5, "crux": 5, "crux_name": "Changing Corners", "hard_aid": true, "deco": ["corner"], "beta": "Switch corner walls on tiny holds. Then it's only the headwall."},

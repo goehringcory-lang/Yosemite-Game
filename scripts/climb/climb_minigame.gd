@@ -30,6 +30,11 @@ enum Phase { INTRO, CLIMB, CRUX, NIGHT, PAUSE, RESULT }
 const SCREEN := Vector2(480, 270)
 const MOVE_TIME := 0.2
 const FALL_TIME := 0.55
+## A crux check ignores input for this long when it starts.
+const CRUX_GRACE := 0.35
+## The top of the gear tray along the bottom. A belayer whose feet sink below
+## this is off the bottom of the picture, not half hidden behind the tray.
+const TRAY_TOP := 237.0
 
 const ROPE := Color("d8452e")
 const ROPE_LIT := Color("f07a5a")
@@ -83,6 +88,7 @@ var _stamina_flash := 0.0
 var _shake := 0.0
 var _confirm_retreat := false
 var _crux := {}
+var _crux_grace := 0.0
 var _crux_result := ""
 var _crux_result_age := 99.0
 var _night := {}
@@ -182,16 +188,17 @@ func _input(event: InputEvent) -> void:
 	if not is_press or event.is_echo():
 		return
 	get_viewport().set_input_as_handled()
-	var interact := event.is_action_pressed("interact")
-	var cancel := event.is_action_pressed("ui_cancel")
-	# Whatever the phase, a finished climb leaves on interact or cancel.
-	if state.status != ClimbState.Status.CLIMBING and (interact or cancel) and _phase != Phase.NIGHT:
-		finished.emit(state.status == ClimbState.Status.TOPPED_OUT, state.minutes)
-		queue_free()
+	# The top-out and the retreat play out before the result card comes up.
+	if _result_delay >= 0.0:
 		return
+	var cancel := event.is_action_pressed("ui_cancel")
+	# E and Space both confirm on the cards, like the other screens.
+	var interact := event.is_action_pressed("interact") or (event.is_action_pressed("use_tool") and _phase in [Phase.INTRO, Phase.RESULT])
 	match _phase:
 		Phase.INTRO:
 			if interact:
+				if ClimbState.starts_too_late(route, _start_minutes):
+					return # the card says why
 				skip_intro()
 				_card_age = 0.0
 			elif cancel:
@@ -205,12 +212,13 @@ func _input(event: InputEvent) -> void:
 			if _night_age > 0.8 and (interact or event.is_action_pressed("use_tool")):
 				_end_night()
 		Phase.PAUSE:
-			if cancel:
+			# Esc backs out of the question, so a second tap doesn't retreat.
+			if interact:
 				_phase = Phase.CLIMB
 				state.retreat()
 				_events()
 				_after_action(Vector3i(state.col, state.row, state.pitch))
-			elif interact:
+			elif cancel:
 				_phase = Phase.CLIMB
 		Phase.RESULT:
 			if _result_age > 0.5 and (interact or cancel):
@@ -257,20 +265,14 @@ func _climb_input(event: InputEvent) -> void:
 	_after_action(before)
 
 
-## Eats whatever will spoil soonest, so fresh food doesn't go to waste.
+## Eats the smallest food that will spoil soonest, keeping a real meal for
+## each night on the wall.
 func eat_next() -> void:
-	var foods := FoodDB.edible_in_inventory()
-	if foods.is_empty():
+	var id := state.next_food()
+	if id == "":
 		state.message = "You have nothing to eat."
 		return
-	# Keep a real meal for the night when sleeping on the wall.
-	foods.sort_custom(func(a, b): return _freshness(a) < _freshness(b))
-	state.eat(foods[0])
-
-
-func _freshness(id: String) -> int:
-	var days := Larder.days_left(id)
-	return days if days > 0 else 9999
+	state.eat(id)
 
 
 ## Starts the move animation, and repaints the wall on a new pitch.
@@ -393,6 +395,7 @@ func _dust_color() -> Color:
 
 func _start_crux() -> void:
 	_phase = Phase.CRUX
+	_crux_grace = CRUX_GRACE
 	var kind: String = state.pending.kind
 	match kind:
 		"timing":
@@ -407,6 +410,11 @@ func _start_crux() -> void:
 
 
 func _update_crux(delta: float) -> void:
+	# The meter waits a moment, so a second tap of the arrow that brought you
+	# here doesn't spend the check.
+	if _crux_grace > 0.0:
+		_crux_grace -= delta
+		return
 	match _crux.kind:
 		"timing":
 			_crux.pos += _crux.dir * _crux.speed * delta
@@ -429,6 +437,8 @@ func _update_crux(delta: float) -> void:
 
 
 func _crux_input(event: InputEvent) -> void:
+	if _crux_grace > 0.0:
+		return
 	match _crux.kind:
 		"timing":
 			if event.is_action_pressed("use_tool") or event.is_action_pressed("interact") or event.is_action_pressed("move_up"):
@@ -734,8 +744,8 @@ func _draw_rope() -> void:
 		_sag(points[i], points[i + 1], sag)
 	if not route.top_rope:
 		# The tail piled below the belayer.
-		var b := points[0]
-		_coil(b + Vector2(-4, 22))
+		if _belayer_in_view():
+			_coil(points[0] + Vector2(-4, 22))
 
 
 func _sag(a: Vector2, b: Vector2, amount: float) -> void:
@@ -763,9 +773,15 @@ var _belay_frame := 0
 var _belay_frame_t := 0.0
 
 
+## False once the belay ledge has sunk below the gear tray as you climb.
+func _belayer_in_view() -> bool:
+	var p := _belay_spot()
+	return p.y >= -30 and p.y <= TRAY_TOP + 6.0
+
+
 func _draw_belayer() -> void:
 	var p := _belay_spot()
-	if p.y < -30 or p.y > SCREEN.y + 40:
+	if not _belayer_in_view():
 		return
 	var mode := "belay"
 	if route.top_rope or (state.pitch > 0 and route.pitches.size() >= 5) or _roof:
@@ -884,9 +900,9 @@ func _hint() -> String:
 	elif state.can_place_cam():
 		parts.append("Space: place a cam")
 	if state.is_at_belay():
-		if state.stamina < ClimbState.MAX_STAMINA and FoodDB.carried_energy() > 0:
+		if state.can_eat():
 			parts.append("E: eat")
-	elif state.has_chalk and not state.chalked_this_pitch:
+	elif state.can_chalk():
 		parts.append("E: chalk up")
 	for dx in [-1, 0, 1]:
 		if state.can_jug(dx):
@@ -897,7 +913,8 @@ func _hint() -> String:
 			parts.append("Shift+arrow: aid")
 			break
 	if parts.is_empty():
-		return "Arrows: climb     Esc: retreat"
+		# The reminder is for the first minute; after that it just covers the wall.
+		return "Arrows: climb     Esc: retreat" if _time < 40.0 and state.pitch == 0 else ""
 	return "     ".join(parts)
 
 
@@ -907,8 +924,8 @@ func _usable() -> Dictionary:
 		return out
 	out["cam"] = state.can_place_cam() and not state.can_clip()
 	out["clip"] = state.can_clip()
-	out["chalk"] = state.has_chalk and not state.chalked_this_pitch and not state.is_at_belay()
-	out["eat"] = state.is_at_belay() and state.stamina < ClimbState.MAX_STAMINA and FoodDB.carried_energy() > 0
+	out["chalk"] = state.can_chalk()
+	out["eat"] = state.can_eat()
 	for dx in [-1, 0, 1]:
 		out["jug"] = out.get("jug", false) or state.can_jug(dx)
 		out["aid"] = out.get("aid", false) or state.can_aid(dx)
@@ -945,16 +962,21 @@ func _draw_reachable() -> void:
 			label += " rest"
 		elif hold.get("fixed", false):
 			label += " fixed"
-		# Left ring's label goes left, the middle one above, the right one right.
-		match dx:
-			-1:
-				UI.text(_canvas, p + Vector2(-9, -1), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_RIGHT)
-			0:
-				UI.text(_canvas, p + Vector2(0, -11), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
-			_:
-				UI.text(_canvas, p + Vector2(9, -1), label, color, 10)
+		# Left ring's label goes left, the middle one above, the right one
+		# right. Under a roof the three rings sit almost on top of each other,
+		# so their labels stack in a list beside them instead.
+		if _roof:
+			UI.outlined(_canvas, p + Vector2(9, -7 + (dx + 1) * 10), label, color, 10)
+		else:
+			match dx:
+				-1:
+					UI.outlined(_canvas, p + Vector2(-9, -1), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_RIGHT)
+				0:
+					UI.outlined(_canvas, p + Vector2(0, -11), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+				_:
+					UI.outlined(_canvas, p + Vector2(9, -1), label, color, 10)
 		if state.stamina - cost <= 0 and not hold.get("crux", false):
-			UI.text(_canvas, p + Vector2(0, 17), "fall!", UI.WARN, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+			UI.outlined(_canvas, p + Vector2(0, 17), "fall!", UI.WARN, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _cost_color(cost: int) -> Color:
@@ -984,12 +1006,15 @@ func _draw_atmosphere() -> void:
 
 func _draw_hud(height: float) -> void:
 	var feet := int(round(height * route.total_height_ft()))
+	# The cards stand alone: no plate, bars or toolbar peeking out behind them.
+	if _phase == Phase.INTRO or _phase == Phase.RESULT:
+		return
 	ClimbHud.route_plate(_canvas, state, feet)
 	ClimbHud.topo_bar(_canvas, state, height)
 	ClimbHud.stamina(_canvas, state, _stamina_flash, 0.0)
 	if _phase == Phase.CLIMB or _phase == Phase.PAUSE:
-		ClimbHud.toolbar(_canvas, state, _time, _usable())
-		ClimbHud.hints(_canvas, _hint(), 8.0 + (state.cams_per_pitch > 0 as int) * 0.0 + 8 + 22 * 6 + 20)
+		var toolbar_end := ClimbHud.toolbar(_canvas, state, _time, _usable())
+		ClimbHud.hints(_canvas, _hint(), toolbar_end + 6.0)
 	if _phase == Phase.CLIMB:
 		ClimbHud.toast(_canvas, _toast_text, _toast_age)
 		ClimbHud.pitch_banner(_canvas, state, _banner_age)

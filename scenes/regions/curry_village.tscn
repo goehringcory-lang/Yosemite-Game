@@ -1453,7 +1453,7 @@ position = Vector2(920, 784)
 collision_mask = 0
 script = ExtResource("5_j2who")
 title = "The Firefall"
-text = "From 1872 to 1968, embers from a bonfire were pushed off Glacier Point at nightfall, and Camp Curry crowds cheered from below. David Curry's call went up to the rim: 'Hello, Glacier!' and then, 'Let the fire fall!' The Park Service ended the show in 1968."
+text = "Starting in the 1870s, embers from a bonfire were pushed off Glacier Point at nightfall, and Camp Curry crowds cheered from below. The show lapsed in the 1890s, and David Curry brought it back. David Curry's call went up to the rim: 'Hello, Glacier!' and then, 'Let the fire fall!' The Park Service ended it on January 25, 1968."
 
 [node name="Sprite" type="Sprite2D" parent="Entities/FirefallBoard" unique_id=81154404]
 texture = ExtResource("17_chy77")

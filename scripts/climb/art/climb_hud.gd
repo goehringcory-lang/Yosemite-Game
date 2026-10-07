@@ -45,16 +45,16 @@ static func stamina(ci: CanvasItem, state: ClimbState, flash: float, shake: floa
 
 
 ## The rack as a Stardew-style toolbar. Slots light up when what they do is
-## possible right now.
-static func toolbar(ci: CanvasItem, state: ClimbState, time: float, usable: Dictionary) -> void:
+## possible right now. Returns the x where the toolbar ends.
+static func toolbar(ci: CanvasItem, state: ClimbState, time: float, usable: Dictionary) -> float:
 	var slots: Array[Dictionary] = []
 	if not state.route.top_rope:
 		if state.cams_per_pitch > 0:
 			slots.append({"id": "cam", "n": state.cams_left, "on": usable.get("cam", false)})
-		if state.quickdraws_per_pitch > 0:
+		if state.quickdraws_per_pitch > 0 and state.route_has_fixed_pieces():
 			slots.append({"id": "quickdraw", "n": state.quickdraws_left, "on": usable.get("clip", false)})
 	if state.has_chalk:
-		slots.append({"id": "chalk_bag", "n": -1, "dim": state.chalked_this_pitch, "on": usable.get("chalk", false)})
+		slots.append({"id": "chalk_bag", "n": -1, "dim": state.chalked_this_pitch or state.is_snow(), "on": usable.get("chalk", false)})
 	slots.append({"id": "food", "n": FoodDB.carried_energy(), "on": usable.get("eat", false)})
 	if state.has_device:
 		slots.append({"id": "belay_device", "n": -1})
@@ -73,6 +73,7 @@ static func toolbar(ci: CanvasItem, state: ClimbState, time: float, usable: Dict
 		var s := slots[i]
 		var pos := origin + Vector2(i * 22 + 1, 0)
 		UI.slot(ci, pos, s.id, s.n, s.get("dim", false), s.get("on", false) and fmod(time, 0.8) < 0.5)
+	return origin.x + w - 3.0
 
 
 ## Key hints for what you can do right now, along the bottom.
@@ -203,13 +204,58 @@ static func crux_result(ci: CanvasItem, result: String, age: float) -> void:
 # ---------------------------------------------------------------- cards
 
 ## The card shown before the climb: a postcard of the view, where and who's on
-## belay, the pitches, the gear you'll need and carry, and what to eat.
+## belay, the pitches, the gear you'll need and carry, and what to eat. The
+## text runs the full width under the postcard, the facts and the topo, so
+## nothing is cut off however long a route's blurb is.
 static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, belayer: Dictionary, recommended_food: int, age: float, view := {}) -> void:
 	ci.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.03, 0.03, 0.06, 0.55 * minf(age * 4.0, 1.0)))
-	var slide := minf(age * 4.0, 1.0)
-	var r := Rect2(30, lerpf(280.0, 14.0, 1.0 - pow(1.0 - slide, 3.0)), 420, 242)
-	UI.panel(ci, r)
 	var route := state.route
+	var too_late := ClimbState.starts_too_late(route, state.start_minutes)
+	# Work out what goes where first, so the card is only as tall as it needs
+	# to be. Facts beside the postcard: [text, color].
+	var fact_w := 168.0
+	var facts: Array = []
+	var pitch_text := route.pitch_text()
+	if UI.text_width(pitch_text, 10) > fact_w:
+		var parts := pitch_text.split(", ", true, 1)
+		facts.append([parts[0] + ",", UI.INK])
+		facts.append([parts[1], UI.INK])
+	else:
+		facts.append([pitch_text, UI.INK])
+	facts.append(["%s ft" % str(route.total_height_ft()), UI.INK])
+	if route.nights > 0:
+		facts.append(["%d nights out" % route.nights, UI.INK])
+		var meals := state.meals_in_pack()
+		facts.append(["Night meals: %d of %d" % [meals, route.nights], UI.GOOD_DARK if meals >= route.nights else UI.WARN_DARK])
+	if route.top_rope:
+		facts.append(["top rope", UI.INK])
+	elif state.is_bolted() or route.protection == "bolts":
+		facts.append(["bolted", UI.INK])
+	else:
+		facts.append(["cams in cracks", UI.INK])
+	if belayer.get("name", "") != "":
+		facts.append(["belay: " + belayer.name.split(" ")[0], UI.INK])
+	if profile.get("weather", "") == "alpine":
+		facts.append(["Start before %d AM" % ClimbState.ALPINE_START_BEFORE, UI.WARN_DARK])
+		facts.append(["Storms after %s" % ClimbState.storm_time_text(), UI.WARN_DARK])
+	if too_late:
+		facts.append(["You'd still be on the wall at 2 AM.", UI.WARN_DARK])
+		facts.append(["Start in the morning.", UI.WARN_DARK])
+	var specs: Array = profile.get("pitches", [])
+	var n := route.pitches.size()
+	var row_h := minf(11.0, 84.0 / n)
+	var text_w := 452.0 - 32.0
+	var lines := UI.wrap_lines(route.description, text_w, 10)
+	var tip := UI.wrap_lines("Tip: " + route.guide_tip, text_w, 10) if route.guide_tip != "" else PackedStringArray()
+	var band_at := 49.0 # from the top of the card
+	var bottom := maxf(band_at + 61.0, maxf(band_at + 3 + facts.size() * 11, band_at + 19 + (n - 1) * row_h + 3.0))
+	var text_at := bottom + 12.0
+	var last_line := text_at + (lines.size() - 1) * 11 + (4 + tip.size() * 11 if not tip.is_empty() else 0)
+	var gear_at := last_line + 17.0
+	var height := gear_at + 25.0
+	var slide := minf(age * 4.0, 1.0)
+	var r := Rect2(14, lerpf(280.0, (SCREEN.y - height) * 0.5, 1.0 - pow(1.0 - slide, 3.0)), 452, height)
+	UI.panel(ci, r)
 	var x := r.position.x + 16
 	var y := r.position.y + 22
 	UI.ink(ci, Vector2(x, y), route.display_name, UI.INK, 16)
@@ -217,7 +263,8 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 	UI.ink(ci, Vector2(x, y + 14), profile.get("place", ""), UI.INK_SOFT, 10)
 	ci.draw_rect(Rect2(x, y + 19, r.size.x - 32, 1), UI.PAPER_DARK)
 	# The postcard: the view from the wall, in a wooden frame.
-	var card := Rect2(x, y + 27, 108, 61)
+	var band := y + 27.0
+	var card := Rect2(x, band, 108, 61)
 	ci.draw_rect(card.grow(2), UI.WOOD_DARK)
 	ci.draw_rect(card.grow(1), UI.WOOD_LIGHT)
 	if view.has("sky"):
@@ -227,38 +274,15 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 	else:
 		ci.draw_rect(card, Color("5aa8e0"))
 	ci.draw_rect(Rect2(card.position, Vector2(card.size.x, 1)), Color(1, 1, 1, 0.3))
-	# Facts beside it.
-	var sx := x + 122
-	var rows: Array[String] = ["%d pitch%s" % [route.pitches.size(), "" if route.pitches.size() == 1 else "es"], "%s ft" % str(route.total_height_ft())]
-	if route.nights > 0:
-		rows.append("%d nights out" % route.nights)
-	if route.top_rope:
-		rows.append("top rope")
-	elif state.is_bolted() or route.protection == "bolts":
-		rows.append("bolted")
-	else:
-		rows.append("cams in cracks")
-	if belayer.get("name", "") != "":
-		rows.append("belay: " + belayer.name.split(" ")[0])
-	for i in rows.size():
-		UI.ink(ci, Vector2(sx, y + 38 + i * 12), rows[i], UI.INK, 10, 100.0)
-	# The blurb.
-	var lines := UI.wrap_lines(route.description, 236.0, 10)
-	for i in mini(lines.size(), 3):
-		UI.ink(ci, Vector2(x, y + 102 + i * 11), lines[i] + ("..." if i == 2 and lines.size() > 3 else ""), UI.INK, 10)
-	if route.guide_tip != "":
-		var tip := UI.wrap_lines("Tip: " + route.guide_tip, 236.0, 10)
-		for i in mini(tip.size(), 2):
-			UI.ink(ci, Vector2(x, y + 102 + mini(lines.size(), 3) * 11 + 4 + i * 11), tip[i] + ("..." if i == 1 and tip.size() > 2 else ""), UI.WARN_DARK, 10)
+	var sx := x + 124
+	for i in facts.size():
+		UI.ink(ci, Vector2(sx, band + 11 + i * 11), facts[i][0], facts[i][1], 10, fact_w + 8)
 	# The topo: the pitches, bottom to top.
-	var tx := r.position.x + 280
-	var ty := r.position.y + 44
-	UI.ink(ci, Vector2(tx, ty - 4), "THE LINE", UI.WARN_DARK, 10)
-	var specs: Array = profile.get("pitches", [])
-	var n := route.pitches.size()
-	var row_h := minf(12.0, 100.0 / n)
+	var tx := r.position.x + 306
+	UI.ink(ci, Vector2(tx, band + 7), "THE LINE", UI.WARN_DARK, 10)
+	UI.ink(ci, Vector2(r.end.x - 16, band + 7), "* crux", UI.INK_SOFT, 10, 60.0, HORIZONTAL_ALIGNMENT_RIGHT)
 	for i in n:
-		var yy := ty + 8 + (n - 1 - i) * row_h
+		var yy := band + 19 + (n - 1 - i) * row_h
 		var diff := route.pitches[i]
 		ci.draw_rect(Rect2(tx, yy - 6, 6, 6), [Color("7ac24a"), Color("a8c24a"), Color("e8c040"), Color("e8863a"), Color("d8452e")][clampi(diff - 1, 0, 4)])
 		var nm: String = specs[i].get("name", "Pitch %d" % (i + 1)) if i < specs.size() else "Pitch %d" % (i + 1)
@@ -266,13 +290,14 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 		if i < specs.size() and specs[i].get("crux", 0) > 0:
 			mark = " *"
 		UI.ink(ci, Vector2(tx + 10, yy), nm + mark, UI.INK, 10, 130.0)
-	UI.ink(ci, Vector2(tx, ty + 14 + n * row_h), "* a crux: a skill check", UI.INK_SOFT, 10)
-	if route.nights > 0:
-		UI.ink(ci, Vector2(tx, ty + 26 + n * row_h), "%d nights on the wall" % route.nights, UI.WARN_DARK, 10)
-	if profile.get("weather", "") == "alpine":
-		UI.ink(ci, Vector2(tx, ty + 26 + n * row_h + (12 if route.nights > 0 else 0)), "Storms build after 2 pm.", UI.WARN_DARK, 10)
+	# The blurb and the tip, across the card.
+	var ty := r.position.y + text_at
+	for i in lines.size():
+		UI.ink(ci, Vector2(x, ty + i * 11), lines[i], UI.INK, 10)
+	for i in tip.size():
+		UI.ink(ci, Vector2(x, ty + lines.size() * 11 + 4 + i * 11), tip[i], UI.WARN_DARK, 10)
 	# Gear you need, with what you have.
-	var gy := r.position.y + 196
+	var gy := r.position.y + gear_at
 	UI.ink(ci, Vector2(x, gy), "GEAR", UI.WARN_DARK, 10)
 	var gx := x + 34
 	for id: String in route.required_gear:
@@ -283,26 +308,23 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 	if route.top_rope:
 		UI.ink(ci, Vector2(gx, gy), "A top rope: nothing to carry.", UI.INK_SOFT, 10)
 	var carrying := FoodDB.carried_energy()
-	var fy := gy + 23
+	var fy := gy + 17
 	UI.icon(ci, "food", Vector2(x, fy - 9))
-	var ok := carrying >= recommended_food
+	var ok := state.food_ready(recommended_food)
 	UI.ink(ci, Vector2(x + 16, fy), "Food: %d energy" % carrying + ("" if recommended_food <= 0 else "  (bring about %d)" % recommended_food), UI.GOOD_DARK if ok else UI.WARN_DARK, 10)
-	UI.ink(ci, Vector2(r.end.x - 16, r.end.y - 10), "E: start climbing     Esc: not yet", UI.INK_SOFT, 10, 240.0, HORIZONTAL_ALIGNMENT_RIGHT)
+	UI.ink(ci, Vector2(r.end.x - 16, fy), "Esc: not yet" if too_late else "E: start climbing     Esc: not yet", UI.INK_SOFT, 10, 240.0, HORIZONTAL_ALIGNMENT_RIGHT)
 
 
 static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, belayer_line: String, age: float, won: bool) -> void:
-	ci.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.03, 0.03, 0.06, 0.45 * minf(age * 3.0, 1.0)))
-	var slide := minf(age * 3.0, 1.0)
-	var r := Rect2(70, lerpf(280.0, 36.0, 1.0 - pow(1.0 - slide, 3.0)), 340, 198)
-	UI.panel(ci, r)
-	var x := r.position.x + 18
-	var y := r.position.y + 26
-	var title := "Topped out!" if won else "Back on the ground"
-	UI.ink(ci, Vector2(r.position.x + r.size.x * 0.5, y), title, UI.GOOD_DARK if won else UI.WARN_DARK, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
-	UI.ink(ci, Vector2(r.position.x + r.size.x * 0.5, y + 14), "%s  ·  %s" % [state.route.display_name, state.route.grade.split(",")[0]], UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
-	ci.draw_rect(Rect2(x, y + 20, r.size.x - 36, 1), UI.PAPER_DARK)
-	var hours := state.minutes / 60
-	var rows: Array[String] = ["Time: %dh %02dm" % [hours, state.minutes % 60], "Falls: %d" % state.falls]
+	ci.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.03, 0.03, 0.06, 0.6 * minf(age * 3.0, 1.0)))
+	var width := 340.0
+	var inner := width - 36.0
+	# What goes on the card, so the card is only as tall as it needs to be.
+	var minutes := state.minutes
+	var time_text := "Time: %dh %02dm" % [minutes / 60, minutes % 60]
+	if minutes >= 24 * 60:
+		time_text = "Time: %dd %dh %02dm" % [minutes / (24 * 60), minutes / 60 % 24, minutes % 60]
+	var rows: Array[String] = [time_text, "Falls: %d" % state.falls]
 	if won:
 		rows.append("Style: %s" % state.style_rating())
 		if state.perfect_cruxes + state.slipped_cruxes > 0:
@@ -313,6 +335,28 @@ static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, 
 			rows.append("A free ascent! No pulling on gear.")
 		if state.jug_moves > 0:
 			rows.append("Jugged %d fixed-rope moves" % state.jug_moves)
+	var quote := PackedStringArray()
+	if belayer_line != "":
+		quote = UI.wrap_lines("\"%s\"" % belayer_line, inner, 10)
+	var fact_lines := PackedStringArray()
+	var facts: Array = profile.get("facts", [])
+	if not facts.is_empty() and won:
+		fact_lines = UI.wrap_lines(facts[(state.route.id.hash() + state.minutes) % facts.size()], inner, 10)
+	var height := 46.0 + rows.size() * 12.0 + 6.0
+	if not quote.is_empty():
+		height += 6.0 + quote.size() * 11.0
+	if not fact_lines.is_empty():
+		height += 6.0 + fact_lines.size() * 11.0
+	height += 24.0
+	var slide := minf(age * 3.0, 1.0)
+	var r := Rect2(70, lerpf(280.0, (SCREEN.y - height) * 0.5, 1.0 - pow(1.0 - slide, 3.0)), width, height)
+	UI.panel(ci, r)
+	var x := r.position.x + 18
+	var y := r.position.y + 26
+	var title := "Topped out!" if won else "Back on the ground"
+	UI.ink(ci, Vector2(r.position.x + r.size.x * 0.5, y), title, UI.GOOD_DARK if won else UI.WARN_DARK, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.ink(ci, Vector2(r.position.x + r.size.x * 0.5, y + 14), "%s  ·  %s" % [state.route.display_name, state.route.grade.split(",")[0]], UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+	ci.draw_rect(Rect2(x, y + 20, r.size.x - 36, 1), UI.PAPER_DARK)
 	for i in rows.size():
 		UI.ink(ci, Vector2(x, y + 36 + i * 12), rows[i], UI.INK, 10)
 	# Stars: a rating for the style.
@@ -324,14 +368,13 @@ static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, 
 			stars = 2
 		for i in 3:
 			UI.icon(ci, "star", Vector2(r.end.x - 70 + i * 16, y + 28), Color.WHITE if i < stars else Color(1, 1, 1, 0.22))
-	var facts: Array = profile.get("facts", [])
-	if not facts.is_empty() and won:
-		var fact: String = facts[(state.route.id.hash() + state.minutes) % facts.size()]
-		var fl := UI.wrap_lines(fact, r.size.x - 40.0, 10)
-		for i in mini(fl.size(), 3):
-			UI.ink(ci, Vector2(x, r.end.y - 54 + i * 11), fl[i], UI.INK_SOFT, 10)
-	if belayer_line != "":
-		UI.ink(ci, Vector2(x, r.end.y - 78), "\"%s\"" % belayer_line, UI.WARN_DARK, 10, r.size.x - 36.0)
+	var ly := y + 36 + rows.size() * 12 + 2.0
+	for i in quote.size():
+		UI.ink(ci, Vector2(x, ly + 6 + i * 11), quote[i], UI.WARN_DARK, 10)
+	if not quote.is_empty():
+		ly += 6.0 + quote.size() * 11.0
+	for i in fact_lines.size():
+		UI.ink(ci, Vector2(x, ly + 6 + i * 11), fact_lines[i], UI.INK_SOFT, 10)
 	UI.ink(ci, Vector2(r.end.x - 16, r.end.y - 10), "E: continue", UI.INK_SOFT, 10, 120.0, HORIZONTAL_ALIGNMENT_RIGHT)
 
 
@@ -342,4 +385,4 @@ static func pause_card(ci: CanvasItem, state: ClimbState) -> void:
 	var verb := "Rappel down?" if state.has_device and state.pitch > 0 else "Lower off?"
 	UI.ink(ci, Vector2(r.position.x + 100, r.position.y + 22), verb, UI.INK, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 	UI.ink(ci, Vector2(r.position.x + 100, r.position.y + 38), "Your gear comes with you. The tick doesn't.", UI.INK_SOFT, 10, 190.0, HORIZONTAL_ALIGNMENT_CENTER)
-	UI.ink(ci, Vector2(r.position.x + 100, r.position.y + 62), "Esc: yes, retreat     E: keep climbing", UI.WARN_DARK, 10, 190.0, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.ink(ci, Vector2(r.position.x + 100, r.position.y + 62), "E: yes, retreat     Esc: keep climbing", UI.WARN_DARK, 10, 190.0, HORIZONTAL_ALIGNMENT_CENTER)
