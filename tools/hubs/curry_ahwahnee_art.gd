@@ -43,7 +43,7 @@ func _shade_right(im: Image, x: int, y: int, w: int, h: int) -> void:
 
 ## The Registration Office: a broad lodge of stained board-and-batten under a
 ## moss-green shingle roof, with a posted porch, a clock, and a chimney.
-func registration() -> Image:
+func _base_registration() -> Image:
 	var w := 88
 	var h := 64
 	var im := K.make(w, h)
@@ -79,7 +79,7 @@ func registration() -> Image:
 
 ## The Camp Curry Store: cream plaster, lit display windows, a striped awning,
 ## produce crates and a chalkboard.
-func store() -> Image:
+func _base_store() -> Image:
 	var w := 68
 	var h := 58
 	var im := K.make(w, h)
@@ -118,7 +118,7 @@ func store() -> Image:
 
 ## The Mountain Shop: slate roof, dark timber over a tall granite base, a
 ## big display window full of gear, and a rope coil by the door.
-func mountain_shop() -> Image:
+func _base_mountain_shop() -> Image:
 	var w := 84
 	var h := 66
 	var im := K.make(w, h)
@@ -174,7 +174,7 @@ func mountain_shop() -> Image:
 
 ## The Pavilion: the open dining hall under a big shingle roof, with lanterns
 ## across the front, tables in the warm dark inside, and a stone base.
-func pavilion() -> Image:
+func _base_pavilion() -> Image:
 	var w := 104
 	var h := 66
 	var im := K.make(w, h)
@@ -216,7 +216,7 @@ func pavilion() -> Image:
 	return im
 
 
-func pizza_deck() -> Image:
+func _base_pizza_deck() -> Image:
 	var w := 64
 	var h := 50
 	var im := K.make(w, h)
@@ -383,6 +383,44 @@ func tent_cabin(variant: int) -> Image:
 			if x == x0 - 2 + inset:
 				tone += 0.12
 			K.px(im, x, y, canvas[clampi(roundi(tone * 5.0), 0, 5)])
+	# worn canvas: darker, stained lower corners and eave, a lit seam beside each
+	# dark one, pine-needle litter and a stitched patch
+	for y in wall_top:
+		var t2 := float(y) / wall_top
+		var inset2 := int((1.0 - t2) * 11.0)
+		for x in range(x0 - 2 + inset2, x0 + bw + 2 - inset2):
+			var col := im.get_pixel(x, y)
+			if (x - x0 - 3) % 9 == 1:
+				col = col.lightened(0.06)
+			var stain := smoothstep(0.55, 1.0, t2) * (0.1 + 0.18 * K.hash2(x / 4, y / 3, 170 + variant))
+			if x < x0 + 5 or x > x0 + bw - 6:
+				stain += 0.05
+			col = col.darkened(stain)
+			if K.hash2(x, y, 171 + variant) > 0.985 and t2 > 0.3:
+				col = mat.leaf[1] if K.hash2(x, y, 172) > 0.5 else mat.timber[2]
+			im.set_pixel(x, y, col)
+	# sag creases running from the ridge toward the corners
+	for side in [-1, 1]:
+		for k in 12:
+			var cx2: int = w / 2 + side * (3 + k)
+			var cy2: int = 2 + k
+			if cx2 > x0 - 2 and cx2 < x0 + bw + 2 and cy2 < wall_top - 2:
+				im.set_pixel(cx2, cy2, im.get_pixel(cx2, cy2).darkened(0.12))
+	if variant % 3 == 0:
+		var px0 := x0 + 8 + (variant % 4) * 4
+		K.rect(im, px0, 9, 7, 5, canvas[4])
+		for sx in range(px0, px0 + 7, 2):
+			K.px(im, sx, 9, canvas[1])
+			K.px(im, sx, 13, canvas[1])
+		K.vline(im, px0, 9, 5, canvas[1])
+		K.vline(im, px0 + 6, 9, 5, canvas[1])
+	if variant % 4 == 1:
+		# a stovepipe with a cap and flashing
+		var sx2 := w - 15
+		K.rect(im, sx2, 1, 3, 9, mat.iron[1])
+		K.vline(im, sx2, 1, 9, mat.iron[3])
+		K.rect(im, sx2 - 1, 0, 5, 2, mat.iron[2])
+		K.rect(im, sx2 - 1, 9, 5, 2, mat.iron[0])
 	for x in range(x0 - 2, x0 + bw + 2):
 		var hem := trim if ((x - x0) / 3) % 2 == 0 else trim.darkened(0.2)
 		K.px(im, x, wall_top - 2, hem)
@@ -452,7 +490,7 @@ func tent_cabin(variant: int) -> Image:
 
 ## A small wood cabin: stained boards on a granite footing under a shingle
 ## roof, with a porch light and a flower box.
-func wood_cabin(variant: int) -> Image:
+func _base_wood_cabin(variant: int) -> Image:
 	var w := 42
 	var h := 40
 	var im := K.make(w, h)
@@ -473,5 +511,154 @@ func wood_cabin(variant: int) -> Image:
 		K.px(im, f[0], wall_top + 13, Color(f[1]).lightened(0.2))
 	K.text(im, 7, wall_top + 3, str(31 + variant * 4), Color("f0e2bc"), mat.timber[0])
 	_shade_right(im, 3, wall_top, w - 6, h - wall_top - 6)
+	K.outline(im, RIM)
+	return im
+
+
+# ---------------------------------------------------------------- finishing
+
+## Weathering and lived-in detail shared by the camp's buildings: pale lichen
+## and moss patches on the roof, a lit ridge, rain streaks down the wall under
+## the eaves, and a bleached sun-side edge. [param wall_top] is the first wall
+## row; [param seed_value] varies the patches between buildings.
+func _weather(im: Image, wall_top: int, seed_value: int) -> void:
+	var w := im.get_width()
+	var h := im.get_height()
+	for y in range(2, wall_top - 2):
+		for x in w:
+			var c := im.get_pixel(x, y)
+			if c.a < 0.5:
+				continue
+			var n := K.hash2(x / 3, y / 2, seed_value)
+			if n > 0.965:
+				im.set_pixel(x, y, c.lerp(mat.moss[2], 0.55))
+			elif n < 0.03:
+				im.set_pixel(x, y, c.lerp(Color("b8c0a0"), 0.35))
+	# the topmost opaque pixel of each column is the ridge or eave line: light it
+	for x in w:
+		for y in range(0, h):
+			var c := im.get_pixel(x, y)
+			if c.a > 0.5:
+				if y < wall_top - 4 and c.get_luminance() > 0.12:
+					im.set_pixel(x, y, c.lightened(0.08))
+				break
+	# rain streaks under the eave
+	for x in range(5, w - 5):
+		if K.hash2(x, seed_value, 3) > 0.82:
+			var len := 3 + int(K.hash2(x, seed_value, 4) * 7.0)
+			for k in len:
+				var y := wall_top + 1 + k
+				var c := im.get_pixel(x, y)
+				if c.a > 0.5 and y < h - 8:
+					im.set_pixel(x, y, c.darkened(0.08 * (1.0 - float(k) / len) + 0.02))
+	# moss creeping up from the footing
+	for x in range(3, w - 3):
+		var up := 1 + int(K.hash2(x, seed_value, 5) * 3.0)
+		for k in up:
+			var y := h - 9 - k
+			var c := im.get_pixel(x, y)
+			if c.a > 0.5 and K.hash2(x, y, seed_value) > 0.4:
+				im.set_pixel(x, y, c.lerp(mat.moss[1], 0.5))
+
+
+## A hanging lantern on a bracket and a little glow, for porches.
+func _porch_lamp(im: Image, x: int, y: int) -> void:
+	K.hline(im, x - 2, y - 2, 3, mat.iron[2])
+	K.vline(im, x, y - 2, 2, mat.iron[2])
+	K.rect(im, x - 1, y, 3, 4, mat.iron[1])
+	K.rect(im, x, y + 1, 1, 2, mat.warm[6])
+	K.px(im, x, y + 1, mat.warm[7])
+	K.hline(im, x - 1, y + 4, 3, mat.iron[3])
+	for dy in range(-1, 7):
+		for dx in range(-3, 4):
+			if absf(dx) + absf(dy - 2) <= 3 and im.get_pixel(x + dx, y + dy).a > 0.5 and (dx != 0 or dy < 0 or dy > 3):
+				var c := im.get_pixel(x + dx, y + dy)
+				im.set_pixel(x + dx, y + dy, c.lerp(Color(1, 0.85, 0.5), 0.12))
+
+
+func registration() -> Image:
+	var im := _base_registration()
+	_weather(im, 27, 701)
+	_porch_lamp(im, 10, 38)
+	_porch_lamp(im, 78, 38)
+	_hanging_flowers(im, 24, 36, Color("e04a6a"))
+	_hanging_flowers(im, 62, 36, Color("f2d25c"))
+	return im
+
+
+func store() -> Image:
+	var im := _base_store()
+	_weather(im, 23, 702)
+	_porch_lamp(im, 31, 24)
+	return im
+
+
+func mountain_shop() -> Image:
+	var im := _base_mountain_shop()
+	_weather(im, 27, 703)
+	_porch_lamp(im, 52, 38)
+	return im
+
+
+func pavilion() -> Image:
+	var im := _base_pavilion()
+	_weather(im, 31, 704)
+	return im
+
+
+func pizza_deck() -> Image:
+	var im := _base_pizza_deck()
+	_weather(im, 19, 705)
+	return im
+
+
+## A hanging basket of flowers from a porch beam.
+func _hanging_flowers(im: Image, x: int, y: int, bloom: Color) -> void:
+	K.vline(im, x, y - 3, 3, mat.iron[2])
+	K.rect(im, x - 3, y, 7, 3, mat.timber[1])
+	K.hline(im, x - 3, y, 7, mat.timber[4])
+	for k in 7:
+		K.px(im, x - 3 + k, y - 1, mat.leaf[3])
+		if K.hash2(k, x, 9) > 0.35:
+			K.px(im, x - 3 + k, y - 2, bloom if k % 2 == 0 else bloom.lightened(0.3))
+	for k in 5:
+		K.px(im, x - 2 + k, y + 3, mat.leaf[2])
+		if k % 2 == 0:
+			K.px(im, x - 2 + k, y + 4, mat.leaf[3])
+
+
+## The small wood cabins get a stone chimney with smoke-stained cap, a log
+## step, a stack of split firewood, and a porch lantern beside the door.
+func wood_cabin(variant: int) -> Image:
+	var im := _base_wood_cabin(variant)
+	_weather(im, 17, 710 + variant)
+	var w := im.get_width()
+	var h := im.get_height()
+	# chimney on the right of the roof
+	var cx := w - 12
+	for y in range(2, 14):
+		for x in range(cx, cx + 5):
+			if im.get_pixel(x, y).a < 0.5 or y < 9:
+				var u := float(x - cx) / 4.0
+				var tone := clampf(0.7 - u * 0.5 + (K.hash2(x, y, 90) - 0.5) * 0.3, 0.0, 0.99)
+				var col: Color = mat.granite[clampi(int(tone * 6.0), 1, 6)]
+				if (y + (x / 2)) % 4 == 0:
+					col = col.darkened(0.18)
+				im.set_pixel(x, y, col)
+	K.hline(im, cx - 1, 2, 7, mat.granite[6])
+	K.hline(im, cx - 1, 3, 7, mat.granite[1])
+	K.rect(im, cx + 1, 1, 3, 1, Color(0.8, 0.8, 0.84, 0.5))
+	# a short stack of split firewood tucked at the left corner
+	for row in 2:
+		for col_i in 2:
+			var lx := 1 + col_i * 3 + (row % 2)
+			var ly := h - 8 - row * 3
+			K.rect(im, lx, ly, 3, 3, mat.timber[3 - (row + col_i) % 2])
+			K.px(im, lx + 1, ly + 1, mat.timber[5])
+			K.hline(im, lx, ly + 2, 3, mat.timber[0])
+	# log step and porch lamp
+	K.rect(im, 8, h - 5, 7, 2, mat.timber[2])
+	K.hline(im, 8, h - 5, 7, mat.timber[5])
+	_porch_lamp(im, 19, 24)
 	K.outline(im, RIM)
 	return im

@@ -15,9 +15,9 @@ const OUT := "res://assets/sprites/buildings/"
 
 ## Building name -> size and look.
 const BUILDINGS := {
-	"village_store": {"size": Vector2i(80, 56), "wall": "timber", "label": "VILLAGE STORE", "seed": 11, "roof": ["2a2a22", "3a3c2c", "4d5238", "62684a", "7b815b", "989d76"], "windows": [14, 66], "gable": 20, "chimney": 60, "awning": true},
-	"welcome_center": {"size": Vector2i(64, 46), "wall": "stone", "label": "WELCOME", "seed": 23, "roof": ["24262a", "34383e", "484e56", "5e666e", "7a828a", "9aa2a8"], "windows": [11, 53], "gable": 32, "chimney": 46},
-	"museum": {"size": Vector2i(56, 46), "wall": "stone", "label": "MUSEUM", "seed": 37, "roof": ["2c2822", "443c32", "5e5242", "786a54", "948468", "b0a07e"], "windows": [9, 19, 37, 47], "chimney": 8, "low": true},
+	"village_store": {"goods": true, "size": Vector2i(80, 56), "wall": "timber", "label": "VILLAGE STORE", "seed": 11, "roof": ["2a2a22", "3a3c2c", "4d5238", "62684a", "7b815b", "989d76"], "windows": [14, 66], "gable": 20, "chimney": 60, "awning": true},
+	"welcome_center": {"flag": true, "size": Vector2i(64, 46), "wall": "stone", "label": "WELCOME", "seed": 23, "roof": ["24262a", "34383e", "484e56", "5e666e", "7a828a", "9aa2a8"], "windows": [11, 53], "gable": 32, "chimney": 46},
+	"museum": {"portico": true, "size": Vector2i(56, 46), "wall": "stone", "label": "MUSEUM", "seed": 37, "roof": ["2c2822", "443c32", "5e5242", "786a54", "948468", "b0a07e"], "windows": [9, 19, 37, 47], "chimney": 8, "low": true},
 	"bests_studio": {"size": Vector2i(44, 38), "wall": "board", "label": "BEST'S", "seed": 41, "roof": ["2e2218", "4a3422", "644630", "7e5c3e", "9a7650", "b89468"], "windows": [9, 35], "gable": 22, "tone": 3},
 	"degnans": {"size": Vector2i(48, 40), "wall": "stucco", "label": "DEGNAN'S", "seed": 53, "roof": ["34201a", "55301f", "74402a", "92583a", "ae7248", "c98c5c"], "windows": [9, 39], "chimney": 36, "awning": true, "awning_a": "9a3a2a", "awning_b": "e8d8b0"},
 	"wilderness_center": {"size": Vector2i(40, 36), "wall": "board", "label": "PERMITS", "seed": 67, "roof": ["1c2a22", "2a4030", "3a5640", "4d6e50", "658a64", "84a67c"], "windows": [8, 32], "tone": 2, "green": true},
@@ -224,6 +224,7 @@ func building(sprite_name: String) -> Array:
 		awning(im, door_cx - aw / 2, wall_top + 1, aw, 5, Color(o.get("awning_a", "3f6b4a")), Color(o.get("awning_b", "e6d8b0")))
 	sign_board(im, door_cx, wall_top - 8 if not o.get("awning", false) else wall_top - 9, o["label"])
 
+	_dress(im, o, sd, wall_top, win_h, door_cx, o.get("awning", false))
 	# Ambient occlusion on the sunless side, and a lit lip on the near side.
 	shade(im, w - 8, wall_top, 7, body_h + 1, timber[0], 0.0, 0.85, 0.34, false)
 	shade(im, 1, wall_top + 2, 4, body_h, granite[6], 0.5, 0.0, 0.12, false)
@@ -231,6 +232,114 @@ func building(sprite_name: String) -> Array:
 	var glow := _glow_image(im, w, h)
 	roof = base_roof
 	return [im, glow]
+
+
+## Small touches that make a building lived in: flower boxes under some
+## windows, a wall lantern by the door, and a downspout down the near corner.
+func _dress(im: Image, o: Dictionary, sd: int, wall_top: int, win_h: int, door_cx: int, awning: bool) -> void:
+	var wins: Array = o["windows"]
+	var blooms: Array = [
+		[Color("e86a8a"), Color("f6b0c2")], [Color("f0c84a"), Color("fbe9a0")],
+		[Color("d8503a"), Color("f08a6a")], [Color("9a7ad8"), Color("c8b4f0")]]
+	var pick: Array = blooms[sd % blooms.size()]
+	for i in wins.size():
+		if wins.size() >= 4 and i % 2 == 1:
+			continue
+		var wx: int = wins[i]
+		var by := wall_top + 3 + win_h + 1
+		K.rect(im, wx - 4, by, 8, 2, timber[1])
+		K.hline(im, wx - 4, by, 8, timber[3])
+		for fx in range(wx - 3, wx + 4):
+			var tall := K.hash2(fx, sd, 7) > 0.45
+			K.px(im, fx, by - 1, leaf[3])
+			if tall:
+				K.px(im, fx, by - 2, pick[0] if (fx + sd) % 2 == 0 else pick[1])
+			elif K.hash2(fx, sd, 8) > 0.5:
+				K.px(im, fx, by - 1, pick[0])
+	if o.get("flag", false):
+		_visitor_details(im, wall_top, door_cx, sd)
+	if o.get("goods", false):
+		_store_goods(im, door_cx, sd)
+	if o.get("portico", false):
+		_museum_details(im, wall_top, door_cx, sd)
+	# a wall lantern beside the door
+	var lx := door_cx + 7
+	var ly := wall_top + 4
+	K.rect(im, lx - 1, ly - 1, 3, 1, iron[3])
+	K.rect(im, lx - 1, ly, 3, 4, iron[1])
+	K.rect(im, lx, ly + 1, 1, 2, warm[6])
+	K.px(im, lx, ly + 1, warm[7])
+	K.hline(im, lx - 1, ly + 4, 3, iron[3])
+
+
+## The Village Store's goods out front: stacked crates of produce and a
+## sack-and-barrel corner either side of the door, and a hanging trade sign.
+func _store_goods(im: Image, door_cx: int, sd: int) -> void:
+	var h := im.get_height()
+	var fruit := [Color("d04a3a"), Color("e8b83a"), Color("7aa84a"), Color("c87a3a")]
+	for side in [-1, 1]:
+		var bx: int = door_cx + side * 14 - 4
+		for row in 1:
+			var cw := 9
+			var cx := bx + row
+			var cy := h - 11 - row * 4
+			K.rect(im, cx, cy, cw, 4, timber[3])
+			K.hline(im, cx, cy, cw, timber[4])
+			K.hline(im, cx, cy + 3, cw, timber[0])
+			K.vline(im, cx + cw - 1, cy, 4, timber[1])
+			for k in cw - 2:
+				K.px(im, cx + 1 + k, cy - 1, fruit[(k + row + (sd + side) % 4) % 4])
+				if k % 2 == 0:
+					K.px(im, cx + 1 + k, cy - 2, fruit[(k + sd) % 4].lightened(0.2))
+	# a flour sack leaning by the left crates
+	var sx: int = door_cx - 25
+	K.rect(im, sx, h - 12, 4, 6, stucco[4])
+	K.vline(im, sx + 3, h - 12, 6, stucco[2])
+	K.hline(im, sx + 1, h - 13, 2, stucco[3])
+	K.px(im, sx + 1, h - 9, Color("a8382a"))
+
+
+## The Museum: a broad granite step with a low wall, two gate lamps, and an
+## interpretive panel on a post by the door.
+func _museum_details(im: Image, wall_top: int, door_cx: int, sd: int) -> void:
+	var h := im.get_height()
+	var w := im.get_width()
+	K.rect(im, door_cx - 7, h - 5, 14, 3, granite[4])
+	K.hline(im, door_cx - 7, h - 5, 14, granite[6])
+	K.hline(im, door_cx - 7, h - 3, 14, granite[1])
+	for side in [-1, 1]:
+		var lx: int = door_cx + side * 11
+		K.vline(im, lx, h - 10, 6, iron[2])
+		K.rect(im, lx - 1, h - 13, 3, 3, iron[1])
+		K.px(im, lx, h - 12, warm[6])
+		K.px(im, lx, h - 11, warm[7])
+		K.hline(im, lx - 1, h - 14, 3, iron[3])
+	# interpretive panel
+	var px0: int = w - 8
+	K.vline(im, px0 + 2, h - 12, 8, timber[1])
+	K.rect(im, px0, h - 16, 6, 5, timber[0])
+	K.rect(im, px0 + 1, h - 15, 4, 3, Color("d8c898"))
+	K.hline(im, px0 + 1, h - 14, 4, Color("8a7a58"))
+
+
+## The Welcome Center's own touches: a cut-stone arch over the door and
+## two planters by the entrance.
+func _visitor_details(im: Image, wall_top: int, door_cx: int, sd: int) -> void:
+	var h := im.get_height()
+	# arch of voussoirs over the door
+	for k in range(-5, 6):
+		var ay := wall_top + 10 - int(sqrt(maxf(0.0, 30.0 - k * k)) * 0.8)
+		K.px(im, door_cx + k, ay, granite[6] if k % 2 == 0 else granite[4])
+		K.px(im, door_cx + k, ay + 1, granite[2])
+	# planters flanking the step
+	for side in [-1, 1]:
+		var bx: int = door_cx + side * 9 - 2
+		K.rect(im, bx, h - 9, 5, 4, timber[2])
+		K.hline(im, bx, h - 9, 5, timber[4])
+		for k in 5:
+			K.px(im, bx + k, h - 10, leaf[3])
+			if K.hash2(k, side + sd, 3) > 0.4:
+				K.px(im, bx + k, h - 11, Color("e86a8a") if side < 0 else Color("f0c84a"))
 
 
 ## Lit windows and a soft halo, drawn over the finished building (for night).
@@ -264,46 +373,76 @@ func _glow_image(final: Image, w: int, h: int) -> Image:
 # ---------------------------------------------------------------- Indian Village
 
 ## A cone of incense-cedar bark slabs over a pole frame, with a doorway.
+## Each course of slabs overlaps the one below it and throws a shadow, the
+## apex is sooted by the fire inside, and the doorway has a lintel pole and a
+## hanging woven mat. A worn patch of earth and a ring of stones sit at the base.
 ## TRIBAL REVIEW NEEDED: a placeholder shape until the tribes have reviewed it.
 func umacha() -> Image:
 	var w := 32
 	var h := 44
 	var im := K.make(w, h)
 	K.shadow(im, 16, 42, 14.5, 2.4, 0.3)
+	# packed earth worn round the door
+	K.ellipse(im, 16, 42, 13.0, 2.2, Color("7a6044"))
+	K.ellipse(im, 15, 41.6, 10.0, 1.4, Color("94784f"))
+	var courses := [5, 12, 19, 26, 33, 42]
 	for y in range(5, 42):
 		var half := (y - 3) * 0.41
+		var course := 0
+		while course < courses.size() - 1 and y >= courses[course + 1]:
+			course += 1
+		var cy: int = y - courses[course]
 		for x in range(floori(16 - half), ceili(16 + half)):
 			var u := (x - (16 - half)) / maxf(1.0, half * 2.0)
-			var slab := (x + (y / 8) * 2) / 3
-			var n := K.hash2(slab, y / 6, 17)
-			var t := 0.55 + (n - 0.5) * 0.34 - u * 0.5 + (0.5 - float(y) / h) * 0.12
+			# slabs are tall strips, staggered between courses
+			var slab := (x + course * 2) / 3
+			var n := K.hash2(slab, course, 17)
+			var t := 0.58 + (n - 0.5) * 0.3 - u * 0.62 + (0.5 - float(y) / h) * 0.1
+			# each course is lit at its top edge and shadowed under the next
+			if cy == 0:
+				t += 0.2
+			elif cy >= 6:
+				t -= 0.24
+			elif cy >= 5:
+				t -= 0.1
 			var idx := clampi(roundi(t * 4.0) + 1, 0, 5)
 			var col := timber[idx]
 			# bark furrows and the seams between slabs
-			if (x + (y / 8) * 2) % 3 == 0:
+			if (x + course * 2) % 3 == 0:
 				col = col.darkened(0.2)
-			elif K.hash2(x, y, 18) > 0.93:
+			elif K.hash2(x, y / 2, 18) > 0.92:
 				col = col.lightened(0.14)
 			K.px(im, x, y, col)
-	# seam between layers of slabs
-	for ly in [14, 23, 32]:
-		var half2: float = (ly - 3) * 0.41
-		for x in range(floori(16 - half2), ceili(16 + half2)):
-			K.px(im, x, ly, timber[0])
-	# pole tips crossing at the apex
+	# soot streaks down from the smoke hole
+	for y in range(5, 17):
+		var half := (y - 3) * 0.41
+		for x in range(floori(16 - half), ceili(16 + half)):
+			var k := K.hash2(x, y, 23)
+			var fade := 1.0 - float(y - 5) / 12.0
+			if k < 0.42 * fade:
+				K.px(im, x, y, im.get_pixel(x, y).darkened(0.32 * fade + 0.1))
+	# pole tips crossing at the apex, with a wisp of smoke
 	for pole in [[14, 0, -1], [17, 1, 1], [19, 0, 1], [12, 1, -1]]:
 		for k in 7:
 			K.px(im, pole[0] + pole[2] * (k / 4), pole[1] + k, timber[1] if k % 2 == 0 else timber[0])
 	K.px(im, 15, 0, timber[3])
 	K.px(im, 18, 1, timber[3])
-	# doorway
-	K.rect(im, 12, 31, 8, 11, timber[0])
-	K.rect(im, 13, 30, 6, 1, timber[0])
-	K.rect(im, 13, 32, 6, 9, Color("1a110c"))
-	shade(im, 12, 41, 8, 1, timber[0], 1.0, 1.0, 0.5)
-	# a few granite stones holding the base down
-	for sx in [4, 9, 23, 27]:
-		boulder(im, sx + 1, 41, 2.6, 1.8, sd_for(sx))
+	K.px(im, 16, 2, Color(0.8, 0.8, 0.82, 0.55))
+	K.px(im, 17, 1, Color(0.85, 0.85, 0.88, 0.4))
+	K.px(im, 16, 0, Color(0.85, 0.85, 0.88, 0.3))
+	# doorway: lintel pole, dark opening, a woven mat folded back at one side
+	K.rect(im, 11, 31, 10, 11, timber[0])
+	K.rect(im, 12, 30, 8, 1, timber[0])
+	K.rect(im, 13, 32, 6, 9, Color("120a07"))
+	K.hline(im, 11, 31, 10, timber[3])
+	K.hline(im, 12, 30, 8, timber[2])
+	for my in range(32, 41):
+		K.px(im, 13, my, stucco[2] if my % 2 == 0 else stucco[3])
+		K.px(im, 14, my, stucco[1] if my % 2 == 0 else stucco[2])
+	shade(im, 11, 41, 10, 1, timber[0], 1.0, 1.0, 0.5)
+	# granite stones holding the base down
+	for sx in [4, 8, 24, 28]:
+		boulder(im, sx + 1, 41, 2.8, 1.9, sd_for(sx))
 	K.outline(im, Color("231a16"))
 	return im
 
@@ -312,7 +451,9 @@ func sd_for(v: int) -> int:
 	return 200 + v
 
 
-## An acorn granary: a tall woven store on poles under a thatched cap.
+## An acorn granary: a tall woven store on poles under a thatched cap, with
+## flat stones under the cap to keep out mice, a basket-weave body and cord
+## bands, and thatch in layered rings. The poles stand on stones.
 ## TRIBAL REVIEW NEEDED: a placeholder shape until the tribes have reviewed it.
 func chuckah() -> Image:
 	var w := 20
@@ -321,54 +462,93 @@ func chuckah() -> Image:
 	K.shadow(im, 10, 38.5, 8.5, 1.8, 0.3)
 	for px_ in [4, 9, 15]:
 		post(im, px_, 26, 12, 300 + px_, 2)
+	# footing stones
+	for px_ in [5, 10, 16]:
+		boulder(im, px_, 38, 2.2, 1.4, 310 + px_)
 	K.hline(im, 3, 26, 15, timber[1])
-	# woven body: horizontal strands, lit on the left
+	# woven body: a diagonal basket weave, lit on the left, bellied at the middle
 	for y in range(12, 27):
 		var half := 6.4 + sin((y - 12) / 14.0 * PI) * 1.2
 		for x in range(floori(10 - half), ceili(10 + half)):
 			var u := (x - (10 - half)) / (half * 2.0)
-			var strand := (y + (x / 3) % 2) % 3
-			var t := 0.58 + (K.hash2(x, y, 31) - 0.5) * 0.2 - u * 0.45
+			var weave := ((x + y) % 4 < 2) != ((x - y + 40) % 6 < 3)
+			var t := 0.62 + (K.hash2(x, y, 31) - 0.5) * 0.14 - u * 0.55
 			var col := stucco[clampi(roundi(t * 4.0), 0, 4)]
-			if strand == 0:
-				col = col.darkened(0.2)
+			if weave:
+				col = col.darkened(0.16)
+			elif (x + y) % 4 == 0:
+				col = col.lightened(0.08)
 			K.px(im, x, y, col)
-	for y in [16, 21]:
-		K.hline(im, 4, y, 12, timber[1])
-	# thatched cap
+	# willow cord bands
+	for y in [14, 19, 24]:
+		for x in range(4, 17):
+			if im.get_pixel(x, y).a > 0.5:
+				var u := float(x - 4) / 12.0
+				K.px(im, x, y, timber[clampi(3 - int(u * 3.0), 0, 3)])
+		for x in range(4, 17):
+			if im.get_pixel(x, y + 1).a > 0.5:
+				K.px(im, x, y + 1, timber[0])
+	# the cap: layered rings of thatch, each lit on top, and a ridge knot
 	for y in range(3, 13):
 		var half := (y - 1) * 0.8
+		var ring := (y - 3) / 3
 		for x in range(floori(10 - half), ceili(10 + half)):
 			var u := (x - (10 - half)) / maxf(1.0, half * 2.0)
-			var t := 0.7 - u * 0.4 + (K.hash2(x, y, 32) - 0.5) * 0.3
+			var t := 0.72 - u * 0.45 + (K.hash2(x, y, 32) - 0.5) * 0.26
+			if (y - 3) % 3 == 0:
+				t += 0.16
+			elif (y - 3) % 3 == 2:
+				t -= 0.14
 			var col := warm[clampi(roundi(t * 3.0) + 2, 2, 5)].lerp(stucco[3], 0.5)
-			if (x + y * 2) % 4 == 0:
-				col = col.darkened(0.2)
+			if (x + y * 2 + ring) % 4 == 0:
+				col = col.darkened(0.18)
 			K.px(im, x, y, col)
+	# the overhang's shadow on the body
+	for x in range(5, 16):
+		K.px(im, x, 13, Color(0, 0, 0, 0.3))
+		K.px(im, x, 14, Color(0, 0, 0, 0.14))
 	K.hline(im, 3, 12, 14, timber[0])
 	K.px(im, 10, 2, stucco[3])
 	K.px(im, 10, 1, stucco[2])
+	K.px(im, 10, 0, timber[1])
 	K.outline(im, Color("231a16"))
 	return im
 
 
 # ---------------------------------------------------------------- street props
 
-## A steel bear-proof food box: olive paint, latch, and a worn lid edge.
+## A steel bear-proof food box: olive paint over riveted panels, a heavy lid
+## with a latch and hasp, a worn edge, a dent, and a lit top.
 func bear_box() -> Image:
 	var im := K.make(16, 12)
 	K.shadow(im, 8, 10.5, 7.5, 1.4, 0.28)
 	for yy in 9:
 		for xx in 14:
-			var t := 0.55 + (K.hash2(xx, yy, 51) - 0.5) * 0.14 - float(xx) / 14.0 * 0.3
-			K.px(im, 1 + xx, 1 + yy, moss[clampi(roundi(t * 2.0), 0, 2)].darkened(0.1))
-	K.rect(im, 1, 1, 14, 2, iron[3])
-	K.hline(im, 1, 1, 14, iron[3].lightened(0.3))
-	K.hline(im, 1, 3, 14, iron[0])
-	K.rect(im, 6, 5, 4, 3, granite[5])
+			var t := 0.6 + (K.hash2(xx, yy, 51) - 0.5) * 0.1 - float(xx) / 14.0 * 0.32 + (0.5 - float(yy) / 9.0) * 0.1
+			K.px(im, 1 + xx, 1 + yy, moss[clampi(roundi(t * 2.0), 0, 2)].darkened(0.08))
+	# the lid: a steel band with a lit top edge, and a shadow under it
+	K.rect(im, 1, 1, 14, 3, iron[3])
+	K.hline(im, 1, 1, 14, iron[3].lightened(0.35))
+	K.hline(im, 1, 3, 14, iron[1])
+	K.hline(im, 1, 4, 14, iron[0])
+	# paint worn through to steel along the lid edge
+	for xx in [3, 4, 9, 12]:
+		K.px(im, 1 + xx, 5, iron[2])
+	# hasp and latch
+	K.rect(im, 6, 5, 4, 4, granite[5])
 	K.hline(im, 6, 5, 4, granite[6])
+	K.rect(im, 7, 7, 2, 2, iron[0])
+	K.px(im, 7, 6, iron[1])
 	K.vline(im, 8, 6, 2, iron[1])
+	# rivets and a dent
+	for rv in [[2, 6], [13, 6], [2, 8], [13, 8]]:
+		K.px(im, rv[0], rv[1], granite[6])
+	K.px(im, 11, 7, moss[0])
+	K.px(im, 12, 7, moss[0].darkened(0.2))
 	K.hline(im, 1, 9, 14, iron[0])
+	# a bear-warning decal
+	K.px(im, 3, 7, Color("e8d08a"))
+	K.px(im, 4, 7, Color("e8d08a"))
 	K.outline(im, Color("231a16"))
 	return im
 

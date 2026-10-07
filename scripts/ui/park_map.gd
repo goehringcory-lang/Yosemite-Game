@@ -331,7 +331,7 @@ func _refresh() -> void:
 	_acts_label.text = "\n".join(Array(hub.activities).map(func(a: String) -> String: return "- " + a))
 	_route_label.text = _route_text(hub)
 	_route_label.modulate = GOLD if _legs.has(_selected) and _legs[_selected].open else (TEXT if _selected == _hub_here else CLOSED)
-	var tab_hint := "[Tab] Area map"
+	var tab_hint := "[Tab] Area"
 	if _travel:
 		_hint_label.text = "[Arrows] Choose   [E] Travel   [Esc] Close   %s" % tab_hint
 	else:
@@ -507,9 +507,12 @@ func _draw_point(canvas: Control, font: Font, point: Dictionary, selected: bool,
 		ink = BROWN
 		canvas.draw_rect(Rect2(pos - Vector2(1, 1), size + Vector2(2, 3)), TEXT)
 	var alpha := 0.55 if dimmed else 1.0
+	# a soft drop shadow, then the box with a lit top edge
+	canvas.draw_rect(Rect2(pos + Vector2(1, 2), size), Color(0.05, 0.03, 0.02, 0.3 * alpha))
 	canvas.draw_rect(Rect2(pos + Vector2(0, 1), size), Color(border, alpha))
 	canvas.draw_rect(Rect2(pos, size), Color(border, alpha))
 	canvas.draw_rect(Rect2(pos + Vector2(1, 1), size - Vector2(2, 2)), Color(fill, alpha))
+	canvas.draw_rect(Rect2(pos + Vector2(1, 1), Vector2(size.x - 2, 1)), Color(fill.lightened(0.35), alpha))
 	canvas.draw_rect(Rect2(pos + Vector2(1, size.y - 3), Vector2(size.x - 2, 2)), Color(shade, alpha))
 	var text_x := pos.x + 4.0 + icon
 	if ribbon:
@@ -680,7 +683,7 @@ func _build() -> void:
 	box.add_theme_constant_override("separation", 4)
 	panel.add_child(box)
 	_name_label = _label(box)
-	_name_label.add_theme_font_size_override("font_size", 16)
+	_name_label.add_theme_font_size_override("font_size", 20)
 	_name_label.add_theme_color_override("font_color", GOLD)
 	_sub_label = _label(box)
 	_sub_label.modulate = DIM
@@ -718,6 +721,7 @@ func _build() -> void:
 	_area_footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_area_footer.custom_minimum_size.x = 462
 	_area_footer.size.x = 462
+	_area_footer.add_theme_font_size_override("font_size", 8)
 	_area_hint = _label(_area_view)
 	_area_hint.position = Vector2(290, 4)
 	_area_hint.size = Vector2(184, 12)
@@ -731,6 +735,6 @@ func _label(parent: Control) -> Label:
 	var label := Label.new()
 	if parent is VBoxContainer:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.custom_minimum_size.x = INFO_RECT.size.x - 8
+		label.custom_minimum_size.x = INFO_RECT.size.x - 14
 	parent.add_child(label)
 	return label

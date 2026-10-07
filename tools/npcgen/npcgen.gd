@@ -16,6 +16,7 @@ const Looks = preload("res://tools/npcgen/looks.gd")
 const FW := 16
 const FH := 24
 const OUT_DIR := "res://assets/sprites/npcs/"
+const PLAYER_PNG := "res://assets/sprites/player.png"
 const ITEMS_PNG := "res://assets/sprites/story_items.png"
 const LINEUP_PNG := "res://docs/cast_lineup.png"
 const OUTLINE := Color("2a1f1a")
@@ -37,6 +38,7 @@ func _init() -> void:
 		sheet.save_png(ProjectSettings.globalize_path(OUT_DIR + id + ".png"))
 		sheets.append(sheet)
 		print("drew ", id)
+	draw_sheet(Looks.PLAYER).save_png(ProjectSettings.globalize_path(PLAYER_PNG))
 	draw_items().save_png(ProjectSettings.globalize_path(ITEMS_PNG))
 	draw_lineup(sheets).save_png(ProjectSettings.globalize_path(LINEUP_PNG))
 	print("done: %d characters" % sheets.size())
@@ -69,20 +71,56 @@ func lighter(c, amount := 0.2) -> Color:
 	return col(c).lightened(amount)
 
 
-## A 1px dark outline around everything drawn in the current frame.
+## Lights the edges that face the upper left and shades the ones that face
+## away, so flat color blocks read as rounded forms. Call before the outline.
+func shade_frame() -> void:
+	var src := im.get_region(Rect2i(ox, oy, FW, FH))
+	for y in FH:
+		for x in FW:
+			var c := src.get_pixel(x, y)
+			if c.a < 0.5:
+				continue
+			var up := y == 0 or src.get_pixel(x, y - 1).a < 0.5
+			var left := x == 0 or src.get_pixel(x - 1, y).a < 0.5
+			var down := y == FH - 1 or src.get_pixel(x, y + 1).a < 0.5
+			var right := x == FW - 1 or src.get_pixel(x + 1, y).a < 0.5
+			if up:
+				c = c.lightened(0.16)
+			elif left:
+				c = c.lightened(0.08)
+			if down:
+				c = c.darkened(0.14)
+			elif right:
+				c = c.darkened(0.1)
+			im.set_pixel(ox + x, oy + y, c)
+
+
+## A 1px outline around everything drawn in the current frame, tinted from the
+## pixel it touches (a dark brown for skin and wood, a dark green for a shirt)
+## so the figure keeps soft, colored edges instead of a hard black line.
 func outline_frame() -> void:
-	var edge: Array[Vector2i] = []
+	var edge := {}
 	for y in FH:
 		for x in FW:
 			if im.get_pixel(ox + x, oy + y).a > 0.5:
 				continue
-			for d: Vector2i in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+			for d: Vector2i in [Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP]:
 				var n := Vector2i(x, y) + d
 				if n.x >= 0 and n.y >= 0 and n.x < FW and n.y < FH and im.get_pixel(ox + n.x, oy + n.y).a > 0.5:
-					edge.append(Vector2i(x, y))
+					edge[Vector2i(x, y)] = OUTLINE.lerp(im.get_pixel(ox + n.x, oy + n.y).darkened(0.55), 0.5)
 					break
-	for p in edge:
-		im.set_pixel(ox + p.x, oy + p.y, OUTLINE)
+	for p: Vector2i in edge:
+		im.set_pixel(ox + p.x, oy + p.y, edge[p])
+
+
+## A soft ground shadow under the feet, drawn behind the figure.
+func ground_shadow() -> void:
+	for y in range(21, 24):
+		for x in range(2, 14):
+			var dx := (x + 0.5 - 8.0) / 6.2
+			var dy := (y + 0.5 - 22.4) / 1.6
+			if dx * dx + dy * dy <= 1.0 and im.get_pixel(ox + x, oy + y).a < 0.5:
+				im.set_pixel(ox + x, oy + y, Color(0.05, 0.03, 0.02, 0.28))
 
 
 # ---------------------------------------------------------------- sheet
@@ -94,7 +132,9 @@ func draw_sheet(look: Dictionary) -> Image:
 			ox = step * FW
 			oy = facing * FH
 			draw_figure(look, facing, step)
+			shade_frame()
 			outline_frame()
+			ground_shadow()
 		# Right is the left frame mirrored.
 		var left := im.get_region(Rect2i(step * FW, Facing.LEFT * FH, FW, FH))
 		left.flip_x()

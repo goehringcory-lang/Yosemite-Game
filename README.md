@@ -125,6 +125,26 @@ The Ahwahnee's art is the reference for the whole Valley: ramp-shaded, ordered-d
 
 Rebuilding rewrites each area's scene, so story NPCs stay in `scenes/story/content/`. To look at the village art on its own: `godot --headless --path . -s res://tools/hubs/preview_valley_art.gd` writes `docs/valley_art_preview.png`, and `preview_camp4_art.gd` writes `docs/camp4_art_preview.png`.
 
+
+### Graphics pipeline for the generated hubs, UI and people
+
+The four generated hubs (El Portal, Wawona, Glacier Point, Tuolumne Meadows) and the Valley map used to show flat tile ground and simple placeholder trees and huts. They now share the Ahwahnee look:
+
+- **Painted ground.** `tools/mapgen/ground_upgrade.gd` reads each map's terrain tiles and hillshade, paints one detailed picture with `tools/hubs/ahwahnee_ground.gd` (golden foothill grass, chaparral, red-fir needles, granite grit, shaded slopes, rivers with foam, road edges), and adds it to the map scene as `GroundArt`. The tile layer stays underneath, hidden, for collision and foraging. Run `godot --headless --path . res://tools/mapgen/upgrade_hubs.tscn -- paint`, then `godot --headless --path . --import`, then `... upgrade_hubs.tscn -- attach`. Re-run it after regenerating a map. The pictures are in `assets/map/ground/`.
+- **Flora atlas.** `tools/mapgen/flora_hd.gd` draws every tree, shrub, boulder, tent and cabin in `assets/sprites/flora.png` with the Ahwahnee ramps and dithering, in the same 32x48 frames, so no scene changed. Run `godot --headless --path . res://tools/mapgen/paint_flora.tscn` (it also writes the info sign, trailhead and map kiosk, and `docs/generated_flora_preview.png`).
+- **Valley scenes.** The Village, Camp 4, Curry Village, the homestead and the Stoneman trail got finer ground: trampled-duff campground, a gravel lot with worn lanes, curbs and contact shadows where plazas meet grass, and the Indian Village grinding rock now has its bedrock-mortar sprite. After changing `ahwahnee_ground.gd`, run `godot --headless --path . res://tools/hubs/repaint_ground.tscn` (repaints the pictures without rebuilding scenes).
+- **Shop interiors and hotel grounds.** The Store and Mountain Shop rooms get a lamp-lit vignette, a ceiling-beam shadow, woven lozenge rugs with fringe, and lit furniture (`interior_ahwahnee_art.gd`; redraw with `res://tools/hubs/repaint_interiors.tscn`). The hotel grounds' lawn has wide mown swaths with clover and drier patches, and its road gets shoulders (`repaint_ground.tscn -- the_ahwahnee`).
+- **Climbing and the Valley map.** Every climbing wall gets a final grade pass (`ClimbRock._finish`: contrast, warm lights and cool shadows, shade turning toward the corner). The Valley map picture is color-graded with `python3 tools/mapgen/oblique/grade.py` (run it once after `gen.js`), and its labels have drop shadows and lit edges.
+- **Camp 4 and the Indian Village.** Umachas have overlapping bark courses with shadows, a sooted smoke hole, a lintel and a woven door mat; the chuckah has a basket-weave body, cord bands and layered thatch; the bear boxes are riveted steel with a latch and worn paint. Redraw with `res://tools/hubs/repaint_village_art.tscn`.
+- **Village buildings and Curry cabins.** Every Valley village building gets window flower boxes and a wall lantern; the tent cabins have stained, worn canvas, sag creases, patches and stovepipes. Redraw with `repaint_village_art.tscn`.
+- **Curry Village buildings and wood cabins.** The Registration Office, Store, Mountain Shop, Pavilion and Pizza Deck have roof lichen and moss, rain streaks under the eaves, moss at the footing, porch lanterns and hanging flower baskets. The wood cabins gain a stone chimney, a firewood stack, a log step and a lantern.
+- **UI.** Panels are a nine-slice timber frame with a brass line (`tools/ui/ui_art.gd` writes `assets/ui/panel.png`), and the whole UI uses the Tiny5 pixel font at size 10, set in `assets/ui/theme.tres`. `tools/shots/ui_shot.tscn` saves screenshots of the HUD, journal, pause menu, conversation and maps.
+- **People.** `tools/npcgen/npcgen.gd` now lights each figure from the upper left, tints the outline from the color it touches, and bakes in a ground shadow. The player is drawn by the same script (`Looks.PLAYER`).
+
+![El Portal](docs/el_portal_painted.png)
+![Glacier Point](docs/glacier_point_painted.png)
+![Pause menu](docs/ui_pause_menu.png)
+
 ### The Ahwahnee: north from the homestead
 
 The Lamon Homestead has a second gate, in the hedge at its north side, opening onto a trail that runs to the **Ahwahnee Hotel**. It is two hand-made regions, and nothing in them is to scale:
