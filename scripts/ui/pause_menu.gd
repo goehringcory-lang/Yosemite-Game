@@ -12,9 +12,10 @@ const CONTROLS := [
 	["Pause and controls", "Esc", "Start"],
 	["Back out of a menu", "Esc", "B"],
 	["Menus: choose, confirm", "Up/Down, E or Enter", "Stick or D-pad, A"],
-	["Climbing: move up", "W / Up (A, D for up-left, up-right)", "Stick up / left / right"],
-	["Climbing: place a cam", "Space or C", "X"],
-	["Climbing: eat, retreat", "E / Esc", "A / B"],
+	["Climbing: move up", "W / Up (A, D: diagonal)", "Stick up / left / right"],
+	["Climbing: place a cam or clip a bolt", "Space or C", "X"],
+	["Climbing: eat, chalk up, retreat", "E / Esc", "A / B"],
+	["Climbing: aid or jug", "Shift + arrow", "Y + stick"],
 ]
 const OPTIONS := ["Resume", "Quit to desktop"]
 const HEADING := Color(1.0, 0.85, 0.5)

@@ -43,6 +43,7 @@ static func say_to(player: Player, lines: Array) -> void:
 
 func _ready() -> void:
 	layer = 30
+	add_to_group("dialogue_box")
 	_opened_frame = Engine.get_process_frames()
 	var root := Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
