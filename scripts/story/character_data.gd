@@ -16,6 +16,12 @@ extends Resource
 @export_multiline var bio: String
 ## Things they say when they have no quest for you.
 @export var idle_lines: PackedStringArray
+## Optional: a rarer thing they say instead of [member idle_lines], about one
+## talk in [member rare_chance], once the quest [member rare_after_quest] is
+## done (empty means from the start).
+@export var rare_lines: PackedStringArray
+@export var rare_after_quest := ""
+@export_range(0.0, 1.0) var rare_chance := 0.2
 ## 48×96 walking sheet (3 frames × 4 facings, like the player's). Drawn by
 ## tools/npcgen; the NPC falls back to a plain figure in [member color] without one.
 @export var sprite_sheet: Texture2D
@@ -32,3 +38,11 @@ extends Resource
 @export var needs_tribal_review := false
 ## Where the facts in the bio and dialogue come from.
 @export_multiline var sources: String
+
+
+## What they say when they have no quest for you. [param rare_unlocked] is
+## whether [member rare_after_quest] is done; [param roll] is a random 0 to 1.
+func idle_lines_for(rare_unlocked: bool, roll := randf()) -> PackedStringArray:
+	if not rare_lines.is_empty() and rare_unlocked and roll < rare_chance:
+		return rare_lines
+	return idle_lines

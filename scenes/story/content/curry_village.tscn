@@ -8,6 +8,7 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_tourist.tres" id="6_r"]
 [ext_resource type="Resource" path="res://data/characters/jules_eichorn.tres" id="7_r"]
 [ext_resource type="Resource" path="res://data/characters/bestor_robinson.tres" id="8_r"]
+[ext_resource type="Script" path="res://scripts/world/firefall.gd" id="9_r"]
 
 [node name="CurryVillageStory" type="Node2D"]
 
@@ -49,3 +50,7 @@ character = ExtResource("8_r")
 spot = "apron_trailhead"
 offset = Vector2(14, 44)
 wander_radius = 12.0
+
+[node name="Firefall" type="Node2D" parent="."]
+position = Vector2(980, 8)
+script = ExtResource("9_r")

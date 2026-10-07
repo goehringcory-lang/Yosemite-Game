@@ -20,6 +20,7 @@ static func attach(region: Region) -> void:
 	if region.has_meta("story_attached"):
 		return
 	region.set_meta("story_attached", true)
+	EasterEggs.dress(region)
 	var path := path_for(region.region_id)
 	if not ResourceLoader.exists(path):
 		return

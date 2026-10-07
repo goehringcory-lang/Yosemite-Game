@@ -10,6 +10,11 @@ signal region_changed(region: Region)
 
 ## Drives can't arrive later than this many hours before the pass-out time.
 const TRAVEL_CUTOFF_HOURS := 1
+## Seen the morning after the player passes out (an Easter egg): the bears
+## came by, and the pack was zipped, so nothing is lost.
+const BEAR_TRACKS_MESSAGE := "Bear tracks by the fence this morning. Your pack was zipped."
+## Seconds to let the "passed out" message show before the tracks message.
+const BEAR_TRACKS_DELAY := 3.8
 
 ## The region the player is in.
 var region: Region
@@ -205,8 +210,17 @@ func sleep(passed_out := false) -> void:
 		hud.show_message("You stayed out too late and passed out...")
 	else:
 		hud.show_message("Good morning! Your game was saved.")
+	if passed_out:
+		_show_bear_tracks() # once per pass-out, so it never repeats on later mornings
 	_set_paused(false)
 	_busy = false
+
+
+## The morning after passing out, once the first message has had its moment.
+func _show_bear_tracks() -> void:
+	await get_tree().create_timer(BEAR_TRACKS_DELAY).timeout
+	if is_inside_tree():
+		hud.show_message(BEAR_TRACKS_MESSAGE)
 
 
 ## Swaps regions right away (no fade). The player lands on [param spawn_name]

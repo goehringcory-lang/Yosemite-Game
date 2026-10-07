@@ -267,7 +267,7 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 		return lines
 
 	if lines.is_empty() and character:
-		_add_lines(lines, speaker, character.idle_lines)
+		_add_lines(lines, speaker, character.idle_lines_for(character.rare_after_quest == "" or is_completed(character.rare_after_quest)))
 	return lines
 
 
