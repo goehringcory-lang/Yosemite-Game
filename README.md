@@ -324,6 +324,17 @@ godot --headless --path . res://tests/eggs_test.tscn
 
 The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds).
 
+### Performance bench
+
+```bash
+godot --headless --fixed-fps 60 --path . res://tools/perf/bench.tscn
+godot --headless --fixed-fps 60 --path . res://tools/perf/bench.tscn -- only=wawona frames=300   # one region
+```
+
+It boots the real world, visits every region, and prints a table: first-visit load time, the first frame there, a return visit, a new day's forage, opening the map, and frame times (average, 99th percentile, peak) by day and at night. Then it opens the climbing screen on four routes and times painting it and its frames. The numbers also go to `user://bench.json`. Headless has no GPU, so these are CPU costs (scripts, physics, scenes); run it before and after a change on the same machine and compare. It takes about a minute.
+
+Things that keep it fast: World loads the regions next door on a background thread (`_preload_neighbors`), a forage spawner reads its map's habitats once, a Region keeps its list of Places, the map keeps each hub's sign layout, and the climbing screen paints the far landscape on a worker thread while it paints the wall.
+
 ## Map data credits
 
 The maps are made from data under these licenses. Keep this credit in the game's credits screen:

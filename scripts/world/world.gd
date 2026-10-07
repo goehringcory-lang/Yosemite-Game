@@ -30,6 +30,13 @@ var forage: ForageSpawner:
 ## Regions visited this session, by id. They stay in memory while the player
 ## is elsewhere, so anything that changed in them is still there on return.
 var _regions: Dictionary = {}
+## Region scenes loaded in the background before the player needs them, so
+## walking through a door or driving to a hub doesn't stall on reading the
+## scene: paths waiting their turn, the one loading now, and the finished
+## scenes (path -> PackedScene) until the region is first entered.
+var _preload_queue: Array[String] = []
+var _preloading := ""
+var _preloaded: Dictionary = {}
 var _busy := false
 var _place_check := 0.0
 ## The clock hit the pass-out hour while World or a dialogue was busy; the
@@ -73,6 +80,9 @@ func _ready() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:
+		# Collect a background load still running, so it doesn't outlive World.
+		if _preloading != "":
+			ResourceLoader.load_threaded_get(_preloading)
 		for cached: Region in _regions.values():
 			if is_instance_valid(cached) and cached.get_parent() == null:
 				cached.free()
@@ -81,6 +91,7 @@ func _notification(what: int) -> void:
 func _process(delta: float) -> void:
 	if _curfew_pending and not _busy and not _dialogue_open():
 		sleep(true)
+	_pump_preload()
 	_place_check -= delta
 	if _place_check <= 0.0:
 		_place_check = 0.25
@@ -252,7 +263,7 @@ func _enter_region(id: String, spawn_name := "") -> void:
 	region = _regions.get(id)
 	var first_visit := region == null
 	if first_visit:
-		var scene: PackedScene = load(region_scene_path(id))
+		var scene := _load_region_scene(id)
 		region = scene.instantiate()
 		_regions[id] = region
 	add_child(region)
@@ -274,6 +285,60 @@ func _enter_region(id: String, spawn_name := "") -> void:
 		forage.refresh()
 	region_changed.emit(region)
 	_update_location()
+	_preload_neighbors()
+
+
+## The scene for region [param id]: one loaded in the background if it's ready
+## (or waiting for it if it's loading now), otherwise loaded now.
+func _load_region_scene(id: String) -> PackedScene:
+	var path := region_scene_path(id)
+	var scene: PackedScene = _preloaded.get(path)
+	_preloaded.erase(path)
+	_preload_queue.erase(path)
+	if scene == null and _preloading == path:
+		_preloading = ""
+		scene = ResourceLoader.load_threaded_get(path) as PackedScene
+	return scene if scene else load(path)
+
+
+## Queues background loads of the regions the player can reach next from
+## here: through its doors and exits first, then its hub and home (where a
+## ranger takes you if you pass out), then the hubs down the road.
+func _preload_neighbors() -> void:
+	if not region.has_meta("exit_targets"):
+		var targets: Array[String] = []
+		for node in region.find_children("*", "", true, false):
+			if node is RegionExit or node is RegionDoor:
+				targets.append(node.target_region)
+		region.set_meta("exit_targets", targets)
+	var ids: Array[String] = []
+	ids.append_array(region.get_meta("exit_targets"))
+	ids.append(region.hub_id)
+	ids.append(Park.HOME_REGION)
+	for leg in Park.legs_from(region.hub_id):
+		var hub := Park.get_hub(leg.to)
+		ids.append(hub.arrival_region if hub.arrival_region != "" else hub.id)
+	for id in ids:
+		var path := region_scene_path(id)
+		if id == "" or _regions.has(id) or _preloaded.has(path) or _preloading == path or path in _preload_queue \
+				or ResourceLoader.has_cached(path) or not ResourceLoader.exists(path):
+			continue
+		_preload_queue.append(path)
+
+
+## Loads the queued regions one at a time on a background thread.
+func _pump_preload() -> void:
+	if _preloading != "":
+		match ResourceLoader.load_threaded_get_status(_preloading):
+			ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+				return
+			ResourceLoader.THREAD_LOAD_LOADED:
+				_preloaded[_preloading] = ResourceLoader.load_threaded_get(_preloading)
+		_preloading = ""
+	while _preloading == "" and not _preload_queue.is_empty():
+		var path: String = _preload_queue.pop_front()
+		if ResourceLoader.load_threaded_request(path) == OK:
+			_preloading = path
 
 
 ## Makes sure the player isn't standing inside something solid (a spawn that

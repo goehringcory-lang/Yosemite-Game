@@ -48,6 +48,8 @@ var _rng := RandomNumberGenerator.new()
 ## Bumped by clear(), so a respawn that's still waiting gives way to a newer
 ## respawn or a loaded save.
 var _generation := 0
+## Habitat -> cells, from _find_habitats(); empty until the first spawn.
+var _habitats := {}
 
 
 func _ready() -> void:
@@ -111,7 +113,15 @@ func world_to_cell(world_position: Vector2) -> Vector2i:
 
 
 ## Habitat -> Array of open cells. A cell can belong to several habitats.
+## The map doesn't change during play, so this is worked out once per spawner
+## (it reads every tile of a hub, which takes a noticeable moment) and kept.
 func _find_habitats() -> Dictionary:
+	if _habitats.is_empty():
+		_habitats = _scan_habitats()
+	return _habitats
+
+
+func _scan_habitats() -> Dictionary:
 	var oak_cells := {}
 	for oak: Node2D in get_tree().get_nodes_in_group("black_oak"):
 		if is_ancestor_of(oak) or get_parent().is_ancestor_of(oak):
@@ -119,42 +129,79 @@ func _find_habitats() -> Dictionary:
 	if oak_canopy:
 		for cell in oak_canopy.get_used_cells():
 			oak_cells[cell] = true
+	# Cells within reach of an oak, of water, and of manzanita, marked once
+	# from each source cell instead of searched around every ground cell.
+	var under_oak := {}
+	for oak_cell: Vector2i in oak_cells:
+		for dy in range(0, OAK_REACH + 1):
+			for dx in range(-OAK_REACH, OAK_REACH + 1):
+				under_oak[oak_cell + Vector2i(dx, dy)] = true
+	var near_water := {}
+	var near_manzanita := {}
+	var near_starter_water := {}
+	var near_starter_manzanita := {}
+	# Read each ground tile once; the second pass below reuses these.
+	var cells := ground.get_used_cells()
+	var sources := PackedInt32Array()
+	sources.resize(cells.size())
+	var types := PackedInt32Array()
+	types.resize(cells.size())
+	for i in cells.size():
+		var cell := cells[i]
+		var coords := ground.get_cell_atlas_coords(cell)
+		var source := ground.get_cell_source_id(cell)
+		sources[i] = source
+		types[i] = coords.y
+		if source == SOURCE_TERRAIN and coords.y in WATER_TERRAIN:
+			_mark_around(near_water, cell)
+		# Like _touches_tile(), these match the atlas coords from any source.
+		if coords == WATER_TILE:
+			_mark_around(near_starter_water, cell)
+		elif coords == MANZANITA_TILE:
+			_mark_around(near_starter_manzanita, cell)
+	var flora_cells := {}
+	if flora:
+		var manzanita := Terrain.frame_coords(Terrain.Flora.MANZANITA)
+		for cell in flora.get_used_cells():
+			flora_cells[cell] = true
+			if flora.get_cell_source_id(cell) == SOURCE_FLORA and flora.get_cell_atlas_coords(cell) == manzanita:
+				_mark_around(near_manzanita, cell)
 
 	var result := {}
-	for cell in ground.get_used_cells():
-		var source := ground.get_cell_source_id(cell)
+	for i in cells.size():
+		var cell := cells[i]
+		var source := sources[i]
 		if source == SOURCE_TERRAIN:
-			var type := ground.get_cell_atlas_coords(cell).y
-			if type not in NATURAL_TERRAIN or _has_flora(cell):
+			var type := types[i]
+			if type not in NATURAL_TERRAIN or flora_cells.has(cell):
 				continue
 			if type in MEADOW_TERRAIN:
 				_add(result, ItemData.Habitat.MEADOW, cell)
-			if type == Terrain.SCRUB or _touches_flora(cell, Terrain.Flora.MANZANITA):
+			if type == Terrain.SCRUB or near_manzanita.has(cell):
 				_add(result, ItemData.Habitat.CHAPARRAL, cell)
-			if _touches_terrain(cell, WATER_TERRAIN):
+			if near_water.has(cell):
 				_add(result, ItemData.Habitat.RIVERSIDE, cell)
 		elif source == SOURCE_STARTER:
 			var data := ground.get_cell_tile_data(cell)
 			if data == null or not data.get_custom_data("open_ground"):
 				continue
 			_add(result, ItemData.Habitat.MEADOW, cell)
-			if _touches_tile(cell, MANZANITA_TILE):
+			if near_starter_manzanita.has(cell):
 				_add(result, ItemData.Habitat.CHAPARRAL, cell)
-			if _touches_tile(cell, WATER_TILE):
+			if near_starter_water.has(cell):
 				_add(result, ItemData.Habitat.RIVERSIDE, cell)
 		else:
 			continue
-		if _under_oak(cell, oak_cells):
+		if under_oak.has(cell):
 			_add(result, ItemData.Habitat.OAK_WOODLAND, cell)
 	return result
 
 
-func _under_oak(cell: Vector2i, oak_cells: Dictionary) -> bool:
-	for dy in range(0, OAK_REACH + 1):
-		for dx in range(-OAK_REACH, OAK_REACH + 1):
-			if oak_cells.has(cell - Vector2i(dx, dy)):
-				return true
-	return false
+## Marks [param cell] and its eight neighbours in [param cells].
+static func _mark_around(cells: Dictionary, cell: Vector2i) -> void:
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			cells[cell + Vector2i(dx, dy)] = true
 
 
 ## Nothing solid (a tree trunk, rock, sign, or building) is on this cell.
