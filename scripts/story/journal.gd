@@ -7,6 +7,8 @@ extends CanvasLayer
 
 const HEADING := Color(1.0, 0.85, 0.5)
 const DIM := Color(1, 1, 1, 0.6)
+## The thin line under each section heading.
+const RULE := Color(0.85, 0.7, 0.37, 0.45)
 ## Pixels one Up/Down press scrolls, and how long a held key waits before it
 ## repeats, then how often it repeats.
 const SCROLL_STEP := 24
@@ -16,6 +18,9 @@ const REPEAT_EVERY := 0.06
 var _panel: PanelContainer
 var _scroll: ScrollContainer
 var _body: VBoxContainer
+## Controls hint and "more above/below" marks, under the page so they never scroll away.
+var _footer: Label
+var _more: Label
 var _repeat := 0.0
 
 
@@ -27,10 +32,22 @@ func _ready() -> void:
 	_panel.custom_minimum_size = Vector2(400, 230)
 	_panel.visible = false
 	add_child(_panel)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 2)
+	_panel.add_child(column)
 	_scroll = ScrollContainer.new()
-	_scroll.custom_minimum_size = Vector2(392, 222)
+	_scroll.custom_minimum_size = Vector2(392, 206)
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_panel.add_child(_scroll)
+	column.add_child(_scroll)
+	var footer := HBoxContainer.new()
+	column.add_child(footer)
+	_footer = Label.new()
+	_footer.add_theme_color_override("font_color", DIM)
+	_footer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	footer.add_child(_footer)
+	_more = Label.new()
+	_more.add_theme_color_override("font_color", HEADING)
+	footer.add_child(_more)
 	_body = VBoxContainer.new()
 	_body.add_theme_constant_override("separation", 0)
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -83,6 +100,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	if not is_open():
 		return
+	_refresh_more()
 	var held := int(Input.is_action_pressed("move_down") or Input.is_action_pressed("ui_down")) \
 			- int(Input.is_action_pressed("move_up") or Input.is_action_pressed("ui_up"))
 	if held == 0:
@@ -167,8 +185,26 @@ func _refresh() -> void:
 		_heading("Chuckah")
 		_line("%d of %d acorns stored. They won't spoil." % [Granary.acorns, Granary.capacity])
 
-	_line("")
-	_line("Up/Down to scroll · J or Esc to close (gamepad: stick, Y or B)", DIM)
+	_refresh_footer()
+
+
+## The controls hint in the current device's buttons.
+func _refresh_footer() -> void:
+	var tree := get_tree()
+	_footer.text = "[%s] Scroll   [%s] Close" % [MenuInput.button(tree, "Up/Down", "Stick"),
+		MenuInput.button(tree, "J/Esc", "Y/B")]
+
+
+## "More v" while there's more page below, "^ Top" at the end of a long page.
+func _refresh_more() -> void:
+	var bar := _scroll.get_v_scroll_bar()
+	var hidden_below := bar.max_value - bar.page - _scroll.scroll_vertical
+	if hidden_below > 1.0:
+		_more.text = "More below  v"
+	elif _scroll.scroll_vertical > 0:
+		_more.text = "^  More above"
+	else:
+		_more.text = ""
 
 
 ## The Register's pages: the stories you've heard, front pages first, with
@@ -246,11 +282,25 @@ func _gear_line(item: GearData, count: int) -> void:
 	_body.add_child(row)
 
 
+## A section heading: a gap above (but not at the top of the page), the
+## title in gold, and a thin rule under it.
 func _heading(text: String) -> void:
+	if _body.get_child_count() > 0:
+		var gap := Control.new()
+		gap.custom_minimum_size.y = 5
+		_body.add_child(gap)
 	var label := Label.new()
 	label.text = text
 	label.add_theme_color_override("font_color", HEADING)
 	_body.add_child(label)
+	var rule := ColorRect.new()
+	rule.color = RULE
+	rule.custom_minimum_size = Vector2(384, 1)
+	rule.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_body.add_child(rule)
+	var under := Control.new()
+	under.custom_minimum_size.y = 2
+	_body.add_child(under)
 
 
 func _line(text: String, color := Color.WHITE) -> void:

@@ -12,3 +12,39 @@ static func pressed(event: InputEvent, action: StringName) -> bool:
 	if not event.is_action_pressed(action):
 		return false
 	return not event is InputEventJoypadMotion or Input.is_action_just_pressed(action)
+
+
+## The name to show for a control on the device in use: [param keyboard] or
+## [param gamepad] (see HUD.prompt). Menus use it so every hint follows the
+## same keyboard/gamepad switch and the Button prompts setting.
+static func button(tree: SceneTree, keyboard: String, gamepad: String) -> String:
+	var hud: HUD = null
+	if tree:
+		hud = tree.get_first_node_in_group("hud") as HUD
+	if hud:
+		return hud.prompt(keyboard, gamepad)
+	Settings.ensure_loaded()
+	return gamepad if Settings.prompts == Settings.Prompts.GAMEPAD else keyboard
+
+
+## True for a fresh press of confirm (interact, use, or Enter).
+static func confirm(event: InputEvent) -> bool:
+	return event.is_action_pressed("interact") or event.is_action_pressed("use_tool") or event.is_action_pressed("ui_accept")
+
+
+## -1, 0 or +1 for a fresh Up/Down press (keys, D-pad, or a stick flick).
+static func vertical(event: InputEvent) -> int:
+	if pressed(event, "move_up") or pressed(event, "ui_up"):
+		return -1
+	if pressed(event, "move_down") or pressed(event, "ui_down"):
+		return 1
+	return 0
+
+
+## -1, 0 or +1 for a fresh Left/Right press.
+static func horizontal(event: InputEvent) -> int:
+	if pressed(event, "move_left") or pressed(event, "ui_left"):
+		return -1
+	if pressed(event, "move_right") or pressed(event, "ui_right"):
+		return 1
+	return 0
