@@ -89,6 +89,8 @@ func _refresh() -> void:
 	for text in objectives:
 		_line("- " + text)
 
+	_register()
+
 	_guidebook()
 
 	_heading("Climbing gear")
@@ -118,6 +120,24 @@ func _refresh() -> void:
 
 	_line("")
 	_line("J or Esc to close (gamepad: Y or B)", DIM)
+
+
+## The Register's pages: the stories you've heard, front pages first, with
+## later hands in the margins, then your own last page.
+func _register() -> void:
+	var pages := RegisterPages.written()
+	if pages.is_empty():
+		return
+	_heading("The Register: %d page%s" % [pages.size(), "" if pages.size() == 1 else "s"])
+	for page: Dictionary in pages:
+		_line("%s: %s" % [page.by, page.text])
+		for note: String in page.notes:
+			_line("     " + note, DIM)
+		if page.review:
+			_line("     (Placeholder pending tribal review.)", DIM)
+	if QuestLog.final_entry >= 0:
+		var entry: String = QuestLog.FINAL_ENTRIES[QuestLog.final_entry].entry
+		_line("You: %s" % (entry if entry != "" else "(left blank)"), DIM if entry == "" else Color.WHITE)
 
 
 ## The guidebook's tick list: every route, its grade, the gear it needs, and

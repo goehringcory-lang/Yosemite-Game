@@ -6,9 +6,10 @@
 script = ExtResource("1_route")
 id = "royal_arches"
 display_name = "Royal Arches"
-grade = "5.7 A0, 16 pitches"
+grade = "5.7 A0"
+real_pitches = 16
 description = "A long, wandering climb up the huge granite arches behind the Ahwahnee to the north rim. The last pitches are a famous friction traverse."
-first_ascent = "Morgan Harris, Kenneth Adam, and Hervey Voge, 1936"
+first_ascent = "Morgan Harris, Kenneth Adam, and Kenneth Davis, October 1936"
 required_gear = {"rope": 1, "harness": 1, "cam": 4, "quickdraw": 4}
 pitches = Array[int]([2, 2, 3, 2, 3, 3])
 moves_per_pitch = 8

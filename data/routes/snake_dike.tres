@@ -6,7 +6,8 @@
 script = ExtResource("1_route")
 id = "snake_dike"
 display_name = "Snake Dike"
-grade = "5.7 R, 8 pitches"
+grade = "5.7 R"
+real_pitches = 8
 description = "A thin dike of harder rock snakes up the smooth southwest shoulder of Half Dome. Protection is sparse, and the climbing is easier than it looks and scarier than it sounds."
 first_ascent = "Eric Beck, Jim Bridwell, and Chris Fredericks, 1965"
 required_gear = {"rope": 1, "harness": 1, "cam": 2, "quickdraw": 6, "belay_device": 1}

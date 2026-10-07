@@ -65,7 +65,7 @@ static func main_quest_for(route_id: String) -> QuestData:
 
 
 ## A grade's number on the Yosemite Decimal System, for comparing routes:
-## "5.5" -> 5.0, "5.10b" -> 10.25, "VI 5.13+, 31 pitches" -> 13.9.
+## "5.5" -> 5.0, "5.10b" -> 10.25, "5.11+" -> 11.9, "VI 5.13" -> 13.0.
 ## Grades off the scale (glaciers, "easy") return 0.
 static func yds(grade: String) -> float:
 	var regex := RegEx.create_from_string("5\\.(\\d+)([abcd])?(\\+)?")
@@ -81,7 +81,7 @@ static func yds(grade: String) -> float:
 	return value
 
 
-## Just the decimal part of a grade: "VI 5.13+, 31 pitches" -> "5.13+".
+## Just the decimal part of a grade: "V 5.10b" -> "5.10b".
 static func yds_label(grade: String) -> String:
 	var found := RegEx.create_from_string("5\\.\\d+[abcd+]?").search(grade)
 	return found.get_string() if found else grade

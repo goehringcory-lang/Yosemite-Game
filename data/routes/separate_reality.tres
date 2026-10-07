@@ -6,7 +6,7 @@
 script = ExtResource("1_route")
 id = "separate_reality"
 display_name = "Separate Reality"
-grade = "5.12a, 1 pitch"
+grade = "5.12a"
 description = "A single crack splitting a twenty-foot roof, hundreds of feet above the Merced River at the Valley's west end. You hang upside down from your hands and feet, then turn the lip with the whole canyon under your heels. Older guidebooks call it 5.11d. Most climbers now call it 5.12a."
 first_ascent = "First free ascent 1978"
 required_gear = {"rope": 1, "harness": 1, "cam": 6, "quickdraw": 2, "chalk_bag": 1}

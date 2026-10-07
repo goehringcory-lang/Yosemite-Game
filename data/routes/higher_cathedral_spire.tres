@@ -6,8 +6,8 @@
 script = ExtResource("1_route")
 id = "higher_cathedral_spire"
 display_name = "Higher Cathedral Spire"
-grade = "III 5.9, 6 pitches"
-description = "A granite fin on the south wall near Bridalveil. In 1934 three Berkeley climbers hauled the best gear in North America up it: German pitons, a rope, and a plan. It was the first big technical climb in the Valley."
+grade = "III 5.9"
+description = "A granite fin on the south wall near Bridalveil. In 1934 three Sierra Club climbers hauled the best gear in North America up it: German pitons, a rope, and a plan. It was the first big technical climb in the Valley."
 first_ascent = "Jules Eichorn, Dick Leonard, and Bestor Robinson, April 15, 1934"
 required_gear = {"rope": 1, "harness": 1, "cam": 6, "quickdraw": 4, "belay_device": 1}
 pitches = Array[int]([3, 3, 3, 3, 3, 2])

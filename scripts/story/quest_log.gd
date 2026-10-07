@@ -97,7 +97,7 @@ const FINAL_ENTRIES: Array[Dictionary] = [
 		"reply": "Many hands, and not one of them mine alone. Good."},
 	{"choice": "Write a thank-you",
 		"entry": "Thank you to everyone who shared a story, and to everyone who chose not to.",
-		"reply": "Thanks is a fine thing to end a book on. Most of mine forgot it."},
+		"reply": "Saying thanks is a fine way to end a book. Most of mine forgot to."},
 	{"choice": "List the climbs, route by route",
 		"entry": "Firefall Slab to the Lyell Glacier. Every pitch was somebody's gift: a rope, a rack, a meal, a story.",
 		"reply": "A tick list. Ha. Muir would call it a hymn."},
@@ -208,9 +208,14 @@ func main_objective() -> Dictionary:
 		if not unmet.is_empty() and unmet.all(func(r: String) -> bool: return not get_quest(r).main_line):
 			var titles := PackedStringArray()
 			for r: String in unmet:
-				var side := get_quest(r)
+				# Name the quest the player can act on now, not one that is
+				# itself waiting on another (Maria Lebrado waits on Tenaya).
+				var side := _first_open(get_quest(r))
 				var side_giver := get_character(side.giver)
-				titles.append("%s from %s" % [side.title, side_giver.display_name if side_giver else side.giver])
+				var title := "%s from %s" % [side.title, side_giver.display_name if side_giver else side.giver]
+				if side.id == "tabuce_acorns" and not active.has(side.id) and GameClock.season != GameClock.Season.FALL:
+					title += " (the oaks drop acorns in fall)"
+				titles.append(title)
 			if quest.id == LAST_PAGE_QUEST:
 				return {"quest": quest, "objective": "Before the last page, hear everyone out: %s" % ", ".join(titles)}
 			var next_giver := get_character(quest.giver)
@@ -219,8 +224,21 @@ func main_objective() -> Dictionary:
 		if unmet.is_empty():
 			var giver := get_character(quest.giver)
 			var where := " (%s)" % giver.home if giver and giver.home != "" else ""
-			return {"quest": quest, "objective": "Talk to %s%s" % [giver.display_name if giver else quest.giver, where]}
+			var objective := "Talk to %s%s" % [giver.display_name if giver else quest.giver, where]
+			# Muir waits up in Tuolumne, and the Tioga Road shuts for winter.
+			if quest.id == "muir_cathedral" and not Park.is_open("tioga_road"):
+				objective += ". The Tioga Road is closed for winter. It reopens in early summer."
+			return {"quest": quest, "objective": objective}
 	return {}
+
+
+## The first quest in [param quest]'s chain of requirements that the player
+## hasn't finished, which is the one they can start or are already doing.
+func _first_open(quest: QuestData) -> QuestData:
+	for r: String in quest.requires:
+		if not is_completed(r):
+			return _first_open(get_quest(r))
+	return quest
 
 
 ## True once The Last Page is done and the player hasn't written their entry.

@@ -6,9 +6,9 @@
 script = ExtResource("1_route")
 id = "cathedral_peak"
 display_name = "Cathedral Peak"
-grade = "5.6, 5 pitches"
+grade = "5.6"
 description = "Clean, knobby granite up the southeast buttress to a summit block the size of a kitchen table."
-first_ascent = "Summit first reached by John Muir, 1869"
+first_ascent = "First recorded ascent: John Muir, 1869"
 required_gear = {"rope": 1, "harness": 1, "cam": 4, "quickdraw": 4}
 pitches = Array[int]([2, 2, 3, 3, 2])
 moves_per_pitch = 8

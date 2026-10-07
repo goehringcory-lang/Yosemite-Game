@@ -6,9 +6,10 @@
 script = ExtResource("1_route")
 id = "the_nose"
 display_name = "The Nose"
-grade = "VI 5.13+, 31 pitches (5.9 C2 with aid)"
-description = "The prow of El Capitan: three thousand feet of cracks, pendulums, and roofs. Harding nailed and bolted his way up it in 1958. Climbed free, with only hands and feet doing the work, it is the top of the grade scale: the Great Roof and the Changing Corners are both 5.13."
-first_ascent = "Warren Harding, Wayne Merry, and George Whitmore, 1958 (aid, 45 days over 18 months). First free ascent 1993"
+grade = "VI 5.13"
+real_pitches = 31
+description = "The prow of El Capitan: three thousand feet of cracks, pendulums, and roofs. Harding nailed and bolted his way up it in 1958. Climbed free, with only hands and feet doing the work, it is the top of the grade scale. The guidebook calls it 5.13 to keep the ladder simple. In real life the Great Roof is 5.13c and the Changing Corners 5.14a, and the free Nose is graded 5.14a."
+first_ascent = "Warren Harding, Wayne Merry, and George Whitmore, 1958 (aid, 47 days over 17 months). First free ascent 1993"
 required_gear = {"rope": 1, "harness": 1, "cam": 10, "quickdraw": 6, "aiders": 2, "ascenders": 2, "haul_bag": 1, "portaledge": 1}
 pitches = Array[int]([4, 4, 5, 4, 5, 5, 5, 4, 4])
 moves_per_pitch = 9

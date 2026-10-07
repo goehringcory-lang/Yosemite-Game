@@ -6,7 +6,7 @@
 script = ExtResource("1_route")
 id = "glacier_point_apron"
 display_name = "Glacier Point Apron"
-grade = "5.7 slab, 3 pitches"
+grade = "5.7 slab"
 description = "A sweep of smooth granite below Glacier Point. The climbing is all about trusting your feet on tiny edges."
 required_gear = {"cam": 2, "harness": 1, "rope": 1}
 pitches = Array[int]([2, 2, 3])

@@ -6,8 +6,8 @@
 script = ExtResource("1_route")
 id = "nutcracker"
 display_name = "Nutcracker"
-grade = "5.8, 5 pitches"
-description = "Cracks, flakes, and a famous mantel up the Manure Pile Buttress, on the Valley's north wall above the Church Bowl near Yosemite Lodge. Royal and Liz Robbins put it up using only nuts, to show the Valley that a good route doesn't need a hammer."
+grade = "5.8"
+description = "Cracks, flakes, and a famous mantel up the Manure Pile Buttress, on the Valley's north wall near El Capitan, west of Camp 4. Royal and Liz Robbins put it up using only nuts, to show the Valley that a good route doesn't need a hammer."
 first_ascent = "Royal and Liz Robbins, 1967"
 required_gear = {"rope": 1, "harness": 1, "cam": 4, "quickdraw": 2}
 guide_chapter = "The Valley walls"
