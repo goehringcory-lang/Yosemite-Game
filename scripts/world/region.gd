@@ -21,6 +21,11 @@ extends Node2D
 
 const SeasonalDressing = preload("res://scripts/world/seasonal_dressing.gd")
 
+## The Place nodes in this region, found once and kept until a Place enters or
+## leaves (see Place). place_at() runs several times a second.
+var _places: Array[Place] = []
+var _places_valid := false
+
 @onready var map: RegionMap = get_node_or_null("Map")
 @onready var entities: Node2D = $Entities
 
@@ -44,12 +49,20 @@ func get_spawn(spawn_name: String) -> Marker2D:
 	return null
 
 
+## Every Place in the region. The array is shared: don't change it.
 func get_places() -> Array[Place]:
-	var places: Array[Place] = []
-	for node in find_children("*", "Marker2D", true, false):
-		if node is Place:
-			places.append(node)
-	return places
+	if not _places_valid:
+		_places.clear()
+		for node in find_children("*", "Marker2D", true, false):
+			if node is Place:
+				_places.append(node)
+		_places_valid = true
+	return _places
+
+
+## Called by a Place entering or leaving the region, so get_places() looks again.
+func places_changed() -> void:
+	_places_valid = false
 
 
 ## The most specific named place around [param pos], or null.

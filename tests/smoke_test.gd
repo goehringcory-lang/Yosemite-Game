@@ -115,7 +115,10 @@ func _ready() -> void:
 		waited += 0.1
 	check(GameClock.day == saved_day + 1 and GameClock.hour == 6, "passing out at 2 AM starts next day")
 
-	# Season rollover
+	# Season rollover. On a busy machine the pass-out morning can still be
+	# fading in, and sleep() does nothing while World is busy.
+	while world._busy:
+		await get_tree().process_frame
 	GameClock.day = 28
 	GameClock.season = GameClock.Season.SPRING
 	await world.sleep()

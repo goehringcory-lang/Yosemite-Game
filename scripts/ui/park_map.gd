@@ -83,6 +83,10 @@ var _points: Array = []
 ## Top-left of each point's sign on the area canvas, nudged clear of the
 ## other signs and the markers (same order as _points).
 var _sign_at: Array[Vector2] = []
+## Read-only caches, so the map opens quickly after the first time: each
+## hub's view data and relief image (by path), and its sign layout (by hub).
+var _view_cache: Dictionary = {}
+var _sign_cache: Dictionary = {}
 var _cursor := -1
 ## Name of the shuttle stop the player is riding from, while choosing where to go.
 var _shuttle_from := ""
@@ -764,7 +768,13 @@ func _load_area_map() -> void:
 	_area_canvas.position = _area_rect.position
 	_area_canvas.size = shown
 	_area_footer.position = Vector2(9, 245) if not _view.is_empty() else Vector2(8, 250)
-	_place_signs()
+	# Where the signs go depends only on the hub's picture and data, so the
+	# search runs once per hub.
+	if _sign_cache.has(_hub_here):
+		_sign_at = _sign_cache[_hub_here].duplicate()
+	else:
+		_place_signs()
+		_sign_cache[_hub_here] = _sign_at.duplicate()
 
 
 ## Reads the illustrated map's data, if this hub has one (<hub>_view.json).
@@ -773,6 +783,11 @@ func _load_view() -> void:
 	_relief = null
 	_points = []
 	var path := "res://assets/map/areas/%s_view.json" % _hub_here
+	if _view_cache.has(path):
+		_view = _view_cache[path].view
+		_relief = _view_cache[path].relief
+		_points = _view.get("points", [])
+		return
 	if not FileAccess.file_exists(path):
 		return
 	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
@@ -783,6 +798,7 @@ func _load_view() -> void:
 	_points = _view.get("points", [])
 	var relief: Texture2D = load(str(_view.relief)) if ResourceLoader.exists(str(_view.relief)) else null
 	_relief = relief.get_image() if relief else null
+	_view_cache[path] = {"view": _view, "relief": _relief}
 
 
 # ---------------------------------------------------------------- layout
