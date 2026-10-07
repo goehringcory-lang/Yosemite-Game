@@ -1,6 +1,7 @@
 extends Node
 ## Saves screenshots of the game's screens: the HUD with a message and a sign,
-## the journal, the pause menu, a conversation, and the Valley and park maps.
+## the journal, the pause menu and its Settings and Controls pages, a
+## conversation (and a choice), and the Valley and park maps.
 ## Needs a window (not --headless). Environment:
 ##   SHOT_DIR    folder for the PNGs (default user://)
 ##   SHOT_SCALE  integer upscale (default 2)
@@ -46,10 +47,18 @@ func _ready() -> void:
 	var pause := get_tree().get_first_node_in_group("pause_menu")
 	pause.open()
 	await _snap(dir, scale, "pause")
+	pause._show_page(PauseMenu.Page.SETTINGS)
+	await _snap(dir, scale, "pause_settings")
+	pause._show_page(PauseMenu.Page.CONTROLS)
+	await _snap(dir, scale, "pause_controls")
 	pause.close()
 	var box := DialogueBox.open(world.player)
 	box.say([{"speaker": "Marty Kessler", "text": "Wren is looking for a partner. Take this guidebook, check the grades, and go find her at the foot of Firefall Slab."}])
+	box.reveal_all()
 	await _snap(dir, scale, "dialogue")
+	box.choose("What do you want?", ["Trail mix for 12 food energy", "Dried apples for 8 food energy", "Nothing, thanks"], "Clerk")
+	box.reveal_all()
+	await _snap(dir, scale, "dialogue_choice")
 	box.close()
 	world.open_map()
 	await _snap(dir, scale, "map")
