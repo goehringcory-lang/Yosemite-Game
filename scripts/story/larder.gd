@@ -54,7 +54,7 @@ func _on_day_started() -> void:
 	for id: String in spoiled:
 		Inventory.remove(id, spoiled[id])
 		var item := ItemDB.get_item(id)
-		names.append("%d %s" % [spoiled[id], item.display_name if item else id])
+		names.append(ItemDB.count_name(spoiled[id], item.display_name if item else id))
 	get_tree().call_group("hud", "show_message", "Spoiled overnight: %s." % ", ".join(names))
 
 

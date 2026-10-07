@@ -90,7 +90,7 @@ func _ready() -> void:
 	Gear.add("rope")
 	Gear.add("harness")
 	var stock := keeper.available_offers().map(func(o: ShopOffer) -> String: return o.id)
-	check("quickdraw" in stock and "belay_device" in stock, "a rope and harness bring out quickdraws and a belay device %s" % [stock])
+	check("quickdraw" in stock and not "belay_device" in stock, "a rope brings out quickdraws, but the belay device comes from Royal Robbins %s" % [stock])
 	check(not ("cam" in stock), "cams only come once you have two: the shop can't hand you a tier")
 	var apron: RouteData = load("res://data/routes/glacier_point_apron.tres")
 	Inventory.add("trail_mix", 10)

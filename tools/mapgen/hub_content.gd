@@ -186,7 +186,7 @@ const CONTENT := {
 			{"title": "Glacier Point", "osm": "Glacier Point",
 				"text": "7,214 feet. The Valley floor is 3,200 feet below you. Across the canyon rise Half Dome, Vernal and Nevada Falls, and the peaks of the High Sierra."},
 			{"title": "The Firefall", "osm": "Landscape in Motion",
-				"text": "On summer nights from 1872 to 1968, glowing embers were pushed off this cliff to fall like a waterfall of fire. The Park Service ended it because it wasn't a natural event."},
+				"text": "On summer nights from the 1870s until 1968, with a break around 1900, glowing embers were pushed off this cliff to fall like a waterfall of fire. The Park Service ended it because it wasn't a natural event."},
 			{"title": "Glacier Point Hotel", "osm": "Area Information",
 				"text": "A hotel stood on this point until it burned in 1969."},
 			{"title": "Washburn Point", "osm": "Washburn Point",

@@ -66,7 +66,7 @@ text = "7,214 feet. The Valley floor is 3,200 feet below you. Across the canyon 
 [node name="Sign_The_Firefall" parent="Objects" unique_id=1679325941 instance=ExtResource("4_km3s7")]
 position = Vector2(1000, 1068)
 title = "The Firefall"
-text = "On summer nights from 1872 to 1968, glowing embers were pushed off this cliff to fall like a waterfall of fire. The Park Service ended it because it wasn't a natural event."
+text = "On summer nights from the 1870s until 1968, with a break around 1900, glowing embers were pushed off this cliff to fall like a waterfall of fire. The Park Service ended it because it wasn't a natural event."
 
 [node name="Sign_Glacier_Point_Hotel" parent="Objects" unique_id=447038793 instance=ExtResource("4_km3s7")]
 position = Vector2(968, 1068)

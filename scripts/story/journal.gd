@@ -123,7 +123,7 @@ func _refresh() -> void:
 
 
 ## The Register's pages: the stories you've heard, front pages first, with
-## later hands in the margins, then your own last page.
+## later hands in the margins. Your own last page shows under Main story.
 func _register() -> void:
 	var pages := RegisterPages.written()
 	if pages.is_empty():
@@ -135,9 +135,6 @@ func _register() -> void:
 			_line("     " + note, DIM)
 		if page.review:
 			_line("     (Placeholder pending tribal review.)", DIM)
-	if QuestLog.final_entry >= 0:
-		var entry: String = QuestLog.FINAL_ENTRIES[QuestLog.final_entry].entry
-		_line("You: %s" % (entry if entry != "" else "(left blank)"), DIM if entry == "" else Color.WHITE)
 
 
 ## The guidebook's tick list: every route, its grade, the gear it needs, and
@@ -180,7 +177,7 @@ func _gear_line(item: GearData, count: int) -> void:
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		row.add_child(icon)
 	var label := Label.new()
-	label.text = item.display_name if count == 1 else "%d %s" % [count, item.display_name]
+	label.text = item.display_name if count == 1 else ItemDB.count_name(count, item.display_name)
 	label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(label)
 	_body.add_child(row)

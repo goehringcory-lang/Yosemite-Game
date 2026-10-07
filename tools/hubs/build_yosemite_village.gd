@@ -368,7 +368,7 @@ func _place_buildings() -> void:
 	_building("BestsStudio", "bests_studio", 86, 18, "Best's Studio",
 		"Harry Best opened a painting studio in the Valley in 1902. His daughter Virginia married Ansel Adams, and the studio became The Ansel Adams Gallery.")
 	_building("Degnans", "degnans", 86, 30, "Degnan's",
-		"John and Bridget Degnan ran a bakery and store in the Valley starting in the 1880s. Bridget's bread was famous with visitors.")
+		"John and Bridget Degnan came to the Valley in 1884. Bridget sold bread from her porch before they opened a bakery and store, and her bread was famous with visitors.")
 	_building("WildernessCenter", "wilderness_center", 93, 18, "Wilderness Center",
 		"Rangers issue wilderness permits and check the trail conditions here.")
 	_building("ValleyLodge", "valley_lodge", 38, 32, "Yosemite Valley Lodge",
@@ -434,13 +434,13 @@ func _place_camp_4() -> void:
 		_prop("log_stump", _tile_pos(17, 21) + stump)
 
 	# A slackline between two pines: Camp 4 climbers started walking slack
-	# lines here on rest days around 1980.
+	# lines here on rest days in the early 1980s.
 	var slack_at := foot(24.5, 20)
 	_prop(_pick("tree_ponderosa"), slack_at + Vector2(-Camp4Art.SLACK_SPAN / 2.0, 0))
 	_prop(_pick("tree_ponderosa"), slack_at + Vector2(Camp4Art.SLACK_SPAN / 2.0, 0))
 	decor("Slackline", B + "camp4_slackline.png", slack_at + Vector2(0, 2))
 	_info("SlacklineInfo", slack_at + Vector2(0, 4), Vector2(40, 10), "Slackline",
-		"Flat webbing strung between two pines. Camp 4 climbers began walking slack chains and lines here on rest days around 1980, and slacklining spread around the world from this campground.")
+		"Flat webbing strung between two pines. Camp 4 climbers began walking slack chains and lines here on rest days in the early 1980s, and slacklining spread around the world from this campground.")
 
 	# Notes for partners and rides where the walk-in path arrives, and the sign.
 	sign_prop("RouteBoard", B + "camp4_board.png", foot(13.5, 30), Vector2(36, 6), "Camp 4 bulletin board",
@@ -544,7 +544,7 @@ func _place_village_life() -> void:
 	mortar.set("body_size", Vector2(50, 10))
 	mortar.set("reach_size", Vector2(60, 26))
 	_sign_prop("IndianVillageSign", "res://assets/sprites/info_sign.png", _tile_pos(58, 18) + Vector2(0, 4), Vector2(12, 4), "Indian Village",
-		"This village behind the Yosemite Museum shows how Native families lived in the Valley: bark homes, acorn granaries, and grinding rocks worn into the granite.")
+		"This village behind the Yosemite Museum shows how Native families lived in the Valley: bark homes, acorn granaries, and grinding rocks worn into the granite. The Southern Sierra Miwuk and neighboring peoples still live and work in and around Yosemite today. [Placeholder pending tribal review.]")
 	# The Village Store clerk trades trail food for forage.
 	_vendor("StoreClerk", "res://data/shops/village_store.tres", _tile_pos(72, 31) + Vector2(0, 2), Color(0.3, 0.5, 0.35))
 	_instance("res://scenes/objects/travel_point.tscn", _tile_pos(92, 33) + Vector2(0, 4), "Travel_YosemiteVillageParking").set("label", "Yosemite Village Parking")

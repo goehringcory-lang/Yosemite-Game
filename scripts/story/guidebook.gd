@@ -105,5 +105,5 @@ static func gear_text(route: RouteData) -> String:
 		var gear := Gear.get_gear(id)
 		var n := int(route.required_gear[id])
 		var name := gear.display_name if gear else id
-		parts.append(name if n == 1 else "%d %s" % [n, name])
+		parts.append(name if n == 1 else ItemDB.count_name(n, name))
 	return ", ".join(parts)

@@ -1110,7 +1110,7 @@ position = Vector2(1384, 480)
 collision_mask = 0
 script = ExtResource("5_xyta8")
 title = "Degnan's"
-text = "John and Bridget Degnan ran a bakery and store in the Valley starting in the 1880s. Bridget's bread was famous with visitors."
+text = "John and Bridget Degnan came to the Valley in 1884. Bridget sold bread from her porch before they opened a bakery and store, and her bread was famous with visitors."
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Degnans" unique_id=198348017]
 texture = ExtResource("10_mqwrs")
@@ -1871,7 +1871,7 @@ collision_layer = 0
 collision_mask = 0
 script = ExtResource("5_xyta8")
 title = "Slackline"
-text = "Flat webbing strung between two pines. Camp 4 climbers began walking slack chains and lines here on rest days around 1980, and slacklining spread around the world from this campground."
+text = "Flat webbing strung between two pines. Camp 4 climbers began walking slack chains and lines here on rest days in the early 1980s, and slacklining spread around the world from this campground."
 
 [node name="Hitbox" type="Area2D" parent="Entities/SlacklineInfo" unique_id=747436699]
 collision_layer = 4
@@ -2177,7 +2177,7 @@ position = Vector2(936, 300)
 collision_mask = 0
 script = ExtResource("5_xyta8")
 title = "Indian Village"
-text = "This village behind the Yosemite Museum shows how Native families lived in the Valley: bark homes, acorn granaries, and grinding rocks worn into the granite."
+text = "This village behind the Yosemite Museum shows how Native families lived in the Valley: bark homes, acorn granaries, and grinding rocks worn into the granite. The Southern Sierra Miwuk and neighboring peoples still live and work in and around Yosemite today. [Placeholder pending tribal review.]"
 
 [node name="Sprite" type="Sprite2D" parent="Entities/IndianVillageSign" unique_id=2127945217]
 texture = ExtResource("46_j1a8p")

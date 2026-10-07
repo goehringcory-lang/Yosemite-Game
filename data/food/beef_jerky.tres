@@ -11,5 +11,5 @@ region = Rect2(48, 0, 16, 16)
 script = ExtResource("2_3jd5n")
 id = "beef_jerky"
 display_name = "Beef Jerky"
-description = "Salty strips that last a season in a pack. Not a thing in the Valley you can't get with a good chew."
+description = "Salty strips that last a season in a pack. Chewy, and easy to eat on the move."
 icon = SubResource("AtlasTexture_nxx3s")

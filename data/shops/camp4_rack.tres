@@ -21,19 +21,9 @@ requires = {
 }
 max_owned = 8
 
-[sub_resource type="Resource" id="Resource_y1ek2"]
-script = ExtResource("1_qsj76")
-id = "belay_device"
-price = 40
-requires = {
-"harness": 1,
-"rope": 1
-}
-max_owned = 1
-
 [resource]
 script = ExtResource("2_akkmp")
 keeper = "Camp 4 climber"
 greeting = "Hey. Rope, cams, draws... everything's for trade, and I'm always hungry."
 nothing_yet = "Come back once you've got a rope and a couple of cams. Then I can help fill out your rack."
-offers = Array[ExtResource("1_qsj76")]([SubResource("Resource_xqpua"), SubResource("Resource_nphu2"), SubResource("Resource_y1ek2")])
+offers = Array[ExtResource("1_qsj76")]([SubResource("Resource_xqpua"), SubResource("Resource_nphu2")])

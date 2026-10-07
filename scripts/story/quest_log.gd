@@ -177,16 +177,16 @@ func tick_report(route_id: String) -> Array[Dictionary]:
 	var hardest := Guidebook.hardest_tick()
 	for route in Guidebook.routes():
 		if route.id == route_id:
-			grade = " (%s)" % route.grade
+			grade = " (%s)" % (Guidebook.yds_label(route.grade) if Guidebook.yds(route.grade) > 0.0 else route.grade)
 			if hardest == route and Guidebook.yds(route.grade) > 0.0:
-				grade += ", your hardest grade yet"
+				grade += ", your hardest grade yet,"
 	lines.append({"speaker": "", "text": "Ticked! %s%s goes in your tick list (%d of %d routes in the guidebook)." % [
 		route_name, grade, Guidebook.ticked_count(), Guidebook.routes().size()]})
 	for quest: QuestData in QUESTS:
 		var step := current_step(quest)
 		if step.get("type") == "climbed" and step.route == route_id and quest.steps.back() == step:
 			var giver := get_character(quest.giver)
-			lines.append({"speaker": "", "text": "%s is waiting to hear about it. Go and tell %s to finish \"%s\"." % [
+			lines.append({"speaker": "", "text": "%s is waiting to hear about it. Tell %s how it went to finish \"%s\"." % [
 				giver.display_name if giver else quest.giver, giver.display_name if giver else "them", quest.title]})
 	return lines
 
@@ -414,12 +414,12 @@ func _give_step_rewards(step: Dictionary) -> String:
 		var amount := int(gear[id])
 		Gear.add(id, amount)
 		var gear_name := Gear.get_gear(id).display_name
-		got.append(gear_name if amount == 1 else "%d %ss" % [amount, gear_name])
+		got.append(gear_name if amount == 1 else ItemDB.count_name(amount, gear_name))
 	var items: Dictionary = step.get("items", {})
 	for id: String in items:
 		Inventory.add(id, int(items[id]))
 		var item := ItemDB.get_item(id)
-		got.append("%d %s" % [int(items[id]), item.display_name if item else id])
+		got.append(ItemDB.count_name(int(items[id]), item.display_name if item else id))
 	return "Received %s." % ", ".join(got) if not got.is_empty() else ""
 
 
@@ -430,12 +430,12 @@ func _give_rewards(quest: QuestData) -> String:
 		var amount := int(quest.reward_gear[id])
 		Gear.add(id, amount)
 		var name := Gear.get_gear(id).display_name
-		got.append(name if amount == 1 else "%d %ss" % [amount, name])
+		got.append(name if amount == 1 else ItemDB.count_name(amount, name))
 	for id: String in quest.reward_items:
 		var amount := int(quest.reward_items[id])
 		Inventory.add(id, amount)
 		var item := ItemDB.get_item(id)
-		got.append("%d %s" % [amount, item.display_name if item else id])
+		got.append(ItemDB.count_name(amount, item.display_name if item else id))
 	for id: String in quest.reward_recipes:
 		Recipes.learn(id)
 		got.append("recipe: %s" % Recipes.get_recipe(id).display_name)

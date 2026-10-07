@@ -4,6 +4,7 @@
 [ext_resource type="Resource" path="res://data/characters/james_mccauley.tres" id="2_r"]
 [ext_resource type="Resource" path="res://data/characters/enid_michael.tres" id="3_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_painter.tres" id="4_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="5_r"]
 
 [node name="GlacierPointStory" type="Node2D"]
 
@@ -23,3 +24,10 @@ character = ExtResource("4_r")
 spot = "apron_top"
 offset = Vector2(-40, 24)
 wander_radius = 24.0
+
+[node name="FourMileTrail" parent="." instance=ExtResource("5_r")]
+position = Vector2(936, 1040)
+label = "Four Mile Trail, down to Curry Village"
+target_region = "curry_village"
+target_spawn = "apron_trailhead"
+minutes = 90

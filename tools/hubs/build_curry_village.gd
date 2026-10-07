@@ -70,7 +70,7 @@ func _build_foods() -> void:
 		["pilot_bread", "Pilot Bread", "Big round crackers, hard as a board and just as durable. Climbers have carried them up walls since before the war.", 0],
 		["cheddar_wedge", "Cheddar Wedge", "A wedge of sharp cheddar in wax paper. Rich, dense and worth its weight on a long pitch.", 1],
 		["dried_apricots", "Dried Apricots", "Sun-dried and chewy. A little sweet, a little tart, and they keep for weeks.", 2],
-		["beef_jerky", "Beef Jerky", "Salty strips that last a season in a pack. Not a thing in the Valley you can't get with a good chew.", 3],
+		["beef_jerky", "Beef Jerky", "Salty strips that last a season in a pack. Chewy, and easy to eat on the move.", 3],
 		["chocolate_bar", "Chocolate Bar", "A thick bar wrapped in foil. Melts in August, so keep it in the shade.", 4],
 	]
 	for food: Array in foods:
@@ -124,7 +124,6 @@ func _build_shops() -> void:
 		"That's all I can trade you today. Once you've got a rope of your own, come back and I'll round out your rack.",
 		[_offer("gear", "quickdraw", 28, {"rope": 1}, 12, 2),
 		_offer("gear", "cam", 48, {"cam": 2}, 10),
-		_offer("gear", "belay_device", 36, {"rope": 1, "harness": 1}, 1),
 		_offer("gear", "haul_bag", 76, {"aiders": 1}, 1),
 		_offer("gear", "ascenders", 60, {"aiders": 1}, 1),
 		_offer("gear", "portaledge", 130, {"haul_bag": 1, "ascenders": 1}, 1)], "mountain_shop"),
@@ -362,7 +361,7 @@ func _place_plaza() -> void:
 	building("Amphitheater", CS + "amphitheater.png", 66, 50, "Camp Curry Amphitheater",
 		"Ranger programs and campfire talks are held here most summer evenings.", 0, 0, 0.2)
 	sign_prop("FirefallBoard", CS + "firefall_board.png", foot(57, 48), Vector2(24, 6), "The Firefall",
-		"From 1872 to 1968, embers from a bonfire were pushed off Glacier Point at nightfall, and Camp Curry crowds cheered from below. David Curry's call went up to the rim: 'Hello, Glacier!' and then, 'Let the fire fall!' The Park Service ended the show in 1968.")
+		"Starting in the 1870s, embers from a bonfire were pushed off Glacier Point at nightfall, and Camp Curry crowds cheered from below. The show lapsed in the 1890s, and David Curry brought it back. David Curry's call went up to the rim: 'Hello, Glacier!' and then, 'Let the fire fall!' The Park Service ended it on January 25, 1968.")
 	# The green's centre: a fire pit ringed by benches, the flag, lamps.
 	var fire := instance_scene("res://scenes/story/station.tscn", Vector2(52 * T + 8, 42.3 * T + 8), "PlazaFirePit")
 	fire.set("station", "campfire")

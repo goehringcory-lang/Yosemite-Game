@@ -421,7 +421,7 @@ ground = NodePath("../../Ground")
 [node name="LamonHomesteadSign" parent="Entities" unique_id=544210696 instance=ExtResource("8_skv85")]
 position = Vector2(72, 172)
 title = "Lamon Homestead"
-text = "James Lamon settled near here in the 1860s and planted apple trees. He was one of the first non-Native settlers to live in Yosemite Valley year-round."
+text = "James Lamon began farming near here in 1859 and planted apple trees. He was one of the first non-Native settlers to live in Yosemite Valley year-round."
 
 [node name="ShuttleStop" parent="Entities" unique_id=1333494725 instance=ExtResource("7_cty7p")]
 position = Vector2(40, 162)

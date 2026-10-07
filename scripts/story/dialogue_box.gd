@@ -68,10 +68,35 @@ func _ready() -> void:
 	column.add_child(_options_box)
 
 
+## Longest text shown at once. Longer lines are split at sentence breaks so
+## they fit the box (about four lines of the pixel font).
+const PAGE_CHARS := 220
+
+
 func say(lines: Array) -> void:
 	for line: Dictionary in lines:
-		_show(line.get("speaker", ""), line.get("text", ""), [])
-		await _next_input()
+		for page in pages(line.get("text", "")):
+			_show(line.get("speaker", ""), page, [])
+			await _next_input()
+
+
+## [param text] split into pages of at most [constant PAGE_CHARS], breaking
+## after a sentence where it can and between words where it can't.
+static func pages(text: String) -> PackedStringArray:
+	var result := PackedStringArray()
+	var rest := text.strip_edges()
+	while rest.length() > PAGE_CHARS:
+		var cut := -1
+		for mark in [". ", "? ", "! ", ": ", "; "]:
+			cut = maxi(cut, rest.rfind(mark, PAGE_CHARS))
+		if cut < PAGE_CHARS / 3:
+			cut = rest.rfind(" ", PAGE_CHARS)
+		if cut <= 0:
+			break
+		result.append(rest.left(cut + 1).strip_edges())
+		rest = rest.substr(cut + 1).strip_edges()
+	result.append(rest)
+	return result
 
 
 ## Returns the chosen option's index, or -1 if the player cancels.

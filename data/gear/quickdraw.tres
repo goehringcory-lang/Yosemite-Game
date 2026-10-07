@@ -7,6 +7,6 @@
 script = ExtResource("1_gear")
 id = "quickdraw"
 display_name = "Quickdraw"
-description = "Clips the rope to bolts on slab routes like Snake Dike."
+description = "Clips the rope to bolts on slab and dike routes, like Snake Dike."
 icon = ExtResource("2_icon")
 tier = 2

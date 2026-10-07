@@ -68,7 +68,7 @@ func offer_name(offer: ShopOffer) -> String:
 		name = Gear.get_gear(offer.id).display_name
 	elif ItemDB.get_item(offer.id):
 		name = ItemDB.get_item(offer.id).display_name
-	return name if offer.amount == 1 else "%d %s" % [offer.amount, name]
+	return name if offer.amount == 1 else ItemDB.count_name(offer.amount, name)
 
 
 func interact(player: Player) -> void:
