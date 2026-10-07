@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/recipe_data.gd" id="1_recipe"]
+
+[resource]
+script = ExtResource("1_recipe")
+id = "bread_pudding"
+display_name = "Apple Bread Pudding"
+station = "campfire"
+inputs = {"degnan_loaf": 1, "lamon_apple": 2}
+output_id = "bread_pudding"
+output_count = 2
+minutes = 60
+description = "A loaf going stale and two apples make two puddings that keep most of a week."

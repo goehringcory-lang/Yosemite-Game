@@ -52,6 +52,13 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/johnson_solo.tres"),
 	preload("res://data/quests/ansel_high_country.tres"),
 	preload("res://data/quests/clark_last_page.tres"),
+	# Side stories for the seasons, the hours, and the hubs past the Valley.
+	# They go last so each giver's earlier quests are offered first.
+	preload("res://data/quests/clark_big_trees.tres"),
+	preload("res://data/quests/enid_dawn_chorus.tres"),
+	preload("res://data/quests/hodges_bear_season.tres"),
+	preload("res://data/quests/degnan_snowbound.tres"),
+	preload("res://data/quests/muir_soda_springs.tres"),
 ]
 
 const CHARACTERS: Array[CharacterData] = [
@@ -299,7 +306,17 @@ func available_from(character_id: String) -> QuestData:
 	for quest: QuestData in QUESTS:
 		if quest.giver != character_id or active.has(quest.id) or is_completed(quest.id):
 			continue
-		if Array(quest.requires).all(is_completed):
+		if Array(quest.requires).all(is_completed) and quest.is_offered_in(GameClock.season):
+			return quest
+	return null
+
+
+## A quest this person would offer if it were the right season, or null.
+func waiting_for_season(character_id: String) -> QuestData:
+	for quest: QuestData in QUESTS:
+		if quest.giver != character_id or active.has(quest.id) or is_completed(quest.id):
+			continue
+		if Array(quest.requires).all(is_completed) and not quest.is_offered_in(GameClock.season):
 			return quest
 	return null
 
@@ -330,6 +347,8 @@ func is_step_done(step: Dictionary) -> bool:
 			return false # only finished by talking to the target
 		"return":
 			return true # finished as soon as you talk to the giver again
+		"time":
+			return GameClock.hour_in_range(int(step.from), int(step.to))
 	push_error("Unknown quest step type: %s" % step.get("type", ""))
 	return false
 
@@ -405,9 +424,13 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 		changed.emit()
 		return lines
 
+	# A quest that's ready but for the season: say when to come back.
+	var seasonal: QuestData = waiting_for_season(character_id) if lines.is_empty() else null
 	# After the last page, Clark talks about the book you wrote, not the job.
 	if lines.is_empty() and character_id == "galen_clark" and final_entry >= 0:
 		_add_lines(lines, speaker, AFTER_LAST_PAGE)
+	elif seasonal and not seasonal.out_of_season.is_empty():
+		_add_lines(lines, speaker, seasonal.out_of_season)
 	elif lines.is_empty() and character:
 		# News of the main line first, once; then their usual lines.
 		var beat := character.latest_beat(is_completed)

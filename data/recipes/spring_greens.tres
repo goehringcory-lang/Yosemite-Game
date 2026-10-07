@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/recipe_data.gd" id="1_recipe"]
+
+[resource]
+script = ExtResource("1_recipe")
+id = "spring_greens"
+display_name = "Spring Greens"
+station = "campfire"
+inputs = {"miners_lettuce": 3, "sierra_onion": 1}
+output_id = "spring_greens"
+output_count = 1
+minutes = 20
+description = "Wilt three handfuls of miner's lettuce with a wild onion. Eat it today."

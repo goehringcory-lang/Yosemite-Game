@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "degnan_snowbound"
+title = "Snowbound"
+giver = "bridget_degnan"
+requires = PackedStringArray("degnan_bread", "enid_leave_some")
+offered_in = 8
+out_of_season = PackedStringArray("When the snow closes the roads, come and see me. A bakery runs out of flour faster than you'd think.")
+intro = PackedStringArray("Snow on the passes, and the stages can't get through. But the railroad runs all winter, right up the river canyon to El Portal.", "My flour came in on the train, and nobody's fetched it. Fifty pounds, sitting by the tracks at the railyard.", "Bring it up to me. And bring a handful of toasted toyon berries while you're at it. A bit of red on the Christmas loaves cheers people up when the sun's behind the wall all day.")
+steps = [{"type": "have", "item": "flour_sack", "count": 1, "consume": true, "objective": "Fetch Bridget Degnan's flour from the El Portal railyard", "reminder": "El Portal, at the end of the line. Drive down the canyon road, and look by the tracks.", "done": ["That's my flour. You carried it all the way up the canyon? Bless you."]}, {"type": "have", "item": "toasted_toyon", "count": 1, "consume": true, "objective": "Bring Bridget Degnan a batch of toasted toyon", "reminder": "Toyon's the shrub with red berries in winter. Toast them at the campfire first. Raw, they'll make you ill.", "done": ["Lovely. Red as holly. That'll brighten up the window."]}]
+outro = PackedStringArray("Nothing goes to waste in my kitchen in winter. A loaf going stale, two apples, and a slow fire make a pudding that keeps most of a week.", "Take the recipe, and some bread to try it with. The days are short, and the climbers still come in hungry.")
+reward_recipes = PackedStringArray("bread_pudding")
+reward_items = {"degnan_loaf": 2}

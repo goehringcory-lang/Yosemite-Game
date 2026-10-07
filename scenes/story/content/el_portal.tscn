@@ -16,3 +16,8 @@ character = ExtResource("3_r")
 spot = "railroad"
 offset = Vector2(-24, 8)
 wander_radius = 32.0
+
+[node name="FlourSack" parent="." instance=ExtResource("1_r")]
+position = Vector2(884, 1104)
+item_id = "flour_sack"
+found_text = "It's stenciled DEGNAN, YOSEMITE, and it's been waiting by the tracks since the last train."

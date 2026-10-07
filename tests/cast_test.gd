@@ -483,6 +483,7 @@ func _play_last_page() -> void:
 	QuestLog.start_new_game()
 	QuestLog.completed.append_array(MAIN_ORDER.slice(0, MAIN_ORDER.find("clark_last_page")))
 	QuestLog.completed.append_array(["lebrado_villages", "lucy_basket"])
+	QuestLog.completed.append("clark_big_trees") # his side story would have come up long before the end
 	check(QuestLog.main_objective().objective.contains("Galen Clark"), "the journal sends you back to Clark at the end")
 	QuestLog.talk_to("galen_clark")
 	QuestLog.talk_to("maggie_howard")

@@ -19,6 +19,9 @@ extends Resource
 ##   "made"       recipe, count: have made a recipe this many times
 ##   "climbed"    route (route id): have finished this climb
 ##   "return"     nothing: just come back and talk to the quest giver
+##   "time"       from, to (hours, 0-23): talk to the giver between these
+##                hours. The range wraps past midnight, so 20 to 2 means
+##                8 PM until 2 AM (see GameClock.hour_in_range).
 ## Every step except "talk" is turned in by talking to the quest giver.
 ##
 ## Any step can also hand the player something the moment it's done:
@@ -37,6 +40,12 @@ extends Resource
 @export var giver: String
 ## Quest ids that must be finished before this one is offered.
 @export var requires: PackedStringArray
+## Seasons the giver offers this quest in (none ticked = any season). Once
+## it's started it can be finished in any season.
+@export_flags("Spring", "Summer", "Fall", "Winter") var offered_in := 0
+## What the giver says while the quest is ready except for the season, so
+## the player knows to come back ("Come and see me when the snow flies").
+@export var out_of_season: PackedStringArray
 @export var intro: PackedStringArray
 @export var steps: Array = []
 @export var outro: PackedStringArray
@@ -50,3 +59,8 @@ extends Resource
 ## Named abilities other systems check, such as "chuckah" (can build one).
 ## "hub:<id>" also unlocks that hub, for example "hub:tuolumne_meadows".
 @export var reward_unlocks: PackedStringArray
+
+
+## Whether the giver offers this quest in [param season] (a GameClock.Season).
+func is_offered_in(season: int) -> bool:
+	return offered_in == 0 or offered_in & (1 << season) != 0

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "enid_dawn_chorus"
+title = "The Dawn Chorus"
+giver = "enid_michael"
+requires = PackedStringArray("enid_leave_some")
+intro = PackedStringArray("Every morning of the season I count the birds. Not the rare ones, all of them. The ordinary ones most of all.", "The Park Service calls me a ranger-naturalist now, and I lead walks for visitors. But the early count I do for the record.", "Come up to Sentinel Dome first thing in the morning, before ten, and count with me. The birds sing hardest in the first hours of the day.")
+steps = [{"type": "time", "from": 6, "to": 10, "objective": "Count birds with Enid Michael at Sentinel Dome, between 6 and 10 in the morning", "reminder": "Come back in the morning, before ten. By midday the birds go quiet and so do I.", "done": ["Shh. Listen. That sweet three-note whistle, fee-bee-bee, is a mountain chickadee.", "The harsh one, like a gate that wants oiling? Clark's nutcracker. It buries pine seeds by the thousand and remembers where most of them are.", "And the juncos, flashing white in their tails. Forty-one birds of nine kinds. Every number goes in the notebook."]}, {"type": "talk", "target": "clare_hodges", "objective": "Take Enid Michael's bird count to Ranger Hodges at the ranger station", "reminder": "Ranger Hodges keeps the records at the ranger station in the Village. Take her my count.", "done": ["Another of Miss Michael's counts? Good. It goes in the file with the others.", "Laugh if you like, but when somebody asks in fifty years whether the birds are still here, this file is how they'll know."]}, {"type": "return", "objective": "Go back to Enid Michael at Sentinel Dome", "reminder": "Come back up and tell me the count is in safe hands.", "done": ["Good. Somebody has to write down the ordinary days, or nobody will know what changed."]}]
+outro = PackedStringArray("Now, breakfast. Miner's lettuce and a wild onion, wilted in the pan. The miners learned to eat it from the people here, and so did I.", "In spring it grows in every shady spot on the valley floor. Take a few leaves from each plant, never the whole patch.")
+reward_recipes = PackedStringArray("spring_greens")
+reward_items = {"wild_strawberry": 2}

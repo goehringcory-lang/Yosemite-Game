@@ -307,6 +307,7 @@ func test_story_beats() -> void:
 	var second := QuestLog.talk_to("galen_clark")
 	check(second.size() > 0 and String(second[0].text) in clark.idle_lines, "and then goes back to his usual lines")
 	QuestLog.completed.append_array(["shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron"])
+	QuestLog.completed.append("clark_big_trees") # his side story would be offered first
 	var news := QuestLog.talk_to("galen_clark")
 	check(news.size() > 0 and "Glacier Point" in news[0].text, "skipping ahead, Clark only has the latest news (%s)" % news[0].text)
 	var saved := QuestLog.save_data()
