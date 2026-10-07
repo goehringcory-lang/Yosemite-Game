@@ -119,8 +119,13 @@ func _ready() -> void:
 	check(world.region.region_id == Park.HOME_REGION and GameClock.day == day + 1, "passing out away from home wakes you at the homestead")
 	check(world.forage != null, "the homestead forage is back")
 
+	await _check_spawns_are_free(world)
+	await _check_unstick(world)
+	await _check_wake_up(world)
 	_check_controls(world)
+	await _check_menus(world)
 	await _check_central_hub(world)
+	await _check_curfew(world)
 
 	# Winter closes both seasonal roads.
 	GameClock.season = GameClock.Season.WINTER
@@ -131,6 +136,132 @@ func _ready() -> void:
 	SaveManager.delete_save()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
+
+
+## Every place a door, road, shuttle, or climb drops the player has room to
+## stand and walk. (El Portal's arrival spot used to be inside a tree.)
+func _check_spawns_are_free(world: Node) -> void:
+	var targets := {}
+	targets["%s/%s" % [Park.HOME_REGION, Park.HOME_SPAWN]] = [Park.HOME_REGION, Park.HOME_SPAWN]
+	for hub in ParkAtlas.HUBS:
+		for leg in Park.legs_from(hub.id):
+			var to := Park.get_hub(leg.to)
+			var region_id: String = to.arrival_region if to.arrival_region != "" else leg.to
+			targets["%s/%s" % [region_id, leg.spawn]] = [region_id, leg.spawn]
+	for stop: Dictionary in ShuttleStop.STOPS:
+		targets["%s/%s" % [stop.region, stop.spawn]] = [stop.region, stop.spawn]
+	for route in Guidebook.routes():
+		if route.destination_hub != "":
+			targets["%s/%s" % [route.destination_hub, route.destination_spawn]] = [route.destination_hub, route.destination_spawn]
+	for file in DirAccess.get_files_at("res://scenes/regions"):
+		if not file.ends_with(".tscn"):
+			continue
+		var scene: Region = load("res://scenes/regions/" + file).instantiate()
+		add_child(scene)
+		for node in scene.find_children("*", "", true, false):
+			if (node is RegionDoor or node is RegionExit) and node.target_region != "":
+				var spawn: String = node.target_spawn if node.target_spawn != "" else "arrival"
+				targets["%s/%s" % [node.target_region, spawn]] = [node.target_region, spawn]
+		scene.free()
+	var stuck := PackedStringArray()
+	for key: String in targets:
+		var target: Array = targets[key]
+		world._enter_region(target[0], target[1])
+		for i in 3:
+			await get_tree().physics_frame
+		var marker: Marker2D = world.region.get_spawn(target[1])
+		if marker == null or world.player.test_move(Transform2D(0.0, marker.global_position), Vector2.ZERO):
+			stuck.append(key)
+	check(targets.size() > 20, "checked %d arrival spots" % targets.size())
+	check(stuck.is_empty(), "no arrival spot is inside a tree or wall (%s)" % ", ".join(stuck))
+	world._enter_region(Park.HOME_REGION, Park.HOME_SPAWN)
+
+
+## The safety net: a player dropped somewhere solid is moved to the nearest open ground.
+func _check_unstick(world: Node) -> void:
+	var player: Player = world.player
+	world._enter_region("el_portal", "arrival")
+	for i in 3:
+		await get_tree().physics_frame
+	var old_arrival := Vector2(1032, 1080) # the generated spawn, inside a tree
+	check(player.test_move(Transform2D(0.0, old_arrival), Vector2.ZERO), "the old El Portal arrival spot is solid")
+	player.global_position = old_arrival
+	await world._unstick_player()
+	check(not player.test_move(player.global_transform, Vector2.ZERO) and player.global_position.distance_to(old_arrival) <= 96.0,
+		"a player dropped in a tree is moved to open ground (%s)" % player.global_position)
+	world._enter_region(Park.HOME_REGION, Park.HOME_SPAWN)
+
+
+## Waking up: the night's spoiled food is mentioned in the morning message,
+## and the player faces down with the interaction area to match.
+func _check_wake_up(world: Node) -> void:
+	var player: Player = world.player
+	Inventory.add("wild_strawberry", 1)
+	Larder.batches["wild_strawberry"] = [1]
+	player.facing = Vector2i.LEFT
+	player.interaction_area.position = Vector2(-12, 0)
+	await world.sleep()
+	var message: String = world.hud.message_label.text
+	check("Good morning" in message and "Spoiled overnight" in message,
+		"the morning message keeps the spoiled-food note (%s)" % message.replace("\n", " / "))
+	check(player.facing == Vector2i.DOWN and player.interaction_area.position == Vector2(0, 12), "after waking the interaction area faces down")
+
+
+## Esc closes a sign before it opens the pause menu, button hints follow the
+## device in use, and the journal scrolls with the keys or the stick.
+func _check_menus(world: Node) -> void:
+	var pause: PauseMenu = world.get_tree().get_first_node_in_group("pause_menu")
+	world.hud.show_info("Sign", "Some words.")
+	_press("pause")
+	check(not world.hud.info_panel.visible and not pause.is_open() and world.player.can_act, "Esc with a sign open closes the sign, not the pause menu")
+	_press("pause")
+	check(pause.is_open(), "Esc with no sign opens the pause menu")
+	_press("ui_cancel")
+
+	world.hud._input(InputEventKey.new())
+	check(world.hud._status.text.contains("J: Journal"), "the status strip names the journal key (%s)" % world.hud._status.text)
+	world.open_travel_map()
+	check("[Arrows] Choose   [E] Travel   [Esc] Close" in world.park_map._hint_label.text, "the travel map shows keyboard prompts")
+	world.hud._input(InputEventJoypadButton.new())
+	check("[D-pad] Choose   [A] Travel   [B] Close" in world.park_map._hint_label.text, "the open map switches to gamepad prompts")
+	check(world.hud._status.text.contains("Y: Journal") and not world.hud._status.text.contains("J: Journal"), "the status strip switches to the gamepad's Y")
+	world.park_map.close()
+	world.open_shuttle_map("Happy Isles")
+	check("[A] Ride" in world.park_map._area_hint.text, "the shuttle map shows gamepad prompts (%s)" % world.park_map._area_hint.text)
+	world.park_map.close()
+	world.hud._input(InputEventKey.new())
+	check(world.hud._status.text.contains("J: Journal"), "keyboard prompts come back with the keyboard")
+
+	var journal: Journal = world.get_tree().get_first_node_in_group("journal")
+	journal.open()
+	for i in 30:
+		journal._line("Filler line %d" % i)
+	for i in 3:
+		await get_tree().process_frame
+	check(journal._body.size.y > journal._scroll.size.y, "the journal can be taller than its page")
+	_press("move_down")
+	check(journal._scroll.scroll_vertical == Journal.SCROLL_STEP, "Down scrolls the journal (%d)" % journal._scroll.scroll_vertical)
+	_press("ui_page_down")
+	check(journal._scroll.scroll_vertical > Journal.SCROLL_STEP * 3, "Page Down scrolls a page (%d)" % journal._scroll.scroll_vertical)
+	_press("move_up")
+	var scrolled := journal._scroll.scroll_vertical
+	_press("ui_up")
+	check(journal._scroll.scroll_vertical == scrolled - Journal.SCROLL_STEP, "Up scrolls back")
+	var stick := InputEventJoypadMotion.new()
+	stick.axis = JOY_AXIS_LEFT_Y
+	stick.axis_value = 1.0
+	scrolled = journal._scroll.scroll_vertical
+	Input.parse_input_event(stick)
+	Input.flush_buffered_events()
+	await get_tree().process_frame
+	check(journal._scroll.scroll_vertical == scrolled + Journal.SCROLL_STEP, "pushing the stick down scrolls the journal one step")
+	stick.axis_value = 0.0
+	Input.parse_input_event(stick)
+	Input.flush_buffered_events()
+	await get_tree().process_frame
+	journal.close()
+	world.hud._input(InputEventKey.new()) # the stick switched the prompts to the gamepad
+	check(world.player.can_act and not journal.is_open(), "the journal closes after scrolling")
 
 
 ## Space, C, click, and gamepad X interact now that there are no tools; the
@@ -244,6 +375,46 @@ func _check_central_hub(world: Node) -> void:
 		add_child(probe)
 		check(probe.get_spawn(dest.spawn) != null, "shuttle stop %s has a spot to land on" % dest.name)
 		probe.free()
+
+
+## The pass-out hour arriving mid-ride or mid-conversation isn't lost: the
+## player passes out as soon as the ride ends or the box closes. Late rides
+## aren't offered.
+func _check_curfew(world: Node) -> void:
+	while world._busy:
+		await get_tree().process_frame
+	await world.go_to_region("yosemite_village", "arrival")
+	var stop: ShuttleStop = world.region.find_child("ShuttleVillage", true, false)
+	GameClock.minutes = 25 * 60 + 10
+	stop.interact(world.player)
+	check(not world.park_map.visible and world.player.can_act, "the shuttle doesn't run after 1 AM")
+	GameClock.minutes = 12 * 60
+	stop.interact(world.player)
+	check(world.park_map.visible, "the shuttle runs by day")
+	world.park_map.close()
+
+	# A ride that ends at 2 AM.
+	var day := GameClock.day
+	GameClock.minutes = 25 * 60 + 50
+	await world.go_to_region("yosemite_valley", "happy_isles", ShuttleStop.RIDE_MINUTES)
+	await get_tree().create_timer(4.0).timeout
+	check(GameClock.day == day + 1 and world.region.region_id == Park.HOME_REGION and world.player.can_act and not world._busy,
+		"a ride that ends at 2 AM still passes the player out (day %d, %s)" % [GameClock.day, world.region.region_id])
+
+	# The pass-out waits for an open conversation to end.
+	await world.go_to_region("yosemite_village", "arrival")
+	day = GameClock.day
+	DialogueBox.say_to(world.player, [{"speaker": "Test", "text": "Hello."}])
+	GameClock.minutes = 25 * 60 + 50
+	GameClock.advance_minutes(10)
+	await get_tree().create_timer(2.0).timeout
+	check(GameClock.day == day and world.region.region_id == "yosemite_village" and not world.player.can_act, "the pass-out waits while a dialogue box is open")
+	var box: DialogueBox = world.get_tree().get_first_node_in_group("dialogue_box")
+	check(box != null and not box.is_queued_for_deletion(), "the dialogue box is still on screen at 2 AM")
+	box.press()
+	await get_tree().create_timer(4.0).timeout
+	check(GameClock.day == day + 1 and world.region.region_id == Park.HOME_REGION and world.player.can_act, "the player passes out once the box closes")
+	check(world.get_tree().get_nodes_in_group("dialogue_box").all(func(b: Node) -> bool: return b.is_queued_for_deletion()), "no dialogue box is left open")
 
 
 func _walkable_cells(region: Region) -> Dictionary:

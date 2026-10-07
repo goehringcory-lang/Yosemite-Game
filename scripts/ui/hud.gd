@@ -12,6 +12,10 @@ var _status: Label
 var _message_tween: Tween
 var _info_anchor := Vector2.ZERO
 
+## Sent when the player switches between keyboard and gamepad, so screens
+## showing button names can refresh them.
+signal device_changed
+
 @onready var date_label: Label = %DateLabel
 @onready var time_label: Label = %TimeLabel
 @onready var status_bar: HBoxContainer = %StatusBar
@@ -38,6 +42,7 @@ func _ready() -> void:
 	Inventory.changed.connect(_refresh_status)
 	Inventory.changed.connect(_refresh_bag)
 	Gear.changed.connect(_refresh_status)
+	device_changed.connect(_refresh_status)
 	var panel := PanelContainer.new()
 	_status = Label.new()
 	panel.add_child(_status)
@@ -87,10 +92,13 @@ func _process(_delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
+	var was_gamepad := _gamepad
 	if event is InputEventJoypadButton or (event is InputEventJoypadMotion and absf(event.axis_value) > 0.5):
 		_gamepad = true
 	elif event is InputEventKey or event is InputEventMouseButton:
 		_gamepad = false
+	if _gamepad != was_gamepad:
+		device_changed.emit()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -101,7 +109,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## The name of the interact button on the current device.
 func interact_button() -> String:
-	return "A" if _gamepad else "E"
+	return prompt("E", "A")
+
+
+## Picks the button name to show for the current device: [param keyboard] or [param gamepad].
+func prompt(keyboard: String, gamepad: String) -> String:
+	return gamepad if _gamepad else keyboard
 
 
 ## Shows "E  Talk to ..." above the player when something usable is in front of them.
@@ -136,7 +149,7 @@ func _refresh_status() -> void:
 	var pieces := 0
 	for id: String in Gear.owned:
 		pieces += Gear.count(id)
-	_status.text = "Food %d energy  ·  Gear %d  ·  J: Journal" % [FoodDB.carried_energy(), pieces]
+	_status.text = "Food %d energy  ·  Gear %d  ·  %s: Journal" % [FoodDB.carried_energy(), pieces, prompt("J", "Y")]
 
 
 ## Lists carried forage and food.

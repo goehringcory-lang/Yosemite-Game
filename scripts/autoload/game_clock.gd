@@ -17,6 +17,8 @@ const DAYS_PER_SEASON := 28
 const DAY_START_HOUR := 6
 const PASS_OUT_HOUR := 26 # 2:00 AM the following morning
 const MINUTES_PER_TICK := 10
+## Drives and rides can't arrive later than this many hours before the pass-out time.
+const TRAVEL_CUTOFF_HOURS := 1
 
 ## Real seconds per clock tick. Stardew Valley uses about 7 seconds per 10 minutes.
 var seconds_per_tick := 7.0
@@ -53,6 +55,11 @@ func advance_minutes(amount: int) -> void:
 	time_changed.emit(hour, minute)
 	if minutes >= PASS_OUT_HOUR * 60:
 		curfew_reached.emit()
+
+
+## True if a trip of [param trip_minutes] would arrive after the travel cutoff.
+func is_too_late_for(trip_minutes: int) -> bool:
+	return minutes + trip_minutes > (PASS_OUT_HOUR - TRAVEL_CUTOFF_HOURS) * 60
 
 
 func start_new_day() -> void:

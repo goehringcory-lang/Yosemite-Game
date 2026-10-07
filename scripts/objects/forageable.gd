@@ -14,6 +14,9 @@ func _ready() -> void:
 
 
 func interact(_player: Player) -> void:
+	# Two presses in one frame (E and Space) must not pick it up twice.
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
 	Inventory.add(item.id)
 	get_tree().call_group("hud", "show_message", "Found %s! %s" % [item.display_name, item.description])
 	get_parent().remove_child(self)
