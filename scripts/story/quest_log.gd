@@ -106,6 +106,12 @@ const FINAL_ENTRIES: Array[Dictionary] = [
 		"reply": "Another blank page. Some things are better kept than written."},
 ]
 
+## What Galen Clark says once the Register is finished.
+const AFTER_LAST_PAGE := [
+	"The book's yours now. I read it some evenings, the parts that aren't mine especially.",
+	"The valley keeps going. So should you: there's always someone new on the trail with a story.",
+]
+
 ## Quest id -> index of the current step. Missing = not started.
 var active: Dictionary = {}
 var completed: Array[String] = []
@@ -376,7 +382,10 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 		changed.emit()
 		return lines
 
-	if lines.is_empty() and character:
+	# After the last page, Clark talks about the book you wrote, not the job.
+	if lines.is_empty() and character_id == "galen_clark" and final_entry >= 0:
+		_add_lines(lines, speaker, AFTER_LAST_PAGE)
+	elif lines.is_empty() and character:
 		_add_lines(lines, speaker, character.idle_lines_for(character.rare_after_quest == "" or is_completed(character.rare_after_quest)))
 	return lines
 
