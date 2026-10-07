@@ -47,8 +47,11 @@ func interact(player: Player) -> void:
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s (%s). You need more gear to climb this: %s." % [
 			route.display_name, route.grade, ", ".join(missing)]}])
 		return
+	if ClimbState.starts_too_late(route, GameClock.minutes):
+		DialogueBox.say_to(player, [{"speaker": "", "text": "%s (%s). You'd still be on the wall at 2 AM. Start in the morning." % [route.display_name, route.grade]}])
+		return
 	var place: String = ClimbProfiles.get_profile(route.id).get("place", "")
-	var info := "%s, %s, %d pitch%s" % [route.display_name, route.grade, route.pitches.size(), "" if route.pitches.size() == 1 else "es"]
+	var info := "%s, %s, %s" % [route.display_name, route.grade, route.pitch_text()]
 	if place != "":
 		info += " (%s)" % place
 	if route.nights > 0:
@@ -69,16 +72,19 @@ func interact(player: Player) -> void:
 
 
 func climb(player: Player) -> void:
+	# Cached now: if the climb ends past the curfew the player is sent home and
+	# this node leaves the tree before the climb is over.
+	var tree := player.get_tree()
 	player.can_act = false
 	var was_paused := GameClock.paused
 	GameClock.paused = true
 	var minigame: ClimbMinigame = MINIGAME.instantiate()
 	minigame.setup(route)
-	player.get_tree().root.add_child(minigame)
+	tree.root.add_child(minigame)
+	var state := minigame.state
 	var result: Array = await minigame.finished
 	var success: bool = result[0]
 	GameClock.paused = was_paused
-	GameClock.advance_minutes(result[1])
 	var report: Array[Dictionary] = []
 	if success and QuestLog.record_climb(route.id):
 		report = QuestLog.tick_report(route.id)
@@ -87,7 +93,12 @@ func climb(player: Player) -> void:
 	if not report.is_empty():
 		await DialogueBox.say_to(player, report)
 	if success and route.destination_hub != "":
-		_travel_to_top()
+		Park.unlock_hub(route.destination_hub)
+	# The nights on the wall are new days. Time passes last: a climb that ran
+	# past 2 AM ends with the player passed out and sent home, not at the top.
+	var passed_out := GameClock.advance_through_nights(result[1], state.nights_spent)
+	if success and route.destination_hub != "" and not passed_out:
+		tree.call_group("world", "go_to_region", route.destination_hub, route.destination_spawn)
 
 
 ## True if the route needs no partner, or your partner's quest is underway or done.
@@ -101,9 +112,3 @@ func partner_name() -> String:
 	var quest := QuestLog.get_quest(route.partner_quest) if route.partner_quest != "" else null
 	var who := QuestLog.get_character(quest.giver) if quest else null
 	return who.display_name if who else ""
-
-
-## Unlocks the hub at the top of the route and moves the player there.
-func _travel_to_top() -> void:
-	Park.unlock_hub(route.destination_hub)
-	get_tree().call_group("world", "go_to_region", route.destination_hub, route.destination_spawn)

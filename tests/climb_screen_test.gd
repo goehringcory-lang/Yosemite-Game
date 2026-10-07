@@ -40,6 +40,8 @@ func test_controls() -> void:
 	check(game.state.row == 0, "nothing moves while the card is up")
 	press(game, "interact")
 	check(game._phase == ClimbMinigame.Phase.CLIMB, "E starts the climb")
+	press(game, "interact")
+	check(Inventory.count("acorn_cake") == 4 and game.state.stamina == ClimbState.MAX_STAMINA, "a second tap of E doesn't eat at full stamina")
 	game._move_t = 1.0
 	Input.action_press("assist")
 	var before := game.state.jug_moves
@@ -65,13 +67,66 @@ func test_controls() -> void:
 	check(game.state.chalked_this_pitch, "E chalks up on the wall")
 	press(game, "ui_cancel")
 	check(game._phase == ClimbMinigame.Phase.PAUSE, "Esc asks before retreating")
+	press(game, "ui_cancel")
+	check(game._phase == ClimbMinigame.Phase.CLIMB and game.state.status == ClimbState.Status.CLIMBING, "Esc again keeps climbing")
+	var finished := [false]
+	game.finished.connect(func(_ok, _minutes): finished[0] = true)
+	press(game, "ui_cancel")
 	press(game, "interact")
-	check(game._phase == ClimbMinigame.Phase.CLIMB and game.state.status == ClimbState.Status.CLIMBING, "E keeps climbing")
+	check(game.state.status == ClimbState.Status.RETREATED, "Esc, then E, retreats")
+	# The result card can't be skipped: not while the retreat plays, and not in its first half second.
+	press(game, "interact")
 	press(game, "ui_cancel")
-	press(game, "ui_cancel")
-	check(game.state.status == ClimbState.Status.RETREATED, "Esc twice retreats")
+	check(not finished[0] and game._phase != ClimbMinigame.Phase.RESULT, "taps during the retreat don't skip the result card")
+	game._result_delay = 0.0
+	await get_tree().process_frame
+	await get_tree().process_frame
+	check(game._phase == ClimbMinigame.Phase.RESULT, "the result card comes up")
+	press(game, "interact")
+	check(not finished[0], "a tap right as the result card comes up doesn't dismiss it")
+	game._result_age = 1.0
+	press(game, "use_tool")
+	check(finished[0], "Space leaves the result card")
 	game.queue_free()
 	await get_tree().process_frame
+	await test_screen_details()
+
+
+## Smaller screen behavior: Space on the route card, the crux meter's grace,
+## the late-start card, and the toolbar next to the hints.
+func test_screen_details() -> void:
+	var firefall: RouteData = load("res://data/routes/firefall_slab.tres")
+	Gear.owned = {"climbing_shoes": 1, "chalk_bag": 1, "harness": 1, "quickdraw": 6, "rope": 1}
+	Inventory.items.clear()
+	GameClock.paused = true
+	GameClock.minutes = 8 * 60
+	var game: ClimbMinigame = load("res://scenes/climb/climb_minigame.tscn").instantiate()
+	game.setup(firefall, 3)
+	add_child(game)
+	await get_tree().process_frame
+	press(game, "use_tool")
+	check(game._phase == ClimbMinigame.Phase.CLIMB, "Space starts the climb from the route card")
+	# A second Up right after stepping onto a crux doesn't spend the check.
+	game.state.pending = {"kind": "timing", "name": "The bulge", "window": 0.3, "row": 3, "cell": Vector2i(2, 3)}
+	game._start_crux()
+	press(game, "move_up")
+	check(game._phase == ClimbMinigame.Phase.CRUX and game.state.slipped_cruxes == 0, "the crux meter ignores a double-tap at first")
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	press(game, "move_up")
+	check(game._phase == ClimbMinigame.Phase.CLIMB, "...and answers after the grace")
+	game.queue_free()
+	await get_tree().process_frame
+	# Starting a day climb at 11:30 PM isn't allowed from the route card either.
+	GameClock.minutes = 23 * 60 + 30
+	game = load("res://scenes/climb/climb_minigame.tscn").instantiate()
+	game.setup(firefall, 3)
+	add_child(game)
+	await get_tree().process_frame
+	press(game, "interact")
+	check(game._phase == ClimbMinigame.Phase.INTRO, "a climb that would run past 2 AM doesn't start")
+	game.queue_free()
+	await get_tree().process_frame
+	GameClock.minutes = 8 * 60
 
 
 func play_route(r: RouteData) -> void:

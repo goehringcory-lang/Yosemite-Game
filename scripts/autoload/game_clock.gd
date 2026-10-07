@@ -55,6 +55,19 @@ func advance_minutes(amount: int) -> void:
 		curfew_reached.emit()
 
 
+## Moves the clock on after a climb that took [param elapsed] minutes and spent
+## [param nights] nights on the wall. Each night is a new day (the calendar
+## moves on and the Larder spoils food) rather than a pass-out at the curfew.
+## Returns true if the climb ran past the curfew, so the player passes out.
+func advance_through_nights(elapsed: int, nights: int) -> bool:
+	# The time of day on the last day, counted from that day's midnight.
+	var end := minutes + elapsed - nights * 24 * 60
+	for i in nights:
+		start_new_day()
+	advance_minutes(maxi(end - minutes, 0))
+	return end >= PASS_OUT_HOUR * 60
+
+
 func start_new_day() -> void:
 	day += 1
 	if day > DAYS_PER_SEASON:
