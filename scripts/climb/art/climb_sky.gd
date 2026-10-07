@@ -10,11 +10,14 @@ const SCREEN := Vector2i(480, 270)
 ## Hour -> sky colors (top, middle, horizon), sun, and how the granite is lit.
 const KEYS := [
 	{"h": 0.0, "top": "0b1028", "mid": "18203f", "low": "2a3258", "sun": "e8e8f0", "rock": "5a6488", "rim": "8a94c0", "tint": "7a86c0", "lum": 0.55},
-	{"h": 5.0, "top": "141a3a", "mid": "2c2c58", "low": "4a3a6a", "sun": "f0e0f0", "rock": "6a6490", "rim": "a090c0", "tint": "9a8ac8", "lum": 0.62},
-	{"h": 6.5, "top": "4a3c80", "mid": "a07cba", "low": "f6c8cc", "sun": "fff0d8", "rock": "8a74a8", "rim": "f0c0d8", "tint": "f0b8c0", "lum": 0.92},
+	{"h": 5.0, "top": "141a3a", "mid": "2c2c58", "low": "4a3a6a", "sun": "f0e0f0", "rock": "6a6490", "rim": "a090c0", "tint": "8a98d0", "lum": 0.62},
+	{"h": 6.5, "top": "4a3c80", "mid": "a07cba", "low": "f6c8cc", "sun": "fff0d8", "rock": "8a74a8", "rim": "f0c0d8", "tint": "b4b8e4", "lum": 0.88},
+	{"h": 8.0, "top": "4a78c4", "mid": "8ab8e0", "low": "e4dcec", "sun": "fffbe8", "rock": "8c8a96", "rim": "ece0d4", "tint": "e8e4f0", "lum": 1.0},
 	{"h": 9.0, "top": "3e7cc8", "mid": "86bce6", "low": "d6ecf4", "sun": "fffbe8", "rock": "8c8a86", "rim": "e8dcc0", "tint": "fff4e0", "lum": 1.05},
 	{"h": 16.0, "top": "3a74c0", "mid": "80b4e0", "low": "e0ecf0", "sun": "fff6d8", "rock": "8a8682", "rim": "f0dcb8", "tint": "fff0d4", "lum": 1.05},
-	{"h": 18.5, "top": "2a3a72", "mid": "7a78b0", "low": "f4b480", "sun": "ffd8a0", "rock": "6a6a88", "rim": "f8b880", "tint": "ffb890", "lum": 0.95},
+	{"h": 17.5, "top": "3a68b4", "mid": "88a8d8", "low": "f0d4b0", "sun": "ffe8b8", "rock": "8a8480", "rim": "f4d0a0", "tint": "ffe0b8", "lum": 1.03},
+	{"h": 18.5, "top": "2a3a72", "mid": "7a78b0", "low": "f4b480", "sun": "ffd8a0", "rock": "6a6a88", "rim": "f8b880", "tint": "ffb488", "lum": 0.98},
+	{"h": 19.3, "top": "1e2a5c", "mid": "5c4c8c", "low": "e08a7a", "sun": "f8a070", "rock": "5a5878", "rim": "e89890", "tint": "e89a90", "lum": 0.86},
 	{"h": 20.0, "top": "141c44", "mid": "3a3a70", "low": "a86a7a", "sun": "f8a878", "rock": "4e5274", "rim": "c08090", "tint": "a07ca0", "lum": 0.7},
 	{"h": 24.0, "top": "0b1028", "mid": "18203f", "low": "2a3258", "sun": "e8e8f0", "rock": "5a6488", "rim": "8a94c0", "tint": "7a86c0", "lum": 0.55},
 ]
@@ -37,6 +40,12 @@ static func palette(hour: float) -> Dictionary:
 			out["lum"] = lerpf(a.lum, b.lum, t)
 			out["night"] = hour < 5.5 or hour > 20.5
 			out["hour"] = hour
+			# Alpenglow: the sunlit faces glow orange-pink at dusk and a cool
+			# lavender at dawn; shadows stay as they are.
+			var dusk := clampf(1.0 - absf(hour - 18.9) / 1.5, 0.0, 1.0)
+			var dawn := clampf(1.0 - absf(hour - 6.4) / 1.1, 0.0, 1.0)
+			out["glow"] = maxf(dusk, dawn * 0.7)
+			out["glow_col"] = Color("ff8a52") if dusk >= dawn else Color("b8a4f0")
 			return out
 	return palette(12.0)
 

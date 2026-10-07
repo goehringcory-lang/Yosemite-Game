@@ -302,7 +302,7 @@ const PROFILES := {
 			{"name": "El Cap Tower", "style": "crack", "cracks": 0.5, "rest": [7], "bivy": "ledge", "deco": ["tree"], "beta": "A big ledge. A good place to eat and sleep."},
 			{"name": "Texas and Boot Flakes", "style": "flake", "cracks": 0.6, "pins": [3], "deco": ["flake"], "beta": "Big flakes, then a crack in the boot."},
 			{"name": "The King Swing", "style": "crack", "cracks": 0.45, "crux": 5, "crux_kind": "rhythm", "crux_name": "King Swing", "deco": ["streaks"], "beta": "Swing across the wall to the next crack: alternate Left and Right to build momentum."},
-			{"name": "Camp IV", "style": "crack", "cracks": 0.5, "rest": [3], "bivy": "ledge", "deco": ["tree"], "beta": "Eagle Ledge and Camp IV: a big ledge, and the night."},
+			{"name": "Camp IV", "style": "crack", "cracks": 0.5, "rest": [3], "deco": ["tree"], "beta": "Eagle Ledge and Camp IV: a big ledge, and a good rest."},
 			{"name": "The Great Roof", "style": "roof", "cols": [0, 1, 2, 3, 4], "cracks": 0.85, "crux": 6, "crux_name": "Great Roof", "hard_aid": true, "bivy": "hanging", "deco": ["roof"], "beta": "A huge roof. Hold Shift to aid a hard move with your aiders."},
 			{"name": "Pancake Flake", "style": "flake", "cracks": 0.55, "rest": [5], "pins": [3], "deco": ["flake"], "beta": "A huge flake. The rest is mostly climbing."},
 			{"name": "Changing Corners", "style": "crack", "cracks": 0.5, "crux": 5, "crux_name": "Changing Corners", "hard_aid": true, "deco": ["corner"], "beta": "Switch corner walls on tiny holds. Then it's only the headwall."},

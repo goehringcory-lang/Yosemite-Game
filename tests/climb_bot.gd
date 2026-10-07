@@ -38,24 +38,11 @@ func play(state: ClimbState) -> void:
 
 
 func _eat(state: ClimbState) -> void:
-	var foods := FoodDB.edible_in_inventory()
-	if foods.is_empty():
-		return
-	# Keep a meal for the night on a wall.
+	# The state keeps a real meal for each night still to come.
 	var guard := 0
-	while state.stamina < eat_below and guard < 6 and not foods.is_empty():
+	while state.stamina < eat_below and guard < 6 and state.can_eat():
 		guard += 1
-		foods.sort_custom(func(a, b): return FoodDB.energy(a) < FoodDB.energy(b))
-		var pick: String = foods[0]
-		if state.route.nights > state.nights_spent and FoodDB.energy(pick) >= ClimbState.BIVY_MEAL_ENERGY:
-			var meals := 0
-			for id in foods:
-				if FoodDB.energy(id) >= ClimbState.BIVY_MEAL_ENERGY:
-					meals += Inventory.count(id)
-			if meals <= state.route.nights - state.nights_spent:
-				break
-		state.eat(pick)
-		foods = FoodDB.edible_in_inventory()
+		state.eat(state.next_food())
 
 
 func _protect(state: ClimbState) -> void:
