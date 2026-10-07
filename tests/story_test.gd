@@ -354,6 +354,40 @@ func test_dialogue_and_minigame_scenes() -> void:
 	check(result[0] == 1, "choose() returns the picked option")
 	box2.close()
 
+	# One flick of the analog stick moves a menu cursor one step, not one per frame.
+	var box3 := DialogueBox.open(self)
+	box3.choose("Pick one", ["A", "B", "C", "D"])
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var stick := InputEventJoypadMotion.new()
+	stick.axis = JOY_AXIS_LEFT_Y
+	for value in [1.0, 1.0, 0.9, 0.0, 1.0, 1.0]:
+		stick.axis_value = value
+		Input.parse_input_event(stick)
+		Input.flush_buffered_events()
+		await get_tree().process_frame
+	check(box3._cursor == 2, "two stick flicks move the menu cursor two steps (at %d)" % box3._cursor)
+	box3.press(false)
+	await get_tree().process_frame
+	box3.close()
+
+	# A long list of choices (the stores, a campfire) stays on screen.
+	var box4 := DialogueBox.open(self)
+	var options := []
+	for i in 9:
+		options.append("Option %d for 12 food energy" % (i + 1))
+	box4.choose("You're carrying 30 energy of food. What do you want?", options, "Clerk")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var screen := get_viewport().get_visible_rect()
+	var panel_rect := box4._panel.get_global_rect()
+	var last_option: Control = box4._options_box.get_child(options.size() - 1)
+	check(screen.encloses(panel_rect), "the dialogue box with 9 options fits the screen (%s)" % panel_rect)
+	check(last_option.get_global_rect().end.y <= screen.end.y, "the last option is on screen (bottom %.0f)" % last_option.get_global_rect().end.y)
+	box4.press(false)
+	await get_tree().process_frame
+	box4.close()
+
 	var minigame: ClimbMinigame = load("res://scenes/climb/climb_minigame.tscn").instantiate()
 	minigame.setup(APRON, 3)
 	add_child(minigame)

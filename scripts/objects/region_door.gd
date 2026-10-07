@@ -22,7 +22,7 @@ func interact(_player: Player) -> void:
 		get_tree().call_group("hud", "show_message", Park.SEASONAL[closure].why)
 		return
 	# Like driving, you must arrive by 1 AM.
-	if minutes > 0 and GameClock.minutes + minutes > (GameClock.PASS_OUT_HOUR - 1) * 60:
+	if minutes > 0 and GameClock.is_too_late_for(minutes):
 		get_tree().call_group("hud", "show_message", "It's too late to start down the trail tonight.")
 		return
 	get_tree().call_group("world", "go_to_region", target_region, target_spawn, minutes)

@@ -63,6 +63,9 @@ const GEAR_LOCKED := Color("6d7488")
 const KIOSK_GREEN := Color("4f9a3c")
 const HERE_RED := Color("ff5a3c")
 
+## The gamepad's name for each keyboard control the map's hints mention.
+const GAMEPAD_BUTTONS := {"Arrows": "D-pad", "E": "A", "Esc": "B", "M": "Back", "Tab": "LB/RB"}
+
 var _tab := Tab.PARK
 var _travel := false
 var _region: Region
@@ -184,9 +187,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			_confirm()
 		elif clicked != "":
 			_select(clicked)
-	elif event.is_action_pressed("move_left") or event.is_action_pressed("move_up"):
+	elif MenuInput.pressed(event, "move_left") or MenuInput.pressed(event, "move_up"):
 		_cycle(-1)
-	elif event.is_action_pressed("move_right") or event.is_action_pressed("move_down"):
+	elif MenuInput.pressed(event, "move_right") or MenuInput.pressed(event, "move_down"):
 		_cycle(1)
 	elif event.is_action_pressed("interact") or event.is_action_pressed("use_tool") or event.is_action_pressed("ui_accept"):
 		_confirm()
@@ -234,13 +237,13 @@ func _area_input(event: InputEvent) -> void:
 	if _points.is_empty():
 		return
 	var dir := Vector2.ZERO
-	if event.is_action_pressed("move_left"):
+	if MenuInput.pressed(event, "move_left"):
 		dir = Vector2.LEFT
-	elif event.is_action_pressed("move_right"):
+	elif MenuInput.pressed(event, "move_right"):
 		dir = Vector2.RIGHT
-	elif event.is_action_pressed("move_up"):
+	elif MenuInput.pressed(event, "move_up"):
 		dir = Vector2.UP
-	elif event.is_action_pressed("move_down"):
+	elif MenuInput.pressed(event, "move_down"):
 		dir = Vector2.DOWN
 	if dir != Vector2.ZERO:
 		_move_cursor(dir)
@@ -344,11 +347,11 @@ func _refresh() -> void:
 	_acts_label.text = "\n".join(Array(hub.activities).map(func(a: String) -> String: return "- " + a))
 	_route_label.text = _route_text(hub)
 	_route_label.modulate = GOLD if _legs.has(_selected) and _legs[_selected].open else (TEXT if _selected == _hub_here else CLOSED)
-	var tab_hint := "[Tab] Area"
+	var tab_hint := "[%s] Area" % _button("Tab")
 	if _travel:
-		_hint_label.text = "[Arrows] Choose   [E] Travel   [Esc] Close   %s" % tab_hint
+		_hint_label.text = "[%s] Choose   [%s] Travel   [%s] Close   %s" % [_button("Arrows"), _button("E"), _button("Esc"), tab_hint]
 	else:
-		_hint_label.text = "Travel from a map kiosk or a road out of the area.\n[Arrows] Choose   [M] Close   %s" % tab_hint
+		_hint_label.text = "Travel from a map kiosk or a road out of the area.\n[%s] Choose   [%s] Close   %s" % [_button("Arrows"), _button("M"), tab_hint]
 	_area_title.text = "" if not _view.is_empty() else "%s area map" % Park.get_hub(_hub_here).display_name
 	_refresh_area_text()
 	_park_canvas.queue_redraw()
@@ -356,9 +359,22 @@ func _refresh() -> void:
 	_area_frame.queue_redraw()
 
 
+## The name of a keyboard control on the current device, like the HUD's prompts.
+func _button(keyboard: String) -> String:
+	var hud := get_tree().get_first_node_in_group("hud") as HUD
+	if hud and not hud.device_changed.is_connected(_on_device_changed):
+		hud.device_changed.connect(_on_device_changed)
+	return hud.prompt(keyboard, GAMEPAD_BUTTONS.get(keyboard, keyboard)) if hud else keyboard
+
+
+func _on_device_changed() -> void:
+	if visible:
+		_refresh()
+
+
 func _refresh_area_text() -> void:
 	if _view.is_empty():
-		_area_footer.text = "You are at %s.   [Tab] Park map   [M] Close" % _here_name
+		_area_footer.text = "You are at %s.   [%s] Park map   [%s] Close" % [_here_name, _button("Tab"), _button("M")]
 		_area_hint.text = ""
 		return
 	var selected: Dictionary = _points[_cursor] if _cursor >= 0 else {}
@@ -367,7 +383,7 @@ func _refresh_area_text() -> void:
 		lines = "%s. %s" % [selected.name, selected.blurb]
 		var stop_name: String = selected.get("stop", "")
 		if _shuttle_from != "" and stop_name != "" and stop_name != _shuttle_from:
-			lines += "  [E] Ride here, free, %d min." % ShuttleStop.RIDE_MINUTES
+			lines += "  [%s] Ride here, free, %d min." % [_button("E"), ShuttleStop.RIDE_MINUTES]
 		elif _shuttle_from != "" and stop_name == _shuttle_from:
 			lines += "  You are at this stop."
 		elif stop_name != "":
@@ -376,9 +392,9 @@ func _refresh_area_text() -> void:
 		lines = "You are at %s." % _here_name
 	_area_footer.text = lines
 	if _shuttle_from != "":
-		_area_hint.text = "[Arrows] Stop   [E] Ride   [Esc] Stay"
+		_area_hint.text = "[%s] Stop   [%s] Ride   [%s] Stay" % [_button("Arrows"), _button("E"), _button("Esc")]
 	else:
-		_area_hint.text = "[Arrows] Look   [Tab] Park map   [M] Close"
+		_area_hint.text = "[%s] Look   [%s] Park map   [%s] Close" % [_button("Arrows"), _button("Tab"), _button("M")]
 
 
 func _route_text(hub: HubData) -> String:

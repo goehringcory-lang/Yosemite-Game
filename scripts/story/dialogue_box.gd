@@ -13,6 +13,7 @@ extends CanvasLayer
 const NAME_COLOR := Color(1.0, 0.85, 0.5)
 const CURSOR := "> "
 
+var _panel: PanelContainer
 var _name_label: Label
 var _text_label: Label
 var _options_box: VBoxContainer
@@ -43,19 +44,27 @@ static func say_to(player: Player, lines: Array) -> void:
 
 func _ready() -> void:
 	layer = 30
-	add_to_group("dialogue_box")
+	add_to_group("dialogue_box") # World waits for the box to close before passing the player out
 	_opened_frame = Engine.get_process_frames()
 	var root := Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
-	var panel := PanelContainer.new()
-	panel.position = Vector2(8, 184)
-	panel.custom_minimum_size = Vector2(464, 78)
-	root.add_child(panel)
+	# Sits on the bottom edge of the screen and grows upward, so a long list of
+	# choices (the stores, a campfire with every recipe) never runs off the bottom.
+	_panel = PanelContainer.new()
+	_panel.anchor_top = 1.0
+	_panel.anchor_bottom = 1.0
+	_panel.offset_left = 8.0
+	_panel.offset_right = 472.0
+	_panel.offset_top = -86.0
+	_panel.offset_bottom = -8.0
+	_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_panel.custom_minimum_size = Vector2(464, 78)
+	root.add_child(_panel)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 1)
-	panel.add_child(column)
+	_panel.add_child(column)
 	_name_label = Label.new()
 	_name_label.add_theme_color_override("font_color", NAME_COLOR)
 	column.add_child(_name_label)
@@ -151,11 +160,11 @@ func _input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_answer = -1
-	elif not _options.is_empty() and (event.is_action_pressed("move_up") or event.is_action_pressed("ui_up")):
+	elif not _options.is_empty() and (MenuInput.pressed(event, "move_up") or MenuInput.pressed(event, "ui_up")):
 		get_viewport().set_input_as_handled()
 		_cursor = wrapi(_cursor - 1, 0, _options.size())
 		_refresh_options()
-	elif not _options.is_empty() and (event.is_action_pressed("move_down") or event.is_action_pressed("ui_down")):
+	elif not _options.is_empty() and (MenuInput.pressed(event, "move_down") or MenuInput.pressed(event, "ui_down")):
 		get_viewport().set_input_as_handled()
 		_cursor = wrapi(_cursor + 1, 0, _options.size())
 		_refresh_options()

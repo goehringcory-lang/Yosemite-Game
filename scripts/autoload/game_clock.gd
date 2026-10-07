@@ -25,6 +25,8 @@ const FIREFALL_MINUTES := 15
 ## The moonbow at Lower Yosemite Fall: spring full-moon nights, 9 PM until 2 AM.
 const MOONBOW_FROM_HOUR := 21
 const MOONBOW_TO_HOUR := 2
+## Drives and rides can't arrive later than this many hours before the pass-out time.
+const TRAVEL_CUTOFF_HOURS := 1
 
 ## Real seconds per clock tick. Stardew Valley uses about 7 seconds per 10 minutes.
 var seconds_per_tick := 7.0
@@ -61,6 +63,11 @@ func advance_minutes(amount: int) -> void:
 	time_changed.emit(hour, minute)
 	if minutes >= PASS_OUT_HOUR * 60:
 		curfew_reached.emit()
+
+
+## True if a trip of [param trip_minutes] would arrive after the travel cutoff.
+func is_too_late_for(trip_minutes: int) -> bool:
+	return minutes + trip_minutes > (PASS_OUT_HOUR - TRAVEL_CUTOFF_HOURS) * 60
 
 
 func start_new_day() -> void:
