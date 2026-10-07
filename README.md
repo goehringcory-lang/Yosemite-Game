@@ -157,6 +157,10 @@ The four generated hubs (El Portal, Wawona, Glacier Point, Tuolumne Meadows) and
 
 The hand-built areas follow the seasons too, without being rebuilt. When a region loads, `scripts/world/seasonal_dressing.gd` swaps its black oaks, dogwoods, garden beds, meadow grass and conifers for the season's drawing (in `assets/sprites/ahwahnee/seasons/`, made by `godot --headless --path . -s res://tools/hubs/build_seasonal_art.gd`), hides lupine, paintbrush and wildflowers in winter and dries them in fall, and grades the painted ground with `assets/shaders/seasonal_ground.gdshader`: dry and golden in fall, cool and frosted in winter. Only sprites change, so collision and foraging stay the same.
 
+**Weather and atmosphere.** Each day's weather comes from the date (`Weather.today()` in `scripts/world/weather.gd`), so it survives a reload: most winter days it snows, now and then a spring or fall day rains, and the rest are fair. Outdoors, `Weather` drifts a few dozen hand-simulated pixels through the air in world space (they wrap round the camera, so you walk through the snow rather than dragging it along): snowflakes at three depths, slanted rain, tumbling apple-blossom petals in spring, cottonwood fluff on summer days and blinking fireflies on summer nights, and swinging gold and red leaves in fall. On fair days, cloud shadows slide over everything (`scripts/world/cloud_shadows.gd` with `assets/shaders/cloud_shadows.gdshader`, sampled per world pixel in two flat steps of shade so the art stays crisp); they fade at dusk and vanish when it's overcast. `day_night.gd` grades the light a touch by season (warm summer, golden fall, cool winter) and greys it on wet and snowy days. The player kicks up a little dust at each step (snow on snowy days, a splash in the rain, nothing on frozen ground) and breathes fog on cold mornings and all winter (`scripts/player/footfall.gd`). All of it is skipped indoors. Shoot it with `region_shot.tscn` and `SHOT_SEASON`, `SHOT_DAY` and `SHOT_WAIT=1`.
+
+![Snow at the Lamon Homestead](docs/weather_winter_snow.png)
+
 ### The Ahwahnee: north from the homestead
 
 The Lamon Homestead has a second gate, in the hedge at its north side, opening onto a trail that runs to the **Ahwahnee Hotel**. It is two hand-made regions, and nothing in them is to scale:
@@ -275,7 +279,8 @@ scripts/
   world/world.gd         loads regions, travel, sleep sequence
   world/region.gd        a map the player can be in (hub or smaller area)
   ui/park_map.gd         park and area map screens
-  world/day_night.gd     time-of-day lighting (edit the gradient in the Inspector)
+  world/day_night.gd     time-of-day lighting (edit the gradient in the Inspector), graded by season and weather
+  world/weather.gd       each day's weather and the snow, rain, petals, leaves and fireflies in the air
   player/player.gd       movement, facing, interaction
   story/                 quests, gear, food, chuckah, recipes, dialogue, journal, perks (autoloads: Gear, QuestLog, FoodDB, Larder, Granary, Recipes, Perks)
   climb/                 climbing rules (climb_state.gd) and screen
