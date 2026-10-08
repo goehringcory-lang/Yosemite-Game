@@ -14,17 +14,17 @@ const L := preload("res://scripts/climb/art/climb_layout.gd")
 
 ## Daylight ramps, dark to light: deep, shade, base, lit, highlight.
 const ROCKS := {
-	"apron": ["56525e", "7c7884", "a29ea8", "cac6cc", "ece8ec"],
-	"polished": ["4e5864", "727e8c", "9aa4b0", "c4cad0", "e8ecee"],
-	"golden": ["5a4430", "82603e", "ac8654", "d6ac70", "f2d492"],
-	"orange": ["5c3a30", "86543e", "b27a54", "daa270", "f6ca92"],
-	"dark": ["262a3c", "44485c", "6a6e82", "9498ac", "c0c4d6"],
-	"pale": ["6c665e", "968e82", "c4bcac", "e6dec8", "faf4e0"],
-	"roof": ["2e2c3a", "4c4a5a", "6c6a7c", "908e9e", "b6b4c4"],
-	"elcap": ["3e3e4c", "6a6a7a", "9e9ea4", "cacac6", "eeeadc"],
-	"arches": ["54505a", "787480", "a09c98", "ccc4b0", "ece2c6"],
-	"dome": ["68646a", "928e96", "bcb8bc", "e0dcd8", "f6f2ea"],
-	"knobby": ["564e44", "7e7662", "aca088", "d4c8a6", "f0e6c4"],
+	"apron": ["3c3654", "645a7a", "9c9090", "d0bca8", "f4e8d0"],
+	"polished": ["34405a", "56667e", "8494a6", "b8c4cc", "e4eef2"],
+	"golden": ["4a2e3e", "7a4a40", "a87452", "d8a464", "f8d898"],
+	"orange": ["4a2c40", "7c4248", "b06a4c", "e09a5c", "fcd49a"],
+	"dark": ["1e2040", "3a3e64", "62648a", "9092b0", "c4c6dc"],
+	"pale": ["5a4e60", "8a7c7e", "bcae9e", "e4d6bc", "fcf4dc"],
+	"roof": ["262444", "424062", "67668a", "9494a8", "c2c2d0"],
+	"elcap": ["30304a", "5a5a72", "8e8ca0", "c6c4c4", "f0ecdc"],
+	"arches": ["4c4262", "766e7c", "a29a92", "cfc2a6", "f0e4c8"],
+	"dome": ["5a5068", "867c88", "b6aeb0", "dcd4cc", "f8f2e6"],
+	"knobby": ["4c4048", "7a6a5e", "a89478", "d6c49a", "f4e8be"],
 	"ice": ["4a6ca8", "7a9ccc", "b0cce6", "dcecf8", "f8fcff"],
 }
 
@@ -53,6 +53,12 @@ static func colors(rock_key: String, pal: Dictionary) -> Dictionary:
 			var col: Color = out[names[i]]
 			var v := col.r * 0.3 + col.g * 0.55 + col.b * 0.15
 			out[names[i]] = col.lerp(Color(glow_col.r * v * 1.3, glow_col.g * v * 1.3, glow_col.b * v * 1.3).clamp(), glow * [0.18, 0.32, 0.45][i - 2])
+	# Hue shift: the shadows drift toward blue-violet and the lights toward
+	# warm cream, so the granite reads as lit stone rather than grey paint.
+	for i in 2:
+		out[names[i]] = (out[names[i]] as Color).lerp(Color("3c3c6e"), 0.22 - i * 0.06)
+	out["lit"] = (out["lit"] as Color).lerp(Color("ffe6b4"), 0.16)
+	out["hi"] = (out["hi"] as Color).lerp(Color("fff4d8"), 0.22)
 	out["seam"] = _light(Color(hexes[0]).darkened(0.35), tint, lum)
 	out["streak"] = _light(STREAK, tint, lum)
 	out["lichen_o"] = _light(LICHEN_ORANGE, tint, lum)
@@ -185,16 +191,21 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 	# (the same arithmetic as per pixel, so the picture doesn't change).
 	var light_x := _scaled_diffs(0.8)
 	var light_y := _scaled_diffs(0.55)
+	# The broad light: the upper left of the face is lit and the lower right
+	# falls off, so every plate reads as lit from the same side.
 	var sun_x := PackedFloat64Array()
 	sun_x.resize(w)
 	for x in w:
-		var sun := float(x) / w
-		sun_x[x] = (sun - 0.5) * 1.1
+		sun_x[x] = (0.5 - float(x) / w) * 0.6
+	var sun_y := PackedFloat64Array()
+	sun_y.resize(h)
+	for y in h:
+		sun_y[y] = (0.5 - float(y) / h) * 0.36
 	var height := PackedFloat64Array()
 	height.resize(256)
 	for v in 256:
 		height[v] = (v / 255.0 - 0.5) * 1.2
-	var bayer := _bayer_terms(0.16)
+	var bayer := _bayer_terms(0.03)
 	for y in h:
 		var row := y * w
 		var brow := (y & 3) << 2
@@ -209,17 +220,24 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 			var yd := relief[i + 3 * w] if down else here
 			# Light from the upper left: surfaces facing left and up are lit.
 			var s_light := (light_x[xl - xr + 255] + light_y[yu - yd + 255]) / 255.0 * 4.0
-			var t := 2.0 + s_light * k_light + sun_x[x] + height[here]
+			var t := 2.0 + s_light * k_light + sun_x[x] + sun_y[y] + height[here]
 			out.encode_u32(i * 4, lut[clampi(roundi((t + bayer[brow | (x & 3)]) * 3.0) * 4 / 3, 0, 19)])
 	im.set_data(w, h, false, Image.FORMAT_RGBA8, out)
 	_joints(im, c, rng, smooth)
 	_stains(im, c, rng, deco)
 	_lichen(im, c, rng, deco, h)
-	# Speckles: feldspar glints and dark crystals.
-	for i in w * h / 160:
+	# Feldspar glints and dark crystals, in small clusters of two or three
+	# pixels, so the grain reads as stone and not as static.
+	for i in w * h / 420:
 		var p := Vector2i(rng.randi_range(0, w - 1), rng.randi_range(0, h - 1))
-		var col := im.get_pixelv(p)
-		im.set_pixelv(p, col.lightened(0.14) if rng.randf() < 0.55 else col.darkened(0.18))
+		var bright := rng.randf() < 0.55
+		var offs: Array[Vector2i] = [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1)]
+		for k in rng.randi_range(2, 3):
+			var q: Vector2i = p + offs[k]
+			if q.x < 0 or q.y < 0 or q.x >= w or q.y >= h:
+				continue
+			var col := im.get_pixelv(q)
+			im.set_pixelv(q, col.lightened(0.12) if bright else col.darkened(0.16))
 
 
 ## The 20 quarter-steps of the rock ramp as opaque RGBA8 pixels, packed for
@@ -259,9 +277,9 @@ static func _relief(w: int, h: int, seed_value: int, smooth: bool) -> PackedByte
 	var fbm := FastNoiseLite.new()
 	fbm.seed = seed_value
 	fbm.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
-	fbm.frequency = 0.022 if not smooth else 0.013
-	fbm.fractal_octaves = 3
-	fbm.fractal_gain = 0.45
+	fbm.frequency = 0.015 if not smooth else 0.011
+	fbm.fractal_octaves = 2
+	fbm.fractal_gain = 0.4
 	var squash := 3 if not smooth else 2
 	var a := fbm.get_image(w, maxi(h / squash, 8), false, false, true)
 	a.resize(w, h, Image.INTERPOLATE_BILINEAR)
@@ -297,7 +315,7 @@ static func _relief(w: int, h: int, seed_value: int, smooth: bool) -> PackedByte
 static func _joints(im: Image, c: Dictionary, rng: RandomNumberGenerator, smooth: bool) -> void:
 	var w := im.get_width()
 	var h := im.get_height()
-	var count := w / (60 if smooth else 34)
+	var count := w / (60 if smooth else 48)
 	for i in count:
 		var x := float(rng.randi_range(4, w - 36))
 		var y := rng.randi_range(-40, h - 80)
@@ -315,9 +333,8 @@ static func _joints(im: Image, c: Dictionary, rng: RandomNumberGenerator, smooth
 			if int((k + i * 13) / 37) % 5 == 4:
 				continue
 			im.set_pixel(xx, yy, c.seam)
-			im.set_pixel(xx - 1, yy, im.get_pixel(xx - 1, yy).lightened(0.12))
-			if (k & 1) == 0:
-				im.set_pixel(xx + 1, yy, im.get_pixel(xx + 1, yy).darkened(0.12))
+			im.set_pixel(xx - 1, yy, im.get_pixel(xx - 1, yy).lightened(0.16))
+			im.set_pixel(xx + 1, yy, im.get_pixel(xx + 1, yy).darkened(0.1))
 
 
 ## Dark water stains running down the rock, thin and dithered at the edges.
@@ -325,12 +342,12 @@ static func _stains(im: Image, c: Dictionary, rng: RandomNumberGenerator, deco: 
 	var w := im.get_width()
 	var h := im.get_height()
 	var heavy := "streaks" in deco
-	var count := (w / 26 if heavy else w / 80)
+	var count := (w / 30 if heavy else w / 110)
 	for i in count:
 		var x := rng.randi_range(6, w - 40)
 		var y := rng.randi_range(0, h - 120)
 		var length := rng.randi_range(70, 240)
-		var sw := rng.randi_range(1, 3)
+		var sw := rng.randi_range(1, 2)
 		for k in length:
 			var yy := y + k
 			if yy >= h:
@@ -338,13 +355,9 @@ static func _stains(im: Image, c: Dictionary, rng: RandomNumberGenerator, deco: 
 			var drift := int(sin(k * 0.05 + i) * 1.4)
 			var fade := 1.0 - float(k) / length
 			for dx in range(-sw, sw + 1):
-				var edge := absi(dx) == sw
-				if edge and not P.dither(x + dx, yy, fade * 0.7):
-					continue
-				if not edge or P.dither(x + dx, yy, fade):
-					var p := Vector2i(x + dx + drift, yy)
-					if p.x >= 0 and p.x < w:
-						im.set_pixelv(p, im.get_pixelv(p).lerp(c.streak, 0.55 * fade + 0.15))
+				var p := Vector2i(x + dx + drift, yy)
+				if p.x >= 0 and p.x < w and not (absi(dx) == sw and not P.dither(x + dx, yy, fade * 0.6)):
+					im.set_pixelv(p, im.get_pixelv(p).lerp(c.streak, 0.36 * fade + 0.1))
 
 
 static func _lichen(im: Image, c: Dictionary, rng: RandomNumberGenerator, deco: Array, h: int) -> void:
