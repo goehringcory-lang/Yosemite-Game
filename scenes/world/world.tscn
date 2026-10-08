@@ -9,8 +9,8 @@
 [ext_resource type="Script" path="res://scripts/world/cloud_shadows.gd" id="16_cldsh"]
 
 [sub_resource type="Gradient" id="Gradient_26xou"]
-offsets = PackedFloat32Array(0, 0.22, 0.27, 0.35, 0.68, 0.77, 0.84, 0.9, 1)
-colors = PackedColorArray(0.33, 0.36, 0.58, 1, 0.33, 0.36, 0.58, 1, 0.95, 0.82, 0.78, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.83, 0.64, 1, 0.62, 0.52, 0.72, 1, 0.33, 0.36, 0.58, 1, 0.33, 0.36, 0.58, 1)
+offsets = PackedFloat32Array(0, 0.19, 0.25, 0.29, 0.34, 0.5, 0.67, 0.73, 0.77, 0.81, 0.86, 0.9, 1)
+colors = PackedColorArray(0.32, 0.4, 0.7, 1, 0.36, 0.42, 0.74, 1, 0.6, 0.66, 0.9, 1, 1, 0.89, 0.76, 1, 1, 0.97, 0.93, 1, 1, 1, 1, 1, 1, 0.93, 0.8, 1, 1, 0.82, 0.58, 1, 0.921, 0.726, 0.635, 1, 0.62, 0.49, 0.646, 1, 0.42, 0.42, 0.72, 1, 0.32, 0.4, 0.7, 1, 0.32, 0.4, 0.7, 1)
 
 [node name="World" type="Node2D" unique_id=141371045]
 script = ExtResource("1_mxkvs")
