@@ -37,7 +37,6 @@ const INK := Color("1a1410")
 const GOLD := Color("ffd24a")
 const CLOSED := Color("e0503c")
 const LOCKED := Color("9a948a")
-const HERE := Color("ff4a4a")
 const TEXT := Color("f7f0dc")
 const DIM := Color(0.97, 0.94, 0.86, 0.6)
 ## Sub-heading text: light enough to read on the dark panel.
@@ -62,6 +61,13 @@ const FALL_BLUE := Color("9fd3ee")
 const GEAR_LOCKED := Color("6d7488")
 const KIOSK_GREEN := Color("4f9a3c")
 const HERE_RED := Color("ff5a3c")
+const PARCHMENT_LIGHT := Color("fff6dc")
+const SIGN_GOLD_LIGHT := Color("ffe58a")
+const SLATE_LIGHT := Color("3d4868")
+## Width of the wooden frame around a picture, in pixels.
+const FRAME_WIDTH := 4.0
+const WOOD_BEVEL := Color("a86d38")
+const WOOD_SHADE := Color("6b4322")
 
 ## The gamepad's name for each keyboard control the map's hints mention.
 const GAMEPAD_BUTTONS := {"Arrows": "D-pad", "E": "A", "Esc": "B", "M": "Back", "Tab": "LB/RB"}
@@ -91,6 +97,12 @@ var _cursor := -1
 ## Name of the shuttle stop the player is riding from, while choosing where to go.
 var _shuttle_from := ""
 var _routes: Dictionary = {}
+var _park_frame: Control
+var _park_marker: Control
+var _area_marker: Control
+## The bob-and-pulse step of the "you are here" pin, the only thing redrawn every frame.
+var _pin_phase := 0
+var _note_box: StyleBoxFlat
 
 var _park_view: Control
 var _park_canvas: Control
@@ -168,10 +180,15 @@ func close() -> void:
 
 
 func _process(_delta: float) -> void:
-	if visible:
-		# Redraw every frame for the blinking "you are here" marker.
-		_park_canvas.queue_redraw()
-		_area_canvas.queue_redraw()
+	if not visible:
+		return
+	# The maps are only redrawn on change. The "you are here" pin bobs and pulses,
+	# so only its small overlays redraw, and only when the animation steps.
+	var phase := int(Time.get_ticks_msec() / 160) % 4
+	if phase != _pin_phase:
+		_pin_phase = phase
+		_park_marker.queue_redraw()
+		_area_marker.queue_redraw()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -358,9 +375,12 @@ func _refresh() -> void:
 		_hint_label.text = "Travel from a map kiosk or a road out of the area.\n[%s] Choose   [%s] Close   %s" % [_button("Arrows"), _button("M"), tab_hint]
 	_area_title.text = "" if not _view.is_empty() else "%s area map" % Park.get_hub(_hub_here).display_name
 	_refresh_area_text()
+	_park_frame.queue_redraw()
 	_park_canvas.queue_redraw()
-	_area_canvas.queue_redraw()
+	_park_marker.queue_redraw()
 	_area_frame.queue_redraw()
+	_area_canvas.queue_redraw()
+	_area_marker.queue_redraw()
 
 
 ## The name of a keyboard control on the current device, like the HUD's prompts.
@@ -432,9 +452,15 @@ func _draw_park() -> void:
 		var fill := TEXT
 		if hub.id != _hub_here and _legs.has(hub.id) and not _legs[hub.id].open:
 			fill = LOCKED if _legs[hub.id].locked else CLOSED
-		var r := 3.0 if hub.id == _selected else 2.0
+		var selected: bool = hub.id == _selected
+		var r := 3.0 if selected else 2.0
+		# The selected hub gets a square highlight ring around its marker.
+		if selected:
+			canvas.draw_rect(Rect2(p - Vector2(r + 4, r + 4), Vector2(r * 2 + 9, r * 2 + 9)), INK, false, 1.0)
+			canvas.draw_rect(Rect2(p - Vector2(r + 3, r + 3), Vector2(r * 2 + 7, r * 2 + 7)), GOLD, false, 1.0)
+		canvas.draw_rect(Rect2(p - Vector2(r + 1, r + 1) + Vector2(1, 1), Vector2(r * 2 + 3, r * 2 + 3)), Color(INK, 0.5))
 		canvas.draw_rect(Rect2(p - Vector2(r + 1, r + 1), Vector2(r * 2 + 3, r * 2 + 3)), INK)
-		canvas.draw_rect(Rect2(p - Vector2(r, r), Vector2(r * 2 + 1, r * 2 + 1)), GOLD if hub.id == _selected else fill)
+		canvas.draw_rect(Rect2(p - Vector2(r, r), Vector2(r * 2 + 1, r * 2 + 1)), GOLD if selected else fill)
 		markers.append(Rect2(p - Vector2(r + 1, r + 1), Vector2(r * 2 + 3, r * 2 + 3)))
 	var taken: Array[Rect2] = []
 	for hub in ParkAtlas.HUBS:
@@ -442,10 +468,10 @@ func _draw_park() -> void:
 		var width := font.get_string_size(hub.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x
 		var at := _park_label_at(p, Vector2(width, FONT_SIZE), LABEL_SIDE.get(hub.id, Vector2(1, 0)), points, markers, taken)
 		taken.append(Rect2(at - Vector2(0, FONT_SIZE - 1), Vector2(width, FONT_SIZE + 2)))
-		_text(canvas, font, at, hub.display_name, GOLD if hub.id == _selected else TEXT)
-	if (Time.get_ticks_msec() / 400) % 2 == 0:
-		var here := _map_point(_here)
-		canvas.draw_rect(Rect2(here - Vector2(1, 1), Vector2(3, 3)), HERE)
+		# The name sits on a parchment plaque, gold when it is the selected hub.
+		var is_selected: bool = hub.id == _selected
+		_plaque(canvas, at + Vector2(-3, -8), Vector2(ceilf(width) + 6.0, 11.0), GOLD if is_selected else PARCHMENT, SIGN_GOLD_SHADE if is_selected else PARCHMENT_SHADE, SIGN_GOLD_LIGHT if is_selected else PARCHMENT_LIGHT, 1.0)
+		canvas.draw_string(font, at, hub.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, BROWN)
 
 
 ## Baseline of a hub's name: its preferred side of the marker, or the nearest
@@ -492,18 +518,15 @@ func _draw_area() -> void:
 		if not place.show_on_map:
 			continue
 		var p := _area_point(hub, _region.to_lonlat(place.position))
-		canvas.draw_rect(Rect2(p - Vector2(1, 1), Vector2(2, 2)), INK)
+		_draw_marker_dot(canvas, p, 1.0, false)
 		var size := font.get_string_size(place.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE)
-		for offset: Vector2 in [Vector2(3, 3), Vector2(-3 - size.x, 3), Vector2(-size.x / 2, -4), Vector2(-size.x / 2, 10)]:
-			var box := Rect2(p + offset - Vector2(0, size.y - 3), size)
-			if not taken.any(func(other: Rect2) -> bool: return other.intersects(box.grow(1))) and Rect2(Vector2.ZERO, _area_canvas.size).encloses(box):
-				taken.append(box)
-				_text(canvas, font, p + offset, place.display_name, TEXT)
+		for offset: Vector2 in [Vector2(6, 3), Vector2(-6 - size.x, 3), Vector2(-size.x / 2, -6), Vector2(-size.x / 2, 11)]:
+			var sign_rect := Rect2(p + offset - Vector2(3, 8), Vector2(size.x + 6, 11))
+			if not taken.any(func(other: Rect2) -> bool: return other.intersects(sign_rect.grow(1))) and Rect2(Vector2.ZERO, _area_canvas.size).encloses(sign_rect):
+				taken.append(sign_rect)
+				_plaque(canvas, sign_rect.position, sign_rect.size, PARCHMENT, PARCHMENT_SHADE, PARCHMENT_LIGHT, 1.0)
+				canvas.draw_string(font, p + offset, place.display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, BROWN)
 				break
-	if (Time.get_ticks_msec() / 400) % 2 == 0:
-		var here := _area_point(hub, _here)
-		canvas.draw_rect(Rect2(here - Vector2(2, 2), Vector2(4, 4)), INK)
-		canvas.draw_rect(Rect2(here - Vector2(1, 1), Vector2(2, 2)), HERE)
 
 
 ## Pixel on the area map for a longitude/latitude inside [param hub].
@@ -549,7 +572,6 @@ func _draw_area_illustrated() -> void:
 			_draw_point(canvas, font, i, false, choosing and not _points[i].has("stop"))
 	if _cursor >= 0:
 		_draw_point(canvas, font, _cursor, true, false)
-	_draw_here(canvas, _view_point(_here) * s)
 
 
 ## The size of a point's sign.
@@ -572,7 +594,11 @@ func _marker_rects() -> Array[Rect2]:
 	var s := float(_area_scale)
 	for point: Dictionary in _points:
 		if point.tier != "landmark" and point.tier != "fall" and point.tier != "home":
-			rects.append(Rect2((_v2(point.anchor) * s).floor() - Vector2(2, 2), Vector2(5, 5)))
+			var dot := (_v2(point.anchor) * s).floor()
+			if point.has("stop"):
+				rects.append(Rect2(dot - Vector2(3, 3), Vector2(7, 7)))
+			else:
+				rects.append(Rect2(dot - Vector2(2, 2), Vector2(5, 5)))
 	for kiosk: Dictionary in _view.kiosks:
 		rects.append(Rect2((_v2(kiosk.anchor) * s - Vector2(3, 8)).floor() - Vector2(1, 1), Vector2(9, 10)))
 	for climb: Dictionary in _view.climbs:
@@ -627,30 +653,27 @@ func _draw_point(canvas: Control, font: Font, index: int, selected: bool, dimmed
 	var pos := _sign_at[index] if index < _sign_at.size() else _sign_home(font, point)
 	var fill := PARCHMENT
 	var shade := PARCHMENT_SHADE
-	var border := BROWN
+	var light := PARCHMENT_LIGHT
 	var ink := BROWN
 	if ribbon:
 		fill = SLATE
 		shade = SLATE_SHADE
-		border = SLATE_DARK
+		light = SLATE_LIGHT
 		ink = CREAM
 	elif tier == "home":
 		fill = SIGN_GOLD
 		shade = SIGN_GOLD_SHADE
+		light = SIGN_GOLD_LIGHT
 	if selected:
 		fill = SIGN_GOLD
 		shade = SIGN_GOLD_SHADE
-		border = INK
+		light = SIGN_GOLD_LIGHT
 		ink = BROWN
-		canvas.draw_rect(Rect2(pos - Vector2(1, 1), size + Vector2(2, 3)), TEXT)
+		# A highlight ring around the selected sign: cream inside, dark outside.
+		canvas.draw_rect(Rect2(pos - Vector2(2, 2), size + Vector2(4, 4)), TEXT, false, 1.0)
+		canvas.draw_rect(Rect2(pos - Vector2(3, 3), size + Vector2(6, 6)), INK, false, 1.0)
 	var alpha := 0.55 if dimmed else 1.0
-	# a soft drop shadow, then the box with a lit top edge
-	canvas.draw_rect(Rect2(pos + Vector2(1, 2), size), Color(0.05, 0.03, 0.02, 0.3 * alpha))
-	canvas.draw_rect(Rect2(pos + Vector2(0, 1), size), Color(border, alpha))
-	canvas.draw_rect(Rect2(pos, size), Color(border, alpha))
-	canvas.draw_rect(Rect2(pos + Vector2(1, 1), size - Vector2(2, 2)), Color(fill, alpha))
-	canvas.draw_rect(Rect2(pos + Vector2(1, 1), Vector2(size.x - 2, 1)), Color(fill.lightened(0.35), alpha))
-	canvas.draw_rect(Rect2(pos + Vector2(1, size.y - 3), Vector2(size.x - 2, 2)), Color(shade, alpha))
+	_plaque(canvas, pos, size, fill, shade, light, alpha)
 	var text_x := pos.x + 4.0 + icon
 	if ribbon:
 		var c := FALL_BLUE if tier == "fall" else CREAM
@@ -664,28 +687,36 @@ func _draw_point(canvas: Control, font: Font, index: int, selected: bool, dimmed
 	canvas.draw_string(font, Vector2(text_x, floorf(baseline)), text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, Color(ink, alpha))
 
 
-## Places sit on a dot where they actually are.
+## Places sit on a marker where they actually are: a shuttle stop gets its bus
+## sign, other places a plain dot. Drawn before the signs.
 func _draw_dot(canvas: Control, point: Dictionary) -> void:
 	if point.tier == "landmark" or point.tier == "fall" or point.tier == "home":
 		return
 	var dot := (_v2(point.anchor) * float(_area_scale)).floor()
-	canvas.draw_rect(Rect2(dot - Vector2(1, 1), Vector2(3, 3)), INK)
-	canvas.draw_rect(Rect2(dot, Vector2(1, 1)), TEXT)
+	if point.has("stop"):
+		_draw_stop(canvas, dot, 1.0)
+	else:
+		_draw_marker_dot(canvas, dot, 1.0, false)
 
 
 func _draw_kiosk(canvas: Control, at: Vector2) -> void:
-	var o := (at - Vector2(3, 8)).floor()
-	canvas.draw_rect(Rect2(o, Vector2(7, 5)), WOOD_DARK)
-	canvas.draw_rect(Rect2(o + Vector2(1, 1), Vector2(5, 3)), KIOSK_GREEN)
-	canvas.draw_rect(Rect2(o + Vector2(2, 2), Vector2(3, 1)), Color("e8f7c8"))
-	canvas.draw_rect(Rect2(o + Vector2(1, 5), Vector2(1, 3)), WOOD_DARK)
-	canvas.draw_rect(Rect2(o + Vector2(5, 5), Vector2(1, 3)), WOOD_DARK)
+	var o := (at - Vector2(4, 8)).floor()
+	canvas.draw_rect(Rect2(o + Vector2(1, 1), Vector2(9, 6)), Color(INK, 0.5))
+	canvas.draw_rect(Rect2(o, Vector2(9, 6)), INK)
+	canvas.draw_rect(Rect2(o + Vector2(1, 1), Vector2(7, 4)), WOOD_MID)
+	canvas.draw_rect(Rect2(o + Vector2(2, 2), Vector2(5, 2)), KIOSK_GREEN)
+	canvas.draw_rect(Rect2(o + Vector2(2, 2), Vector2(2, 1)), Color("e8f7c8"))
+	canvas.draw_rect(Rect2(o + Vector2(2, 6), Vector2(1, 2)), INK)
+	canvas.draw_rect(Rect2(o + Vector2(6, 6), Vector2(1, 2)), INK)
 
 
+## A climb: a diamond, gold when the gear is in hand and gray until then.
 func _draw_climb(canvas: Control, at: Vector2, ready: bool) -> void:
 	var c := at.floor()
-	canvas.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -5), c + Vector2(5, 0), c + Vector2(0, 5), c + Vector2(-5, 0)]), WOOD_DARK)
-	canvas.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -3.5), c + Vector2(3.5, 0), c + Vector2(0, 3.5), c + Vector2(-3.5, 0)]), SIGN_GOLD if ready else GEAR_LOCKED)
+	canvas.draw_colored_polygon(_diamond(c + Vector2(1, 1), 5.0), Color(INK, 0.5))
+	canvas.draw_colored_polygon(_diamond(c, 5.0), INK)
+	canvas.draw_colored_polygon(_diamond(c, 3.5), SIGN_GOLD if ready else GEAR_LOCKED)
+	canvas.draw_rect(Rect2(c + Vector2(-2, -1), Vector2(1, 1)), SIGN_GOLD_LIGHT if ready else Color("b9b3a6"))
 	if ready:
 		canvas.draw_rect(Rect2(c + Vector2(0, -2), Vector2(1, 4)), BROWN)
 	else:
@@ -693,12 +724,77 @@ func _draw_climb(canvas: Control, at: Vector2, ready: bool) -> void:
 		canvas.draw_rect(Rect2(c + Vector2(0, -1), Vector2(1, 1)), Color("e9e3d0"))
 
 
-## A red arrow that bobs above where the player is.
-func _draw_here(canvas: Control, at: Vector2) -> void:
-	var bob: float = [0.0, -1.0, -2.0, -1.0][(Time.get_ticks_msec() / 160) % 4]
-	var tip := at.floor() + Vector2(0, bob)
-	canvas.draw_colored_polygon(PackedVector2Array([tip, tip + Vector2(-4, -6), tip + Vector2(-4, -9), tip + Vector2(4, -9), tip + Vector2(4, -6)]), WOOD_DARK)
-	canvas.draw_colored_polygon(PackedVector2Array([tip + Vector2(0, -1.5), tip + Vector2(-2.5, -6), tip + Vector2(-2.5, -7.5), tip + Vector2(2.5, -7.5), tip + Vector2(2.5, -6)]), HERE_RED)
+func _diamond(c: Vector2, r: float) -> PackedVector2Array:
+	return PackedVector2Array([c + Vector2(0, -r), c + Vector2(r, 0), c + Vector2(0, r), c + Vector2(-r, 0)])
+
+
+## The "you are here" pin: a red head on a point. It bobs and its ground ring
+## pulses, one step per phase of the animation.
+func _draw_pin(canvas: Control, at: Vector2) -> void:
+	var bob: float = [0.0, -1.0, -2.0, -1.0][_pin_phase]
+	var base := at.floor()
+	var shadow_w := int(4.0 + bob)
+	canvas.draw_rect(Rect2(base + Vector2(-(shadow_w / 2), -1), Vector2(shadow_w, 2)), Color(INK, 0.5))
+	canvas.draw_arc(base, 4.0 + float(_pin_phase), 0.0, TAU, 16, Color(HERE_RED, 0.6 - 0.1 * float(_pin_phase)), 1.0)
+	var tip := base + Vector2(0, bob)
+	var head := tip + Vector2(0, -6)
+	canvas.draw_colored_polygon(PackedVector2Array([tip + Vector2(0, 1), head + Vector2(-4, 0), head + Vector2(4, 0)]), INK)
+	canvas.draw_circle(head, 4.0, INK)
+	canvas.draw_colored_polygon(PackedVector2Array([tip, head + Vector2(-3, 0.5), head + Vector2(3, 0.5)]), HERE_RED)
+	canvas.draw_circle(head, 3.0, HERE_RED)
+	canvas.draw_rect(Rect2(head + Vector2(-2, -2), Vector2(1, 1)), Color(1, 1, 1, 0.85))
+
+
+## The "you are here" pin on the park map.
+func _draw_park_marker() -> void:
+	_draw_pin(_park_marker, _map_point(_here))
+
+
+## The "you are here" pin on the area map, where the player stands.
+func _draw_area_marker() -> void:
+	if not _view.is_empty():
+		_draw_pin(_area_marker, _view_point(_here) * float(_area_scale))
+		return
+	var hub := Park.get_hub(_hub_here)
+	if _area_rect.texture == null or hub == null:
+		return
+	_draw_pin(_area_marker, _area_point(hub, _here))
+
+
+## The plank backdrop behind both maps.
+func _draw_planks(canvas: Control) -> void:
+	canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), WOOD_PLANK)
+	for y in range(0, int(SCREEN.y), 15):
+		canvas.draw_rect(Rect2(0, y + 14, SCREEN.x, 1), WOOD_PLANK_LINE)
+
+
+## A wooden frame pinned around [param picture]: a lit top-left bevel, a shaded
+## bottom-right, a dark lip where it meets the picture, brass studs at the
+## corners, and a soft shadow cast down and to the right.
+func _draw_frame(canvas: Control, picture: Rect2) -> void:
+	var outer := picture.grow(FRAME_WIDTH)
+	var inner := outer.grow(-1)
+	canvas.draw_rect(Rect2(outer.position + Vector2(2, 3), outer.size), Color(0, 0, 0, 0.16))
+	canvas.draw_rect(Rect2(outer.position + Vector2(1, 2), outer.size), Color(0, 0, 0, 0.3))
+	canvas.draw_rect(outer, WOOD_DARK)
+	canvas.draw_rect(inner, WOOD_MID)
+	canvas.draw_rect(Rect2(outer.position, Vector2(outer.size.x, 1)), WOOD_LIGHT)
+	canvas.draw_rect(Rect2(outer.position, Vector2(1, outer.size.y)), WOOD_LIGHT)
+	canvas.draw_rect(Rect2(inner.position, Vector2(inner.size.x, 1)), WOOD_BEVEL)
+	canvas.draw_rect(Rect2(inner.position, Vector2(1, inner.size.y)), WOOD_BEVEL)
+	canvas.draw_rect(Rect2(inner.position + Vector2(0, inner.size.y - 1), Vector2(inner.size.x, 1)), WOOD_SHADE)
+	canvas.draw_rect(Rect2(inner.position + Vector2(inner.size.x - 1, 0), Vector2(1, inner.size.y)), WOOD_SHADE)
+	canvas.draw_rect(picture.grow(1), WOOD_DARK)
+	var corners := [outer.position, outer.position + Vector2(outer.size.x - 3, 0), outer.position + Vector2(0, outer.size.y - 3), outer.end - Vector2(3, 3)]
+	for corner: Vector2 in corners:
+		canvas.draw_rect(Rect2(corner, Vector2(3, 3)), WOOD_DARK)
+		canvas.draw_rect(Rect2(corner + Vector2(1, 1), Vector2(1, 1)), SIGN_GOLD)
+
+
+## The park map's frame and plank backdrop; the picture sits at MAP_POS.
+func _draw_park_frame() -> void:
+	_draw_planks(_park_frame)
+	_draw_frame(_park_frame, Rect2(MAP_POS, PARK_MAP.get_size()))
 
 
 func _route_ready(route_id: String) -> bool:
@@ -709,35 +805,29 @@ func _route_ready(route_id: String) -> bool:
 	return route != null and Gear.has_all(route.required_gear)
 
 
-## Planks behind the map, the wood frame around it, and the title plaque.
+## Planks behind the area map, the wood frame around its picture, the title
+## plaque (illustrated maps only), and the footer panel for the note.
 func _draw_area_frame() -> void:
 	var canvas := _area_frame
-	if _view.is_empty():
-		return
 	var font := canvas.get_theme_default_font()
-	canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), WOOD_PLANK)
-	for y in range(0, int(SCREEN.y), 15):
-		canvas.draw_rect(Rect2(0, y + 14, SCREEN.x, 1), WOOD_PLANK_LINE)
-	var outer := AREA_BOX.grow(3)
-	canvas.draw_rect(outer, WOOD_DARK)
-	canvas.draw_rect(outer.grow(-1), WOOD_LIGHT)
-	canvas.draw_rect(outer.grow(-2), WOOD_DARK)
-	# Tabs
-	_tab_chip(canvas, font, Rect2(6, 4, 26, 12), "Park", false)
-	_tab_chip(canvas, font, Rect2(34, 2, 36, 14), "Area", true)
-	# Title plaque
-	var title := Park.get_hub(_hub_here).display_name
-	var width := font.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x
-	var plaque := Rect2(floorf((SCREEN.x - width) / 2.0) - 8.0, 0, width + 16.0, 14)
-	canvas.draw_rect(plaque, WOOD_DARK)
-	canvas.draw_rect(Rect2(plaque.position + Vector2(1, 0), plaque.size - Vector2(2, 1)), WOOD_MID)
-	canvas.draw_rect(Rect2(plaque.position + Vector2(1, 0), Vector2(plaque.size.x - 2, 1)), WOOD_LIGHT)
-	canvas.draw_string_outline(font, Vector2(plaque.position.x + 8, 11), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, 2, WOOD_DARK)
-	canvas.draw_string(font, Vector2(plaque.position.x + 8, 11), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("fff3cf"))
-	# Footer panel
-	var footer := Rect2(6, 244, 468, 24)
-	canvas.draw_rect(footer.grow(1), WOOD_DARK)
-	canvas.draw_rect(footer, Color("4a2f17"))
+	_draw_planks(canvas)
+	if _area_rect.texture != null:
+		_draw_frame(canvas, _area_rect.get_rect())
+	if not _view.is_empty():
+		# Tabs
+		_tab_chip(canvas, font, Rect2(6, 4, 26, 12), "Park", false)
+		_tab_chip(canvas, font, Rect2(34, 2, 36, 14), "Area", true)
+		# Title plaque
+		var title := Park.get_hub(_hub_here).display_name
+		var width := font.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x
+		var plaque := Rect2(floorf((SCREEN.x - width) / 2.0) - 8.0, 0, width + 16.0, 14)
+		canvas.draw_rect(plaque, WOOD_DARK)
+		canvas.draw_rect(Rect2(plaque.position + Vector2(1, 0), plaque.size - Vector2(2, 1)), WOOD_MID)
+		canvas.draw_rect(Rect2(plaque.position + Vector2(1, 0), Vector2(plaque.size.x - 2, 1)), WOOD_LIGHT)
+		canvas.draw_string_outline(font, Vector2(plaque.position.x + 8, 11), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, 2, WOOD_DARK)
+		canvas.draw_string(font, Vector2(plaque.position.x + 8, 11), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("fff3cf"))
+	# Footer panel, the same tidy panel as the park map's note.
+	canvas.draw_style_box(_note_box, Rect2(6, 246, 468, 22))
 
 
 func _tab_chip(canvas: Control, font: Font, rect: Rect2, text: String, active: bool) -> void:
@@ -747,9 +837,31 @@ func _tab_chip(canvas: Control, font: Font, rect: Rect2, text: String, active: b
 	canvas.draw_string(font, rect.position + Vector2(floorf((rect.size.x - width) / 2.0), rect.size.y - 3), text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, BROWN if active else Color("e9d3a0"))
 
 
-func _text(canvas: Control, font: Font, at: Vector2, text: String, color: Color) -> void:
-	canvas.draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, 3, INK)
-	canvas.draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, color)
+## A small flat sign: a 1 px dark outline, a lit top edge, a shaded bottom
+## edge, and a 2 px drop shadow down and to the right.
+func _plaque(canvas: Control, pos: Vector2, size: Vector2, fill: Color, shade: Color, light: Color, alpha: float) -> void:
+	canvas.draw_rect(Rect2(pos + Vector2(1, 2), size + Vector2(1, 0)), Color(INK, 0.55 * alpha))
+	canvas.draw_rect(Rect2(pos, size), Color(INK, alpha))
+	canvas.draw_rect(Rect2(pos + Vector2(1, 1), size - Vector2(2, 2)), Color(fill, alpha))
+	canvas.draw_rect(Rect2(pos + Vector2(1, 1), Vector2(size.x - 2, 1)), Color(light, alpha))
+	canvas.draw_rect(Rect2(pos + Vector2(1, size.y - 3), Vector2(size.x - 2, 2)), Color(shade, alpha))
+
+
+## A plain place's marker: a small cream dot in a dark outline.
+func _draw_marker_dot(canvas: Control, at: Vector2, alpha: float, selected: bool) -> void:
+	var o := (at - Vector2(2, 2)).floor()
+	canvas.draw_rect(Rect2(o + Vector2(1, 1), Vector2(5, 5)), Color(INK, 0.5 * alpha))
+	canvas.draw_rect(Rect2(o, Vector2(5, 5)), Color(INK, alpha))
+	canvas.draw_rect(Rect2(o + Vector2(1, 1), Vector2(3, 3)), Color(GOLD if selected else TEXT, alpha))
+
+
+## A shuttle stop's marker: a small bus sign, cream with a slate header band.
+func _draw_stop(canvas: Control, at: Vector2, alpha: float) -> void:
+	var o := (at - Vector2(3, 3)).floor()
+	canvas.draw_rect(Rect2(o + Vector2(1, 1), Vector2(7, 7)), Color(INK, 0.5 * alpha))
+	canvas.draw_rect(Rect2(o, Vector2(7, 7)), Color(INK, alpha))
+	canvas.draw_rect(Rect2(o + Vector2(1, 1), Vector2(5, 5)), Color(CREAM, alpha))
+	canvas.draw_rect(Rect2(o + Vector2(1, 1), Vector2(5, 2)), Color(SLATE, alpha))
 
 
 func _load_area_map() -> void:
@@ -767,7 +879,7 @@ func _load_area_map() -> void:
 	_area_rect.size = shown
 	_area_canvas.position = _area_rect.position
 	_area_canvas.size = shown
-	_area_footer.position = Vector2(9, 245) if not _view.is_empty() else Vector2(8, 250)
+	_area_footer.position = Vector2(9, 247)
 	# Where the signs go depends only on the hub's picture and data, so the
 	# search runs once per hub.
 	if _sign_cache.has(_hub_here):
@@ -818,6 +930,8 @@ func _build() -> void:
 	_park_view.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_park_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_park_view)
+	_note_box = _make_note_box()
+	_park_frame = _overlay(_park_view, _draw_park_frame)
 	var map := TextureRect.new()
 	map.texture = PARK_MAP
 	map.position = MAP_POS
@@ -829,10 +943,12 @@ func _build() -> void:
 	_park_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_park_canvas.draw.connect(_draw_park)
 	_park_view.add_child(_park_canvas)
+	_park_marker = _overlay(_park_canvas, _draw_park_marker)
 
 	var panel := PanelContainer.new()
 	panel.position = INFO_RECT.position
 	panel.size = INFO_RECT.size
+	panel.add_theme_stylebox_override("panel", _note_box)
 	_park_view.add_child(panel)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 4)
@@ -855,11 +971,7 @@ func _build() -> void:
 	_area_view.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_area_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_area_view)
-	_area_frame = Control.new()
-	_area_frame.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_area_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_area_frame.draw.connect(_draw_area_frame)
-	_area_view.add_child(_area_frame)
+	_area_frame = _overlay(_area_view, _draw_area_frame)
 	_area_title = _label(_area_view)
 	_area_title.position = Vector2(8, 3)
 	_area_title.add_theme_color_override("font_color", GOLD)
@@ -871,6 +983,7 @@ func _build() -> void:
 	_area_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_area_canvas.draw.connect(_draw_area)
 	_area_view.add_child(_area_canvas)
+	_area_marker = _overlay(_area_canvas, _draw_area_marker)
 	_area_footer = _label(_area_view)
 	_area_footer.position = Vector2(8, 245)
 	_area_footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -893,3 +1006,27 @@ func _label(parent: Control) -> Label:
 		label.custom_minimum_size.x = INFO_RECT.size.x - 14
 	parent.add_child(label)
 	return label
+
+
+## A full-size child of [param parent] that draws [param on_draw], so the
+## parts that never change are drawn once and the animated part on its own.
+func _overlay(parent: Control, on_draw: Callable) -> Control:
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.draw.connect(on_draw)
+	parent.add_child(overlay)
+	return overlay
+
+
+## The tidy panel behind the notes: dark wood with a thin edge and a soft shadow.
+func _make_note_box() -> StyleBoxFlat:
+	var box := StyleBoxFlat.new()
+	box.bg_color = Color("3a2412")
+	box.border_color = WOOD_MID
+	box.set_border_width_all(1)
+	box.set_content_margin_all(4)
+	box.shadow_color = Color(0, 0, 0, 0.4)
+	box.shadow_size = 2
+	box.shadow_offset = Vector2(1, 1)
+	return box
