@@ -23,8 +23,8 @@ const OUT := FloraArt.DIR + "seasons/"
 const STRAW := ["4a3a1e", "6b5530", "8c7440", "ad9450", "c9b266", "ddc982", "efe0a6"]
 const BLEACHED := ["4a4438", "675f4e", "857b66", "a39983", "bdb39c", "d6ccb4", "e8e0cc"]
 const SEED_HEAD := ["5a4228", "775a38", "957548", "b09258", "c8ae72"]
-const GOLD_LEAF := ["3a3014", "574a1c", "7a6626", "9a8530", "b8a040", "d0b858", "e4d078"]
-const RUST := ["3a1c12", "5a2a16", "7c3c1c", "9c5224", "b86c2c", "d08c3c", "e8b05c"]
+const GOLD_LEAF := ["2a2616", "574a1c", "7a6626", "9a8530", "b8a040", "d0b858", "e4d078"]
+const RUST := ["2c1a1c", "5a2a16", "7c3c1c", "9c5224", "b86c2c", "d08c3c", "e8b05c"]
 const DORMANT := ["34302c", "4a443c", "625a4e", "7c7262", "978b78", "b2a690"]
 const FALL_BLOOM := ["4a1a20", "7a2a22", "a8442a", "d0702e", "e8a038", "f6d060"]
 const SNOW := ["8ea2b0", "b4c4d0", "d6e2ea", "eef4f8", "fbfdfe"]
@@ -153,11 +153,11 @@ static func recolor(src: Image, mode: String, seed_value: int) -> Image:
 			var t := _t(col)
 			if mode == "snow":
 				# snow settles on the lit side of the boughs
-				if kind == "leaf" and t > 0.48 and K.hash2(x, y, seed_value) < (t - 0.4) * 1.1:
+				if kind == "leaf" and t > 0.48 and K.hash2(x >> 1, y >> 1, seed_value) < (t - 0.4) * 1.1:
 					im.set_pixel(x, y, _pick(leaf, (t - 0.4) * 1.4, x, y))
 				continue
 			if kind == "leaf":
-				if thin > 0.0 and t > 0.12 and K.hash2(x, y, seed_value) < thin:
+				if thin > 0.0 and t > 0.12 and K.hash2(x >> 1, y >> 1, seed_value) < thin:
 					im.set_pixel(x, y, Color(0, 0, 0, 0))
 				else:
 					im.set_pixel(x, y, _pick(leaf, t, x, y))
@@ -165,7 +165,7 @@ static func recolor(src: Image, mode: String, seed_value: int) -> Image:
 				if keep_fruit:
 					continue
 				if bloom_to_leaf:
-					if thin > 0.0 and K.hash2(x, y, seed_value) < thin:
+					if thin > 0.0 and K.hash2(x >> 1, y >> 1, seed_value) < thin:
 						im.set_pixel(x, y, Color(0, 0, 0, 0))
 					else:
 						im.set_pixel(x, y, _pick(leaf, t * 0.8, x, y))
