@@ -2,14 +2,22 @@ extends SceneTree
 ## Draws the placeholder pixel art for every person in the game: one 48×96
 ## sheet per character, in the same layout as assets/sprites/player.png
 ## (16×24 frames; columns stand / step A / step B, rows down / up / left /
-## right). Also draws the icons for story items (assets/sprites/story_items.png)
-## and a preview lineup of the whole cast (docs/cast_lineup.png).
+## right). Also draws the player sheet (assets/sprites/player.png), the icons
+## for story items (assets/sprites/story_items.png) and a preview lineup of the
+## whole cast (docs/cast_lineup.png).
 ##
 ##   godot --headless --path . -s res://tools/npcgen/npcgen.gd
 ##   godot --headless --path . --import      # so Godot picks up new PNGs
 ##
 ## Each look is a Dictionary in tools/npcgen/looks.gd. Replace any PNG with
 ## hand-drawn art in the same layout at any time; the game only reads the PNG.
+##
+## Style: a big head (hair included ~10 px), 2 px eyes with a light glint, a
+## blush and 1 px nose and mouth. Front views get explicit 3-tone clothes and
+## skin; every view is then lit from the upper left in screen space, so right
+## views are drawn mirrored but shaded the same way. The outline is a dark
+## shade of the touching colour, lighter on top and left. On step frames the
+## upper body rises 1 px, and a soft oval shadow sits under the feet.
 
 const Looks = preload("res://tools/npcgen/looks.gd")
 
@@ -21,6 +29,11 @@ const ITEMS_PNG := "res://assets/sprites/story_items.png"
 const LINEUP_PNG := "res://docs/cast_lineup.png"
 const OUTLINE := Color("2a1f1a")
 const SHOE := "3a2a20"
+const SHADOW := Color("1c1830")
+const BLUSH := Color("e07a70")
+const MOUTH := Color("9a4a44")
+const GLINT := Color("fbf6ea")
+const NEIGHBOURS := [Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(1, 0)]
 
 enum Facing { DOWN, UP, LEFT, RIGHT }
 
@@ -28,6 +41,11 @@ var im: Image
 ## Top-left of the frame being drawn.
 var ox := 0
 var oy := 0
+## Vertical offset of the upper body inside the frame: -1 on a step, so the body bobs.
+var dy := 0
+## True while drawing a right-facing frame: geometry is mirrored, shading is not.
+var mirror := false
+var skin_c := Color("e0ac7e")
 
 
 func _init() -> void:
@@ -51,16 +69,24 @@ func col(v) -> Color:
 	return v if v is Color else Color(str(v))
 
 
-## Fills a rect in frame coordinates.
+## Side views (left and right) share one drawing, mirrored for the right.
+func is_side(facing: int) -> bool:
+	return facing == Facing.LEFT or facing == Facing.RIGHT
+
+
+## Fills a rect in frame coordinates (upper-body rects follow the bob).
 func rect(x: int, y: int, w: int, h: int, c) -> void:
-	var r := Rect2i(ox + x, oy + y, w, h).intersection(Rect2i(ox, oy, FW, FH))
+	var xx := FW - x - w if mirror else x
+	var r := Rect2i(ox + xx, oy + dy + y, w, h).intersection(Rect2i(ox, oy, FW, FH))
 	if r.size.x > 0 and r.size.y > 0:
 		im.fill_rect(r, col(c))
 
 
 func px(x: int, y: int, c) -> void:
-	if x >= 0 and y >= 0 and x < FW and y < FH:
-		im.set_pixel(ox + x, oy + y, col(c))
+	var xx := FW - 1 - x if mirror else x
+	var yy := y + dy
+	if xx >= 0 and yy >= 0 and xx < FW and yy < FH:
+		im.set_pixel(ox + xx, oy + yy, col(c))
 
 
 func darker(c, amount := 0.25) -> Color:
@@ -71,8 +97,37 @@ func lighter(c, amount := 0.2) -> Color:
 	return col(c).lightened(amount)
 
 
+## Moves a colour's hue toward target by amt (0..1 of the way round the wheel).
+func shift_hue(c: Color, target: float, amt: float) -> Color:
+	var d := target - c.h
+	if d > 0.5:
+		d -= 1.0
+	elif d < -0.5:
+		d += 1.0
+	return Color.from_hsv(fposmod(c.h + d * amt, 1.0), c.s, c.v, c.a)
+
+
+## A tone of c for shading. k > 0 lifts toward warm yellow light, k < 0 darkens
+## toward cool blue-violet shadow. k runs from -1 (deep shadow) to 1 (glint).
+func tone(c, k: float) -> Color:
+	var base := col(c)
+	if k >= 0.0:
+		return shift_hue(base.lightened(k * 0.3), 0.13, k * 0.12)
+	var shade := base.darkened(-k * 0.55)
+	shade = Color.from_hsv(shade.h, minf(1.0, shade.s * 1.08), shade.v, shade.a)
+	return shift_hue(shade, 0.68, -k * 0.12)
+
+
+## The outline colour for an edge of a sprite coloured src. Edges facing up
+## or left are lit, so they get a lighter, warmer line.
+func outline_of(src: Color, lit: bool) -> Color:
+	var o := src.darkened(0.5 if lit else 0.72)
+	return shift_hue(o, 0.68, 0.06)
+
+
 ## Lights the edges that face the upper left and shades the ones that face
-## away, so flat color blocks read as rounded forms. Call before the outline.
+## away, so flat colour blocks read as rounded forms. Works in screen space,
+## so mirrored frames are lit from the same side. Call before the outline.
 func shade_frame() -> void:
 	var src := im.get_region(Rect2i(ox, oy, FW, FH))
 	for y in FH:
@@ -95,22 +150,35 @@ func shade_frame() -> void:
 			im.set_pixel(ox + x, oy + y, c)
 
 
-## A 1px outline around everything drawn in the current frame, tinted from the
-## pixel it touches (a dark brown for skin and wood, a dark green for a shirt)
-## so the figure keeps soft, colored edges instead of a hard black line.
-func outline_frame() -> void:
-	var edge := {}
-	for y in FH:
-		for x in FW:
-			if im.get_pixel(ox + x, oy + y).a > 0.5:
+## Outlines the transparent pixels that touch the sprite in the w×h region at
+## (x0, y0), in a dark shade of the touching colour.
+func outline_region(x0: int, y0: int, w: int, h: int) -> void:
+	var paint: Array = []
+	for y in h:
+		for x in w:
+			if im.get_pixel(x0 + x, y0 + y).a > 0.5:
 				continue
-			for d: Vector2i in [Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP]:
-				var n := Vector2i(x, y) + d
-				if n.x >= 0 and n.y >= 0 and n.x < FW and n.y < FH and im.get_pixel(ox + n.x, oy + n.y).a > 0.5:
-					edge[Vector2i(x, y)] = OUTLINE.lerp(im.get_pixel(ox + n.x, oy + n.y).darkened(0.55), 0.5)
-					break
-	for p: Vector2i in edge:
-		im.set_pixel(ox + p.x, oy + p.y, edge[p])
+			var src := Color(0, 0, 0, 0)
+			var lit := false
+			for i in 4:
+				var n: Vector2i = Vector2i(x, y) + NEIGHBOURS[i]
+				if n.x < 0 or n.y < 0 or n.x >= w or n.y >= h:
+					continue
+				var nc := im.get_pixel(x0 + n.x, y0 + n.y)
+				if nc.a > 0.5:
+					if src.a == 0.0:
+						src = nc
+					if i >= 2:
+						lit = true
+			if src.a > 0.0:
+				paint.append([Vector2i(x0 + x, y0 + y), outline_of(src, lit)])
+	for p: Array in paint:
+		im.set_pixel(p[0].x, p[0].y, p[1])
+
+
+## A 1px outline around everything drawn in the current frame.
+func outline_frame() -> void:
+	outline_region(ox, oy, FW, FH)
 
 
 ## A soft ground shadow under the feet, drawn behind the figure.
@@ -118,9 +186,9 @@ func ground_shadow() -> void:
 	for y in range(21, 24):
 		for x in range(2, 14):
 			var dx := (x + 0.5 - 8.0) / 6.2
-			var dy := (y + 0.5 - 22.4) / 1.6
-			if dx * dx + dy * dy <= 1.0 and im.get_pixel(ox + x, oy + y).a < 0.5:
-				im.set_pixel(ox + x, oy + y, Color(0.05, 0.03, 0.02, 0.28))
+			var dy_s := (y + 0.5 - 22.4) / 1.6
+			if dx * dx + dy_s * dy_s <= 1.0 and im.get_pixel(ox + x, oy + y).a < 0.5:
+				im.set_pixel(ox + x, oy + y, Color(SHADOW.r, SHADOW.g, SHADOW.b, 0.3))
 
 
 # ---------------------------------------------------------------- sheet
@@ -128,39 +196,39 @@ func ground_shadow() -> void:
 func draw_sheet(look: Dictionary) -> Image:
 	im = Image.create_empty(FW * 3, FH * 4, false, Image.FORMAT_RGBA8)
 	for step in 3:
-		for facing in [Facing.DOWN, Facing.UP, Facing.LEFT]:
+		for facing in [Facing.DOWN, Facing.UP, Facing.LEFT, Facing.RIGHT]:
 			ox = step * FW
 			oy = facing * FH
 			draw_figure(look, facing, step)
 			shade_frame()
 			outline_frame()
 			ground_shadow()
-		# Right is the left frame mirrored.
-		var left := im.get_region(Rect2i(step * FW, Facing.LEFT * FH, FW, FH))
-		left.flip_x()
-		im.blit_rect(left, Rect2i(0, 0, FW, FH), Vector2i(step * FW, Facing.RIGHT * FH))
 	return im
 
 
 func draw_figure(look: Dictionary, facing: int, step: int) -> void:
-	var side := facing == Facing.LEFT
-	var skin = look.get("skin", "e0ac7e")
-	var top = look.get("top", "6b7d4a")
-	var bottom = look.get("bottom", "3b4660")
+	var side := is_side(facing)
+	var back := facing == Facing.UP
+	mirror = facing == Facing.RIGHT
+	var skin := col(look.get("skin", "e0ac7e"))
+	skin_c = skin
+	var top := col(look.get("top", "6b7d4a"))
+	var bottom := col(look.get("bottom", "3b4660"))
 	var bottom_style: String = look.get("bottom_style", "pants")
-	var shoes = look.get("shoes", SHOE)
-	var hair = look.get("hair", "4a3020")
+	var shoes := col(look.get("shoes", SHOE))
+	var hair := col(look.get("hair", "4a3020"))
 	var accessories: Array = look.get("carry", [])
 	# Arm swing: on step A the left arm leads, on step B the right.
 	var swing_l := 1 if step == 1 else 0
 	var swing_r := 1 if step == 2 else 0
+	# The upper body rises a pixel on each step; the feet stay on the ground.
+	var bob := -1 if step != 0 else 0
 
-	# Things worn on the back go behind the body.
+	# ---- back items and long hair, behind the body
+	dy = bob
 	if facing != Facing.UP:
 		_back_items(look, facing, true)
-
-	# Long hair falls behind the shoulders.
-	if look.get("hair_style", "short") in ["long", "braid"] and facing != Facing.UP:
+	if look.get("hair_style", "short") in ["long", "braid"] and not back:
 		if side:
 			rect(8, 7, 3, 7 if look.hair_style == "long" else 5, hair)
 			if look.hair_style == "braid":
@@ -168,142 +236,216 @@ func draw_figure(look: Dictionary, facing: int, step: int) -> void:
 		else:
 			rect(4, 7, 8, 6, hair)
 
-	# ---- legs and skirt
+	# ---- legs and skirt (dy 0: the feet do not bob)
+	dy = 0
 	var skirt := bottom_style in ["dress", "skirt", "coat_long"]
-	var skirt_col = top if bottom_style == "dress" else bottom
 	if side:
-		var back_leg := darker(bottom, 0.2)
+		var back_leg := tone(bottom, -0.4)
 		if step == 0:
-			rect(6, 18, 4, 4, bottom)
-			rect(6, 22, 5, 1, shoes)
+			rect(6, 17, 4, 4, bottom)
+			rect(5, 21, 5, 1, shoes)
 		else:
 			var fwd := 1 if step == 1 else -1
-			rect(7 - fwd, 18, 2, 4, back_leg)
-			rect(7 + fwd, 18, 2, 4, bottom)
-			rect(6 - fwd, 22, 3, 1, shoes)
-			rect(6 + fwd, 22, 3, 1, shoes)
+			rect(7 - fwd, 17, 2, 4, back_leg)
+			rect(7 + fwd, 17, 2, 4, bottom)
+			rect(6 - fwd, 21, 3, 1, shoes)
+			rect(6 + fwd, 21, 3, 1, shoes)
 	else:
 		var lift_l := 1 if step == 1 else 0
 		var lift_r := 1 if step == 2 else 0
-		rect(5, 18, 3, 4 - lift_l, bottom)
-		rect(8, 18, 3, 4 - lift_r, bottom)
-		rect(10, 18, 1, 4 - lift_r, darker(bottom, 0.15))
-		rect(5, 22 - lift_l, 3, 1, shoes)
-		rect(8, 22 - lift_r, 3, 1, shoes)
+		rect(5, 17, 1, 4 - lift_l, tone(bottom, 0.12))
+		rect(6, 17, 1, 4 - lift_l, bottom)
+		rect(7, 17, 1, 4 - lift_l, tone(bottom, -0.35))
+		rect(8, 17, 2, 4 - lift_r, bottom)
+		rect(10, 17, 1, 4 - lift_r, tone(bottom, -0.35))
+		rect(5, 21 - lift_l, 3, 1, shoes)
+		rect(8, 21 - lift_r, 3, 1, shoes)
+		rect(7, 21 - lift_l, 1, 1, tone(shoes, -0.3))
+		rect(10, 21 - lift_r, 1, 1, tone(shoes, -0.3))
 		if bottom_style == "knickers":
-			rect(5, 20 - lift_l, 3, 2, look.get("socks", "8a8a7a"))
-			rect(8, 20 - lift_r, 3, 2, look.get("socks", "8a8a7a"))
+			var socks = look.get("socks", "8a8a7a")
+			rect(5, 19 - lift_l, 3, 2, socks)
+			rect(8, 19 - lift_r, 3, 2, socks)
 	if skirt:
-		var hem := 21 if bottom_style != "coat_long" else 20
+		var skirt_col := top if bottom_style == "dress" else bottom
 		if side:
-			rect(5, 17, 6, hem - 16, skirt_col)
-			rect(10, 17, 1, hem - 16, darker(skirt_col, 0.15))
+			rect(5, 17, 6, 4, skirt_col)
 		else:
-			rect(4, 17, 8, hem - 16, skirt_col)
-			rect(11, 17, 1, hem - 16, darker(skirt_col, 0.15))
+			rect(4, 17, 8, 4, skirt_col)
+			rect(4, 17, 1, 4, tone(skirt_col, 0.15))
+			rect(10, 17, 2, 4, tone(skirt_col, -0.3))
 			if bottom_style != "coat_long":
-				rect(3, 20, 10, 2, skirt_col)
-				rect(12, 20, 1, 2, darker(skirt_col, 0.15))
+				rect(3, 19, 10, 2, skirt_col)
+				rect(12, 19, 1, 2, tone(skirt_col, -0.3))
 			else:
-				rect(7, 17, 2, hem - 16, darker(skirt_col, 0.3))
+				rect(7, 17, 2, 4, tone(skirt_col, -0.2))
 
-	# ---- torso
+	# ---- torso: lit left, base, shaded right, darker belt at the bottom
+	dy = bob
 	if side:
 		rect(5, 12, 6, 6, top)
-		rect(10, 12, 1, 6, darker(top, 0.15))
 	else:
 		rect(4, 12, 8, 6, top)
-		rect(11, 12, 1, 6, darker(top, 0.15))
+		rect(4, 12, 2, 6, tone(top, 0.14))
+		rect(10, 12, 2, 6, tone(top, -0.3))
+	if not look.has("belt"):
+		rect(4 if not side else 5, 17, 8 if not side else 6, 1, tone(top, -0.55))
 	_torso_details(look, facing)
 
-	# ---- arms
-	var sleeve := darker(top, 0.12) if not look.has("sleeve") else col(look.sleeve)
+	# ---- arms: darker sleeve, skin hands
+	var sleeve := tone(top, -0.2) if not look.has("sleeve") else col(look.sleeve)
 	if side:
 		rect(7, 12 + swing_l, 2, 5, sleeve)
 		rect(7, 17 + swing_l, 2, 1, skin)
 	else:
-		rect(3, 12 + swing_l, 1, 5, sleeve)
-		rect(12, 12 + swing_r, 1, 5, darker(sleeve, 0.1))
+		rect(3, 12 + swing_l, 1, 5, tone(sleeve, 0.1))
+		rect(12, 12 + swing_r, 1, 5, tone(sleeve, -0.3))
 		px(3, 17 + swing_l, skin)
-		px(12, 17 + swing_r, skin)
+		px(12, 17 + swing_r, tone(skin, -0.12))
 
-	# ---- head
-	if side:
-		rect(5, 5, 6, 7, skin)
-		px(4, 8, skin) # nose
-		rect(10, 6, 1, 5, darker(skin, 0.12))
-	else:
-		rect(5, 5, 6, 7, skin)
-		rect(10, 5, 1, 7, darker(skin, 0.1))
-	_hair(look, facing)
-	if facing != Facing.UP:
-		var eye = look.get("eyes", "2a1f1a")
-		if side:
-			px(6, 8, eye)
+	# ---- head: a big round face, 10 px tall with the hair
+	var skin_lit := tone(skin, 0.12)
+	var skin_shade := tone(skin, -0.22)
+	var style: String = look.get("hair_style", "short")
+	if back:
+		if style == "bald":
+			rect(5, 2, 6, 8, skin)
+			rect(4, 5, 1, 4, hair)
+			rect(11, 5, 1, 4, tone(hair, -0.3))
 		else:
-			px(6, 8, eye)
-			px(9, 8, eye)
-		if look.get("glasses", false):
-			if side:
-				rect(5, 8, 3, 1, "c8c8c8")
-				px(6, 8, eye)
-			else:
-				rect(5, 8, 6, 1, "c8c8c8")
-				px(6, 8, eye)
-				px(9, 8, eye)
+			# A rounded crown: a 4 px dome over the full-width back of the head.
+			rect(6, 2, 4, 1, hair)
+			rect(4, 3, 8, 7, hair)
+			rect(6, 2, 2, 1, tone(hair, 0.3))
+			rect(10, 3, 2, 6, tone(hair, -0.3))
+		rect(5, 10, 6, 2, skin_shade)
+	elif side:
+		rect(5, 2, 6, 3, skin)
+		rect(5, 5, 5, 6, skin)
+		rect(5, 11, 4, 1, skin)
+		rect(10, 5, 1, 6, skin_shade)
+		px(4, 8, skin_shade) # the nose
+	else:
+		rect(5, 2, 6, 3, skin)
+		rect(5, 5, 6, 6, skin)
+		rect(4, 7, 1, 3, skin)
+		rect(11, 7, 1, 3, skin_shade)
+		rect(5, 5, 1, 6, skin_lit)
+		rect(10, 5, 1, 6, skin_shade)
+		rect(5, 11, 6, 1, skin)
+		px(10, 11, skin_shade)
+	_hair(look, facing)
+	if not back:
+		_face(look, facing, skin, skin_shade)
 	_beard(look, facing)
 	_hat(look, facing)
 
-	if facing == Facing.UP:
+	# ---- back items seen from behind, and anything carried
+	dy = bob
+	if back:
 		_back_items(look, facing, false)
 	_carry(accessories, facing, swing_r, swing_l, skin)
+	dy = 0
+	mirror = false
+
+
+## Eyes with a light glint, blush, nose and mouth, and optional glasses.
+func _face(look: Dictionary, facing: int, skin: Color, skin_shade: Color) -> void:
+	var eye := col(look.get("eyes", "2a1f1a"))
+	var blush := skin.lerp(BLUSH, 0.45)
+	var mouth := skin.lerp(MOUTH, 0.6)
+	if is_side(facing):
+		px(6, 7, GLINT)
+		px(6, 8, eye)
+		px(6, 9, blush)
+		px(5, 10, mouth)
+	else:
+		for ex in [6, 9]:
+			px(ex, 7, GLINT)
+			px(ex, 8, eye)
+		px(5, 9, blush)
+		px(10, 9, blush)
+		px(7, 9, skin_shade)
+		px(7, 10, mouth)
+	if look.get("glasses", false):
+		var g := Color("c8c8c8")
+		if is_side(facing):
+			rect(5, 6, 3, 1, g)
+		else:
+			rect(5, 6, 6, 1, g)
 
 
 func _hair(look: Dictionary, facing: int) -> void:
 	var style: String = look.get("hair_style", "short")
-	var hair = look.get("hair", "4a3020")
-	var side := facing == Facing.LEFT
+	var hair := col(look.get("hair", "4a3020"))
+	var hi := tone(hair, 0.3)
+	var sh := tone(hair, -0.3)
+	var dp := tone(hair, -0.55)
+	var side := is_side(facing)
+	var back := facing == Facing.UP
 	if style == "none":
 		return
 	if style == "bald":
-		if facing == Facing.UP:
-			rect(5, 8, 6, 3, hair)
-		elif side:
-			rect(9, 7, 2, 3, hair)
+		if back:
+			return
+		if side:
+			rect(9, 3, 2, 3, hair)
 		else:
-			px(5, 7, hair)
-			px(10, 7, hair)
+			rect(4, 3, 1, 3, hair)
+			rect(11, 3, 1, 3, sh)
 		return
-	if facing == Facing.UP:
-		rect(5, 4, 6, 8, hair)
+	if back:
 		if style in ["long", "braid"]:
 			rect(4, 6, 8, 7 if style == "long" else 5, hair)
 			if style == "braid":
 				rect(7, 11, 2, 5, hair)
 				px(7, 16, look.get("tie", "b03030"))
 		if style == "bun":
-			rect(6, 3, 4, 3, hair)
+			rect(6, 1, 4, 2, hair)
+		if style == "wild":
+			rect(3, 3, 1, 5, hair)
+			rect(12, 3, 1, 5, hair)
 		return
 	if side:
-		rect(5, 4, 6, 2, hair)
-		rect(8, 5, 3, 4, hair)
+		# Rounded dome, a lit streak on the top, hair falling behind the head.
+		rect(6, 2, 4, 1, hair)
+		rect(5, 3, 6, 2, hair)
+		rect(6, 2, 2, 1, hi)
+		rect(7, 3, 2, 1, hi)
+		rect(5, 5, 2, 1, hair)
+		rect(9, 5, 2, 5, hair)
+		rect(9, 3, 2, 2, sh)
+		rect(10, 5, 1, 5, sh)
 		if style == "bun":
-			rect(9, 3, 3, 3, hair)
+			rect(8, 1, 3, 2, hair)
+			px(9, 1, hi)
 		if style in ["long", "braid"]:
-			rect(9, 6, 2, 6, hair)
+			rect(9, 5, 2, 7 if style == "long" else 6, hair)
+		if style == "wild":
+			rect(5, 1, 2, 1, hair)
 		return
-	rect(5, 4, 6, 2, hair)
-	px(5, 6, hair)
-	px(10, 6, hair)
-	if style in ["long", "braid", "bun"]:
-		px(5, 7, hair)
-		px(10, 7, hair)
+	# Front: a rounded dome (4 px, then 6, then 8 px wide), a lit streak, a
+	# fringe, and sideburns.
+	rect(6, 2, 4, 1, hair)
+	rect(4, 3, 8, 2, hair)
+	rect(6, 2, 2, 1, hi)
+	rect(5, 3, 2, 1, hi)
+	rect(10, 3, 2, 2, sh)
+	rect(4, 5, 2, 2, hair)
+	rect(10, 5, 2, 2, sh)
+	rect(6, 5, 4, 1, dp)
+	if style == "long":
+		rect(4, 5, 1, 6, hair)
+		rect(11, 5, 1, 6, sh)
+	if style in ["long", "braid"]:
+		rect(4, 7, 1, 2, hair)
 	if style == "bun":
-		rect(6, 2, 4, 2, hair)
+		rect(6, 1, 4, 2, hair)
+		px(7, 1, hi)
 	if style == "wild":
-		rect(4, 4, 8, 2, hair)
-		rect(4, 6, 1, 4, hair)
-		rect(11, 6, 1, 4, hair)
+		rect(3, 2, 1, 3, hair)
+		rect(12, 2, 1, 3, hair)
+		rect(6, 1, 2, 1, hair)
 
 
 func _beard(look: Dictionary, facing: int) -> void:
@@ -311,7 +453,7 @@ func _beard(look: Dictionary, facing: int) -> void:
 	if beard == "none" or facing == Facing.UP:
 		return
 	var c = look.get("beard_color", look.get("hair", "4a3020"))
-	var side := facing == Facing.LEFT
+	var side := is_side(facing)
 	match beard:
 		"mustache":
 			if side:
@@ -351,59 +493,63 @@ func _beard(look: Dictionary, facing: int) -> void:
 				px(8, 9, darker(c, 0.3))
 
 
+## A hat with a lit left side, a shaded right side and a darker band. Brims
+## throw a shadow across the forehead.
 func _hat(look: Dictionary, facing: int) -> void:
 	var hat: String = look.get("hat", "none")
 	if hat == "none":
 		return
-	var c = look.get("hat_color", "6b4a2a")
-	var band = look.get("hat_band", darker(c, 0.35))
-	var side := facing == Facing.LEFT
+	var c := col(look.get("hat_color", "6b4a2a"))
+	var band := col(look.get("hat_band", tone(c, -0.45)))
+	var side := is_side(facing)
+	var back := facing == Facing.UP
 	match hat:
 		"wide":
-			rect(5, 1, 6, 3, c)
+			_crown(5, 1, 6, 3, c)
 			rect(5, 3, 6, 1, band)
-			rect(2, 4, 12, 1, c)
-			rect(3, 5, 10, 0, c)
+			_brim(2, 12, c)
 		"campaign":
 			# The pinched "Montana peak" of the ranger hat.
-			rect(7, 0, 2, 1, c)
-			rect(6, 1, 4, 1, c)
-			rect(5, 2, 6, 2, c)
+			_crown(5, 2, 6, 2, c)
+			rect(7, 1, 2, 1, c)
 			rect(5, 3, 6, 1, band)
-			rect(2, 4, 12, 1, c)
+			_brim(2, 12, c)
 		"fedora":
-			rect(5, 2, 6, 2, c)
+			_crown(5, 2, 6, 2, c)
 			px(7, 1, c)
 			px(8, 1, c)
 			rect(5, 3, 6, 1, band)
-			rect(3 if not side else 2, 4, 10 if not side else 11, 1, c)
+			if side:
+				_brim(2, 11, c)
+			else:
+				_brim(3, 10, c)
 		"bowler":
+			_crown(5, 2, 6, 2, c)
 			rect(6, 1, 4, 1, c)
-			rect(5, 2, 6, 2, c)
-			rect(4, 4, 8, 1, c)
+			_brim(4, 8, c)
 		"top":
-			rect(6, 0, 4, 4, c)
+			_crown(6, 1, 4, 3, c)
 			rect(6, 3, 4, 1, band)
-			rect(4, 4, 8, 1, c)
+			_brim(4, 8, c)
 		"cap":
-			rect(5, 3, 6, 2, c)
+			_crown(5, 2, 6, 3, c)
 			if facing == Facing.DOWN:
-				rect(5, 5, 6, 1, darker(c, 0.2))
+				rect(5, 5, 6, 1, tone(c, -0.3))
 			elif side:
-				rect(2, 5, 4, 1, darker(c, 0.2))
+				rect(2, 5, 4, 1, tone(c, -0.3))
 		"painter_cap":
-			rect(5, 3, 6, 2, c)
+			_crown(5, 2, 6, 3, c)
 			if facing == Facing.DOWN:
-				rect(5, 5, 6, 1, darker(c, 0.15))
+				rect(5, 5, 6, 1, tone(c, -0.25))
 			elif side:
-				rect(3, 5, 3, 1, darker(c, 0.15))
+				rect(3, 5, 3, 1, tone(c, -0.25))
 		"beanie":
-			rect(5, 2, 6, 3, c)
-			rect(5, 4, 6, 1, darker(c, 0.2))
-			px(7, 1, lighter(c))
-			px(8, 1, lighter(c))
+			_crown(5, 1, 6, 3, c)
+			rect(5, 4, 6, 1, tone(c, -0.3))
+			px(7, 1, tone(c, 0.35))
+			px(8, 1, tone(c, 0.35))
 		"bonnet":
-			if facing == Facing.UP:
+			if back:
 				rect(4, 3, 8, 6, c)
 			elif side:
 				rect(5, 3, 7, 3, c)
@@ -415,13 +561,13 @@ func _hat(look: Dictionary, facing: int) -> void:
 				rect(11, 5, 1, 5, c)
 		"scarf":
 			# A headscarf tied at the back.
-			if facing == Facing.UP:
+			if back:
 				rect(5, 3, 6, 6, c)
-				rect(7, 9, 2, 2, darker(c, 0.2))
+				rect(7, 9, 2, 2, tone(c, -0.3))
 			elif side:
 				rect(5, 3, 6, 3, c)
 				rect(8, 5, 3, 4, c)
-				px(11, 8, darker(c, 0.2))
+				px(11, 8, tone(c, -0.3))
 			else:
 				rect(5, 3, 6, 3, c)
 				px(5, 6, c)
@@ -433,16 +579,33 @@ func _hat(look: Dictionary, facing: int) -> void:
 			else:
 				rect(5, 5, 6, 1, c)
 		"helmet":
-			rect(5, 2, 6, 3, c)
+			_crown(5, 1, 6, 3, c)
 			rect(4, 4, 8, 1, c)
 			px(6, 2, lighter(c, 0.3))
+	if not back and hat in ["wide", "campaign", "fedora", "bowler", "top"]:
+		# The brim's shadow falls across the forehead.
+		rect(5, 5, 6, 1, tone(skin_c, -0.3))
+
+
+## A crown with a lit left column and a shaded right column.
+func _crown(x: int, y: int, w: int, h: int, c: Color) -> void:
+	rect(x, y, w, h, c)
+	rect(x, y, 1, h, tone(c, 0.2))
+	rect(x + w - 1, y, 1, h, tone(c, -0.3))
+
+
+## A brim one row tall, lit at the left end and shaded at the right.
+func _brim(x: int, w: int, c: Color) -> void:
+	rect(x, 4, w, 1, c)
+	rect(x, 4, 2, 1, tone(c, 0.2))
+	rect(x + w - 2, 4, 2, 1, tone(c, -0.3))
 
 
 func _torso_details(look: Dictionary, facing: int) -> void:
 	var style: String = look.get("top_style", "shirt")
 	var top = look.get("top", "6b7d4a")
 	var alt = look.get("top2", darker(top, 0.35))
-	var side := facing == Facing.LEFT
+	var side := is_side(facing)
 	var back := facing == Facing.UP
 	match style:
 		"vest":
@@ -473,7 +636,7 @@ func _torso_details(look: Dictionary, facing: int) -> void:
 		"sweater":
 			if not side and not back:
 				rect(6, 12, 4, 1, alt)
-			rect(4 if not side else 5, 17, 8 if not side else 6, 1, alt)
+			rect(4 if not side else 5, 16, 8 if not side else 6, 1, alt)
 		"coat":
 			if not side and not back:
 				rect(7, 12, 2, 6, alt)
@@ -529,13 +692,14 @@ func _back_items(look: Dictionary, facing: int, behind: bool) -> void:
 	if pack == "none":
 		return
 	var c = look.get("pack_color", "7a5a3a")
-	var side := facing == Facing.LEFT
+	var side := is_side(facing)
 	match pack:
 		"pack", "frame_pack", "haul_bag":
 			var tall := 7 if pack == "pack" else 9
 			var top_y := 11 if pack == "pack" else 9
 			if facing == Facing.UP and not behind:
 				rect(4, top_y, 8, tall, c)
+				rect(4, top_y, 2, tall, lighter(c, 0.12))
 				rect(4, top_y + 2, 8, 1, darker(c, 0.3))
 				if pack == "frame_pack":
 					rect(4, 8, 1, 12, "9a9a9a")
@@ -544,6 +708,7 @@ func _back_items(look: Dictionary, facing: int, behind: bool) -> void:
 					rect(6, top_y - 1, 4, 1, "d8c898")
 			elif side and behind:
 				rect(10, top_y, 3, tall, c)
+				rect(10, top_y, 1, tall, tone(c, -0.3))
 				if pack == "frame_pack":
 					rect(13, 8, 1, 12, "9a9a9a")
 			elif facing == Facing.DOWN and behind:
@@ -555,7 +720,7 @@ func _back_items(look: Dictionary, facing: int, behind: bool) -> void:
 
 ## Things carried in the hand or worn over the clothes.
 func _carry(items: Array, facing: int, swing_r: int, swing_l: int, skin) -> void:
-	var side := facing == Facing.LEFT
+	var side := is_side(facing)
 	var back := facing == Facing.UP
 	# Hand positions for this frame.
 	var hx := 12 if facing == Facing.DOWN else (3 if back else 7)
@@ -649,56 +814,93 @@ func _carry(items: Array, facing: int, swing_r: int, swing_l: int, skin) -> void
 
 # ---------------------------------------------------------------- items
 
-## 16×16 icons for story items, in the order of Looks.ITEMS.
+## 16×16 icons for story items, in the order of Looks.ITEMS. Each has three
+## tones lit from the upper left, a dark coloured outline, and a glint.
 func draw_items() -> Image:
 	im = Image.create_empty(16 * Looks.ITEMS.size(), 16, false, Image.FORMAT_RGBA8)
+	dy = 0
+	mirror = false
 	for i in Looks.ITEMS.size():
 		ox = i * 16
 		oy = 0
 		match Looks.ITEMS[i]:
 			"lamon_apple":
-				rect(4, 5, 8, 8, "c83030")
-				rect(5, 4, 6, 10, "c83030")
-				rect(10, 6, 2, 6, "9a2020")
-				rect(5, 6, 2, 2, "e87070")
+				var r := Color("c83030")
+				rect(4, 5, 8, 9, r)
+				rect(3, 6, 10, 7, r)
+				rect(5, 14, 6, 1, r)
+				rect(4, 6, 2, 6, tone(r, 0.3))
+				rect(10, 7, 2, 7, tone(r, -0.4))
+				rect(5, 13, 6, 1, tone(r, -0.4))
+				px(5, 7, GLINT)
+				px(5, 8, tone(r, 0.5))
 				rect(7, 2, 1, 3, "5a3a1a")
 				rect(8, 2, 3, 2, "5a9a30")
+				px(8, 2, "7ac040")
+				px(10, 3, "3a7a20")
 			"degnan_loaf":
-				rect(2, 7, 12, 6, "b0783a")
-				rect(3, 6, 10, 1, "b0783a")
-				rect(3, 12, 10, 1, "8a5a2a")
+				var b := Color("b0783a")
+				rect(2, 7, 12, 6, b)
+				rect(3, 6, 10, 1, b)
+				rect(2, 7, 12, 1, tone(b, 0.25))
+				rect(3, 12, 10, 1, tone(b, -0.35))
+				rect(12, 8, 1, 4, tone(b, -0.35))
 				for x in [4, 7, 10]:
-					rect(x, 7, 2, 1, "e0b070")
+					rect(x, 8, 2, 1, tone(b, 0.45))
+				px(4, 9, GLINT)
 			"pine_nuts":
 				for p in [Vector2i(3, 8), Vector2i(7, 5), Vector2i(11, 8), Vector2i(7, 10)]:
-					rect(p.x, p.y, 2, 3, "8a5a3a")
-					px(p.x, p.y + 3, "6a4028")
-					px(p.x, p.y, "c89a6a")
+					var n := Color("8a5a3a")
+					rect(p.x, p.y, 2, 3, n)
+					rect(p.x, p.y, 1, 2, tone(n, 0.3))
+					rect(p.x + 1, p.y + 1, 1, 2, tone(n, -0.35))
+					px(p.x, p.y + 2, tone(n, -0.5))
+				px(7, 5, GLINT)
 			"model_a_axle":
 				rect(2, 7, 12, 2, "6a6a70")
 				rect(2, 7, 12, 1, "9a9aa0")
+				rect(2, 8, 12, 1, "4a4a52")
 				rect(1, 5, 2, 6, "4a4a50")
-				rect(13, 5, 2, 6, "4a4a50")
+				rect(13, 5, 2, 6, "34343a")
+				rect(1, 5, 1, 2, "7a7a84")
 				px(6, 8, "8a5a3a")
 				px(10, 7, "8a5a3a")
+				px(4, 7, GLINT)
 			"anderson_eyebolt":
-				rect(7, 6, 2, 8, "7a7a80")
-				rect(5, 2, 6, 5, "7a7a80")
+				var m := Color("7a7a80")
+				rect(5, 2, 6, 5, m)
 				rect(6, 3, 4, 3, Color(0, 0, 0, 0))
+				rect(7, 6, 2, 8, m)
+				rect(5, 2, 1, 5, tone(m, 0.3))
+				rect(7, 6, 1, 8, tone(m, 0.3))
+				rect(10, 2, 1, 5, tone(m, -0.35))
+				rect(8, 6, 1, 8, tone(m, -0.35))
+				px(7, 9, tone(m, -0.5))
+				px(8, 11, tone(m, -0.5))
+				px(5, 3, GLINT)
 				px(8, 13, "5a4a3a")
 			"sourdough_starter":
-				rect(4, 4, 8, 10, "c8c0b0")
+				var g := Color("d8d0c0")
 				rect(4, 4, 8, 2, "7a5a3a")
-				rect(5, 7, 6, 5, "f0e8d0")
+				rect(4, 4, 2, 2, tone(Color("7a5a3a"), 0.3))
+				rect(4, 6, 8, 8, g)
+				rect(10, 6, 2, 8, tone(g, -0.3))
+				rect(5, 7, 5, 5, "f0e8d0")
+				rect(9, 7, 1, 5, tone(Color("f0e8d0"), -0.2))
+				px(5, 7, GLINT)
 			"rental_shoes":
 				# A pair of rental climbing shoes tied together by the laces, with a shop tag.
-				rect(1, 7, 7, 4, "c8502e")
+				var s := Color("c8502e")
+				rect(1, 7, 7, 4, s)
 				rect(1, 10, 8, 2, "222226")
-				rect(8, 9, 7, 3, "c8502e")
+				rect(8, 9, 7, 3, s)
 				rect(8, 12, 7, 1, "222226")
-				rect(1, 7, 7, 1, "e8784a")
+				rect(1, 7, 7, 1, tone(s, 0.3))
+				rect(8, 9, 7, 1, tone(s, 0.3))
+				rect(8, 11, 7, 1, tone(s, -0.35))
 				px(4, 8, "f0e8d8")
 				px(11, 10, "f0e8d8")
+				px(2, 8, GLINT)
 				rect(6, 3, 1, 5, "f0e8d8")
 				rect(9, 4, 4, 3, "e8dcb0")
 				px(10, 5, "5a3a24")
@@ -706,19 +908,9 @@ func draw_items() -> Image:
 	return im
 
 
+## Outlines the 16×16 item icon at ox.
 func outline_frame16() -> void:
-	var edge: Array[Vector2i] = []
-	for y in 16:
-		for x in 16:
-			if im.get_pixel(ox + x, y).a > 0.5:
-				continue
-			for d: Vector2i in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
-				var n := Vector2i(x, y) + d
-				if n.x >= 0 and n.y >= 0 and n.x < 16 and n.y < 16 and im.get_pixel(ox + n.x, n.y).a > 0.5:
-					edge.append(Vector2i(x, y))
-					break
-	for p in edge:
-		im.set_pixel(ox + p.x, p.y, OUTLINE)
+	outline_region(ox, 0, 16, 16)
 
 
 # ---------------------------------------------------------------- preview
