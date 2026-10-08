@@ -1,8 +1,9 @@
 class_name Weather
 extends Node2D
 ## What falls through the air outdoors: snow in winter, apple-blossom petals
-## and the odd spring shower, drifting cottonwood fluff on summer days and
-## fireflies on summer nights, tumbling leaves and an autumn rain now and then.
+## and the odd spring shower, drifting cottonwood fluff and warm light motes
+## in the summer afternoon sun, fireflies on summer nights, tumbling leaves and
+## an autumn rain now and then.
 ##
 ## Each day's weather comes from the date (see [method today]), so it's the
 ## same after a reload and other systems (DayNight, CloudShadows) can ask for
@@ -11,12 +12,15 @@ extends Node2D
 ## you through the snow instead of dragging it along. Hidden indoors.
 
 ## How many of each, at full strength.
-const COUNTS := {"snow": 170, "rain": 70, "petal": 30, "leaf": 34, "fluff": 14, "firefly": 14}
+const COUNTS := {"snow": 130, "rain": 55, "petal": 30, "leaf": 30, "fluff": 12, "firefly": 12, "mote": 16}
+## Most flakes on screen at once, whatever the weather. Keeps the draw cost
+## flat and the view clear enough to see the player.
+const MAX_FLAKES := 140
 ## Extra room round the view, so flakes don't pop in at the edges.
 const MARGIN := 12.0
 
 ## Kind of each flake (an index into KINDS) and its state.
-const KINDS := ["snow", "rain", "petal", "leaf", "fluff", "firefly"]
+const KINDS := ["snow", "rain", "petal", "leaf", "fluff", "firefly", "mote"]
 
 var _pos := PackedVector2Array()
 var _kind := PackedInt32Array()
@@ -88,7 +92,7 @@ func _process(delta: float) -> void:
 	if not outdoors:
 		return
 	_view = _camera_view()
-	var key := "%d:%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day, int(_darkness() > 0.35)]
+	var key := "%d:%d:%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day, int(_darkness() > 0.35), int(_motes_on())]
 	if key != _key:
 		_key = key
 		_populate()
@@ -113,6 +117,8 @@ func _process(delta: float) -> void:
 				v = Vector2(wind * 0.8 + sin(_time * 0.7 + ph) * 3.0, sin(_time * 0.9 + ph * 2.0) * 3.0 - 0.6)
 			5: # fireflies: slow wandering loops
 				v = Vector2(cos(_time * 0.6 + ph) * 6.0, sin(_time * 0.8 + ph * 1.7) * 4.0)
+			6: # light motes: barely moving, drifting up through the sun
+				v = Vector2(wind * 0.3 + cos(_time * 0.4 + ph) * 4.0, sin(_time * 0.5 + ph * 1.3) * 3.0 - 1.2)
 		p += v * delta
 		# Wrap round the view, in world space.
 		p = area.position + Vector2(fposmod(p.x - area.position.x, area.size.x), fposmod(p.y - area.position.y, area.size.y))
@@ -133,6 +139,8 @@ func _populate() -> void:
 				counts["firefly"] = 1.0
 			else:
 				counts["fluff"] = 1.0
+				if _motes_on():
+					counts["mote"] = 1.0
 		GameClock.Season.FALL:
 			counts["leaf"] = 1.0
 	if w.snow > 0.0:
@@ -149,7 +157,7 @@ func _populate() -> void:
 	rng.seed = hash(_key)
 	var area := _view.grow(MARGIN)
 	for kind_name: String in counts:
-		var n := int(COUNTS[kind_name] * float(counts[kind_name]))
+		var n := mini(int(COUNTS[kind_name] * float(counts[kind_name])), MAX_FLAKES - _pos.size())
 		for i in n:
 			_pos.append(area.position + Vector2(rng.randf() * area.size.x, rng.randf() * area.size.y))
 			_kind.append(KINDS.find(kind_name))
@@ -170,6 +178,8 @@ func _color_for(kind_name: String, rng: RandomNumberGenerator) -> Color:
 			return [Color(0.93, 0.66, 0.2), Color(0.85, 0.42, 0.16), Color(0.72, 0.28, 0.14), Color(0.95, 0.8, 0.3)][rng.randi() % 4]
 		"fluff":
 			return Color(1.0, 0.98, 0.9, 0.85)
+		"mote":
+			return Color(1.0, 0.9, 0.55, rng.randf_range(0.45, 0.8))
 	return Color(1.0, 0.95, 0.5)
 
 
@@ -217,6 +227,10 @@ func _draw() -> void:
 			4:
 				var twinkle := 0.6 + 0.4 * sin(_time * 3.0 + _phase[i] * 5.0)
 				draw_rect(Rect2(p, Vector2.ONE), Color(c, c.a * twinkle))
+			6:
+				# A fleck of sunlight: a pixel that catches the light now and then.
+				var shine := clampf(0.5 + 0.5 * sin(_time * 1.1 + _phase[i] * 4.0), 0.0, 1.0)
+				draw_rect(Rect2(p, Vector2.ONE), Color(c, c.a * shine))
 
 
 func _draw_fireflies() -> void:
@@ -229,9 +243,13 @@ func _draw_fireflies() -> void:
 			continue
 		var p := _pos[i].floor()
 		_fireflies.draw_rect(Rect2(p, Vector2.ONE), Color(0.85, 1.0, 0.3, blink))
-		var halo := Color(0.55, 0.7, 0.12, blink * 0.45)
+		var halo := Color(0.55, 0.7, 0.12, blink * 0.4)
 		_fireflies.draw_rect(Rect2(p + Vector2(-1, 0), Vector2(3, 1)), halo)
 		_fireflies.draw_rect(Rect2(p + Vector2(0, -1), Vector2(1, 3)), halo)
+		# A faint outer glow on the corners, so the glow is round, not a plus.
+		var corner := Color(0.5, 0.66, 0.1, blink * 0.14)
+		for d in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
+			_fireflies.draw_rect(Rect2(p + d, Vector2.ONE), corner)
 
 
 func _camera_view() -> Rect2:
@@ -248,6 +266,12 @@ func _outdoors() -> bool:
 	if world and "region" in world and world.region:
 		return not world.region.indoors
 	return true
+
+
+## True in the summer afternoon sun, when the light motes drift about.
+func _motes_on() -> bool:
+	return GameClock.season == GameClock.Season.SUMMER and _darkness() <= 0.35 \
+			and GameClock.hour >= 12 and GameClock.hour < 18
 
 
 ## 0 in daylight, 1 at full night, from the world's day and night tint.

@@ -9,8 +9,8 @@ extends Node2D
 
 const SHADER := preload("res://assets/shaders/cloud_shadows.gdshader")
 ## How fast the clouds drift, in pixels a second.
-const WIND := Vector2(-7.0, -2.0)
-const STRENGTH := 0.2
+const WIND := Vector2(-4.0, -1.5)
+const STRENGTH := 0.16
 
 var _drift := Vector2.ZERO
 var _view := Rect2()

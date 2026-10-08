@@ -1,8 +1,8 @@
 shader_type canvas_item;
 // Soft shadows of clouds drifting over the ground (see scripts/world/cloud_shadows.gd).
 // Works in world pixels, so it stays as crisp as the art: the noise is sampled
-// once per world pixel and the shade comes in two flat steps, never a
-// smooth blend.
+// once per world pixel and the shade comes in a few flat steps (a soft ramp
+// from rim to core, never a per-pixel dither).
 
 uniform vec2 drift = vec2(0.0);
 // 0 clear sky .. 1 overcast
@@ -41,9 +41,9 @@ void fragment() {
 	p.y *= 1.4;
 	float n = vnoise(p) * 0.62 + vnoise(p * 2.3 + 7.1) * 0.28 + vnoise(p * 5.1 + 3.7) * 0.1;
 	float edge = 1.0 - coverage;
-	float d = smoothstep(edge - 0.06, edge + 0.1, n);
-	// two flat steps of shade, a lighter rim and the core, with hard pixel
+	float d = smoothstep(edge - 0.14, edge + 0.18, n);
+	// four flat steps of shade, from a faint rim to the core, with hard pixel
 	// edges (dithering would put a checkerboard over people and signs)
-	float level = floor(d * 2.0 + 0.5) / 2.0;
+	float level = floor(d * 3.0 + 0.5) / 3.0;
 	COLOR = vec4(shade, level * strength);
 }
