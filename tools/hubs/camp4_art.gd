@@ -693,6 +693,9 @@ func _planks(im: Image, x: int, y: int, w: int, h: int, tone: int) -> void:
 				idx += 1
 			elif n < 0.06:
 				idx -= 1
+			# long grain streaks, a few pixels each, along the plank
+			if K.hash2((x + xx) / 5, y + yy, 43) < 0.22:
+				idx -= 1
 			K.px(im, x + xx, y + yy, timber[clampi(idx, 0, 5)])
 	# board joints along the top
 	if h > 4:
@@ -903,6 +906,11 @@ func van() -> Image:
 		K.hline(im, 3, 20 - i, 6 - i, at(paint, 0.8))
 	K.hline(im, 3, 20, 54, paint[3])
 	K.hline(im, 3, 9, 54, cream[3])
+	# glossy paint: a soft sheen running down the lit side of the body, dithered
+	for x in range(6, 30):
+		if x % 3 != 0:
+			K.px(im, x, 21 + (x - 6) / 12, paint[3].lightened(0.45))
+	K.hline(im, 3, 10, 54, cream[3].lightened(0.25))
 	# windows
 	K.rect(im, 4, 11, 7, 6, Color("2a3a4a"))
 	K.px(im, 5, 12, Color("a8c8d8"))

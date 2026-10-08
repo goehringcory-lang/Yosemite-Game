@@ -99,20 +99,185 @@ func _wall(im: Image, style: String, x: int, y: int, w: int, h: int, sd: int, o:
 			board_wall(im, x, y, w, h, sd, int(o.get("tone", 3)), Color(0.18, 0.34, 0.2, 0.42) if o.get("green", false) else Color(0, 0, 0, 0))
 		"stucco":
 			stucco_wall(im, x, y, w, h, sd)
+		"timber":
+			_vb_logs(im, x, y, w, h, sd)
 		_:
 			timber_wall(im, x, y, w, h, sd, int(o.get("pitch", 16)), 40)
 
 
+## Shifts a tone toward cool violet-blue as it goes into shade and toward warm
+## gold as it goes into sun, so no ramp is a plain multiply toward black.
+## [param t] runs from -1 (deep shade) to 1 (full sun).
+func _vb_tone(c: Color, t: float) -> Color:
+	if t < 0.0:
+		return c.lerp(Color(0.16, 0.16, 0.34), -t * 0.3).darkened(-t * 0.14)
+	return c.lerp(Color(1.0, 0.84, 0.42), t * 0.2).lightened(t * 0.1)
+
+
+## Hue-shifted shingle courses on a hipped roof seen from above: staggered
+## shingles, a shaded lower lip on every course, moss creeping into the upper
+## courses, and a mossy ridge cap. [param taper] narrows the roof toward the top.
+func _vb_roof(im: Image, x: int, y: int, w: int, h: int, sd: int, taper := 0.28) -> void:
+	var course := 3
+	for row in h:
+		var inset := int((h - 1 - row) * taper)
+		var ci := row / course
+		var inrow := row % course
+		var off := (ci % 2) * 3
+		var lit := 0.22 - float(row) / h * 0.3
+		for sx in range(x + inset, x + w - inset):
+			var gx := sx - x
+			var shi := (gx + off) / 6
+			var n := K.hash2(shi, ci, sd)
+			var lev := clampi(roundi((0.3 + n * 0.5 + lit + (0.5 - float(gx) / w) * 0.2) * 5.0), 0, 5)
+			var col := _vb_tone(roof[lev], (float(lev) / 5.0 - 0.5) * 1.1)
+			if n < 0.2:
+				col = col.darkened(0.1)
+			if inrow == course - 1:
+				col = _vb_tone(col, -0.55)
+			elif inrow == 0 and ci > 0:
+				col = col.lightened(0.08)
+			if (gx + off) % 6 == 5 and inrow < course - 1:
+				col = col.darkened(0.14)
+			var mo := vnoise(gx * 0.13, row * 0.2, sd + 7)
+			if mo > 0.7 and row < h * 0.6 and n > 0.25:
+				col = moss[clampi(roundi((mo - 0.7) * 9.0), 0, 2)]
+			if sx == x + inset:
+				col = col.lightened(0.22)
+			elif sx == x + w - inset - 1:
+				col = col.darkened(0.32)
+			K.px(im, sx, y + row, col)
+	var ridge_inset := int((h - 1) * taper)
+	K.hline(im, x + ridge_inset, y, w - ridge_inset * 2, roof[5].lightened(0.3))
+	K.hline(im, x + ridge_inset, y + 1, w - ridge_inset * 2, roof[4].lightened(0.05))
+	for mx in range(x + ridge_inset + 3, x + w - ridge_inset - 3, 7):
+		if K.hash2(mx, y, sd + 9) < 0.7:
+			K.px(im, mx, y, moss[2])
+			K.px(im, mx + 1, y, moss[1])
+	K.hline(im, x, y + h - 1, w, timber[0])
+	K.hline(im, x, y + h - 2, w, _vb_tone(roof[0], -0.6))
+
+
+## The eave: a dark fascia, rafter tails, and a deep cool shadow falling across
+## the top of the wall.
+func _vb_eave(im: Image, x: int, y: int, w: int) -> void:
+	K.hline(im, x, y, w, timber[0])
+	K.hline(im, x, y + 1, w, timber[1])
+	for tx in range(x + 2, x + w - 2, 6):
+		K.rect(im, tx, y + 2, 2, 2, timber[3])
+		K.px(im, tx + 1, y + 4, timber[0])
+	shade(im, x, y + 3, w, 7, Color("1e1834"), 1.0, 0.0, 0.5)
+
+
+## Stacked hewn logs: a lit top edge, a shaded underside, grain streaks along
+## each log, and round end-cuts with rings at both corners.
+func _vb_logs(im: Image, x: int, y: int, w: int, h: int, sd: int) -> void:
+	var course := 4
+	for row in h:
+		var ci := row / course
+		var inrow := row % course
+		var base_t := 0.5 + (K.hash2(ci, sd, 3) - 0.5) * 0.24
+		for xx in w:
+			var t := base_t + (0.5 - float(xx) / w) * 0.1
+			var idx := clampi(roundi(t * 5.0), 0, 5)
+			if inrow == 0:
+				idx += 1
+			elif inrow == course - 1:
+				idx -= 1
+			var col := timber[clampi(idx, 0, 5)]
+			if inrow == 1 and K.hash2(xx / 5, ci, sd + 5) < 0.3:
+				col = col.darkened(0.12)
+			if inrow == course - 1:
+				col = _vb_tone(col, -0.5)
+			K.px(im, x + xx, y + row, col)
+		# end-cuts: a pale face with a darker heart, lit on the left
+		var end_l := timber[4] if inrow != course - 1 else timber[1]
+		var end_r := timber[2] if inrow != course - 1 else timber[0]
+		if inrow == 1:
+			end_l = end_l.lightened(0.12)
+			end_r = end_r.lightened(0.04)
+		K.px(im, x, y + row, end_l)
+		K.px(im, x + w - 1, y + row, end_r)
+		if inrow == 1 or inrow == 2:
+			K.px(im, x + w - 2, y + row, timber[1])
+
+
+## A plank run with one plank per [param plank] rows: a lit top row, a dark
+## seam, and grain streaks along the length.
+func _vb_plank_rows(im: Image, x: int, y: int, w: int, h: int, sd: int, plank := 2) -> void:
+	for row in h:
+		var pi := row / plank
+		var inrow := row % plank
+		var base_t := 0.5 + (K.hash2(pi, sd, 41) - 0.5) * 0.3
+		for xx in w:
+			var idx := clampi(roundi(base_t * 5.0), 0, 5)
+			if inrow == 0:
+				idx += 1
+			elif inrow == plank - 1:
+				idx -= 1
+			var col := timber[clampi(idx, 0, 5)]
+			if inrow == 0 and K.hash2(xx / 6, pi, sd + 7) < 0.3:
+				col = col.darkened(0.08)
+			if xx == 0 or xx == w - 1:
+				col = col.darkened(0.1)
+			K.px(im, x + xx, y + row, col)
+
+
 # ---------------------------------------------------------------- openings
 
-## A plank door under a stone lintel with an arched top, on a granite step.
+## A sash window in a timber frame lit on its top and left edges: sky glass with
+## a diagonal glint (or warm glass with red curtains when lit), a mullion and
+## transom, and a granite sill. Flower boxes come from [method _dress].
+func _vb_window(im: Image, x: int, y: int, w: int, h: int, lit: bool, sd: int) -> void:
+	K.rect(im, x - 1, y - 1, w + 2, h + 2, timber[0])
+	K.hline(im, x - 1, y - 1, w + 2, timber[3])
+	K.vline(im, x - 1, y - 1, h + 2, timber[2])
+	for gy in h:
+		for gx in w:
+			var v := float(gy) / maxi(1, h - 1)
+			var col: Color
+			if lit:
+				col = warm[clampi(roundi((0.9 - v * 0.6) * 7.0 + (K.hash2(gx, gy, sd) - 0.5) * 1.0), 1, 7)]
+			else:
+				col = sky[clampi(roundi((0.95 - v * 0.8) * 4.0 + (K.hash2(gx, gy, sd) - 0.5) * 0.8), 0, 4)]
+				col = _vb_tone(col, -0.1 - v * 0.2)
+			K.px(im, x + gx, y + gy, col)
+	if lit:
+		if w >= 6:
+			var cur_h := maxi(2, h * 2 / 3)
+			K.vline(im, x, y, cur_h, Color("9a3a2e"))
+			K.vline(im, x + w - 1, y, cur_h, Color("7e2e26"))
+			K.vline(im, x + 1, y, 1, Color("c4604c"))
+	else:
+		# a diagonal sky glint across the upper pane
+		for k in range(0, mini(3, h - 2)):
+			K.px(im, x + 2 + k, y + 1 + k, sky[4].lightened(0.2))
+	if w >= 5:
+		K.vline(im, x + w / 2, y, h, timber[1])
+	if h >= 6:
+		K.hline(im, x, y + h / 2, w, timber[1])
+	K.hline(im, x, y, w, timber[0].lerp(warm[3] if lit else sky[1], 0.3))
+	# granite sill, its top lit, and a shaded lip
+	K.rect(im, x - 2, y + h + 1, w + 4, 1, granite[5])
+	K.hline(im, x - 2, y + h + 1, w + 4, granite[6])
+	K.hline(im, x - 2, y + h + 2, w + 4, granite[2])
+	shade(im, x - 1, y + h + 3, w + 2, 3, timber[0], 1.0, 0.0, 0.4)
+	_register(im, Rect2i(x, y, w, h), 1.0 if lit else 0.55 + K.hash2(x, y, sd) * 0.45)
+
+
+## A plank door under a granite arched lintel with a keystone, two raised panels,
+## and iron strap hinges, on a two-step granite stoop. The wall lantern by the
+## door comes from [method _dress].
 func plank_door(im: Image, cx: int, bottom: int, h: int, sd: int, w := 8) -> void:
 	var x := cx - w / 2
 	var top := bottom - h
 	K.rect(im, x - 2, top - 2, w + 4, 2, granite[4])
 	K.hline(im, x - 2, top - 2, w + 4, granite[6])
 	K.hline(im, x - 2, top - 1, w + 4, granite[2])
+	K.px(im, cx - 1, top - 2, granite[6].lightened(0.1))
+	K.px(im, cx, top - 2, granite[6].lightened(0.1))
 	K.rect(im, x - 1, top, w + 2, h, timber[0])
+	K.vline(im, x - 1, top, h, timber[3])
 	for yy in h:
 		for xx in w:
 			if yy < 2 and (xx < 2 - yy or xx >= w - (2 - yy)):
@@ -122,15 +287,27 @@ func plank_door(im: Image, cx: int, bottom: int, h: int, sd: int, w := 8) -> voi
 			if xx % 2 == 0:
 				idx += 1
 			var col := timber[clampi(idx, 0, 5)]
-			if yy > h * 0.55 and yy < h * 0.6:
-				col = timber[1]
+			if K.hash2(plank, yy / 4, sd + 3) < 0.15:
+				col = col.darkened(0.08)
 			K.px(im, x + xx, top + yy, col)
-	K.vline(im, cx, top + 2, h - 2, timber[1])
-	K.px(im, cx - 2, top + h / 2, warm[5])
-	K.px(im, cx + 1, top + h / 2, warm[4])
-	# step
+	# two raised panels, lit on their top-left edges
+	for seg: Array in [[3, h / 2 - 1], [h / 2 + 1, h - 3]]:
+		var p0: int = seg[0]
+		var p1: int = seg[1]
+		if p1 - p0 < 2:
+			continue
+		K.rect(im, x + 2, top + p0, w - 4, p1 - p0 + 1, timber[1])
+		K.rect(im, x + 3, top + p0 + 1, w - 6, p1 - p0 - 1, timber[3])
+		K.vline(im, x + 3, top + p0 + 1, p1 - p0 - 1, timber[4])
+		K.hline(im, x + 3, top + p1, w - 6, timber[2])
+	K.px(im, x, top + 2, iron[1])
+	K.px(im, x, top + h - 4, iron[1])
+	K.px(im, cx + 1, top + h / 2, warm[5])
+	K.px(im, cx + 1, top + h / 2 - 1, warm[4])
+	# two-step granite stoop
 	K.rect(im, x - 2, bottom, w + 4, 1, granite[5])
 	K.hline(im, x - 2, bottom, w + 4, granite[6])
+	K.rect(im, x - 3, bottom + 1, w + 6, 1, granite[3])
 	shade(im, x - 1, top, w + 2, 3, timber[0], 0.9, 0.0, 0.4)
 
 
@@ -150,6 +327,11 @@ func sign_board(im: Image, cx: int, y: int, text: String, ink: Color = Color("f0
 	K.text(im, x + 3, y + 2, text, ink, timber[0])
 	K.px(im, x + 1, y + 1, granite[5])
 	K.px(im, x + w - 2, y + 1, granite[5])
+	# iron bracket and two hangers running up to the wall
+	K.hline(im, x + 3, y - 2, w - 6, iron[2])
+	K.hline(im, x + 3, y - 3, w - 6, iron[3])
+	K.px(im, x + 2, y - 1, iron[1])
+	K.px(im, x + w - 3, y - 1, iron[1])
 	shade(im, x, y + 9, w, 3, timber[0], 1.0, 0.0, 0.4)
 
 
@@ -202,7 +384,7 @@ func building(sprite_name: String, options := {}) -> Array:
 
 	# Roof, then a cross gable and chimney rising from it.
 	var taper := 0.22 if o.get("low", false) else 0.28
-	shingle_roof(im, 0, 2, w, wall_top - 3, sd + 200, taper)
+	_vb_roof(im, 0, 2, w, wall_top - 3, sd + 200, taper)
 	if o.has("gable"):
 		var gx: int = o["gable"]
 		var apex := mini(wall_top - 8, 15)
@@ -210,12 +392,12 @@ func building(sprite_name: String, options := {}) -> Array:
 	if o.has("chimney"):
 		var cx: int = o["chimney"]
 		chimney(im, cx, 8, maxi(6, wall_top - 14), sd + 400)
-	eave(im, 0, wall_top - 2, w)
+	_vb_eave(im, 0, wall_top - 2, w)
 
 	# Windows, door, sign.
 	var win_h := clampi(body_h - 7, 4, 8)
 	for wx: int in o["windows"]:
-		window(im, wx - 3, wall_top + 3, 6, win_h, K.hash2(wx, sd, 5) < 0.55, sd + wx)
+		_vb_window(im, wx - 3, wall_top + 3, 6, win_h, K.hash2(wx, sd, 5) < 0.55, sd + wx)
 	var door_cx := w / 2
 	if o.has("gable") and not o.get("low", false):
 		door_cx = w / 2
@@ -275,6 +457,7 @@ func _dress(im: Image, o: Dictionary, sd: int, wall_top: int, win_h: int, door_c
 	K.rect(im, lx, ly + 1, 1, 2, warm[6])
 	K.px(im, lx, ly + 1, warm[7])
 	K.hline(im, lx - 1, ly + 4, 3, iron[3])
+	_register(im, Rect2i(lx, ly + 1, 1, 1), 1.0)
 
 
 ## The Village Store's goods out front: stacked crates of produce and a
