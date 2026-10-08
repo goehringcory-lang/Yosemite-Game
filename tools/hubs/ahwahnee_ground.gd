@@ -12,6 +12,9 @@ extends RefCounted
 const Terrain = preload("res://tools/mapgen/terrain.gd")
 const T := 16
 const FORMAL := [Terrain.PAVED, Terrain.PARKING, Terrain.ROAD, Terrain.BRIDGE, Terrain.BUILT]
+## Formal groups that get a smoothed outline of their own in paint().
+const PAVE_SET := [Terrain.PAVED, Terrain.PARKING, Terrain.BUILT, Terrain.BRIDGE]
+const WET_SET := [Terrain.RIVER, Terrain.LAKE, Terrain.CREEK, Terrain.FALLS]
 
 var w := 0
 var h := 0
@@ -46,6 +49,29 @@ var _water_depth := PackedFloat32Array() # tiles from land, per tile
 var _pk := PackedByteArray() # the ground type shown at each pixel
 var _pw := 0
 var _ph := 0
+## Per-pixel road cover (0..1) from the smoothed road mask, for the shoulders.
+var _road_s := PackedFloat32Array()
+## Smoothed 0/1 masks of the formal and water groups, one value per tile.
+var _mroad := PackedFloat32Array()
+var _mpave := PackedFloat32Array()
+var _mwet := PackedFloat32Array()
+## The kind each tile lends to the paved and water groups (see _path_rep).
+var _fkind := PackedInt32Array()
+var _wkind := PackedInt32Array()
+## Bilinear weights from pixel columns and rows to tile centers (see _path_index).
+var _qx0 := PackedInt32Array()
+var _qx1 := PackedInt32Array()
+var _qtx := PackedFloat32Array()
+var _qy0 := PackedInt32Array()
+var _qy1 := PackedInt32Array()
+var _qty := PackedFloat32Array()
+## Per tile: 1 where the tile is paving or water (see _path_hard).
+var _thard := PackedByteArray()
+## Per tile: 1 where any formal or water cover reaches the 3x3 tiles around it.
+var _tany := PackedByteArray()
+## Per pixel: 1 where the shown ground is paving or water, and 1 where it is water.
+var _phard := PackedByteArray()
+var _pwet := PackedByteArray()
 
 
 static func c(hex: String) -> Color:
@@ -93,29 +119,51 @@ func paint(grid: PackedInt32Array, width: int, height: int, seed_v: int) -> Imag
 	if bed.size() != w * h:
 		bed.resize(w * h)
 	_compute_water_depth()
+	_path_index()
+	_path_groups()
 	var out := PackedByteArray()
 	out.resize(_pw * _ph * 4)
 	_pk.resize(_pw * _ph)
+	_road_s.resize(_pw * _ph)
+	_phard.resize(_pw * _ph)
+	_pwet.resize(_pw * _ph)
 	for y in _ph:
 		for x in _pw:
 			var i := y * _pw + x
-			# Warp the lookup so borders between ground types are ragged.
-			var wxn := float(_wx[i]) / 255.0 - 0.5
-			var wyn := float(_wy[i]) / 255.0 - 0.5
-			var jx := (hash2(x, y, 5) - 0.5) * 2.4
-			var jy := (hash2(x, y, 6) - 0.5) * 2.4
-			var tx := clampi((x + int(wxn * 17.0 + jx)) / T, 0, w - 1)
-			var ty := clampi((y + int(wyn * 17.0 + jy)) / T, 0, h - 1)
-			var k := kind[ty * w + tx]
-			# Paved, gravel and road edges stay crisp; natural ground is ragged.
-			var sx := clampi((x + int(wxn * 1.6 + jx * 0.5)) / T, 0, w - 1)
-			var sy := clampi((y + int(wyn * 1.6 + jy * 0.5)) / T, 0, h - 1)
-			var ks := kind[sy * w + sx]
-			if ks in FORMAL or k in FORMAL:
-				k = ks
-				tx = sx
-				ty = sy
+			# Each formal group is a smoothed outline (see _path_groups), so its
+			# edges are curves rather than tile steps. Ties go to bridge, water,
+			# then road.
+			var near := (y / T) * w + x / T
+			var k := 0
+			var tx := x / T
+			var ty := y / T
+			# A tile's own pixels use a lower cutoff (see _path_cut), so one-tile
+			# roads and streams survive the blur. The shoreline wobbles on
+			# low-frequency noise; roads do not.
+			var own := kind[near]
+			# (_tany skips the samples where no group cover is near.)
+			if _tany[near] == 1 and own == Terrain.BRIDGE and _path_sample(_mpave, x, y) > 0.25:
+				k = Terrain.BRIDGE
+			elif _tany[near] == 1 and _path_sample(_mwet, x, y) > _path_cut(_path_wet(own), (float(_na[i]) / 255.0 - 0.5) * 0.3):
+				k = _wkind[near]
+			elif _tany[near] == 1 and _path_sample(_mroad, x, y) > _path_cut(own == Terrain.ROAD, 0.0):
+				k = Terrain.ROAD
+			elif _tany[near] == 1 and _path_sample(_mpave, x, y) > _path_cut(own in PAVE_SET, 0.0):
+				k = _fkind[near]
+			else:
+				# Natural ground: warp the lookup so borders are ragged.
+				var wxn := float(_wx[i]) / 255.0 - 0.5
+				var wyn := float(_wy[i]) / 255.0 - 0.5
+				var jx := (hash2(x, y, 5) - 0.5) * 2.4
+				var jy := (hash2(x, y, 6) - 0.5) * 2.4
+				var nt := _path_natural_tile(clampi((x + int(wxn * 17.0 + jx)) / T, 0, w - 1), clampi((y + int(wyn * 17.0 + jy)) / T, 0, h - 1))
+				tx = nt.x
+				ty = nt.y
+				k = kind[ty * w + tx]
 			_pk[i] = k
+			_phard[i] = 1 if _path_hard(k) else 0
+			_pwet[i] = 1 if _is_water(k) else 0
+			_road_s[i] = _path_sample(_mroad, x, y)
 			var col := _color(k, x, y, i, tx, ty)
 			if bed[ty * w + tx] != 0 and k in [Terrain.LAWN, Terrain.MEADOW]:
 				col = _bed_color(x, y, i)
@@ -136,6 +184,183 @@ func paint(grid: PackedInt32Array, width: int, height: int, seed_v: int) -> Imag
 	if road_shoulders:
 		_road_shoulders(im)
 	return im
+
+
+## Smoothed outlines for the formal and water groups. Each group is a 0/1 mask
+## at tile resolution, blurred twice with a 3x3 box, so a pixel belongs to the
+## group where the blurred mask (sampled at the pixel) is above one half. The
+## outline stays within about half a tile of the real tiles.
+func _path_groups() -> void:
+	var n := w * h
+	var road := PackedFloat32Array()
+	var pave := PackedFloat32Array()
+	var wet := PackedFloat32Array()
+	road.resize(n)
+	pave.resize(n)
+	wet.resize(n)
+	for t in n:
+		road[t] = 1.0 if kind[t] == Terrain.ROAD else 0.0
+		pave[t] = 1.0 if kind[t] in PAVE_SET else 0.0
+		wet[t] = 1.0 if _path_wet(kind[t]) else 0.0
+	_mroad = _path_blur(road)
+	_mpave = _path_blur(pave)
+	_mwet = _path_blur(wet)
+	_thard.resize(n)
+	for t in n:
+		_thard[t] = 1 if _path_hard(kind[t]) else 0
+	# Tiles with any group cover within one tile; elsewhere every sample is zero.
+	_tany.resize(n)
+	for y in h:
+		for x in w:
+			var any := 0
+			for dy in range(-1, 2):
+				for dx in range(-1, 2):
+					var t := clampi(y + dy, 0, h - 1) * w + clampi(x + dx, 0, w - 1)
+					if _mroad[t] > 0.0 or _mpave[t] > 0.0 or _mwet[t] > 0.0:
+						any = 1
+			_tany[y * w + x] = any
+	_fkind.resize(n)
+	_wkind.resize(n)
+	for y in h:
+		for x in w:
+			_fkind[y * w + x] = _path_rep(x, y, PAVE_SET, Terrain.PAVED)
+			_wkind[y * w + x] = _path_rep(x, y, WET_SET, Terrain.RIVER)
+
+
+## Two passes of a 3x3 box blur over a tile-resolution mask (edges clamped).
+func _path_blur(src: PackedFloat32Array) -> PackedFloat32Array:
+	var a := src
+	for _pass in 2:
+		var b := PackedFloat32Array()
+		b.resize(w * h)
+		for y in h:
+			for x in w:
+				var s := 0.0
+				for dy in range(-1, 2):
+					for dx in range(-1, 2):
+						s += a[clampi(y + dy, 0, h - 1) * w + clampi(x + dx, 0, w - 1)]
+				b[y * w + x] = s / 9.0
+		a = b
+	return a
+
+
+## The blurred-mask cutoff for a pixel: one half in general, but a quarter on a
+## tile that is itself a member, where a one-tile-wide run blurs to a third.
+func _path_cut(own_member: bool, wobble: float) -> float:
+	return (0.25 if own_member else 0.5) + wobble
+
+
+## A blurred mask at a pixel, bilinear between tile centers (tile i is centered
+## at i + 0.5 tiles).
+func _path_sample(m: PackedFloat32Array, x: int, y: int) -> float:
+	var y0 := _qy0[y]
+	var y1 := _qy1[y]
+	var x0 := _qx0[x]
+	var x1 := _qx1[x]
+	var tx := _qtx[x]
+	return lerpf(lerpf(m[y0 + x0], m[y0 + x1], tx), lerpf(m[y1 + x0], m[y1 + x1], tx), _qty[y])
+
+
+## The kind a tile lends to a group: its own kind if it is a member, else the
+## nearest member within two tiles, else the fallback.
+func _path_rep(x: int, y: int, group: Array, fallback: int) -> int:
+	if kind[y * w + x] in group:
+		return kind[y * w + x]
+	for r in range(1, 3):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				var nx := x + dx
+				var ny := y + dy
+				if nx >= 0 and ny >= 0 and nx < w and ny < h and kind[ny * w + nx] in group:
+					return kind[ny * w + nx]
+	return fallback
+
+
+## A natural tile for the warped lookup: the tile itself, or the nearest one that
+## is not paving or water, so the grass never shows a paved tile's ground.
+func _path_natural_tile(tx: int, ty: int) -> Vector2i:
+	if _thard[ty * w + tx] == 0:
+		return Vector2i(tx, ty)
+	for r in range(1, 3):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				var nx := tx + dx
+				var ny := ty + dy
+				if nx >= 0 and ny >= 0 and nx < w and ny < h and _thard[ny * w + nx] == 0:
+					return Vector2i(nx, ny)
+	return Vector2i(tx, ty)
+
+
+## Bilinear weights for each pixel column and row (tile i is centered at i + 0.5).
+func _path_index() -> void:
+	_qx0.resize(_pw)
+	_qx1.resize(_pw)
+	_qtx.resize(_pw)
+	for x in _pw:
+		var fx := clampf((x + 0.5) / T - 0.5, 0.0, w - 1.0)
+		var x0 := floori(fx)
+		_qx0[x] = x0
+		_qx1[x] = mini(x0 + 1, w - 1)
+		_qtx[x] = fx - x0
+	_qy0.resize(_ph)
+	_qy1.resize(_ph)
+	_qty.resize(_ph)
+	for y in _ph:
+		var fy := clampf((y + 0.5) / T - 0.5, 0.0, h - 1.0)
+		var y0 := floori(fy)
+		_qy0[y] = y0 * w
+		_qy1[y] = mini(y0 + 1, h - 1) * w
+		_qty[y] = fy - y0
+
+
+## Ground that gets a smoothed outline instead of the warped tile lookup.
+func _path_hard(k: int) -> bool:
+	return k in FORMAL or _path_wet(k)
+
+
+func _path_wet(k: int) -> bool:
+	return _is_water(k) or k == Terrain.FALLS
+
+
+## Water with a clear depth gradient: pale teal in the shallows, deeper blue out
+## in the channel. Ripples gather in soft patches as small 3-pixel dashes, and
+## sun glints are rare 2-pixel sparkles, so the surface reads as moving light.
+func _path_water(k: int, x: int, y: int, i: int, a: float, b: float, n: float, r: float) -> Color:
+	var d := _depth_at(x, y)
+	var shallow := c("a4dcc8")
+	var mid := c("55b3ae")
+	var deep := c("2f7f98")
+	var abyss := c("215c7e")
+	if k == Terrain.CREEK:
+		shallow = c("b2e3cc")
+		mid = c("6ec0b4")
+		deep = c("3f9aa0")
+		abyss = c("2d7a8c")
+	if k == Terrain.LAKE:
+		shallow = c("8fcfb4")
+		mid = c("3f9e96")
+		deep = c("2a7470")
+		abyss = c("1d5563")
+	# Depth is at least one tile out from land; the gradient runs over ~3 tiles.
+	var t := clampf((d - 0.5) / 2.5, 0.0, 1.0)
+	var col := shallow.lerp(mid, smooth(0.0, 0.4, t)).lerp(deep, smooth(0.3, 0.75, t)).lerp(abyss, smooth(0.7, 1.0, t))
+	col = col.lerp(abyss, smooth(0.55, 0.9, a) * 0.18)
+	# Ripple patches: a 6-pixel cell holds a 3-pixel dash, only in some cells.
+	var zone := smooth(0.5, 0.78, float(_nb[i]) / 255.0)
+	var rp := hash2(x / 6, y / 6, 61)
+	if y % 6 == 2 and x % 6 >= 1 and x % 6 <= 3 and zone > 0.2 and rp < 0.3 + zone * 0.5:
+		col = col.lightened(0.16) if x % 6 == 2 else col.lightened(0.09)
+	# Sun glints: a 2-pixel sparkle, at most one per 14-pixel cell, in ripple patches.
+	var gx := x / 14
+	var gy := y / 14
+	if zone > 0.3 and hash2(gx, gy, 62) > 0.9 and y % 14 == 4 + int(hash2(gx, gy, 63) * 4.0):
+		var gxo := 5 + int(hash2(gx, gy, 64) * 4.0)
+		if x % 14 == gxo or x % 14 == gxo + 1:
+			col = c("f6fffa")
+	# Pebbles in the shallows, in small clusters.
+	if d < 1.2 and hash2(x / 3, y / 3, 65) < 0.05:
+		col = c("9b9482").lerp(col, 0.3 + d * 0.3)
+	return col
 
 
 # ---------------------------------------------------------------- water depth
@@ -288,7 +513,7 @@ func _color(k: int, x: int, y: int, i: int, tx: int, ty: int) -> Color:
 		Terrain.SAND:
 			return _sand(x, y, a, b, n, r)
 		Terrain.RIVER, Terrain.LAKE, Terrain.CREEK, Terrain.FALLS:
-			return _water(k, x, y, i, a, b, n, r)
+			return _path_water(k, x, y, i, a, b, n, r)
 		Terrain.BRIDGE:
 			return _gravel(x, y, a, b, n, r).darkened(0.08)
 		Terrain.TALUS, Terrain.SCREE:
@@ -483,29 +708,56 @@ func _duff(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 	return col
 
 
-func _flagstone(x: int, y: int, a: float, n: float, r: float) -> Color:
-	var row_h := 12
-	var row := y / row_h
-	var off := int(hash2(row, 3, seed_value) * 30.0)
-	var slab_w := 18 + int(hash2(row, 4, seed_value) * 14.0)
-	var sx := (x + off) / slab_w
-	var lx := (x + off) % slab_w
-	var ly := y % row_h
-	var tone := hash2(sx, row, seed_value + 8)
-	var col := c("b7b09f").lerp(c("d0c9b6"), tone)
-	col = col.lerp(c("a7a08f"), smooth(0.5, 0.9, a) * 0.3)
-	if lx == 0 or ly == 0:
-		col = c("867f70")
-		if r < 0.25:
-			col = c("5f7a44") # moss in the joints
-	elif lx == 1 or ly == 1:
-		col = col.lightened(0.09)
-	elif lx == slab_w - 1 or ly == row_h - 1:
+## A stone plaza: slabs in staggered rows, each a different width, with warm or
+## cool stone per slab, a lit top-left edge and a shaded bottom-right edge. Joints
+## wobble and some break so the slabs merge, the worn middle is a shade lighter,
+## and moss only sits in a few joints.
+func _flagstone(x: int, y: int, a: float, _n: float, r: float) -> Color:
+	var i := y * _pw + x
+	var wob_y := int((float(_nb[i]) / 255.0 - 0.5) * 6.0)
+	var yy := y + wob_y
+	var row := floori(float(yy) / 13.0)
+	var ly := yy - row * 13
+	var off := int(hash2(row, 3, seed_value) * 22.0)
+	var xs := x + off + int((float(_nb[i]) / 255.0 - 0.5) * 4.0)
+	# Vertical joints: one per 24-pixel column, each jittered within its column.
+	var k0 := floori(float(xs) / 24.0)
+	var p0 := k0 * 24 + int(hash2(k0, row, seed_value + 21) * 12.0)
+	var slab := k0
+	var start := p0
+	var stop := (k0 + 1) * 24 + int(hash2(k0 + 1, row, seed_value + 21) * 12.0)
+	if xs < p0:
+		slab = k0 - 1
+		start = (k0 - 1) * 24 + int(hash2(k0 - 1, row, seed_value + 21) * 12.0)
+		stop = p0
+	var lx := xs - start
+	var sw := stop - start
+	# Joints: a line at a slab edge, dropped now and then so slabs merge.
+	var joint_v := xs == p0 and hash2(k0, row, seed_value + 22) > 0.35
+	var joint_h := ly == 0 and hash2(slab, row, seed_value + 23) > 0.5
+	if joint_v or joint_h:
+		if hash2(x / 2, y / 2, 95) < 0.2:
+			return c("64804c") # moss
+		if hash2(x / 2, y / 2, 94) > 0.93:
+			return c("8f9a6a")
+		return c("9d9383")
+	var hue := hash2(slab, row, seed_value + 8)
+	var tone := hash2(slab, row, seed_value + 9)
+	var col := c("d3c6a8") if hue < 0.4 else (c("bebcb0") if hue > 0.78 else c("cdb49b"))
+	col = col.lerp(col.darkened(0.07), tone * 0.6)
+	col = col.lightened(0.05 * smooth(0.55, 0.85, a))
+	if lx == 1 or ly == 1:
+		col = col.lightened(0.12)
+	elif lx >= sw - 2 or ly >= 12:
 		col = col.darkened(0.1)
-	if r < 0.05:
-		col = col.darkened(0.06)
-	elif r > 0.965:
-		col = col.lightened(0.07)
+	# Specks in small clusters, not per pixel.
+	var sp := hash2(x / 2, y / 2, 97)
+	if sp < 0.06:
+		col = col.darkened(0.05)
+	elif sp > 0.97:
+		col = col.lightened(0.06)
+	if r > 0.998:
+		col = c("7b8f5a") # a blade of grass
 	return col
 
 
@@ -539,12 +791,15 @@ func _lot(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 	return col
 
 
-func _asphalt(x: int, y: int, a: float, n: float, r: float) -> Color:
-	var col := c("55514d").lerp(c("655f59"), n * 0.6 + a * 0.3)
-	if r < 0.07:
-		col = c("777069")
-	elif r < 0.12:
-		col = c("46423f")
+## Dark road: grit in small clusters over a faint worn patch.
+func _asphalt(x: int, y: int, a: float, _n: float, _r: float) -> Color:
+	var col := c("57524d").lerp(c("625b55"), smooth(0.45, 0.8, a))
+	col = col.lerp(c("6b645c"), smooth(0.6, 0.85, a) * 0.3)
+	var grit := hash2(x / 2, y / 2, 98)
+	if grit < 0.1:
+		col = c("716a62")
+	elif grit > 0.92:
+		col = c("45413e")
 	return col
 
 
@@ -645,53 +900,40 @@ func _water(k: int, x: int, y: int, i: int, a: float, b: float, n: float, r: flo
 
 ## Foam where water meets land, drawn from the ground type actually shown at
 ## each pixel (so it follows the ragged, warped borders).
+## Foam where water meets land: a soft band of flecks, thickest at the very edge,
+## that follows the smoothed shoreline. Land just beside the water gets a damp
+## sand band that fades into the grass.
 func _shore_and_edges(im: Image) -> void:
-	for y in range(2, _ph - 2):
-		for x in range(2, _pw - 2):
+	for y in range(3, _ph - 3):
+		for x in range(3, _pw - 3):
 			var i := y * _pw + x
-			if not _is_water(_pk[i]):
-				continue
-			var edge := 0
-			for o: int in [2, -2, 2 * _pw, -2 * _pw]:
-				if not _is_water(_pk[i + o]):
-					edge += 1
-			if edge > 0:
-				var f := hash2(x, y, 71)
-				if f < 0.55:
-					im.set_pixel(x, y, c("e6f3ee"))
-				elif f < 0.8:
-					im.set_pixel(x, y, c("b9dcd2"))
+			if _pwet[i] == 1:
+				var d := _depth_at(x, y)
+				var band := 0.32 + (hash2(x / 3, y / 3, 71) - 0.5) * 0.14 + (float(_nb[i]) / 255.0 - 0.5) * 0.12
+				if d < 0.5 + band:
+					var near := 1.0 - (d - 0.5) / band
+					if hash2(x / 2, y / 2, 72) < 0.3 + near * 0.6:
+						im.set_pixel(x, y, c("eef8f2") if near > 0.55 else c("b9dfd4"))
+			elif _phard[i] == 0 and (_pwet[i + 3] == 1 or _pwet[i - 3] == 1 or _pwet[i + 3 * _pw] == 1 or _pwet[i - 3 * _pw] == 1):
+				if hash2(x / 2, y / 2, 73) < 0.7:
+					im.set_pixel(x, y, im.get_pixel(x, y).lerp(c("8f8462"), 0.35))
 
 
+## Soft gravel shoulders beside roads, fading over a few pixels and broken into
+## clusters, and a subtle dark edge line on the road itself.
 func _road_shoulders(im: Image) -> void:
 	var edits := {}
 	for y in range(2, _ph - 2):
 		for x in range(2, _pw - 2):
 			var i := y * _pw + x
 			var k := _pk[i]
+			var s := _road_s[i]
 			if k == Terrain.ROAD:
-				var open := false
-				for o: int in [1, -1, _pw, -_pw]:
-					var nk := _pk[i + o]
-					if nk != Terrain.ROAD and nk != Terrain.BRIDGE and nk != Terrain.PARKING:
-						open = true
-				if open:
-					edits[i] = c("3a3735")
-				else:
-					var inner := false
-					for o: int in [2, -2, 2 * _pw, -2 * _pw]:
-						var nk := _pk[i + o]
-						if nk != Terrain.ROAD and nk != Terrain.BRIDGE and nk != Terrain.PARKING:
-							inner = true
-					if inner:
-						edits[i] = im.get_pixel(x, y).darkened(0.12)
-			elif k not in FORMAL and not _is_water(k) and k not in [Terrain.CLIFF, Terrain.GRANITE]:
-				var near := 0
-				for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1), Vector2i(2, 0), Vector2i(-2, 0), Vector2i(0, 2), Vector2i(0, -2)]:
-					if _pk[i + d.y * _pw + d.x] == Terrain.ROAD:
-						near += 1 if absi(d.x) + absi(d.y) == 1 else 0
-				if near > 0 and hash2(x, y, 88) < 0.78:
-					edits[i] = im.get_pixel(x, y).lerp(c("8c7a5a"), 0.55)
+				if s < 0.64 and hash2(x / 3, y / 3, 81) > 0.3:
+					edits[i] = im.get_pixel(x, y).darkened(0.2)
+			elif _phard[i] == 0 and k != Terrain.CLIFF and k != Terrain.GRANITE and s > 0.06:
+				var amt := 0.55 * smooth(0.06, 0.5, s) * (0.8 + 0.2 * hash2(x / 2, y / 2, 88))
+				edits[i] = im.get_pixel(x, y).lerp(c("a08e6c"), amt)
 	for i: int in edits:
 		im.set_pixel(i % _pw, i / _pw, edits[i])
 
