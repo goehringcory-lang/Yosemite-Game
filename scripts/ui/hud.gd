@@ -67,6 +67,11 @@ func _ready() -> void:
 	QuestLog.changed.connect(refresh_objective)
 	GameClock.day_started.connect(refresh_objective.unbind(3))
 	clock_panel.resized.connect(_place_objective)
+	# The clock and the place name are wooden plaques; the goal and status strip keep the plain frame.
+	var plaque := clock_panel.get_theme_stylebox("panel", "PanelContainer").duplicate() as StyleBoxTexture
+	plaque.texture = load("res://assets/ui/plaque.png")
+	clock_panel.add_theme_stylebox_override("panel", plaque)
+	location_panel.add_theme_stylebox_override("panel", plaque)
 
 
 func bind_player(player: Player) -> void:

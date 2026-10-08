@@ -53,6 +53,13 @@ static func colors(rock_key: String, pal: Dictionary) -> Dictionary:
 			var col: Color = out[names[i]]
 			var v := col.r * 0.3 + col.g * 0.55 + col.b * 0.15
 			out[names[i]] = col.lerp(Color(glow_col.r * v * 1.3, glow_col.g * v * 1.3, glow_col.b * v * 1.3).clamp(), glow * [0.18, 0.32, 0.45][i - 2])
+	# Hue shift: the shadows drift toward blue-violet and the lights toward
+	# warm cream, so the granite reads as lit stone rather than grey paint.
+	# The violet is kept to the deepest tone; mid-tones stay neutral granite.
+	out["deep"] = (out["deep"] as Color).lerp(Color("3c3c6e"), 0.3)
+	out["shade"] = (out["shade"] as Color).lerp(Color("4a4870"), 0.08)
+	out["lit"] = (out["lit"] as Color).lerp(Color("ffe6b4"), 0.1)
+	out["hi"] = (out["hi"] as Color).lerp(Color("fff4d8"), 0.18)
 	out["seam"] = _light(Color(hexes[0]).darkened(0.35), tint, lum)
 	out["streak"] = _light(STREAK, tint, lum)
 	out["lichen_o"] = _light(LICHEN_ORANGE, tint, lum)
@@ -185,16 +192,21 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 	# (the same arithmetic as per pixel, so the picture doesn't change).
 	var light_x := _scaled_diffs(0.8)
 	var light_y := _scaled_diffs(0.55)
+	# The broad light: the upper left of the face is lit and the lower right
+	# falls off, so every plate reads as lit from the same side.
 	var sun_x := PackedFloat64Array()
 	sun_x.resize(w)
 	for x in w:
-		var sun := float(x) / w
-		sun_x[x] = (sun - 0.5) * 1.1
+		sun_x[x] = (0.5 - float(x) / w) * 0.26
+	var sun_y := PackedFloat64Array()
+	sun_y.resize(h)
+	for y in h:
+		sun_y[y] = (0.5 - float(y) / h) * 0.16
 	var height := PackedFloat64Array()
 	height.resize(256)
 	for v in 256:
 		height[v] = (v / 255.0 - 0.5) * 1.2
-	var bayer := _bayer_terms(0.16)
+	var bayer := _bayer_terms(0.03)
 	for y in h:
 		var row := y * w
 		var brow := (y & 3) << 2
@@ -209,17 +221,24 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 			var yd := relief[i + 3 * w] if down else here
 			# Light from the upper left: surfaces facing left and up are lit.
 			var s_light := (light_x[xl - xr + 255] + light_y[yu - yd + 255]) / 255.0 * 4.0
-			var t := 2.0 + s_light * k_light + sun_x[x] + height[here]
+			var t := 2.0 + s_light * k_light + sun_x[x] + sun_y[y] + height[here]
 			out.encode_u32(i * 4, lut[clampi(roundi((t + bayer[brow | (x & 3)]) * 3.0) * 4 / 3, 0, 19)])
 	im.set_data(w, h, false, Image.FORMAT_RGBA8, out)
 	_joints(im, c, rng, smooth)
 	_stains(im, c, rng, deco)
 	_lichen(im, c, rng, deco, h)
-	# Speckles: feldspar glints and dark crystals.
-	for i in w * h / 160:
+	# Feldspar glints and dark crystals, in small clusters of two or three
+	# pixels, so the grain reads as stone and not as static.
+	for i in w * h / 420:
 		var p := Vector2i(rng.randi_range(0, w - 1), rng.randi_range(0, h - 1))
-		var col := im.get_pixelv(p)
-		im.set_pixelv(p, col.lightened(0.14) if rng.randf() < 0.55 else col.darkened(0.18))
+		var bright := rng.randf() < 0.55
+		var offs: Array[Vector2i] = [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1)]
+		for k in rng.randi_range(2, 3):
+			var q: Vector2i = p + offs[k]
+			if q.x < 0 or q.y < 0 or q.x >= w or q.y >= h:
+				continue
+			var col := im.get_pixelv(q)
+			im.set_pixelv(q, col.lightened(0.12) if bright else col.darkened(0.16))
 
 
 ## The 20 quarter-steps of the rock ramp as opaque RGBA8 pixels, packed for
@@ -259,9 +278,9 @@ static func _relief(w: int, h: int, seed_value: int, smooth: bool) -> PackedByte
 	var fbm := FastNoiseLite.new()
 	fbm.seed = seed_value
 	fbm.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
-	fbm.frequency = 0.022 if not smooth else 0.013
-	fbm.fractal_octaves = 3
-	fbm.fractal_gain = 0.45
+	fbm.frequency = 0.015 if not smooth else 0.011
+	fbm.fractal_octaves = 2
+	fbm.fractal_gain = 0.4
 	var squash := 3 if not smooth else 2
 	var a := fbm.get_image(w, maxi(h / squash, 8), false, false, true)
 	a.resize(w, h, Image.INTERPOLATE_BILINEAR)
@@ -297,7 +316,7 @@ static func _relief(w: int, h: int, seed_value: int, smooth: bool) -> PackedByte
 static func _joints(im: Image, c: Dictionary, rng: RandomNumberGenerator, smooth: bool) -> void:
 	var w := im.get_width()
 	var h := im.get_height()
-	var count := w / (60 if smooth else 34)
+	var count := w / (60 if smooth else 48)
 	for i in count:
 		var x := float(rng.randi_range(4, w - 36))
 		var y := rng.randi_range(-40, h - 80)
@@ -315,9 +334,8 @@ static func _joints(im: Image, c: Dictionary, rng: RandomNumberGenerator, smooth
 			if int((k + i * 13) / 37) % 5 == 4:
 				continue
 			im.set_pixel(xx, yy, c.seam)
-			im.set_pixel(xx - 1, yy, im.get_pixel(xx - 1, yy).lightened(0.12))
-			if (k & 1) == 0:
-				im.set_pixel(xx + 1, yy, im.get_pixel(xx + 1, yy).darkened(0.12))
+			im.set_pixel(xx - 1, yy, im.get_pixel(xx - 1, yy).lightened(0.16))
+			im.set_pixel(xx + 1, yy, im.get_pixel(xx + 1, yy).darkened(0.1))
 
 
 ## Dark water stains running down the rock, thin and dithered at the edges.
@@ -325,12 +343,12 @@ static func _stains(im: Image, c: Dictionary, rng: RandomNumberGenerator, deco: 
 	var w := im.get_width()
 	var h := im.get_height()
 	var heavy := "streaks" in deco
-	var count := (w / 26 if heavy else w / 80)
+	var count := (w / 30 if heavy else w / 110)
 	for i in count:
 		var x := rng.randi_range(6, w - 40)
 		var y := rng.randi_range(0, h - 120)
 		var length := rng.randi_range(70, 240)
-		var sw := rng.randi_range(1, 3)
+		var sw := rng.randi_range(1, 2)
 		for k in length:
 			var yy := y + k
 			if yy >= h:
@@ -338,13 +356,9 @@ static func _stains(im: Image, c: Dictionary, rng: RandomNumberGenerator, deco: 
 			var drift := int(sin(k * 0.05 + i) * 1.4)
 			var fade := 1.0 - float(k) / length
 			for dx in range(-sw, sw + 1):
-				var edge := absi(dx) == sw
-				if edge and not P.dither(x + dx, yy, fade * 0.7):
-					continue
-				if not edge or P.dither(x + dx, yy, fade):
-					var p := Vector2i(x + dx + drift, yy)
-					if p.x >= 0 and p.x < w:
-						im.set_pixelv(p, im.get_pixelv(p).lerp(c.streak, 0.55 * fade + 0.15))
+				var p := Vector2i(x + dx + drift, yy)
+				if p.x >= 0 and p.x < w and not (absi(dx) == sw and not P.dither(x + dx, yy, fade * 0.6)):
+					im.set_pixelv(p, im.get_pixelv(p).lerp(c.streak, 0.36 * fade + 0.1))
 
 
 static func _lichen(im: Image, c: Dictionary, rng: RandomNumberGenerator, deco: Array, h: int) -> void:
@@ -855,8 +869,8 @@ static func _crack_line(im: Image, c: Dictionary, a: Vector2, b: Vector2) -> voi
 		var x := int(p.x + sin(p.y * 0.21) * 1.0)
 		var y := int(p.y)
 		var wide := 1 + int(sin(t * PI) * 1.2)
-		P.px(im, x - 1, y, tone(c, 3.8))
-		P.rect(im, x, y, wide, 1, c.deep)
+		P.px(im, x - 1, y, tone(c, 4.0))
+		P.rect(im, x, y, wide, 1, c.seam.darkened(0.2))
 		P.px(im, x + wide, y, c.seam)
 		P.px(im, x + wide + 1, y, tone(c, 1.9))
 
@@ -922,8 +936,8 @@ static func _hold(im: Image, c: Dictionary, rng: RandomNumberGenerator, p: Vecto
 			P.px(im, p.x - 1, p.y - 1, chalk)
 		"slab", "dike":
 			# Smear marks: a tiny edge, a chalky smudge, a dimple.
-			P.rect(im, p.x - 2, p.y, 5, 1, tone(c, 4.0))
-			P.rect(im, p.x - 2, p.y + 1, 5, 1, c.deep)
+			P.rect(im, p.x - 2, p.y, 5, 1, tone(c, 4.7))
+			P.rect(im, p.x - 2, p.y + 1, 5, 1, c.seam)
 			if not hard:
 				P.px(im, p.x - 1, p.y - 1, chalk)
 				P.px(im, p.x + 1, p.y - 1, chalk.darkened(0.1))
@@ -931,17 +945,20 @@ static func _hold(im: Image, c: Dictionary, rng: RandomNumberGenerator, p: Vecto
 				P.rect(im, p.x - 3, p.y, 7, 1, tone(c, 4.2))
 		_:
 			if easy:
-				P.rect(im, p.x - 3, p.y - 1, 6, 3, tone(c, 3.2))
+				P.rect(im, p.x - 3, p.y - 1, 6, 3, tone(c, 3.8))
 				P.rect(im, p.x - 2, p.y - 2, 4, 1, chalk)
-				P.rect(im, p.x - 3, p.y + 2, 6, 1, c.deep)
+				P.rect(im, p.x - 3, p.y - 1, 6, 1, tone(c, 4.6))
+				P.rect(im, p.x - 3, p.y + 2, 6, 1, c.seam)
 			elif hard:
-				P.rect(im, p.x - 1, p.y - 1, 3, 2, tone(c, 3.0))
-				P.rect(im, p.x - 1, p.y + 1, 3, 1, c.deep)
+				P.rect(im, p.x - 1, p.y - 1, 3, 2, tone(c, 3.3))
+				P.rect(im, p.x - 1, p.y - 1, 3, 1, tone(c, 4.3))
+				P.rect(im, p.x - 1, p.y + 1, 3, 1, c.seam)
 				P.px(im, p.x, p.y - 2, chalk)
 			else:
-				P.rect(im, p.x - 2, p.y - 1, 5, 2, tone(c, 3.2))
+				P.rect(im, p.x - 2, p.y - 1, 5, 2, tone(c, 3.8))
 				P.rect(im, p.x - 1, p.y - 2, 3, 1, chalk)
-				P.rect(im, p.x - 2, p.y + 1, 5, 1, c.deep)
+				P.rect(im, p.x - 2, p.y - 1, 5, 1, tone(c, 4.6))
+				P.rect(im, p.x - 2, p.y + 1, 5, 1, c.seam)
 	if hold.get("rest", false):
 		# A good stance: a flat shelf you can stand on.
 		P.rect(im, p.x - 10, p.y + 4, 21, 2, tone(c, 3.8))

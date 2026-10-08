@@ -122,7 +122,7 @@ func village_wall(prof: PackedInt32Array, fall_cx: int) -> Image:
 			var cav := (hgt[y * W + x4a] + hgt[y * W + x4b] + hgt[y4a * W + x] + hgt[y4b * W + x]) * 0.25 - hgt[i]
 			s -= _sat(cav * 0.03) * 0.4
 			s += shade_add[i]
-			s += (K.hash2(x, y, 31) - 0.5) * 0.045
+			s += (K.hash2(x / 3, y / 3, 31) - 0.5) * 0.05
 			var sh := n_shade.get_noise_2d(x * 0.0045, y * 0.006)
 			s -= maxf(0.0, sh - 0.02) * 0.65
 			s *= 0.9 + 0.1 * (1.0 - float(y) / Hh)
@@ -138,14 +138,19 @@ func village_wall(prof: PackedInt32Array, fall_cx: int) -> Image:
 			var ch := absf(n_crack.get_noise_2d(x * 0.004 + 30.0, y * 0.022))
 			if cv < 0.0045 or ch < 0.0016:
 				s -= 0.22
-			var col := _ramp(ramp, s, x, y, 0.55)
+			var col := _ramp(ramp, s, x, y, 0.3)
+			# hue shift: lit faces warm toward cream, shade cools toward blue-violet
+			if s > 0.7 and stain < 0.2:
+				col = col.lerp(Color("eadfc4"), minf(0.35, (s - 0.7) * 0.9))
+			elif s < 0.38:
+				col = col.lerp(Color("2a2f4c"), minf(0.4, (0.38 - s) * 0.9))
 			if stain > 0.25:
 				col = col.lerp(blue_black, minf(0.45, (stain - 0.25) * 0.8))
 			var lich := n_lichen.get_noise_2d(x * 0.05, y * 0.05)
 			if lich > 0.4 and s > 0.5 and stain < 0.3 and d > 0.5:
-				col = _ramp(orange, s * 0.85 + (K.hash2(x, y, 5) - 0.5) * 0.3, x, y, 0.4) if lich > 0.5 else col.lerp(Color("c9a05a"), 0.3)
+				col = _ramp(orange, s * 0.85 + (K.hash2(x / 2, y / 2, 5) - 0.5) * 0.3, x, y, 0.3) if lich > 0.5 else col.lerp(Color("c9a05a"), 0.3)
 			elif lich < -0.42 and s > 0.4 and stain < 0.3:
-				col = _ramp(gray_green, s + (K.hash2(x, y, 6) - 0.5) * 0.3, x, y, 0.4)
+				col = _ramp(gray_green, s + (K.hash2(x / 2, y / 2, 6) - 0.5) * 0.3, x, y, 0.3)
 			im.set_pixel(x, y, col)
 
 	# conifers and shrubs on the ledges
@@ -262,12 +267,12 @@ func fall_frame(frame: int, fall_h := FALL_H) -> Image:
 	for y in Hh:
 		var Y := float(y)
 		var cx := gully_x(Y, W / 2.0) - 0.0
-		var w := 4.5 + 3.0 * smoothstep(0.0, 60.0, Y) + 0.6 * sin(Y * 0.19)
+		var w := 6.0 + 3.5 * smoothstep(0.0, 60.0, Y) + 0.6 * sin(Y * 0.19)
 		var lip_glow := 0.0
 		for ly: int in ledge_ys:
 			var t := Y - ly
 			if t >= 0.0 and t < 22.0:
-				w += 3.0 * smoothstep(0.0, 8.0, t) * (1.0 - smoothstep(8.0, 22.0, t))
+				w += 3.6 * smoothstep(0.0, 8.0, t) * (1.0 - smoothstep(8.0, 22.0, t))
 			if absf(t) < 3.0:
 				lip_glow = 1.0 - absf(t) / 3.0
 				w += 0.9
@@ -282,7 +287,14 @@ func fall_frame(frame: int, fall_h := FALL_H) -> Image:
 				var cell := int(floor(x * 0.55))
 				var v := _vnoise(cell, flow_y, 6.0, 8, 21) * 0.5 + _vnoise(cell + 40, flow_y, 12.0, 4, 22) * 0.3 + _vnoise(int(x * 0.9) + 90, flow_y, 3.0, 16, 23) * 0.2
 				var prof_c := 1.0 - pow(d / maxf(w, 1.0), 2.0) * 0.7
-				v = v * 0.95 + prof_c * 0.2 + lip_glow * 0.3 - 0.12
+				# a fast, thin layer of white streaks riding the flow
+				var fast := _vnoise(int(x * 0.7) + 140, flow_y * 1.6, 2.5, 24, 24)
+				if fast > 0.6:
+					v += 1.1 * (fast - 0.6)
+				v = v * 0.95 + prof_c * 0.24 + lip_glow * 0.3 - 0.08
+				# the bright core of the sheet, brightest down the middle
+				var core := 1.0 - clampf(d / maxf(w, 1.0), 0.0, 1.0)
+				v += 0.16 * core * core
 				v -= 0.22 * ((x - cx) / maxf(w, 1.0))
 				if d > w - 1.2:
 					v -= 0.22
@@ -296,4 +308,9 @@ func fall_frame(frame: int, fall_h := FALL_H) -> Image:
 				var fall := posmod(int(flow_y), 48)
 				if K.hash2(x, fall, 33) < 0.11 * (1.0 + lip_glow) and K.hash2(x + 7, fall + 3, 34) < 0.7:
 					im.set_pixel(x, y, Color(0.86, 0.95, 1.0, 0.55 if cover > -1.6 else 0.35))
+			# foam splashing around the plunge, in clumps that move with the frame
+			if Y > Hh - 18.0 and cover > -5.0 and cover <= 1.0:
+				var fc := K.hash2(int(x / 2), int(Y / 2) + frame * 3, 36)
+				if fc < 0.5 * (1.0 - absf(cover) / 5.0):
+					im.set_pixel(x, y, Color("f2fbff") if fc < 0.2 else Color("cfeaf6"))
 	return im

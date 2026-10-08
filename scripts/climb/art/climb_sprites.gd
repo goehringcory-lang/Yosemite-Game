@@ -187,6 +187,37 @@ static func _kit_key(kit: Dictionary) -> String:
 	return "".join(parts)
 
 
+## A colored outline: each dark edge takes a deep, saturated shade of the
+## color it runs along. The edge on the upper-left (where the light hits the
+## figure's outside) is lighter, so the outline breaks up there.
+static func _outline(im: Image) -> void:
+	var w := im.get_width()
+	var h := im.get_height()
+	var out := {}
+	for y in h:
+		for x in w:
+			if im.get_pixel(x, y).a > 0.1:
+				continue
+			# The opaque neighbor this pixel borders, if any (right and below
+			# count as lit-side neighbors: the outline is on our upper left).
+			var src := Color(0, 0, 0, 0)
+			var lit_side := false
+			for d in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+				var n: Vector2i = Vector2i(x, y) + d
+				if n.x < 0 or n.y < 0 or n.x >= w or n.y >= h:
+					continue
+				var c := im.get_pixel(n.x, n.y)
+				if c.a > 0.5:
+					src = c
+					lit_side = d == Vector2i.RIGHT or d == Vector2i.DOWN
+					break
+			if src.a > 0.5:
+				var v := src.v * (0.62 if lit_side else 0.34)
+				out[Vector2i(x, y)] = Color.from_hsv(src.h, minf(src.s + 0.2, 1.0), v, 1.0)
+	for p: Vector2i in out:
+		im.set_pixelv(p, out[p])
+
+
 ## Two-bone limb: the middle joint for a limb from [param a] reaching toward
 ## [param t], bending toward [param side] (+1 or -1). Returns [elbow, hand].
 static func _limb(a: Vector2, t: Vector2, l1: float, l2: float, side: float) -> Array[Vector2]:
@@ -283,7 +314,7 @@ static func _paint_climber(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 	var hx := tx + roundi(lean * 0.5)
 	var hy := ty - 14 + roundi(tilt * 0.3)
 	_head(im, hx, hy, tilt)
-	P.outline(im)
+	_outline(im)
 	return im
 
 
@@ -556,7 +587,7 @@ static func _paint_chimney(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 	P.ellipse(im, hx + 1, hy - 4, 6.0, 1.7, HAT)
 	P.shaded_ellipse(im, hx + 1, hy - 5, 3.6, 3.0, HAT, HAT.lightened(0.3), HAT.darkened(0.22))
 	P.hline(im, hx - 2, hy - 3, 7, Color("c8a050"))
-	P.outline(im)
+	_outline(im)
 	if int(pose.get("side", -1)) > 0:
 		im.flip_x()
 		var shifted := P.make(SIZE.x, SIZE.y)
@@ -732,7 +763,7 @@ static func _paint_belayer(look: Dictionary, mode: String, frame: int) -> Image:
 	_belayer_head(im, id, look, hx, hy, look_up, skin, skin_lit, skin_shade)
 	# ---- arms
 	_belayer_arms(im, id, look, mode, frame, tx, ty, tw, th, top, skin, skin_shade, skin_lit, by2)
-	P.outline(im)
+	_outline(im)
 	return im
 
 
@@ -1008,7 +1039,7 @@ static func hardware(kind: String, color_index := 0) -> Texture2D:
 			P.hline(im, 3, 0, 6, STEEL_LIT)
 			P.rect(im, 5, 1, 2, 1, STEEL_DARK)
 			P.rect(im, 5, 3, 2, 2, STEEL_DARK)
-	P.outline(im)
+	_outline(im)
 	var tex := ImageTexture.create_from_image(im)
 	_cache[key] = tex
 	return tex

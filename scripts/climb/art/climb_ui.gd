@@ -119,13 +119,26 @@ static func panel(ci: CanvasItem, r: Rect2, paper := PAPER, frame := true) -> vo
 	if frame:
 		ci.draw_rect(r, WOOD_DARK)
 		ci.draw_rect(r.grow(-1), WOOD)
+		# Bevel: the upper-left rims catch the light, the lower-right rims fall
+		# into shade.
 		ci.draw_rect(Rect2(r.position + Vector2(1, 1), Vector2(r.size.x - 2, 1)), WOOD_HI)
 		ci.draw_rect(Rect2(r.position + Vector2(1, 1), Vector2(1, r.size.y - 2)), WOOD_LIGHT)
+		ci.draw_rect(Rect2(r.position + Vector2(r.size.x - 2, 2), Vector2(1, r.size.y - 4)), WOOD_DARK)
 		ci.draw_rect(Rect2(r.position + Vector2(1, r.size.y - 2), Vector2(r.size.x - 2, 1)), WOOD_DARK)
+		# Grain: short darker and lighter dashes along the top and bottom rails.
+		for gx in range(7, int(r.size.x) - 9, 11):
+			var k := gx / 11
+			ci.draw_rect(Rect2(r.position + Vector2(gx, 2 + k % 2), Vector2(4, 1)), WOOD_LIGHT)
+			ci.draw_rect(Rect2(r.position + Vector2(gx + 5, r.size.y - 3 - k % 2), Vector2(3, 1)), WOOD_DARK)
 		var inner := r.grow(-3)
 		ci.draw_rect(inner, PAPER_DARK)
 		ci.draw_rect(inner.grow(-1), paper)
-		ci.draw_rect(Rect2(inner.position + Vector2(1, 1), Vector2(inner.size.x - 2, 1)), paper.lightened(0.35))
+		# The paper sits in a recess: the frame throws a shadow across its top
+		# and left, and the bottom and right catch a little light.
+		ci.draw_rect(Rect2(inner.position + Vector2(1, 1), Vector2(inner.size.x - 2, 1)), PAPER_DARK.darkened(0.12))
+		ci.draw_rect(Rect2(inner.position + Vector2(1, 1), Vector2(1, inner.size.y - 2)), PAPER_DARK.darkened(0.06))
+		ci.draw_rect(Rect2(inner.position + Vector2(inner.size.x - 2, 2), Vector2(1, inner.size.y - 4)), paper.lightened(0.18))
+		ci.draw_rect(Rect2(inner.position + Vector2(2, 2), Vector2(inner.size.x - 4, 1)), paper.lightened(0.35))
 		# Little rivets in the corners.
 		for c: Vector2 in [Vector2(2, 2), Vector2(r.size.x - 4, 2), Vector2(2, r.size.y - 4), Vector2(r.size.x - 4, r.size.y - 4)]:
 			ci.draw_rect(Rect2(r.position + c, Vector2(2, 2)), WOOD_DARK)

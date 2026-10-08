@@ -70,7 +70,7 @@ func _ready() -> void:
 			scale_amount_max = 1.5
 			emitting = false
 			fade.offsets = PackedFloat32Array([0.0, 0.3, 0.7, 1.0])
-			fade.colors = PackedColorArray([Color(1, 1, 0.5, 0.0), Color(1, 0.95, 0.5, 0.95), Color(1, 0.95, 0.5, 0.95), Color(1, 1, 0.5, 0.0)])
+			fade.colors = PackedColorArray([Color(0.6, 0.8, 0.2, 0.0), Color(0.9, 1.0, 0.4, 0.9), Color(0.9, 1.0, 0.4, 0.9), Color(0.6, 0.8, 0.2, 0.0)])
 		"drift":
 			amount = 26
 			lifetime = 7.0
@@ -87,6 +87,11 @@ func _ready() -> void:
 			fade.offsets = PackedFloat32Array([0.0, 0.15, 0.85, 1.0])
 			fade.colors = PackedColorArray([Color(1, 1, 1, 0.0), Color(1, 1, 1, 0.9), Color(1, 1, 1, 0.9), Color(1, 1, 1, 0.0)])
 	color_ramp = fade
+	if effect == "fireflies":
+		# Fireflies glow: additive, so they show against the night tint.
+		var add := CanvasItemMaterial.new()
+		add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		material = add
 
 
 func _process(_delta: float) -> void:
@@ -102,7 +107,8 @@ func _process(_delta: float) -> void:
 			_:
 				emitting = false
 	elif effect == "fireflies":
-		emitting = _darkness() > 0.35
+		# Summer nights only: no fireflies in spring, fall or winter.
+		emitting = GameClock.season == GameClock.Season.SUMMER and _darkness() > 0.35
 	elif effect == "smoke":
 		# Chimneys smoke in the cold months and at either end of the day.
 		var hour := GameClock.hour

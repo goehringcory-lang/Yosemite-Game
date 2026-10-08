@@ -57,7 +57,7 @@ static func sky(pal: Dictionary) -> Image:
 	# The pattern repeats every 4 pixels across, so paint one 4-wide strip
 	# and copy it along the sky.
 	var strip := Image.create_empty(4, SCREEN.y, false, Image.FORMAT_RGBA8)
-	var bands := 9
+	var bands := 12
 	for y in SCREEN.y:
 		var t := y / float(SCREEN.y - 1)
 		for x in 4:
@@ -112,24 +112,45 @@ static func _inside(p: Vector2i) -> bool:
 	return p.x >= 0 and p.y >= 0 and p.x < SCREEN.x and p.y < SCREEN.y
 
 
-## A small puffy cloud, white on top and shaded underneath.
+## A small puffy cloud: three tones, lit on the top-left puffs, a flat
+## shaded underside, and a thin bluish outline under it.
 static func cloud(pal: Dictionary, seed_value: int) -> Image:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
 	var w := rng.randi_range(36, 64)
 	var im := Image.create_empty(w, 22, false, Image.FORMAT_RGBA8)
-	var lit := (pal.low as Color).lerp(Color.WHITE, 0.75)
-	var shade := (pal.mid as Color).lerp(Color.WHITE, 0.35)
+	var hi := (pal.low as Color).lerp(Color.WHITE, 0.8)
+	var base := (pal.low as Color).lerp(Color.WHITE, 0.45)
+	var shade := (pal.mid as Color).lerp(Color.WHITE, 0.22)
+	var line := (pal.mid as Color).darkened(0.12)
 	var puffs := []
 	for i in rng.randi_range(3, 5):
 		puffs.append(Vector3(rng.randi_range(8, w - 8), rng.randi_range(9, 13), rng.randi_range(5, 9)))
-	for y in 22:
+	var mask := PackedByteArray()
+	mask.resize(w * 22)
+	for y in 18:
 		for x in w:
 			for p: Vector3 in puffs:
 				var d := Vector2(x - p.x, (y - p.y) * 1.3).length()
 				if d <= p.z and y <= 17:
-					im.set_pixel(x, y, shade if y > p.y + 1 else lit)
+					mask[y * w + x] = 1
 					break
+	for y in 18:
+		for x in w:
+			if mask[y * w + x] == 0:
+				continue
+			var above := y == 0 or mask[(y - 1) * w + x] == 0
+			var col := base
+			if y >= 13:
+				col = shade
+			elif above and x < w * 0.7:
+				col = hi
+			elif y < 8 and x < w * 0.5:
+				col = hi
+			im.set_pixel(x, y, col)
+	# Outline on the transparent pixels under the cloud only.
+	for y in range(1, 19):
+		for x in w:
+			if mask[y * w + x] == 0 and mask[(y - 1) * w + x] == 1 and y >= 14:
+				im.set_pixel(x, y, line)
 	return im
-
-

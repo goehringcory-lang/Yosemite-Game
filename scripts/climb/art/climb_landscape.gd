@@ -20,7 +20,7 @@ const PAD := 110
 ## Base line of each depth layer (0 far .. 2 near) in the layer's picture,
 ## and how much haze it carries.
 const LAYER_BASE := [176, 198, 220]
-const LAYER_HAZE := [0.3, 0.2, 0.08]
+const LAYER_HAZE := [0.4, 0.24, 0.09]
 ## Warm granite, lit to deep shade: cream, tan, body, blue shade, deep.
 const GRANITE := ["f6e2b0", "dcb886", "b09478", "7f7ea0", "524f78"]
 ## How much of the sky's tint each tone takes.
@@ -108,13 +108,19 @@ static func _lit(col: Color, pal: Dictionary, tint: float, fade: float) -> Color
 	var lum: float = pal.get("lum", 1.0)
 	var out := Color(col.r * lum, col.g * lum, col.b * lum)
 	out = out.lerp(pal.tint, tint * minf(lum, 1.0))
-	var haze: Color = (pal.low as Color).lerp(pal.mid, 0.45)
+	# Distance is bluer as well as paler: the haze leans toward sky blue.
+	var haze: Color = _haze(pal)
 	return out.lerp(haze, fade)
+
+
+## The air between the valley and the far walls: pale, and a little blue.
+static func _haze(pal: Dictionary) -> Color:
+	return (pal.low as Color).lerp(pal.mid, 0.45).lerp(Color("a4c8ec"), 0.22)
 
 
 ## The haze color a layer fades toward, and the rock tones at that depth.
 static func _body(pal: Dictionary, l: int) -> Dictionary:
-	var haze: Color = (pal.low as Color).lerp(pal.mid, 0.45)
+	var haze: Color = _haze(pal)
 	var fade: float = LAYER_HAZE[l]
 	var ramp: Array[Color] = []
 	for k in 5:

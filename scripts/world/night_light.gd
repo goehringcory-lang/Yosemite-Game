@@ -21,9 +21,10 @@ var _phase := 0.0
 
 func _ready() -> void:
 	if _glow == null:
+		# A soft pool: bright at the lamp, then an eased fall-off with no hard rim.
 		var gradient := Gradient.new()
-		gradient.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
-		gradient.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.45), Color(1, 1, 1, 0)])
+		gradient.offsets = PackedFloat32Array([0.0, 0.2, 0.5, 0.78, 1.0])
+		gradient.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.7), Color(1, 1, 1, 0.3), Color(1, 1, 1, 0.07), Color(1, 1, 1, 0)])
 		_glow = GradientTexture2D.new()
 		_glow.gradient = gradient
 		_glow.fill = GradientTexture2D.FILL_RADIAL
@@ -54,5 +55,6 @@ func _process(delta: float) -> void:
 	if flicker > 0.0 and level > 0.0:
 		_phase += delta * 9.0
 		level *= 1.0 - flicker * (0.5 + 0.5 * sin(_phase) * sin(_phase * 0.37 + 1.0))
-	energy = level
+	# A touch over 1 so a lamp clearly lifts the blue night, not just a speck.
+	energy = level * 1.25
 	visible = level > 0.01

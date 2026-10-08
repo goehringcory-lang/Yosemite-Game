@@ -153,7 +153,7 @@ const BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 # Tone ramps, dark to light. Shadows lean blue-green, lights lean yellow.
 const PINE_NEEDLE := ["1f3a2c", "2b4d33", "3a6438", "4e7d3c", "679644", "84b04c", "a6c95c", "c9e07e"]
 const CEDAR_LEAF := ["1a3524", "24472c", "305c34", "3f7440", "528e4a", "6ca85a", "8cc272"]
-const FIR_LEAF := ["16323a", "1e453f", "2a5c4b", "3a7659", "4f9068", "6aac7c", "8cc796"]
+const FIR_LEAF := ["173a37", "1f4c40", "2d6046", "467a51", "628f5c", "80a86c", "a6c382"]
 const OAK_LEAF := ["1c3a2e", "26482f", "345f34", "487a3a", "639441", "84ae4b", "a9c95f", "cfe486"]
 ## The oak's leaves in spring (new pink-green growth) and fall (gold and rust).
 const OAK_LEAF_SPRING := ["2a4a30", "3a6538", "559040", "76b150", "9ccd66", "bfe284", "dcf2a4", "f0fac4"]
@@ -166,6 +166,8 @@ const BARK_OAK := ["221c1c", "372f2d", "504640", "6b5f55", "877a6c", "a3968a"]
 const BARK_FIR := ["2a2726", "403b39", "5a534f", "766d66", "928779"]
 const BARK_DEAD := ["2e2a29", "4a4340", "685f58", "8a7e71", "b0a290", "d0c4b0"]
 const GRANITE := ["30343f", "484d5a", "626773", "7d818b", "9a9da2", "b8b7b1", "d5d0c2", "ece6d6"]
+## Boulder tones: cool violet-gray in the shadow, warm cream where the sun hits.
+const ROCK_TONE := ["2a2834", "3e3b4e", "59566a", "767688", "9896a0", "b8b2ac", "d8ccb4", "f4ead0"]
 
 
 static func c(hex: String) -> Color:
@@ -196,9 +198,53 @@ static func shade(r: Array[Color], t: float, x: int, y: int) -> Color:
 	return r[i + 1] if (frac - 0.3) / 0.4 > bayer(x, y) else r[i]
 
 
+
+
+## Picks a tone from a dark-to-light ramp. Only the middle band between two
+## steps is dithered, and in 2x2 clusters rather than single pixels, so the
+## surface reads as texture instead of static.
+static func shade_c(r: Array[Color], t: float, x: int, y: int) -> Color:
+	var f := clampf(t, 0.0, 0.9999) * (r.size() - 1)
+	var i := int(f)
+	var frac := f - i
+	if frac < 0.4:
+		return r[i]
+	if frac > 0.6:
+		return r[i + 1]
+	return r[i + 1] if (frac - 0.4) / 0.2 > K.hash2(x >> 1, y >> 1, 77) else r[i]
+
+
+## A lit leaf clump: a sphere lit from the upper left with clustered leaf
+## texture (3 px cells) and a scalloped edge. The clump gets a light rim on
+## its upper-left edge and a dark rim on its lower-right edge, so each clump
+## reads against the ones around it. [param bias] lightens or darkens it.
+static func blob(im: Image, cx: float, cy: float, rx: float, ry: float, r: Array[Color], seed_value: int, bias := 0.0, tex := 0.16, jag := 0.16) -> void:
+	for y in range(floori(cy - ry - 1.0), ceili(cy + ry + 1.0) + 1):
+		for x in range(floori(cx - rx - 1.0), ceili(cx + rx + 1.0) + 1):
+			var dx := (x + 0.5 - cx) / rx
+			var dy := (y + 0.5 - cy) / ry
+			var d2 := dx * dx + dy * dy
+			# scalloped silhouette: a slow wave around the rim, plus a little per-cell jag
+			var ang := atan2(dy, dx)
+			var wave := sin(ang * 5.0 + float(seed_value % 17)) * 0.05 + sin(ang * 9.0 + float(seed_value % 11)) * 0.03
+			var edge := 1.0 + wave + (K.hash2(x >> 1, y >> 1, seed_value) - 0.5) * jag * 2.0
+			if d2 > edge * edge:
+				continue
+			var nz := sqrt(maxf(0.0, 1.0 - d2))
+			var lam := dx * LIGHT.x + dy * LIGHT.y + nz * LIGHT.z
+			var outer := d2 > (edge * 0.78) * (edge * 0.78)
+			var t := 0.5 + lam * 0.62 + (K.hash2(x / 3, y / 3, seed_value + 5) - 0.5) * tex * 2.0 + bias
+			if outer:
+				# rim: the upper-left edge catches light, the lower-right falls into shade
+				t = (0.92 if lam > 0.12 else (0.22 if lam < -0.1 else t))
+			K.px(im, x, y, shade_c(r, t, x, y))
+
+
+
+
 ## A lit, jagged-edged leaf mass: a sphere lit from the upper left with leafy
 ## texture noise. [param bias] lightens or darkens the whole clump.
-static func blob(im: Image, cx: float, cy: float, rx: float, ry: float, r: Array[Color], seed_value: int, bias := 0.0, tex := 0.16, jag := 0.16) -> void:
+static func blob_orig(im: Image, cx: float, cy: float, rx: float, ry: float, r: Array[Color], seed_value: int, bias := 0.0, tex := 0.16, jag := 0.16) -> void:
 	for y in range(floori(cy - ry - 1.0), ceili(cy + ry + 1.0) + 1):
 		for x in range(floori(cx - rx - 1.0), ceili(cx + rx + 1.0) + 1):
 			var dx := (x + 0.5 - cx) / rx
@@ -338,6 +384,11 @@ static func tuft(im: Image, cx: float, cy: float, rad: float, r: Array[Color], s
 ## A frilly droop of foliage for cedars and firs: a flat lit ellipse.
 static func fan(im: Image, cx: float, cy: float, rx: float, ry: float, r: Array[Color], seed_value: int, bias := 0.0) -> void:
 	blob(im, cx, cy, rx, ry, r, seed_value, bias, 0.13, 0.12)
+
+
+## A 0 or 1 offset for a conifer bough's underside, so the shadow line is broken.
+static func edge_wave(k: int, seed_value: int) -> float:
+	return 1.0 if K.hash2(k, 5, seed_value) > 0.55 else 0.0
 
 
 static func line(im: Image, x0: float, y0: float, x1: float, y1: float, col: Color) -> void:
@@ -507,6 +558,14 @@ func tree_cedar(v: int) -> Image:
 			var by := y + rng.randf() * 1.6 + edge * edge * 3.4
 			var bias := -(bx - cx) / 15.0 * 0.16 - t * 0.08 - 0.07
 			fan(im, bx, by, hw / n * 1.05 + 2.4, 3.4 - t * 0.2, leaf, seed_value + tier * 7 + k, bias)
+			# drooping tips hanging off the lower edge of the bough
+			if K.hash2(k, tier, seed_value + 9) > 0.4:
+				var sy := roundi(by + 2.6 + K.hash2(k, tier, seed_value + 10) * 1.6)
+				K.px(im, roundi(bx), sy, leaf[1])
+				K.px(im, roundi(bx) + (1 if bx > cx else -1), sy + 1, leaf[0])
+		# shadowed underside of the bough, broken so it reads as needles
+		for k in range(0, int(hw * 2.0), 2):
+			K.px(im, roundi(cx - hw) + k, roundi(y + 3.4 + edge_wave(k, seed_value + tier)), Color(leaf[0], 0.55))
 		y += 4.4 + t * 0.9
 		tier += 1
 	# spire
@@ -543,6 +602,11 @@ func tree_fir() -> Image:
 			var by := y + edge * edge * 2.6 + rng.randf() * 1.2
 			var bias := -(bx - cx) / 15.0 * 0.15 - t * 0.06 - 0.06
 			fan(im, bx, by, hw / n * 1.0 + 2.0, 2.8, leaf, seed_value + tier * 9 + k, bias)
+			if K.hash2(k, tier, seed_value + 9) > 0.45:
+				var sy := roundi(by + 2.2 + K.hash2(k, tier, seed_value + 10) * 1.4)
+				K.px(im, roundi(bx), sy, leaf[1])
+		for k in range(0, int(hw * 2.0), 2):
+			K.px(im, roundi(cx - hw) + k, roundi(y + 2.8 + edge_wave(k, seed_value + tier)), Color(leaf[0], 0.55))
 		y += 3.8 + t * 0.8
 		tier += 1
 	# leader with a tapering spire
@@ -595,6 +659,33 @@ func tree_oak(v: int, season := 1) -> Image:
 			var ly := 38.0 + v * 1.5 + sin(a) * d * 24.0
 			K.px(im, int(lx), int(ly), Color("7a5a38") if i % 3 else Color("a08052"))
 			K.px(im, int(lx) + 1, int(ly), Color("5a4028"))
+		# snow caps: a white crust along the top of each limb and twig, a blue
+		# shadow beneath it, and a few drifts left in the fork
+		var snow := ramp(["c8d8e6", "e8f0f6", "fbfdff"])
+		for l: Array in limbs:
+			var lx0 := fx + float(l[0])
+			var ly0 := float(l[1])
+			for s in 14:
+				var t := float(s) / 13.0
+				var p := Vector2(lerpf(fx, lx0, t), lerpf(float(fork_y) + 2.0, ly0, t))
+				if K.hash2(s / 3, int(lx0), seed_value + 61) > 0.4:
+					K.hline(im, roundi(p.x) - 1, roundi(p.y) - 2, 3, snow[1])
+					K.px(im, roundi(p.x), roundi(p.y) - 2, snow[2])
+					K.px(im, roundi(p.x), roundi(p.y) - 1, snow[0])
+		for l: Array in limbs:
+			var ex := fx + float(l[0])
+			var ey := float(l[1])
+			for t in 5:
+				var ang := (t - 2.0) * 0.62 + (K.hash2(t, int(ex), seed_value) - 0.5) * 0.4
+				var reach := 9.0 + K.hash2(t, int(ey), seed_value + 3) * 7.0
+				var tip := Vector2(ex + sin(ang) * reach * 0.7, ey - cos(ang) * reach * 0.7 - 1.0)
+				K.px(im, roundi(tip.x), roundi(tip.y), snow[2])
+				K.px(im, roundi(tip.x) - 1, roundi(tip.y), snow[1])
+				K.px(im, roundi(tip.x), roundi(tip.y) + 1, snow[0])
+		var drift_c := Vector2(fx, float(fork_y) + 2.0)
+		for k in 9:
+			var dxk := roundi((K.hash2(k, 2, seed_value + 67) - 0.5) * 22.0)
+			K.hline(im, roundi(drift_c.x) + dxk - 2, roundi(drift_c.y) - 1 - k % 2, 4, snow[1])
 		rim(im, 0.5)
 		return im
 	# canopy clumps, sorted so lower ones overlap the ones behind them
@@ -611,18 +702,18 @@ func tree_oak(v: int, season := 1) -> Image:
 		clumps.append(Vector3(bx, by, 6.5 + rng.randf() * 5.5))
 	clumps.sort_custom(func(a: Vector3, b: Vector3) -> bool: return a.y < b.y)
 	# dark mass behind everything for depth
-	blob(im, dome_cx, dome_cy + 3.0, rx_dome * 0.86, ry_dome * 0.78, leaf, seed_value + 1, -0.4, 0.1, 0.05)
+	blob_orig(im, dome_cx, dome_cy + 3.0, rx_dome * 0.86, ry_dome * 0.78, leaf, seed_value + 1, -0.4, 0.1, 0.05)
 	for i in clumps.size():
 		var cl := clumps[i]
 		var g := ((dome_cx - cl.x) * 0.5 + (dome_cy - cl.y) * 0.75) / 34.0
 		var bias := clampf(g, -0.3, 0.16) - 0.38
-		blob(im, cl.x, cl.y, cl.z, cl.z * 0.82, leaf, seed_value + 9 * i, bias, 0.17, 0.17)
+		blob_orig(im, cl.x, cl.y, cl.z, cl.z * 0.82, leaf, seed_value + 9 * i, bias, 0.17, 0.17)
 		leaf_specks(im, cl.x, cl.y, cl.z, cl.z * 0.82, leaf, seed_value + i * 5, 7)
 	# a low branch crossing in front of the trunk and a leaf drape under the crown
 	limb(im, fx + 1.0, float(fork_y) + 4.0, fx + 12.0 * spread, float(fork_y) - 3.0, 4.0, 2.0, bark, seed_value + 77, 1.5)
 	for i in 3:
 		var lx := fx + (i - 1) * 15.0 * spread + rng.randf_range(-3.0, 3.0)
-		blob(im, lx, dome_cy + ry_dome * 0.86, 7.0, 4.5, leaf, seed_value + 130 + i, -0.42, 0.15, 0.2)
+		blob_orig(im, lx, dome_cy + ry_dome * 0.86, 7.0, 4.5, leaf, seed_value + 130 + i, -0.42, 0.15, 0.2)
 	rim(im, 0.5)
 	return im
 
@@ -984,22 +1075,24 @@ func plant_lupine() -> Image:
 		for k in range(1, 8):
 			var x := 12.0 + sin(a) * k * 1.1
 			var y := h - 3.0 - cos(a) * k * 0.55 - k * 0.15
-			K.px(im, roundi(x), roundi(y), shade(leaf, 0.3 + float(k) / 8.0 * 0.4 + (0.1 if a < 0.0 else 0.0), roundi(x), roundi(y)))
+			K.px(im, roundi(x), roundi(y), shade_c(leaf, 0.3 + float(k) / 8.0 * 0.4 + (0.1 if a < 0.0 else 0.0), roundi(x), roundi(y)))
 	var florets := ramp(["4a3591", "5b45a8", "7059c2", "8d7ad8", "adaaee", "d8d4fa"])
 	for s in 4:
 		var sx := 6.0 + s * 4.0 + rng.randf_range(-1.0, 1.0)
 		var top := 4.0 + rng.randf() * 6.0
 		for y in range(int(top), h - 4):
 			K.px(im, roundi(sx), y, leaf[2])
-		for y in range(int(top), int(top) + 15, 2):
+		# florets stack up the spike in solid rows: lit on the left, shaded on the right
+		for y in range(int(top), int(top) + 15):
 			var t := float(y - int(top)) / 14.0
-			var fw := 1 + int((1.0 - t) * 0.0)
+			var tone := 0.92 - t * 0.7
 			for dx in [-1, 0, 1]:
-				if (y / 2 + dx) % 2 == 0 or dx == 0:
-					K.px(im, roundi(sx) + dx, y, shade(florets, 0.9 - t * 0.8 - dx * 0.06 + (K.hash2(s, y, 5) - 0.5) * 0.2, roundi(sx) + dx, y))
-			K.px(im, roundi(sx) - 1, y + 1, florets[1])
-			K.px(im, roundi(sx) + 1, y + 1, florets[2])
+				var k := 0.0 if dx == -1 else (0.5 if dx == 0 else 1.0)
+				if y % 3 == 2 and dx == 1:
+					continue
+				K.px(im, roundi(sx) + dx, y, shade_c(florets, tone - k * 0.18 + (K.hash2(s, y, 5) - 0.5) * 0.08, roundi(sx) + dx, y))
 		K.px(im, roundi(sx), int(top) - 1, florets[5])
+		K.px(im, roundi(sx) - 1, int(top), florets[4])
 	rim(im, 0.42)
 	return im
 
@@ -1049,46 +1142,65 @@ func plant_wildflowers(v: int) -> Image:
 	rng.seed = 3300 + v * 19
 	var grass := ramp(GRASS_GOLD)
 	var leaf := ramp(FERN_LEAF)
-	for i in 8:
+	K.shadow(im, w / 2.0, h - 2.0, 13.0, 2.2, 0.2)
+	for i in 9:
 		blade(im, 3.0 + rng.randf() * 26.0, h - 2.0, 4.0 + rng.randf() * 5.0, rng.randf_range(-2.0, 2.0), grass, 3300 + i, false)
-	for i in 12:
+	# stems first (two greens, dark on the shade side and light on the lit side),
+	# then the heads on top, back to front
+	var stems: Array[Vector3] = []
+	for i in 13:
 		var x := 3 + int(rng.randf() * 26.0)
 		var top := 3 + int(rng.randf() * 7.0)
+		stems.append(Vector3(x, top, i))
+	stems.sort_custom(func(p: Vector3, q: Vector3) -> bool: return p.y > q.y)
+	for s in stems:
+		var x := int(s.x)
+		var top := int(s.y)
 		for y in range(top + 1, h - 2):
-			K.px(im, x, y, leaf[2 + (y % 2)])
+			K.px(im, x, y, leaf[2] if (y % 3) else leaf[3])
+			if y % 2 == 0:
+				K.px(im, x + 1, y, leaf[1])
+		# a pair of grass leaves at the foot of each stem
+		K.px(im, x - 1, h - 3, leaf[3])
+		K.px(im, x - 2, h - 4, leaf[2])
+		K.px(im, x + 2, h - 3, leaf[2])
 		match v:
-			0: # lupine and yarrow
-				if i % 3 == 0:
-					K.px(im, x - 1, top, c("ffffff"))
-					K.hline(im, x - 2, top + 1, 5, c("f2efe0"))
-					K.px(im, x, top - 1, c("fbf8ea"))
-					K.hline(im, x - 2, top + 2, 5, c("d8d2b8"))
+			0: # lupine spikes and yarrow
+				if int(s.z) % 3 == 0:
+					K.hline(im, x - 2, top + 1, 5, c("f8f5e8"))
+					K.hline(im, x - 3, top + 2, 7, c("e6e0c8"))
+					K.hline(im, x - 2, top + 3, 5, c("c9c2a4"))
+					K.px(im, x, top, c("fffdf2"))
+					K.px(im, x, top - 1, c("ffffff"))
 				else:
-					K.rect(im, x - 1, top, 3, 4, c("7a5fc9"))
-					K.px(im, x, top - 1, c("b6a6ee"))
+					for k in 4:
+						var sw := 2 if k < 3 else 1
+						K.hline(im, x - sw + (k % 2), top + k, sw * 2 + 1, shade_c(ramp(["4a3591", "5b45a8", "7059c2", "8d7ad8", "adaaee"]), 0.85 - float(k) * 0.2, x, top + k))
+					K.px(im, x, top - 1, c("c4b6f4"))
 					K.px(im, x - 1, top + 1, c("a692e6"))
-					K.px(im, x + 1, top + 3, c("4a3591"))
-			1: # poppies
-				K.rect(im, x - 1, top, 3, 2, c("f28a1c"))
+			1: # poppies, with a few blue cornflowers
+				K.rect(im, x - 1, top, 3, 2, c("e8731a"))
 				K.hline(im, x - 2, top + 1, 5, c("f6a428"))
 				K.px(im, x, top, c("ffd24a"))
-				K.px(im, x + 1, top + 1, c("d0660e"))
-				if i % 4 == 0:
-					K.px(im, x, top - 2, c("7fb2f0"))
-					K.px(im, x - 1, top - 1, c("a4ccf8"))
-					K.px(im, x + 1, top - 1, c("5a92d8"))
+				K.px(im, x + 1, top + 1, c("c9600e"))
+				K.px(im, x - 1, top + 2, c("b04c10"))
+				if int(s.z) % 4 == 0:
+					K.rect(im, x - 1, top - 2, 2, 2, c("5a92d8"))
+					K.px(im, x - 1, top - 2, c("a4ccf8"))
+					K.px(im, x, top - 1, c("7fb2f0"))
 			2: # shooting stars and yarrow
-				if i % 3 != 0:
-					K.px(im, x, top, c("3a2a3a"))
-					K.vline(im, x - 1, top - 3, 3, c("d84a9c"))
-					K.vline(im, x + 1, top - 3, 3, c("b83a86"))
+				if int(s.z) % 3 != 0:
+					K.px(im, x, top + 1, c("3a2a3a"))
+					K.vline(im, x - 1, top - 3, 4, c("d84a9c"))
+					K.vline(im, x + 1, top - 3, 4, c("b83a86"))
 					K.px(im, x, top - 2, c("f8a0cc"))
-					K.px(im, x, top - 3, c("ffd0e4"))
-					K.px(im, x, top + 1, c("f0d048"))
+					K.px(im, x, top - 4, c("ffd0e4"))
+					K.px(im, x, top - 3, c("ffe8f2"))
 				else:
 					K.hline(im, x - 2, top, 5, c("fbf8ea"))
 					K.hline(im, x - 1, top - 1, 3, c("ffffff"))
 					K.hline(im, x - 2, top + 1, 5, c("d8d2b8"))
+					K.px(im, x, top, c("f0c040"))
 	return im
 
 
@@ -1222,12 +1334,15 @@ static func wobble(t: float, seed_value: int) -> float:
 ## squashes it; [param wet] adds a water-worn sheen and foam at the base.
 func rock(w: int, h: int, seed_value: int, moss := 0.0, lichen := 0.5, wet := false, cracks := 1.0) -> Image:
 	var im := K.make(w, h)
-	var gr := ramp(GRANITE)
+	var gr := ramp(ROCK_TONE)
+	var moss_ramp := ramp(["25402e", "31573a", "436f45", "588a52", "72a566", "96c17e"])
 	var base_y := h - 4
 	var rx := (w - 4) / 2.0
 	var ry := float(h - 6)
 	var cx := w / 2.0
-	K.shadow(im, cx + 2.0, base_y + 1.0, rx * 0.98, 2.6 + h * 0.03, 0.28)
+	# a soft wide shadow, then a tight dark contact line where the stone sits
+	K.shadow(im, cx + 2.0, base_y + 1.0, rx * 0.98, 2.6 + h * 0.03, 0.26)
+	K.shadow(im, cx + 1.0, base_y + 1.0, rx * 0.7, 1.4, 0.3)
 	# jittered cell centers for the facets
 	var cell := 9.0 + w * 0.06
 	var lumps := []
@@ -1258,23 +1373,20 @@ func rock(w: int, h: int, seed_value: int, moss := 0.0, lichen := 0.5, wet := fa
 				elif dd < d2c:
 					d2c = dd
 			var edge := sqrt(d2c) - sqrt(d1)
-			var t := 0.46 + lam * 0.36 + d1t * 0.3
-			var col := shade(gr, t + (K.hash2(x, y, seed_value + 9) - 0.5) * 0.1, x, y)
-			var sp := K.hash2(x, y, seed_value + 4)
-			if sp > 0.955:
-				col = gr[maxi(0, int(t * 5.0) - 2)]
-			elif sp < 0.03:
-				col = gr[mini(gr.size() - 1, int(t * 6.0) + 2)]
-			if edge < 0.9 * cracks and K.hash2(x / 3, y / 3, seed_value + 6) > 0.35:
+			var t := 0.42 + lam * 0.42 + d1t * 0.3
+			var col := shade_c(gr, t + (K.hash2(x >> 2, y >> 2, seed_value + 9) - 0.5) * 0.12, x, y)
+			# cracks run along the seams that some facets own, so they read as
+			# a few lines instead of a grid
+			if edge < 0.8 * cracks and d1t > 0.1:
 				col = gr[0].lerp(gr[1], 0.5)
-			elif edge < 1.7 * cracks and t > 0.4 and K.hash2(x, y, seed_value + 12) > 0.55:
-				col = shade(gr, t + 0.2, x, y)
-			# lichen on the lit side, moss in the lee
+			elif edge < 1.4 * cracks and d1t > 0.1 and t > 0.45:
+				col = shade_c(gr, t + 0.18, x, y)
+			# lichen on the lit side, moss in the lee: both grow in 2x2 patches
 			var ln := wobble(x * 0.5 + y * 0.31, seed_value + 20) + wobble(y * 0.7, seed_value + 21) * 0.5
-			if lichen > 0.0 and lam > 0.25 and ln > 0.85 - lichen * 0.5 and K.hash2(x, y, seed_value + 30) > 0.35:
-				col = c("b4bf80") if K.hash2(x, y, seed_value + 31) > 0.3 else c("cfb060")
+			if lichen > 0.0 and lam > 0.25 and ln > 0.85 - lichen * 0.5 and K.hash2(x >> 1, y >> 1, seed_value + 30) > 0.3:
+				col = c("b4bf80") if K.hash2(x >> 1, y >> 1, seed_value + 31) > 0.3 else c("cfb060")
 			if moss > 0.0 and (lam > 0.45 or y > base_y - 4) and wobble(x * 0.42 + y * 0.2, seed_value + 40) > 0.4 - moss * 0.9:
-				col = shade(ramp(["25402e", "31573a", "436f45", "588a52", "72a566", "96c17e"]), 0.35 + lam * 0.4 + (K.hash2(x, y, 2) - 0.5) * 0.25, x, y)
+				col = shade_c(moss_ramp, 0.35 + lam * 0.4 + (K.hash2(x >> 1, y >> 1, 2) - 0.5) * 0.25, x, y)
 			if y >= base_y - 1:
 				col = col.darkened(0.3)
 			if wet:

@@ -1,27 +1,36 @@
 extends "res://tools/hubs/curry_art.gd"
-## Curry Village's buildings, cabins and entrance arch redrawn in the
+## Curry Village's buildings, cabins, props and entrance arch redrawn in the
 ## Ahwahnee's style: the hotel's materials (cut-granite footings with moss,
 ## stained timber and plaster, mossy shingle roofs, painted signs), ramp-shaded
-## and ordered-dithered, light from the upper left, dark rim. Everything else
-## in the camp keeps curry_art.gd's version. Every sprite keeps its size and
-## where its doors and signs sit, so the village scene needs no changes.
+## and ordered-dithered, light from the upper left, dark rim. Shingles, planks,
+## windows, signs and awnings are drawn here with hue-shifted tones (shadows
+## cool toward violet, lights warm toward yellow). Everything else in the camp
+## keeps curry_art.gd's version. Every sprite keeps its size and where its doors
+## and signs sit, so the village scene needs no changes.
 ## Written to assets/sprites/curry/ by save_all(). Replace any PNG with
 ## hand-drawn art of the same size at any time.
 
 const ValleyArt = preload("res://tools/hubs/valley_art.gd")
 const RIM := Color("231a16")
 
-## Roof ramps, dark to light.
+## Roof ramps for the gable and chimney code, dark to light.
 const GREEN_RAMP := ["1f3326", "2c4631", "3c5d3f", "4f7650", "698f62", "88aa7c"]
 const SLATE_RAMP := ["22262c", "30363e", "444c56", "5a6470", "76818c", "98a3ac"]
 const BROWN_RAMP := ["2c1c14", "46301f", "62432a", "7d5636", "9a7048", "b88c60"]
 const RED_RAMP := ["2e1814", "4e2a20", "6e3a2a", "8c4c36", "aa6448", "c68260"]
 const CANVAS_RAMP := ["6a6c76", "8e8d92", "b0aaa0", "cec6b0", "e6dec6", "f6f0dc"]
+## Base colors for the shingles and their five-step hue-shifted ramps.
+const GREEN_BASE := Color("4f7650")
+const SLATE_BASE := Color("5a6470")
+const BROWN_BASE := Color("8a5c3a")
+const RED_BASE := Color("a85a40")
+const PLANK_BASE := Color("9a7048")
+const MOSS := Color("5f8f4a")
 
 var mat := ValleyArt.new()
 
 
-## Runs [param draw] with the roof ramp swapped in for the shingles.
+## Runs [param draw] with the roof ramp swapped in for the gables.
 func _with_roof(ramp: Array, draw: Callable) -> void:
 	var saved := mat.roof
 	mat.roof = mat._ramp(ramp)
@@ -29,14 +38,232 @@ func _with_roof(ramp: Array, draw: Callable) -> void:
 	mat.roof = saved
 
 
-func _foundation(im: Image, w: int, h: int, fh: int, sd: int) -> void:
-	mat.stone_wall(im, 2, h - fh - 1, w - 4, fh, sd, 0.5, 3, 3, true)
-	K.hline(im, 2, h - fh - 1, w - 4, mat.granite[5])
+## Shifts [param col]: [param light] lightens or darkens it, and [param warm]
+## pulls the hue toward yellow (warm > 0, lights) or toward blue-violet
+## (warm < 0, shadows), the shorter way round the color wheel.
+func _tone(col: Color, light: float, warm: float) -> Color:
+	var target := 0.12 if warm > 0.0 else 0.58
+	var d := fposmod(target - col.h + 0.5, 1.0) - 0.5
+	var hue := fposmod(col.h + d * clampf(absf(warm) * 0.22, 0.0, 0.22), 1.0)
+	var sat := clampf(col.s + (0.03 if light > 0.0 else 0.0), 0.0, 1.0)
+	return Color.from_hsv(hue, sat, clampf(col.v + light, 0.0, 1.0), col.a)
 
 
-func _shade_right(im: Image, x: int, y: int, w: int, h: int) -> void:
-	ValleyArt.shade(im, x + w - 9, y, 8, h, mat.timber[0], 0.0, 0.85, 0.34, false)
-	ValleyArt.shade(im, x, y + 2, 4, h, mat.granite[6], 0.5, 0.0, 0.1, false)
+## A five-step ramp from [param base]: deep shadow, shade, base, light, lit edge.
+func _ramp5(base: Color) -> Array[Color]:
+	var out: Array[Color] = []
+	out.append(_tone(base, -0.26, -1.0))
+	out.append(_tone(base, -0.13, -0.6))
+	out.append(base)
+	out.append(_tone(base, 0.1, 0.6))
+	out.append(_tone(base, 0.2, 1.0))
+	return out
+
+
+## Shingle courses in hue-shifted tabs: each tab lit on its upper-left corner
+## and dark along its lower seam, courses stepping down the roof, a few moss
+## clusters on the lower courses, a lit ridge cap, and a dark fascia at the eave.
+func _shingles(im: Image, x: int, y: int, w: int, h: int, ramp: Array[Color], sd: int, taper: float) -> void:
+	var course := 3
+	for row in h:
+		var inset := int((h - 1 - row) * taper)
+		var ci := row / course
+		var inr := row % course
+		var off := (ci % 2) * 3
+		for sx in range(x + inset, x + w - inset):
+			var tab := (sx - x + off) / 5
+			var n := K.hash2(tab, ci, sd)
+			var idx := 1 + int(n * 3.0)
+			if inr == 0:
+				idx += 1
+			if inr == course - 1:
+				idx = 0
+			if sx - x - inset < 2:
+				idx += 1
+			if sx >= x + w - inset - 2:
+				idx -= 1
+			if (sx - x + off) % 5 == 4 and inr < course - 1:
+				idx = maxi(0, idx - 1)
+			var col := ramp[clampi(idx, 0, 4)]
+			if ci >= 1 and row > h * 0.4 and inr == 1 and K.hash2(sx / 2, ci, sd + 7) > 0.9:
+				col = MOSS.lerp(ramp[2], 0.25)
+			K.px(im, sx, y + row, col)
+	var ri := int((h - 1) * taper)
+	K.hline(im, x + ri, y, w - ri * 2, _tone(ramp[4], 0.1, 1.0))
+	K.hline(im, x + ri + 1, y + 1, w - ri * 2 - 2, ramp[3])
+	K.hline(im, x, y + h - 1, w, ramp[0].darkened(0.25))
+
+
+## Stained vertical planks: a lit left edge and shaded right edge on every
+## board, grain as short dashes in clusters, and a few knots.
+func _planks(im: Image, x: int, y: int, w: int, h: int, base: Color, sd: int, board := 5) -> void:
+	var ramp := _ramp5(base)
+	for xx in w:
+		var b := xx / board
+		var ib := xx % board
+		var btone := 1 + int(K.hash2(b, sd, 3) * 3.0)
+		if ib == 0:
+			btone += 1
+		if ib == board - 1:
+			btone = 0
+		for yy in h:
+			var idx := btone
+			var gs := K.hash2(b * 7 + ib, yy / 3, sd + 5)
+			if gs > 0.86:
+				idx -= 1
+			elif gs < 0.1:
+				idx += 1
+			if yy > h * 0.85:
+				idx -= 1
+			K.px(im, x + xx, y + yy, ramp[clampi(idx, 0, 4)])
+	for k in maxi(1, w * h / 160):
+		var kx := x + 2 + int(K.hash2(k, sd, 11) * (w - 4))
+		var ky := y + 2 + int(K.hash2(k, sd, 12) * (h - 4))
+		K.hline(im, kx, ky, 2, ramp[0])
+		K.px(im, kx, ky + 1, ramp[1])
+
+
+## A horizontal board of [param h] rows, lit on top and shaded at the bottom.
+func _slat(im: Image, x: int, y: int, w: int, h: int, ramp: Array[Color], sd: int) -> void:
+	for yy in h:
+		var idx := 2
+		if yy == 0:
+			idx = 4
+		elif yy == h - 1:
+			idx = 0
+		for xx in w:
+			var col := ramp[idx]
+			if K.hash2(xx, yy, sd) > 0.9 and yy > 0 and yy < h - 1:
+				col = ramp[clampi(idx - 1, 0, 4)]
+			K.px(im, x + xx, y + yy, col)
+	if w > 4:
+		K.px(im, x + w / 3, y + h - 1, ramp[0].darkened(0.2))
+
+
+## A sash window: a dark timber frame lit along its top, mullions, sky glass
+## with a glint (or warm lamplight with a shade when lit), and a granite sill.
+func _window(im: Image, x: int, y: int, w: int, h: int, lit: bool, sd: int) -> void:
+	K.rect(im, x - 2, y - 2, w + 4, h + 4, mat.timber[0])
+	K.rect(im, x - 1, y - 1, w + 2, h + 2, mat.timber[3])
+	K.hline(im, x - 1, y - 1, w + 2, mat.timber[4])
+	for gy in h:
+		var v := float(gy) / maxf(1.0, float(h - 1))
+		for gx in w:
+			var n := K.hash2(gx, gy, sd)
+			var col: Color
+			if lit:
+				col = mat.warm[clampi(roundi((0.9 - v * 0.6) * 6.0 + (n - 0.5) * 0.8) + 1, 1, 7)]
+			else:
+				col = mat.sky[clampi(roundi((0.95 - v * 0.75) * 4.0 + (n - 0.5) * 0.6), 0, 4)]
+				if gy >= h - 3:
+					col = mat.leaf[1] if gx % 4 != 2 else mat.leaf[2]
+			K.px(im, x + gx, y + gy, col)
+	if lit:
+		K.hline(im, x, y, w, mat.timber[0])
+		K.rect(im, x + w / 2 - 1, y + h / 3, 2, 2, mat.warm[7])
+	else:
+		K.px(im, x + 1, y + 2, Color(1, 1, 1, 0.85))
+		K.px(im, x + 2, y + 3, Color(1, 1, 1, 0.55))
+	K.vline(im, x + w / 2, y, h, mat.timber[2])
+	K.hline(im, x, y + h / 2, w, mat.timber[2])
+	K.rect(im, x - 3, y + h + 1, w + 6, 2, mat.granite[5])
+	K.hline(im, x - 3, y + h + 1, w + 6, mat.granite[6])
+	K.hline(im, x - 3, y + h + 3, w + 6, Color(0, 0, 0, 0.25))
+
+
+## A carved board sign: a dark routed edge, a lit bevel on top and left, a
+## shaded bottom, nail heads, and crisp lettering with a drop shadow.
+func _sign(im: Image, cx: int, y: int, text: String, ink := Color("f0e2bc")) -> void:
+	var w := K.text_width(text) + 8
+	var x := cx - w / 2
+	K.rect(im, x, y, w, 9, mat.timber[0])
+	K.rect(im, x + 1, y + 1, w - 2, 7, mat.timber[2])
+	K.hline(im, x + 1, y + 1, w - 2, mat.timber[4])
+	K.vline(im, x + 1, y + 1, 7, mat.timber[3])
+	K.hline(im, x + 1, y + 7, w - 2, mat.timber[1])
+	for k in 4:
+		K.hline(im, x + 3 + k * 9 % (w - 8), y + 4 + (k % 2), 3, mat.timber[1])
+	K.px(im, x + 2, y + 4, mat.iron[2])
+	K.px(im, x + w - 3, y + 4, mat.iron[2])
+	K.text(im, x + 4, y + 2, text, ink, mat.timber[0])
+
+
+## A striped fabric awning with folds: each fold a lit face and a dark crease,
+## a scalloped valance and a soft shadow under it.
+func _awning(im: Image, x: int, y: int, w: int, depth: int, a: Color, b: Color) -> void:
+	for row in depth:
+		for ax in w:
+			var stripe := (ax / 4) % 2 == 0
+			var col := a if stripe else b
+			var fold := (ax + 2) % 6
+			if fold == 0:
+				col = col.darkened(0.16)
+			elif fold == 1:
+				col = col.lightened(0.12)
+			col = col.lightened(0.08 - float(row) / depth * 0.2)
+			if row == depth - 1:
+				col = col.darkened(0.18)
+			K.px(im, x + ax, y + row, col)
+	for ax in range(0, w, 6):
+		var stripe := (ax / 4) % 2 == 0
+		var col := (a if stripe else b).darkened(0.24)
+		K.hline(im, x + ax + 1, y + depth, 4, col)
+		K.hline(im, x + ax + 2, y + depth + 1, 2, col)
+	K.rect(im, x + 1, y + depth + 2, w - 2, 1, Color(0, 0, 0, 0.18))
+
+
+## Hue-shifted horizontal deck boards with dark seams and grain.
+func _deck(im: Image, x: int, y: int, w: int, h: int, base: Color, sd: int) -> void:
+	var ramp := _ramp5(base)
+	for yy in h:
+		var board := yy / 3
+		var iy := yy % 3
+		for xx in w:
+			var idx := 2 + int(K.hash2(board, sd, 2) * 2.0)
+			if iy == 0:
+				idx += 1
+			elif iy == 2:
+				idx = 0
+			if K.hash2(xx / 4 + board * 9, yy, sd + 3) > 0.84:
+				idx -= 1
+			K.px(im, x + xx, y + yy, ramp[clampi(idx, 0, 4)])
+
+
+## A round market umbrella seen from the front: a canopy of wedge stripes, lit
+## on its upper left, with a cooler, darker underside and a shaded rim.
+func _umbrella(im: Image, cx: float, cy: float, rx: float, dome_h: float, a: Color, b: Color) -> void:
+	var rim_h := maxf(1.2, rx * 0.2)
+	for x in range(floori(cx - rx) - 1, ceili(cx + rx) + 2):
+		var dx := (x + 0.5 - cx) / rx
+		if absf(dx) > 1.0:
+			continue
+		var round_k := sqrt(1.0 - dx * dx)
+		# the dome's silhouette, the front rim, and a scalloped hem below the rim
+		var top_y := cy - dome_h * round_k
+		var rim_y := cy + rim_h * round_k
+		var lobe := fposmod((dx + 1.0) * 4.0, 1.0)
+		var hem_y := rim_y + 0.6 + 0.7 * sin(lobe * PI)
+		# red and white wedges follow the dome's meridians: they bunch at the
+		# top and spread toward the rim
+		var theta := asin(clampf(dx, -1.0, 1.0))
+		var k := clampi(floori((theta / (PI / 2.0) + 1.0) * 4.0), 0, 7)
+		var stripe := a if k % 2 == 0 else b
+		for y in range(floori(top_y), ceili(hem_y) + 1):
+			var fy := float(y) + 0.5
+			if fy < top_y or fy > hem_y:
+				continue
+			var col := stripe
+			if fy > rim_y:
+				# the underside band visible at the rim: darker and cooler
+				col = _tone(stripe, -0.2, -0.6)
+			elif dx < -0.2 and fy < cy - dome_h * 0.35:
+				# lit on the upper left
+				col = _tone(stripe, 0.12, 0.6)
+			elif dx > 0.45:
+				col = _tone(stripe, -0.08, -0.3)
+			if y == floori(top_y):
+				col = col.darkened(0.12)
+			K.px(im, x, y, col)
 
 
 # ---------------------------------------------------------------- buildings
@@ -50,10 +277,10 @@ func _base_registration() -> Image:
 	K.shadow(im, w / 2.0, h - 2.5, w / 2.0 - 1.0, 2.6, 0.3)
 	var roof_h := 26
 	var wall_top := roof_h + 1
-	mat.board_wall(im, 3, wall_top, w - 6, h - wall_top - 8, 71, 3)
+	_planks(im, 3, wall_top, w - 6, h - wall_top - 8, PLANK_BASE, 71)
 	_foundation(im, w, h, 7, 72)
+	_shingles(im, 0, 2, w, roof_h - 1, _ramp5(GREEN_BASE), 73, 0.2)
 	_with_roof(GREEN_RAMP, func() -> void:
-		mat.shingle_roof(im, 0, 2, w, roof_h - 1, 73, 0.2)
 		mat.gable(im, 44, wall_top - 1, 16, 15, 3, 74, true, 6)
 		mat.chimney(im, 14, 8, 12, 75))
 	mat.eave(im, 0, wall_top - 2, w)
@@ -61,20 +288,29 @@ func _base_registration() -> Image:
 	mat.beam(im, 1, wall_top + 2, w - 2, 76, 3)
 	for px_x in [4, 24, 43, 62, 81]:
 		mat.post(im, px_x, wall_top + 5, h - wall_top - 15, 77 + px_x, 3)
-	for yy in 3:
-		K.hline(im, 1, h - 10 + yy, w - 2, mat.timber[4 - yy])
+	_deck(im, 1, h - 10, w - 2, 3, Color("b08a5c"), 78)
 	for wx in [10, 30, 57, 71]:
-		mat.window(im, wx, wall_top + 9, 7, 9, K.hash2(wx, 5, 5) < 0.6, 80 + wx)
+		_window(im, wx, wall_top + 9, 7, 9, K.hash2(wx, 5, 5) < 0.6, 80 + wx)
 	mat.plank_door(im, w / 2, h - 9, 15, 81, 12)
 	# the clock over the door
 	K.ellipse(im, w / 2.0, wall_top + 5.0, 3.8, 3.8, mat.timber[0])
 	K.ellipse(im, w / 2.0, wall_top + 5.0, 3.0, 3.0, Color("f0e6c8"))
 	K.vline(im, w / 2, wall_top + 3, 3, RIM)
 	K.hline(im, w / 2, wall_top + 5, 2, RIM)
-	mat.sign_board(im, w / 2, wall_top - 12, "REGISTRATION")
+	_sign(im, w / 2, wall_top - 12, "REGISTRATION")
 	_shade_right(im, 3, wall_top, w - 6, h - wall_top - 8)
 	K.outline(im, RIM)
 	return im
+
+
+func _foundation(im: Image, w: int, h: int, fh: int, sd: int) -> void:
+	mat.stone_wall(im, 2, h - fh - 1, w - 4, fh, sd, 0.5, 3, 3, true)
+	K.hline(im, 2, h - fh - 1, w - 4, mat.granite[5])
+
+
+func _shade_right(im: Image, x: int, y: int, w: int, h: int) -> void:
+	ValleyArt.shade(im, x + w - 9, y, 8, h, mat.timber[0], 0.0, 0.85, 0.34, false)
+	ValleyArt.shade(im, x, y + 2, 4, h, mat.granite[6], 0.5, 0.0, 0.1, false)
 
 
 ## The Camp Curry Store: cream plaster, lit display windows, a striped awning,
@@ -88,17 +324,18 @@ func _base_store() -> Image:
 	var wall_top := roof_h + 1
 	mat.stucco_wall(im, 3, wall_top, w - 6, h - wall_top - 7, 91)
 	_foundation(im, w, h, 6, 92)
+	_shingles(im, 0, 2, w, roof_h - 1, _ramp5(GREEN_BASE), 93, 0.24)
 	_with_roof(GREEN_RAMP, func() -> void:
-		mat.shingle_roof(im, 0, 2, w, roof_h - 1, 93, 0.24)
 		mat.chimney(im, 48, 7, 8, 94))
 	mat.eave(im, 0, wall_top - 2, w)
-	mat.sign_board(im, w / 2, wall_top + 1, "CURRY STORE")
+	_sign(im, w / 2, wall_top + 1, "CURRY STORE", Color("f4ecd0"))
 	for wx in [8, w - 22]:
-		mat.window(im, wx, wall_top + 14, 12, 10, true, 95 + wx)
+		_window(im, wx, wall_top + 14, 12, 10, true, 95 + wx)
 	for jar in [[10, 20, "d8a040"], [14, 20, "c05a3a"], [18, 20, "8a6ad0"], [w - 20, 20, "d8a040"], [w - 16, 20, "5a9a4a"], [w - 12, 20, "c05a3a"]]:
 		K.rect(im, jar[0], wall_top + jar[1] + 2, 2, 3, Color(jar[2]))
+		K.px(im, jar[0], wall_top + jar[1] + 1, Color(jar[2]).lightened(0.3))
 	mat.plank_door(im, w / 2, h - 8, 14, 96, 10)
-	mat.awning(im, 4, wall_top + 26, w - 8, 5, Color("4f7a4a"), Color("eadfba"))
+	_awning(im, 4, wall_top + 26, w - 8, 5, Color("4f7a4a"), Color("eadfba"))
 	# crates of produce and a chalkboard out front
 	for crate in [[5, "d04a3a"], [w - 16, "e0c050"]]:
 		K.rect(im, crate[0], h - 13, 10, 7, mat.timber[3])
@@ -109,6 +346,7 @@ func _base_store() -> Image:
 			K.px(im, crate[0] + 2 + k * 2, h - 15, Color(crate[1]).lightened(0.2))
 	K.rect(im, w / 2 + 9, h - 14, 8, 9, mat.timber[0])
 	K.rect(im, w / 2 + 10, h - 13, 6, 7, Color("2d3a34"))
+	K.hline(im, w / 2 + 10, h - 13, 6, Color("4a5a50"))
 	for k in 3:
 		K.hline(im, w / 2 + 11, h - 12 + k * 2, 5 - k, Color("e8e0c8"))
 	_shade_right(im, 3, wall_top, w - 6, h - wall_top - 7)
@@ -125,16 +363,16 @@ func _base_mountain_shop() -> Image:
 	K.shadow(im, w / 2.0, h - 2.5, w / 2.0 - 1.0, 2.6, 0.3)
 	var roof_h := 26
 	var wall_top := roof_h + 1
-	mat.board_wall(im, 3, wall_top, w - 6, h - wall_top - 12, 111, 2, Color(0.1, 0.12, 0.2, 0.22))
+	_planks(im, 3, wall_top, w - 6, h - wall_top - 12, Color("6a4c36"), 111, 6)
 	mat.stone_wall(im, 2, h - 14, w - 4, 13, 112, 0.52, 4, 3, true)
 	K.hline(im, 2, h - 14, w - 4, mat.granite[5])
+	_shingles(im, 0, 2, w, roof_h - 1, _ramp5(SLATE_BASE), 113, 0.26)
 	_with_roof(SLATE_RAMP, func() -> void:
-		mat.shingle_roof(im, 0, 2, w, roof_h - 1, 113, 0.26)
 		mat.chimney(im, w - 22, 7, 10, 114))
 	mat.eave(im, 0, wall_top - 2, w)
 	for bx in [3, 27, w - 6]:
 		mat.post(im, bx, wall_top, h - wall_top - 12, 115 + bx, 3)
-	mat.sign_board(im, w / 2, wall_top - 12, "MOUNTAIN SHOP", Color("e8ecf0"))
+	_sign(im, w / 2, wall_top - 12, "MOUNTAIN SHOP", Color("e8ecf0"))
 	# the big display window, left of the door
 	var wx := 8
 	var wy := wall_top + 6
@@ -159,7 +397,7 @@ func _base_mountain_shop() -> Image:
 		K.px(im, wx + cx, wy + 10, mat.warm[5])
 		K.px(im, wx + cx, wy + 5, Color("d84a3a"))
 	K.hline(im, wx, wy + 18, 28, mat.timber[2])
-	mat.window(im, w - 18, wall_top + 7, 8, 9, K.hash2(w, 3, 3) < 0.7, 116)
+	_window(im, w - 18, wall_top + 7, 8, 9, K.hash2(w, 3, 3) < 0.7, 116)
 	mat.plank_door(im, w / 2, h - 14, 20, 117, 14)
 	# a rope coil by the door and an ice axe on the wall
 	K.ellipse(im, w / 2.0 + 15.0, wall_top + 24.0, 4.4, 5.0, Color("a8372a"))
@@ -185,11 +423,9 @@ func _base_pavilion() -> Image:
 	K.rect(im, 4, wall_top, w - 8, h - wall_top - 6, Color("2c2018"))
 	ValleyArt.shade(im, 4, wall_top, w - 8, h - wall_top - 6, Color("120c08"), 1.0, 0.1, 0.5)
 	for tx in [10, 30, 50, 70]:
-		K.rect(im, tx, h - 23, 14, 5, mat.timber[3])
-		K.hline(im, tx, h - 23, 14, mat.timber[5])
-		K.hline(im, tx, h - 19, 14, mat.timber[0])
-		K.vline(im, tx + 1, h - 18, 6, mat.timber[1])
-		K.vline(im, tx + 12, h - 18, 6, mat.timber[1])
+		_slat(im, tx, h - 23, 14, 3, _ramp5(PLANK_BASE), 120 + tx)
+		K.vline(im, tx + 1, h - 20, 6, Color("4e3220"))
+		K.vline(im, tx + 12, h - 20, 6, Color("4e3220"))
 		K.rect(im, tx + 5, h - 25, 4, 2, Color("e8dcb8"))
 	for gx in range(7, w - 6, 8):
 		K.vline(im, gx, wall_top + 3, 6, mat.iron[2])
@@ -202,15 +438,15 @@ func _base_pavilion() -> Image:
 		mat.post(im, pxx, wall_top, h - wall_top - 6, 122 + pxx, 4)
 	mat.stone_wall(im, 2, h - 8, w - 4, 7, 123, 0.5, 3, 3, true)
 	K.hline(im, 2, h - 8, w - 4, mat.granite[5])
+	_shingles(im, 0, 2, w, roof_h - 1, _ramp5(BROWN_BASE), 124, 0.2)
 	_with_roof(BROWN_RAMP, func() -> void:
-		mat.shingle_roof(im, 0, 2, w, roof_h - 1, 124, 0.2)
 		mat.gable(im, 52, wall_top - 1, 18, 17, 3, 125, true, 7)
 		mat.chimney(im, w - 22, 8, 12, 126))
 	mat.eave(im, 0, wall_top - 2, w)
 	# the way in: steps and the sign
 	K.rect(im, w / 2 - 8, h - 8, 16, 4, mat.granite[4])
 	K.hline(im, w / 2 - 8, h - 8, 16, mat.granite[6])
-	mat.sign_board(im, w / 2, wall_top - 12, "PAVILION")
+	_sign(im, w / 2, wall_top - 12, "PAVILION")
 	_shade_right(im, 3, wall_top, w - 6, h - wall_top - 6)
 	K.outline(im, RIM)
 	return im
@@ -224,31 +460,24 @@ func _base_pizza_deck() -> Image:
 	var roof_h := 18
 	var wall_top := roof_h + 1
 	mat.stucco_wall(im, 4, wall_top, w - 8, 14, 131)
-	_with_roof(RED_RAMP, func() -> void:
-		mat.shingle_roof(im, 0, 2, w, roof_h - 1, 132, 0.28))
+	_shingles(im, 0, 2, w, roof_h - 1, _ramp5(RED_BASE), 132, 0.28)
 	mat.eave(im, 0, wall_top - 2, w)
-	mat.sign_board(im, w / 2, wall_top + 2, "PIZZA")
+	_sign(im, w / 2, wall_top + 2, "PIZZA")
 	# the wood-fired oven mouth
 	K.rect(im, w / 2 - 5, wall_top + 11, 11, 5, mat.granite[1])
 	K.rect(im, w / 2 - 4, wall_top + 12, 9, 3, mat.warm[4])
 	K.px(im, w / 2, wall_top + 13, mat.warm[7])
 	# the deck with rails and two umbrella tables
-	for yy in 16:
-		for xx in w - 4:
-			var n := K.hash2(xx, yy, 133)
-			var idx := 3 if (yy / 3) % 2 == 0 else 2
-			K.px(im, 2 + xx, h - 20 + yy, mat.timber[clampi(idx + (1 if n > 0.9 else 0) - (1 if n < 0.08 else 0), 0, 5)])
+	_deck(im, 2, h - 20, w - 4, 16, PLANK_BASE, 133)
 	K.hline(im, 2, h - 20, w - 4, mat.timber[5])
 	for rx in range(4, w - 2, 6):
 		mat.post(im, rx, h - 11, 7, 134 + rx, 2)
 	K.hline(im, 2, h - 12, w - 4, mat.timber[4])
 	K.hline(im, 2, h - 11, w - 4, mat.timber[1])
 	for tx in [10, 38]:
-		K.ellipse(im, tx + 8, h - 15, 8, 3, Color("b8382a"))
-		K.ellipse(im, tx + 8, h - 15, 5, 1.6, Color("eadfba"))
-		K.ellipse(im, tx + 8, h - 16, 2, 1, Color("d8583a"))
-		K.rect(im, tx + 8, h - 15, 1, 8, mat.timber[1])
-		K.ellipse(im, tx + 8, h - 9, 5, 2, mat.timber[3])
+		K.ellipse(im, tx + 8, h - 9, 5, 2, mat.timber[0])
+		K.rect(im, tx + 8, h - 15, 1, 7, mat.timber[1])
+		_umbrella(im, tx + 8.0, h - 15.0, 8.0, 5.0, Color("c8402e"), Color("eadfba"))
 	_shade_right(im, 4, wall_top, w - 8, 14)
 	K.outline(im, RIM)
 	return im
@@ -263,7 +492,7 @@ func amphitheater() -> Image:
 	mat.stone_wall(im, 0, 20, w, h - 21, 141, 0.62, 5, 3, false)
 	# the stage: a raised timber platform with a plank backdrop and curtains
 	K.rect(im, 18, 2, 60, 22, mat.timber[0])
-	mat.board_wall(im, 19, 3, 58, 13, 142, 3)
+	_planks(im, 19, 3, 58, 13, Color("8a6440"), 142, 5)
 	for cx in [19, 68]:
 		for yy in 13:
 			for xx in 9:
@@ -288,9 +517,7 @@ func amphitheater() -> Image:
 			var x0: int = bx if side > 0 else bx - length
 			for seg in range(0, length, 9):
 				var sl := mini(8, length - seg)
-				K.rect(im, x0 + seg, y, sl, 2, mat.timber[4])
-				K.hline(im, x0 + seg, y, sl, mat.timber[5])
-				K.hline(im, x0 + seg, y + 2, sl, mat.timber[1])
+				_slat(im, x0 + seg, y, sl, 3, _ramp5(PLANK_BASE), 150 + row * 7 + seg)
 				K.px(im, x0 + seg + 1, y + 3, mat.timber[0])
 				K.px(im, x0 + seg + sl - 2, y + 3, mat.timber[0])
 	K.outline(im, RIM)
@@ -327,10 +554,141 @@ func entrance_sign() -> Image:
 	return im
 
 
-# ---------------------------------------------------------------- cabins
+# ---------------------------------------------------------------- props
 
-## A tent cabin: canvas over a timber frame on a plank deck, with a door
-## flap, a numbered plate, and something on the deck that varies by tent.
+## A bench of stained slats on two posts: a slatted back, a seat, and a dark
+## contact shadow under the legs.
+func bench() -> Image:
+	var im := K.make(28, 14)
+	K.shadow(im, 14.0, 12.5, 12.0, 1.4, 0.3)
+	var ramp := _ramp5(Color("a0764a"))
+	_slat(im, 2, 0, 24, 2, ramp, 201)
+	_slat(im, 2, 2, 24, 2, ramp, 202)
+	K.rect(im, 2, 0, 2, 6, ramp[1])
+	K.rect(im, 23, 0, 2, 6, ramp[1])
+	_slat(im, 1, 5, 26, 3, ramp, 203)
+	K.hline(im, 1, 8, 26, ramp[0])
+	for lx in [3, 22]:
+		K.rect(im, lx, 9, 3, 3, ramp[1])
+		K.px(im, lx, 12, ramp[0])
+		K.px(im, lx + 1, 12, ramp[0])
+	K.outline(im)
+	return im
+
+
+## A wooden tub full of flowers: staves with a lit edge, iron hoops, dark soil,
+## leaf clumps, and blooms in clusters of two to four pixels.
+func planter() -> Image:
+	var im := K.make(18, 20)
+	K.shadow(im, 9.0, 18.0, 7.0, 1.6, 0.3)
+	var ramp := _ramp5(Color("9a6c44"))
+	for by in 9:
+		for xx in 12:
+			var idx := 2
+			if xx <= 1:
+				idx = 4
+			elif xx >= 10:
+				idx = 0
+			if xx % 3 == 0 and xx > 0:
+				idx = 1
+			if by == 8:
+				idx = 0
+			K.px(im, 3 + xx, 9 + by, ramp[idx])
+	for hoop_y in [10, 15]:
+		K.hline(im, 3, hoop_y, 12, Color("5a5a62"))
+		K.px(im, 4, hoop_y, Color("8a8a92"))
+	K.rect(im, 2, 7, 14, 2, Color("c4996a"))
+	K.hline(im, 2, 7, 14, Color("e0b888"))
+	K.hline(im, 3, 8, 12, Color("3a2418"))
+	# leafy clumps spilling over the rim
+	for lf in [[3, 6], [7, 5], [11, 6], [14, 7]]:
+		K.ellipse(im, lf[0] + 0.5, lf[1] + 0.5, 2.2, 1.6, Color("3f7a3a"))
+		K.px(im, lf[0], lf[1] - 1, Color("7ab860"))
+	# blooms in clusters
+	for f in [[4, 3, "e04a6a"], [8, 2, "f2d25c"], [12, 3, "b06ad0"], [6, 5, "f2ecd6"], [10, 5, "e04a6a"], [14, 4, "f2d25c"], [2, 4, "b06ad0"], [16, 5, "e8704a"]]:
+		var col := Color(f[2])
+		K.rect(im, f[0] - 1, f[1] - 1, 3, 2, col)
+		K.px(im, f[0] - 1, f[1] - 1, col.lightened(0.3))
+		K.px(im, f[0], f[1] - 1, col.lightened(0.15))
+		K.px(im, f[0] + 1, f[1], col.darkened(0.25))
+	K.outline(im)
+	return im
+
+
+## A round patio table under a striped umbrella, with two chairs.
+func patio_table() -> Image:
+	var im := K.make(28, 34)
+	K.shadow(im, 14.0, 31.0, 11.0, 2.2, 0.3)
+	K.rect(im, 13, 14, 2, 17, Color("5a3a22"))
+	K.vline(im, 13, 14, 17, Color("9a6c44"))
+	for chair in [[2, 25], [22, 25]]:
+		_slat(im, chair[0], chair[1], 4, 2, _ramp5(Color("8a6440")), 210 + chair[0])
+		K.rect(im, chair[0], chair[1] + 2, 4, 4, Color("6e4a2e"))
+	# the table top: a lit disc with a dark rim and a foot
+	K.ellipse(im, 14.0, 26.0, 8.0, 2.8, Color("6e4a2e"))
+	K.ellipse(im, 14.0, 25.4, 7.4, 2.2, Color("c8945e"))
+	K.hline(im, 9, 24, 8, Color("e0b888"))
+	K.ellipse(im, 14.0, 31.0, 4.0, 1.2, Color("5a3a22"))
+	# umbrella canopy, lit on the upper left with a shaded underside
+	_umbrella(im, 14.0, 13.0, 12.0, 7.0, Color("d8442a"), Color("f2ecd6"))
+	K.px(im, 13, 15, Color("5a3a22"))
+	K.outline(im)
+	return im
+
+
+## Warm bulbs strung between two poles, sagging in the middle. Drawn over
+## everything, so it hangs above the people walking under it.
+func string_lights(w: int) -> Image:
+	var im := K.make(w, 16)
+	for x in w:
+		var t := float(x) / (w - 1)
+		var sag := int(sin(t * PI) * 7.0)
+		K.px(im, x, 2 + sag, Color("3a2c22"))
+		if x % 10 == 5:
+			K.px(im, x, 4 + sag, Color("ffe07a"))
+			K.px(im, x, 5 + sag, Color("ffc850"))
+			K.px(im, x - 1, 4 + sag, Color(1, 0.86, 0.4, 0.45))
+			K.px(im, x + 1, 4 + sag, Color(1, 0.86, 0.4, 0.45))
+			K.px(im, x, 3 + sag, Color("fff4c0"))
+	K.outline(im, Color(0.16, 0.12, 0.1, 0.55))
+	return im
+
+
+## A cast-iron lamp post with a caged lantern: a warm glass, a lit cap, a
+## flared base, and a soft halo around the glass.
+func lamp_post() -> Image:
+	var im := K.make(12, 34)
+	K.shadow(im, 6.0, 31.0, 4.0, 1.4, 0.3)
+	var iron := _ramp5(Color("3a4440"))
+	for yy in 20:
+		K.rect(im, 5, 10 + yy, 1, 1, iron[3])
+		K.rect(im, 6, 10 + yy, 1, 1, iron[1])
+	K.rect(im, 3, 30, 6, 2, iron[2])
+	K.hline(im, 3, 30, 6, iron[4])
+	K.rect(im, 2, 32, 8, 1, iron[0])
+	# the halo, then the cage and glass
+	for hy in range(3, 10):
+		K.px(im, 1, hy, Color(1, 0.85, 0.4, 0.2))
+		K.px(im, 10, hy, Color(1, 0.85, 0.4, 0.2))
+	K.rect(im, 2, 3, 8, 8, iron[1])
+	K.rect(im, 3, 4, 6, 6, Color("ffe08a"))
+	K.rect(im, 4, 5, 4, 3, Color("fff4c0"))
+	K.vline(im, 3, 4, 6, Color("ffd060"))
+	K.hline(im, 3, 4, 6, iron[4])
+	K.rect(im, 2, 3, 8, 1, iron[4])
+	K.rect(im, 1, 1, 10, 2, iron[2])
+	K.hline(im, 1, 1, 10, iron[4])
+	K.px(im, 5, 0, iron[1])
+	K.px(im, 6, 0, iron[1])
+	K.outline(im)
+	return im
+
+
+# ---------------------------------------------------------------- tent cabins and cabins
+
+## A white canvas tent cabin on a wooden platform: a peaked canvas roof over
+## a wood frame, a little fly over the door, guy ropes to stakes, a hanging
+## number plate, and a chair or a cooler on the deck.
 func tent_cabin(variant: int) -> Image:
 	var w := 46
 	var h := 48
@@ -497,13 +855,12 @@ func _base_wood_cabin(variant: int) -> Image:
 	K.shadow(im, w / 2.0, h - 2.5, w / 2.0 - 1.0, 2.4, 0.3)
 	var roof_h := 16
 	var wall_top := roof_h + 1
-	mat.board_wall(im, 3, wall_top, w - 6, h - wall_top - 6, 171 + variant, 3 if variant == 0 else 2)
+	_planks(im, 3, wall_top, w - 6, h - wall_top - 6, PLANK_BASE if variant == 0 else Color("8f6a48"), 171 + variant, 4)
 	_foundation(im, w, h, 5, 172 + variant)
-	_with_roof(GREEN_RAMP if variant == 0 else BROWN_RAMP, func() -> void:
-		mat.shingle_roof(im, 0, 2, w, roof_h - 1, 173 + variant, 0.26))
+	_shingles(im, 0, 2, w, roof_h - 1, _ramp5(GREEN_BASE if variant == 0 else BROWN_BASE), 173 + variant, 0.26)
 	mat.eave(im, 0, wall_top - 2, w)
 	mat.plank_door(im, 11, h - 6, 13, 174, 9)
-	mat.window(im, w - 18, wall_top + 5, 8, 8, K.hash2(variant, 9, 9) < 0.6, 175)
+	_window(im, w - 18, wall_top + 5, 8, 8, K.hash2(variant, 9, 9) < 0.6, 175)
 	K.rect(im, w - 19, wall_top + 15, 12, 3, mat.timber[1])
 	K.hline(im, w - 19, wall_top + 15, 12, mat.timber[4])
 	for f in [[w - 18, "e04a6a"], [w - 15, "f2d25c"], [w - 12, "e04a6a"], [w - 9, "f2ecd6"]]:
