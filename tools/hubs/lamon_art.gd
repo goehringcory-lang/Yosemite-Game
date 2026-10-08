@@ -46,7 +46,8 @@ func camp_tent() -> Image:
 	var im := K.make(52, 44)
 	K.shadow(im, 26.0, 41.0, 23.0, 2.6)
 	var canvas := c(CANVAS)
-	var shade := canvas.darkened(0.2)
+	# the shaded slope leans cool, the sunlit one warm
+	var shade := canvas.darkened(0.2).lerp(Color("7c7a8e"), 0.18)
 	var lit := canvas.lightened(0.14)
 	var apex := Vector2i(26, 6)
 	var base_y := 40
@@ -117,6 +118,14 @@ func _campfire_frame(f: int, w: int, h: int) -> Image:
 	var cx := w / 2.0
 	var gy := float(h - 6)
 	K.shadow(im, cx, gy + 2.0, 14.0, 3.5, 0.28)
+	# Warm light pooling on the ground around the fire, flickering with the frame.
+	for yy in range(int(gy) - 11, int(gy) + 5):
+		for xx in range(int(cx) - 19, int(cx) + 20):
+			var gd := Vector2(xx + 0.5 - cx, (yy + 0.5 - gy) * 1.8).length() / 18.0
+			if gd < 1.0:
+				var ga := pow(1.0 - gd, 1.6) * (0.34 + 0.06 * float(f % 2))
+				if K.hash2(xx / 2, yy / 2, 7 + f) < 0.45 + ga:
+					K.px(im, xx, yy, Color(1.0, 0.72, 0.32, ga))
 	# Ash bed.
 	K.ellipse(im, cx, gy, 10.0, 3.6, c("3a3230"))
 	K.ellipse(im, cx, gy - 0.5, 7.0, 2.4, c("5a4a44"))
@@ -167,7 +176,7 @@ func _speckled_ellipse(im: Image, cx: float, cy: float, rx: float, ry: float, ba
 			if dx * dx + dy * dy > 1.0:
 				continue
 			var col := base
-			var n := K.hash2(x, y, seed_value)
+			var n := K.hash2(x / 2, y / 2, seed_value)
 			if n > 0.9:
 				col = col.lightened(0.14)
 			elif n < 0.1:
