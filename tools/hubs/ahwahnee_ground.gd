@@ -242,9 +242,10 @@ func _shapes(col: Color, k: int, x: int, y: int, i: int) -> Color:
 
 
 func _bed_color(x: int, y: int, i: int) -> Color:
-	# Dark garden soil with small clods; no per-pixel grain.
+	# Dark garden soil in four steps, with small clods.
 	var a := float(_na[i]) / 255.0
-	var col := c("4a3524").lerp(c("62452e"), smooth(0.35, 0.75, a))
+	var lvl := _nat_tone(a, x, y)
+	var col: Color = [c("3a2a1c"), c("4a3524"), c("5a402a"), c("62452e")][lvl]
 	var clod := _nat_pebble(x, y, 9, 401, 0.25)
 	if clod == 1:
 		col = c("7a5a3e")
@@ -305,13 +306,12 @@ func _color(k: int, x: int, y: int, i: int, tx: int, ty: int) -> Color:
 
 
 func _forest(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	# Mossy forest floor: olive moss, warm needle duff, cool shade in the hollows.
-	var shade := smooth(0.5, 0.2, a)
-	var col := c("5d7a3c").lerp(c("3f5d40"), shade * 0.6)
-	col = col.lerp(c("7a5a37"), smooth(0.5, 0.85, b) * 0.45)
-	# Sunlight through the canopy: soft warm patches, grouped rather than dotted.
-	var sun := smooth(0.6, 0.74, b * 0.5 + a * 0.5)
-	col = col.lerp(c("9aa45e"), sun * 0.3)
+	# Mossy forest floor in four tone steps: blue-green moss in the shade,
+	# olive in the light, and warm needle-duff patches where the field runs high.
+	var lvl := _nat_tone(a * 0.6 + b * 0.4, x, y)
+	var col: Color = [c("3b5a3f"), c("4a6636"), c("5d7a3c"), c("6f7a40")][lvl]
+	if _nat_tone(clampf(b * 1.6 - 0.6, 0.0, 1.0), x, y) == 3:
+		col = c("7a5a37")
 	# Needle litter and twigs as small clusters.
 	var twig := _nat_pair(x, y, 9, 311, 0.2)
 	if twig == 1:
@@ -339,15 +339,14 @@ func _meadow(x: int, y: int, i: int, a: float, b: float, n: float, r: float, wet
 
 ## Foothill grass cured gold by summer, with green oak-shade patches.
 func _golden(x: int, y: int, i: int, a: float, b: float, n: float, r: float) -> Color:
-	# Foothill grass cured gold by summer.
+	# Foothill grass cured gold by summer: ochre base, dense gold tufts.
 	return _nat_grass(x, y, a, b, 2)
 
 
 func _chaparral(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	# Chaparral floor: dusty olive-sage with dry tan patches and low shrub clumps.
-	var col := c("6b7040").lerp(c("86804a"), smooth(0.4, 0.8, b))
-	col = col.lerp(c("4f6040"), smooth(0.5, 0.2, a) * 0.5)
-	col = col.lerp(c("9a8458"), smooth(0.7, 0.95, a) * 0.35)
+	# Chaparral floor: dusty olive-sage in four steps, dry tan patches, shrub clumps.
+	var lvl := _nat_tone(b * 0.6 + a * 0.4, x, y)
+	var col: Color = [c("4f6040"), c("626c44"), c("7c7c4c"), c("9a8458")][lvl]
 	var tuft := _nat_tuft(x, y, 11, 411, 0.45)
 	if tuft == 1:
 		col = c("4a5a32")
@@ -368,9 +367,8 @@ func _chaparral(x: int, y: int, a: float, b: float, n: float, r: float) -> Color
 ## High-country forest floor: pale granite grit with needle litter.
 ## High-country forest floor: pale granite grit with needle litter.
 func _granite_sand(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	var col := c("a79a7e").lerp(c("c4b896"), smooth(0.3, 0.8, b))
-	col = col.lerp(c("7e8260"), smooth(0.55, 0.9, a) * 0.45)
-	col = col.lerp(c("5f7348"), smooth(0.72, 0.95, 1.0 - b) * 0.3)
+	var lvl := _nat_tone(b * 0.6 + a * 0.4, x, y)
+	var col: Color = [c("737a5c"), c("a09580"), c("b8ac8e"), c("cbbf9e")][lvl]
 	var peb := _nat_pebble(x, y, 8, 431, 0.22)
 	if peb == 1:
 		col = c("e4dcc4")
@@ -387,11 +385,9 @@ func _granite_sand(x: int, y: int, a: float, b: float, n: float, r: float) -> Co
 
 
 func _snow(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	# Cool blue-white drifts: lit wind crests, blue hollows, a few ice glints.
-	var drift := sin(float(x) * 0.07 + b * 3.0 - float(y) * 0.05)
-	var col := c("e8f0f6").lerp(c("cfdcea"), b * 0.6)
-	col = col.lerp(c("b8c8dc"), smooth(0.55, 0.9, a) * 0.5)
-	col = col.lerp(c("f6fafd"), smooth(0.3, 0.9, drift) * 0.35)
+	# Cool blue-white snow in four steps, with a few ice glints.
+	var lvl := _nat_tone(b * 0.5 + a * 0.5, x, y)
+	var col: Color = [c("b8c8dc"), c("d4e0ec"), c("e8f0f6"), c("f6fafd")][lvl]
 	var glint := _nat_pair(x, y, 10, 451, 0.04)
 	if glint == 1:
 		col = c("ffffff")
@@ -401,9 +397,9 @@ func _snow(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 
 
 func _alpine(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	# Alpine turf: grey-green sedge clumps on granite grit, a few bright flowers.
-	var col := c("8b8a78").lerp(c("a6a28c"), smooth(0.3, 0.7, b))
-	col = col.lerp(c("6e7a52"), smooth(0.45, 0.8, a) * 0.5)
+	# Alpine turf: grey-green in four steps on granite grit, a few bright flowers.
+	var lvl := _nat_tone(b * 0.5 + a * 0.5, x, y)
+	var col: Color = [c("6a7458"), c("82846a"), c("9a9a80"), c("b2ae94")][lvl]
 	var peb := _nat_pebble(x, y, 9, 471, 0.14)
 	if peb == 1:
 		col = c("c8c2ac")
@@ -445,11 +441,10 @@ func _lawn(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 
 
 func _trail(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	# Packed dirt: warm brown, lighter where feet wear the centre, cooler at the edges.
-	var worn := smooth(2.0, 20.0, _nat_trail_edge(x, y))
-	var col := c("8f6843").lerp(c("c69d6c"), worn)
-	col = col.lerp(c("7d5a48"), smooth(0.6, 0.9, a) * 0.3)
-	col = col.lerp(c("b48a5a"), smooth(0.35, 0.65, b) * 0.2)
+	# Packed dirt in four steps: lighter where feet wear the centre, cooler at the edges.
+	var e := _nat_trail_edge(x, y)
+	var lvl := _nat_tone(clampf(e / 24.0, 0.0, 1.0) * 0.8 + a * 0.2, x, y)
+	var col: Color = [c("7a5448"), c("96704c"), c("b08758"), c("c89f6e")][lvl]
 	# Pebble clusters: lit top-left, dark below.
 	var peb := _nat_pebble(x, y, 10, 361, 0.14)
 	if peb == 1:
@@ -463,13 +458,12 @@ func _trail(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 
 ## Campground ground: trampled duff, pine-needle litter, grit and the odd
 ## root-dark patch, with the packed lighter dirt worn where feet go.
-## Campground ground: trampled needle duff and twigs, with the packed dirt
-## worn lighter along the centre of the paths.
+## Campground ground: trampled needle duff and twigs in four steps, with the
+## packed dirt worn lighter along the centre of the paths.
 func _duff(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	var worn := smooth(2.0, 20.0, _nat_trail_edge(x, y))
-	var col := c("8a6c44").lerp(c("a78856"), smooth(0.3, 0.75, b))
-	col = col.lerp(c("6c5434"), smooth(0.55, 0.9, a) * 0.45)
-	col = col.lerp(c("b89a68"), worn * 0.4)
+	var e := _nat_trail_edge(x, y)
+	var lvl := _nat_tone(clampf(e / 24.0, 0.0, 1.0) * 0.35 + b * 0.4 + a * 0.25, x, y)
+	var col: Color = [c("6a4f30"), c("846140"), c("a07c4f"), c("b89a68")][lvl]
 	var twig := _nat_pair(x, y, 7, 491, 0.3)
 	if twig == 1:
 		col = c("c9a96e")
@@ -551,9 +545,9 @@ func _asphalt(x: int, y: int, a: float, n: float, r: float) -> Color:
 
 
 func _sand(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	# Pale sand: warm ridges, cooler wind-shaded hollows, scattered pebbles.
-	var col := c("dccb92").lerp(c("e8dbab"), smooth(0.4, 0.8, b))
-	col = col.lerp(c("bca97d"), smooth(0.55, 0.9, a) * 0.4)
+	# Pale sand in four steps: cooler wind-shaded hollows, warm ridges, pebbles.
+	var lvl := _nat_tone(b * 0.5 + a * 0.5, x, y)
+	var col: Color = [c("b9a77e"), c("cdb98a"), c("dccb92"), c("e9dcae")][lvl]
 	var peb := _nat_pebble(x, y, 10, 371, 0.1)
 	if peb == 1:
 		col = c("f3ead0")
@@ -584,7 +578,9 @@ func _boulder(x: int, y: int, cw: int, ch: int, ox: int, oy: int, seed_v: int) -
 
 func _talus(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 	# Rocky forest floor at the foot of the wall: duff with scattered boulders.
-	var base := _forest(x, y, a, b, n, r).lerp(c("4a4740"), 0.25).lerp(c("5a5752"), smooth(0.45, 0.7, a) * 0.5)
+	var base := _forest(x, y, a, b, n, r)
+	if _nat_tone(a, x, y) >= 2:
+		base = c("57534c")
 	for layer in 2:
 		var cw := 17 - layer * 4
 		var ch := 12 - layer * 3
@@ -594,23 +590,27 @@ func _talus(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 			continue
 		var bo := _boulder(x, y, cw, ch, layer * 9, layer * 6, 60 + layer * 11)
 		if bo.x > 0.5:
-			# Lit upper-left, cool rim on the shadow side.
-			var tone := c("7a736b").lerp(c("c0b8aa"), bo.y)
-			tone = tone.lerp(c("8c8d72"), smooth(0.7, 0.9, a) * 0.3)
+			# Lit upper-left in steps, cool rim on the shadow side.
+			var tone: Color = [c("6f6a64"), c("8a847b"), c("a79f92"), c("c0b8aa")][_nat_tone(bo.y, x, y)]
 			if bo.z > 0.5:
-				tone = tone.lerp(c("4e5260"), 0.45)
+				tone = c("4e5260")
 			base = tone
 	return base
 
 
 func _rock(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	# Granite: faceted slabs with lit upper-left faces, cool cracks, and rare lichen.
+	# Granite: faceted slabs lit on the upper-left in steps, cool cracks, rare lichen.
 	var v := _nat_vor(x, y, 13, 381)
-	var col := c("847d75").lerp(c("a79f92"), v.z * 0.75)
-	col = col.lerp(c("6c6e78"), v.x * 0.3)
-	col = col.lerp(c("5a5860"), smooth(0.9, 0.3, v.y) * 0.4)
+	var lvl := _nat_tone(v.z, x, y)
+	var col: Color
+	if v.x > 0.5:
+		col = [c("5f6068"), c("70727a"), c("80838a"), c("93959b")][lvl]
+	else:
+		col = [c("6e6a64"), c("847e76"), c("988f84"), c("aca596")][lvl]
+	if v.y < 0.9:
+		col = c("58565e")
 	if _nat_pair(x, y, 9, 391, 0.05) != 0:
-		col = col.lerp(c("a9a262"), 0.5)
+		col = c("a9a262")
 	return col
 
 
@@ -740,38 +740,47 @@ func _edge_trim(im: Image) -> void:
 		im.set_pixel(i % _pw, i / _pw, edits[i])
 
 
+## Quantizes a low-frequency value (0..1) into four tone steps (0 darkest to
+## 3 brightest). Where two steps meet, a 1 px checker band alternates between
+## them, so the edge reads as hand-placed pixels rather than a soft gradient.
+func _nat_tone(v: float, x: int, y: int) -> int:
+	var f := clampf(v, 0.0, 0.9999) * 4.0
+	var lvl := int(f)
+	var frac := f - float(lvl)
+	var checker := (x + y) % 2 == 0
+	if frac < 0.06 and lvl > 0 and checker:
+		lvl -= 1
+	elif frac > 0.94 and lvl < 3 and checker:
+		lvl += 1
+	return lvl
+
+
 ## Grass ground shared by the meadow kinds. Mode 0 meadow, 1 wet meadow,
-## 2 golden foothill grass (straw tones, no flowers).
+## 2 golden foothill grass (ochre base, gold tufts, no flowers).
 func _nat_grass(x: int, y: int, a: float, b: float, mode: int) -> Color:
-	var sun := smooth(0.42, 0.72, a)
-	var shade := smooth(0.5, 0.2, a)
-	var col := c("5f9a3c")
-	var sun_c := c("8aa94a")
-	var shade_c := c("3f7b58")
-	var body := c("3b6a2e")
-	var shade_body := c("2e5c44")
-	var tip := c("9dc766")
+	var lvl := _nat_tone(a * 0.7 + b * 0.3, x, y)
+	var col: Color
+	var body := c("2b5a33")
+	var shade_body := c("23503f")
+	var tip := c("b8d878")
 	if mode == 1:
-		col = c("3f7a4c")
-		body = c("2f6446")
-		shade_body = c("24523f")
-		tip = c("86bfa0")
+		col = [c("2f5e48"), c("3b6e52"), c("4f8a5e"), c("6aa074")][lvl]
+		body = c("1f4a3c")
+		shade_body = c("1a3f36")
+		tip = c("9fd0b0")
 	elif mode == 2:
-		col = c("b09a48")
-		sun_c = c("cdb35c")
-		shade_c = c("7f8556")
-		body = c("7f7434")
-		shade_body = c("6a6a3e")
-		tip = c("e8d37c")
-	col = col.lerp(sun_c, sun * 0.55).lerp(shade_c, shade * 0.55)
-	if mode != 2:
-		col = col.lerp(c("4f8c3a"), smooth(0.5, 0.8, b) * 0.25)
+		col = [c("8a7236"), c("a88a40"), c("c2a24c"), c("d8bc66")][lvl]
+		body = c("6e5222")
+		shade_body = c("5c4a22")
+		tip = c("f4e28a")
+	else:
+		col = [c("3d7452"), c("4f8a44"), c("6a9e3a"), c("9ab554")][lvl]
 	# Grass tufts: darker "v" and "w" marks with a lighter tip.
 	var tuft_p := 0.5
 	if mode == 1:
 		tuft_p = 0.3
 	elif mode == 2:
-		tuft_p = 0.35
+		tuft_p = 0.7
 	var tuft := _nat_tuft(x, y, 11, 321, tuft_p)
 	if tuft == 1:
 		col = body
