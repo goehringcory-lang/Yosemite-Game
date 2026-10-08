@@ -153,11 +153,11 @@ static func recolor(src: Image, mode: String, seed_value: int) -> Image:
 			var t := _t(col)
 			if mode == "snow":
 				# snow settles on the lit side of the boughs
-				if kind == "leaf" and t > 0.48 and K.hash2(x, y, seed_value) < (t - 0.4) * 1.1:
+				if kind == "leaf" and t > 0.48 and K.hash2(x >> 1, y >> 1, seed_value) < (t - 0.4) * 1.1:
 					im.set_pixel(x, y, _pick(leaf, (t - 0.4) * 1.4, x, y))
 				continue
 			if kind == "leaf":
-				if thin > 0.0 and t > 0.12 and K.hash2(x, y, seed_value) < thin:
+				if thin > 0.0 and t > 0.12 and K.hash2(x >> 1, y >> 1, seed_value) < thin:
 					im.set_pixel(x, y, Color(0, 0, 0, 0))
 				else:
 					im.set_pixel(x, y, _pick(leaf, t, x, y))
@@ -165,7 +165,7 @@ static func recolor(src: Image, mode: String, seed_value: int) -> Image:
 				if keep_fruit:
 					continue
 				if bloom_to_leaf:
-					if thin > 0.0 and K.hash2(x, y, seed_value) < thin:
+					if thin > 0.0 and K.hash2(x >> 1, y >> 1, seed_value) < thin:
 						im.set_pixel(x, y, Color(0, 0, 0, 0))
 					else:
 						im.set_pixel(x, y, _pick(leaf, t * 0.8, x, y))
