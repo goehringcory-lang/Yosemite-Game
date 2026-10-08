@@ -14,17 +14,17 @@ const L := preload("res://scripts/climb/art/climb_layout.gd")
 
 ## Daylight ramps, dark to light: deep, shade, base, lit, highlight.
 const ROCKS := {
-	"apron": ["3c3654", "645a7a", "9c9090", "d0bca8", "f4e8d0"],
-	"polished": ["34405a", "56667e", "8494a6", "b8c4cc", "e4eef2"],
-	"golden": ["4a2e3e", "7a4a40", "a87452", "d8a464", "f8d898"],
-	"orange": ["4a2c40", "7c4248", "b06a4c", "e09a5c", "fcd49a"],
-	"dark": ["1e2040", "3a3e64", "62648a", "9092b0", "c4c6dc"],
-	"pale": ["5a4e60", "8a7c7e", "bcae9e", "e4d6bc", "fcf4dc"],
-	"roof": ["262444", "424062", "67668a", "9494a8", "c2c2d0"],
-	"elcap": ["30304a", "5a5a72", "8e8ca0", "c6c4c4", "f0ecdc"],
-	"arches": ["4c4262", "766e7c", "a29a92", "cfc2a6", "f0e4c8"],
-	"dome": ["5a5068", "867c88", "b6aeb0", "dcd4cc", "f8f2e6"],
-	"knobby": ["4c4048", "7a6a5e", "a89478", "d6c49a", "f4e8be"],
+	"apron": ["56525e", "7c7884", "a29ea8", "cac6cc", "ece8ec"],
+	"polished": ["4e5864", "727e8c", "9aa4b0", "c4cad0", "e8ecee"],
+	"golden": ["5a4430", "82603e", "ac8654", "d6ac70", "f2d492"],
+	"orange": ["5c3a30", "86543e", "b27a54", "daa270", "f6ca92"],
+	"dark": ["262a3c", "44485c", "6a6e82", "9498ac", "c0c4d6"],
+	"pale": ["6c665e", "968e82", "c4bcac", "e6dec8", "faf4e0"],
+	"roof": ["2e2c3a", "4c4a5a", "6c6a7c", "908e9e", "b6b4c4"],
+	"elcap": ["3e3e4c", "6a6a7a", "9e9ea4", "cacac6", "eeeadc"],
+	"arches": ["54505a", "787480", "a09c98", "ccc4b0", "ece2c6"],
+	"dome": ["68646a", "928e96", "bcb8bc", "e0dcd8", "f6f2ea"],
+	"knobby": ["564e44", "7e7662", "aca088", "d4c8a6", "f0e6c4"],
 	"ice": ["4a6ca8", "7a9ccc", "b0cce6", "dcecf8", "f8fcff"],
 }
 
@@ -55,10 +55,11 @@ static func colors(rock_key: String, pal: Dictionary) -> Dictionary:
 			out[names[i]] = col.lerp(Color(glow_col.r * v * 1.3, glow_col.g * v * 1.3, glow_col.b * v * 1.3).clamp(), glow * [0.18, 0.32, 0.45][i - 2])
 	# Hue shift: the shadows drift toward blue-violet and the lights toward
 	# warm cream, so the granite reads as lit stone rather than grey paint.
-	for i in 2:
-		out[names[i]] = (out[names[i]] as Color).lerp(Color("3c3c6e"), 0.22 - i * 0.06)
-	out["lit"] = (out["lit"] as Color).lerp(Color("ffe6b4"), 0.16)
-	out["hi"] = (out["hi"] as Color).lerp(Color("fff4d8"), 0.22)
+	# The violet is kept to the deepest tone; mid-tones stay neutral granite.
+	out["deep"] = (out["deep"] as Color).lerp(Color("3c3c6e"), 0.3)
+	out["shade"] = (out["shade"] as Color).lerp(Color("4a4870"), 0.08)
+	out["lit"] = (out["lit"] as Color).lerp(Color("ffe6b4"), 0.1)
+	out["hi"] = (out["hi"] as Color).lerp(Color("fff4d8"), 0.18)
 	out["seam"] = _light(Color(hexes[0]).darkened(0.35), tint, lum)
 	out["streak"] = _light(STREAK, tint, lum)
 	out["lichen_o"] = _light(LICHEN_ORANGE, tint, lum)
@@ -196,11 +197,11 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 	var sun_x := PackedFloat64Array()
 	sun_x.resize(w)
 	for x in w:
-		sun_x[x] = (0.5 - float(x) / w) * 0.6
+		sun_x[x] = (0.5 - float(x) / w) * 0.26
 	var sun_y := PackedFloat64Array()
 	sun_y.resize(h)
 	for y in h:
-		sun_y[y] = (0.5 - float(y) / h) * 0.36
+		sun_y[y] = (0.5 - float(y) / h) * 0.16
 	var height := PackedFloat64Array()
 	height.resize(256)
 	for v in 256:
@@ -868,8 +869,8 @@ static func _crack_line(im: Image, c: Dictionary, a: Vector2, b: Vector2) -> voi
 		var x := int(p.x + sin(p.y * 0.21) * 1.0)
 		var y := int(p.y)
 		var wide := 1 + int(sin(t * PI) * 1.2)
-		P.px(im, x - 1, y, tone(c, 3.8))
-		P.rect(im, x, y, wide, 1, c.deep)
+		P.px(im, x - 1, y, tone(c, 4.0))
+		P.rect(im, x, y, wide, 1, c.seam.darkened(0.2))
 		P.px(im, x + wide, y, c.seam)
 		P.px(im, x + wide + 1, y, tone(c, 1.9))
 
@@ -935,8 +936,8 @@ static func _hold(im: Image, c: Dictionary, rng: RandomNumberGenerator, p: Vecto
 			P.px(im, p.x - 1, p.y - 1, chalk)
 		"slab", "dike":
 			# Smear marks: a tiny edge, a chalky smudge, a dimple.
-			P.rect(im, p.x - 2, p.y, 5, 1, tone(c, 4.0))
-			P.rect(im, p.x - 2, p.y + 1, 5, 1, c.deep)
+			P.rect(im, p.x - 2, p.y, 5, 1, tone(c, 4.7))
+			P.rect(im, p.x - 2, p.y + 1, 5, 1, c.seam)
 			if not hard:
 				P.px(im, p.x - 1, p.y - 1, chalk)
 				P.px(im, p.x + 1, p.y - 1, chalk.darkened(0.1))
@@ -944,17 +945,20 @@ static func _hold(im: Image, c: Dictionary, rng: RandomNumberGenerator, p: Vecto
 				P.rect(im, p.x - 3, p.y, 7, 1, tone(c, 4.2))
 		_:
 			if easy:
-				P.rect(im, p.x - 3, p.y - 1, 6, 3, tone(c, 3.2))
+				P.rect(im, p.x - 3, p.y - 1, 6, 3, tone(c, 3.8))
 				P.rect(im, p.x - 2, p.y - 2, 4, 1, chalk)
-				P.rect(im, p.x - 3, p.y + 2, 6, 1, c.deep)
+				P.rect(im, p.x - 3, p.y - 1, 6, 1, tone(c, 4.6))
+				P.rect(im, p.x - 3, p.y + 2, 6, 1, c.seam)
 			elif hard:
-				P.rect(im, p.x - 1, p.y - 1, 3, 2, tone(c, 3.0))
-				P.rect(im, p.x - 1, p.y + 1, 3, 1, c.deep)
+				P.rect(im, p.x - 1, p.y - 1, 3, 2, tone(c, 3.3))
+				P.rect(im, p.x - 1, p.y - 1, 3, 1, tone(c, 4.3))
+				P.rect(im, p.x - 1, p.y + 1, 3, 1, c.seam)
 				P.px(im, p.x, p.y - 2, chalk)
 			else:
-				P.rect(im, p.x - 2, p.y - 1, 5, 2, tone(c, 3.2))
+				P.rect(im, p.x - 2, p.y - 1, 5, 2, tone(c, 3.8))
 				P.rect(im, p.x - 1, p.y - 2, 3, 1, chalk)
-				P.rect(im, p.x - 2, p.y + 1, 5, 1, c.deep)
+				P.rect(im, p.x - 2, p.y - 1, 5, 1, tone(c, 4.6))
+				P.rect(im, p.x - 2, p.y + 1, 5, 1, c.seam)
 	if hold.get("rest", false):
 		# A good stance: a flat shelf you can stand on.
 		P.rect(im, p.x - 10, p.y + 4, 21, 2, tone(c, 3.8))
