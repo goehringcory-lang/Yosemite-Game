@@ -656,9 +656,9 @@ func _lawn(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 
 
 func _trail(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	# Packed dirt in four steps: lighter where feet wear the centre, cooler at the edges.
-	var e := _nat_trail_edge(x, y)
-	var lvl := _nat_tone(clampf(e / 24.0, 0.0, 1.0) * 0.8 + a * 0.2, x, y)
+	# Packed dirt in tone steps from low-frequency noise, so no band follows
+	# the tile grid under the ragged trail outline.
+	var lvl := _nat_tone(0.3 + a * 0.45 + b * 0.22, x, y)
 	var col: Color = [c("7a5448"), c("96704c"), c("b08758"), c("c89f6e")][lvl]
 	# Pebble clusters: lit top-left, dark below.
 	var peb := _nat_pebble(x, y, 10, 361, 0.14)
@@ -671,13 +671,10 @@ func _trail(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 	return col
 
 
-## Campground ground: trampled duff, pine-needle litter, grit and the odd
-## root-dark patch, with the packed lighter dirt worn where feet go.
-## Campground ground: trampled needle duff and twigs in four steps, with the
-## packed dirt worn lighter along the centre of the paths.
+## Campground ground: trampled needle duff and twigs in four tone steps,
+## with grit and the odd root-dark patch.
 func _duff(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	var e := _nat_trail_edge(x, y)
-	var lvl := _nat_tone(clampf(e / 24.0, 0.0, 1.0) * 0.35 + b * 0.4 + a * 0.25, x, y)
+	var lvl := _nat_tone(0.15 + b * 0.45 + a * 0.35, x, y)
 	var col: Color = [c("6a4f30"), c("846140"), c("a07c4f"), c("b89a68")][lvl]
 	var twig := _nat_pair(x, y, 7, 491, 0.3)
 	if twig == 1:
@@ -729,8 +726,8 @@ func _flagstone(x: int, y: int, a: float, _n: float, r: float) -> Color:
 		return c("9d9383")
 	var hue := hash2(slab, row, seed_value + 8)
 	var tone := hash2(slab, row, seed_value + 9)
-	var col := c("d3c6a8") if hue < 0.4 else (c("bebcb0") if hue > 0.78 else c("cdb49b"))
-	col = col.lerp(col.darkened(0.07), tone * 0.6)
+	var col := c("d0c4a8") if hue < 0.45 else (c("c6c0ae") if hue > 0.8 else c("cbbca1"))
+	col = col.lerp(col.darkened(0.05), tone * 0.5)
 	col = col.lightened(0.05 * smooth(0.55, 0.85, a))
 	if lx == 1 or ly == 1:
 		col = col.lightened(0.12)
@@ -1121,31 +1118,3 @@ func _nat_vor(x: int, y: int, cs: int, s: int) -> Vector3:
 	var lit := clampf(0.5 - (bdx + bdy) / (1.5 * float(cs)), 0.0, 1.0)
 	return Vector3(bid, sqrt(second) - sqrt(best), lit)
 
-
-## Pixels from (x, y) to the nearest non-trail tile edge, looking up to three
-## tiles along each axis. Gives a path its lighter worn centre.
-func _nat_trail_edge(x: int, y: int) -> float:
-	var tx := clampi(x / T, 0, w - 1)
-	var ty := clampi(y / T, 0, h - 1)
-	var best := 3.0 * float(T)
-	for dir: Vector2i in [Vector2i(-1, 0), Vector2i(1, 0), Vector2i(0, -1), Vector2i(0, 1)]:
-		for k in range(1, 4):
-			var nx := tx + dir.x * k
-			var ny := ty + dir.y * k
-			if nx < 0 or ny < 0 or nx >= w or ny >= h:
-				break
-			var kk := kind[ny * w + nx]
-			if kk == Terrain.TRAIL or kk == Terrain.CAMP:
-				continue
-			var dd: float
-			if dir.x < 0:
-				dd = float(x - (nx + 1) * T)
-			elif dir.x > 0:
-				dd = float(nx * T - x)
-			elif dir.y < 0:
-				dd = float(y - (ny + 1) * T)
-			else:
-				dd = float(ny * T - y)
-			best = minf(best, maxf(dd, 0.0))
-			break
-	return best
