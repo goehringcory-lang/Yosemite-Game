@@ -12,7 +12,7 @@ extends Node2D
 ## you through the snow instead of dragging it along. Hidden indoors.
 
 ## How many of each, at full strength.
-const COUNTS := {"snow": 130, "rain": 55, "petal": 30, "leaf": 30, "fluff": 12, "firefly": 12, "mote": 16}
+const COUNTS := {"snow": 130, "rain": 55, "petal": 30, "leaf": 30, "fluff": 12, "firefly": 12, "mote": 24}
 ## Most flakes on screen at once, whatever the weather. Keeps the draw cost
 ## flat and the view clear enough to see the player.
 const MAX_FLAKES := 140
@@ -179,7 +179,7 @@ func _color_for(kind_name: String, rng: RandomNumberGenerator) -> Color:
 		"fluff":
 			return Color(1.0, 0.98, 0.9, 0.85)
 		"mote":
-			return Color(1.0, 0.9, 0.55, rng.randf_range(0.45, 0.8))
+			return Color(1.0, 0.9, 0.55, rng.randf_range(0.55, 0.9))
 	return Color(1.0, 0.95, 0.5)
 
 
