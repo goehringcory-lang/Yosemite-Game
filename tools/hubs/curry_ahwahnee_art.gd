@@ -231,21 +231,37 @@ func _deck(im: Image, x: int, y: int, w: int, h: int, base: Color, sd: int) -> v
 
 ## A round market umbrella seen from the front: a canopy of wedge stripes, lit
 ## on its upper left, with a cooler, darker underside and a shaded rim.
-func _umbrella(im: Image, cx: float, cy: float, rx: float, ry: float, a: Color, b: Color) -> void:
-	for y in range(floori(cy - ry) - 1, ceili(cy + ry) + 1):
-		for x in range(floori(cx - rx), ceili(cx + rx) + 1):
-			var dx := (x + 0.5 - cx) / rx
-			var dy := (y + 0.5 - cy) / ry
-			var d := dx * dx + dy * dy
-			if d > 1.0:
+func _umbrella(im: Image, cx: float, cy: float, rx: float, dome_h: float, a: Color, b: Color) -> void:
+	var rim_h := maxf(1.2, rx * 0.2)
+	for x in range(floori(cx - rx) - 1, ceili(cx + rx) + 2):
+		var dx := (x + 0.5 - cx) / rx
+		if absf(dx) > 1.0:
+			continue
+		var round_k := sqrt(1.0 - dx * dx)
+		# the dome's silhouette, the front rim, and a scalloped hem below the rim
+		var top_y := cy - dome_h * round_k
+		var rim_y := cy + rim_h * round_k
+		var lobe := fposmod((dx + 1.0) * 4.0, 1.0)
+		var hem_y := rim_y + 0.6 + 0.7 * sin(lobe * PI)
+		# red and white wedges follow the dome's meridians: they bunch at the
+		# top and spread toward the rim
+		var theta := asin(clampf(dx, -1.0, 1.0))
+		var k := clampi(floori((theta / (PI / 2.0) + 1.0) * 4.0), 0, 7)
+		var stripe := a if k % 2 == 0 else b
+		for y in range(floori(top_y), ceili(hem_y) + 1):
+			var fy := float(y) + 0.5
+			if fy < top_y or fy > hem_y:
 				continue
-			var wedge := int(floor((atan2(dy, dx) + PI) / (TAU / 8.0))) % 8
-			var col := a if wedge % 2 == 0 else b
-			if dy > 0.5:
-				col = _tone(col, -0.16, -0.5)
-			elif dx < -0.25 and dy < -0.1:
-				col = _tone(col, 0.1, 0.6)
-			if d > 0.7:
+			var col := stripe
+			if fy > rim_y:
+				# the underside band visible at the rim: darker and cooler
+				col = _tone(stripe, -0.2, -0.6)
+			elif dx < -0.2 and fy < cy - dome_h * 0.35:
+				# lit on the upper left
+				col = _tone(stripe, 0.12, 0.6)
+			elif dx > 0.45:
+				col = _tone(stripe, -0.08, -0.3)
+			if y == floori(top_y):
 				col = col.darkened(0.12)
 			K.px(im, x, y, col)
 
@@ -461,7 +477,7 @@ func _base_pizza_deck() -> Image:
 	for tx in [10, 38]:
 		K.ellipse(im, tx + 8, h - 9, 5, 2, mat.timber[0])
 		K.rect(im, tx + 8, h - 15, 1, 7, mat.timber[1])
-		_umbrella(im, tx + 8.0, h - 15.0, 8.0, 3.4, Color("c8402e"), Color("eadfba"))
+		_umbrella(im, tx + 8.0, h - 15.0, 8.0, 5.0, Color("c8402e"), Color("eadfba"))
 	_shade_right(im, 4, wall_top, w - 8, 14)
 	K.outline(im, RIM)
 	return im
@@ -614,7 +630,7 @@ func patio_table() -> Image:
 	K.hline(im, 9, 24, 8, Color("e0b888"))
 	K.ellipse(im, 14.0, 31.0, 4.0, 1.2, Color("5a3a22"))
 	# umbrella canopy, lit on the upper left with a shaded underside
-	_umbrella(im, 14.0, 9.0, 12.0, 6.5, Color("d8442a"), Color("f2ecd6"))
+	_umbrella(im, 14.0, 13.0, 12.0, 7.0, Color("d8442a"), Color("f2ecd6"))
 	K.px(im, 13, 15, Color("5a3a22"))
 	K.outline(im)
 	return im
