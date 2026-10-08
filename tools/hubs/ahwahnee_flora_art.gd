@@ -157,10 +157,10 @@ const FIR_LEAF := ["173a37", "1f4c40", "2d6046", "467a51", "628f5c", "80a86c", "
 ## Canopy ramps are five hue-shifted tones: blue-green in the shade, yellow-green
 ## in the light. Each clump lands on one or two of them, so the crown reads as
 ## a few clean masses instead of noise.
-const OAK_LEAF := ["1d3b3a", "2d5a3e", "4a7a3c", "7aa148", "b8cf5e"]
+const OAK_LEAF := ["1f3b2c", "2a4a33", "34653d", "4a8038", "74a04a"]
 ## The oak's leaves in spring (new pink-green growth) and fall (gold and rust).
-const OAK_LEAF_SPRING := ["2c4e3a", "43733e", "6aa048", "a2cc68", "dcea98"]
-const OAK_LEAF_FALL := ["3a1a16", "6a2c1a", "a4501e", "d68236", "f4c25a"]
+const OAK_LEAF_SPRING := ["24443a", "2f5a40", "4f8442", "7fae4c", "bcd878"]
+const OAK_LEAF_FALL := ["2c1a20", "5a2a1e", "86401c", "b8682a", "e0943a"]
 const DOGWOOD_LEAF_FALL := ["3a1424", "5c1c2e", "84283a", "a8404a", "c85c52", "e08060", "f2a874"]
 const WILLOW_LEAF := ["2f5238", "417146", "5b8f4f", "7aab5a", "9cc56d", "bfdc8b", "dcef b0"]
 const BARK_PINE := ["2a1a14", "44291d", "5f3a26", "7c5232", "98693c", "b4844e", "cfa06a"]
@@ -226,6 +226,52 @@ static func blob(im: Image, cx: float, cy: float, rx: float, ry: float, r: Array
 				# rim: the upper-left edge catches light, the lower-right falls into shade
 				t = (0.92 if lam > 0.12 else (0.22 if lam < -0.1 else t))
 			K.px(im, x, y, shade(r, t, x, y))
+
+
+## One oak crown clump: a lit sphere with a clustered texture. Its upper-left
+## rim steps one tone up and its lower-right rim drops into a deep pocket, so
+## each clump reads as its own face against the clumps around it.
+static func clump(im: Image, cx: float, cy: float, rx: float, ry: float, r: Array[Color], seed_value: int, bias := 0.0) -> void:
+	for y in range(floori(cy - ry - 1.0), ceili(cy + ry + 1.0) + 1):
+		for x in range(floori(cx - rx - 1.0), ceili(cx + rx + 1.0) + 1):
+			var dx := (x + 0.5 - cx) / rx
+			var dy := (y + 0.5 - cy) / ry
+			var d2 := dx * dx + dy * dy
+			var ang := atan2(dy, dx)
+			var wave := sin(ang * 5.0 + float(seed_value % 17)) * 0.05 + sin(ang * 9.0 + float(seed_value % 11)) * 0.03
+			var edge := 1.0 + wave + (K.hash2(x >> 1, y >> 1, seed_value) - 0.5) * 0.14
+			if d2 > edge * edge:
+				continue
+			var nz := sqrt(maxf(0.0, 1.0 - d2))
+			var lam := dx * LIGHT.x + dy * LIGHT.y + nz * LIGHT.z
+			var t := 0.5 + lam * 0.6 + (K.hash2(x / 3, y / 3, seed_value + 5) - 0.5) * 0.14 + bias
+			if d2 > (edge * 0.8) * (edge * 0.8):
+				t += 0.16 if lam > 0.15 else (-0.3 if lam < -0.05 else 0.0)
+			K.px(im, x, y, shade(r, t, x, y))
+
+
+## The crown's silhouette: a dark, broken outline. Edges that face up or left
+## catch a little light (a mid tone), the rest fall into the deep dark tone,
+## and every other 2x2 cell is left as it was, so the line is broken.
+static func crown_edge(im: Image, r: Array[Color], seed_value: int) -> void:
+	var w := im.get_width()
+	var h := im.get_height()
+	var todo: Array[Vector3i] = []
+	for y in h:
+		for x in w:
+			if im.get_pixel(x, y).a < 0.5:
+				continue
+			var up := y == 0 or im.get_pixel(x, y - 1).a < 0.5
+			var left := x == 0 or im.get_pixel(x - 1, y).a < 0.5
+			var down := y == h - 1 or im.get_pixel(x, y + 1).a < 0.5
+			var right := x == w - 1 or im.get_pixel(x + 1, y).a < 0.5
+			if not (up or left or down or right):
+				continue
+			if K.hash2(x >> 1, y >> 1, seed_value + 3) > 0.7:
+				continue
+			todo.append(Vector3i(x, y, 1 if (up or left) else 0))
+	for p in todo:
+		im.set_pixel(p.x, p.y, r[2] if p.z == 1 else r[0])
 
 
 ## Light and dark specks that read as individual leaves on a clump.
@@ -663,28 +709,28 @@ func tree_oak(v: int, season := 1) -> Image:
 	var dome_cy := 38.0 + v * 1.5
 	var rx_dome := 33.0 * spread
 	var ry_dome := 27.0 - v * 1.0
-	for i in 40:
+	for i in 14:
 		var a := rng.randf() * TAU
 		var d := 0.35 + 0.65 * sqrt(rng.randf())
 		var bx := dome_cx + cos(a) * d * rx_dome
 		var by := dome_cy + sin(a) * d * ry_dome * (0.9 if sin(a) > 0.0 else 1.0)
-		clumps.append(Vector3(bx, by, 6.5 + rng.randf() * 5.5))
+		clumps.append(Vector3(bx, by, 8.5 + rng.randf() * 4.0))
 	clumps.sort_custom(func(a: Vector3, b: Vector3) -> bool: return a.y < b.y)
 	# dark mass behind everything for depth
 	blob(im, dome_cx, dome_cy + 3.0, rx_dome * 0.86, ry_dome * 0.78, leaf, seed_value + 1, -0.4, 0.1, 0.05)
 	for i in clumps.size():
 		var cl := clumps[i]
 		var g := ((dome_cx - cl.x) * 0.5 + (dome_cy - cl.y) * 0.75) / 34.0
-		var bias := clampf(g, -0.3, 0.16) - 0.3
-		blob(im, cl.x, cl.y, cl.z, cl.z * 0.82, leaf, seed_value + 9 * i, bias, 0.17, 0.17)
-		leaf_specks(im, cl.x, cl.y, cl.z, cl.z * 0.82, leaf, seed_value + i * 5, 7)
+		var bias := clampf(g, -0.25, 0.14) - 0.24
+		clump(im, cl.x, cl.y, cl.z, cl.z * 0.82, leaf, seed_value + 9 * i, bias)
+		leaf_specks(im, cl.x, cl.y, cl.z, cl.z * 0.82, leaf, seed_value + i * 5, 4)
 	# a low branch crossing in front of the trunk and a leaf drape under the crown
 	limb(im, fx + 1.0, float(fork_y) + 4.0, fx + 12.0 * spread, float(fork_y) - 3.0, 4.0, 2.0, bark, seed_value + 77, 1.5)
 	for i in 3:
 		var lx := fx + (i - 1) * 15.0 * spread + rng.randf_range(-3.0, 3.0)
 		blob(im, lx, dome_cy + ry_dome * 0.86, 7.0, 4.5, leaf, seed_value + 130 + i, -0.42, 0.15, 0.2)
 	# a few sky gaps between the clumps, low on the dome where the light gets in
-	for i in 6:
+	for i in 3:
 		var a := rng.randf_range(-PI * 0.9, -PI * 0.1)
 		var d := rng.randf_range(0.5, 0.82)
 		var gx := roundi(dome_cx + cos(a) * d * rx_dome)
@@ -692,6 +738,7 @@ func tree_oak(v: int, season := 1) -> Image:
 		for k in range(0, 2 + i % 2):
 			im.set_pixel(clampi(gx + k, 0, w - 1), clampi(gy, 0, h - 1), Color(0, 0, 0, 0))
 		im.set_pixel(clampi(gx, 0, w - 1), clampi(gy + 1, 0, h - 1), Color(0, 0, 0, 0))
+	crown_edge(im, leaf, seed_value + 200)
 	rim(im, 0.5)
 	return im
 
