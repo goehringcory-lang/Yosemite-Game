@@ -61,6 +61,11 @@ var _cursor := 0
 var _settings_cursor := 0
 var _confirm_quit := false
 var _was_paused := false
+## The brass tab the page title sits on, the bar behind the chosen row, and the
+## plain style every other row gets (it keeps the rows' text in the same place).
+var _title_style: StyleBoxTexture
+var _select_style: StyleBoxTexture
+var _plain_style: StyleBoxEmpty
 
 
 func _ready() -> void:
@@ -80,7 +85,21 @@ func _ready() -> void:
 	_title = Label.new()
 	_title.add_theme_font_size_override("font_size", 20)
 	_title.add_theme_color_override("font_color", HEADING)
+	# a brass tab on the panel's top-left edge, the page's name sitting in it
+	_title_style = _style("res://assets/ui/tag.png", 4.0)
+	_title_style.content_margin_left = 6.0
+	_title_style.content_margin_right = 6.0
+	_title_style.expand_margin_top = 5.0
+	_title_style.expand_margin_left = 2.0
+	_title.add_theme_stylebox_override("normal", _title_style)
+	_title.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN # the tab hugs the title
 	column.add_child(_title)
+	_select_style = _style("res://assets/ui/select.png", 2.0)
+	_select_style.content_margin_left = 2.0
+	_select_style.expand_margin_top = 1.0
+	_select_style.expand_margin_bottom = 1.0
+	_plain_style = StyleBoxEmpty.new()
+	_plain_style.content_margin_left = 2.0
 	_pages.append(_build_main())
 	_pages.append(_build_settings())
 	_pages.append(_build_controls())
@@ -91,6 +110,17 @@ func _ready() -> void:
 	column.add_child(filler)
 	_footer = _label("", DIM)
 	column.add_child(_footer)
+
+
+## A nine-slice style from a texture, with its corners [param margin] pixels in.
+func _style(path: String, margin: float) -> StyleBoxTexture:
+	var style := StyleBoxTexture.new()
+	style.texture = load(path)
+	style.texture_margin_left = margin
+	style.texture_margin_top = margin
+	style.texture_margin_right = margin
+	style.texture_margin_bottom = margin
+	return style
 
 
 func _build_main() -> Control:
@@ -361,10 +391,11 @@ func _footer_text() -> String:
 	return "[%s] Choose   [%s] Select   [%s] Resume" % [choose, ok, back]
 
 
-## A menu line: "> " and gold when chosen, so it shows without the color too.
+## A menu line: "> ", gold and a highlight bar when chosen, so it shows without the color too.
 func _set_choice(label: Label, text: String, chosen: bool) -> void:
 	label.text = ("> " if chosen else "  ") + text
 	label.add_theme_color_override("font_color", HEADING if chosen else Color.WHITE)
+	label.add_theme_stylebox_override("normal", _select_style if chosen else _plain_style)
 
 
 func _label(text: String, color := Color.WHITE) -> Label:

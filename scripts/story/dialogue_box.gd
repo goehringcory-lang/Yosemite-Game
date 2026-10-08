@@ -16,6 +16,9 @@ extends CanvasLayer
 const NAME_COLOR := Color(1.0, 0.85, 0.5)
 const CURSOR := "> "
 const HINT_COLOR := Color(1, 1, 1, 0.6)
+## How far the next arrow bobs, in pixels, and how many bobs a second.
+const ARROW_BOB := 1.0
+const ARROW_SPEED := 1.2
 
 var _panel: PanelContainer
 var _name_label: Label
@@ -28,6 +31,13 @@ var _hint_time := 0.0
 var _options: PackedStringArray = []
 var _cursor := 0
 var _opened_frame := 0
+## The brass tag the speaker's name sits on, the bar behind the chosen option,
+## and the arrow that bobs when the page is waiting for E.
+var _tag_style: StyleBoxTexture
+var _select_style: StyleBoxTexture
+var _plain_style: StyleBoxEmpty
+var _arrow: TextureRect
+var _hint_text_width := 0.0
 ## 0 while waiting, 1 after confirm, -1 after cancel.
 var _answer := 0
 
@@ -75,6 +85,14 @@ func _ready() -> void:
 	_panel.add_child(column)
 	_name_label = Label.new()
 	_name_label.add_theme_color_override("font_color", NAME_COLOR)
+	# a brass-edged tab on the box's top-left edge, the speaker's name sitting in it
+	_tag_style = _style("res://assets/ui/tag.png", 4.0)
+	_tag_style.content_margin_left = 4.0
+	_tag_style.content_margin_right = 4.0
+	_tag_style.expand_margin_top = 5.0
+	_tag_style.expand_margin_left = 2.0
+	_name_label.add_theme_stylebox_override("normal", _tag_style)
+	_name_label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN # the tab hugs the name
 	column.add_child(_name_label)
 	_text_label = Label.new()
 	_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -92,9 +110,32 @@ func _ready() -> void:
 	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_hint_label.add_theme_color_override("font_color", HINT_COLOR)
 	column.add_child(_hint_label)
+	# the next arrow: drawn over the box, just left of the "Next" hint
+	_arrow = TextureRect.new()
+	_arrow.texture = load("res://assets/ui/next.png")
+	_arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_arrow.visible = false
+	root.add_child(_arrow)
+	_select_style = _style("res://assets/ui/select.png", 2.0)
+	_select_style.content_margin_left = 2.0
+	_select_style.expand_margin_top = 1.0
+	_select_style.expand_margin_bottom = 1.0
+	_plain_style = StyleBoxEmpty.new()
+	_plain_style.content_margin_left = 2.0
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud:
 		hud.device_changed.connect(_refresh_hint)
+
+
+## A nine-slice style from a texture, with its corners [param margin] pixels in.
+func _style(path: String, margin: float) -> StyleBoxTexture:
+	var style := StyleBoxTexture.new()
+	style.texture = load(path)
+	style.texture_margin_left = margin
+	style.texture_margin_top = margin
+	style.texture_margin_right = margin
+	style.texture_margin_bottom = margin
+	return style
 
 
 ## Longest text shown at once. Longer lines are split at sentence breaks so
@@ -174,9 +215,20 @@ func _process(delta: float) -> void:
 		else:
 			_text_label.visible_characters = int(_shown)
 	elif _options.is_empty() and _hint_label.text != "":
-		# A slow blink on "Next", so the box reads as waiting for you.
+		# The next arrow bobs beside "Next", so the box reads as waiting for you.
 		_hint_time += delta
-		_hint_label.modulate.a = 1.0 if fmod(_hint_time, 1.2) < 0.8 else 0.35
+		_position_arrow()
+
+
+## Shows the bobbing arrow just left of the "Next" hint, and hides it otherwise.
+func _position_arrow() -> void:
+	var waiting := _options.is_empty() and is_revealed() and _hint_label.text.ends_with("Next")
+	_arrow.visible = waiting
+	if not waiting:
+		return
+	var hint := _hint_label.get_global_rect()
+	var bob := roundf(sin(_hint_time * TAU * ARROW_SPEED) * ARROW_BOB)
+	_arrow.position = Vector2(hint.end.x - _hint_text_width - _arrow.size.x - 4.0, hint.position.y + (hint.size.y - _arrow.size.y) / 2.0 + bob).round()
 
 
 ## "[E] Next", or the choice controls, in the current device's buttons.
@@ -192,6 +244,9 @@ func _refresh_hint() -> void:
 		_hint_label.text = "[%s] Skip" % MenuInput.button(tree, "E", "A")
 	else:
 		_hint_label.text = "[%s] Next" % MenuInput.button(tree, "E", "A")
+	var font := _hint_label.get_theme_font("font")
+	_hint_text_width = font.get_string_size(_hint_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, _hint_label.get_theme_font_size("font_size")).x
+	_arrow.visible = false
 
 
 func _refresh_options() -> void:
@@ -203,6 +258,9 @@ func _refresh_options() -> void:
 		label.text = (CURSOR if i == _cursor else "  ") + _options[i]
 		if i == _cursor:
 			label.add_theme_color_override("font_color", NAME_COLOR)
+			label.add_theme_stylebox_override("normal", _select_style)
+		else:
+			label.add_theme_stylebox_override("normal", _plain_style)
 		_options_box.add_child(label)
 
 
