@@ -288,6 +288,11 @@ func shingle_col(gx: int, gy: int, sd: int, lit: float) -> Color:
 		col = col.darkened(0.18)
 	if K.hash2(gx, gy, sd + 2) > 0.94:
 		col = col.lightened(0.1)
+	# hue shift: sunlit shingles warm toward ochre, shaded ones cool toward slate
+	if lit > 0.02 and col.a > 0.5:
+		col = col.lerp(Color("9c8a4a"), minf(0.3, lit * 1.5))
+	elif lit < -0.04 and col.a > 0.5:
+		col = col.lerp(Color("2b3040"), minf(0.3, -lit * 2.0))
 	return col
 
 
@@ -541,7 +546,12 @@ func shrub(im: Image, cx: int, base_y: int, r: int, sd: int, flowers := false) -
 		for i in r:
 			var fx := cx - r + int(K.hash2(i, sd, 8) * r * 2.0)
 			var fy := base_y - r + int(K.hash2(i, sd, 9) * r * 1.2)
-			K.px(im, fx, fy, Color("f2c6d4") if K.hash2(i, sd, 10) < 0.5 else Color("f6f0e0"))
+			# blooms come in small clumps of two, a few of them gold
+			var fl := Color("f2c6d4") if K.hash2(i, sd, 10) < 0.5 else Color("f6f0e0")
+			if K.hash2(i, sd, 11) < 0.2:
+				fl = Color("f2c24a")
+			K.px(im, fx, fy, fl)
+			K.px(im, fx + 1, fy, fl.darkened(0.12))
 
 
 ## A tall, narrow evergreen shrub.
