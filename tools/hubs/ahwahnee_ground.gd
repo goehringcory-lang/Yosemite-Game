@@ -15,6 +15,8 @@ const FORMAL := [Terrain.PAVED, Terrain.PARKING, Terrain.ROAD, Terrain.BRIDGE, T
 ## Formal groups that get a smoothed outline of their own in paint().
 const PAVE_SET := [Terrain.PAVED, Terrain.PARKING, Terrain.BUILT, Terrain.BRIDGE]
 const WET_SET := [Terrain.RIVER, Terrain.LAKE, Terrain.CREEK, Terrain.FALLS]
+## How far (in tiles) the path distance fields look for an edge.
+const PATH_REACH := 3
 
 var w := 0
 var h := 0
@@ -45,12 +47,14 @@ var _nc := PackedByteArray() # small scale
 var _wx := PackedByteArray() # warp x
 var _wy := PackedByteArray() # warp y
 var _nf := PackedByteArray() # flower clusters
-var _water_depth := PackedFloat32Array() # tiles from land, per tile
 var _pk := PackedByteArray() # the ground type shown at each pixel
 var _pw := 0
 var _ph := 0
 ## Per-pixel road cover (0..1) from the smoothed road mask, for the shoulders.
 var _road_s := PackedFloat32Array()
+## Per-pixel depth (in tiles, 0.5 at the shore) of water pixels, from the
+## smoothed outline, so the foam and the depth tint follow its curves.
+var _pdep := PackedFloat32Array()
 ## Smoothed 0/1 masks of the formal and water groups, one value per tile.
 var _mroad := PackedFloat32Array()
 var _mpave := PackedFloat32Array()
@@ -118,13 +122,13 @@ func paint(grid: PackedInt32Array, width: int, height: int, seed_v: int) -> Imag
 	_nf = _noise_bytes(0.03, seed_v + 5, 2)
 	if bed.size() != w * h:
 		bed.resize(w * h)
-	_compute_water_depth()
 	_path_index()
 	_path_groups()
 	var out := PackedByteArray()
 	out.resize(_pw * _ph * 4)
 	_pk.resize(_pw * _ph)
 	_road_s.resize(_pw * _ph)
+	_pdep.resize(_pw * _ph)
 	_phard.resize(_pw * _ph)
 	_pwet.resize(_pw * _ph)
 	for y in _ph:
@@ -137,18 +141,17 @@ func paint(grid: PackedInt32Array, width: int, height: int, seed_v: int) -> Imag
 			var k := 0
 			var tx := x / T
 			var ty := y / T
-			# A tile's own pixels use a lower cutoff (see _path_cut), so one-tile
-			# roads and streams survive the blur. The shoreline wobbles on
-			# low-frequency noise; roads do not.
+			# The shoreline wobbles on low-frequency noise; roads do not.
 			var own := kind[near]
 			# (_tany skips the samples where no group cover is near.)
-			if _tany[near] == 1 and own == Terrain.BRIDGE and _path_sample(_mpave, x, y) > 0.25:
+			if _tany[near] == 1 and own == Terrain.BRIDGE and _path_sample(_mpave, x, y) > -0.4:
 				k = Terrain.BRIDGE
-			elif _tany[near] == 1 and _path_sample(_mwet, x, y) > _path_cut(_path_wet(own), (float(_na[i]) / 255.0 - 0.5) * 0.3):
+			elif _tany[near] == 1 and _path_sample(_mwet, x, y) > _path_cut((float(_na[i]) / 255.0 - 0.5) * 0.5):
 				k = _wkind[near]
-			elif _tany[near] == 1 and _path_sample(_mroad, x, y) > _path_cut(own == Terrain.ROAD, 0.0):
+				_pdep[i] = 0.5 + _path_sample(_mwet, x, y) - _path_cut((float(_na[i]) / 255.0 - 0.5) * 0.5)
+			elif _tany[near] == 1 and _path_sample(_mroad, x, y) > _path_cut(0.0):
 				k = Terrain.ROAD
-			elif _tany[near] == 1 and _path_sample(_mpave, x, y) > _path_cut(own in PAVE_SET, 0.0):
+			elif _tany[near] == 1 and _path_sample(_mpave, x, y) > _path_cut(0.0):
 				k = _fkind[near]
 			else:
 				# Natural ground: warp the lookup so borders are ragged.
@@ -163,7 +166,7 @@ func paint(grid: PackedInt32Array, width: int, height: int, seed_v: int) -> Imag
 			_pk[i] = k
 			_phard[i] = 1 if _path_hard(k) else 0
 			_pwet[i] = 1 if _is_water(k) else 0
-			_road_s[i] = _path_sample(_mroad, x, y)
+			_road_s[i] = clampf(0.5 + _path_sample(_mroad, x, y) * 0.6, 0.0, 1.0)
 			var col := _color(k, x, y, i, tx, ty)
 			if bed[ty * w + tx] != 0 and k in [Terrain.LAWN, Terrain.MEADOW]:
 				col = _bed_color(x, y, i)
@@ -186,29 +189,31 @@ func paint(grid: PackedInt32Array, width: int, height: int, seed_v: int) -> Imag
 	return im
 
 
-## Smoothed outlines for the formal and water groups. Each group is a 0/1 mask
-## at tile resolution, blurred twice with a 3x3 box, so a pixel belongs to the
-## group where the blurred mask (sampled at the pixel) is above one half. The
-## outline stays within about half a tile of the real tiles.
+## Smoothed outlines for the formal and water groups. Each group gets a signed
+## distance field at tile resolution (tile centers, in tiles: positive inside,
+## negative outside, zero on the tile edge), lightly smoothed. Sampled
+## bilinearly at each pixel and cut near zero, it keeps a run's real width
+## (one-tile roads and streams stay one tile wide) while tile steps become
+## diagonals and square corners round off.
 func _path_groups() -> void:
 	var n := w * h
-	var road := PackedFloat32Array()
-	var pave := PackedFloat32Array()
-	var wet := PackedFloat32Array()
+	var road := PackedByteArray()
+	var pave := PackedByteArray()
+	var wet := PackedByteArray()
 	road.resize(n)
 	pave.resize(n)
 	wet.resize(n)
 	for t in n:
-		road[t] = 1.0 if kind[t] == Terrain.ROAD else 0.0
-		pave[t] = 1.0 if kind[t] in PAVE_SET else 0.0
-		wet[t] = 1.0 if _path_wet(kind[t]) else 0.0
-	_mroad = _path_blur(road)
-	_mpave = _path_blur(pave)
-	_mwet = _path_blur(wet)
+		road[t] = 1 if kind[t] == Terrain.ROAD else 0
+		pave[t] = 1 if kind[t] in PAVE_SET else 0
+		wet[t] = 1 if _path_wet(kind[t]) else 0
+	_mroad = _path_blur(_path_sdf(road))
+	_mpave = _path_blur(_path_sdf(pave))
+	_mwet = _path_blur(_path_sdf(wet))
 	_thard.resize(n)
 	for t in n:
 		_thard[t] = 1 if _path_hard(kind[t]) else 0
-	# Tiles with any group cover within one tile; elsewhere every sample is zero.
+	# Tiles with any group edge within reach; elsewhere every sample is far out.
 	_tany.resize(n)
 	for y in h:
 		for x in w:
@@ -216,7 +221,7 @@ func _path_groups() -> void:
 			for dy in range(-1, 2):
 				for dx in range(-1, 2):
 					var t := clampi(y + dy, 0, h - 1) * w + clampi(x + dx, 0, w - 1)
-					if _mroad[t] > 0.0 or _mpave[t] > 0.0 or _mwet[t] > 0.0:
+					if _mroad[t] > -1.0 or _mpave[t] > -1.0 or _mwet[t] > -1.0:
 						any = 1
 			_tany[y * w + x] = any
 	_fkind.resize(n)
@@ -227,27 +232,52 @@ func _path_groups() -> void:
 			_wkind[y * w + x] = _path_rep(x, y, WET_SET, Terrain.RIVER)
 
 
-## Two passes of a 3x3 box blur over a tile-resolution mask (edges clamped).
+## Signed distance (in tiles) from each tile center to the edge of a 0/1 tile
+## mask, searched out to PATH_REACH tiles and clamped there.
+func _path_sdf(m: PackedByteArray) -> PackedFloat32Array:
+	var out := PackedFloat32Array()
+	out.resize(w * h)
+	for y in h:
+		for x in w:
+			var inside := m[y * w + x]
+			var best := float(PATH_REACH * PATH_REACH + 1)
+			for dy in range(-PATH_REACH, PATH_REACH + 1):
+				var ny := y + dy
+				if ny < 0 or ny >= h:
+					continue
+				for dx in range(-PATH_REACH, PATH_REACH + 1):
+					var nx := x + dx
+					if nx < 0 or nx >= w or m[ny * w + nx] == inside:
+						continue
+					best = minf(best, float(dx * dx + dy * dy))
+			var d := minf(sqrt(best), float(PATH_REACH)) - 0.5
+			out[y * w + x] = d if inside == 1 else -d
+	return out
+
+
+## A center-weighted 3x3 blur (edges clamped), mixed with the original, which
+## rounds the distance field's corners without shifting its zero line on
+## straight runs.
 func _path_blur(src: PackedFloat32Array) -> PackedFloat32Array:
-	var a := src
-	for _pass in 2:
-		var b := PackedFloat32Array()
-		b.resize(w * h)
-		for y in h:
-			for x in w:
-				var s := 0.0
-				for dy in range(-1, 2):
-					for dx in range(-1, 2):
-						s += a[clampi(y + dy, 0, h - 1) * w + clampi(x + dx, 0, w - 1)]
-				b[y * w + x] = s / 9.0
-		a = b
-	return a
+	var b := PackedFloat32Array()
+	b.resize(w * h)
+	for y in h:
+		for x in w:
+			var s := 0.0
+			for dy in range(-1, 2):
+				for dx in range(-1, 2):
+					var wt := 4.0 if dx == 0 and dy == 0 else (2.0 if dx == 0 or dy == 0 else 1.0)
+					s += src[clampi(y + dy, 0, h - 1) * w + clampi(x + dx, 0, w - 1)] * wt
+			# Half blur, half original, so a lone tile or a one-tile run keeps
+			# its body instead of blurring away.
+			b[y * w + x] = lerpf(src[y * w + x], s / 16.0, 0.45)
+	return b
 
 
-## The blurred-mask cutoff for a pixel: one half in general, but a quarter on a
-## tile that is itself a member, where a one-tile-wide run blurs to a third.
-func _path_cut(own_member: bool, wobble: float) -> float:
-	return (0.25 if own_member else 0.5) + wobble
+## The distance-field cutoff for a pixel, in tiles: a little below the edge so
+## runs that only touch at a corner stay joined, plus an optional wobble.
+func _path_cut(wobble: float) -> float:
+	return -0.12 + wobble
 
 
 ## A blurred mask at a pixel, bilinear between tile centers (tile i is centered
@@ -326,23 +356,23 @@ func _path_wet(k: int) -> bool:
 ## in the channel. Ripples gather in soft patches as small 3-pixel dashes, and
 ## sun glints are rare 2-pixel sparkles, so the surface reads as moving light.
 func _path_water(k: int, x: int, y: int, i: int, a: float, b: float, n: float, r: float) -> Color:
-	var d := _depth_at(x, y)
-	var shallow := c("a4dcc8")
-	var mid := c("55b3ae")
+	var d := _pdep[i]
+	var shallow := c("5bb5ad")
+	var mid := c("3f9aa3")
 	var deep := c("2f7f98")
 	var abyss := c("215c7e")
 	if k == Terrain.CREEK:
-		shallow = c("b2e3cc")
+		shallow = c("68bdb0")
 		mid = c("6ec0b4")
 		deep = c("3f9aa0")
 		abyss = c("2d7a8c")
 	if k == Terrain.LAKE:
-		shallow = c("8fcfb4")
+		shallow = c("4fa99c")
 		mid = c("3f9e96")
 		deep = c("2a7470")
 		abyss = c("1d5563")
-	# Depth is at least one tile out from land; the gradient runs over ~3 tiles.
-	var t := clampf((d - 0.5) / 2.5, 0.0, 1.0)
+	# Depth is 0.5 at the shore; the gradient runs over ~2 tiles.
+	var t := clampf((d - 0.5) / 1.8, 0.0, 1.0)
 	var col := shallow.lerp(mid, smooth(0.0, 0.4, t)).lerp(deep, smooth(0.3, 0.75, t)).lerp(abyss, smooth(0.7, 1.0, t))
 	col = col.lerp(abyss, smooth(0.55, 0.9, a) * 0.18)
 	# Ripple patches: a 6-pixel cell holds a 3-pixel dash, only in some cells.
@@ -363,37 +393,10 @@ func _path_water(k: int, x: int, y: int, i: int, a: float, b: float, n: float, r
 	return col
 
 
-# ---------------------------------------------------------------- water depth
+# ---------------------------------------------------------------- water
 
 func _is_water(k: int) -> bool:
 	return k == Terrain.RIVER or k == Terrain.LAKE or k == Terrain.CREEK
-
-
-## Distance in tiles from each tile to the nearest non-water tile, smoothed.
-func _compute_water_depth() -> void:
-	_water_depth.resize(w * h)
-	for y in h:
-		for x in w:
-			var best := 9.0
-			if _is_water(kind[y * w + x]):
-				for r in range(1, 6):
-					var found := false
-					for dy in range(-r, r + 1):
-						for dx in range(-r, r + 1):
-							if maxi(absi(dx), absi(dy)) != r:
-								continue
-							var nx := x + dx
-							var ny := y + dy
-							if nx < 0 or ny < 0 or nx >= w or ny >= h:
-								continue
-							if not _is_water(kind[ny * w + nx]) and kind[ny * w + nx] != Terrain.BRIDGE:
-								found = true
-								best = minf(best, Vector2(dx, dy).length())
-					if found:
-						break
-			else:
-				best = 0.0
-			_water_depth[y * w + x] = best
 
 
 func _tint_at(x: int, y: int) -> float:
@@ -409,19 +412,6 @@ func _tint_at(x: int, y: int) -> float:
 	var b := lerpf(tint[y1 * w + x0], tint[y1 * w + x1], tx)
 	return lerpf(a, b, ty)
 
-
-func _depth_at(x: int, y: int) -> float:
-	var fx := (x + 0.0) / T - 0.5
-	var fy := (y + 0.0) / T - 0.5
-	var x0 := clampi(floori(fx), 0, w - 1)
-	var y0 := clampi(floori(fy), 0, h - 1)
-	var x1 := mini(x0 + 1, w - 1)
-	var y1 := mini(y0 + 1, h - 1)
-	var tx := clampf(fx - x0, 0.0, 1.0)
-	var ty := clampf(fy - y0, 0.0, 1.0)
-	var a := lerpf(_water_depth[y0 * w + x0], _water_depth[y0 * w + x1], tx)
-	var b := lerpf(_water_depth[y1 * w + x0], _water_depth[y1 * w + x1], tx)
-	return lerpf(a, b, ty)
 
 
 # ---------------------------------------------------------------- colors
@@ -862,41 +852,6 @@ func _rock(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 	return col
 
 
-func _water(k: int, x: int, y: int, i: int, a: float, b: float, n: float, r: float) -> Color:
-	var d := _depth_at(x, y)
-	var deep := c("2b6877")
-	var mid := c("3f8c94")
-	var shallow := c("86c5b6")
-	if k == Terrain.CREEK:
-		deep = c("3a8288")
-		mid = c("58a3a0")
-		shallow = c("8fcbb8")
-	if k == Terrain.LAKE:
-		deep = c("25605e")
-		mid = c("2f7a70")
-		shallow = c("6cb5a0")
-	var t := clampf(d / 3.2, 0.0, 1.0)
-	var col := shallow.lerp(mid, smooth(0.0, 0.45, t)).lerp(deep, smooth(0.4, 1.0, t))
-	# Long ripples stretched along the flow (north-south).
-	var ripple := float(_nb[((y * 1) * _pw + x * 3 + (y % 5) * 0) % _nb.size()]) / 255.0
-	var streak := sin(float(x) * 0.55 + b * 6.0 + float(y) * 0.05) * 0.5 + 0.5
-	if streak > 0.86:
-		col = col.lightened(0.12)
-	elif streak < 0.1:
-		col = col.darkened(0.1)
-	col = col.lerp(deep, smooth(0.65, 0.95, a) * 0.3)
-	# Pebbles visible through the shallows.
-	if d < 1.6 and r < 0.14 - d * 0.05:
-		col = c("a9a08a").lerp(col, 0.4 + d * 0.15)
-	# Sun glints.
-	if r > 0.9985 - t * 0.0008 and ripple > 0.4:
-		col = c("f4fffb")
-	elif hash2(x / 3, y, 61) > 0.992 and streak > 0.6:
-		col = col.lightened(0.22)
-	return col
-
-
-# ---------------------------------------------------------------- finishing
 
 ## Foam where water meets land, drawn from the ground type actually shown at
 ## each pixel (so it follows the ragged, warped borders).
@@ -908,12 +863,14 @@ func _shore_and_edges(im: Image) -> void:
 		for x in range(3, _pw - 3):
 			var i := y * _pw + x
 			if _pwet[i] == 1:
-				var d := _depth_at(x, y)
-				var band := 0.32 + (hash2(x / 3, y / 3, 71) - 0.5) * 0.14 + (float(_nb[i]) / 255.0 - 0.5) * 0.12
-				if d < 0.5 + band:
-					var near := 1.0 - (d - 0.5) / band
-					if hash2(x / 2, y / 2, 72) < 0.3 + near * 0.6:
-						im.set_pixel(x, y, c("eef8f2") if near > 0.55 else c("b9dfd4"))
+				var d := _pdep[i]
+				# A thin, steady foam line at the shore, then a broken lighter
+				# band just inside it.
+				var wob := (float(_nb[i]) / 255.0 - 0.5) * 0.06
+				if d < 0.56 + wob:
+					im.set_pixel(x, y, c("e4f4ec"))
+				elif d < 0.68 + wob and hash2(x / 2, y / 2, 72) < 0.45:
+					im.set_pixel(x, y, im.get_pixel(x, y).lerp(c("bfe3d6"), 0.6))
 			elif _phard[i] == 0 and (_pwet[i + 3] == 1 or _pwet[i - 3] == 1 or _pwet[i + 3 * _pw] == 1 or _pwet[i - 3 * _pw] == 1):
 				if hash2(x / 2, y / 2, 73) < 0.7:
 					im.set_pixel(x, y, im.get_pixel(x, y).lerp(c("8f8462"), 0.35))
