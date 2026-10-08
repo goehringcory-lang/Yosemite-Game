@@ -1,7 +1,7 @@
 [gd_resource type="Theme" format=3]
 
 [ext_resource type="Texture2D" path="res://assets/ui/panel.png" id="1_panel"]
-[ext_resource type="FontFile" path="res://assets/fonts/Tiny5-Regular.ttf" id="2_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSans-Regular.ttf" id="2_font"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
 content_margin_left = 6.0

@@ -4,7 +4,7 @@ extends RefCounted
 ## parchment panels (in the spirit of Stardew's menus), and a set of tiny
 ## gear icons. Everything draws onto a CanvasItem during its draw pass.
 
-const FONT_PATH := "res://assets/fonts/Tiny5-Regular.ttf"
+const FONT_PATH := "res://assets/fonts/NotoSans-Regular.ttf"
 
 # Wood frame, parchment, ink.
 const WOOD_DARK := Color("3a2414")
@@ -33,9 +33,9 @@ static func font() -> Font:
 	if _font == null:
 		var loaded := load(FONT_PATH) as FontFile
 		if loaded != null:
-			loaded.antialiasing = TextServer.FONT_ANTIALIASING_NONE
-			loaded.hinting = TextServer.HINTING_NONE
-			loaded.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
+			loaded.antialiasing = TextServer.FONT_ANTIALIASING_GRAY
+			loaded.hinting = TextServer.HINTING_LIGHT
+			loaded.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_AUTO
 			loaded.force_autohinter = false
 			_font = loaded
 		else:
