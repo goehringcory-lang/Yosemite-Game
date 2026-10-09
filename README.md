@@ -29,7 +29,9 @@ godot project.godot         # opens the editor; press F5 to play
 
 A prompt above the player's head shows what the interact button will do ("E  Read: Camp 4"), and it switches to gamepad button names when you use a gamepad. Every menu's hint line (pause menu, journal, conversations, maps) follows the same switch.
 
-**Settings** are on the pause menu (Esc, then Settings) and are kept in `user://settings.cfg`, apart from your save: text speed (Slow, Normal, Fast, Instant), full screen, window size (whole steps of 480x270, up to what fits your screen), whether your next main-story step shows under the clock, and button prompts (Auto, or always keyboard or always gamepad). There is no audio yet, so there are no volume settings. The code is `scripts/ui/settings.gd`.
+**The title screen** comes up first, over a painted view of the Valley at golden hour (El Capitan, Half Dome, Bridalveil Fall, drawn by the climbing screen's skyline painter): Continue (when there's a save), New Game, Settings, Credits and Quit. New Game asks first if there's a save, and the old save stays on disk until your first night's sleep replaces it, so quitting before then loses nothing. Credits has two pages: the credits (the map data, elevation, font and engine), which scroll by themselves, and Licenses, the full license texts the game has to carry (Godot's and its libraries', read from the engine, and the font's). The code is `scripts/ui/title_screen.gd` and `scripts/ui/credits.gd`; `SHOT_DIR=/tmp/shots xvfb-run -a godot --path . res://tools/shots/title_shot.tscn` photographs them (`docs/ui_title.png`, `docs/ui_credits.png`).
+
+**Settings** are on the pause menu (Esc, then Settings) and on the title screen, and are kept in `user://settings.cfg`, apart from your save: text speed (Slow, Normal, Fast, Instant), full screen, window size (whole steps of 480x270, up to what fits your screen), whether your next main-story step shows under the clock, button prompts (Auto, or always keyboard or always gamepad), and three volumes (the whole game, sound effects, and ambience, in steps of 10%). The code is `scripts/ui/settings.gd`.
 
 Controls are set in **Project > Project Settings > Input Map**.
 
@@ -237,6 +239,23 @@ Where things are:
 
 The font is Noto Sans (SIL Open Font License, `assets/fonts/`). To photograph a route: `SHOT_ROUTE=the_nose SHOT_PITCH=6 SHOT_HOURS=7,19 godot --path . res://tools/shots/climb_shot.tscn` (needs a window; `SHOT_INTRO=1` shoots the route card, `SHOT_SPECIAL=crux|result|pause|night` the others). `tools/shots/climb_walls.tscn`, `climb_landmarks.tscn` and `climb_figures.tscn` show the rock, the skyline and the people on their own. More in [docs/CLIMBING_MINIGAME.md](docs/CLIMBING_MINIGAME.md).
 
+## Sound
+
+Every sound is synthesized by `tools/audio/build_sounds.gd` into `assets/audio/` (16-bit mono WAVs, each from a fixed seed), so nothing is recorded or downloaded and there's nothing to license. To change one, edit its function there and rebuild:
+
+```bash
+godot --headless --path . -s res://tools/audio/build_sounds.gd
+godot --headless --path . --import
+```
+
+The `Sound` autoload (`scripts/autoload/sound.gd`) plays them on three buses (Master, Effects, Ambience), each with a volume on the Settings page.
+
+- **Ambience.** Four loops fade into each other: birds by day (mountain chickadees, a warbler, a far-off Steller's jay), crickets and a great horned owl at night, wind, and rain. Their mix follows the hour (crossing over at dawn and dusk), the season (fewer birds and no crickets in winter, more wind), the day's weather, and the place: indoors you hear only rain on the roof, and Glacier Point and Tuolumne are windy. Up on the climbing screen the wind rises.
+- **Campfires and waterfalls.** `scripts/world/sound_emitter.gd` places a looping sound in the world that gets louder as you walk up to it. Every fire's sparks crackle, every waterfall's mist roars (Lower Yosemite Fall, Staircase Falls, Royal Arch Cascade), and on the hub maps each Place named for a fall gets one (Yosemite Falls, Bridalveil, Illilouette). Falls are loudest in spring and down to a trickle by fall.
+- **Footsteps.** Each step (`scripts/player/footfall.gd`) is dirt and duff, a squelch in the rain, a crunch in snow or on frozen winter ground, or boards indoors.
+- **Climbing.** Moves scrape on the granite; clipping a bolt, placing a cam, chalking up, eating, aiding or jugging, falling onto the rope, a perfect crux and topping out each have their own sound (hooked into `_events()` in `climb_minigame.gd`).
+- **Menus.** A soft tick to move and a wooden knock to choose, on the title screen and pause menu.
+
 ## Story
 
 The story is in [STORY.md](STORY.md), and the mechanics are in [docs/DESIGN.md](docs/DESIGN.md). Galen Clark gives you the Guardian's Register, and you fill it with the stories of real people from the park's history. Native characters and practices are flagged for review by the tribes traditionally associated with Yosemite.
@@ -271,7 +290,8 @@ Black oaks change color with the seasons: new pale leaves in spring, gold and ru
 ```
 project.godot            480×270 base resolution, scaled up in whole-number steps with nearest-neighbor filtering
 scenes/
-  world/world.tscn       main scene: loads one region at a time, plus player, lighting, HUD, park map
+  ui/title_screen.tscn   main scene: the title screen (Continue, New Game, Settings, Credits, Quit)
+  world/world.tscn       the game: loads one region at a time, plus player, lighting, HUD, park map
   regions/               one scene per hub, plus lamon_homestead.tscn (your camp)
   regions/generated/     generated hub terrain (don't edit; rebuilt by tools/mapgen)
   player/player.tscn     the player (CharacterBody2D + camera)
@@ -287,6 +307,9 @@ scripts/
     item_db.gd           registry of all items (forage + prepared food)
     save_manager.gd      JSON save/load (user://save.json)
     park.gd              hubs, routes, seasonal road closures, hub unlocks
+    sound.gd             buses, volumes, one-shot sounds, and the ambience beds
+  ui/title_screen.gd     the title screen; ui/credits.gd the credits and licenses
+  world/sound_emitter.gd a looping sound in the world (campfires, waterfalls)
   world/forage_spawner.gd  daily wild forage, placed by season and habitat
   world/world.gd         loads regions, travel, sleep sequence
   world/region.gd        a map the player can be in (hub or smaller area)
@@ -304,9 +327,13 @@ data/park/hubs/*.tres    one file per hub: name, description, location, map boun
 data/park/routes.json    generated driving routes between hubs
 assets/map/              generated park map and area maps
 tools/mapgen/            the map generator
+tools/audio/             the sound synthesizer (writes assets/audio/)
+assets/audio/            every sound in the game (generated)
 assets/sprites/          placeholder pixel art, meant to be replaced (items.png holds the 16×16 item icons)
 assets/tiles/            TileSet (collision + "open_ground" flag per tile, where forage can land)
-tests/                   headless tests (smoke, story, travel, world_story, ahwahnee)
+tests/                   headless tests; tests/run_all.sh runs them all
+export_presets.cfg       Windows, macOS and Linux export presets (see Builds)
+.github/workflows/       CI: tests on every pull request, builds on demand or on a tag
 ```
 
 ## How to add things
@@ -320,6 +347,14 @@ tests/                   headless tests (smoke, story, travel, world_story, ahwa
 **Replacing the art:** overwrite the PNGs in `assets/sprites/` with the same layout. The player sheet uses 16×24 frames, with columns stand / step A / step B and rows down / up / left / right. Aseprite is the usual tool for this.
 
 ## Testing
+
+To run everything (each test prints its own PASS/FAIL lines to a log; this prints a summary and exits non-zero if any fail):
+
+```bash
+tests/run_all.sh                       # GODOT=/path/to/godot if it isn't on the PATH
+```
+
+GitHub Actions runs the same script on every pull request and push to main (`.github/workflows/tests.yml`), with Godot 4.7 and xvfb for the climbing screen test. It takes about five minutes. The tests one by one:
 
 ```bash
 godot --headless --path . res://tests/smoke_test.tscn
@@ -349,9 +384,11 @@ godot --headless --path . res://tests/eggs_test.tscn
 godot --headless --path . res://tests/perks_test.tscn
 godot --headless --path . res://tests/settings_test.tscn
 godot --headless --path . res://tests/side_quests_test.tscn   # seasonal and time-of-day side stories
+godot --headless --path . res://tests/title_test.tscn
+godot --headless --path . res://tests/audio_test.tscn
 ```
 
-The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds). The perks test earns each perk, checks its effect where it's hooked in, the HUD message and Journal section, and that perks survive a save. The settings test saves and reloads the settings (in its own file), drives the pause menu's Settings page with keys, and checks the goal panel, pinned button prompts, and the dialogue reveal and skip. The side quests test plays the side stories that depend on the season or the hour (Clark at the Mariposa Grove, Enid Michael at dawn, Hodges in fall, Degnan in winter, Muir after dark) and checks their Register pages say what is real.
+The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds). The perks test earns each perk, checks its effect where it's hooked in, the HUD message and Journal section, and that perks survive a save. The settings test saves and reloads the settings (in its own file), drives the pause menu's Settings page with keys, and checks the goal panel, pinned button prompts, and the dialogue reveal and skip. The side quests test plays the side stories that depend on the season or the hour (Clark at the Mariposa Grove, Enid Michael at dawn, Hodges in fall, Degnan in winter, Muir after dark) and checks their Register pages say what is real. The title test drives the title screen with keys (with and without a save, New Game asking first, Settings and Credits), checks the credits carry the OpenStreetMap credit and the license texts, and that a new game starts fresh without deleting the old save. The audio test checks that every sound the game plays exists, that loops repeat over their whole length, that the buses follow the volume settings, how the ambience follows the hour, season, weather and place, and that fires, waterfalls, footsteps and the climbing screen make their sounds.
 
 ### Performance bench
 
@@ -366,10 +403,23 @@ Things that keep it fast: World loads the regions next door on a background thre
 
 ## Map data credits
 
-The maps are made from data under these licenses. Keep this credit in the game's credits screen:
+The maps are made from data under these licenses. The credit is on the game's credits screen (`CREDITS` in `scripts/ui/credits.gd`); keep it there:
 
 - Map data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, available under the Open Database License (ODbL).
 - Elevation: USGS 3D Elevation Program (public domain), from the [AWS Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) open dataset.
+
+## Builds
+
+`export_presets.cfg` has three presets: **Windows** (x86_64), **macOS** (universal, ad-hoc signed) and **Linux** (x86_64, which also covers the Steam Deck). Each packs the game into one file, leaves out `docs/` and `tests/`, and carries the font's license text for the Licenses page. To build locally, install the Godot 4.7 export templates (Editor > Manage Export Templates), then:
+
+```bash
+mkdir -p build/windows build/macos build/linux
+godot --headless --path . --export-release "Windows" "build/windows/Yosemite Game.exe"
+godot --headless --path . --export-release "macOS" "build/macos/Yosemite Game.zip"
+godot --headless --path . --export-release "Linux" "build/linux/YosemiteGame.x86_64"
+```
+
+On GitHub, run the **Build** workflow from the Actions tab (`.github/workflows/build.yml`) to get all three as downloadable artifacts. Pushing a tag such as `v0.1.0` does the same and also drafts a GitHub release with the three zips; nothing is published until you publish the draft. The macOS build isn't notarized, so the first time players open it with right-click > Open; notarizing needs an Apple Developer account (the `codesign/` and `notarization/` options in the macOS preset). The Windows build keeps Godot's icon, since setting the .exe icon needs rcedit (`application/modify_resources`).
 
 ## Road to Steam
 
@@ -377,5 +427,5 @@ The maps are made from data under these licenses. Keep this credit in the game's
 2. Put up a Steam store page early. Wishlists drive visibility at launch.
 3. Set up [Steamworks](https://partner.steamgames.com/). The Steam Direct fee is $100 per game.
 4. Add [GodotSteam](https://godotsteam.com/) for achievements and cloud saves.
-5. Export builds: **Project > Export**. Install export templates, then add Windows, Linux, and macOS presets. The Linux build also covers the Steam Deck.
+5. Export builds: the Windows, macOS and Linux presets are set up (see Builds above), and the Build workflow makes all three. Before release, notarize the macOS build and give the Windows .exe the game's icon.
 6. Upload builds with SteamPipe.
