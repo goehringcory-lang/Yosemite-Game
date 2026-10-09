@@ -87,6 +87,11 @@ func _ready() -> void:
 			fade.offsets = PackedFloat32Array([0.0, 0.15, 0.85, 1.0])
 			fade.colors = PackedColorArray([Color(1, 1, 1, 0.0), Color(1, 1, 1, 0.9), Color(1, 1, 1, 0.9), Color(1, 1, 1, 0.0)])
 	color_ramp = fade
+	# Fires crackle and waterfalls roar, heard from nearby.
+	if effect == "sparks":
+		add_child(SoundEmitter.make("campfire", 150.0, 0.8))
+	elif effect == "mist":
+		add_child(SoundEmitter.make("waterfall", 360.0, 1.0))
 	if effect == "fireflies":
 		# Fireflies glow: additive, so they show against the night tint.
 		var add := CanvasItemMaterial.new()

@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Yosemite Game"
 config/description="A cozy pixel exploration game set in Yosemite National Park."
-run/main_scene="res://scenes/world/world.tscn"
+run/main_scene="res://scenes/ui/title_screen.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -30,6 +30,7 @@ Recipes="*res://scripts/story/recipes.gd"
 QuestLog="*res://scripts/story/quest_log.gd"
 Larder="*res://scripts/story/larder.gd"
 Perks="*res://scripts/story/perks.gd"
+Sound="*res://scripts/autoload/sound.gd"
 
 [display]
 
@@ -157,3 +158,4 @@ textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 2d/snap/snap_2d_transforms_to_pixel=true
+textures/vram_compression/import_etc2_astc=true

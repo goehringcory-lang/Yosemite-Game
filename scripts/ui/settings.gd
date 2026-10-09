@@ -7,8 +7,7 @@ extends RefCounted
 ##   Settings.text_speed = Settings.TextSpeed.FAST
 ##   Settings.save()
 ##   Settings.apply(get_window())
-##
-## There is no audio in the game yet, so there are no volume settings.
+##   Sound.apply_volumes()
 
 enum TextSpeed { SLOW, NORMAL, FAST, INSTANT }
 enum Prompts { AUTO, KEYBOARD, GAMEPAD }
@@ -21,6 +20,8 @@ const PROMPT_NAMES := ["Auto", "Keyboard", "Gamepad"]
 const MIN_SCALE := 1
 const MAX_SCALE := 6
 const BASE_SIZE := Vector2i(480, 270)
+## Volumes run from 0 (off) to MAX_VOLUME in whole steps.
+const MAX_VOLUME := 10
 
 ## Where the settings are kept. Tests point this at their own file.
 static var path := DEFAULT_PATH
@@ -33,6 +34,11 @@ static var show_objective := true
 ## Which buttons the on-screen hints name: follow the last device used, or
 ## always the keyboard's or the gamepad's.
 static var prompts := Prompts.AUTO
+## Volume of everything, of one-shot sounds (steps, climbing, menus), and of
+## the ambience (birds, wind, rain, campfires, waterfalls); 0 to MAX_VOLUME.
+static var master_volume := 8
+static var effects_volume := MAX_VOLUME
+static var ambience_volume := MAX_VOLUME
 
 static var _loaded := false
 ## True once settings came from a file or the player changed one, so the
@@ -58,6 +64,9 @@ static func load_settings() -> void:
 	window_scale = clampi(int(config.get_value("display", "window_scale", window_scale)), MIN_SCALE, MAX_SCALE)
 	show_objective = bool(config.get_value("hud", "show_objective", show_objective))
 	prompts = clampi(int(config.get_value("input", "prompts", prompts)), 0, Prompts.size() - 1) as Prompts
+	master_volume = clampi(int(config.get_value("audio", "master", master_volume)), 0, MAX_VOLUME)
+	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
+	ambience_volume = clampi(int(config.get_value("audio", "ambience", ambience_volume)), 0, MAX_VOLUME)
 
 
 static func save() -> Error:
@@ -69,6 +78,9 @@ static func save() -> Error:
 	config.set_value("display", "window_scale", window_scale)
 	config.set_value("hud", "show_objective", show_objective)
 	config.set_value("input", "prompts", int(prompts))
+	config.set_value("audio", "master", master_volume)
+	config.set_value("audio", "effects", effects_volume)
+	config.set_value("audio", "ambience", ambience_volume)
 	return config.save(path)
 
 
@@ -78,6 +90,9 @@ static func reset_defaults() -> void:
 	window_scale = 3
 	show_objective = true
 	prompts = Prompts.AUTO
+	master_volume = 8
+	effects_volume = MAX_VOLUME
+	ambience_volume = MAX_VOLUME
 	_customized = false
 
 

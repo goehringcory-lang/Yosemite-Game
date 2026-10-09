@@ -1,10 +1,10 @@
 class_name Footfall
 extends Node2D
-## Little touches as the player moves: a puff of dust at each step (kicked-up
-## snow on snowy days, a splash when it rains, nothing indoors), and on cold
-## mornings and all winter, a breath of fog in front of their face. Pixel
-## puffs in a small pool, drawn in world space so they stay where they were
-## made. Player adds one as a child.
+## Little touches as the player moves: a puff of dust and a footstep sound at
+## each step (kicked-up snow on snowy days, a splash when it rains, boards and
+## no dust indoors), and on cold mornings and all winter, a breath of fog in
+## front of their face. Pixel puffs in a small pool, drawn in world space so
+## they stay where they were made. Player adds one as a child.
 
 ## Pixels walked between steps (the walk cycle's footfalls).
 const STEP_DISTANCE := 10.0
@@ -77,6 +77,7 @@ func _process(delta: float) -> void:
 
 
 func _step(at: Vector2) -> void:
+	_step_sound()
 	if _indoors():
 		return
 	var color := Color(0.8, 0.72, 0.56, 0.6)
@@ -90,6 +91,20 @@ func _step(at: Vector2) -> void:
 	elif GameClock.season == GameClock.Season.SPRING:
 		color.a = 0.4 # damp spring earth
 	_add([at, 0.0, 0, color, Vector2.ZERO])
+
+
+## A footstep: boards indoors, a crunch in snow or on winter ground, a squelch
+## in the rain, and dirt and duff the rest of the time.
+func _step_sound() -> void:
+	var surface := "step_dirt"
+	var weather := Weather.today()
+	if _indoors():
+		surface = "step_wood"
+	elif weather.snow > 0.0 or GameClock.season == GameClock.Season.WINTER:
+		surface = "step_snow"
+	elif weather.rain > 0.0:
+		surface = "step_wet"
+	Sound.play(surface, -9.0, 0.08)
 
 
 func _add(puff: Array) -> void:
