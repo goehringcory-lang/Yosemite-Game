@@ -5,27 +5,17 @@ extends Control
 ## Up/Down choose, E (A) or Enter selects. Settings opens the pause menu's
 ## Settings page on its own; Credits opens the credits.
 ##
-## The view is painted when the screen opens by the climbing screen's painters
-## (climb_sky.gd, climb_landscape.gd), the way the Valley looks from the Tunnel
-## View at golden hour: El Capitan, Half Dome far off, Bridalveil Fall.
+## Behind it all is a pixel painting of the Valley (assets/ui/title_background.png):
+## El Capitan, Half Dome far off, Bridalveil Fall, which shimmers.
 
 const WORLD_SCENE := "res://scenes/world/world.tscn"
 const SCREEN := Vector2(480, 270)
-const HOUR := 18.4
-const VIEW := {
-	"ground": "valley_forest",
-	"view": [
-		{"k": "sierra_crest", "x": 250, "s": 1.0, "l": 2},
-		{"k": "half_dome", "x": 336, "s": 0.85, "l": 0},
-		{"k": "el_capitan", "x": 84, "s": 1.35, "l": 1},
-		{"k": "cathedral_rocks", "x": 440, "s": 1.1, "l": 1},
-		{"k": "bridalveil", "x": 392, "s": 1.0, "l": 1},
-	],
-}
-## How far up the wall the view is painted from (0 is the climbing screen's
-## first move, 1 the top): sets how high the landmarks stand.
-const VIEW_HEIGHT := 0.55
-const SEED := 1864 # the year of the Yosemite Grant
+const BACKGROUND := "res://assets/ui/title_background.png"
+## Where Bridalveil Fall is in the background, for the shimmer: the middle of
+## the water at its lip and where it meets the mist, and its half width there.
+const FALL_TOP := Vector2(437, 141)
+const FALL_BOTTOM := Vector2(429, 203)
+const FALL_HALF_WIDTH := Vector2(2.5, 4.0)
 
 enum Option { CONTINUE, NEW_GAME, SETTINGS, CREDITS, QUIT }
 const OPTION_NAMES := ["Continue", "New Game", "Settings", "Credits", "Quit"]
@@ -41,10 +31,7 @@ var _cursor := 0
 var _confirm_new := false
 var _starting := false
 var _time := 0.0
-var _sky: Texture2D
-var _layers: Array[Dictionary] = []
-var _falls: Array[Dictionary] = []
-var _clouds: Array[Texture2D] = []
+var _shimmer: Control
 var _menu: PanelContainer
 var _hint: Label
 var _footer: Label
@@ -60,7 +47,7 @@ func _ready() -> void:
 	size = SCREEN
 	Settings.ensure_loaded()
 	Settings.apply(get_window())
-	_paint_view()
+	_build_background()
 	_build_title()
 	_build_menu()
 	_pause = PauseMenu.new()
@@ -79,15 +66,18 @@ func _ready() -> void:
 	_refresh()
 
 
-func _paint_view() -> void:
-	var pal := ClimbSky.palette(HOUR)
-	_sky = ImageTexture.create_from_image(ClimbSky.sky(pal))
-	var land := ClimbLandscape.build(VIEW, pal, SEED)
-	for layer: Dictionary in land.layers:
-		_layers.append({"tex": ImageTexture.create_from_image(layer.image), "sink": layer.sink, "pad": layer.pad})
-	_falls = land.falls
-	for i in 3:
-		_clouds.append(ImageTexture.create_from_image(ClimbSky.cloud(pal, SEED + i)))
+func _build_background() -> void:
+	var background := TextureRect.new()
+	background.texture = load(BACKGROUND)
+	background.size = SCREEN
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(background)
+	# Drawn on its own node so it stays above the background.
+	_shimmer = Control.new()
+	_shimmer.size = SCREEN
+	_shimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_shimmer.draw.connect(_draw_shimmer)
+	add_child(_shimmer)
 
 
 func _build_title() -> void:
@@ -165,24 +155,22 @@ func cursor_option() -> int:
 
 func _process(delta: float) -> void:
 	_time += delta
-	queue_redraw()
+	_shimmer.queue_redraw()
 
 
-func _draw() -> void:
-	draw_texture(_sky, Vector2.ZERO)
-	for i in _clouds.size():
-		var x := fposmod(60.0 + i * 170.0 + _time * (2.0 + i * 1.2), SCREEN.x + 140.0) - 70.0
-		draw_texture(_clouds[i], Vector2(x, 14.0 + i * 22.0).round(), Color(1, 1, 1, 0.9))
-	for layer: Dictionary in _layers:
-		draw_texture(layer.tex, Vector2(0, roundf(VIEW_HEIGHT * layer.sink) - layer.pad))
-	# Bridalveil shimmers, as on the climbing screen.
-	for f: Dictionary in _falls:
-		var layer: Dictionary = _layers[f.layer]
-		var off: float = roundf(VIEW_HEIGHT * layer.sink) - float(layer.pad)
-		for y in range(int(f.y0) + 2, int(f.y1), 3):
-			var pos := Vector2(f.x + 1 + int(sin(_time * 3.0 + y * 0.3) * 1.2), y + off)
-			if fmod(_time * 7.0 + y * 0.21, 3.0) < 1.0:
-				draw_rect(Rect2(pos, Vector2(1, 2)), Color(1, 1, 1, 0.8))
+## Bridalveil shimmers, as on the climbing screen: three streams of bright
+## flecks running down the water.
+func _draw_shimmer() -> void:
+	for y in range(int(FALL_TOP.y), int(FALL_BOTTOM.y), 3):
+		var t := inverse_lerp(FALL_TOP.y, FALL_BOTTOM.y, y)
+		var mid := lerpf(FALL_TOP.x, FALL_BOTTOM.x, t)
+		var half := lerpf(FALL_HALF_WIDTH.x, FALL_HALF_WIDTH.y, t)
+		for stream in 3:
+			var phase := _time * 7.0 + y * 0.21 + stream * 1.1
+			if fmod(phase, 3.0) >= 1.0:
+				continue
+			var x := mid + (stream - 1) * half * 0.7 + sin(_time * 3.0 + y * 0.3 + stream) * 1.2
+			_shimmer.draw_rect(Rect2(Vector2(roundf(x), y), Vector2(1, 2)), Color(1, 1, 1, 0.8))
 
 
 func _unhandled_input(event: InputEvent) -> void:
