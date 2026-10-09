@@ -17,7 +17,7 @@ godot project.godot         # opens the editor; press F5 to play
 | Talk, read, pick up, use | E, Space, X, C, or click | A or X |
 | Park and area map | M (Tab or mouse wheel switches tabs) | Back (LB / RB switch tabs) |
 | Journal (quests, perks, gear, food) | J | Y |
-| Pause menu (settings, every control) | Esc | Start |
+| Pause menu (save, settings, every control) | Esc | Start |
 | Back out of a menu | Esc | B |
 | Menus: choose / confirm | Up/Down / E or Enter | Stick or D-pad / A |
 | Settings: change a value | Left/Right (or E) | Stick or D-pad left/right (or A) |
@@ -29,7 +29,7 @@ godot project.godot         # opens the editor; press F5 to play
 
 A prompt above the player's head shows what the interact button will do ("E  Read: Camp 4"), and it switches to gamepad button names when you use a gamepad. Every menu's hint line (pause menu, journal, conversations, maps) follows the same switch.
 
-**The title screen** comes up first, over a painted view of the Valley at golden hour (El Capitan, Half Dome, Bridalveil Fall, drawn by the climbing screen's skyline painter): Continue (when there's a save), New Game, Settings, Credits and Quit. New Game asks first if there's a save, and the old save stays on disk until your first night's sleep replaces it, so quitting before then loses nothing. Credits has two pages: the credits (the map data, elevation, font and engine), which scroll by themselves, and Licenses, the full license texts the game has to carry (Godot's and its libraries', read from the engine, and the font's). The code is `scripts/ui/title_screen.gd` and `scripts/ui/credits.gd`; `SHOT_DIR=/tmp/shots xvfb-run -a godot --path . res://tools/shots/title_shot.tscn` photographs them (`docs/ui_title.png`, `docs/ui_credits.png`).
+**The title screen** comes up first, over a painted view of the Valley at golden hour (El Capitan, Half Dome, Bridalveil Fall, drawn by the climbing screen's skyline painter): Continue (when there's a save), New Game, Settings, Credits and Quit. New Game asks first if there's a save, and the old save stays on disk until your first save or night's sleep replaces it, so quitting before then loses nothing. Credits has two pages: the credits (the map data, elevation, font and engine), which scroll by themselves, and Licenses, the full license texts the game has to carry (Godot's and its libraries', read from the engine, and the font's). The code is `scripts/ui/title_screen.gd` and `scripts/ui/credits.gd`; `SHOT_DIR=/tmp/shots xvfb-run -a godot --path . res://tools/shots/title_shot.tscn` photographs them (`docs/ui_title.png`, `docs/ui_credits.png`).
 
 **Settings** are on the pause menu (Esc, then Settings) and on the title screen, and are kept in `user://settings.cfg`, apart from your save: text speed (Slow, Normal, Fast, Instant), full screen, window size (whole steps of 480x270, up to what fits your screen), whether your next main-story step shows under the clock, button prompts (Auto, or always keyboard or always gamepad), and three volumes (the whole game, sound effects, and ambience, in steps of 10%). The code is `scripts/ui/settings.gd`.
 
@@ -43,7 +43,7 @@ Climbing runs on food. Each morning, wild forage appears around your camp, depen
 
 As you play, the valley teaches you **perks**: small, permanent bonuses earned from people and experience, never bought. Foraging 25 finds earns *Enid's Eye* (one more find each morning), learning to belay from Dick Leonard earns *Leonard's Belay* (more rest at each ledge), two weeks of mornings earns *Muir's Stride* (a quicker walk), and so on. The Journal lists all eight and how to earn the rest. They're in `scripts/story/perks.gd`, and [docs/DESIGN.md](docs/DESIGN.md#perks) has the table.
 
-Sleep in the tent to end the day, which also saves the game. If you're still up at 2 AM you pass out, and the game moves to the next day anyway.
+Sleep in the tent to end the day, which also saves the game. You can also save any time from the pause menu (Esc, then Save game): it keeps where you're standing, the time of day, and everything you're carrying, and Continue on the title screen picks up right there. If you're still up at 2 AM you pass out, and the game moves to the next day anyway.
 
 ## The map of Yosemite
 

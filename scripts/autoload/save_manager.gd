@@ -29,7 +29,8 @@ func start_fresh() -> void:
 	_fresh = true
 
 
-func save_game() -> void:
+## Returns false if the file couldn't be written.
+func save_game() -> bool:
 	var nodes := _pending.duplicate()
 	for node in _persist_nodes():
 		nodes[node.name] = node.save_data()
@@ -42,9 +43,10 @@ func save_game() -> void:
 	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	if file == null:
 		push_error("Could not write save file: %s" % error_string(FileAccess.get_open_error()))
-		return
+		return false
 	_fresh = false
 	file.store_string(JSON.stringify(data, "\t"))
+	return true
 
 
 ## Returns false if there is no valid save, so the caller can start a new game.
