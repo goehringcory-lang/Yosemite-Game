@@ -2,9 +2,11 @@ class_name PauseMenu
 extends CanvasLayer
 ## Esc (gamepad Start) pauses the game. World adds one. Three pages:
 ##   Main: Resume, Settings, Controls, Quit, and your current goal
-##   Settings: text speed, full screen, window size, the goal panel, button prompts
+##   Settings: text speed, full screen, window size, the goal panel, button
+##     prompts, and the volumes
 ##   Controls: every control, keyboard and gamepad
 ## Up/Down choose, E (A) selects, Left/Right change a setting, Esc (B) goes back.
+## The title screen opens the Settings page on its own with open_settings().
 
 signal closed
 
@@ -26,14 +28,17 @@ const CONTROLS := [
 ]
 const OPTIONS := ["Resume", "Settings", "Controls", "Quit to desktop"]
 const QUIT_CONFIRM := "Quit? Progress since you last slept is lost. Press again to quit."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, OBJECTIVE, PROMPTS, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Goal on screen", "Button prompts", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, OBJECTIVE, PROMPTS, MASTER_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Goal on screen", "Button prompts", "Volume", "Sound effects", "Ambience", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill the screen. The picture stays sharp in whole-pixel steps.",
 	"The window's size, in whole steps of 480 x 270.",
 	"Show your next main-story step under the clock.",
 	"Which buttons hints name. Auto follows the last device you used.",
+	"How loud the whole game is.",
+	"Footsteps, climbing, and menus.",
+	"Birds, crickets, wind, rain, campfires, and waterfalls.",
 	"Back to the pause menu.",
 ]
 ## A line that plays at the chosen text speed while Text speed is selected.
@@ -61,6 +66,8 @@ var _cursor := 0
 var _settings_cursor := 0
 var _confirm_quit := false
 var _was_paused := false
+## Opened by open_settings(): backing out of Settings closes the menu.
+var _settings_only := false
 ## The brass tab the page title sits on, the bar behind the chosen row, and the
 ## plain style every other row gets (it keeps the rows' text in the same place).
 var _title_style: StyleBoxTexture
@@ -193,6 +200,7 @@ func open() -> void:
 		return
 	_cursor = 0
 	_confirm_quit = false
+	_settings_only = false
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud and not hud.device_changed.is_connected(_refresh):
 		hud.device_changed.connect(_refresh)
@@ -201,6 +209,13 @@ func open() -> void:
 	_was_paused = GameClock.paused
 	GameClock.paused = true
 	_set_player_can_act(false)
+
+
+## Opens straight onto the Settings page; Back closes the menu.
+func open_settings() -> void:
+	open()
+	_settings_only = true
+	_show_page(Page.SETTINGS)
 
 
 func close() -> void:
@@ -240,7 +255,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	get_viewport().set_input_as_handled()
 	if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
-		if _page == Page.MAIN:
+		Sound.play("ui_back")
+		if _page == Page.MAIN or _settings_only:
 			close()
 		else:
 			_cursor = OPTIONS.find(["", "Settings", "Controls"][_page])
@@ -258,8 +274,10 @@ func _main_input(event: InputEvent) -> void:
 	if step != 0:
 		_cursor = wrapi(_cursor + step, 0, OPTIONS.size())
 		_confirm_quit = false
+		Sound.play("ui_move")
 		_refresh()
 	elif MenuInput.confirm(event):
+		Sound.play("ui_select")
 		match _cursor:
 			0:
 				close()
@@ -279,16 +297,25 @@ func _settings_input(event: InputEvent) -> void:
 	var step := MenuInput.vertical(event)
 	if step != 0:
 		_settings_cursor = wrapi(_settings_cursor + step, 0, SETTING_NAMES.size())
+		Sound.play("ui_move")
 		_restart_sample()
 		_refresh()
 		return
 	var change := MenuInput.horizontal(event)
 	if change == 0 and MenuInput.confirm(event):
 		if _settings_cursor == Setting.BACK:
+			if _settings_only:
+				close()
+				return
 			_cursor = OPTIONS.find("Settings")
 			_show_page(Page.MAIN)
 			return
 		change = 1
+		# E steps a volume up, and from 100% round to Off (Left/Right stop at
+		# the ends, so Left from Off never jumps to full).
+		if _settings_cursor in [Setting.MASTER_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME] \
+				and _volume(_settings_cursor) >= Settings.MAX_VOLUME:
+			change = -Settings.MAX_VOLUME
 	if change != 0:
 		change_setting(_settings_cursor, change)
 
@@ -309,10 +336,19 @@ func change_setting(which: int, step: int) -> void:
 			Settings.show_objective = not Settings.show_objective
 		Setting.PROMPTS:
 			Settings.prompts = wrapi(Settings.prompts + step, 0, Settings.Prompts.size()) as Settings.Prompts
+		Setting.MASTER_VOLUME:
+			Settings.master_volume = clampi(Settings.master_volume + step, 0, Settings.MAX_VOLUME)
+		Setting.EFFECTS_VOLUME:
+			Settings.effects_volume = clampi(Settings.effects_volume + step, 0, Settings.MAX_VOLUME)
+		Setting.AMBIENCE_VOLUME:
+			Settings.ambience_volume = clampi(Settings.ambience_volume + step, 0, Settings.MAX_VOLUME)
 		_:
 			return
 	Settings.save()
 	Settings.apply(get_window())
+	Sound.apply_volumes()
+	if which in [Setting.MASTER_VOLUME, Setting.EFFECTS_VOLUME]:
+		Sound.play("ui_select", 0.0, 0.0) # a sample at the new level
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud:
 		hud.refresh_settings()
@@ -347,6 +383,8 @@ func _refresh() -> void:
 		_setting_values[i].text = _setting_value(i)
 		_setting_values[i].modulate = DIM if i == Setting.WINDOW_SIZE and Settings.fullscreen else Color.WHITE
 	_help_label.text = SETTING_HELP[_settings_cursor]
+	if _settings_only and _settings_cursor == Setting.BACK:
+		_help_label.text = "Back to the title screen."
 	_sample_label.visible = _settings_cursor == Setting.TEXT_SPEED
 	# Mark the column for the device in use, in words as well as color.
 	var gamepad := MenuInput.button(get_tree(), "k", "g") == "g"
@@ -373,9 +411,26 @@ func _setting_value(which: int) -> String:
 			value = "On" if Settings.show_objective else "Off"
 		Setting.PROMPTS:
 			value = Settings.PROMPT_NAMES[Settings.prompts]
+		Setting.MASTER_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME:
+			value = _volume_text(_volume(which))
 		_:
 			return ""
 	return "<  %s  >" % value
+
+
+## The level of volume setting [param which] (0 to Settings.MAX_VOLUME).
+func _volume(which: int) -> int:
+	match which:
+		Setting.MASTER_VOLUME:
+			return Settings.master_volume
+		Setting.EFFECTS_VOLUME:
+			return Settings.effects_volume
+	return Settings.ambience_volume
+
+
+## "70%", or "Off" at 0.
+func _volume_text(level: int) -> String:
+	return "Off" if level <= 0 else "%d%%" % (level * 100 / Settings.MAX_VOLUME)
 
 
 func _footer_text() -> String:

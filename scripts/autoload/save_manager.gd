@@ -15,10 +15,18 @@ const SAVE_VERSION := 1
 ## Saved data for persist nodes that weren't in the tree when the game
 ## loaded, by node name. World hands it over with restore() once they appear.
 var _pending: Dictionary = {}
+## True after New Game on the title screen: World starts fresh and ignores the
+## old save, which stays on disk until the first night's sleep replaces it.
+var _fresh := false
 
 
 func has_save() -> bool:
 	return FileAccess.file_exists(save_path)
+
+
+## Makes the next World start a new game even though a save exists.
+func start_fresh() -> void:
+	_fresh = true
 
 
 func save_game() -> void:
@@ -35,12 +43,13 @@ func save_game() -> void:
 	if file == null:
 		push_error("Could not write save file: %s" % error_string(FileAccess.get_open_error()))
 		return
+	_fresh = false
 	file.store_string(JSON.stringify(data, "\t"))
 
 
 ## Returns false if there is no valid save, so the caller can start a new game.
 func load_game() -> bool:
-	if not has_save():
+	if _fresh or not has_save():
 		return false
 	var data = JSON.parse_string(FileAccess.get_file_as_string(save_path))
 	if typeof(data) != TYPE_DICTIONARY:
@@ -60,7 +69,7 @@ func load_game() -> bool:
 ## Reads one node's saved data without loading the game. World uses it to
 ## load the saved region before anything else.
 func peek_node(node_name: String) -> Dictionary:
-	if not has_save():
+	if _fresh or not has_save():
 		return {}
 	var data = JSON.parse_string(FileAccess.get_file_as_string(save_path))
 	if typeof(data) != TYPE_DICTIONARY:

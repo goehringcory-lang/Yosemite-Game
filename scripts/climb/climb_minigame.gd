@@ -115,6 +115,7 @@ func setup(p_route: RouteData, seed := -1) -> void:
 
 func _ready() -> void:
 	layer = 20
+	add_to_group("climb_screen") # Sound plays the wind while it's up
 	profile = ClimbProfiles.get_profile(route.id)
 	belayer_look = ClimbProfiles.belayer_look(route)
 	_canvas = Control.new()
@@ -292,6 +293,7 @@ func _after_action(before: Vector3i) -> void:
 			_pose_mode = "fall"
 		else:
 			_pose_mode = "wall"
+			Sound.play("climb_move", -2.0, 0.08)
 			if state.style() == "slab" or state.style() == "dike":
 				_fx.dust(_torso() + Vector2(0, 22), _dust_color(), 3)
 	_fell = false
@@ -336,16 +338,20 @@ func _events() -> void:
 				if e.pitch == 0:
 					_speak("start")
 			"clip":
+				Sound.play("climb_clip")
 				_fx.sparks(_torso() + Vector2(8, -10), 8)
 				if randf() < 0.5:
 					_speak("clip")
 			"cam":
+				Sound.play("climb_cam")
 				_fx.sparks(_torso() + Vector2(8, -6), 6)
 			"chalk":
+				Sound.play("climb_chalk")
 				_fx.chalk(_torso() + Vector2(0, 2), 16)
 				_act_t = 0.0
 				_act_kind = "chalk"
 			"eat":
+				Sound.play("climb_eat")
 				_act_t = 0.0
 				_act_kind = "eat"
 				_stamina_flash = 1.0
@@ -354,6 +360,7 @@ func _events() -> void:
 				if randf() < 0.5:
 					_speak("rest")
 			"fall":
+				Sound.play("climb_fall", 0.0, 0.03)
 				_fell = true
 				_shake = 6.0
 				_speak("fall")
@@ -362,15 +369,18 @@ func _events() -> void:
 				_crux_result = e.result
 				_crux_result_age = 0.0
 				if e.result == "perfect":
+					Sound.play("climb_crux", 0.0, 0.0)
 					_fx.sparks(_torso() + Vector2(0, -16), 16)
 					_speak("crux")
 			"aid", "jug":
+				Sound.play("climb_jug")
 				_fx.sparks(_torso() + Vector2(6, -14), 6)
 			"bivy":
 				_night = e
 				_night_age = 0.0
 				_phase = Phase.NIGHT
 			"topout":
+				Sound.play("climb_topout", 0.0, 0.0)
 				_fx.confetti(_torso() + Vector2(0, -20))
 				_pose_mode = "cheer"
 				_result_delay = 1.6

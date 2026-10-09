@@ -74,6 +74,7 @@ func _ready() -> void:
 		if forage:
 			forage.respawn()
 	hud.bind_player(player)
+	Sound.set_ambience("world")
 	add_child(Journal.new())
 	add_child(PauseMenu.new())
 	_update_location()
@@ -273,6 +274,7 @@ func _enter_region(id: String, spawn_name := "") -> void:
 		StoryContent.attach(region)
 		SaveManager.restore(region)
 		_connect_tents(region)
+		SoundEmitter.attach_waterfalls(region)
 	region.entities.add_child(player)
 	var spawn: Marker2D = region.get_spawn(spawn_name) if spawn_name != "" else null
 	if spawn:
