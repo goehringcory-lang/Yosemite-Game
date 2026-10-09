@@ -1,0 +1,90 @@
+# Exports the game for Windows, macOS and Linux (export_presets.cfg) and
+# uploads each build as an artifact. Run it from the Actions tab, or push a
+# tag like v0.1.0 to also get a draft GitHub release with the three builds.
+# The macOS build is ad-hoc signed, not notarized: players open it with
+# right-click > Open the first time. The Linux build also runs on Steam Deck.
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+env:
+  GODOT_VERSION: "4.7"
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write # for the draft release on a tag
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot and export templates
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/godot
+            ~/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_VERSION }}-linux-templates
+
+      - name: Download Godot and export templates
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          mkdir -p ~/godot
+          curl -fsSL -o /tmp/godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 ~/godot/godot
+          curl -fsSL -o /tmp/templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          # Only the desktop templates (the full set is over a gigabyte).
+          dest=~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          mkdir -p "$dest"
+          unzip -q -j /tmp/templates.tpz 'templates/version.txt' 'templates/windows_*_x86_64*' \
+            'templates/linux_*.x86_64' 'templates/macos.zip' -d "$dest"
+
+      - name: Import assets
+        run: ~/godot/godot --headless --path . --import
+
+      - name: Export Windows
+        run: |
+          mkdir -p build/windows
+          ~/godot/godot --headless --path . --export-release "Windows" "build/windows/Yosemite Game.exe"
+
+      - name: Export macOS
+        run: |
+          mkdir -p build/macos
+          ~/godot/godot --headless --path . --export-release "macOS" "build/macos/Yosemite Game.zip"
+
+      - name: Export Linux
+        run: |
+          mkdir -p build/linux
+          ~/godot/godot --headless --path . --export-release "Linux" "build/linux/YosemiteGame.x86_64"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yosemite-game-windows
+          path: build/windows/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yosemite-game-macos
+          path: build/macos/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yosemite-game-linux
+          path: build/linux/
+
+      - name: Draft a release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd build
+          (cd windows && zip -q -r "../yosemite-game-${GITHUB_REF_NAME}-windows.zip" .)
+          (cd linux && zip -q -r "../yosemite-game-${GITHUB_REF_NAME}-linux.zip" .)
+          cp "macos/Yosemite Game.zip" "yosemite-game-${GITHUB_REF_NAME}-macos.zip"
+          gh release create "$GITHUB_REF_NAME" --draft --title "Yosemite Game $GITHUB_REF_NAME" \
+            --notes "Builds for Windows, macOS and Linux (also Steam Deck)." yosemite-game-*.zip
