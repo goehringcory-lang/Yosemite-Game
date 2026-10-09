@@ -1,7 +1,7 @@
 class_name PauseMenu
 extends CanvasLayer
 ## Esc (gamepad Start) pauses the game. World adds one. Three pages:
-##   Main: Resume, Settings, Controls, Quit, and your current goal
+##   Main: Resume, Save game, Settings, Controls, Quit, and your current goal
 ##   Settings: text speed, full screen, window size, the goal panel, button
 ##     prompts, and the volumes
 ##   Controls: every control, keyboard and gamepad
@@ -26,8 +26,10 @@ const CONTROLS := [
 	["Climbing: eat, chalk up, retreat", "E / Esc", "A / B"],
 	["Climbing: aid or jug", "Shift + arrow", "Y + stick"],
 ]
-const OPTIONS := ["Resume", "Settings", "Controls", "Quit to desktop"]
-const QUIT_CONFIRM := "Quit? Progress since you last slept is lost. Press again to quit."
+enum Option { RESUME, SAVE, SETTINGS, CONTROLS, QUIT }
+const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Quit to desktop"]
+const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again to quit."
+const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
 enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, OBJECTIVE, PROMPTS, MASTER_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
 const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Goal on screen", "Button prompts", "Volume", "Sound effects", "Ambience", "Back"]
 const SETTING_HELP := [
@@ -65,6 +67,10 @@ var _device_headers: Array[Label] = []
 var _cursor := 0
 var _settings_cursor := 0
 var _confirm_quit := false
+## "Saved at 2:15 PM." after Save game, until the menu closes.
+var _save_note := ""
+## Nothing has happened since the last save from this menu, so quitting loses nothing.
+var _just_saved := false
 var _was_paused := false
 ## Opened by open_settings(): backing out of Settings closes the menu.
 var _settings_only := false
@@ -144,7 +150,7 @@ func _build_main() -> Control:
 	_goal_label.custom_minimum_size.x = PANEL_SIZE.x - 16
 	page.add_child(_goal_label)
 	page.add_child(_spacer(4))
-	page.add_child(_label("Your game saves when you sleep in your tent.", DIM))
+	page.add_child(_label("Save here any time. Sleeping in your tent saves too.", DIM))
 	return page
 
 
@@ -200,6 +206,8 @@ func open() -> void:
 		return
 	_cursor = 0
 	_confirm_quit = false
+	_save_note = ""
+	_just_saved = false
 	_settings_only = false
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud and not hud.device_changed.is_connected(_refresh):
@@ -279,18 +287,30 @@ func _main_input(event: InputEvent) -> void:
 	elif MenuInput.confirm(event):
 		Sound.play("ui_select")
 		match _cursor:
-			0:
+			Option.RESUME:
 				close()
-			1:
+			Option.SAVE:
+				save_game()
+			Option.SETTINGS:
 				_show_page(Page.SETTINGS)
-			2:
+			Option.CONTROLS:
 				_show_page(Page.CONTROLS)
-			3:
+			Option.QUIT:
 				if _confirm_quit:
 					get_tree().quit()
 				else:
 					_confirm_quit = true
 					_refresh()
+
+
+## Saves the game where the player stands and notes the time on the menu.
+func save_game() -> void:
+	_just_saved = SaveManager.save_game()
+	if _just_saved:
+		_save_note = "Saved at %s." % GameClock.get_time_string()
+	else:
+		_save_note = "Couldn't save. Check that the game can write to its save folder."
+	_refresh()
 
 
 func _settings_input(event: InputEvent) -> void:
@@ -374,8 +394,10 @@ func _restart_sample() -> void:
 func _refresh() -> void:
 	for i in _option_labels.size():
 		var text: String = OPTIONS[i]
-		if i == 3 and _confirm_quit:
-			text = QUIT_CONFIRM
+		if i == Option.SAVE and _save_note != "":
+			text += "   " + _save_note
+		elif i == Option.QUIT and _confirm_quit:
+			text = QUIT_SAVED if _just_saved else QUIT_CONFIRM
 		_set_choice(_option_labels[i], text, i == _cursor)
 	_goal_label.text = HUD.objective_text() if HUD.objective_text() != "" else "Explore, and talk to people around the valley."
 	for i in _setting_names.size():
