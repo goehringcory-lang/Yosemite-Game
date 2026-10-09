@@ -89,8 +89,9 @@ func test_pause_settings() -> void:
 	_press("pause")
 	check(pause.is_open() and pause.page() == PauseMenu.Page.MAIN, "Esc opens the pause menu on its main page")
 	_press("move_down")
+	_press("move_down")
 	_press("interact")
-	check(pause.page() == PauseMenu.Page.SETTINGS, "Down then E opens Settings")
+	check(pause.page() == PauseMenu.Page.SETTINGS, "Down twice then E opens Settings")
 	_press("move_right")
 	check(Settings.text_speed == Settings.TextSpeed.FAST, "Right raises the text speed")
 	_press("move_left")
@@ -113,7 +114,7 @@ func test_pause_settings() -> void:
 		_press("move_up")
 	check(pause._settings_cursor == PauseMenu.Setting.BACK, "the cursor wraps round to Back")
 	_press("interact")
-	check(pause.is_open() and pause.page() == PauseMenu.Page.MAIN and pause._cursor == 1, "Back returns to the main page on Settings")
+	check(pause.is_open() and pause.page() == PauseMenu.Page.MAIN and pause._cursor == PauseMenu.Option.SETTINGS, "Back returns to the main page on Settings")
 	_press("move_down")
 	_press("interact")
 	check(pause.page() == PauseMenu.Page.CONTROLS, "Controls opens")
@@ -124,9 +125,35 @@ func test_pause_settings() -> void:
 	check(pause.is_open() and pause._confirm_quit, "Quit asks first instead of quitting")
 	_press("move_up")
 	check(not pause._confirm_quit, "moving away cancels the quit")
+	await test_pause_save(pause)
 	_press("ui_cancel")
 	check(not pause.is_open() and world.player.can_act, "Esc on the main page resumes")
 	await get_tree().process_frame
+
+
+## Save game on the pause menu writes the save where the player stands, at the
+## time of day it is.
+func test_pause_save(pause: PauseMenu) -> void:
+	SaveManager.delete_save()
+	var spot: Vector2 = world.player.position + Vector2(8, 0)
+	world.player.position = spot
+	GameClock.minutes = 14 * 60 + 15
+	for i in 2: # from Controls: Settings, Save game
+		_press("move_up")
+	check(pause._cursor == PauseMenu.Option.SAVE, "the cursor reaches Save game")
+	_press("interact")
+	check(SaveManager.has_save(), "Save game writes the save file")
+	check(pause.is_open() and "Saved at" in pause._option_labels[PauseMenu.Option.SAVE].text, "the menu says it saved, and stays open")
+	_press("move_down")
+	_press("move_down")
+	_press("move_down")
+	_press("interact")
+	check(pause._confirm_quit and pause._option_labels[PauseMenu.Option.QUIT].text.contains("Your game is saved"), "Quit says the game is saved")
+	_press("move_up")
+	var saved = JSON.parse_string(FileAccess.get_file_as_string(SaveManager.save_path))
+	var player_data: Dictionary = saved.nodes.get(str(world.player.name), {})
+	check(is_equal_approx(float(player_data.get("x", 0.0)), spot.x), "the save holds where the player stands")
+	check(int(saved.clock.minutes) == 14 * 60 + 15, "the save holds the time of day")
 
 
 func test_prompts() -> void:
