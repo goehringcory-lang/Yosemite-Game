@@ -114,6 +114,25 @@ func test_screen_details() -> void:
 	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
 	press(game, "move_up")
 	check(game._phase == ClimbMinigame.Phase.CLIMB, "...and answers after the grace")
+	# Miss the green with food in the pack: the meter waits until you eat.
+	Inventory.add("dried_apples", 1)
+	game.state.pending = {"kind": "timing", "name": "The bulge", "window": 0.3, "row": 3, "cell": Vector2i(2, 3)}
+	game._start_crux()
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	game._crux.pos = 0.0
+	game._crux.center = 0.6
+	press(game, "use_tool")
+	check(game._phase == ClimbMinigame.Phase.CRUX and game._crux.kind == "pumped" and game.state.slipped_cruxes == 2, "a miss with food in the pack leaves you pumped")
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	press(game, "use_tool")
+	check(game._crux.kind == "pumped" and Inventory.count("dried_apples") == 1, "Space doesn't eat by accident")
+	press(game, "interact")
+	check(game._crux.kind == "timing" and Inventory.count("dried_apples") == 0, "E eats and brings the meter back")
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	game._crux.pos = game._crux.center
+	press(game, "use_tool")
+	check(game._phase == ClimbMinigame.Phase.CLIMB and game.state.perfect_cruxes == 1, "stop in the green and you climb on")
+	Inventory.items.clear()
 	game.queue_free()
 	await get_tree().process_frame
 	# Starting a day climb at 11:30 PM isn't allowed from the route card either.

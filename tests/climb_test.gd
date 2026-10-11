@@ -257,12 +257,84 @@ func test_crux() -> void:
 	var s0 := slip.stamina
 	slip.resolve_crux("slip")
 	check(slip.slipped_cruxes == 1 and (slip.stamina < s0 or slip.falls == 1), "a slip costs stamina")
+	check(slip.falls == 1 and slip.pending.is_empty(), "miss the green with nothing to eat and you come off")
+	# With food in the pack a miss leaves you pumped: eat, then try again.
+	Inventory.items.clear()
+	Inventory.add("dried_apples", 2)
+	var pumped := ClimbState.new(r, 0, 5, kit_for(r))
+	pumped.pitch = 1
+	pumped._start_pitch()
+	pumped.interactive = true
+	guard = 0
+	while pumped.pending.is_empty() and guard < 20:
+		guard += 1
+		pumped.stamina = 100
+		if pumped.can_clip():
+			pumped.clip_bolt()
+		pumped.move(_up(pumped))
+	var window0 := pumped.crux_window()
+	var speed0 := pumped.crux_speed()
+	var row0 := pumped.row
+	pumped.resolve_crux("slip")
+	check(pumped.is_pumped() and pumped.falls == 0 and pumped.row == row0 and pumped.stamina < 100, "miss the green with food and you're pumped on the move")
+	pumped.resolve_crux("perfect")
+	check(pumped.is_pumped() and not pumped.move(0), "...and you can't try again or climb on until you eat")
+	check(pumped.can_eat() and pumped.eat(pumped.next_food()), "...so you eat where you hang")
+	check(Inventory.count("dried_apples") == 1 and not pumped.is_pumped() and not pumped.pending.is_empty(), "eating spends the food and puts you back on the crux")
+	check(pumped.crux_window() > window0 and pumped.crux_speed() < speed0, "the next try is a little kinder (%.2f wide at %.2f, from %.2f at %.2f)" % [pumped.crux_window(), pumped.crux_speed(), window0, speed0])
+	pumped.resolve_crux("good")
+	check(pumped.pending.is_empty() and pumped.status == ClimbState.Status.CLIMBING, "hit the green and you climb on")
+	Inventory.items.clear()
+	test_crux_progression()
 	var easy := ClimbState.new(route("swan_slab"), 0, 1, {})
 	var tough := ClimbState.new(route("the_nose"), 10, 1, kit_for(route("the_nose")))
 	check(easy.crux_window() > tough.crux_window(), "a top rope is the most forgiving crux (%.2f vs %.2f)" % [easy.crux_window(), tough.crux_window()])
 	var shod := ClimbState.new(r, 0, 1, {"climbing_shoes": 1})
 	var barefoot := ClimbState.new(r, 0, 1, {})
 	check(shod.crux_window() > barefoot.crux_window(), "climbing shoes widen the crux window")
+
+
+## Harder climbs have more crux points and a faster meter, but the green can
+## always be caught.
+func test_crux_progression() -> void:
+	var counts := {}
+	for r in Guidebook.routes():
+		counts[r.id] = ClimbProfiles.crux_count(r)
+		var state := ClimbState.new(r, 4, 3, kit_for(r))
+		var bare := ClimbState.new(r, 4, 3, {})
+		var slowest := 99.0
+		for p in r.pitches.size():
+			state.pitch = p
+			state._start_pitch()
+			bare.pitch = p
+			bare._start_pitch()
+			var rows := state.crux_rows()
+			# Fixed ropes and stances can leave room for fewer than the grade asks.
+			var want: int = ClimbProfiles.CRUXES_BY_DIFF[r.pitches[p] - 1]
+			check(rows.size() >= mini(want, 1) and rows.size() <= maxi(want, 1), "%s pitch %d has crux points for its grade (%d of %d)" % [r.id, p + 1, rows.size(), want])
+			for i in rows.size():
+				var row: int = rows[i]
+				check(row > 0 and row < state.top_row and not (row in state.spec.get("rest", [])), "%s pitch %d: the crux at row %d is on the wall, off the stances" % [r.id, p + 1, row])
+				check(i == 0 or row - int(rows[i - 1]) >= ClimbProfiles.CRUX_GAP, "%s pitch %d: crux points have a move between them" % [r.id, p + 1])
+				check(state.holds[row].values().all(func(h): return h.get("crux", false)), "%s pitch %d: row %d is a crux whichever hold you take" % [r.id, p + 1, row])
+			for s: ClimbState in [state, bare]:
+				slowest = minf(slowest, s.crux_window() / s.crux_speed())
+		check(slowest >= ClimbState.CRUX_MIN_GREEN_SECONDS - 0.001, "%s: the marker is never too fast to stop in the green (%.0f ms at worst)" % [r.id, slowest * 1000.0])
+	check(counts.swan_slab == 1 and counts.firefall_slab == 1, "the first climbs have a single crux")
+	check(counts.glacier_point_apron < counts.higher_cathedral_spire and counts.higher_cathedral_spire < counts.steck_salathe \
+		and counts.steck_salathe < counts.astroman and counts.astroman < counts.the_nose, "crux points grow with the grade (Apron %d, Spire %d, Steck-Salathe %d, Astroman %d, the Nose %d)" % [counts.glacier_point_apron, counts.higher_cathedral_spire, counts.steck_salathe, counts.astroman, counts.the_nose])
+	var kit := {"climbing_shoes": 1}
+	var speeds: Array[float] = []
+	for id in ["swan_slab", "firefall_slab", "higher_cathedral_spire", "astroman", "the_nose"]:
+		var state := ClimbState.new(route(id), 4, 1, kit)
+		state.pitch = route(id).pitches.find(route(id).pitches.max())
+		state._start_pitch()
+		speeds.append(state.crux_speed())
+	var faster := true
+	for i in range(1, speeds.size()):
+		faster = faster and speeds[i] > speeds[i - 1]
+	check(faster, "the meter is faster on each harder climb (%s)" % ", ".join(speeds.map(func(v): return "%.2f" % v)))
+	check(ClimbProfiles.recommended_food(route("the_nose")) > int(ClimbProfiles.get_profile("the_nose").food), "the route card asks for spare food for the cruxes")
 
 
 func test_weather_and_snow() -> void:

@@ -6,7 +6,7 @@ extends Node
 ##   SHOT_HOURS   comma-separated game hours to shoot at (default 7,12,19)
 ##   SHOT_MOVES   moves to climb before each shot (default 5)
 ##   SHOT_INTRO   1 to shoot the route card instead of the climb
-##   SHOT_SPECIAL cards to shoot instead: "crux", "result", "pause", "night"
+##   SHOT_SPECIAL cards to shoot instead: "crux", "pumped", "result", "pause", "night"
 ##   SHOT_DIR     folder for the PNGs (default user://)
 ## The screenshot is the window's own size (3x the 480 x 270 screen).
 ## Run: SHOT_ROUTE=firefall_slab SHOT_HOURS=7,19 godot --path . res://tools/shots/climb_shot.tscn
@@ -64,6 +64,10 @@ func _ready() -> void:
 			"crux":
 				game.state.pending = {"kind": "timing", "name": "The crux", "window": 0.3}
 				game._start_crux()
+			"pumped":
+				Inventory.add("trail_mix", 1)
+				game.state.pending = {"kind": "timing", "name": "The crux", "window": 0.3, "pumped": true}
+				game._start_pumped()
 			"rhythm", "mash":
 				game.state.pending = {"kind": _env("SHOT_SPECIAL", ""), "name": "The Narrows", "window": 0.3}
 				game._start_crux()

@@ -57,9 +57,9 @@ func _protect(state: ClimbState) -> void:
 func _chalk(state: ClimbState) -> void:
 	if state.is_at_belay() or state.chalked_this_pitch or not state.has_chalk:
 		return
-	var crux := state.crux_row()
+	var cruxes := state.crux_rows()
 	var next := state.row + 1
-	if (crux > 0 and next == crux - 0) or (crux == 0 and state.stamina < 45):
+	if next in cruxes or (cruxes.is_empty() and state.stamina < 45):
 		state.chalk_up()
 
 

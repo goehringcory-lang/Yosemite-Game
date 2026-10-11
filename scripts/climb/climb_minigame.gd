@@ -10,7 +10,7 @@ extends CanvasLayer
 ## sink as you gain height, and the light follows the time of day.
 ##
 ## Before the climb a route card shows the line, the gear and the food. At a
-## crux there's a short skill check; at a belay you can eat; on a wall, nights
+## crux there's a short skill check (miss it and you eat before you try again); at a belay you can eat; on a wall, nights
 ## are spent on a ledge or a portaledge.
 ##
 ## Controls: arrows climb (up = straight up, left/right = up-left/up-right);
@@ -409,14 +409,32 @@ func _start_crux() -> void:
 	var kind: String = state.pending.kind
 	match kind:
 		"timing":
-			_crux = {"kind": kind, "name": state.pending.name, "window": state.pending.window,
-				"center": randf_range(0.3, 0.7), "pos": 0.0, "dir": 1.0, "speed": 1.15 + 0.1 * float(state.spec.get("diff", 2)), "passes": 0}
+			_crux = {"kind": kind, "window": state.pending.window,
+				"center": randf_range(0.3, 0.7), "pos": 0.0, "dir": 1.0, "speed": state.crux_speed(), "passes": 0}
 		"rhythm":
-			_crux = {"kind": kind, "name": state.pending.name, "need": 8, "done": 0, "left_next": true,
-				"time_total": 5.0 + (2.0 if state.has_shoes else 0.0), "time_left": 5.0 + (2.0 if state.has_shoes else 0.0)}
+			_crux = {"kind": kind, "need": 8, "done": 0, "left_next": true,
+				"time_total": state.crux_seconds(kind), "time_left": state.crux_seconds(kind)}
 		_:
-			_crux = {"kind": "mash", "name": state.pending.name, "need": 9, "done": 0, "left_next": true,
-				"time_total": 4.0, "time_left": 4.0}
+			_crux = {"kind": "mash", "need": 9, "done": 0, "left_next": true,
+				"time_total": state.crux_seconds("mash"), "time_left": state.crux_seconds("mash")}
+	_crux["name"] = _crux_title()
+
+
+## "The lip (2 of 3)" on a pitch with several crux points, or just the name.
+func _crux_title() -> String:
+	var count := int(state.pending.get("count", 1))
+	var name: String = state.pending.name
+	return "%s (%d of %d)" % [name, state.pending.get("index", 1), count] if count > 1 else name
+
+
+## After a miss: the meter gives way to the pack until you've eaten.
+func _start_pumped() -> void:
+	_phase = Phase.CRUX
+	_crux_grace = CRUX_GRACE
+	var id := state.next_food()
+	var item := ItemDB.get_item(id)
+	_crux = {"kind": "pumped", "name": state.pending.name, "food": item.display_name if item else id,
+		"energy": FoodDB.energy(id) + int(Perks.bonus("trail_cook"))}
 
 
 func _update_crux(delta: float) -> void:
@@ -426,6 +444,8 @@ func _update_crux(delta: float) -> void:
 		_crux_grace -= delta
 		return
 	match _crux.kind:
+		"pumped":
+			pass
 		"timing":
 			_crux.pos += _crux.dir * _crux.speed * delta
 			if _crux.pos >= 1.0:
@@ -436,10 +456,10 @@ func _update_crux(delta: float) -> void:
 				_crux.pos = 0.0
 				_crux.dir = 1.0
 				_crux.passes += 1
-			# Wait as long as you like, but the marker keeps sweeping; after a
-			# long time it counts as an average move.
+			# Take a few sweeps to read it, but you can't hang on a crux
+			# forever: wait too long and it counts as a miss.
 			if _crux.passes >= 9:
-				_resolve_crux("good")
+				_resolve_crux("slip")
 		_:
 			_crux.time_left -= delta
 			if _crux.time_left <= 0.0:
@@ -450,6 +470,14 @@ func _crux_input(event: InputEvent) -> void:
 	if _crux_grace > 0.0:
 		return
 	match _crux.kind:
+		"pumped":
+			# Only E eats, so a late tap at the meter doesn't spend your food.
+			if event.is_action_pressed("interact"):
+				eat_next()
+				_events()
+				_toast(state.message)
+				if not state.is_pumped():
+					_start_crux()
 		"timing":
 			if event.is_action_pressed("use_tool") or event.is_action_pressed("interact") or event.is_action_pressed("move_up"):
 				var off := absf(_crux.pos - _crux.center)
@@ -481,9 +509,16 @@ func _crux_input(event: InputEvent) -> void:
 
 
 func _resolve_crux(result: String) -> void:
-	_phase = Phase.CLIMB
 	var before := Vector3i(state.col, state.row, state.pitch)
 	state.resolve_crux(result)
+	if state.is_pumped():
+		# Missed the green: eat before the next try.
+		_events()
+		_toast(state.message)
+		_stamina_flash = 1.0
+		_start_pumped()
+		return
+	_phase = Phase.CLIMB
 	_crux = {}
 	_after_action(before)
 
@@ -634,7 +669,7 @@ func _draw_screen() -> void:
 
 ## About how much food energy this route wants, for the route card.
 func _recommended_food() -> int:
-	return int(profile.get("food", 0))
+	return ClimbProfiles.recommended_food(route)
 
 
 func _draw_clouds(height: float) -> void:
@@ -916,6 +951,8 @@ func _pose() -> Dictionary:
 func _hint() -> String:
 	if state.status != ClimbState.Status.CLIMBING:
 		return ""
+	if state.is_pumped():
+		return "E: eat, then try the move again"
 	var parts: Array[String] = []
 	if state.can_clip():
 		parts.append("Space: clip the bolt" if state.bolt_kinds.get(state.row, "bolt") == "bolt" else "Space: clip the old piton")
