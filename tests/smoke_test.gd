@@ -75,11 +75,18 @@ func _ready() -> void:
 				acorn = f
 				break
 	check(Inventory.count("black_oak_acorn") == 1 and acorn != null and acorn.is_queued_for_deletion(), "acorn picked up")
-	check(world.hud.bag_panel.visible and world.hud.bag_list.get_child_count() == 1, "bag panel lists the acorn")
+	var journal: Journal = get_tree().get_first_node_in_group("journal")
+	journal.open(Journal.Tab.BACKPACK)
+	var carried := journal._slot_items.map(func(slot: Dictionary) -> String: return "%s x%d" % [slot.name, slot.count])
+	check(carried == ["Approach Shoes x1", "Black Oak Acorn x1"], "the backpack holds your shoes and the acorn (%s)" % [carried])
+	journal.close()
 	Inventory.add("acorn_cake", 2)
-	check(world.hud.bag_list.get_child_count() == 2, "bag panel lists cooked food too")
-	check(world.hud._status.text.begins_with("Food 90 energy"), "status strip shows food energy (%s)" % world.hud._status.text)
-	check(world.hud.status_bar.size.x <= 472.0, "status strip fits on screen (%.0f px)" % world.hud.status_bar.size.x)
+	journal.open(Journal.Tab.BACKPACK)
+	carried = journal._slot_items.map(func(slot: Dictionary) -> String: return "%s x%d" % [slot.name, slot.count])
+	check(carried == ["Approach Shoes x1", "Acorn Cake x2", "Black Oak Acorn x1"], "cooked food goes in the backpack too (%s)" % [carried])
+	check(journal._body.get_children().any(func(n: Node) -> bool: return n is Label and n.text == "Food (90 energy)"), "the backpack adds up your food energy")
+	journal.close()
+	check(world.hud.status_bar.size.x <= 472.0, "the hint line fits on screen (%.0f px)" % world.hud.status_bar.size.x)
 
 	# Two presses in the same frame (E and Space) must not pick the same thing up twice.
 	var other: Forageable

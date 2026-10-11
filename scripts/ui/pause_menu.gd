@@ -2,8 +2,8 @@ class_name PauseMenu
 extends CanvasLayer
 ## Esc (gamepad Start) pauses the game. World adds one. Three pages:
 ##   Main: Resume, Save game, Settings, Controls, Quit, and your current goal
-##   Settings: text speed, full screen, window size, the goal panel, button
-##     prompts, and the volumes
+##   Settings: text speed, full screen, window size, button prompts, and
+##     the volumes
 ##   Controls: every control, keyboard and gamepad
 ## Up/Down choose, E (A) selects, Left/Right change a setting, Esc (B) goes back.
 ## The title screen opens the Settings page on its own with open_settings().
@@ -16,7 +16,7 @@ const CONTROLS := [
 	["Walk", "WASD or arrow keys", "Left stick or D-pad"],
 	["Talk, read, use", "E, Space, X, C, or click", "A or X"],
 	["Park and area map", "M (Tab switches tabs)", "Back (LB/RB switch tabs)"],
-	["Journal", "J", "Y"],
+	["Journal, quests, backpack", "J, Q, B (Tab switches tabs)", "Y (LB/RB switch tabs)"],
 	["Pause, settings", "Esc", "Start"],
 	["Back out of a menu", "Esc", "B"],
 	["Menus: choose, confirm", "Up/Down, E or Enter", "Stick or D-pad, A"],
@@ -30,13 +30,12 @@ enum Option { RESUME, SAVE, SETTINGS, CONTROLS, QUIT }
 const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Quit to desktop"]
 const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again to quit."
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, OBJECTIVE, PROMPTS, MASTER_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Goal on screen", "Button prompts", "Volume", "Sound effects", "Ambience", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, MASTER_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Volume", "Sound effects", "Ambience", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill the screen. The picture stays sharp in whole-pixel steps.",
 	"The window's size, in whole steps of 480 x 270.",
-	"Show your next main-story step under the clock.",
 	"Which buttons hints name. Auto follows the last device you used.",
 	"How loud the whole game is.",
 	"Footsteps, climbing, and menus.",
@@ -352,8 +351,6 @@ func change_setting(which: int, step: int) -> void:
 			if Settings.fullscreen:
 				return
 			Settings.window_scale = clampi(Settings.window_scale + step, Settings.MIN_SCALE, Settings.max_window_scale())
-		Setting.OBJECTIVE:
-			Settings.show_objective = not Settings.show_objective
 		Setting.PROMPTS:
 			Settings.prompts = wrapi(Settings.prompts + step, 0, Settings.Prompts.size()) as Settings.Prompts
 		Setting.MASTER_VOLUME:
@@ -429,8 +426,6 @@ func _setting_value(which: int) -> String:
 			if Settings.fullscreen:
 				return "(full screen)"
 			value = "%dx  (%d x %d)" % [Settings.window_scale, Settings.BASE_SIZE.x * Settings.window_scale, Settings.BASE_SIZE.y * Settings.window_scale]
-		Setting.OBJECTIVE:
-			value = "On" if Settings.show_objective else "Off"
 		Setting.PROMPTS:
 			value = Settings.PROMPT_NAMES[Settings.prompts]
 		Setting.MASTER_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME:
