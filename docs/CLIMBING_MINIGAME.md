@@ -8,12 +8,12 @@ A climb is a short sequence of decisions: read the wall, choose a hold, decide w
 
 ## Play loop
 
-1. **Route card.** A postcard of the view, the pitches (a `*` marks a crux), the gear you need and have, the food you carry and what's worth bringing, night meals for routes with nights, and when storms build. `E` or `Space` starts, `Esc` backs out without spending time. A day climb that would still be going at 2 AM can't be started, and the card says so.
+1. **Route card.** A postcard of the view, the pitches (a `*` for each crux point), the gear you need and have, the food you carry and what's worth bringing, night meals for routes with nights, and when storms build. `E` or `Space` starts, `Esc` backs out without spending time. A day climb that would still be going at 2 AM can't be started, and the card says so.
 2. **Pitch banner.** Each pitch announces its name and a line of beta ("Chalk up before the bulge").
 3. **Read.** Rings mark the holds within reach with what each move costs now (shoes, chalk, chimney rhythm, weather and slush included). Rests and cruxes are labelled.
 4. **Move.** Up, up-left, up-right. A move costs stamina and six game minutes. Run out and you fall.
 5. **Protect.** `Space` clips a bolt (or an old piton) with a quickdraw, or places a cam in a crack. The rope runs through every piece; runouts of four moves or more end the climb safely.
-6. **Crux.** One hard move on some pitches asks for a short skill check. Perfect gives stamina back; a slip costs some.
+6. **Crux.** A hard move asks for a short skill check. Perfect gives stamina back. Miss it and you're pumped: it costs stamina, and you eat from the pack (`E`) before you can try again. With nothing to eat (or only the meals the nights need) you fall.
 7. **Belay.** At a ledge you recover 10 stamina (16 with a belay device), can eat (`E`, not at full stamina, smaller foods first, never the real meals a night still needs), and the next pitch starts. Rope and gear are recovered by your partner.
 8. **Nights.** On a wall, a night needs a real meal (30+ energy; the smallest is eaten); the night scene plays, and you wake rested at 6:30 the next morning. Each night is a new day on the calendar (fresh food keeps spoiling), and a night falls where the route's profile says (`bivy`), not at a fixed time.
 9. **Top out or retreat.** The result card shows time, falls, style (onsight, hard-won, aided), how the cruxes went and a fact about the route. Retreating keeps your gear; the tick only comes with the top. The caller records the tick once and applies the elapsed time once.
@@ -53,6 +53,12 @@ A climb is a short sequence of decisions: read the wall, choose a hold, decide w
 | mash | Tap Up quickly | Nutcracker's mantel |
 | rhythm | Alternate Left and Right to the beat | The Narrows, Harding Slot, the King Swing, the Pendulum |
 
+**How many.** A pitch's authored crux always counts. On top of it a grade 3 pitch has at least 1 crux point, a grade 4 pitch 2 and a grade 5 pitch 3 (`ClimbProfiles.CRUXES_BY_DIFF`), spread out and kept off the stances and fixed ropes. The added ones are timing checks named for the pitch's style, and add only 2 to their holds, so they test timing more than stamina. Swan Slab and Firefall Slab have 1 crux; the Nose has 20.
+
+**How fast.** The timing marker's speed is `0.85 + 0.12 x pitch grade + 0.06 x the route's hardest grade` bar lengths a second (`ClimbState.crux_speed`), from about 1.0 on Swan Slab to 1.7 on the Nose. It's capped so the marker never crosses the green in less than 0.13 seconds. Rhythm and mash checks lose 0.2 seconds a grade.
+
+**A miss.** Outside the green (or waiting out nine sweeps) costs `3 + 2 x grade` stamina and leaves you pumped on the move. `E` eats the next food in the pack and brings the meter back, with the green 0.03 wider and the marker 10% slower for each miss so far (up to 4). The route card's food advice includes a spare snack for every 4 crux points.
+
 Bots and tests resolve cruxes as an average move; the screen sets `ClimbState.interactive`.
 
 ## Economy
@@ -65,7 +71,7 @@ Each hold costs `2 + round(grade * 1.2) + 0..2` (grade is the pitch's 1-5 diffic
 
 ## Verification
 
-- `tests/climb_test.tscn`: every route has a profile and authored pitches, every pitch has a line, a careful bot tops every route, each piece of gear does its job, cruxes, weather, nights.
+- `tests/climb_test.tscn`: every route has a profile and authored pitches, every pitch has a line, a careful bot tops every route, each piece of gear does its job, cruxes (the pumped rule, crux points and meter speed by grade), weather, nights.
 - `tests/climb_screen_test.tscn` (needs a window): plays every route on the real screen, through crux checks, nights and the result card.
 - Screenshots: see the README.
 

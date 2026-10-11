@@ -19,9 +19,12 @@ extends RefCounted
 ## and on snow an ice axe stops a slide.
 ##
 ## Each pitch comes from ClimbProfiles: its style (slab, crack, chimney, roof,
-## dike, knobs, snow, ice), where its crux and rests and fixed pieces are.
-## The crux asks for a short skill check when the screen sets [member
-## interactive]; otherwise (tests, bots) it resolves as an average move.
+## dike, knobs, snow, ice), where its crux points and rests and fixed pieces
+## are. A crux asks for a short skill check when the screen sets [member
+## interactive]; otherwise (tests, bots) it resolves as an average move. Miss
+## the check and you're pumped: you eat something from the pack before you can
+## try the move again, and with nothing to eat you come off. Harder pitches
+## have more crux points and a faster meter.
 
 enum Status { CLIMBING, TOPPED_OUT, RETREATED }
 
@@ -68,6 +71,27 @@ const CHALK_MOVES := 2
 const REST_STANCE := 6
 ## Each step up the grades adds this much to what a hold costs.
 const COST_PER_GRADE := 1.2
+## A crux point that isn't the pitch's named crux adds this much to its holds.
+const CRUX_POINT_COST := 2
+## Missing a crux costs this much stamina, plus PUMP_PER_GRADE a grade.
+const PUMP_BASE := 3
+const PUMP_PER_GRADE := 2
+## The crux meter's marker crosses the bar this many times a second, plus a
+## little for the pitch's grade and for the hardest grade on the route.
+const CRUX_SPEED := 0.85
+const CRUX_SPEED_PER_GRADE := 0.12
+const CRUX_SPEED_PER_ROUTE_GRADE := 0.06
+## ...but never so fast that it crosses the green in less than this.
+const CRUX_MIN_GREEN_SECONDS := 0.13
+## Each miss on a crux makes the next try a little easier: a wider green and
+## a slower marker, up to CRUX_MERCY_TRIES misses.
+const CRUX_MERCY_WINDOW := 0.03
+const CRUX_MERCY_SLOWDOWN := 0.9
+const CRUX_MERCY_TRIES := 4
+## Seconds for a rhythm or a mash crux on the easiest pitch, less a grade.
+const CRUX_RHYTHM_SECONDS := 5.6
+const CRUX_MASH_SECONDS := 4.6
+const CRUX_SECONDS_PER_GRADE := 0.2
 ## Aiding a hard move, and jugging a fixed rope, cost this much stamina.
 const AID_STAMINA := 3
 const JUG_STAMINA := 3
@@ -126,7 +150,7 @@ var minutes := 0
 ## Hard moves pulled through on aiders, and fixed-rope moves jugged.
 var aid_moves := 0
 var jug_moves := 0
-## Crux moves done well, and slipped.
+## Crux moves done well, and missed.
 var perfect_cruxes := 0
 var slipped_cruxes := 0
 ## What just happened, for the UI.
@@ -139,7 +163,9 @@ var spec: Dictionary = {}
 ## The screen sets this to get a skill check at the crux; without it a crux
 ## resolves as an average move.
 var interactive := false
-## A crux waiting on the player: {"kind", "name", "window", "row", "cell"}.
+## A crux waiting on the player: {"kind", "name", "window", "row", "cell",
+## "index", "count", "tries", "pumped"}. "pumped" is set after a miss, until
+## you eat.
 var pending: Dictionary = {}
 ## The in-game hour the climb started, for weather and snow.
 var start_minutes := 8 * 60
@@ -233,8 +259,19 @@ func pitch_name() -> String:
 	return spec.get("name", "Pitch %d" % (pitch + 1))
 
 
+## The pitch's named crux (0 if it has none). See [method crux_rows].
 func crux_row() -> int:
 	return int(spec.get("crux", 0))
+
+
+## Every row of this pitch with a crux point, lowest first.
+func crux_rows() -> Array:
+	return spec.get("cruxes", [])
+
+
+## True after missing a crux: you have to eat before you can try it again.
+func is_pumped() -> bool:
+	return pending.get("pumped", false)
 
 
 ## What moving onto the hold at ([param r], [param c]) costs right now, after
@@ -346,12 +383,17 @@ func _step(dx: int, cost: int, mins: int, safe := false) -> void:
 		message = "A good stance. You shake out (+%d)." % REST_STANCE
 		events.append({"type": "rest"})
 	if hold.get("crux", false) and row < top_row and not safe:
+		var crux := ClimbProfiles.crux_at(spec, row)
 		pending = {
-			"kind": spec.get("crux_kind", "timing"),
-			"name": spec.get("crux_name", "The crux"),
+			"kind": crux.kind,
+			"name": crux.name,
 			"window": crux_window(),
 			"row": row,
 			"cell": Vector2i(col, row),
+			"index": crux_rows().find(row) + 1,
+			"count": crux_rows().size(),
+			"tries": 0,
+			"pumped": false,
 		}
 		if not interactive:
 			resolve_crux("good")
@@ -368,7 +410,8 @@ func _settle() -> void:
 
 
 ## How wide the green zone of the crux meter is, 0..1 of the bar. The
-## better your kit and your hands, the more forgiving the move.
+## better your kit and your hands, the more forgiving the move, and every
+## miss on a crux widens it a little for the next try.
 func crux_window() -> float:
 	var window := 0.30 - 0.025 * int(spec.get("diff", 2))
 	if has_shoes:
@@ -378,28 +421,67 @@ func crux_window() -> float:
 	if route.top_rope:
 		window += 0.12
 	window += Perks.bonus("steady_breath")
+	window += CRUX_MERCY_WINDOW * _crux_mercy()
 	return clampf(window, 0.12, 0.5)
 
 
-## Finishes a crux with "perfect", "good" or "slip".
+## How fast the crux meter's marker moves, in bar lengths a second: faster on
+## a harder pitch and on a harder route, slower after a miss, and never too
+## fast to catch the green.
+func crux_speed() -> float:
+	var speed := CRUX_SPEED + CRUX_SPEED_PER_GRADE * int(spec.get("diff", 2)) \
+		+ CRUX_SPEED_PER_ROUTE_GRADE * int(route.pitches.max())
+	speed *= pow(CRUX_MERCY_SLOWDOWN, _crux_mercy())
+	return minf(speed, crux_window() / CRUX_MIN_GREEN_SECONDS)
+
+
+## Seconds a "rhythm" or "mash" crux gives you: less on a harder pitch, more
+## after a miss.
+func crux_seconds(kind: String) -> float:
+	var seconds := CRUX_RHYTHM_SECONDS if kind == "rhythm" else CRUX_MASH_SECONDS
+	seconds -= CRUX_SECONDS_PER_GRADE * int(spec.get("diff", 2))
+	if kind == "rhythm" and has_shoes:
+		seconds += 2.0
+	return seconds + 0.5 * _crux_mercy()
+
+
+func _crux_mercy() -> int:
+	return mini(int(pending.get("tries", 0)), CRUX_MERCY_TRIES)
+
+
+## Finishes a try at a crux with "perfect", "good" or "slip". A slip (missing
+## the green) leaves you pumped on the move: eat, then try again. With nothing
+## to eat, or nothing left in your arms, you come off.
 func resolve_crux(result: String) -> void:
-	if pending.is_empty():
+	if pending.is_empty() or is_pumped():
 		return
 	var name: String = pending.name
-	pending = {}
 	var diff := int(spec.get("diff", 2))
-	match result:
-		"perfect":
-			stamina = mini(stamina + 3 + diff, MAX_STAMINA)
-			perfect_cruxes += 1
-			message = "Sent! Perfect through %s (+%d)." % [name.to_lower(), 3 + diff]
-		"slip":
-			stamina -= 2 + diff
-			slipped_cruxes += 1
-			message = "You slip on %s! (-%d)" % [name.to_lower(), 2 + diff]
-		_:
-			message = "You make %s." % name.to_lower()
 	events.append({"type": "crux", "result": result, "name": name})
+	if result == "slip":
+		var cost := PUMP_BASE + PUMP_PER_GRADE * diff
+		stamina -= cost
+		slipped_cruxes += 1
+		if stamina > 0 and _has_spare_food():
+			pending.tries = int(pending.get("tries", 0)) + 1
+			pending.pumped = true
+			message = "You miss %s and you're pumped (-%d). Eat something, then try again." % [name.to_lower(), cost]
+			return
+		pending = {}
+		if stamina > 0:
+			_fall()
+			if status == Status.CLIMBING:
+				message = "Pumped on %s with nothing to eat, you come off. " % name.to_lower() + message
+		else:
+			_settle()
+		return
+	pending = {}
+	if result == "perfect":
+		stamina = mini(stamina + 3 + diff, MAX_STAMINA)
+		perfect_cruxes += 1
+		message = "Sent! Perfect through %s (+%d)." % [name.to_lower(), 3 + diff]
+	else:
+		message = "You make %s." % name.to_lower()
 	_settle()
 
 
@@ -538,21 +620,32 @@ func _freshness(item_id: String) -> int:
 
 
 ## True at a belay when there's something to eat and room to eat it, without
-## touching a night's meal.
+## touching a night's meal. Pumped on a crux, you eat right where you hang.
 func can_eat() -> bool:
-	if status != Status.CLIMBING or not pending.is_empty() or not is_at_belay() or stamina >= MAX_STAMINA:
+	if status != Status.CLIMBING:
 		return false
+	if is_pumped():
+		return _has_spare_food()
+	if not pending.is_empty() or not is_at_belay() or stamina >= MAX_STAMINA:
+		return false
+	return _has_spare_food()
+
+
+## True if the pack has food that isn't a meal a night on the wall needs.
+func _has_spare_food() -> bool:
 	var id := next_food()
 	return id != "" and not is_reserved_meal(id)
 
 
 ## Eats one of [param item_id] from the Inventory. Only at belay ledges, and
-## not at full stamina. The meals the nights on the wall need are kept.
+## not at full stamina, or wherever a missed crux has left you pumped. The
+## meals the nights on the wall need are kept.
 func eat(item_id: String) -> bool:
-	if not is_at_belay():
+	var pumped := is_pumped()
+	if not is_at_belay() and not pumped:
 		message = "You can only eat at a belay ledge."
 		return false
-	if stamina >= MAX_STAMINA:
+	if stamina >= MAX_STAMINA and not pumped:
 		message = "You're not hungry."
 		return false
 	var energy := FoodDB.energy(item_id)
@@ -567,6 +660,10 @@ func eat(item_id: String) -> bool:
 	minutes += MINUTES_TO_EAT
 	var item := ItemDB.get_item(item_id)
 	message = "Ate %s (+%d)." % [item.display_name if item else item_id, energy]
+	if pumped:
+		pending.pumped = false
+		pending.window = crux_window()
+		message += " Shake out and try %s again." % String(pending.name).to_lower()
 	events.append({"type": "eat"})
 	return true
 
@@ -864,11 +961,13 @@ func _make_hold(difficulty: int, on_line: bool) -> Dictionary:
 
 ## Marks the crux, stances and fixed ropes the pitch's spec asks for.
 func _apply_features(path: Dictionary, difficulty: int) -> void:
-	var crux := crux_row()
-	if crux > 0 and crux < top_row:
+	# The pitch's named crux is its hardest move; the other crux points test
+	# your timing more than your arms.
+	for crux: int in crux_rows():
+		var extra := 3 + difficulty if crux == crux_row() else CRUX_POINT_COST
 		for c: int in holds[crux]:
 			var hold: Dictionary = holds[crux][c]
-			hold.cost = int(hold.cost) + 3 + difficulty
+			hold.cost = int(hold.cost) + extra
 			hold["crux"] = true
 			hold["hard"] = true
 	for r: int in spec.get("rest", []):

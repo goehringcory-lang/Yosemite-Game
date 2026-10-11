@@ -19,7 +19,9 @@ extends RefCounted
 ##   bolt_gap    rows between bolts on a bolted line (default 2)
 ##   pins        rows with an old fixed piece (piton or bolt) to clip
 ##   pin_kind    "pin" (rusty piton) or "bolt" (default "pin")
-##   crux        row of the hard move
+##   crux        row of the hard move. Harder pitches get more crux points
+##               on top of it (see CRUXES_BY_DIFF); pitch_spec lists them all
+##               in "cruxes".
 ##   crux_kind   timing | rhythm | mash  (default timing)
 ##   crux_name   the move's name, shown on the meter
 ##   rest        rows with a good stance (a bit of stamina back)
@@ -32,6 +34,21 @@ extends RefCounted
 ## Route keys: food (energy worth bringing; tests check a careful climber
 ## tops out with it), place, rock, ground, finish, weather, belayer, descent,
 ## view (skyline landmarks), facts, pitches.
+
+## Crux points on a pitch of each difficulty, 1 to 5. An authored crux always
+## counts, so an easy pitch can still have its one hard move.
+const CRUXES_BY_DIFF: Array[int] = [0, 0, 1, 2, 3]
+## Crux points sit at least this many rows apart, and no lower than CRUX_FIRST.
+const CRUX_GAP := 2
+const CRUX_FIRST := 3
+## What the crux points a pitch gets for its grade are called, by style.
+const CRUX_NAMES := {
+	"slab": "Thin smears", "crack": "Thin jams", "flake": "The layback", "chimney": "The squeeze",
+	"roof": "Roof jams", "dike": "The blank step", "knobs": "The long reach", "snow": "Steep snow", "ice": "Blue ice",
+}
+## The route card asks for one spare snack for every few crux points.
+const CRUXES_PER_SNACK := 4
+const SNACK_ENERGY := 30
 
 const BELAYERS := {
 	"wren_alvarez": {"name": "Wren", "skin": "c8905e", "hair": "3a2418", "hat": "e8b040", "hat_kind": "headband", "top": "4a8a8a", "bottom": "7a6a52", "pack": "8a5a3a"},
@@ -441,7 +458,70 @@ static func pitch_spec(route: RouteData, index: int) -> Dictionary:
 		spec["bolts"] = "line"
 	spec["diff"] = route.pitches[mini(index, route.pitches.size() - 1)]
 	spec["name"] = spec.get("name", "Pitch %d" % (index + 1))
+	spec["cruxes"] = _crux_rows(spec)
 	return spec
+
+
+## The rows of a pitch's crux points, lowest first: the authored one, plus as
+## many more as its grade asks for, spread out and kept off the stances and
+## the fixed ropes.
+static func _crux_rows(spec: Dictionary) -> Array[int]:
+	var rows: Array[int] = []
+	var top := int(spec.rows)
+	var authored := int(spec.get("crux", 0))
+	if authored > 0 and authored < top:
+		rows.append(authored)
+	var want: int = CRUXES_BY_DIFF[clampi(int(spec.diff), 1, CRUXES_BY_DIFF.size()) - 1]
+	var open: Array[int] = []
+	for r in range(CRUX_FIRST, top):
+		if not (r in spec.get("rest", []) or r in spec.get("fixed", [])):
+			open.append(r)
+	if rows.is_empty() and want > 0 and not open.is_empty():
+		# With no authored crux, the first one sits a little above halfway.
+		var mid := roundi(top * 0.6)
+		var best: int = open[0]
+		for r in open:
+			if absi(r - mid) < absi(best - mid):
+				best = r
+		rows.append(best)
+	while rows.size() < want:
+		# The open row farthest from the crux points so far.
+		var pick := 0
+		var pick_gap := CRUX_GAP - 1
+		for r in open:
+			var gap := top
+			for other in rows:
+				gap = mini(gap, absi(r - other))
+			if gap > pick_gap:
+				pick = r
+				pick_gap = gap
+		if pick == 0:
+			break
+		rows.append(pick)
+	rows.sort()
+	return rows
+
+
+## What the crux at [param row] of a pitch is called, and how it's played.
+static func crux_at(spec: Dictionary, row: int) -> Dictionary:
+	if row == int(spec.get("crux", 0)):
+		return {"kind": spec.get("crux_kind", "timing"), "name": spec.get("crux_name", "The crux")}
+	return {"kind": "timing", "name": CRUX_NAMES.get(spec.get("style", "crack"), "The crux")}
+
+
+## Every crux point on [param route].
+static func crux_count(route: RouteData) -> int:
+	var n := 0
+	for i in route.pitches.size():
+		n += pitch_spec(route, i).cruxes.size()
+	return n
+
+
+## Food energy worth bringing: what the climbing takes, and a spare snack or
+## two for the crux moves you miss.
+static func recommended_food(route: RouteData) -> int:
+	var food := int(get_profile(route.id).get("food", 0))
+	return food + ceili(crux_count(route) / float(CRUXES_PER_SNACK)) * SNACK_ENERGY
 
 
 static func belayer_look(route: RouteData) -> Dictionary:

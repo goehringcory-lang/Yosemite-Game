@@ -148,20 +148,25 @@ static func pitch_banner(ci: CanvasItem, state: ClimbState, age: float) -> void:
 
 # ---------------------------------------------------------------- crux meter
 
-## The skill check at a crux. [param kind] is "timing", "rhythm" or "mash".
+## The skill check at a crux. [param kind] is "timing", "rhythm" or "mash",
+## or "pumped" after a miss, when you have to eat before the next try.
 static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, time: float) -> void:
 	var r := Rect2(SCREEN.x * 0.5 - 110, 60, 220, 66)
 	UI.panel(ci, r)
-	UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 17), "CRUX: " + name.to_upper(), UI.WARN_DARK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 17), ("PUMPED: " if kind == "pumped" else "CRUX: ") + name.to_upper(), UI.WARN_DARK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 	var bar := Rect2(r.position.x + 16, r.position.y + 28, 188, 12)
 	match kind:
+		"pumped":
+			UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 37), "You missed the green. Your arms are done.", UI.INK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+			UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 54), "E: eat %s (+%d), then try again" % [data.food, data.energy], UI.GOOD_DARK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 		"timing":
 			ci.draw_rect(bar.grow(1), UI.WOOD_DARK)
 			ci.draw_rect(bar, Color("5a4a3a"))
 			var win: float = data.window
 			var center: float = data.center
+			# The green is the move; its bright middle is a perfect one.
 			var good := Rect2(bar.position.x + bar.size.x * (center - win / 2.0), bar.position.y, bar.size.x * win, bar.size.y)
-			ci.draw_rect(good, Color("c8a040"))
+			ci.draw_rect(good, UI.GOOD_DARK)
 			var perfect_w := win * 0.38
 			var perf := Rect2(bar.position.x + bar.size.x * (center - perfect_w / 2.0), bar.position.y, bar.size.x * perfect_w, bar.size.y)
 			ci.draw_rect(perf, UI.GOOD)
@@ -193,7 +198,7 @@ static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, t
 static func crux_result(ci: CanvasItem, result: String, age: float) -> void:
 	if age > 1.4:
 		return
-	var text: String = {"perfect": "PERFECT!", "good": "Good", "slip": "Slip!"}.get(result, "")
+	var text: String = {"perfect": "PERFECT!", "good": "Good", "slip": "Missed!"}.get(result, "")
 	var col: Color = {"perfect": UI.GOLD, "good": UI.CREAM, "slip": UI.WARN}.get(result, UI.CREAM)
 	var y := 100.0 - age * 30.0
 	ci.modulate.a = clampf(1.4 - age, 0.0, 1.0)
@@ -286,9 +291,11 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 		var diff := route.pitches[i]
 		ci.draw_rect(Rect2(tx, yy - 6, 6, 6), [Color("7ac24a"), Color("a8c24a"), Color("e8c040"), Color("e8863a"), Color("d8452e")][clampi(diff - 1, 0, 4)])
 		var nm: String = specs[i].get("name", "Pitch %d" % (i + 1)) if i < specs.size() else "Pitch %d" % (i + 1)
+		# One star for each crux point on the pitch.
 		var mark := ""
-		if i < specs.size() and specs[i].get("crux", 0) > 0:
-			mark = " *"
+		var cruxes: int = ClimbProfiles.pitch_spec(route, i).cruxes.size()
+		if cruxes > 0:
+			mark = " " + "*".repeat(cruxes)
 		UI.ink(ci, Vector2(tx + 10, yy), nm + mark, UI.INK, 10, 130.0)
 	# The blurb and the tip, across the card.
 	var ty := r.position.y + text_at
@@ -328,7 +335,7 @@ static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, 
 	if won:
 		rows.append("Style: %s" % state.style_rating())
 		if state.perfect_cruxes + state.slipped_cruxes > 0:
-			rows.append("Cruxes: %d perfect, %d slipped" % [state.perfect_cruxes, state.slipped_cruxes])
+			rows.append("Cruxes: %d perfect, %d missed" % [state.perfect_cruxes, state.slipped_cruxes])
 		if state.aid_moves > 0:
 			rows.append("Aid moves: %d" % state.aid_moves)
 		elif state.route.nights > 0 or state.route.id == "the_nose":
