@@ -1,6 +1,6 @@
 extends Node
 ## Saves screenshots of the game's screens: the HUD with a message and a sign,
-## the journal, the pause menu and its Settings and Controls pages, a
+## the journal's three tabs, the pause menu and its Settings and Controls pages, a
 ## conversation (and a choice), and the Valley and park maps.
 ## Needs a window (not --headless). Environment:
 ##   SHOT_DIR    folder for the PNGs (default user://)
@@ -33,16 +33,25 @@ func _ready() -> void:
 	await world.go_to_region(region_id, "arrival")
 	for i in 12:
 		await get_tree().process_frame
-	# HUD with a message, the pack and a sign
+	# HUD with a message and a sign
 	world.hud.show_message("You pick up a wild strawberry.")
 	world.hud.message_label.modulate.a = 1.0
-	world.hud.bag_panel.visible = true
 	world.hud.show_info("Staircase Falls", "A seasonal fall that spills down the granite above Curry Village. It runs after the spring melt.")
 	await _snap(dir, scale, "hud")
 	world.hud.hide_info()
 	var journal := get_tree().get_first_node_in_group("journal")
 	journal.open()
 	await _snap(dir, scale, "journal")
+	journal.show_tab(Journal.Tab.QUESTS)
+	await _snap(dir, scale, "quests")
+	for id in ["acorn_cake", "acorn_cake", "leached_acorn_meal", "elderberry_sauce", "trail_mix", "wild_strawberry", "black_oak_acorn", "black_oak_acorn", "sequoia_cone"]:
+		Inventory.add(id)
+	for id in ["climbing_shoes", "chalk_bag", "harness", "rope", "cam", "cam", "cam", "quickdraw", "quickdraw"]:
+		Gear.add(id)
+	journal.show_tab(Journal.Tab.BACKPACK)
+	await get_tree().process_frame
+	journal.move_cursor(Vector2i.DOWN)
+	await _snap(dir, scale, "backpack")
 	journal.close()
 	var pause := get_tree().get_first_node_in_group("pause_menu")
 	pause.open()

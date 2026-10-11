@@ -229,7 +229,7 @@ All of this is wired into the World. Each region's people, climbs, and cooking s
 | Chuckah | `scripts/story/granary.gd`, `chuckah.gd` | Autoload `Granary`. Stored acorns never spoil, and one chuckah holds 40. |
 | Cooking | `scripts/story/recipes.gd`, `station.gd`, `data/recipes/*.tres` | Stations: campfire, bedrock mortar, leaching basin. Acorn chain: 4 acorns → flour → leached meal → mush or cakes. |
 | Climbing | `scripts/climb/*`, `scenes/climb/*`, `data/routes/*.tres` | Rules are in `ClimbState`, pictures in `ClimbScenery`. Cams in cracks, or quickdraws on bolts (`RouteData.protection`). A route can need a partner (`RouteData.partner_quest`). |
-| Journal | `scripts/story/journal.gd` | Press J. Shows quests, gear, food with days left, the chuckah, and climbs. Pauses the clock. |
+| Journal | `scripts/story/journal.gd` | One book, three tabs. J: the Register, the guidebook's tick list, and perks. Q: the main story's next step and open quests. B: the Backpack, a grid of slots for gear, food (with days left), and forage, plus the chuckah. Tab (LB/RB) flips tabs. Pauses the clock. |
 | Perks | `scripts/story/perks.gd` | Autoload `Perks`. Eight gentle bonuses earned from people and experience; see **Perks** above. |
 | Tests | `tests/story_test.tscn`, `tests/world_story_test.tscn` | Run headless. The world test uses its own save file. |
 

@@ -29,8 +29,6 @@ static var text_speed := TextSpeed.NORMAL
 static var fullscreen := false
 ## Window size in whole steps of 480x270 (3 = 1440x810, the default window).
 static var window_scale := 3
-## Show the current main-story goal under the clock.
-static var show_objective := true
 ## Which buttons the on-screen hints name: follow the last device used, or
 ## always the keyboard's or the gamepad's.
 static var prompts := Prompts.AUTO
@@ -62,7 +60,6 @@ static func load_settings() -> void:
 	text_speed = clampi(int(config.get_value("text", "speed", text_speed)), 0, TextSpeed.size() - 1) as TextSpeed
 	fullscreen = bool(config.get_value("display", "fullscreen", fullscreen))
 	window_scale = clampi(int(config.get_value("display", "window_scale", window_scale)), MIN_SCALE, MAX_SCALE)
-	show_objective = bool(config.get_value("hud", "show_objective", show_objective))
 	prompts = clampi(int(config.get_value("input", "prompts", prompts)), 0, Prompts.size() - 1) as Prompts
 	master_volume = clampi(int(config.get_value("audio", "master", master_volume)), 0, MAX_VOLUME)
 	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
@@ -76,7 +73,6 @@ static func save() -> Error:
 	config.set_value("text", "speed", int(text_speed))
 	config.set_value("display", "fullscreen", fullscreen)
 	config.set_value("display", "window_scale", window_scale)
-	config.set_value("hud", "show_objective", show_objective)
 	config.set_value("input", "prompts", int(prompts))
 	config.set_value("audio", "master", master_volume)
 	config.set_value("audio", "effects", effects_volume)
@@ -88,7 +84,6 @@ static func reset_defaults() -> void:
 	text_speed = TextSpeed.NORMAL
 	fullscreen = false
 	window_scale = 3
-	show_objective = true
 	prompts = Prompts.AUTO
 	master_volume = 8
 	effects_volume = MAX_VOLUME

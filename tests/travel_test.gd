@@ -122,7 +122,7 @@ func _ready() -> void:
 	await _check_spawns_are_free(world)
 	await _check_unstick(world)
 	await _check_wake_up(world)
-	_check_controls(world)
+	await _check_controls(world)
 	await _check_menus(world)
 	await _check_central_hub(world)
 	await _check_curfew(world)
@@ -229,12 +229,12 @@ func _check_menus(world: Node) -> void:
 	_press("ui_cancel")
 
 	world.hud._input(InputEventKey.new())
-	check(world.hud._status.text.contains("J: Journal"), "the status strip names the journal key (%s)" % world.hud._status.text)
+	check(world.hud._status.text.contains("J: Journal"), "the hint line names the journal key (%s)" % world.hud._status.text)
 	world.open_travel_map()
 	check("[Arrows] Choose   [E] Travel   [Esc] Close" in world.park_map._hint_label.text, "the travel map shows keyboard prompts")
 	world.hud._input(InputEventJoypadButton.new())
 	check("[D-pad] Choose   [A] Travel   [B] Close" in world.park_map._hint_label.text, "the open map switches to gamepad prompts")
-	check(world.hud._status.text.contains("Y: Journal") and not world.hud._status.text.contains("J: Journal"), "the status strip switches to the gamepad's Y")
+	check(world.hud._status.text.contains("Y: Journal") and not world.hud._status.text.contains("J: Journal"), "the hint line switches to the gamepad's Y")
 	world.park_map.close()
 	world.open_shuttle_map("Happy Isles")
 	check("[A] Ride" in world.park_map._area_hint.text, "the shuttle map shows gamepad prompts (%s)" % world.park_map._area_hint.text)
@@ -294,6 +294,7 @@ func _check_controls(world: Node) -> void:
 	check(journal.is_open() and not player.can_act, "J opens the journal")
 	_press("journal")
 	check(not journal.is_open() and player.can_act, "J closes the journal")
+	await _check_book(world, journal, player)
 	_press("pause")
 	check(pause.is_open() and not player.can_act and GameClock.paused, "Esc opens the pause menu")
 	_press("ui_cancel")
@@ -314,6 +315,62 @@ func _press(action: String) -> void:
 	release.action = action
 	Input.parse_input_event(release)
 	Input.flush_buffered_events()
+
+
+## Q and B open the book on Quests and the Backpack, the keys and Tab move
+## between its tabs, and the arrows move over the Backpack's slots.
+func _check_book(world: Node, journal: Journal, player: Player) -> void:
+	for action in ["quests", "backpack"]:
+		check(InputMap.has_action(action) and InputMap.action_get_events(action).any(func(e: InputEvent) -> bool: return e is InputEventKey), "%s has a key" % action)
+	_press("quests")
+	check(journal.is_open() and journal.tab() == Journal.Tab.QUESTS and not player.can_act and GameClock.paused, "Q opens the book on Quests")
+	check(journal._body.get_child(0).text == "Main story" and journal._footer.text.contains("[Q/Esc] Close"), "Quests starts with the main story (%s)" % journal._footer.text)
+	check(not journal._detail.visible, "only the Backpack shows the detail lines")
+	_press("backpack")
+	check(journal.is_open() and journal.tab() == Journal.Tab.BACKPACK, "B turns to the Backpack without closing")
+	_press("ui_focus_next")
+	check(journal.tab() == Journal.Tab.JOURNAL, "Tab goes round to the Journal")
+	_press("ui_focus_prev")
+	check(journal.tab() == Journal.Tab.BACKPACK, "Shift+Tab goes back")
+	var bumper := InputEventJoypadButton.new()
+	bumper.button_index = JOY_BUTTON_LEFT_SHOULDER
+	bumper.pressed = true
+	Input.parse_input_event(bumper)
+	Input.flush_buffered_events()
+	check(journal.tab() == Journal.Tab.QUESTS, "LB turns back a tab")
+	world.hud._input(InputEventKey.new()) # the bumper switched the prompts to the gamepad
+	_press("ui_cancel")
+	check(not journal.is_open() and player.can_act and not GameClock.paused, "Esc closes the book from any tab")
+
+	var before := Inventory.items.duplicate()
+	Inventory.items = {"acorn_cake": 3, "trail_mix": 1, "black_oak_acorn": 12, "sequoia_cone": 1}
+	Inventory.changed.emit()
+	_press("backpack")
+	for i in 3:
+		await get_tree().process_frame
+	var names := journal._slot_items.map(func(slot: Dictionary) -> String: return slot.name)
+	check(names.slice(-4) == ["Acorn Cake", "Trail Mix", "Black Oak Acorn", "Giant Sequoia Cone"], "the Backpack sorts food from forage (%s)" % [names])
+	var gear := names.size() - 4
+	check(gear > 0 and journal._cursor == 0 and journal._detail.visible and journal._detail_name.text.begins_with(names[0]), "the cursor starts on the first piece of gear (%s)" % journal._detail_name.text)
+	check(get_viewport().get_visible_rect().encloses(journal._panel.get_global_rect()), "the Backpack fits on screen (%s)" % journal._panel.get_global_rect())
+	_press("move_down")
+	check(journal._cursor == gear, "Down goes to the row of food (%d)" % journal._cursor)
+	check(journal._detail_name.text == "Acorn Cake x3   (45 energy each, keeps %d days)" % Larder.days_left("acorn_cake"), "the detail line names the food and what it's worth (%s)" % journal._detail_name.text)
+	check(journal._detail_text.text == ItemDB.get_item("acorn_cake").description, "and describes it")
+	_press("move_right")
+	check(journal._cursor == gear + 1, "Right goes along the row")
+	_press("move_down")
+	_press("move_left")
+	check(journal._cursor == gear + 2 and journal._detail_name.text.contains("not ready to eat"), "raw acorns say they aren't ready to eat (%s)" % journal._detail_name.text)
+	_press("move_down")
+	check(journal._cursor == gear + 2, "Down stops on the last row")
+	_press("move_up")
+	_press("move_up")
+	check(journal._cursor < gear, "Up goes back to the gear")
+	_press("backpack")
+	check(not journal.is_open() and player.can_act, "B closes the Backpack")
+	Inventory.items = before
+	Inventory.changed.emit()
 
 
 ## The Yosemite Village central hub: drivers arrive there, every spot in it is

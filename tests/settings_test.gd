@@ -1,8 +1,8 @@
 extends Node
 ## Headless test of the player settings (scripts/ui/settings.gd) and the UI
 ## that uses them: saving and loading user://, bad values, the pause menu's
-## Settings page driven by keys, the goal panel, pinned button prompts, and
-## the dialogue box's text reveal and skip.
+## Settings page driven by keys, pinned button prompts, the HUD hiding under
+## the journal, and the dialogue box's text reveal and skip.
 ## Run: godot --headless --path . res://tests/settings_test.tscn
 ## Exit code is the number of failed checks. Uses its own settings and save files.
 
@@ -36,7 +36,7 @@ func _ready() -> void:
 	GameClock.paused = true
 	await test_pause_settings()
 	test_prompts()
-	await test_objective()
+	await test_book()
 	await test_dialogue_reveal()
 	world.queue_free()
 	SaveManager.delete_save()
@@ -48,11 +48,10 @@ func _ready() -> void:
 func test_persistence() -> void:
 	Settings.load_settings()
 	check(Settings.text_speed == Settings.TextSpeed.NORMAL and not Settings.fullscreen and Settings.window_scale == 3
-		and Settings.show_objective and Settings.prompts == Settings.Prompts.AUTO, "no settings file gives the defaults")
+		and Settings.prompts == Settings.Prompts.AUTO, "no settings file gives the defaults")
 	Settings.text_speed = Settings.TextSpeed.FAST
 	Settings.fullscreen = true
 	Settings.window_scale = 2
-	Settings.show_objective = false
 	Settings.prompts = Settings.Prompts.GAMEPAD
 	check(Settings.save() == OK and FileAccess.file_exists(TEST_PATH), "settings save to user://")
 	Settings.reset_defaults()
@@ -61,7 +60,6 @@ func test_persistence() -> void:
 	check(Settings.text_speed == Settings.TextSpeed.FAST, "text speed loads back")
 	check(Settings.fullscreen, "full screen loads back")
 	check(Settings.window_scale == 2, "window size loads back")
-	check(not Settings.show_objective, "the goal panel setting loads back")
 	check(Settings.prompts == Settings.Prompts.GAMEPAD, "button prompts load back")
 	check(Settings.chars_per_second() == 120.0, "Fast reveals 120 letters a second")
 	Settings.text_speed = Settings.TextSpeed.INSTANT
@@ -78,7 +76,7 @@ func test_bad_values() -> void:
 	check(Settings.text_speed == Settings.TextSpeed.INSTANT, "an out-of-range text speed is clamped (%d)" % Settings.text_speed)
 	check(Settings.window_scale == Settings.MIN_SCALE, "an out-of-range window size is clamped (%d)" % Settings.window_scale)
 	check(Settings.prompts == Settings.Prompts.GAMEPAD, "an out-of-range prompt mode is clamped")
-	check(Settings.show_objective, "a missing key keeps its default")
+	check(not Settings.fullscreen, "a missing key keeps its default")
 	Settings.path = "user://no_such_dir/settings.cfg"
 	Settings.load_settings()
 	check(Settings.text_speed == Settings.TextSpeed.NORMAL, "an unreadable file gives the defaults")
@@ -101,16 +99,11 @@ func test_pause_settings() -> void:
 	_press("move_down")
 	_press("move_down")
 	_press("move_down")
-	_press("interact")
-	check(not Settings.show_objective and _saved("hud", "show_objective") == false, "E toggles the goal panel off and saves it")
-	_press("interact")
-	check(Settings.show_objective, "and back on")
-	_press("move_down")
 	_press("move_right")
 	check(Settings.prompts == Settings.Prompts.KEYBOARD, "Right steps the button prompts")
 	_press("move_left")
 	check(Settings.prompts == Settings.Prompts.AUTO, "Left steps them back to Auto")
-	for i in 5: # Button prompts, up past Text speed, round to Back
+	for i in 4: # Button prompts, up past Text speed, round to Back
 		_press("move_up")
 	check(pause._settings_cursor == PauseMenu.Setting.BACK, "the cursor wraps round to Back")
 	_press("interact")
@@ -171,33 +164,26 @@ func test_prompts() -> void:
 	check(hud.interact_button() == "E" and MenuInput.button(get_tree(), "Esc", "B") == "Esc", "and the keyboard, in the menus too")
 
 
-func test_objective() -> void:
+func test_book() -> void:
 	var hud: HUD = world.hud
-	Settings.show_objective = true
-	hud.refresh_objective()
 	await get_tree().process_frame
-	await get_tree().process_frame
-	var text := HUD.objective_text()
-	check(text != "" and hud.objective_label.text == text, "the goal panel shows the next step (%s)" % text)
-	check(hud.objective_panel.visible, "the goal panel is visible")
-	var screen := get_viewport().get_visible_rect()
-	var rect := hud.objective_panel.get_global_rect()
-	check(screen.encloses(rect), "the goal panel fits on screen (%s)" % rect)
-	check(rect.position.y >= hud.clock_panel.get_global_rect().end.y, "the goal panel sits under the clock")
-	check(rect.size.x <= HUD.OBJECTIVE_WIDTH + 16, "the goal panel stays narrow (%.0f)" % rect.size.x)
-	Settings.show_objective = false
-	hud.refresh_objective()
-	check(not hud.objective_panel.visible, "turning the setting off hides it")
-	Settings.show_objective = true
-	hud.refresh_objective()
+	check(hud._status.text == "J: Journal  ·  Q: Quests  ·  B: Backpack", "the hint line names the three keys (%s)" % hud._status.text)
+	check(get_viewport().get_visible_rect().encloses(hud.status_bar.get_global_rect()), "the hint line fits on screen")
 	var journal: Journal = get_tree().get_first_node_in_group("journal")
 	journal.open()
 	await get_tree().process_frame
-	check(hud.objective_panel.modulate.a == 0.0, "the goal panel hides under the journal")
+	check(hud.status_bar.modulate.a == 0.0 and hud.clock_panel.modulate.a == 0.0, "the HUD hides under the journal")
 	check(journal._footer.text.contains("[J/Esc] Close"), "the journal's hint stays under the page (%s)" % journal._footer.text)
+	check(get_viewport().get_visible_rect().encloses(journal._panel.get_global_rect()), "the journal fits on screen (%s)" % journal._panel.get_global_rect())
+	Settings.prompts = Settings.Prompts.GAMEPAD
+	hud.refresh_settings()
+	check(journal._footer.text.contains("[LB/RB] Next tab") and journal._tab_labels[Journal.Tab.QUESTS].text == "Quests", "its hints follow the Button prompts setting (%s)" % journal._footer.text)
+	Settings.prompts = Settings.Prompts.AUTO
+	hud.refresh_settings()
+	check(journal._tab_labels[Journal.Tab.QUESTS].text == "Q  Quests", "and name the keys on a keyboard")
 	journal.close()
 	await get_tree().process_frame
-	check(hud.objective_panel.modulate.a == 1.0, "and comes back after")
+	check(hud.status_bar.modulate.a == 1.0, "and comes back after")
 
 
 func test_dialogue_reveal() -> void:
