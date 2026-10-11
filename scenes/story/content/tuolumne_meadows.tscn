@@ -17,7 +17,7 @@ offset = Vector2(-20, -12)
 wander_radius = 16.0
 
 [node name="CathedralPeak" parent="." instance=ExtResource("3_r")]
-position = Vector2(1328, 1024)
+position = Vector2(200, 1144)
 route = ExtResource("4_r")
 
 [node name="CarrieBethel" parent="." instance=ExtResource("1_r")]

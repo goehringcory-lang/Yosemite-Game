@@ -21,7 +21,7 @@ spot = "camp_4"
 offset = Vector2(16, -24)
 
 [node name="SwanSlab" parent="." instance=ExtResource("3_r")]
-position = Vector2(324, 258)
+position = Vector2(216, 120)
 route = ExtResource("4_r")
 
 [node name="JohnSalathe" parent="." instance=ExtResource("1_r")]
