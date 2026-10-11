@@ -9,8 +9,8 @@
 
 [node name="RoyalRobbins" parent="." instance=ExtResource("1_r")]
 character = ExtResource("2_r")
-position = Vector2(892, 200)
+position = Vector2(1028, 238)
 
 [node name="RoyalArches" parent="." instance=ExtResource("3_r")]
-position = Vector2(936, 176)
+position = Vector2(1004, 226)
 route = ExtResource("4_r")

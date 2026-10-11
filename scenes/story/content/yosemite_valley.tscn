@@ -54,7 +54,7 @@ spot = "happy_isles"
 offset = Vector2(-38, 0)
 
 [node name="SnakeDike" parent="." instance=ExtResource("3_r")]
-position = Vector2(3920, 1120)
+position = Vector2(3944, 1128)
 route = ExtResource("11_r")
 
 [node name="WarrenHarding" parent="." instance=ExtResource("1_r")]
@@ -68,7 +68,7 @@ spot = "el_capitan_meadow"
 offset = Vector2(16, -24)
 
 [node name="TheNose" parent="." instance=ExtResource("3_r")]
-position = Vector2(1568, 1456)
+position = Vector2(1416, 1336)
 route = ExtResource("14_r")
 
 [node name="VisitorAngler" parent="." instance=ExtResource("1_r")]
@@ -90,15 +90,15 @@ target_region = "curry_village"
 target_spawn = "west_road"
 
 [node name="HigherCathedralSpire" parent="." instance=ExtResource("3_r")]
-position = Vector2(1780, 1530)
+position = Vector2(1512, 1688)
 route = ExtResource("spire_r")
 
 [node name="Nutcracker" parent="." instance=ExtResource("3_r")]
-position = Vector2(2232, 856)
+position = Vector2(1976, 1256)
 route = ExtResource("nut_r")
 
 [node name="SteckSalathe" parent="." instance=ExtResource("3_r")]
-position = Vector2(2560, 1144)
+position = Vector2(2664, 1240)
 route = ExtResource("steck_r")
 
 [node name="Astroman" parent="." instance=ExtResource("3_r")]
@@ -106,5 +106,5 @@ position = Vector2(3568, 616)
 route = ExtResource("astro_r")
 
 [node name="SeparateReality" parent="." instance=ExtResource("3_r")]
-position = Vector2(672, 1744)
+position = Vector2(216, 1640)
 route = ExtResource("sepr_r")

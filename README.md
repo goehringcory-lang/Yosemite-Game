@@ -381,6 +381,7 @@ It walks the way from the homestead's north gate through Stoneman Meadow, over S
 godot --headless --path . res://tests/story_test.tscn
 godot --headless --path . res://tests/world_story_test.tscn
 godot --headless --path . res://tests/cast_test.tscn
+godot --headless --path . res://tests/climb_access_test.tscn   # every climb can be walked to, at the foot of a wall
 godot --headless --path . res://tests/climb_test.tscn   # every route, every piece of gear
 xvfb-run -a godot --path . res://tests/climb_screen_test.tscn   # plays all 13 on the real screen (needs a window)
 godot --headless --path . res://tests/eggs_test.tscn

@@ -61,7 +61,7 @@ spot = "apron_trailhead"
 offset = Vector2(-84, -32)
 
 [node name="FirefallSlab" parent="." instance=ExtResource("10_r")]
-position = Vector2(1150, 132)
+position = Vector2(1150, 118)
 route = ExtResource("11_r")
 
 [node name="CurryRentalShoes" parent="." instance=ExtResource("12_r")]
