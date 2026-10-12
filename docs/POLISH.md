@@ -25,6 +25,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | A "!" over people with a quest | Orange "!" for a new quest, blue "?" to hand one in; on shopkeepers too | `QuestLog.marker_for`, `scripts/story/quest_marker.gd` | test (Clark "!" at the start, gone once taken; "?" when ready); shot `polish_quest_marker.png` |
 | Friendship hearts and gifts | Five hearts per person, from talking each day, finishing their quests, and one gift a week (G or LB while facing them); everyone has loves drawn from their story (Muir's dry crusts and tea), likes good food, and never thinks less of you; hearts in the Journal's Friends section, a heart pop and chime, and new hearts on the day's page | `scripts/story/friendship.gd`, `gift_giving.gd`, `hearts.gd` | test (daily talk once, loved and liked gifts, weekly limit, hearts one at a time, quest warmth, saved, everyone has real loves, Journal shows hearts); shot `polish_gifts.png` |
 | People react when you talk | They turn to face you and give a small hop | `npc.gd` | by eye |
+| People keep hours | Visitors go home between 8 and 10 PM and come back at 7 AM, fading out and in; about half stay in on rainy days | `NPC.is_out` | test (home at night and can't be talked to, back in the morning, quest givers always there) |
 | People walk about | Wanderers stroll round their spot (existing) | `npc.gd` | cast test |
 
 ## Time and place
@@ -53,5 +54,5 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 ## Not done
 
 - **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew also has several pieces a season; here there is one.
-- **No daily schedules.** People stay round their spot rather than following a timetable through the day.
+- **Only visitors keep a daily routine.** Visitors head home in the evening, each at their own hour, come back in the morning, and half stay in when it rains; the people with quests stay where they are so you can always find them for their stories. Stardew's villagers walk full timetables between home, work and the saloon.
 - **No hand-drawn art pass.** All the art is drawn by code in a consistent style; Stardew's is hand-drawn by one artist.

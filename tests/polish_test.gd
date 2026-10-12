@@ -33,6 +33,7 @@ func _ready() -> void:
 	await test_critters(world)
 	await test_rustle(world)
 	await test_location_fits(world)
+	await test_routines(world)
 	test_friendship(world)
 	await test_day_log(world)
 	SaveManager.delete_save()
@@ -254,6 +255,34 @@ func test_location_fits(world: Node) -> void:
 	var clock: Rect2 = world.hud.clock_panel.get_global_rect()
 	check(not banner.intersects(clock), "a long place name keeps clear of the clock (%s)" % world.hud.location_label.text)
 	check(world.hud.location_label.text.ends_with("Glacier Point Apron trail"), "and keeps the place you're in")
+
+
+func test_routines(world: Node) -> void:
+	var visitor: NPC = null
+	var local: NPC = null
+	for node in world.region.find_children("*", "NPC", true, false):
+		if node.character and node.character.visitor and visitor == null:
+			visitor = node
+		elif node.character and not node.character.visitor and local == null:
+			local = node
+	check(visitor != null and local != null, "Curry Village has visitors and locals")
+	if visitor == null or local == null:
+		return
+	var saved := GameClock.minutes
+	GameClock.minutes = 23 * 60
+	visitor._routine_check = 0.0
+	visitor._process(0.016)
+	await get_tree().create_timer(1.0).timeout
+	check(not visitor.is_out() and not visitor.visible, "visitors go home at night")
+	check(not visitor.get_node("Hitbox").monitorable, "and can't be talked to while they're gone")
+	check(local.is_out(), "people with stories to tell stay where you can find them")
+	GameClock.minutes = 10 * 60
+	visitor._routine_check = 0.0
+	visitor._process(0.016)
+	await get_tree().create_timer(1.0).timeout
+	var rainy: bool = Weather.today().rain > 0.4
+	check(visitor.visible or rainy, "and come back out in the morning")
+	GameClock.minutes = saved
 
 
 func test_rustle(world: Node) -> void:

@@ -32,6 +32,15 @@ var _sprite: Sprite2D
 var _rng := RandomNumberGenerator.new()
 ## The "!" or "?" over their head.
 var quest_marker: QuestMarker
+## Visitors keep hours (see is_out): out of doors by day, home at night.
+var _out := true
+var _routine_check := 0.0
+
+## Visitors head home between these hours (each at their own time) and come
+## back out in the morning; on a rainy day about half of them stay in.
+const HOME_FROM := 20.0
+const HOME_SPREAD := 2.0
+const OUT_FROM := 7.0
 
 
 func _ready() -> void:
@@ -60,6 +69,43 @@ func _ready() -> void:
 	if character and not character.visitor:
 		quest_marker = QuestMarker.new(character.id)
 		add_child(quest_marker)
+
+
+func _process(delta: float) -> void:
+	_routine_check -= delta
+	if _routine_check > 0.0 or character == null or not character.visitor:
+		return
+	_routine_check = 0.5
+	var out := is_out()
+	if out != _out and not _talking:
+		_set_out(out)
+
+
+## True when this visitor is about: from OUT_FROM until their own hour
+## between HOME_FROM and HOME_FROM + HOME_SPREAD, and not kept in by rain.
+func is_out() -> bool:
+	if character == null or not character.visitor:
+		return true
+	var hour := GameClock.minutes / 60.0
+	var home_at := HOME_FROM + float(absi(hash(name)) % 100) / 100.0 * HOME_SPREAD
+	if hour >= home_at or hour < OUT_FROM:
+		return false
+	return not (Weather.today().rain > 0.4 and absi(hash(name + "rain")) % 2 == 0)
+
+
+## Fades them away (home for the night) or back.
+func _set_out(out: bool) -> void:
+	_out = out
+	var hitbox := get_node_or_null("Hitbox") as Area2D
+	if hitbox:
+		hitbox.set_deferred("monitorable", out)
+	set_deferred("collision_layer", 1 if out else 0)
+	if out:
+		visible = true
+	var tween := create_tween()
+	tween.tween_property(self, "modulate:a", 1.0 if out else 0.0, 0.8)
+	if not out:
+		tween.tween_callback(func() -> void: visible = _out)
 
 
 func _find_region() -> Region:
