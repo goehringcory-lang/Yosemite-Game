@@ -215,6 +215,7 @@ func open() -> void:
 		hud.device_changed.connect(_refresh)
 	_show_page(Page.MAIN)
 	_panel.visible = true
+	MenuInput.pop_in(_panel)
 	_was_paused = GameClock.paused
 	GameClock.paused = true
 	_set_player_can_act(false)
@@ -231,6 +232,7 @@ func close() -> void:
 	if not is_open():
 		return
 	_panel.visible = false
+	Sound.play("ui_close")
 	GameClock.paused = _was_paused
 	_set_player_can_act(true)
 	closed.emit()

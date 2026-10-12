@@ -48,3 +48,15 @@ static func horizontal(event: InputEvent) -> int:
 	if pressed(event, "move_right") or pressed(event, "ui_right"):
 		return 1
 	return 0
+
+
+## Opens [param panel] with a quick fade and grow and the page swish, so
+## menus don't just blink into place.
+static func pop_in(panel: Control) -> void:
+	panel.pivot_offset = panel.size / 2.0
+	panel.modulate.a = 0.0
+	panel.scale = Vector2(0.96, 0.96)
+	var tween := panel.create_tween().set_parallel()
+	tween.tween_property(panel, "modulate:a", 1.0, 0.12)
+	tween.tween_property(panel, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	Sound.play("ui_open")

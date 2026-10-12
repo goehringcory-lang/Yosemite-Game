@@ -162,6 +162,7 @@ func open(which := Tab.JOURNAL) -> void:
 	_panel.visible = true
 	show_tab(which)
 	GameClock.paused = true
+	MenuInput.pop_in(_panel)
 	_set_player_can_act(false)
 
 
@@ -169,6 +170,7 @@ func close() -> void:
 	if not is_open():
 		return
 	_panel.visible = false
+	Sound.play("ui_close")
 	GameClock.paused = false
 	_set_player_can_act(true)
 
