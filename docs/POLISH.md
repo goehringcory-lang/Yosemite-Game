@@ -31,6 +31,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 |---|---|---|---|
 | The clock dial | A window of sky: the sun crosses over Half Dome, moon and stars at night, dawn, gold and dusk skies, clouds, rain and snow | `scripts/ui/clock_dial.gd` | test (sun rises left, high at noon, sets right; moon up at night; sky colors); shot `polish_clock_dial.png` |
 | The end-of-day tally | The day's page at bedtime: things found and given with pictures, gear, first ascents, quests, perks, recipes, dishes | `scripts/story/day_log.gd`, `scripts/ui/day_summary.gd` | test (counts, saved with the game, clears each morning, opens and closes); shot `polish_day_summary.png` |
+| Grass that moves as you walk through it | Ferns, bracken, shrubs and flowers sway in a damped wobble with a soft rustle when you brush past | `scripts/world/rustle.gd` | test (walking through sets a fern swaying; it leans, then settles upright) |
 | Critters | Steller's jays, juncos, robins and quail hop and peck, and fly off as you come near; butterflies on fair spring and summer days | `scripts/world/critters.gd`, `tools/npcgen/critter_art.gd` | test (by day outdoors only, flee when close, the right birds each season); shot `polish_critters.png` |
 | Seasons you can see | Blossom and leaf drift, seasonal trees and ground, snow, waterfalls that run dry (existing) | `seasonal_*.gd`, `ambient_fx.gd`, `weather.gd` | smoke and audio tests |
 | Night lighting | Windows, lamps, tents and fires glow; fireflies (existing) | `night_light.gd`, `night_glow.gd` | by eye (`docs/camp4_night.png`) |
@@ -52,5 +53,4 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 - **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew also has several pieces a season; here there is one.
 - **No friendship or gifts.** Stardew's hearts and gifting are a game system rather than polish, and the story here is built on quests instead.
 - **No daily schedules.** People stay round their spot rather than following a timetable through the day.
-- **Grass and bushes don't sway as you walk through them.** The ground is one painted picture, so this would need separate plant sprites.
 - **No hand-drawn art pass.** All the art is drawn by code in a consistent style; Stardew's is hand-drawn by one artist.

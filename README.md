@@ -58,6 +58,7 @@ The small touches that make the Valley feel alive, in the spirit of Stardew Vall
 - **Music.** Six short pieces, one for each season by day, one for the night, and the title theme. They play the way Stardew's do: a piece now and then, with the birds and wind on their own in between. Music rests in the rain and on the wall, comes in softer indoors, and fades when the hour or the season calls for another piece. See [Sound](#sound).
 - **The day's page.** When you sleep, a page comes up over the black before morning: what you found and were given (with pictures), new gear, first ascents, finished quests, perks, recipes, and dishes cooked, or "A quiet day in the Valley" (`scripts/story/day_log.gd`, `scripts/ui/day_summary.gd`).
 - **Birds and butterflies.** Steller's jays, juncos, robins and California quail hop and peck about on open ground and flutter off as you come near; butterflies drift over on fair spring and summer days (`scripts/world/critters.gd`, sprites from `tools/npcgen/critter_art.gd`).
+- **Plants rustle.** Ferns, bracken, shrubs and flowers sway and rustle when you brush past them (`scripts/world/rustle.gd`).
 - **Pictures in the shops and at the fire.** Every trade and every dish in a choice list shows its picture (`DialogueBox.choose` takes an icon per option).
 - **Every food has a picture.** The acorn chain and the campfire dishes are drawn by `tools/ui/food_icons.gd` in the forage icons' style.
 

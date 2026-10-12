@@ -31,6 +31,7 @@ func _ready() -> void:
 	test_music()
 	test_tuning()
 	await test_critters(world)
+	await test_rustle(world)
 	await test_day_log(world)
 	SaveManager.delete_save()
 	print("OK: %d failure(s)" % failures if failures == 0 else "FAILED: %d failure(s)" % failures)
@@ -241,6 +242,32 @@ func test_critters(world: Node) -> void:
 	GameClock.minutes = saved_minutes
 	GameClock.season = saved_season
 	await get_tree().process_frame
+
+
+func test_rustle(world: Node) -> void:
+	await world.go_to_region("curry_village", "arrival")
+	var rustle: Rustle = null
+	for child in world.get_children():
+		if child is Rustle:
+			rustle = child
+	check(rustle != null, "plants can rustle")
+	if rustle == null:
+		return
+	rustle._process(0.016)
+	check(rustle.plant_count() > 20, "Curry Village's ferns and shrubs are found (%d)" % rustle.plant_count())
+	var plant: Sprite2D = rustle._plants[0]
+	# walk the player's feet into the plant
+	world.player.global_position = plant.global_position + Vector2(-20, 0)
+	rustle._process(0.016)
+	world.player.global_position = plant.global_position + Vector2(2, 1)
+	rustle._process(0.016)
+	check(rustle.is_swaying(plant), "walking through a fern sets it swaying")
+	rustle._process(0.1)
+	check(absf(plant.skew) > 0.01, "it leans (skew %.2f)" % plant.skew)
+	world.player.global_position = plant.global_position + Vector2(60, 0)
+	for i in 10:
+		rustle._process(0.1)
+	check(not rustle.is_swaying(plant) and plant.skew == 0.0, "and settles back upright")
 
 
 func test_day_log(world: Node) -> void:

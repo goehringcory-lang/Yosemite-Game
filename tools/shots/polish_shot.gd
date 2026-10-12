@@ -97,6 +97,20 @@ func _ready() -> void:
 		world.player.global_position = nearest + Vector2(20, 0)
 		await get_tree().create_timer(0.25).timeout
 		await _snap(dir, "critters_flee", 1)
+	# Ferns swaying as the player brushes through.
+	var rustle: Rustle = null
+	for child in world.get_children():
+		if child is Rustle:
+			rustle = child
+	if rustle and rustle.plant_count() > 0:
+		var fern: Sprite2D = rustle._plants[rustle.plant_count() / 2]
+		world.player.global_position = fern.global_position + Vector2(-30, 0)
+		await get_tree().create_timer(0.6).timeout
+		for other in rustle._plants:
+			if other.global_position.distance_to(fern.global_position) < 60.0:
+				rustle.brush(other, 1.0)
+		await get_tree().create_timer(0.12).timeout
+		await _snap(dir, "rustle", 1)
 	# The day's page at bedtime.
 	world.day_log.clear()
 	for id in ["miners_lettuce", "miners_lettuce", "miners_lettuce", "wild_strawberry", "sierra_onion", "black_oak_acorn", "black_oak_acorn", "acorn_cake"]:

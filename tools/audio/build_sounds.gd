@@ -56,6 +56,7 @@ func _init() -> void:
 	_save("quest_done", _chime([67, 72, 76, 79, 76, 84], 0.1, 1.2), RATE_FX, -6.0)
 	_save("talk", _talk(), RATE_FX, -15.0)
 	_save("flutter", _flutter(72), RATE_FX, -12.0)
+	_save("rustle", _rustle(73), RATE_FX, -14.0)
 	print("Sounds written to %s. Run godot --headless --path . --import next." % OUT)
 	quit()
 
@@ -527,6 +528,17 @@ func _flutter(seed_value: int) -> PackedFloat32Array:
 		var at := k * 0.055 * (1.0 + k * 0.04)
 		var start := int(at * RATE_FX)
 		_add_noise(buf, RATE_FX, 0.6 * pow(0.85, k), 2400.0, 500.0, start, mini(start + int(0.035 * RATE_FX), buf.size()))
+	return buf
+
+
+## Leaves brushed aside: a short, airy swish with a few crackles in it.
+func _rustle(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(0.24, RATE_FX)
+	_add_noise(buf, RATE_FX, 0.5, 5200.0, 1400.0)
+	for k in 5:
+		_add_click(buf, RATE_FX, _rng.randf_range(0.01, 0.16), 0.004, 0.5, 7000.0)
+	_envelope(buf, 0.02, RATE_FX)
 	return buf
 
 
