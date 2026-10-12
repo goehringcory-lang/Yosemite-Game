@@ -30,14 +30,15 @@ enum Option { RESUME, SAVE, SETTINGS, CONTROLS, QUIT }
 const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Quit to desktop"]
 const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again to quit."
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, MASTER_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Volume", "Sound effects", "Ambience", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Volume", "Music", "Sound effects", "Ambience", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill the screen. The picture stays sharp in whole-pixel steps.",
 	"The window's size, in whole steps of 480 x 270.",
 	"Which buttons hints name. Auto follows the last device you used.",
 	"How loud the whole game is.",
+	"The songs for each season, the night, and the title screen.",
 	"Footsteps, climbing, and menus.",
 	"Birds, crickets, wind, rain, campfires, and waterfalls.",
 	"Back to the pause menu.",
@@ -155,7 +156,8 @@ func _build_main() -> Control:
 
 func _build_settings() -> Control:
 	var page := VBoxContainer.new()
-	page.add_theme_constant_override("separation", 2)
+	# Rows sit close so all nine settings, the help and the hint line fit.
+	page.add_theme_constant_override("separation", 0)
 	for i in SETTING_NAMES.size():
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 4)
@@ -332,7 +334,7 @@ func _settings_input(event: InputEvent) -> void:
 		change = 1
 		# E steps a volume up, and from 100% round to Off (Left/Right stop at
 		# the ends, so Left from Off never jumps to full).
-		if _settings_cursor in [Setting.MASTER_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME] \
+		if _settings_cursor in [Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME] \
 				and _volume(_settings_cursor) >= Settings.MAX_VOLUME:
 			change = -Settings.MAX_VOLUME
 	if change != 0:
@@ -355,6 +357,8 @@ func change_setting(which: int, step: int) -> void:
 			Settings.prompts = wrapi(Settings.prompts + step, 0, Settings.Prompts.size()) as Settings.Prompts
 		Setting.MASTER_VOLUME:
 			Settings.master_volume = clampi(Settings.master_volume + step, 0, Settings.MAX_VOLUME)
+		Setting.MUSIC_VOLUME:
+			Settings.music_volume = clampi(Settings.music_volume + step, 0, Settings.MAX_VOLUME)
 		Setting.EFFECTS_VOLUME:
 			Settings.effects_volume = clampi(Settings.effects_volume + step, 0, Settings.MAX_VOLUME)
 		Setting.AMBIENCE_VOLUME:
@@ -428,7 +432,7 @@ func _setting_value(which: int) -> String:
 			value = "%dx  (%d x %d)" % [Settings.window_scale, Settings.BASE_SIZE.x * Settings.window_scale, Settings.BASE_SIZE.y * Settings.window_scale]
 		Setting.PROMPTS:
 			value = Settings.PROMPT_NAMES[Settings.prompts]
-		Setting.MASTER_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME:
+		Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME:
 			value = _volume_text(_volume(which))
 		_:
 			return ""
@@ -440,6 +444,8 @@ func _volume(which: int) -> int:
 	match which:
 		Setting.MASTER_VOLUME:
 			return Settings.master_volume
+		Setting.MUSIC_VOLUME:
+			return Settings.music_volume
 		Setting.EFFECTS_VOLUME:
 			return Settings.effects_volume
 	return Settings.ambience_volume

@@ -36,6 +36,8 @@ static var prompts := Prompts.AUTO
 ## the ambience (birds, wind, rain, campfires, waterfalls); 0 to MAX_VOLUME.
 static var master_volume := 8
 static var effects_volume := MAX_VOLUME
+## Volume of the music, 0 to MAX_VOLUME.
+static var music_volume := 8
 static var ambience_volume := MAX_VOLUME
 
 static var _loaded := false
@@ -63,6 +65,7 @@ static func load_settings() -> void:
 	prompts = clampi(int(config.get_value("input", "prompts", prompts)), 0, Prompts.size() - 1) as Prompts
 	master_volume = clampi(int(config.get_value("audio", "master", master_volume)), 0, MAX_VOLUME)
 	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
+	music_volume = clampi(int(config.get_value("audio", "music", music_volume)), 0, MAX_VOLUME)
 	ambience_volume = clampi(int(config.get_value("audio", "ambience", ambience_volume)), 0, MAX_VOLUME)
 
 
@@ -76,6 +79,7 @@ static func save() -> Error:
 	config.set_value("input", "prompts", int(prompts))
 	config.set_value("audio", "master", master_volume)
 	config.set_value("audio", "effects", effects_volume)
+	config.set_value("audio", "music", music_volume)
 	config.set_value("audio", "ambience", ambience_volume)
 	return config.save(path)
 
@@ -87,6 +91,7 @@ static func reset_defaults() -> void:
 	prompts = Prompts.AUTO
 	master_volume = 8
 	effects_volume = MAX_VOLUME
+	music_volume = 8
 	ambience_volume = MAX_VOLUME
 	_customized = false
 

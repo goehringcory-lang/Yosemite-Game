@@ -10,6 +10,12 @@ extends Node
 ## Effects (one-shots) and Ambience (the beds, and the campfires and
 ## waterfalls placed in the world by SoundEmitter).
 ##
+## Music (tools/audio/build_music.gd) plays the way it does in Stardew
+## Valley: a piece for the season, or the night, now and then, with the
+## ambience on its own in between. It rests in the rain and on the wall, comes
+## in softer indoors, and fades out when the time of day or the season calls
+## for a different piece. The title screen's theme loops.
+##
 ## The beds are four loops (birds by day, crickets at night, wind, rain) that
 ## fade up and down together. In "world" mode their mix follows the hour, the
 ## season, the weather, the region (quiet indoors, windy up high), and the
@@ -18,6 +24,22 @@ extends Node
 const DIR := "res://assets/audio/"
 const BUS_EFFECTS := &"Effects"
 const BUS_AMBIENCE := &"Ambience"
+const BUS_MUSIC := &"Music"
+## The day's piece for each season (GameClock.Season order), and the night's.
+const SEASON_MUSIC := ["music_spring", "music_summer", "music_fall", "music_winter"]
+const NIGHT_MUSIC := "music_night"
+const TITLE_MUSIC := "music_title"
+## Seconds of quiet between one piece and the next, at random in this range.
+const MUSIC_REST := Vector2(30.0, 75.0)
+## Seconds to wait before the first piece, and after a change of piece.
+const MUSIC_START := 2.5
+## Seconds to fade a piece out when it no longer fits.
+const MUSIC_FADE := 2.5
+## Music level indoors, against 1 outside.
+const MUSIC_INDOORS := 0.55
+## The night piece plays from this hour until morning.
+const NIGHT_FROM := 20
+const NIGHT_UNTIL := 6
 ## Sounds that come in numbered takes (name_1, name_2, ...).
 const VARIANTS := {"step_dirt": 3, "step_snow": 3, "step_wood": 3, "step_wet": 3, "climb_move": 3}
 const BEDS := ["amb_day", "amb_night", "amb_wind", "amb_rain"]
@@ -32,11 +54,15 @@ var _next := 0
 var _beds: Dictionary = {}
 var _mode := ""
 var _streams: Dictionary = {}
+var _music: AudioStreamPlayer
+## The piece playing (or due next), and the seconds until it starts.
+var _music_id := ""
+var _music_wait := MUSIC_START
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	for bus in [BUS_EFFECTS, BUS_AMBIENCE]:
+	for bus in [BUS_EFFECTS, BUS_AMBIENCE, BUS_MUSIC]:
 		if AudioServer.get_bus_index(bus) < 0:
 			AudioServer.add_bus()
 			var index := AudioServer.bus_count - 1
@@ -54,13 +80,18 @@ func _ready() -> void:
 		player.volume_linear = 0.0
 		add_child(player)
 		_beds[bed] = player
+	_music = AudioStreamPlayer.new()
+	_music.bus = BUS_MUSIC
+	add_child(_music)
+	_music.finished.connect(_on_music_finished)
+	GameClock.day_started.connect(_on_day_started.unbind(3))
 	Settings.ensure_loaded()
 	apply_volumes()
 
 
 func _exit_tree() -> void:
 	# Let go of every stream on quit, so none is still playing at exit.
-	for player: AudioStreamPlayer in _pool + _beds.values():
+	for player: AudioStreamPlayer in _pool + _beds.values() + [_music]:
 		player.stop()
 		player.stream = null
 	_streams.clear()
@@ -75,6 +106,7 @@ func apply_volumes() -> void:
 	_set_bus(&"Master", Settings.master_volume)
 	_set_bus(BUS_EFFECTS, Settings.effects_volume)
 	_set_bus(BUS_AMBIENCE, Settings.ambience_volume)
+	_set_bus(BUS_MUSIC, Settings.music_volume)
 
 
 func _set_bus(bus: StringName, level: int) -> void:
@@ -185,7 +217,71 @@ func _daylight() -> float:
 	return 1.0 - smoothstep(19.5, 21.0, hour)
 
 
+## The piece that fits now, or "" for quiet.
+func music_choice() -> String:
+	var mode := _mode
+	if mode == "world" and get_tree().get_first_node_in_group("climb_screen"):
+		return ""
+	match mode:
+		"title":
+			return TITLE_MUSIC
+		"world":
+			if Weather.today().rain > 0.4:
+				return ""
+			if GameClock.hour >= NIGHT_FROM or GameClock.hour < NIGHT_UNTIL:
+				return NIGHT_MUSIC
+			return SEASON_MUSIC[GameClock.season]
+	return ""
+
+
+## The piece playing now, or "" between pieces.
+func music_playing() -> String:
+	return _music_id if _music.playing else ""
+
+
+func _music_level() -> float:
+	var world := get_tree().get_first_node_in_group("world")
+	var region: Region = world.region if world else null
+	return MUSIC_INDOORS if region and region.indoors else 1.0
+
+
+func _update_music(delta: float) -> void:
+	var want := music_choice()
+	if _music.playing:
+		var target := _music_level() if want == _music_id else 0.0
+		_music.volume_linear = move_toward(_music.volume_linear, target, delta / MUSIC_FADE)
+		if target <= 0.0 and _music.volume_linear <= 0.0:
+			_music.stop()
+			_music_wait = MUSIC_START
+		return
+	if want != _music_id:
+		_music_id = want
+		_music_wait = minf(_music_wait, MUSIC_START)
+	if want == "":
+		return
+	_music_wait -= delta
+	if _music_wait > 0.0:
+		return
+	_music.stream = loop_stream(want) if want == TITLE_MUSIC else _stream(want)
+	if _music.stream == null:
+		_music_wait = MUSIC_REST.y
+		return
+	_music.volume_linear = _music_level()
+	_music.play()
+
+
+func _on_music_finished() -> void:
+	_music_wait = randf_range(MUSIC_REST.x, MUSIC_REST.y)
+
+
+## A new morning starts with music, like the first walk out of the tent.
+func _on_day_started() -> void:
+	if not _music.playing:
+		_music_wait = MUSIC_START
+
+
 func _process(delta: float) -> void:
+	_update_music(delta)
 	var targets := bed_targets()
 	var k := 1.0 - exp(-delta * 3.0 / BED_FADE)
 	for bed: String in BEDS:
