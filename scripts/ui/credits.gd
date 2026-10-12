@@ -34,7 +34,7 @@ const CREDITS := [
 	]],
 	["Fonts", [
 		"Noto Sans, © 2022 The Noto Project Authors, and",
-		"Pixelify Sans, © 2021 The Pixelify Sans Project Authors,",
+		"DotGothic16, © 2020 The DotGothic16 Project Authors,",
 		"both under the SIL Open Font License 1.1.",
 	]],
 	["Engine", [
@@ -50,7 +50,7 @@ const CREDITS := [
 	["", ["Thank you for playing."]],
 ]
 const FONT_LICENSE := "res://assets/fonts/NotoSans-OFL.txt"
-const PIXEL_FONT_LICENSE := "res://assets/fonts/PixelifySans-OFL.txt"
+const PIXEL_FONT_LICENSE := "res://assets/fonts/DotGothic16-OFL.txt"
 const HEADING := Color(1.0, 0.85, 0.5)
 const DIM := Color(1, 1, 1, 0.6)
 const PANEL_POS := Vector2(30, 16)
@@ -155,9 +155,9 @@ static func licenses_bbcode() -> String:
 	out.append("[color=#%s]Noto Sans[/color]" % gold)
 	out.append(_escape(FileAccess.get_file_as_string(FONT_LICENSE)) if FileAccess.file_exists(FONT_LICENSE) \
 		else "Copyright 2022 The Noto Project Authors. SIL Open Font License, Version 1.1.")
-	out.append("[color=#%s]Pixelify Sans[/color]" % gold)
+	out.append("[color=#%s]DotGothic16[/color]" % gold)
 	out.append(_escape(FileAccess.get_file_as_string(PIXEL_FONT_LICENSE)) if FileAccess.file_exists(PIXEL_FONT_LICENSE) \
-		else "Copyright 2021 The Pixelify Sans Project Authors. SIL Open Font License, Version 1.1.")
+		else "Copyright 2020 The DotGothic16 Project Authors. SIL Open Font License, Version 1.1.")
 	out.append("[color=#%s]Libraries in Godot Engine[/color]" % gold)
 	for component: Dictionary in Engine.get_copyright_info():
 		if component.name == "Godot Engine":

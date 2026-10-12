@@ -376,6 +376,7 @@ func _refresh() -> void:
 	else:
 		_hint_label.text = "Travel from a map kiosk or a road out of the area.\n[%s] Choose   [%s] Close   %s" % [_button("Arrows"), _button("M"), tab_hint]
 	_area_title.text = "" if not _view.is_empty() else "%s area map" % Park.get_hub(_hub_here).display_name
+	_fit_info()
 	_refresh_area_text()
 	_park_frame.queue_redraw()
 	_park_canvas.queue_redraw()
@@ -386,6 +387,16 @@ func _refresh() -> void:
 
 
 ## The name of a keyboard control on the current device, like the HUD's prompts.
+## Steps the description's type down a size at a time until the hub's whole
+## note fits its panel (the longest notes, or a wider font, need it).
+func _fit_info() -> void:
+	for size in [9, 8, 7]:
+		_desc_label.add_theme_font_size_override("font_size", size)
+		_acts_label.add_theme_font_size_override("font_size", size)
+		if _info_panel.get_combined_minimum_size().y <= INFO_RECT.size.y:
+			return
+
+
 func _button(keyboard: String) -> String:
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud and not hud.device_changed.is_connected(_on_device_changed):

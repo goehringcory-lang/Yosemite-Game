@@ -16,15 +16,15 @@ const CONTROLS := [
 	["Walk", "WASD or arrow keys", "Left stick or D-pad"],
 	["Talk, read, use", "E, Space, X, C, or click", "A or X"],
 	["Give a gift", "G", "LB"],
-	["Park and area map", "M (Tab switches tabs)", "Back (LB/RB: tabs)"],
-	["Journal, quests, backpack", "J, Q, B (Tab switches tabs)", "Y (LB/RB: tabs)"],
-	["Pause, or back out of a menu", "Esc", "Start, or B"],
+	["Park and area map", "M (Tab: tabs)", "Back (LB/RB: tabs)"],
+	["Journal, quests, backpack", "J, Q, B (Tab: tabs)", "Y (LB/RB: tabs)"],
+	["Pause, or go back", "Esc", "Start, or B"],
 	["Menus: choose, confirm", "Up/Down, E or Enter", "Stick or D-pad, A"],
 	["Dialogue: show all, next", "E (twice)", "A (twice)"],
-	["Climbing: move up", "W / Up (A, D: diagonal)", "Stick up / left / right"],
-	["Climbing: place a cam or clip a bolt", "Space or C", "X"],
-	["Climbing: eat, chalk up, retreat", "E / Esc", "A / B"],
-	["Climbing: aid or jug", "Shift + arrow", "Y + stick"],
+	["Climb: move up", "W / Up (A, D: diagonal)", "Stick up / left / right"],
+	["Climb: place a cam, clip a bolt", "Space or C", "X"],
+	["Climb: eat, chalk up, retreat", "E / Esc", "A / B"],
+	["Climb: aid or jug", "Shift + arrow", "Y + stick"],
 ]
 enum Option { RESUME, SAVE, SETTINGS, CONTROLS, QUIT }
 const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Quit to desktop"]

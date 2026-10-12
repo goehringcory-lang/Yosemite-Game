@@ -445,11 +445,11 @@ func test_font_setting() -> void:
 	var saved_path := Settings.path
 	Settings.path = "user://polish_test_settings.cfg"
 	Settings.load_settings()
-	check(not Settings.pixel_font, "letters are smooth by default, easiest to read")
+	check(Settings.pixel_font, "letters are pixel letters by default, like the art")
 	var theme := ThemeDB.get_project_theme()
 	Settings.pixel_font = true
 	Settings.apply_font()
-	check(theme.default_font.resource_path.ends_with("PixelifySans.ttf") or theme.default_font == Settings.ui_font(), "the pixel font goes on every themed screen")
+	check(theme.default_font == Settings.ui_font(), "the pixel font goes on every themed screen")
 	check(load("res://scripts/climb/art/climb_ui.gd").font() == Settings.ui_font(), "and on the climbing screen")
 	Settings.save()
 	Settings.pixel_font = false
@@ -462,7 +462,7 @@ func test_font_setting() -> void:
 	Settings.path = saved_path
 	Settings.load_settings()
 	check(FileAccess.file_exists(Credits.PIXEL_FONT_LICENSE), "the pixel font's license is in the project")
-	check(Credits.licenses_bbcode().contains("Pixelify Sans"), "and on the Licenses page")
+	check(Credits.licenses_bbcode().contains("DotGothic16"), "and on the Licenses page")
 
 
 func test_day_log(world: Node) -> void:

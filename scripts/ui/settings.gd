@@ -39,11 +39,12 @@ static var effects_volume := MAX_VOLUME
 ## Volume of the music, 0 to MAX_VOLUME.
 static var music_volume := 8
 static var ambience_volume := MAX_VOLUME
-## The UI's letters: smooth (Noto Sans, the default, easiest to read) or a
-## pixel font (Pixelify Sans) that matches the pixel art, as in Stardew Valley.
-static var pixel_font := false
+## The UI's letters: a pixel font (DotGothic16, the default) that matches the
+## pixel art as in Stardew Valley and keeps every letter distinct, or smooth
+## Noto Sans.
+static var pixel_font := true
 const SMOOTH_FONT := "res://assets/fonts/NotoSans-Regular.ttf"
-const PIXEL_FONT := "res://assets/fonts/PixelifySans.ttf"
+const PIXEL_FONT := "res://assets/fonts/DotGothic16-Regular.ttf"
 static var _fonts: Dictionary = {}
 
 static var _loaded := false
@@ -58,7 +59,7 @@ static func ensure_loaded() -> void:
 		apply_font()
 
 
-## The font for the UI, as chosen: Noto Sans, or crisp Pixelify Sans.
+## The font for the UI, as chosen: DotGothic16 or Noto Sans.
 static func ui_font() -> Font:
 	ensure_loaded()
 	var path := PIXEL_FONT if pixel_font else SMOOTH_FONT
@@ -68,23 +69,24 @@ static func ui_font() -> Font:
 			return ThemeDB.fallback_font
 		if path == PIXEL_FONT:
 			font = font.duplicate() as FontFile
-			# A touch of smoothing keeps letters like C and B apart at small
-			# sizes (with none, C closes up into an O).
+			# a touch of smoothing keeps the strokes even at the small sizes
 			font.antialiasing = TextServer.FONT_ANTIALIASING_GRAY
 			font.hinting = TextServer.HINTING_NONE
 			font.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
-			# no ligatures: the font joins "fi" into a shape that reads as "A"
+			# no ligatures: every letter stays its own
 			var ts := TextServerManager.get_primary_interface()
 			font.opentype_feature_overrides = {
 				ts.name_to_tag("liga"): 0, ts.name_to_tag("clig"): 0,
 				ts.name_to_tag("dlig"): 0, ts.name_to_tag("calt"): 0,
 			}
-			# and a little more room between words
-			var spaced := FontVariation.new()
-			spaced.base_font = font
-			spaced.spacing_space = 1
-			_fonts[path] = spaced
-			return spaced
+			# its lines run a pixel taller than Noto's; trim that so every
+			# screen keeps the layout it was made for
+			var trimmed := FontVariation.new()
+			trimmed.base_font = font
+			trimmed.spacing_top = -1
+			_fonts[path] = trimmed
+			return trimmed
+
 		_fonts[path] = font
 	return _fonts[path]
 
@@ -144,7 +146,7 @@ static func reset_defaults() -> void:
 	effects_volume = MAX_VOLUME
 	music_volume = 8
 	ambience_volume = MAX_VOLUME
-	pixel_font = false
+	pixel_font = true
 	_customized = false
 
 
