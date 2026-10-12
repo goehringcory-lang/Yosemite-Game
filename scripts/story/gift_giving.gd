@@ -31,7 +31,8 @@ static func offer(player: Player, character_id: String, speaker: String, anchor:
 				icons.append(item.icon)
 			names.append("Not now")
 			icons.append(null)
-			var pick := await box.choose("Give %s a gift?" % speaker, names, "", icons)
+			# their face beside the choices, as they wait to see what you have
+			var pick := await box.choose("What will you give %s?" % speaker.split(" ")[0], names, speaker, icons)
 			if pick >= 0 and pick < items.size():
 				var before := Friendship.hearts(character_id)
 				var thanks := Friendship.give(character_id, items[pick])

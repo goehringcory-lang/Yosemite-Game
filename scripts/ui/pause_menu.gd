@@ -63,6 +63,7 @@ var _page := Page.MAIN
 var _option_labels: Array[Label] = []
 var _goal_label: Label
 var _card_date: Label
+var _help_title: Label
 var _card_stats: Label
 var _setting_names: Array[Label] = []
 ## Volume setting -> its slider bar.
@@ -235,9 +236,13 @@ static func card_text() -> PackedStringArray:
 
 
 func _build_settings() -> Control:
+	var both := HBoxContainer.new()
+	both.add_theme_constant_override("separation", 8)
 	var page := VBoxContainer.new()
-	# Rows sit close so all ten settings, the help and the hint line fit.
+	# Rows sit close so all ten settings and the hint line fit.
 	page.add_theme_constant_override("separation", 0)
+	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	both.add_child(page)
 	for i in SETTING_NAMES.size():
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 4)
@@ -257,14 +262,40 @@ func _build_settings() -> Control:
 		page.add_child(row)
 		_setting_names.append(name_label)
 		_setting_values.append(value)
-	page.add_child(_spacer(6))
+	# what the chosen setting does, in a card beside the list
+	var card := _card_panel()
+	card.custom_minimum_size.x = CARD_WIDTH
+	card.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 2)
+	card.add_child(column)
+	_help_title = _label("", HEADING)
+	column.add_child(_help_title)
 	_help_label = _label("", DIM)
 	_help_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_help_label.custom_minimum_size.x = PANEL_SIZE.x - 16
-	page.add_child(_help_label)
+	_help_label.custom_minimum_size.x = CARD_WIDTH - 14
+	column.add_child(_help_label)
 	_sample_label = _label(SPEED_SAMPLE)
-	page.add_child(_sample_label)
-	return page
+	_sample_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_sample_label.custom_minimum_size.x = CARD_WIDTH - 14
+	column.add_child(_sample_label)
+	both.add_child(card)
+	return both
+
+
+## The framed card used beside the pause menu's and settings' lists.
+func _card_panel() -> PanelContainer:
+	var card := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0.2)
+	style.border_color = Color(0.78, 0.63, 0.38, 0.55)
+	style.border_width_left = 1
+	style.content_margin_left = 8.0
+	style.content_margin_right = 4.0
+	style.content_margin_top = 4.0
+	style.content_margin_bottom = 4.0
+	card.add_theme_stylebox_override("panel", style)
+	return card
 
 
 func _build_controls() -> Control:
@@ -501,6 +532,7 @@ func _refresh() -> void:
 			_sliders[i].queue_redraw()
 		_setting_values[i].modulate = DIM if i == Setting.WINDOW_SIZE and Settings.fullscreen else Color.WHITE
 	_help_label.text = SETTING_HELP[_settings_cursor]
+	_help_title.text = SETTING_NAMES[_settings_cursor]
 	if _settings_only and _settings_cursor == Setting.BACK:
 		_help_label.text = "Back to the title screen."
 	_sample_label.visible = _settings_cursor == Setting.TEXT_SPEED
