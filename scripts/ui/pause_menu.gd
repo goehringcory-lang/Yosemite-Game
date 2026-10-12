@@ -183,7 +183,7 @@ func _build_settings() -> Control:
 func _build_controls() -> Control:
 	var grid := GridContainer.new()
 	grid.columns = 3
-	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("h_separation", 6)
 	grid.add_theme_constant_override("v_separation", 0)
 	grid.add_child(_label(""))
 	for header in ["Keyboard and mouse", "Gamepad"]:

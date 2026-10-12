@@ -35,6 +35,13 @@ func _ready() -> void:
 	await test_rustle(world)
 	await test_location_fits(world)
 	await test_screens_fit(world)
+	# and again with the pixel font
+	Settings.pixel_font = true
+	Settings.apply_font()
+	await get_tree().process_frame
+	await test_screens_fit(world)
+	Settings.pixel_font = false
+	Settings.apply_font()
 	await test_routines(world)
 	await test_vendors_drawn(world)
 	test_friendship(world)

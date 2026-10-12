@@ -55,13 +55,19 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 
 Two separate reviewers, given only screenshots and asked to be harsh, judged the game against Stardew Valley. The first found text running off the Controls page and both maps, the day's page over the clock, item cards under menus, the gift prompt covering the person, placeholder shopkeepers and a placeholder campfire, ASCII cursors, and a crowded climbing HUD. All of that is fixed, and the second reviewer confirmed it from new screenshots, rating the presentation about 6.5 of 10 against Stardew (up from about 5). Their next round (padding inside panels, the world dimming behind menus, drawn checkboxes and arrows, fades at scroll edges, a card behind messages, at most four item cards) is fixed too.
 
-Their biggest remaining point was typography: Stardew uses one pixel font, and this game uses Noto Sans because a pixel font (Tiny5) was found too hard to read. So the choice is now the player's: **Settings > Font** switches every screen, the climbing screen included, to Pixelify Sans, a pixel font that is still easy to read (`docs/polish_pixel_font.png`). Smooth stays the default.
+Their biggest remaining point was typography: Stardew uses one pixel font, and this game uses Noto Sans because a pixel font (Tiny5) was found too hard to read. So the choice is now the player's: **Settings > Font** switches every screen, the climbing screen included, to Pixelify Sans, a pixel font that is still easy to read (`docs/polish_pixel_font.png`). Smooth stays the default. A third review found the pixel font joined "fi" into a shape that read as "A" and set words too close; ligatures are now off, words get an extra pixel, and the letters get a touch of smoothing so C and O stay apart. Its rounded B can still read as a G at this small size, which is the font's own design; that is the main reason Smooth stays the default.
+
+The third reviewer scored the default build 6.5 of 10 against Stardew Valley. What they said meets the bar: the world art and props, day and night lighting with lamp and fire glow, the item icons, the frame and tab system across the book and conversations, the friendship hearts, and the day's page. What they said still separates it from a 10 is in the next section.
 
 | Stardew hallmark | Here | Where | Checked by |
 |---|---|---|---|
 | A pixel font that matches the art | Settings > Font: Smooth (Noto Sans) or Pixel (Pixelify Sans, SIL Open Font License, credited with its license) | `Settings.ui_font`, `apply_font` | test (switches the theme and the climbing screen, saved, smooth by default, license present) |
 
 ## Not done
+
+- **Typography by default.** Stardew uses one bespoke pixel font everywhere. Here the pixel font is an option with the quirks above; a font drawn for this game would close the gap.
+- **Portraits and people are small.** Portraits are 40 px (Stardew's are 64) with simple shading, and the walking sprites are small next to the detailed scenery.
+- **Some screens are less illustrated than Stardew's.** The title is a working name in plain type, the park travel map is a smooth hillshade rather than pixel art, volumes are text values rather than sliders, and the climbing screen's parchment notes use a different frame style from the rest.
 
 - **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew also has several pieces a season; here there is one.
 - **Only visitors keep a daily routine.** Visitors head home in the evening, each at their own hour, come back in the morning, and half stay in when it rains; the people with quests stay where they are so you can always find them for their stories. Stardew's villagers walk full timetables between home, work and the saloon.

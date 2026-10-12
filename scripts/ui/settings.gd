@@ -68,9 +68,23 @@ static func ui_font() -> Font:
 			return ThemeDB.fallback_font
 		if path == PIXEL_FONT:
 			font = font.duplicate() as FontFile
-			font.antialiasing = TextServer.FONT_ANTIALIASING_NONE
+			# A touch of smoothing keeps letters like C and B apart at small
+			# sizes (with none, C closes up into an O).
+			font.antialiasing = TextServer.FONT_ANTIALIASING_GRAY
 			font.hinting = TextServer.HINTING_NONE
 			font.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
+			# no ligatures: the font joins "fi" into a shape that reads as "A"
+			var ts := TextServerManager.get_primary_interface()
+			font.opentype_feature_overrides = {
+				ts.name_to_tag("liga"): 0, ts.name_to_tag("clig"): 0,
+				ts.name_to_tag("dlig"): 0, ts.name_to_tag("calt"): 0,
+			}
+			# and a little more room between words
+			var spaced := FontVariation.new()
+			spaced.base_font = font
+			spaced.spacing_space = 1
+			_fonts[path] = spaced
+			return spaced
 		_fonts[path] = font
 	return _fonts[path]
 
@@ -83,6 +97,7 @@ static func apply_font() -> void:
 	var font := ui_font()
 	if theme.default_font != font:
 		theme.default_font = font
+
 
 
 ## Reads [member path]; missing keys keep their defaults.
