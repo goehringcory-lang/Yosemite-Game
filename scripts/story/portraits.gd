@@ -14,7 +14,7 @@ extends RefCounted
 
 const CHARACTER_DIR := "res://data/characters/"
 const MOODS := ["neutral", "happy", "sad", "surprised"]
-const SIZE := 40
+## Faces are square, as tall as their strip (see for_speaker).
 ## Words that make a line sad or glad (whole words, any case).
 const SAD_WORDS := ["sorry", "lost", "died", "dead", "miss", "missed", "afraid", "worried", "worry",
 	"sad", "tired", "grief", "burned", "hurt", "fear", "lonely", "ruined", "broken", "gone forever"]
@@ -62,10 +62,12 @@ static func for_speaker(speaker: String, mood := "neutral") -> Texture2D:
 			var face := AtlasTexture.new()
 			face.atlas = sheet
 			var index := maxi(0, MOODS.find(mood))
+			# faces are square, as tall as the strip
+			var side := sheet.get_height()
 			# an older single-face file has only the neutral face
-			if sheet.get_width() < SIZE * MOODS.size():
+			if sheet.get_width() < side * MOODS.size():
 				index = 0
-			face.region = Rect2(index * SIZE, 0, SIZE, SIZE)
+			face.region = Rect2(index * side, 0, side, side)
 			_cache[key] = face
 	return _cache[key]
 

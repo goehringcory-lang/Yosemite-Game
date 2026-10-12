@@ -14,7 +14,13 @@ extends SceneTree
 
 const Looks = preload("res://tools/npcgen/looks.gd")
 
+## Faces are laid out on a 40-dot grid (S) and painted at K pixels a dot,
+## so the round shapes (head, hair, hats, shoulders) are shaded at the full
+## 80 pixels the conversation box shows, while eyes, brows and mouths keep
+## their crisp two-pixel dots.
 const S := 40
+const K := 2
+const R := S * K
 const OUT_DIR := "res://assets/sprites/portraits/"
 const SHEET_PNG := "res://docs/cast_portraits.png"
 const OUTLINE := Color("2a1f1a")
@@ -38,11 +44,11 @@ func _init() -> void:
 	for id: String in ids:
 		var strip := _strip(Looks.LOOKS[id], id)
 		strip.save_png(OUT_DIR + id + ".png")
-		all.append(strip.get_region(Rect2i(0, 0, S, S)))
+		all.append(strip.get_region(Rect2i(0, 0, R, R)))
 		strips[id] = strip
 	var player := _strip(Looks.PLAYER, "player")
 	player.save_png(OUT_DIR + "player.png")
-	all.append(player.get_region(Rect2i(0, 0, S, S)))
+	all.append(player.get_region(Rect2i(0, 0, R, R)))
 	_save_sheet(all)
 	_save_moods([strips.galen_clark, strips.wren_alvarez, strips.maria_lebrado, strips.warren_harding])
 	print("%d portraits written to %s. Run godot --headless --path . --import next." % [all.size(), OUT_DIR])
@@ -51,33 +57,33 @@ func _init() -> void:
 
 ## Every mood of one person, side by side.
 func _strip(look: Dictionary, id: String) -> Image:
-	var strip := Image.create_empty(S * MOODS.size(), S, false, Image.FORMAT_RGBA8)
+	var strip := Image.create_empty(R * MOODS.size(), R, false, Image.FORMAT_RGBA8)
 	for i in MOODS.size():
-		strip.blit_rect(paint(look, id, MOODS[i]), Rect2i(0, 0, S, S), Vector2i(i * S, 0))
+		strip.blit_rect(paint(look, id, MOODS[i]), Rect2i(0, 0, R, R), Vector2i(i * R, 0))
 	return strip
 
 
 func _save_moods(strips: Array) -> void:
-	var sheet := Image.create_empty(S * MOODS.size() + 8, strips.size() * (S + 4) + 4, false, Image.FORMAT_RGBA8)
+	var sheet := Image.create_empty(R * MOODS.size() + 8, strips.size() * (R + 4) + 4, false, Image.FORMAT_RGBA8)
 	sheet.fill(Color("e8dfcc"))
 	for r in strips.size():
 		for i in MOODS.size():
-			sheet.fill_rect(Rect2i(4 + i * S, 4 + r * (S + 4), S - 2, S), Color("6a5440"))
-		sheet.blend_rect(strips[r], Rect2i(0, 0, S * MOODS.size(), S), Vector2i(4, 4 + r * (S + 4)))
-	sheet.resize(sheet.get_width() * 3, sheet.get_height() * 3, Image.INTERPOLATE_NEAREST)
+			sheet.fill_rect(Rect2i(4 + i * R, 4 + r * (R + 4), R - 2, R), Color("6a5440"))
+		sheet.blend_rect(strips[r], Rect2i(0, 0, R * MOODS.size(), R), Vector2i(4, 4 + r * (R + 4)))
+	sheet.resize(sheet.get_width() * 2, sheet.get_height() * 2, Image.INTERPOLATE_NEAREST)
 	sheet.save_png("res://docs/portrait_moods.png")
 
 
 func _save_sheet(all: Array[Image]) -> void:
 	var cols := 10
 	var rows := ceili(all.size() / float(cols))
-	var sheet := Image.create_empty(cols * (S + 4) + 4, rows * (S + 4) + 4, false, Image.FORMAT_RGBA8)
+	var sheet := Image.create_empty(cols * (R + 4) + 4, rows * (R + 4) + 4, false, Image.FORMAT_RGBA8)
 	sheet.fill(Color("e8dfcc"))
 	for i in all.size():
-		var at := Vector2i(4 + (i % cols) * (S + 4), 4 + (i / cols) * (S + 4))
-		sheet.fill_rect(Rect2i(at, Vector2i(S, S)), Color("6a5440"))
-		sheet.blend_rect(all[i], Rect2i(0, 0, S, S), at)
-	sheet.resize(sheet.get_width() * 3, sheet.get_height() * 3, Image.INTERPOLATE_NEAREST)
+		var at := Vector2i(4 + (i % cols) * (R + 4), 4 + (i / cols) * (R + 4))
+		sheet.fill_rect(Rect2i(at, Vector2i(R, R)), Color("6a5440"))
+		sheet.blend_rect(all[i], Rect2i(0, 0, R, R), at)
+	sheet.resize(sheet.get_width() * 2, sheet.get_height() * 2, Image.INTERPOLATE_NEAREST)
 	sheet.save_png(SHEET_PNG)
 
 
@@ -89,7 +95,12 @@ func col(v) -> Color:
 
 func px(x: int, y: int, c) -> void:
 	if x >= 0 and y >= 0 and x < S and y < S:
-		im.set_pixel(x, y, col(c))
+		im.fill_rect(Rect2i(x * K, y * K, K, K), col(c))
+
+
+## The color at dot ([param x], [param y]).
+func at(x: int, y: int) -> Color:
+	return im.get_pixel(x * K, y * K)
 
 
 func rect(x: int, y: int, w: int, h: int, c) -> void:
@@ -110,10 +121,12 @@ func lighter(c, k := 0.18) -> Color:
 ## lower right. [param from_y] clips off everything above that row.
 func shaded(cx: float, cy: float, rx: float, ry: float, c, from_y := -100, to_y := 100) -> void:
 	var base := col(c)
-	for y in range(maxi(floori(cy - ry), from_y), mini(ceili(cy + ry) + 1, to_y + 1)):
-		for x in range(floori(cx - rx), ceili(cx + rx) + 1):
-			var dx := (x + 0.5 - cx) / rx
-			var dy := (y + 0.5 - cy) / ry
+	# walked in pixels, not dots, so curves and shading are as fine as the
+	# picture is
+	for y in range(maxi(floori((cy - ry) * K), from_y * K), mini(ceili((cy + ry) * K) + 1, (to_y + 1) * K)):
+		for x in range(floori((cx - rx) * K), ceili((cx + rx) * K) + 1):
+			var dx := ((x + 0.5) / K - cx) / rx
+			var dy := ((y + 0.5) / K - cy) / ry
 			var d := dx * dx + dy * dy
 			if d > 1.0:
 				continue
@@ -132,18 +145,19 @@ func shaded(cx: float, cy: float, rx: float, ry: float, c, from_y := -100, to_y 
 				shade = lighter(base, 0.24)
 			elif lit > 0.5 and d > 0.3:
 				shade = lighter(base, 0.12)
-			px(x, y, shade)
+			if x >= 0 and y >= 0 and x < R and y < R:
+				im.set_pixel(x, y, shade)
 
 
 func outline() -> void:
 	var edge: Array[Vector2i] = []
-	for y in S:
-		for x in S:
+	for y in R:
+		for x in R:
 			if im.get_pixel(x, y).a > 0.5:
 				continue
 			for d: Vector2i in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
 				var n := Vector2i(x, y) + d
-				if n.x >= 0 and n.y >= 0 and n.x < S and n.y < S and im.get_pixel(n.x, n.y).a > 0.5:
+				if n.x >= 0 and n.y >= 0 and n.x < R and n.y < R and im.get_pixel(n.x, n.y).a > 0.5:
 					edge.append(Vector2i(x, y))
 					break
 	for p in edge:
@@ -153,7 +167,7 @@ func outline() -> void:
 # ------------------------------------------------------------ the portrait
 
 func paint(look: Dictionary, id: String, mood := "neutral") -> Image:
-	im = Image.create_empty(S, S, false, Image.FORMAT_RGBA8)
+	im = Image.create_empty(R, R, false, Image.FORMAT_RGBA8)
 	_rng.seed = hash(id)
 	var skin := col(look.get("skin", Looks.SKIN_FAIR))
 	var hair := col(look.get("hair", "4a3020"))
@@ -175,7 +189,9 @@ func paint(look: Dictionary, id: String, mood := "neutral") -> Image:
 	if look.get("glasses", false):
 		_glasses()
 	_mouth(mood, skin)
-	outline()
+	# a rim as heavy as one dot (two pixels), like every sprite in the game
+	for i in K:
+		outline()
 	return im
 
 
@@ -208,12 +224,12 @@ func _torso(look: Dictionary) -> void:
 		"plaid":
 			for y in range(29, S):
 				for x in range(5, 35):
-					if im.get_pixel(x, y).a > 0.5 and (x % 4 == 0 or y % 4 == 1):
+					if at(x, y).a > 0.5 and (x % 4 == 0 or y % 4 == 1):
 						px(x, y, top2 if (x % 4 == 0) != (y % 4 == 1) else darker(top2, 0.25))
 		"stripes":
 			for y in range(30, S, 3):
 				for x in range(5, 35):
-					if im.get_pixel(x, y).a > 0.5:
+					if at(x, y).a > 0.5:
 						px(x, y, top2)
 		"suspenders":
 			rect(12, 29, 2, 11, top2)
@@ -237,7 +253,7 @@ func _torso(look: Dictionary) -> void:
 		"shawl":
 			for y in range(29, S):
 				for x in range(5, 35):
-					if im.get_pixel(x, y).a > 0.5 and absi(x - 20) > (y - 28) * 1.2:
+					if at(x, y).a > 0.5 and absi(x - 20) > (y - 28) * 1.2:
 						px(x, y, top2 if (x + y) % 4 else darker(top2, 0.2))
 		"blouse":
 			rect(16, 29, 8, 2, top2)
