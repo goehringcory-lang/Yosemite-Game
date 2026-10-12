@@ -439,13 +439,27 @@ func _refresh_area_text() -> void:
 
 func _route_text(hub: HubData) -> String:
 	if hub.id == _hub_here:
-		return "You are here."
+		return "You are here." if not _travel or _any_road_open() else "You are here. Every road out is closed." + _on_foot_text()
 	if not _legs.has(hub.id):
 		return "No road leads there from here."
 	var leg: Dictionary = _legs[hub.id]
 	if not leg.open:
-		return ("Locked. " if leg.locked else "Closed. ") + leg.closed_reason
+		return ("Locked. " if leg.locked else "Closed. ") + leg.closed_reason + ("" if _any_road_open() else _on_foot_text())
 	return "Drive %s mi via %s, about %s." % [str(leg.miles), leg.via, Park.format_minutes(leg.minutes)]
+
+
+func _any_road_open() -> bool:
+	return _legs.values().any(func(leg: Dictionary) -> bool: return leg.open)
+
+
+## " On foot: Four Mile Trail, down to Curry Village." for the trails that
+## still leave this region when every road is shut, or "" if there are none.
+func _on_foot_text() -> String:
+	var trails: Array[String] = []
+	for door in _region.find_children("*", "RegionDoor", true, false):
+		if door.minutes > 0 and (door.closure == "" or Park.is_open(door.closure)):
+			trails.append(door.label)
+	return "" if trails.is_empty() else " On foot: %s." % "; ".join(trails)
 
 
 # ---------------------------------------------------------------- drawing

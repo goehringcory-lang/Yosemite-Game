@@ -73,6 +73,21 @@ func _ready() -> void:
 	check(world.region.region_id == "glacier_point", "drove to Glacier Point")
 	check(world.region.get_spawn("apron_top") != null, "Glacier Point has the Apron climb's top spot")
 
+	# Topping out the Apron before the road opens: the map points to the trail down.
+	GameClock.season = GameClock.Season.SPRING
+	GameClock.day = 3
+	world.open_travel_map("yosemite_valley")
+	check(world.park_map._route_label.text.contains("On foot: Four Mile Trail"), "with the road snowed in, the map names the trail down (%s)" % world.park_map._route_label.text)
+	check(world.park_map._info_panel.get_combined_minimum_size().y <= ParkMap.INFO_RECT.size.y, "and the note still fits the panel")
+	world.open_travel_map("")
+	check(world.park_map._route_label.text.contains("Every road out is closed") and world.park_map._route_label.text.contains("Four Mile Trail"), "a kiosk says so too (%s)" % world.park_map._route_label.text)
+	world.park_map.close()
+	GameClock.season = GameClock.Season.SUMMER
+	GameClock.day = 1
+	world.open_travel_map("yosemite_valley")
+	check(not world.park_map._route_label.text.contains("On foot"), "with the road open, the map just gives the drive")
+	world.park_map.close()
+
 	# A climb (or any other system) can move the player directly.
 	get_tree().call_group("world", "go_to_region", "yosemite_valley", "apron_base")
 	await get_tree().create_timer(2.5).timeout
