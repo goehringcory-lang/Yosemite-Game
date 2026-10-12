@@ -564,8 +564,13 @@ func crash_pad() -> Image:
 	K.hline(im, 1, 12, w - 2, c("2a5a90"))
 	for x in range(8, w - 6, 16):
 		K.vline(im, x, 3, 9, c("2a5a90"))
+	# a gold maker's patch with a stitched border (lettering this small
+	# read as scribbles)
 	K.rect(im, 30, 5, 12, 4, c("e0b030"))
-	K.text(im, 31, 4, "YMS", c("3a2a1e"))
+	K.hline(im, 30, 5, 12, c("f4d870"))
+	K.px(im, 32, 7, c("8a6a20"))
+	K.px(im, 35, 7, c("8a6a20"))
+	K.px(im, 38, 7, c("8a6a20"))
 	K.outline(im)
 	return im
 

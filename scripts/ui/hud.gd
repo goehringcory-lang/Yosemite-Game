@@ -9,10 +9,20 @@ const INFO_CLOSE_DISTANCE := 24.0
 ## Gap (pixels) between the message and the sign panel it sits above.
 const MESSAGE_GAP := 2.0
 ## Groups of the screens that hide the HUD while they're open.
-const COVERING_GROUPS := ["journal", "pause_menu", "park_map"]
+## Seconds the place name stays up after you arrive.
+const LOCATION_SHOWN := 4.0
+const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary"]
 
 var _player: Player
+## The food energy you carry, under the time.
+var food_label: Label
+var _location_text := ""
+var _location_tween: Tween
 var _status: Label
+## The "you got this" cards at the bottom left.
+var toasts: ItemToasts
+## Darkens the world behind the pause menu and the book.
+var _dim: ColorRect
 var _message_tween: Tween
 var _info_anchor := Vector2.ZERO
 ## True while a menu, map or conversation covers the screen.
@@ -46,6 +56,28 @@ func _ready() -> void:
 	GameClock.time_changed.connect(_refresh_clock.unbind(2))
 	GameClock.day_started.connect(_refresh_clock.unbind(3))
 	device_changed.connect(_refresh_status)
+	_dim = ColorRect.new()
+	_dim.color = Color(0.03, 0.02, 0.06, 0.0)
+	_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_dim)
+	move_child(_dim, 0)
+	# Messages ("You fell asleep at...", what a find is) sit on a dark card
+	# rather than floating over the world.
+	var card := StyleBoxFlat.new()
+	card.bg_color = Color(0.1, 0.07, 0.05, 0.72)
+	card.border_color = Color(0.55, 0.4, 0.22, 0.9)
+	card.set_border_width_all(1)
+	card.set_content_margin_all(3)
+	card.content_margin_left = 5
+	card.content_margin_right = 5
+	message_label.add_theme_stylebox_override("normal", card)
+	toasts = ItemToasts.new()
+	add_child(toasts)
+	move_child(toasts, fade.get_index()) # under the fade, so the black covers it
+	Inventory.added.connect(_on_item_added)
+	Gear.added.connect(_on_gear_added)
+	QuestLog.quest_completed.connect(func(_quest: QuestData) -> void: Sound.play("quest_done", 0.0, 0.0))
 	var panel := PanelContainer.new()
 	_status = Label.new()
 	panel.add_child(_status)
@@ -54,7 +86,57 @@ func _ready() -> void:
 	var plaque := clock_panel.get_theme_stylebox("panel", "PanelContainer").duplicate() as StyleBoxTexture
 	plaque.texture = load("res://assets/ui/plaque.png")
 	clock_panel.add_theme_stylebox_override("panel", plaque)
+	# The sky dial sits on the time's row, under the date, so the plaque
+	# grows down rather than out toward the place name.
+	var labels := time_label.get_parent()
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	labels.add_child(row)
+	labels.move_child(row, time_label.get_index())
+	labels.remove_child(time_label)
+	var dial := ClockDial.new()
+	dial.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(dial)
+	time_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var right := VBoxContainer.new()
+	right.add_theme_constant_override("separation", 0)
+	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(right)
+	right.add_child(time_label)
+	# The food you carry, which is what you trade with, under the time, as
+	# Stardew Valley keeps your gold under its clock.
+	var purse := HBoxContainer.new()
+	purse.alignment = BoxContainer.ALIGNMENT_END
+	purse.add_theme_constant_override("separation", 2)
+	var apple := TextureRect.new()
+	var fruit := ItemDB.get_item("lamon_apple")
+	apple.texture = fruit.icon if fruit else null
+	apple.custom_minimum_size = Vector2(12, 12)
+	apple.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	apple.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	apple.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	purse.add_child(apple)
+	food_label = Label.new()
+	food_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.5))
+	food_label.tooltip_text = "Food energy you carry (what you trade with)"
+	purse.add_child(food_label)
+	right.add_child(purse)
+	Inventory.changed.connect(_refresh_food)
+	_refresh_food()
 	location_panel.add_theme_stylebox_override("panel", plaque)
+	# The use prompt is a slim bubble, not a full frame, so it doesn't cover
+	# the person or the sign you're facing.
+	var bubble := StyleBoxFlat.new()
+	bubble.bg_color = Color(0.11, 0.08, 0.06, 0.82)
+	bubble.border_color = Color(0.78, 0.63, 0.38, 0.9)
+	bubble.set_border_width_all(1)
+	bubble.set_corner_radius_all(2)
+	bubble.content_margin_left = 4.0
+	bubble.content_margin_right = 4.0
+	bubble.content_margin_top = 0.0
+	bubble.content_margin_bottom = 1.0
+	prompt_panel.add_theme_stylebox_override("panel", bubble)
 
 
 func bind_player(player: Player) -> void:
@@ -78,9 +160,53 @@ func show_message(text: String) -> void:
 	_message_tween.tween_property(message_label, "modulate:a", 0.0, 0.6)
 
 
+func _on_item_added(id: String, amount: int) -> void:
+	var item := ItemDB.get_item(id)
+	if item:
+		toasts.notify(id, item.icon, item.display_name, amount)
+		Sound.play("pickup", 0.0, 0.08)
+
+
+## New gear is a bigger moment than a berry: it gets the brighter chime.
+func _on_gear_added(id: String, amount: int) -> void:
+	var gear := Gear.get_gear(id)
+	if gear:
+		toasts.notify("gear:" + id, gear.icon, gear.display_name, amount)
+		Sound.play("item_get", 0.0, 0.0)
+
+
 ## The location banner at the top of the screen.
+## Parts of a long name ("Yosemite Valley · Curry Village · ...") are dropped
+## from the front until it fits between the screen's left side and the clock.
 func set_location(text: String) -> void:
-	location_label.text = text
+	if text == _location_text:
+		return
+	_location_text = text
+	_show_location_banner()
+	var parts := text.split(" · ")
+	# the banner is centered, so its right edge is half its width past the middle
+	var middle := get_viewport().get_visible_rect().size.x / 2.0
+	var clock_left := clock_panel.get_global_rect().position.x
+	var room := 2.0 * (clock_left - 4.0 - middle)
+	location_label.text = " · ".join(parts)
+	while parts.size() > 1 and location_panel.get_combined_minimum_size().x > room:
+		parts.remove_at(0)
+		location_label.text = " · ".join(parts)
+	# keep it centered at its new width
+	var width := roundf(location_panel.get_combined_minimum_size().x / 2.0) * 2.0
+	location_panel.offset_left = -width / 2.0
+	location_panel.offset_right = width / 2.0
+
+
+## The place name shows as you arrive, then fades after a few seconds, as
+## in Stardew Valley; it comes back each time you go somewhere new.
+func _show_location_banner() -> void:
+	if _location_tween:
+		_location_tween.kill()
+	location_panel.modulate.a = 1.0
+	_location_tween = create_tween()
+	_location_tween.tween_interval(LOCATION_SHOWN)
+	_location_tween.tween_property(location_panel, "modulate:a", 0.0, 0.8)
 
 
 ## Shows a sign's text until the player walks away from it.
@@ -98,6 +224,10 @@ func hide_info() -> void:
 
 
 func _process(_delta: float) -> void:
+	# Cards ride above a conversation box (shops, cooking) so they stay readable.
+	toasts.bottom_margin = 44.0
+	for box: DialogueBox in get_tree().get_nodes_in_group("dialogue_box"):
+		toasts.bottom_margin = maxf(toasts.bottom_margin, get_viewport().get_visible_rect().size.y - box.top() + 4.0)
 	if info_panel.visible and _player and _player.global_position.distance_to(_info_anchor) > INFO_CLOSE_DISTANCE:
 		hide_info()
 	_update_cover()
@@ -124,10 +254,17 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Hides the HUD while the journal, pause menu, map or a conversation is open.
 func _update_cover() -> void:
 	var covered := not get_tree().get_nodes_in_group("dialogue_box").is_empty()
+	var menu := false
 	for group: String in COVERING_GROUPS:
 		var screen := get_tree().get_first_node_in_group(group)
 		if screen and screen.is_open():
-			covered = true
+			menu = true
+	# Cards hide under a menu, and during a conversation unless they're
+	# fresh (what you just bought or cooked), so they don't sit over the
+	# person you're talking to.
+	toasts.visible = not menu and (not covered or toasts.has_fresh())
+	_dim.color.a = move_toward(_dim.color.a, 0.42 if menu else 0.0, get_process_delta_time() * 3.0)
+	covered = covered or menu
 	if covered == _covered:
 		return
 	_covered = covered
@@ -171,10 +308,15 @@ func _update_prompt() -> void:
 	if target == null:
 		return
 	prompt_label.text = "%s  %s" % [interact_button(), Player.prompt_for(target)]
+	if target.has_method("can_receive_gift") and target.can_receive_gift():
+		prompt_label.text += "    %s  Give a gift" % prompt("G", "LB")
 	prompt_panel.size = Vector2.ZERO
 	var screen := _player.get_global_transform_with_canvas().origin
+	# Above whichever head is higher, so it never covers the person you face.
+	if target is CanvasItem:
+		screen.y = minf(screen.y, (target as CanvasItem).get_global_transform_with_canvas().origin.y)
 	var size := prompt_panel.get_combined_minimum_size()
-	prompt_panel.position = (screen + Vector2(-size.x / 2.0, -46)).clamp(Vector2(2, 2), get_viewport().get_visible_rect().size - size - Vector2(2, 2)).round()
+	prompt_panel.position = (screen + Vector2(-size.x / 2.0, -40)).clamp(Vector2(2, 2), get_viewport().get_visible_rect().size - size - Vector2(2, 2)).round()
 
 
 func fade_to_black() -> void:
@@ -185,7 +327,13 @@ func fade_from_black() -> void:
 	await create_tween().tween_property(fade, "color:a", 0.0, 0.6).finished
 
 
+func _refresh_food() -> void:
+	food_label.text = "%d energy" % Barter.purse()
+
+
 func _refresh_clock() -> void:
+	if food_label:
+		_refresh_food()
 	date_label.text = "%s, Year %d" % [GameClock.get_date_string(), GameClock.year]
 	time_label.text = GameClock.get_time_string()
 

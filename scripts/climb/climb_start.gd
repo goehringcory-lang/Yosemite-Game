@@ -28,9 +28,16 @@ func _draw() -> void:
 	draw_rect(Rect2(-6, -15, 13, 6), plate)
 	draw_rect(Rect2(-6, -15, 13, 1), plate.lightened(0.4))
 	draw_rect(Rect2(-6, -10, 13, 1), plate.darkened(0.3))
-	draw_arc(Vector2(7, -3), 4.0, 0, TAU, 12, Color("2a1f1a"), 3.0)
-	draw_arc(Vector2(7, -3), 4.0, 0, TAU, 12, Color(0.85, 0.3, 0.25), 2.0)
-	draw_arc(Vector2(7, -3), 2.0, 0, TAU, 8, Color(0.85, 0.3, 0.25), 1.0)
+	# the rope: a flat coil in pixels, lit on top, with its tail trailing off
+	var rope := Color(0.85, 0.3, 0.25)
+	draw_rect(Rect2(3, -6, 9, 6), Color("2a1f1a"))
+	draw_rect(Rect2(2, -5, 11, 4), Color("2a1f1a"))
+	draw_rect(Rect2(3, -5, 9, 4), rope.darkened(0.25))
+	draw_rect(Rect2(4, -5, 7, 1), rope.lightened(0.25))
+	draw_rect(Rect2(3, -3, 9, 1), rope)
+	draw_rect(Rect2(5, -4, 5, 1), Color("2a1f1a"))
+	draw_rect(Rect2(12, -2, 3, 1), rope)
+	draw_rect(Rect2(12, -1, 3, 1), Color("2a1f1a"))
 
 
 func interact(player: Player) -> void:

@@ -22,7 +22,9 @@ run() {
 	local name="$1"
 	shift
 	local start=$SECONDS
-	if "$@" > "/tmp/yosemite_${name}.log" 2>&1; then
+	# A script that fails to compile can leave every check passing, so a
+	# SCRIPT ERROR anywhere in the log fails the test too.
+	if "$@" > "/tmp/yosemite_${name}.log" 2>&1 && ! grep -q "SCRIPT ERROR" "/tmp/yosemite_${name}.log"; then
 		printf 'PASS  %-16s %4ss\n' "$name" $((SECONDS - start))
 	else
 		printf 'FAIL  %-16s %4ss  (log: /tmp/yosemite_%s.log)\n' "$name" $((SECONDS - start)) "$name"

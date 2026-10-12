@@ -6,6 +6,7 @@ extends CanvasLayer
 ##   var box := DialogueBox.open(player)
 ##   await box.say(lines)             # lines: [{"speaker": "...", "text": "..."}]
 ##   var i := await box.choose("Build it?", ["Yes", "No"])   # -1 if cancelled
+##   var i := await box.choose("Buy?", names, "Clerk", icons)  # a picture per option (or null)
 ##   box.close()
 ##
 ## Or, for a one-off conversation: DialogueBox.say_to(player, lines)
@@ -14,8 +15,25 @@ extends CanvasLayer
 ## while it's still appearing shows the whole page, and confirm again goes on.
 
 const NAME_COLOR := Color(1.0, 0.85, 0.5)
-const CURSOR := "> "
+## Room left at the start of each option for the arrow (MenuInput.mark).
+const CURSOR := "   "
 const HINT_COLOR := Color(1, 1, 1, 0.6)
+## The text's width with and without a portrait beside it.
+const TEXT_WIDTH := 456.0
+const TEXT_WIDTH_PORTRAIT := 364.0
+## The card beside a list of choices that tells about the one picked, like
+## Stardew Valley's crafting and shop menus (see choose's details).
+const DETAIL_WIDTH := 168.0
+const DETAIL_SHORT := Color(1.0, 0.55, 0.42)
+const DETAIL_DIM := Color(1, 1, 1, 0.65)
+## Portraits are painted at 40 px and shown at exactly twice that, so they
+## stay crisp and read at a glance, like Stardew's 64 px faces.
+const PORTRAIT_SIZE := Vector2(80, 80)
+## A talking blip every this many letters while a person's line types out.
+const BLIP_EVERY := 3
+## How far the box rises as it opens, in pixels, and how long it takes.
+const OPEN_RISE := 8.0
+const OPEN_TIME := 0.14
 ## How far the next arrow bobs, in pixels, and how many bobs a second.
 const ARROW_BOB := 1.0
 const ARROW_SPEED := 1.2
@@ -29,6 +47,12 @@ var _hint_label: Label
 var _shown := 0.0
 var _hint_time := 0.0
 var _options: PackedStringArray = []
+## A picture for each option (or null), when the list has any: the shops'
+## goods, the campfire's dishes.
+var _icons: Array = []
+var _details: Array = []
+var _detail_panel: PanelContainer
+var _detail_column: VBoxContainer
 var _cursor := 0
 var _opened_frame := 0
 ## The brass tag the speaker's name sits on, the bar behind the chosen option,
@@ -38,6 +62,13 @@ var _select_style: StyleBoxTexture
 var _plain_style: StyleBoxEmpty
 var _arrow: TextureRect
 var _hint_text_width := 0.0
+## The speaker's face, in a frame at the right of the box.
+var _portrait_frame: PanelContainer
+var _portrait: TextureRect
+## The speaker's voice pitch, and the last letter that blipped.
+var _voice := 1.0
+var _blipped := 0
+var _speaker := ""
 ## 0 while waiting, 1 after confirm, -1 after cancel.
 var _answer := 0
 
@@ -47,6 +78,11 @@ static func open(from: Node) -> DialogueBox:
 	var box := DialogueBox.new()
 	from.get_tree().root.add_child(box)
 	return box
+
+
+## The screen row of the box's top edge, so the HUD can keep clear of it.
+func top() -> float:
+	return _panel.get_global_rect().position.y if _panel else 0.0
 
 
 ## Shows [param lines] with the player frozen, then closes the box.
@@ -80,9 +116,32 @@ func _ready() -> void:
 	_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_panel.custom_minimum_size = Vector2(464, 78)
 	root.add_child(_panel)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	_panel.add_child(row)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 1)
-	_panel.add_child(column)
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(column)
+	_portrait_frame = PanelContainer.new()
+	var frame := StyleBoxFlat.new()
+	frame.bg_color = Color("5a4634")
+	frame.border_color = Color("c8a060")
+	frame.set_border_width_all(1)
+	frame.set_content_margin_all(1)
+	frame.shadow_color = Color(0, 0, 0, 0.35)
+	frame.shadow_offset = Vector2(1, 1)
+	frame.shadow_size = 1
+	_portrait_frame.add_theme_stylebox_override("panel", frame)
+	_portrait_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_portrait_frame.visible = false
+	row.add_child(_portrait_frame)
+	_portrait = TextureRect.new()
+	_portrait.custom_minimum_size = PORTRAIT_SIZE
+	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_portrait_frame.add_child(_portrait)
 	_name_label = Label.new()
 	_name_label.add_theme_color_override("font_color", NAME_COLOR)
 	# a brass-edged tab on the box's top-left edge, the speaker's name sitting in it
@@ -96,11 +155,30 @@ func _ready() -> void:
 	column.add_child(_name_label)
 	_text_label = Label.new()
 	_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_text_label.custom_minimum_size = Vector2(456, 0)
+	_text_label.custom_minimum_size = Vector2(TEXT_WIDTH, 0)
 	column.add_child(_text_label)
 	_options_box = VBoxContainer.new()
 	_options_box.add_theme_constant_override("separation", 0)
 	column.add_child(_options_box)
+	_detail_panel = PanelContainer.new()
+	var card := StyleBoxFlat.new()
+	card.bg_color = Color(0, 0, 0, 0.22)
+	card.border_color = Color(0.78, 0.63, 0.38, 0.55)
+	card.border_width_left = 1
+	card.content_margin_left = 6.0
+	card.content_margin_right = 4.0
+	card.content_margin_top = 3.0
+	card.content_margin_bottom = 3.0
+	_detail_panel.add_theme_stylebox_override("panel", card)
+	_detail_panel.custom_minimum_size.x = DETAIL_WIDTH
+	_detail_panel.visible = false
+	row.add_child(_detail_panel)
+	# the card sits between the words and the face, so the face keeps the
+	# box's right end, as it does in Stardew Valley
+	row.move_child(_detail_panel, _portrait_frame.get_index())
+	_detail_column = VBoxContainer.new()
+	_detail_column.add_theme_constant_override("separation", 1)
+	_detail_panel.add_child(_detail_column)
 	# Pushes the hint to the bottom edge of the box.
 	var filler := Control.new()
 	filler.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -125,6 +203,13 @@ func _ready() -> void:
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud:
 		hud.device_changed.connect(_refresh_hint)
+	# The box rises into place as it opens.
+	root.modulate.a = 0.0
+	root.position.y = OPEN_RISE
+	var tween := create_tween().set_parallel()
+	tween.tween_property(root, "modulate:a", 1.0, OPEN_TIME)
+	tween.tween_property(root, "position:y", 0.0, OPEN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	Sound.play("ui_open", -2.0)
 
 
 ## A nine-slice style from a texture, with its corners [param margin] pixels in.
@@ -145,8 +230,9 @@ const PAGE_CHARS := 220
 
 func say(lines: Array) -> void:
 	for line: Dictionary in lines:
+		var mood: String = line.get("mood", Portraits.mood_for(line.get("text", "")))
 		for page in pages(line.get("text", "")):
-			_show(line.get("speaker", ""), page, [])
+			_show(line.get("speaker", ""), page, [], mood)
 			await _next_input()
 
 
@@ -170,11 +256,20 @@ static func pages(text: String) -> PackedStringArray:
 
 
 ## Returns the chosen option's index, or -1 if the player cancels.
-func choose(prompt: String, options: Array, speaker := "") -> int:
+##
+## [param details], if given, has a card per option shown beside the list for
+## the one under the cursor: {"title": String, "rows": [[icon or null, text,
+## short (true draws it in red)], ...], "facts": String, "note": String}. Options without one
+## (Leave) show an empty card.
+func choose(prompt: String, options: Array, speaker := "", icons := [], details := []) -> int:
 	_cursor = 0
+	_icons = icons
+	_details = details
 	_show(speaker, prompt, options)
 	var confirmed: bool = await _next_input()
 	var picked := _cursor if confirmed else -1
+	_icons = []
+	_details = []
 	_show("", "", [])
 	return picked
 
@@ -183,9 +278,16 @@ func close() -> void:
 	queue_free()
 
 
-func _show(speaker: String, text: String, options: Array) -> void:
+func _show(speaker: String, text: String, options: Array, mood := "neutral") -> void:
 	_name_label.text = speaker
 	_name_label.visible = speaker != ""
+	var face := Portraits.for_speaker(speaker, mood)
+	_portrait.texture = face
+	_portrait_frame.visible = face != null
+	_text_label.custom_minimum_size.x = (TEXT_WIDTH_PORTRAIT if face else TEXT_WIDTH) - (DETAIL_WIDTH + 6.0 if not _details.is_empty() else 0.0)
+	_speaker = speaker
+	_voice = Portraits.voice_pitch(speaker)
+	_blipped = 0
 	_text_label.text = text
 	_options = PackedStringArray(options)
 	_shown = 0.0 if Settings.chars_per_second() > 0.0 else float(text.length())
@@ -214,10 +316,24 @@ func _process(delta: float) -> void:
 			reveal_all()
 		else:
 			_text_label.visible_characters = int(_shown)
+			_blip()
 	elif _options.is_empty() and _hint_label.text != "":
 		# The next arrow bobs beside "Next", so the box reads as waiting for you.
 		_hint_time += delta
 		_position_arrow()
+
+
+## A soft syllable in the speaker's voice as their words type out. Narration
+## (no speaker) types out silently.
+func _blip() -> void:
+	var at := int(_shown)
+	if _speaker == "" or at - _blipped < BLIP_EVERY or at >= _text_label.text.length():
+		return
+	_blipped = at
+	var letter := _text_label.text[at]
+	if letter == " " or letter == "." or letter == ",":
+		return
+	Sound.play("talk", 0.0, 0.06, _voice)
 
 
 ## Shows the bobbing arrow just left of the "Next" hint, and hides it otherwise.
@@ -253,15 +369,88 @@ func _refresh_options() -> void:
 	for child in _options_box.get_children():
 		_options_box.remove_child(child)
 		child.queue_free()
+	_refresh_detail()
+	var pictures := _icons.any(func(icon: Variant) -> bool: return icon != null)
 	for i in _options.size():
 		var label := Label.new()
-		label.text = (CURSOR if i == _cursor else "  ") + _options[i]
+		label.text = CURSOR + _options[i]
+		MenuInput.mark(label, i == _cursor)
 		if i == _cursor:
 			label.add_theme_color_override("font_color", NAME_COLOR)
 			label.add_theme_stylebox_override("normal", _select_style)
 		else:
 			label.add_theme_stylebox_override("normal", _plain_style)
-		_options_box.add_child(label)
+		if not pictures:
+			_options_box.add_child(label)
+			continue
+		# a picture after the cursor; options without one keep the column
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 3)
+		var picture := TextureRect.new()
+		picture.custom_minimum_size = Vector2(16, 16)
+		picture.texture = _icons[i] if i < _icons.size() else null
+		picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		var cursor := Control.new()
+		cursor.custom_minimum_size = Vector2(8, 14)
+		MenuInput.mark(cursor, i == _cursor)
+		label.text = _options[i]
+		MenuInput.mark(label, false) # the arrow goes in its own column here
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(cursor)
+		row.add_child(picture)
+		row.add_child(label)
+		# the highlight runs under the whole row, picture and all
+		label.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+		var holder := PanelContainer.new()
+		holder.add_theme_stylebox_override("panel", _select_style if i == _cursor else _plain_style)
+		holder.add_child(row)
+		_options_box.add_child(holder)
+
+
+## Fills the card beside the list for the option under the cursor.
+func _refresh_detail() -> void:
+	_detail_panel.visible = not _details.is_empty() and not _options.is_empty()
+	for child in _detail_column.get_children():
+		_detail_column.remove_child(child)
+		child.queue_free()
+	if not _detail_panel.visible or _cursor >= _details.size() or not _details[_cursor] is Dictionary:
+		return
+	var card: Dictionary = _details[_cursor]
+	if card.get("title", "") != "":
+		var title := Label.new()
+		title.text = card.title
+		title.add_theme_color_override("font_color", NAME_COLOR)
+		_detail_column.add_child(title)
+	for entry: Array in card.get("rows", []):
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override("separation", 3)
+		if entry[0] != null:
+			var picture := TextureRect.new()
+			picture.custom_minimum_size = Vector2(16, 16)
+			picture.texture = entry[0]
+			picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			line.add_child(picture)
+		var text := Label.new()
+		text.text = entry[1]
+		if entry.size() > 2 and entry[2]:
+			text.add_theme_color_override("font_color", DETAIL_SHORT)
+		line.add_child(text)
+		_detail_column.add_child(line)
+	if card.get("facts", "") != "":
+		var facts := Label.new()
+		facts.text = card.facts
+		_detail_column.add_child(facts)
+	if card.get("note", "") != "":
+		var note := Label.new()
+		note.text = card.note
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		note.custom_minimum_size.x = DETAIL_WIDTH - 10.0
+		note.add_theme_color_override("font_color", DETAIL_DIM)
+		_detail_column.add_child(note)
 
 
 ## Waits for confirm (true) or cancel (false).
@@ -282,17 +471,21 @@ func _input(event: InputEvent) -> void:
 			reveal_all() # the first press finishes the page
 		else:
 			_answer = 1
+			Sound.play("ui_select", -3.0)
 	elif event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_answer = -1
+		Sound.play("ui_back")
 	elif not _options.is_empty() and (MenuInput.pressed(event, "move_up") or MenuInput.pressed(event, "ui_up")):
 		get_viewport().set_input_as_handled()
 		_cursor = wrapi(_cursor - 1, 0, _options.size())
 		_refresh_options()
+		Sound.play("ui_move")
 	elif not _options.is_empty() and (MenuInput.pressed(event, "move_down") or MenuInput.pressed(event, "ui_down")):
 		get_viewport().set_input_as_handled()
 		_cursor = wrapi(_cursor + 1, 0, _options.size())
 		_refresh_options()
+		Sound.play("ui_move")
 
 
 ## For tests: act as if the player pressed confirm (true) or cancel (false).

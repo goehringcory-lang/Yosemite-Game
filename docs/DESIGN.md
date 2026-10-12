@@ -1,4 +1,4 @@
-# Yosemite Game: Design
+# Valley Days: Design
 
 Working design doc. Farming has been removed from the game. Anything marked **(open)** still needs a decision.
 

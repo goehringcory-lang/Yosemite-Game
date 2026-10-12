@@ -198,6 +198,22 @@ const LOOKS := {
 		"top": "3a6a8a", "top_style": "jacket", "top2": "27485e", "bottom": "8a6a48", "bottom_style": "pants",
 		"beard": "short", "beard_color": "2a1a14", "carry": ["rope"],
 	},
+	# ------------------------------------------------ Gear traders and the Village Store (unnamed)
+	"camp4_rack_trader": {
+		"skin": SKIN_TAN, "hair": "6a4a2a", "hair_style": "long", "hat": "headband", "hat_color": "e8a030",
+		"top": "e8dcc0", "top_style": "stripes", "top2": "c8402e", "bottom": "5a6a8a", "bottom_style": "pants",
+		"carry": ["rope", "chalk_bag"],
+	},
+	"camp4_bigwall_trader": {
+		"skin": SKIN_FAIR, "hair": "3a2a1a", "beard": "short", "hat": "beanie", "hat_color": "3a5a8a",
+		"top": "6a7a4a", "top_style": "plaid", "top2": "3a4a2a", "bottom": "6a5a48", "pack": "haul_bag",
+		"pack_color": "c86a2a", "carry": ["hammer"],
+	},
+	"village_store_clerk": {
+		"skin": SKIN_BROWN, "hair": "2a1a14", "hair_style": "bun",
+		"top": "e8e4d8", "top_style": "shirt", "top2": "8a3a2a", "sleeve": "8a3a2a", "collar": "8a3a2a",
+		"bottom": "4a4038", "apron": "8a3a2a", "shoes": "3a2a20",
+	},
 	# ------------------------------------------------ Mountain Shop staff (invented, not historical)
 	"wren_alvarez": {
 		"skin": SKIN_TAN, "hair": "3a2418", "hair_style": "braid", "hat": "headband", "hat_color": "e8b040",

@@ -47,6 +47,7 @@ func save_all() -> void:
 	sheets["store_foods"] = store_foods()
 	for i in 4:
 		sheets["chair_%d" % i] = chair(i)
+		sheets["planter_%d" % i] = planter(i)
 	for sprite_name: String in sheets:
 		(sheets[sprite_name] as Image).save_png(ProjectSettings.globalize_path(DIR + sprite_name + ".png"))
 
@@ -472,10 +473,16 @@ func flagpole(phase := 0) -> Image:
 	K.vline(im, 4, 4, 44, c("eeeae0"))
 	K.ellipse(im, 5, 3, 1.6, 1.6, c("e0c060"))
 	# the flag, mid-wave, rippling along a different phase in each frame
+	# red and white stripes running along it, shaded where the cloth turns
 	for x in 16:
 		var wave := int(round(sin(x * 0.55 - phase * 2.1) * (0.6 + x * 0.09)))
-		K.rect(im, 6 + x, 6 + wave, 1, 9, c("a83a3a") if x % 8 < 4 else c("bf4a44"))
-		K.px(im, 6 + x, 6 + wave, c("d86a5a"))
+		var turned := cos(x * 0.55 - phase * 2.1) < -0.3
+		for row in 9:
+			var red := row % 2 == 0
+			var col := c("b8403c") if red else c("f2ece0")
+			if turned:
+				col = col.darkened(0.16)
+			K.px(im, 6 + x, 6 + wave + row, col)
 		if x > 0:
 			K.px(im, 6 + x, 15 + wave, c("7a2a2a"))
 	K.rect(im, 7, 8 + int(round(sin(-phase * 2.1) * 0.6)), 6, 5, c("2a3a7a"))
@@ -566,7 +573,7 @@ func bench() -> Image:
 	return im
 
 
-func planter() -> Image:
+func planter(_variant := 0) -> Image:
 	var im := K.make(18, 20)
 	K.shadow(im, 9.0, 18.0, 7.0, 1.6)
 	K.barrel(im, 3, 9, 12, 9, c("9a6c44"))
@@ -1071,5 +1078,24 @@ func car(style: int, paint: Color) -> Image:
 			K.rect(im, x0 + 4, 24, 8, 6, c("b8b0a0"))                    # roof air conditioner
 			K.rect(im, x0 + body_w - 10, 40, 6, 8, c("d8d0b8"))
 			K.rect(im, x0 + 4, 22, 2, h - 30, c("a89f8a"))               # ladder
+	# The back of the car, seen from above and behind like the buildings:
+	# a shaded rear panel with tail lights and a plate, the bumper, and the
+	# rear tyres under it, so the car stands up instead of lying flat.
+	var face := 8
+	var top := h - 4 - face
+	K.rect(im, x0, top, body_w, face, paint.darkened(0.22))
+	K.hline(im, x0, top, body_w, paint.lightened(0.2))
+	K.vline(im, x0, top, face, paint.darkened(0.08))
+	K.vline(im, x0 + body_w - 1, top, face, paint.darkened(0.4))
+	K.rect(im, x0 + 1, top + 2, 4, 3, c("d8402e"))
+	K.px(im, x0 + 1, top + 2, c("ff8a6a"))
+	K.rect(im, x0 + body_w - 5, top + 2, 4, 3, c("d8402e"))
+	K.px(im, x0 + body_w - 5, top + 2, c("ff8a6a"))
+	K.rect(im, x0 + body_w / 2 - 3, top + 3, 6, 3, c("efe6cf"))
+	K.hline(im, x0 + body_w / 2 - 2, top + 4, 4, c("3a5a8a"))
+	K.rect(im, x0 + 1, h - 5, body_w - 2, 2, c("c8c8c0"))
+	K.hline(im, x0 + 1, h - 5, body_w - 2, c("f0f0ea"))
+	K.rect(im, x0, h - 3, 5, 3, c("1c1c20"))
+	K.rect(im, x0 + body_w - 5, h - 3, 5, 3, c("1c1c20"))
 	K.outline(im)
 	return im

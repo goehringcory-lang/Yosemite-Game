@@ -369,21 +369,26 @@ func _place_plaza() -> void:
 	night_light(fire, Vector2(0, -6), 70.0, 1.2, 0.35)
 	ambient(fire, "sparks", Vector2(0, -8), Vector2(3, 1))
 	animate(decor("Flagpole", CS + "flagpole.png", foot(45.5, 39), Vector2(6, 4)), 3, 2.5)
-	for lamp in [[33, 38.6], [47, 38.6], [61, 38.6], [72, 38.6], [40.2, 44.5], [65.5, 44.5], [30, 45], [74, 46], [52, 47.5]]:
+	for lamp in [[33, 38.6], [47, 38.6], [61, 38.6], [72, 38.6], [40.2, 44.5], [65.5, 44.5], [30, 45], [74, 46], [49.4, 47.5]]:
 		_lamp("Lamp%d_%d" % [lamp[0], int(lamp[1] * 10)], lamp[0], lamp[1])
 	for bench in [[46.5, 43.6, 0], [57.5, 43.6, 1], [52, 46.6, 2], [52, 39.6, 3]]:
 		_prop("garden_bench", foot(bench[0], bench[1]) + Vector2(0, 2), "Bench%d" % bench[2])
 	for planter in [[30, 36.2], [37.5, 36.2], [43, 36.2], [50, 36.2], [52.2, 36.2], [60.2, 36.2], [62, 36.2], [70, 36.2], [74.5, 36.2]]:
-		decor("Planter%d" % int(planter[0] * 10), CS + "planter.png", foot(planter[0], planter[1]), Vector2(12, 5))
+		decor("Planter%d" % int(planter[0] * 10), CS + "planter_%d.png" % (int(planter[0] * 10) % 4), foot(planter[0], planter[1]), Vector2(12, 5))
 	decor("BikeRack", CS + "bike_rack.png", foot(46, 48.4), Vector2(30, 5))
+	# Bear-proof bins, as at every Yosemite plaza, a second bike rack by the
+	# store, and a cooler left by a patio table.
+	for bin in [[41, 39.2], [67, 39.2], [57.5, 47.6], [35.5, 45.2]]:
+		decor("BearBin%d" % int(bin[0] * 10), "res://assets/sprites/buildings/bear_box.png", foot(bin[0], bin[1]), Vector2(14, 6))
+	decor("BikeRackStore", CS + "bike_rack.png", foot(63.5, 37.2), Vector2(30, 5))
+	decor("Cooler", CS + "cooler.png", foot(50.4, 41.2), Vector2(12, 4))
 	decor("Fountain", CS + "fountain.png", foot(74.5, 42), Vector2(10, 5))
 	# Patio tables in front of the Pavilion and the pizza deck.
 	for tbl in [[44, 40.6], [49, 40.8], [37, 47], [44.6, 47.6], [61, 41]]:
 		decor("PatioTable%d" % int(tbl[0] * 10), CS + "patio_table.png", foot(tbl[0], tbl[1]), Vector2(14, 6))
-	# Strings of lights between the lamp posts along the shop fronts and over the green.
+	# Strings of lights between the lamp posts along the shop fronts.
 	for span in [[33, 47], [47, 61], [61, 72]]:
 		overhead("Lights%d" % span[0], CS + "string_lights_%d.png" % ((span[1] - span[0]) * T), Vector2((span[0] + span[1]) / 2.0 * T + 8, 38.6 * T + 8))
-	overhead("LightsGreen", CS + "string_lights_112.png", Vector2(46.5 * T, 44.5 * T + 8))
 
 
 ## A wrought-iron lamp, as at the Ahwahnee, with its dusk glow and a light

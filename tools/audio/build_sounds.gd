@@ -48,6 +48,16 @@ func _init() -> void:
 	_save("ui_move", _tick(1250.0, 0.03), RATE_FX, -14.0)
 	_save("ui_select", _knock(660.0, 0.11), RATE_FX, -10.0)
 	_save("ui_back", _knock(440.0, 0.1), RATE_FX, -12.0)
+	_save("ui_open", _swish(70, true), RATE_FX, -13.0)
+	_save("ui_close", _swish(71, false), RATE_FX, -14.0)
+	# Getting things, and talking.
+	_save("pickup", _pickup(), RATE_FX, -9.0)
+	_save("item_get", _chime([72, 76, 79, 84], 0.07, 0.9), RATE_FX, -7.0)
+	_save("quest_done", _chime([67, 72, 76, 79, 76, 84], 0.1, 1.2), RATE_FX, -6.0)
+	_save("talk", _talk(), RATE_FX, -15.0)
+	_save("flutter", _flutter(72), RATE_FX, -12.0)
+	_save("rustle", _rustle(73), RATE_FX, -14.0)
+	_save("heart", _chime([76, 81, 88], 0.09, 1.0), RATE_FX, -8.0)
 	print("Sounds written to %s. Run godot --headless --path . --import next." % OUT)
 	quit()
 
@@ -470,6 +480,66 @@ func _chime(notes: Array, gap: float, ring: float) -> PackedFloat32Array:
 func _tick(freq: float, length: float) -> PackedFloat32Array:
 	var buf := _buf(length, RATE_FX)
 	_add_ping(buf, RATE_FX, 0.0, [[freq, 1.0], [freq * 2.7, 0.3]], length / 4.0, 1.0)
+	return buf
+
+
+## A soft page-turn swish: a puff of band noise that rises (opening) or
+## falls (closing).
+func _swish(seed_value: int, rising: bool) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(0.16, RATE_FX)
+	var center := PackedFloat32Array()
+	var gain := PackedFloat32Array()
+	center.resize(buf.size())
+	gain.resize(buf.size())
+	for i in buf.size():
+		var t := float(i) / buf.size()
+		center[i] = lerpf(900.0, 3200.0, t if rising else 1.0 - t)
+		gain[i] = sin(PI * t) * 0.5
+	_add_band_noise(buf, RATE_FX, center, 1.4, gain)
+	return buf
+
+
+## A round, bubbly pop for picking something up: two quick rising blips.
+func _pickup() -> PackedFloat32Array:
+	var buf := _buf(0.16, RATE_FX)
+	_add_tone(buf, RATE_FX, 0.0, 0.07, 520.0, 980.0, 0.8, 0.15)
+	_add_tone(buf, RATE_FX, 0.055, 0.09, 780.0, 1480.0, 0.6, 0.1)
+	return buf
+
+
+## One syllable of the talking blip: a short, soft, slightly reedy tone.
+## Sound.play pitches it per speaker, so each person has their own voice.
+func _talk() -> PackedFloat32Array:
+	var buf := _buf(0.05, RATE_FX)
+	var phase := 0.0
+	for i in buf.size():
+		var t := float(i) / buf.size()
+		phase += TAU * lerpf(330.0, 300.0, t) / RATE_FX
+		var env := minf(t * 12.0, 1.0) * pow(1.0 - t, 1.5)
+		buf[i] = (sin(phase) + 0.35 * sin(phase * 2.0) + 0.12 * sin(phase * 3.0)) * env
+	return buf
+
+
+## Wings taking off: a quick run of soft feathery beats.
+func _flutter(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(0.42, RATE_FX)
+	for k in 7:
+		var at := k * 0.055 * (1.0 + k * 0.04)
+		var start := int(at * RATE_FX)
+		_add_noise(buf, RATE_FX, 0.6 * pow(0.85, k), 2400.0, 500.0, start, mini(start + int(0.035 * RATE_FX), buf.size()))
+	return buf
+
+
+## Leaves brushed aside: a short, airy swish with a few crackles in it.
+func _rustle(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(0.24, RATE_FX)
+	_add_noise(buf, RATE_FX, 0.5, 5200.0, 1400.0)
+	for k in 5:
+		_add_click(buf, RATE_FX, _rng.randf_range(0.01, 0.16), 0.004, 0.5, 7000.0)
+	_envelope(buf, 0.02, RATE_FX)
 	return buf
 
 

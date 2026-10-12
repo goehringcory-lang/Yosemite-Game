@@ -12,6 +12,8 @@ extends Node
 signal changed
 signal quest_started(quest: QuestData)
 signal quest_completed(quest: QuestData)
+## Sent on a first ascent of a route.
+signal ticked(route_id: String)
 
 const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/leonard_belay.tres"),
@@ -184,6 +186,7 @@ func record_climb(route_id: String) -> bool:
 		return false
 	climbed.append(route_id)
 	changed.emit()
+	ticked.emit(route_id)
 	return true
 
 
@@ -309,6 +312,21 @@ func available_from(character_id: String) -> QuestData:
 		if Array(quest.requires).all(is_completed) and quest.is_offered_in(GameClock.season):
 			return quest
 	return null
+
+
+## What to show over this person's head: "!" when they have a new quest for
+## you or a quest has sent you to them, "?" when you can finish a quest of
+## theirs by talking to them, and "" otherwise.
+func marker_for(character_id: String) -> String:
+	for quest: QuestData in QUESTS:
+		if not active.has(quest.id):
+			continue
+		var step := current_step(quest)
+		if step.get("type") == "talk" and step.get("target") == character_id:
+			return "!"
+		if quest.giver == character_id and step.get("type") != "talk" and is_step_done(step):
+			return "?"
+	return "!" if available_from(character_id) else ""
 
 
 ## A quest this person would offer if it were the right season, or null.

@@ -5,6 +5,8 @@ extends Node
 ## to GEAR below. Quests hand it out through their reward_gear.
 
 signal changed
+## Sent when the player gets new gear, so the HUD can show it.
+signal added(id: String, amount: int)
 
 const GEAR: Array[GearData] = [
 	preload("res://data/gear/approach_shoes.tres"),
@@ -57,6 +59,7 @@ func add(id: String, amount := 1) -> void:
 		return
 	owned[id] = count(id) + amount
 	changed.emit()
+	added.emit(id, amount)
 
 
 ## True if the player owns everything in [param required] (gear id -> count).

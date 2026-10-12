@@ -13,10 +13,11 @@ func _ready() -> void:
 	sprite.texture = item.icon
 
 
-func interact(_player: Player) -> void:
+func interact(player: Player) -> void:
 	# Two presses in one frame (E and Space) must not pick it up twice.
 	if not is_inside_tree() or is_queued_for_deletion():
 		return
+	PickupPop.spawn(sprite, player)
 	Inventory.add(item.id)
 	Perks.note("forage")
 	get_tree().call_group("hud", "show_message", "Found %s! %s" % [item.display_name, item.description])

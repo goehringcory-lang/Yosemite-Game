@@ -22,9 +22,10 @@ func _ready() -> void:
 	_refresh()
 
 
-func interact(_player: Player) -> void:
+func interact(player: Player) -> void:
 	if taken:
 		return
+	PickupPop.spawn(sprite, player)
 	var item := ItemDB.get_item(item_id)
 	Inventory.add(item_id)
 	taken = true

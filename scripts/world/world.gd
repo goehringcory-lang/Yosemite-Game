@@ -46,6 +46,8 @@ var _curfew_pending := false
 @onready var player: Player = $Player
 @onready var hud: HUD = $HUD
 @onready var park_map: ParkMap = $ParkMap
+## Today's events, for the page at bedtime.
+var day_log: DayLog
 
 
 func _ready() -> void:
@@ -56,6 +58,11 @@ func _ready() -> void:
 	park_map.travel_requested.connect(travel)
 	park_map.shuttle_requested.connect(_on_shuttle_requested)
 	park_map.closed.connect(_set_paused.bind(false))
+	day_log = DayLog.new()
+	add_child(day_log)
+	add_child(Critters.new())
+	add_child(Rustle.new())
+	add_child(StringLights.new())
 	var saved := SaveManager.peek_node(name)
 	var start := str(saved.get("region", Park.HOME_REGION))
 	if not ResourceLoader.exists(region_scene_path(start)):
@@ -71,6 +78,7 @@ func _ready() -> void:
 		Recipes.start_new_game()
 		QuestLog.start_new_game()
 		Perks.start_new_game()
+		Friendship.start_new_game()
 		if forage:
 			forage.respawn()
 	hud.bind_player(player)
@@ -218,6 +226,7 @@ func sleep(passed_out := false) -> void:
 	_curfew_pending = false
 	_set_paused(true)
 	await hud.fade_to_black()
+	await show_day_summary()
 
 	var fell_asleep_at := ""
 	if region.region_id != Park.HOME_REGION:
@@ -246,6 +255,15 @@ func sleep(passed_out := false) -> void:
 		_show_bear_tracks() # once per pass-out, so it never repeats on later mornings
 	_set_paused(false)
 	_busy = false
+
+
+## The day's page (DaySummary), over the black, until the player goes on.
+## Headless (the tests) it is skipped.
+func show_day_summary() -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var page := DaySummary.open(self, day_log)
+	await page.closed
 
 
 ## The morning after passing out, once the first message has had its moment.

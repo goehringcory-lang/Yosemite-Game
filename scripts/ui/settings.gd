@@ -36,7 +36,16 @@ static var prompts := Prompts.AUTO
 ## the ambience (birds, wind, rain, campfires, waterfalls); 0 to MAX_VOLUME.
 static var master_volume := 8
 static var effects_volume := MAX_VOLUME
+## Volume of the music, 0 to MAX_VOLUME.
+static var music_volume := 8
 static var ambience_volume := MAX_VOLUME
+## The UI's letters: a pixel font (DotGothic16, the default) that matches the
+## pixel art as in Stardew Valley and keeps every letter distinct, or smooth
+## Noto Sans.
+static var pixel_font := true
+const SMOOTH_FONT := "res://assets/fonts/NotoSans-Regular.ttf"
+const PIXEL_FONT := "res://assets/fonts/DotGothic16Prop-Regular.ttf"
+static var _fonts: Dictionary = {}
 
 static var _loaded := false
 ## True once settings came from a file or the player changed one, so the
@@ -45,8 +54,53 @@ static var _customized := false
 
 
 static func ensure_loaded() -> void:
+	OldUserDir.migrate()
 	if not _loaded:
 		load_settings()
+		apply_font()
+
+
+## The font for the UI, as chosen: DotGothic16 or Noto Sans.
+static func ui_font() -> Font:
+	ensure_loaded()
+	var path := PIXEL_FONT if pixel_font else SMOOTH_FONT
+	if not _fonts.has(path):
+		var font := load(path) as FontFile
+		if font == null:
+			return ThemeDB.fallback_font
+		if path == PIXEL_FONT:
+			font = font.duplicate() as FontFile
+			# a touch of smoothing keeps the strokes even at the small sizes
+			font.antialiasing = TextServer.FONT_ANTIALIASING_GRAY
+			font.hinting = TextServer.HINTING_NONE
+			font.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_AUTO
+			# no ligatures: every letter stays its own
+			var ts := TextServerManager.get_primary_interface()
+			font.opentype_feature_overrides = {
+				ts.name_to_tag("liga"): 0, ts.name_to_tag("clig"): 0,
+				ts.name_to_tag("dlig"): 0, ts.name_to_tag("calt"): 0,
+			}
+			# its lines run a pixel taller than Noto's; trim that so every
+			# screen keeps the layout it was made for
+			var trimmed := FontVariation.new()
+			trimmed.base_font = font
+			trimmed.spacing_top = -1
+			_fonts[path] = trimmed
+			return trimmed
+
+		_fonts[path] = font
+	return _fonts[path]
+
+
+## Puts the chosen font on every screen that uses the project's theme.
+static func apply_font() -> void:
+	var theme := ThemeDB.get_project_theme()
+	if theme == null:
+		return
+	var font := ui_font()
+	if theme.default_font != font:
+		theme.default_font = font
+
 
 
 ## Reads [member path]; missing keys keep their defaults.
@@ -63,7 +117,9 @@ static func load_settings() -> void:
 	prompts = clampi(int(config.get_value("input", "prompts", prompts)), 0, Prompts.size() - 1) as Prompts
 	master_volume = clampi(int(config.get_value("audio", "master", master_volume)), 0, MAX_VOLUME)
 	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
+	music_volume = clampi(int(config.get_value("audio", "music", music_volume)), 0, MAX_VOLUME)
 	ambience_volume = clampi(int(config.get_value("audio", "ambience", ambience_volume)), 0, MAX_VOLUME)
+	pixel_font = bool(config.get_value("display", "pixel_font", pixel_font))
 
 
 static func save() -> Error:
@@ -76,7 +132,9 @@ static func save() -> Error:
 	config.set_value("input", "prompts", int(prompts))
 	config.set_value("audio", "master", master_volume)
 	config.set_value("audio", "effects", effects_volume)
+	config.set_value("audio", "music", music_volume)
 	config.set_value("audio", "ambience", ambience_volume)
+	config.set_value("display", "pixel_font", pixel_font)
 	return config.save(path)
 
 
@@ -87,7 +145,9 @@ static func reset_defaults() -> void:
 	prompts = Prompts.AUTO
 	master_volume = 8
 	effects_volume = MAX_VOLUME
+	music_volume = 8
 	ambience_volume = MAX_VOLUME
+	pixel_font = true
 	_customized = false
 
 

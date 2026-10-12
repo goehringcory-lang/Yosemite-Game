@@ -18,15 +18,21 @@ static func route_plate(ci: CanvasItem, state: ClimbState, feet: int) -> void:
 	var sub := "%s  ·  %s" % [state.pitch_name(), Guidebook.yds_label(state.route.grade) if Guidebook.yds(state.route.grade) > 0.0 else state.route.grade.split(",")[0]]
 	UI.ink(ci, Vector2(14, 32), sub, UI.INK_SOFT, 10, 142)
 	# Altimeter under it.
-	var a := Rect2(6, 44, 60, 14)
-	UI.glass(ci, a)
-	UI.text(ci, Vector2(11, 55), "%d ft" % feet, UI.CREAM, 10)
+	var a := Rect2(6, 43, 60, 18)
+	UI.panel(ci, a)
+	UI.ink(ci, Vector2(12, 56), "%d ft" % feet, UI.INK, 10)
 
 
 static func topo_bar(ci: CanvasItem, state: ClimbState, progress: float) -> void:
-	var bar := Rect2(SCREEN.x - 10, 28, 4, 138)
+	var bar := Rect2(SCREEN.x - 10, 28, 4, 126)
 	UI.glass(ci, Rect2(bar.position + Vector2(-3, -6), bar.size + Vector2(6, 12)), 0.5)
 	ci.draw_rect(bar, Color(0.12, 0.1, 0.14, 0.9))
+	# a little summit on top, so it reads as the way to the top and not a
+	# second energy bar
+	var peak := Vector2(bar.position.x + bar.size.x / 2.0, bar.position.y - 13)
+	ci.draw_colored_polygon(PackedVector2Array([peak + Vector2(0, -1), peak + Vector2(6, 6), peak + Vector2(-6, 6)]), UI.WOOD_DARK)
+	ci.draw_colored_polygon(PackedVector2Array([peak, peak + Vector2(5, 5), peak + Vector2(-5, 5)]), UI.CREAM)
+	ci.draw_colored_polygon(PackedVector2Array([peak, peak + Vector2(2, 2), peak + Vector2(-2, 2)]), Color.WHITE)
 	var n := state.route.pitches.size()
 	for i in n + 1:
 		var y := bar.end.y - bar.size.y * float(i) / n
@@ -39,9 +45,21 @@ static func topo_bar(ci: CanvasItem, state: ClimbState, progress: float) -> void
 
 static func stamina(ci: CanvasItem, state: ClimbState, flash: float, shake: float) -> void:
 	var frac := clampf(state.stamina / float(ClimbState.MAX_STAMINA), 0.0, 1.0)
-	var r := Rect2(SCREEN.x - 26 + roundf(shake), SCREEN.y - 96, 12, 80)
+	# short enough that the number under it clears the bottom of the screen
+	var r := Rect2(SCREEN.x - 26 + roundf(shake), SCREEN.y - 100, 12, 76)
 	UI.energy_bar(ci, r, frac, state.stamina <= 25, flash)
-	UI.text(ci, Vector2(r.position.x - 3, r.end.y + 12), "%d" % maxi(state.stamina, 0), UI.WARN if state.stamina <= 25 else UI.CREAM, 10)
+	# a bolt over the bar, as on Stardew's energy bar, and the number under it
+	# a little lightning bolt over the bar for energy (a letter "E" read as
+	# the E key)
+	var b := Vector2(r.position.x + r.size.x / 2.0, r.position.y - 6).round()
+	var bolt := PackedVector2Array([b + Vector2(1, -6), b + Vector2(-3, 0), b + Vector2(0, 0), b + Vector2(-1, 4), b + Vector2(3, -2), b + Vector2(0, -2), b + Vector2(2, -6)])
+	var rim := PackedVector2Array()
+	for v in bolt:
+		rim.append(v + Vector2(0, 1))
+	ci.draw_colored_polygon(rim, UI.WOOD_DARK)
+	ci.draw_polyline(bolt + PackedVector2Array([bolt[0]]), UI.WOOD_DARK, 1.0)
+	ci.draw_colored_polygon(bolt, UI.GOLD)
+	UI.outlined(ci, Vector2(r.position.x + r.size.x / 2.0, r.end.y + 10), "%d" % maxi(state.stamina, 0), UI.WARN if state.stamina <= 25 else UI.CREAM, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 ## The rack as a Stardew-style toolbar. Slots light up when what they do is
@@ -80,10 +98,10 @@ static func toolbar(ci: CanvasItem, state: ClimbState, time: float, usable: Dict
 static func hints(ci: CanvasItem, text: String, x: float) -> void:
 	if text == "":
 		return
-	var w := UI.text_width(text, 10) + 10
-	var r := Rect2(x, SCREEN.y - 24, w, 14)
-	UI.glass(ci, r, 0.62)
-	UI.text(ci, Vector2(r.position.x + 5, r.position.y + 10), text, UI.CREAM, 10)
+	var w := UI.text_width(text, 10) + 16
+	var r := Rect2(x, SCREEN.y - 28, w, 18)
+	UI.panel(ci, r)
+	UI.ink(ci, Vector2(r.position.x + 8, r.position.y + 13), text, UI.INK, 10)
 
 
 ## What just happened, as a parchment note under the route plate.
@@ -93,7 +111,8 @@ static func toast(ci: CanvasItem, text: String, age: float) -> void:
 	var alpha := 1.0 if age < 5.0 else clampf(1.0 - (age - 5.0) / 1.0, 0.0, 1.0)
 	if alpha <= 0.0:
 		return
-	var lines := UI.wrap_lines(text, 170.0, 10)
+	# wrapped to the board inside the frame (174 wide, text 8 in from each side)
+	var lines := UI.wrap_lines(text, 158.0, 10)
 	var r := Rect2(SCREEN.x - 190, 8, 174, 12 + lines.size() * 11)
 	ci.modulate.a = alpha
 	UI.panel(ci, r)

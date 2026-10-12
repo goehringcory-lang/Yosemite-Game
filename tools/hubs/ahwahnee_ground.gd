@@ -523,12 +523,15 @@ func _color(k: int, x: int, y: int, i: int, tx: int, ty: int) -> Color:
 func _forest(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 	# Mossy forest floor in four tone steps: blue-green moss in the shade,
 	# olive in the light, and warm needle-duff patches where the field runs high.
+	# Tones kept close, so the floor reads as one calm ground with tufts on
+	# it (far-apart steps read as a busy camouflage), the duff only where
+	# the field runs highest, and twigs few.
 	var lvl := _nat_tone(a * 0.6 + b * 0.4, x, y)
-	var col: Color = [c("3b5a3f"), c("4a6636"), c("5d7a3c"), c("6f7a40")][lvl]
-	if _nat_tone(clampf(b * 1.6 - 0.6, 0.0, 1.0), x, y) == 3:
-		col = c("7a5a37")
+	var col: Color = [c("41603f"), c("4a6636"), c("54703a"), c("5f783c")][lvl]
+	if _nat_tone(clampf(b * 2.2 - 1.3, 0.0, 1.0), x, y) == 3:
+		col = c("6f5a3a")
 	# Needle litter and twigs as small clusters.
-	var twig := _nat_pair(x, y, 9, 311, 0.2)
+	var twig := _nat_pair(x, y, 9, 311, 0.07)
 	if twig == 1:
 		col = c("a88a58")
 	elif twig == 2:
@@ -697,21 +700,23 @@ func _duff(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 ## and moss only sits in a few joints.
 func _flagstone(x: int, y: int, a: float, _n: float, r: float) -> Color:
 	var i := y * _pw + x
-	var wob_y := int((float(_nb[i]) / 255.0 - 0.5) * 6.0)
+	# Slabs about 16x9, a person standing on two or three of them: big slabs
+	# in straight courses read as a wall standing up, not a floor.
+	var wob_y := int((float(_nb[i]) / 255.0 - 0.5) * 4.0)
 	var yy := y + wob_y
-	var row := floori(float(yy) / 13.0)
-	var ly := yy - row * 13
-	var off := int(hash2(row, 3, seed_value) * 22.0)
+	var row := floori(float(yy) / 9.0)
+	var ly := yy - row * 9
+	var off := int(hash2(row, 3, seed_value) * 14.0)
 	var xs := x + off + int((float(_nb[i]) / 255.0 - 0.5) * 4.0)
-	# Vertical joints: one per 24-pixel column, each jittered within its column.
-	var k0 := floori(float(xs) / 24.0)
-	var p0 := k0 * 24 + int(hash2(k0, row, seed_value + 21) * 12.0)
+	# Vertical joints: one per 16-pixel column, each jittered within its column.
+	var k0 := floori(float(xs) / 16.0)
+	var p0 := k0 * 16 + int(hash2(k0, row, seed_value + 21) * 8.0)
 	var slab := k0
 	var start := p0
-	var stop := (k0 + 1) * 24 + int(hash2(k0 + 1, row, seed_value + 21) * 12.0)
+	var stop := (k0 + 1) * 16 + int(hash2(k0 + 1, row, seed_value + 21) * 8.0)
 	if xs < p0:
 		slab = k0 - 1
-		start = (k0 - 1) * 24 + int(hash2(k0 - 1, row, seed_value + 21) * 12.0)
+		start = (k0 - 1) * 16 + int(hash2(k0 - 1, row, seed_value + 21) * 8.0)
 		stop = p0
 	var lx := xs - start
 	var sw := stop - start
@@ -731,7 +736,7 @@ func _flagstone(x: int, y: int, a: float, _n: float, r: float) -> Color:
 	col = col.lightened(0.05 * smooth(0.55, 0.85, a))
 	if lx == 1 or ly == 1:
 		col = col.lightened(0.12)
-	elif lx >= sw - 2 or ly >= 12:
+	elif lx >= sw - 2 or ly >= 8:
 		col = col.darkened(0.1)
 	# Specks in small clusters, not per pixel.
 	var sp := hash2(x / 2, y / 2, 97)

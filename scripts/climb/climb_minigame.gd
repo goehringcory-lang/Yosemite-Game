@@ -1013,29 +1013,45 @@ func _draw_reachable() -> void:
 		if hold.get("rest", false):
 			color = UI.GOOD
 		_canvas.draw_arc(p, 7.0, 0, TAU, 16, Color(color, pulse), 1.0)
-		var key: String = ["<", "^", ">"][dx + 1]
-		var label := "%s %d" % [key, cost]
+		_chevron(p, dx, Color(color, pulse))
+		# what the move costs, in energy
+		var label := "-%d" % cost
 		if hold.get("crux", false):
 			label += " crux"
 		elif hold.get("rest", false):
 			label += " rest"
 		elif hold.get("fixed", false):
 			label += " fixed"
+		# the number in cream (the ring's colour says how hard; a green "-1"
+		# read as a gain), unless it's a rest or crux, which keep their colour
+		var ink: Color = color if hold.get("rest", false) or hold.get("crux", false) else UI.CREAM
 		# Left ring's label goes left, the middle one above, the right one
 		# right. Under a roof the three rings sit almost on top of each other,
 		# so their labels stack in a list beside them instead.
 		if _roof:
-			UI.outlined(_canvas, p + Vector2(9, -7 + (dx + 1) * 10), label, color, 10)
+			UI.outlined(_canvas, p + Vector2(9, -7 + (dx + 1) * 10), label, ink, 10)
 		else:
 			match dx:
 				-1:
-					UI.outlined(_canvas, p + Vector2(-9, -1), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_RIGHT)
+					UI.outlined(_canvas, p + Vector2(-9, -1), label, ink, 10, -1.0, HORIZONTAL_ALIGNMENT_RIGHT)
 				0:
-					UI.outlined(_canvas, p + Vector2(0, -11), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+					UI.outlined(_canvas, p + Vector2(0, -11), label, ink, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 				_:
-					UI.outlined(_canvas, p + Vector2(9, -1), label, color, 10)
+					UI.outlined(_canvas, p + Vector2(9, -1), label, ink, 10)
 		if state.stamina - cost <= 0 and not hold.get("crux", false):
 			UI.outlined(_canvas, p + Vector2(0, 17), "fall!", UI.WARN, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+## A small arrow inside a hold's ring, pointing the way that move goes:
+## up-left, up, or up-right.
+func _chevron(at: Vector2, dx: int, color: Color) -> void:
+	var dir := Vector2(dx, -1.0).normalized()
+	var side := Vector2(-dir.y, dir.x)
+	var tip := at.round() + dir * 3.5
+	var back := at.round() - dir * 1.5
+	var arrow := PackedVector2Array([tip, back + side * 3.0, back - side * 3.0])
+	_canvas.draw_colored_polygon(arrow, Color(UI.SHADOW, color.a))
+	_canvas.draw_colored_polygon(PackedVector2Array([tip - dir * 0.8, back + side * 2.0, back - side * 2.0]), color)
 
 
 func _cost_color(cost: int) -> Color:

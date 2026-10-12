@@ -12,8 +12,14 @@ extends StaticBody2D
 @export_range(0, 3) var facing := 0
 
 
+var _marker: QuestMarker
+
+
 func _ready() -> void:
 	queue_redraw()
+	if shop and shop.talk_target != "":
+		_marker = QuestMarker.new(shop.talk_target)
+		add_child(_marker)
 
 
 func _process(_delta: float) -> void:
@@ -22,6 +28,7 @@ func _process(_delta: float) -> void:
 
 
 func _draw() -> void:
+	GroundShadow.draw_under(self)
 	if sprite_sheet:
 		# A slow breath so the shopkeeper isn't a statue.
 		var bob := -1.0 if int(Time.get_ticks_msec() / 700) % 2 == 1 else 0.0
@@ -62,6 +69,14 @@ func buy(offer: ShopOffer) -> Dictionary:
 	return paid
 
 
+## The picture of what [param offer] gets you.
+func offer_icon(offer: ShopOffer) -> Texture2D:
+	if offer.kind == "gear" and Gear.get_gear(offer.id):
+		return Gear.get_gear(offer.id).icon
+	var item := ItemDB.get_item(offer.id)
+	return item.icon if item else null
+
+
 func offer_name(offer: ShopOffer) -> String:
 	var name := offer.id
 	if offer.kind == "gear" and Gear.get_gear(offer.id):
@@ -71,8 +86,32 @@ func offer_name(offer: ShopOffer) -> String:
 	return name if offer.amount == 1 else ItemDB.count_name(offer.amount, name)
 
 
+## The card beside the list for [param offer]: what it is, what it costs
+## against the food you carry, and how many you have already.
+func offer_card(offer: ShopOffer) -> Dictionary:
+	var thing: Resource = Gear.get_gear(offer.id) if offer.kind == "gear" else ItemDB.get_item(offer.id)
+	var rows := [[null, "Costs %d of your %d energy" % [offer.price, Barter.purse()], not Barter.can_afford(offer.price)]]
+	return {"title": offer_name(offer), "rows": rows, "facts": "You have %d" % _owned(offer),
+		"note": thing.description if thing else ""}
+
+
+## Shopkeepers with a name in the story keep friendship hearts too.
+func can_receive_gift() -> bool:
+	return shop != null and shop.talk_target != "" and GiftGiving.possible(shop.talk_target)
+
+
+func receive_gift(player: Player) -> void:
+	if shop and shop.talk_target != "":
+		await GiftGiving.offer(player, shop.talk_target, shop.keeper, self)
+
+
 func interact(player: Player) -> void:
+	if shop and shop.talk_target != "":
+		Friendship.note_talk(shop.talk_target)
 	player.can_act = false
+	if _marker:
+		_marker.hidden_while_talking = true
+		_marker.refresh()
 	var box := DialogueBox.open(player)
 	if shop.talk_target != "":
 		var story := QuestLog.talk_to(shop.talk_target, shop.keeper)
@@ -86,12 +125,19 @@ func interact(player: Player) -> void:
 			await box.say([{"speaker": shop.keeper, "text": shop.nothing_yet}])
 			break
 		var options := []
+		var icons := []
+		var details := []
 		for offer in offers:
-			options.append("%s for %d food energy%s" % [offer_name(offer), offer.price,
-				"" if Barter.can_afford(offer.price) else " (not enough food)"])
+			icons.append(offer_icon(offer))
+			# the card beside the list says the rest (and shows a price you
+			# can't meet in red)
+			options.append("%s · costs %d" % [offer_name(offer), offer.price])
+			details.append(offer_card(offer))
 		options.append("Done")
+		icons.append(null)
+		details.append(null)
 		var prompt := "You're carrying %d energy of food. What do you want?" % Barter.purse()
-		var choice := await box.choose(prompt, options, shop.keeper)
+		var choice := await box.choose(prompt, options, shop.keeper, icons, details)
 		if choice < 0 or choice >= offers.size():
 			break
 		var offer := offers[choice]
@@ -102,6 +148,9 @@ func interact(player: Player) -> void:
 			await box.say([{"speaker": shop.keeper, "text": "Deal. You hand over %s and get %s." % [Barter.describe(paid), offer_name(offer)]}])
 	box.close()
 	player.can_act = true
+	if _marker:
+		_marker.hidden_while_talking = false
+		_marker.refresh()
 
 
 func _owned(offer: ShopOffer) -> int:

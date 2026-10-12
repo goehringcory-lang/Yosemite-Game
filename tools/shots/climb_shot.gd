@@ -97,6 +97,8 @@ func _ready() -> void:
 
 func _save(dir: String, route_id: String, tag: String) -> void:
 	var image := get_viewport().get_texture().get_image()
+	# doubled like the other shots, so screens compare at one scale
+	image.resize(image.get_width() * 2, image.get_height() * 2, Image.INTERPOLATE_NEAREST)
 	image.save_png("%s/climb_%s_%s.png" % [dir, route_id, tag])
 
 

@@ -15,29 +15,31 @@ enum Page { MAIN, SETTINGS, CONTROLS }
 const CONTROLS := [
 	["Walk", "WASD or arrow keys", "Left stick or D-pad"],
 	["Talk, read, use", "E, Space, X, C, or click", "A or X"],
-	["Park and area map", "M (Tab switches tabs)", "Back (LB/RB switch tabs)"],
-	["Journal, quests, backpack", "J, Q, B (Tab switches tabs)", "Y (LB/RB switch tabs)"],
-	["Pause, settings", "Esc", "Start"],
-	["Back out of a menu", "Esc", "B"],
+	["Give a gift", "G", "LB"],
+	["Park and area map", "M (Tab: tabs)", "Back (LB/RB: tabs)"],
+	["Journal, quests, backpack", "J, Q, B (Tab: tabs)", "Y (LB/RB: tabs)"],
+	["Pause, or go back", "Esc", "Start, or B"],
 	["Menus: choose, confirm", "Up/Down, E or Enter", "Stick or D-pad, A"],
 	["Dialogue: show all, next", "E (twice)", "A (twice)"],
-	["Climbing: move up", "W / Up (A, D: diagonal)", "Stick up / left / right"],
-	["Climbing: place a cam or clip a bolt", "Space or C", "X"],
-	["Climbing: eat, chalk up, retreat", "E / Esc", "A / B"],
-	["Climbing: aid or jug", "Shift + arrow", "Y + stick"],
+	["Climb: move up", "W / Up (A, D: diagonal)", "Stick up / left / right"],
+	["Climb: place a cam, clip a bolt", "Space or C", "X"],
+	["Climb: eat, chalk up, retreat", "E / Esc", "A / B"],
+	["Climb: aid or jug", "Shift + arrow", "Y + stick"],
 ]
 enum Option { RESUME, SAVE, SETTINGS, CONTROLS, QUIT }
 const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Quit to desktop"]
 const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again to quit."
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, MASTER_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Volume", "Sound effects", "Ambience", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, FONT, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Font", "Volume", "Music", "Sound effects", "Ambience", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill the screen. The picture stays sharp in whole-pixel steps.",
 	"The window's size, in whole steps of 480 x 270.",
 	"Which buttons hints name. Auto follows the last device you used.",
+	"Smooth letters are easiest to read; pixel letters match the art.",
 	"How loud the whole game is.",
+	"The songs for each season, the night, and the title screen.",
 	"Footsteps, climbing, and menus.",
 	"Birds, crickets, wind, rain, campfires, and waterfalls.",
 	"Back to the pause menu.",
@@ -48,7 +50,10 @@ const HEADING := Color(1.0, 0.85, 0.5)
 const DIM := Color(1, 1, 1, 0.6)
 const PANEL_POS := Vector2(30, 16)
 const PANEL_SIZE := Vector2(420, 238)
+## The width of the card beside the pause menu's choices.
+const CARD_WIDTH := 132.0
 const NAME_WIDTH := 96
+const VOLUME_SETTINGS := [Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME]
 
 var _panel: PanelContainer
 var _title: Label
@@ -57,7 +62,12 @@ var _pages: Array[Control] = []
 var _page := Page.MAIN
 var _option_labels: Array[Label] = []
 var _goal_label: Label
+var _card_date: Label
+var _help_title: Label
+var _card_stats: Label
 var _setting_names: Array[Label] = []
+## Volume setting -> its slider bar.
+var _sliders: Dictionary = {}
 var _setting_values: Array[Label] = []
 var _help_label: Label
 var _sample_label: Label
@@ -136,8 +146,12 @@ func _style(path: String, margin: float) -> StyleBoxTexture:
 
 
 func _build_main() -> Control:
+	var both := HBoxContainer.new()
+	both.add_theme_constant_override("separation", 8)
 	var page := VBoxContainer.new()
 	page.add_theme_constant_override("separation", 2)
+	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	both.add_child(page)
 	for option in OPTIONS:
 		var label := _label(option)
 		page.add_child(label)
@@ -146,43 +160,148 @@ func _build_main() -> Control:
 	page.add_child(_label("Goal", HEADING))
 	_goal_label = _label("")
 	_goal_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_goal_label.custom_minimum_size.x = PANEL_SIZE.x - 16
+	_goal_label.custom_minimum_size.x = PANEL_SIZE.x - 16 - CARD_WIDTH - 8
 	page.add_child(_goal_label)
 	page.add_child(_spacer(4))
-	page.add_child(_label("Save here any time. Sleeping in your tent saves too.", DIM))
-	return page
+	var note := _label("Save here any time. Sleeping in your tent saves too.", DIM)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size.x = _goal_label.custom_minimum_size.x
+	page.add_child(note)
+	both.add_child(_build_card())
+	return both
+
+
+## The card beside the pause menu, like the player's page in Stardew Valley's
+## menu: your face, the day, and how your time in the Valley is going.
+func _build_card() -> Control:
+	var card := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0.2)
+	style.border_color = Color(0.78, 0.63, 0.38, 0.55)
+	style.border_width_left = 1
+	style.content_margin_left = 8.0
+	style.content_margin_right = 4.0
+	style.content_margin_top = 4.0
+	style.content_margin_bottom = 4.0
+	card.add_theme_stylebox_override("panel", style)
+	card.custom_minimum_size.x = CARD_WIDTH
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 1)
+	card.add_child(column)
+	var frame := PanelContainer.new()
+	var frame_style := StyleBoxFlat.new()
+	frame_style.bg_color = Color("5a4634")
+	frame_style.border_color = Color("c8a060")
+	frame_style.set_border_width_all(1)
+	frame_style.set_content_margin_all(1)
+	frame.add_theme_stylebox_override("panel", frame_style)
+	frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var face := TextureRect.new()
+	face.texture = Portraits.for_speaker("You")
+	face.custom_minimum_size = Vector2(48, 48)
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	face.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	frame.add_child(face)
+	frame.visible = face.texture != null
+	column.add_child(frame)
+	_card_date = _label("", HEADING)
+	_card_date.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(_card_date)
+	_card_stats = _label("")
+	_card_stats.add_theme_constant_override("line_spacing", 0)
+	column.add_child(_card_stats)
+	return card
+
+
+## What the card says: today, and a tally of the game so far.
+static func card_text() -> PackedStringArray:
+	var gear := 0
+	for id: String in Gear.owned:
+		gear += int(Gear.owned[id])
+	var friends := 0
+	var hearts := 0
+	for id: String in Friendship.points:
+		var h := Friendship.hearts(id)
+		hearts += h
+		if h > 0:
+			friends += 1
+	return PackedStringArray([
+		"Food: %d energy" % Barter.purse(),
+		"Gear: %d piece%s" % [gear, "" if gear == 1 else "s"],
+		"Friends: %d (%d hearts)" % [friends, hearts],
+		"Quests done: %d" % QuestLog.completed.size(),
+		"Climbs: %d" % QuestLog.climbed.size(),
+	])
 
 
 func _build_settings() -> Control:
+	var both := HBoxContainer.new()
+	both.add_theme_constant_override("separation", 8)
 	var page := VBoxContainer.new()
-	page.add_theme_constant_override("separation", 2)
+	# Rows sit close so all ten settings and the hint line fit.
+	page.add_theme_constant_override("separation", 0)
+	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	both.add_child(page)
 	for i in SETTING_NAMES.size():
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 4)
 		var name_label := _label(SETTING_NAMES[i])
 		name_label.custom_minimum_size.x = NAME_WIDTH
 		row.add_child(name_label)
+		if i in VOLUME_SETTINGS:
+			# a slider bar for each volume, ten notches, filled to the level
+			var bar := Control.new()
+			bar.custom_minimum_size = Vector2(52, 8)
+			bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			bar.draw.connect(_draw_slider.bind(bar, i))
+			row.add_child(bar)
+			_sliders[i] = bar
 		var value := _label("")
 		row.add_child(value)
 		page.add_child(row)
 		_setting_names.append(name_label)
 		_setting_values.append(value)
-	page.add_child(_spacer(6))
+	# what the chosen setting does, in a card beside the list
+	var card := _card_panel()
+	card.custom_minimum_size.x = CARD_WIDTH
+	card.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 2)
+	card.add_child(column)
+	_help_title = _label("", HEADING)
+	column.add_child(_help_title)
 	_help_label = _label("", DIM)
 	_help_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_help_label.custom_minimum_size.x = PANEL_SIZE.x - 16
-	page.add_child(_help_label)
+	_help_label.custom_minimum_size.x = CARD_WIDTH - 14
+	column.add_child(_help_label)
 	_sample_label = _label(SPEED_SAMPLE)
-	page.add_child(_sample_label)
-	page.add_child(_spacer(2))
-	page.add_child(_label("Settings save as soon as you change them.", DIM))
-	return page
+	_sample_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_sample_label.custom_minimum_size.x = CARD_WIDTH - 14
+	column.add_child(_sample_label)
+	both.add_child(card)
+	return both
+
+
+## The framed card used beside the pause menu's and settings' lists.
+func _card_panel() -> PanelContainer:
+	var card := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0.2)
+	style.border_color = Color(0.78, 0.63, 0.38, 0.55)
+	style.border_width_left = 1
+	style.content_margin_left = 8.0
+	style.content_margin_right = 4.0
+	style.content_margin_top = 4.0
+	style.content_margin_bottom = 4.0
+	card.add_theme_stylebox_override("panel", style)
+	return card
 
 
 func _build_controls() -> Control:
 	var grid := GridContainer.new()
 	grid.columns = 3
-	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("h_separation", 6)
 	grid.add_theme_constant_override("v_separation", 0)
 	grid.add_child(_label(""))
 	for header in ["Keyboard and mouse", "Gamepad"]:
@@ -213,6 +332,7 @@ func open() -> void:
 		hud.device_changed.connect(_refresh)
 	_show_page(Page.MAIN)
 	_panel.visible = true
+	MenuInput.pop_in(_panel)
 	_was_paused = GameClock.paused
 	GameClock.paused = true
 	_set_player_can_act(false)
@@ -229,6 +349,7 @@ func close() -> void:
 	if not is_open():
 		return
 	_panel.visible = false
+	Sound.play("ui_close")
 	GameClock.paused = _was_paused
 	_set_player_can_act(true)
 	closed.emit()
@@ -332,7 +453,7 @@ func _settings_input(event: InputEvent) -> void:
 		change = 1
 		# E steps a volume up, and from 100% round to Off (Left/Right stop at
 		# the ends, so Left from Off never jumps to full).
-		if _settings_cursor in [Setting.MASTER_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME] \
+		if _settings_cursor in [Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME] \
 				and _volume(_settings_cursor) >= Settings.MAX_VOLUME:
 			change = -Settings.MAX_VOLUME
 	if change != 0:
@@ -345,6 +466,9 @@ func change_setting(which: int, step: int) -> void:
 		Setting.TEXT_SPEED:
 			Settings.text_speed = wrapi(Settings.text_speed + step, 0, Settings.TextSpeed.size()) as Settings.TextSpeed
 			_restart_sample()
+		Setting.FONT:
+			Settings.pixel_font = not Settings.pixel_font
+			Settings.apply_font()
 		Setting.FULLSCREEN:
 			Settings.fullscreen = not Settings.fullscreen
 		Setting.WINDOW_SIZE:
@@ -355,6 +479,8 @@ func change_setting(which: int, step: int) -> void:
 			Settings.prompts = wrapi(Settings.prompts + step, 0, Settings.Prompts.size()) as Settings.Prompts
 		Setting.MASTER_VOLUME:
 			Settings.master_volume = clampi(Settings.master_volume + step, 0, Settings.MAX_VOLUME)
+		Setting.MUSIC_VOLUME:
+			Settings.music_volume = clampi(Settings.music_volume + step, 0, Settings.MAX_VOLUME)
 		Setting.EFFECTS_VOLUME:
 			Settings.effects_volume = clampi(Settings.effects_volume + step, 0, Settings.MAX_VOLUME)
 		Setting.AMBIENCE_VOLUME:
@@ -397,11 +523,16 @@ func _refresh() -> void:
 			text = QUIT_SAVED if _just_saved else QUIT_CONFIRM
 		_set_choice(_option_labels[i], text, i == _cursor)
 	_goal_label.text = HUD.objective_text() if HUD.objective_text() != "" else "Explore, and talk to people around the valley."
+	_card_date.text = "%s, Year %d" % [GameClock.get_date_string(), GameClock.year]
+	_card_stats.text = "\n".join(card_text())
 	for i in _setting_names.size():
 		_set_choice(_setting_names[i], SETTING_NAMES[i], i == _settings_cursor)
 		_setting_values[i].text = _setting_value(i)
+		if _sliders.has(i):
+			_sliders[i].queue_redraw()
 		_setting_values[i].modulate = DIM if i == Setting.WINDOW_SIZE and Settings.fullscreen else Color.WHITE
 	_help_label.text = SETTING_HELP[_settings_cursor]
+	_help_title.text = SETTING_NAMES[_settings_cursor]
 	if _settings_only and _settings_cursor == Setting.BACK:
 		_help_label.text = "Back to the title screen."
 	_sample_label.visible = _settings_cursor == Setting.TEXT_SPEED
@@ -420,6 +551,8 @@ func _setting_value(which: int) -> String:
 	match which:
 		Setting.TEXT_SPEED:
 			value = Settings.TEXT_SPEED_NAMES[Settings.text_speed]
+		Setting.FONT:
+			value = "Pixel" if Settings.pixel_font else "Smooth"
 		Setting.FULLSCREEN:
 			value = "On" if Settings.fullscreen else "Off"
 		Setting.WINDOW_SIZE:
@@ -428,11 +561,24 @@ func _setting_value(which: int) -> String:
 			value = "%dx  (%d x %d)" % [Settings.window_scale, Settings.BASE_SIZE.x * Settings.window_scale, Settings.BASE_SIZE.y * Settings.window_scale]
 		Setting.PROMPTS:
 			value = Settings.PROMPT_NAMES[Settings.prompts]
-		Setting.MASTER_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME:
+		Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME:
 			value = _volume_text(_volume(which))
 		_:
 			return ""
-	return "<  %s  >" % value
+	return "‹  %s  ›" % value
+
+
+## A volume's slider: ten notches, gold up to the level on the chosen row.
+func _draw_slider(bar: Control, which: int) -> void:
+	var level := _volume(which)
+	var chosen := which == _settings_cursor
+	var on := Color(1.0, 0.85, 0.5) if chosen else Color(0.95, 0.9, 0.78)
+	bar.draw_rect(Rect2(0, 0, 52, 8), Color("2a1f1a"))
+	for n in Settings.MAX_VOLUME:
+		var notch := Rect2(1 + n * 5, 1, 4, 6)
+		bar.draw_rect(notch, on if n < level else Color(0.35, 0.28, 0.22))
+		if n < level:
+			bar.draw_rect(Rect2(notch.position, Vector2(4, 1)), on.lightened(0.4))
 
 
 ## The level of volume setting [param which] (0 to Settings.MAX_VOLUME).
@@ -440,6 +586,8 @@ func _volume(which: int) -> int:
 	match which:
 		Setting.MASTER_VOLUME:
 			return Settings.master_volume
+		Setting.MUSIC_VOLUME:
+			return Settings.music_volume
 		Setting.EFFECTS_VOLUME:
 			return Settings.effects_volume
 	return Settings.ambience_volume
@@ -463,9 +611,10 @@ func _footer_text() -> String:
 	return "[%s] Choose   [%s] Select   [%s] Resume" % [choose, ok, back]
 
 
-## A menu line: "> ", gold and a highlight bar when chosen, so it shows without the color too.
+## A menu line: an arrow, gold and a highlight bar when chosen, so it shows without the color too.
 func _set_choice(label: Label, text: String, chosen: bool) -> void:
-	label.text = ("> " if chosen else "  ") + text
+	label.text = "   " + text
+	MenuInput.mark(label, chosen)
 	label.add_theme_color_override("font_color", HEADING if chosen else Color.WHITE)
 	label.add_theme_stylebox_override("normal", _select_style if chosen else _plain_style)
 

@@ -935,14 +935,20 @@ static func _hold(im: Image, c: Dictionary, rng: RandomNumberGenerator, p: Vecto
 			P.shaded_ellipse(im, p.x, p.y, r + 0.5, r * 0.8 + 0.5, tone(c, 3.0), tone(c, 4.2), tone(c, 1.8))
 			P.px(im, p.x - 1, p.y - 1, chalk)
 		"slab", "dike":
-			# Smear marks: a tiny edge, a chalky smudge, a dimple.
-			P.rect(im, p.x - 2, p.y, 5, 1, tone(c, 4.7))
-			P.rect(im, p.x - 2, p.y + 1, 5, 1, c.seam)
+			# Smear marks: a lit edge with its shadow under it, and a chalky
+			# smudge over it where hands have been, big enough to read at a
+			# glance.
+			P.rect(im, p.x - 3, p.y, 7, 1, tone(c, 4.7))
+			P.rect(im, p.x - 3, p.y + 1, 7, 1, c.seam)
+			P.rect(im, p.x - 2, p.y + 2, 5, 1, c.seam.lerp(tone(c, 2.0), 0.5))
 			if not hard:
-				P.px(im, p.x - 1, p.y - 1, chalk)
-				P.px(im, p.x + 1, p.y - 1, chalk.darkened(0.1))
+				P.rect(im, p.x - 2, p.y - 1, 4, 1, chalk)
+				P.px(im, p.x + 2, p.y - 1, chalk.darkened(0.1))
+				P.px(im, p.x - 1, p.y - 2, chalk.darkened(0.15))
 			if easy:
-				P.rect(im, p.x - 3, p.y, 7, 1, tone(c, 4.2))
+				P.rect(im, p.x - 4, p.y, 9, 1, tone(c, 4.2))
+				P.px(im, p.x - 4, p.y + 1, c.seam)
+				P.px(im, p.x + 4, p.y + 1, c.seam)
 		_:
 			if easy:
 				P.rect(im, p.x - 3, p.y - 1, 6, 3, tone(c, 3.8))

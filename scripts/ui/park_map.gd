@@ -102,7 +102,10 @@ var _park_marker: Control
 var _area_marker: Control
 ## The bob-and-pulse step of the "you are here" pin, the only thing redrawn every frame.
 var _pin_phase := 0
-var _note_box: StyleBoxFlat
+var _note_box: StyleBox
+## The slim strip under the area map: the panels' dark board and gold edge,
+## without the wood frame, which is too deep for it.
+var _strip_box: StyleBoxFlat
 
 var _park_view: Control
 var _park_canvas: Control
@@ -120,6 +123,8 @@ var _desc_label: Label
 var _acts_label: Label
 var _route_label: Label
 var _hint_label: Label
+## The travel map's description panel (for tests: its text must fit).
+var _info_panel: PanelContainer
 
 
 func _ready() -> void:
@@ -363,9 +368,9 @@ func _refresh() -> void:
 	_area_view.visible = _tab == Tab.AREA
 	var hub := Park.get_hub(_selected)
 	_name_label.text = hub.display_name
-	_sub_label.text = "%s. %s" % [hub.get_elevation_text(), hub.tagline]
+	_sub_label.text = "%s. %s%s" % [hub.get_elevation_text(), hub.tagline, "" if hub.tagline.ends_with(".") else "."]
 	_desc_label.text = hub.description
-	_acts_label.text = "\n".join(Array(hub.activities).map(func(a: String) -> String: return "- " + a))
+	_acts_label.text = "\n".join(Array(hub.activities).map(func(a: String) -> String: return "• " + a))
 	_route_label.text = _route_text(hub)
 	_route_label.modulate = GOLD if _legs.has(_selected) and _legs[_selected].open else (TEXT if _selected == _hub_here else CLOSED)
 	var tab_hint := "[%s] Area" % _button("Tab")
@@ -374,6 +379,7 @@ func _refresh() -> void:
 	else:
 		_hint_label.text = "Travel from a map kiosk or a road out of the area.\n[%s] Choose   [%s] Close   %s" % [_button("Arrows"), _button("M"), tab_hint]
 	_area_title.text = "" if not _view.is_empty() else "%s area map" % Park.get_hub(_hub_here).display_name
+	_fit_info()
 	_refresh_area_text()
 	_park_frame.queue_redraw()
 	_park_canvas.queue_redraw()
@@ -384,6 +390,16 @@ func _refresh() -> void:
 
 
 ## The name of a keyboard control on the current device, like the HUD's prompts.
+## Steps the description's type down a size at a time until the hub's whole
+## note fits its panel (the longest notes, or a wider font, need it).
+func _fit_info() -> void:
+	for size in [9, 8, 7]:
+		_desc_label.add_theme_font_size_override("font_size", size)
+		_acts_label.add_theme_font_size_override("font_size", size)
+		if _info_panel.get_combined_minimum_size().y <= INFO_RECT.size.y:
+			return
+
+
 func _button(keyboard: String) -> String:
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud and not hud.device_changed.is_connected(_on_device_changed):
@@ -411,7 +427,7 @@ func _refresh_area_text() -> void:
 		elif _shuttle_from != "" and stop_name == _shuttle_from:
 			lines += "  You are at this stop."
 		elif stop_name != "":
-			lines += "  Valley shuttle stop."
+			lines += " Valley shuttle stop."
 	else:
 		lines = "You are at %s." % _here_name
 	_area_footer.text = lines
@@ -603,6 +619,9 @@ func _marker_rects() -> Array[Rect2]:
 		rects.append(Rect2((_v2(kiosk.anchor) * s - Vector2(3, 8)).floor() - Vector2(1, 1), Vector2(9, 10)))
 	for climb: Dictionary in _view.climbs:
 		rects.append(Rect2((_v2(climb.anchor) * s).floor() - Vector2(6, 6), Vector2(13, 13)))
+	# the "you are here" pin, head and all
+	if _here != Vector2.ZERO:
+		rects.append(Rect2((_view_point(_here) * s).floor() - Vector2(6, 17), Vector2(13, 20)))
 	return rects
 
 
@@ -630,7 +649,7 @@ func _place_signs() -> void:
 				for other: Rect2 in placed:
 					cost += _overlap(rect.grow(2), other) * 4.0
 				for marker: Rect2 in markers:
-					cost += _overlap(rect, marker) * 4.0
+					cost += _overlap(rect.grow(1), marker) * 8.0
 				if cost < best_cost:
 					best_cost = cost
 					best = rect.position
@@ -826,8 +845,8 @@ func _draw_area_frame() -> void:
 		canvas.draw_rect(Rect2(plaque.position + Vector2(1, 0), Vector2(plaque.size.x - 2, 1)), WOOD_LIGHT)
 		canvas.draw_string_outline(font, Vector2(plaque.position.x + 8, 11), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, 2, WOOD_DARK)
 		canvas.draw_string(font, Vector2(plaque.position.x + 8, 11), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("fff3cf"))
-	# Footer panel, the same tidy panel as the park map's note.
-	canvas.draw_style_box(_note_box, Rect2(6, 246, 468, 22))
+	# Footer strip: the panels' board and gold edge, slim enough for one line.
+	canvas.draw_style_box(_strip_box, Rect2(6, 246, 468, 22))
 
 
 func _tab_chip(canvas: Control, font: Font, rect: Rect2, text: String, active: bool) -> void:
@@ -879,7 +898,7 @@ func _load_area_map() -> void:
 	_area_rect.size = shown
 	_area_canvas.position = _area_rect.position
 	_area_canvas.size = shown
-	_area_footer.position = Vector2(9, 247)
+	_area_footer.position = Vector2(10, 247)
 	# Where the signs go depends only on the hub's picture and data, so the
 	# search runs once per hub.
 	if _sign_cache.has(_hub_here):
@@ -931,6 +950,12 @@ func _build() -> void:
 	_park_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_park_view)
 	_note_box = _make_note_box()
+	_strip_box = StyleBoxFlat.new()
+	_strip_box.bg_color = Color("3a2a1e")
+	_strip_box.border_color = Color("c8a060")
+	_strip_box.set_border_width_all(1)
+	_strip_box.shadow_color = Color(0, 0, 0, 0.4)
+	_strip_box.shadow_size = 2
 	_park_frame = _overlay(_park_view, _draw_park_frame)
 	var map := TextureRect.new()
 	map.texture = PARK_MAP
@@ -951,21 +976,28 @@ func _build() -> void:
 	panel.add_theme_stylebox_override("panel", _note_box)
 	_park_view.add_child(panel)
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 4)
+	box.add_theme_constant_override("separation", 2)
 	panel.add_child(box)
+	# The panel is a fixed size; the longest hub's text has to fit it whole.
+	panel.clip_contents = true
+	_info_panel = panel
 	_name_label = _label(box)
-	_name_label.add_theme_font_size_override("font_size", 20)
+	_name_label.add_theme_font_size_override("font_size", 17)
 	_name_label.add_theme_color_override("font_color", GOLD)
 	_sub_label = _label(box)
+	_sub_label.add_theme_font_size_override("font_size", 9)
 	_sub_label.add_theme_color_override("font_color", SUBHEAD)
 	_desc_label = _label(box)
+	_desc_label.add_theme_font_size_override("font_size", 9)
 	_acts_label = _label(box)
+	_acts_label.add_theme_font_size_override("font_size", 9)
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(spacer)
 	_route_label = _label(box)
 	_hint_label = _label(box)
 	_hint_label.modulate = DIM
+	_hint_label.add_theme_font_size_override("font_size", 8)
 
 	_area_view = Control.new()
 	_area_view.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -985,15 +1017,16 @@ func _build() -> void:
 	_area_view.add_child(_area_canvas)
 	_area_marker = _overlay(_area_canvas, _draw_area_marker)
 	_area_footer = _label(_area_view)
-	_area_footer.position = Vector2(8, 245)
+	_area_footer.position = Vector2(10, 245)
 	_area_footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_area_footer.custom_minimum_size.x = 462
-	_area_footer.size.x = 462
+	_area_footer.custom_minimum_size.x = 454
+	_area_footer.size.x = 454
 	_area_footer.add_theme_font_size_override("font_size", 8)
 	_area_hint = _label(_area_view)
 	_area_hint.position = Vector2(290, 4)
 	_area_hint.size = Vector2(184, 12)
 	_area_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_area_hint.add_theme_font_size_override("font_size", 8)
 	_area_hint.modulate = DIM
 	_area_hint.visible = true
 
@@ -1020,13 +1053,11 @@ func _overlay(parent: Control, on_draw: Callable) -> Control:
 
 
 ## The tidy panel behind the notes: dark wood with a thin edge and a soft shadow.
-func _make_note_box() -> StyleBoxFlat:
-	var box := StyleBoxFlat.new()
-	box.bg_color = Color("3a2412")
-	box.border_color = WOOD_MID
-	box.set_border_width_all(1)
-	box.set_content_margin_all(4)
-	box.shadow_color = Color(0, 0, 0, 0.4)
-	box.shadow_size = 2
-	box.shadow_offset = Vector2(1, 1)
+## The game's own wood-and-gold panel, as on every other screen.
+func _make_note_box() -> StyleBox:
+	var box := ThemeDB.get_project_theme().get_stylebox("panel", "PanelContainer").duplicate() as StyleBox
+	box.content_margin_left = 7
+	box.content_margin_right = 7
+	box.content_margin_top = 5
+	box.content_margin_bottom = 5
 	return box

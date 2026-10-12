@@ -42,6 +42,8 @@ var _panel: PanelContainer
 var _tab := Tab.JOURNAL
 var _tab_labels: Array[Label] = []
 var _scroll: ScrollContainer
+var _fade_below: TextureRect
+var _fade_above: TextureRect
 var _body: VBoxContainer
 ## The Backpack's slots in reading order, what each one holds
 ## ({"name", "count", "facts", "description"}), and the one under the cursor.
@@ -88,7 +90,17 @@ func _ready() -> void:
 	_scroll.custom_minimum_size.x = LINE_WIDTH + 8
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	column.add_child(_scroll)
+	# The page sits in a holder with a soft fade at whichever edge has more
+	# to scroll to, so a line is never sliced off hard at the edge.
+	var holder := Control.new()
+	holder.custom_minimum_size.x = LINE_WIDTH + 8
+	holder.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	holder.clip_contents = true
+	column.add_child(holder)
+	_scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
+	holder.add_child(_scroll)
+	_fade_below = _edge_fade(holder, false)
+	_fade_above = _edge_fade(holder, true)
 	_detail = VBoxContainer.new()
 	_detail.add_theme_constant_override("separation", 0)
 	column.add_child(_detail)
@@ -162,6 +174,7 @@ func open(which := Tab.JOURNAL) -> void:
 	_panel.visible = true
 	show_tab(which)
 	GameClock.paused = true
+	MenuInput.pop_in(_panel)
 	_set_player_can_act(false)
 
 
@@ -169,6 +182,7 @@ func close() -> void:
 	if not is_open():
 		return
 	_panel.visible = false
+	Sound.play("ui_close")
 	GameClock.paused = false
 	_set_player_can_act(true)
 
@@ -294,22 +308,28 @@ func _refresh_hints() -> void:
 		MenuInput.button(tree, "%s/Esc" % TAB_KEYS[_tab], close_key)]
 
 
-## "More v" while there's more page below, "^ More above" at the end of a long page.
+## "More below" with a down arrow while there's more page below, "More above" with an up arrow at the end of a long page.
 func _refresh_more() -> void:
 	var bar := _scroll.get_v_scroll_bar()
 	var hidden_below := bar.max_value - bar.page - _scroll.scroll_vertical
+	_fade_below.visible = hidden_below > 1.0
+	_fade_above.visible = _scroll.scroll_vertical > 0
 	if hidden_below > 1.0:
-		_more.text = "More below  v"
+		_more.text = "More below   "
+		MenuInput.badge(_more, load("res://assets/ui/next.png"), true)
 	elif _scroll.scroll_vertical > 0:
-		_more.text = "^  More above"
+		_more.text = "More above   "
+		MenuInput.badge(_more, load("res://assets/ui/next.png"), true, true)
 	else:
 		_more.text = ""
+		MenuInput.badge(_more, null, true)
 
 
 # ---------------------------------------------------------------- the Journal tab
 
 func _journal_page() -> void:
 	_register()
+	_friends()
 	if QuestLog.final_entry >= 0:
 		_heading("The last page")
 		var entry: String = QuestLog.FINAL_ENTRIES[QuestLog.final_entry].entry
@@ -328,11 +348,48 @@ func _register() -> void:
 		return
 	_heading("The Guardian's Register: %d page%s" % [pages.size(), "" if pages.size() == 1 else "s"])
 	for page: Dictionary in pages:
-		_line("%s: %s" % [page.by, page.text])
+		_line("%s · %s" % [page.by, page.text])
 		for note: String in page.notes:
 			_line("     " + note, DIM)
 		if page.review:
 			_line("     (Placeholder pending tribal review.)", DIM)
+
+
+## Everyone you've got to know, with their hearts (Friendship).
+func _friends() -> void:
+	var known: Array[CharacterData] = []
+	for character: CharacterData in QuestLog.CHARACTERS + QuestLog.STAFF:
+		if int(Friendship.points.get(character.id, 0)) > 0:
+			known.append(character)
+	_heading("Friends")
+	if known.is_empty():
+		_line("Talk with people each day, finish their quests, and bring them a gift now and then (G) to get to know them.", DIM)
+		return
+	known.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return Friendship.points[a.id] > Friendship.points[b.id])
+	for character in known:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 1)
+		var face := _face(character.display_name, 16)
+		face.custom_minimum_size.x = 20 # a little room after the face
+		row.add_child(face)
+		var name_label := Label.new()
+		name_label.text = character.display_name
+		name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		name_label.custom_minimum_size.x = 124
+		row.add_child(name_label)
+		var hearts := Friendship.hearts(character.id)
+		for i in Friendship.MAX_HEARTS:
+			var heart := TextureRect.new()
+			heart.texture = Hearts.texture(i < hearts)
+			heart.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+			heart.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			row.add_child(heart)
+		if not Friendship.can_gift(character.id):
+			var note := Label.new()
+			note.text = "   gift given this week"
+			note.add_theme_color_override("font_color", DIM)
+			row.add_child(note)
+		_body.add_child(row)
 
 
 ## The guidebook's tick list: every route, its grade, the gear it needs, and
@@ -352,9 +409,8 @@ func _guidebook() -> void:
 		if route.guide_chapter != chapter:
 			chapter = route.guide_chapter
 			_line(chapter.to_upper(), DIM)
-		var box := "[x]" if entry.ticked else "[ ]"
 		var star := " *" if entry.main else ""
-		_line("%s %s%s  %s" % [box, route.display_name, star, route.grade], Color(0.7, 1.0, 0.7) if entry.ticked else Color.WHITE)
+		_check_line(entry.ticked, "%s%s  %s" % [route.display_name, star, route.grade], Color(0.7, 1.0, 0.7) if entry.ticked else Color.WHITE)
 		if not entry.ticked:
 			var need: String = Guidebook.gear_text(route)
 			if entry.ready:
@@ -374,7 +430,7 @@ func _perks() -> void:
 		else:
 			var p := Perks.progress(perk)
 			var count := " (%d of %d)" % [p[0], p[1]] if p[1] > 1 else ""
-			_line("[ ] %s: %s%s" % [perk.name, perk.how, count], DIM)
+			_check_line(false, "%s: %s%s" % [perk.name, perk.how, count], DIM)
 
 
 # ---------------------------------------------------------------- the Quests tab
@@ -383,7 +439,7 @@ func _quests_page() -> void:
 	_heading("Main story")
 	var main := QuestLog.main_objective()
 	if not main.is_empty():
-		_line("%s: %s" % [main.quest.title, main.objective])
+		_quest_card(main.quest, main.objective)
 	elif not QuestLog.has_guidebook():
 		_line("Pick up a climbing guidebook at the Mountain Shop in Curry Village.")
 	elif QuestLog.final_entry_pending():
@@ -393,14 +449,81 @@ func _quests_page() -> void:
 	else:
 		_line("Explore, and talk to people around the valley.", DIM)
 
-	var objectives := QuestLog.objectives()
-	_heading("Open quests (%d)" % objectives.size())
-	if objectives.is_empty():
+	var open: Array[QuestData] = []
+	for quest: QuestData in QuestLog.QUESTS:
+		if QuestLog.active.has(quest.id) and (main.is_empty() or quest != main.quest):
+			open.append(quest)
+	_heading("Open quests (%d)" % open.size())
+	if open.is_empty():
 		_line("No open quests. Talk to people around the valley.", DIM)
-	for text in objectives:
-		_line("- " + text)
-	if Array(objectives).any(func(text: String) -> bool: return text.begins_with("* ")):
-		_line("* Part of the main story.", DIM)
+	for quest in open:
+		_quest_card(quest, QuestLog.objective_text(quest))
+
+	# Who has something for you, as on a help-wanted board.
+	var asking: Array[CharacterData] = []
+	for character: CharacterData in QuestLog.CHARACTERS:
+		var offer: QuestData = QuestLog.available_from(character.id)
+		# the main story's next step is already shown above
+		if offer != null and (main.is_empty() or offer != main.quest):
+			asking.append(character)
+	if not asking.is_empty():
+		_heading("Looking for help (%d)" % asking.size())
+		var flow := HFlowContainer.new()
+		flow.add_theme_constant_override("h_separation", 10)
+		flow.add_theme_constant_override("v_separation", 4)
+		flow.custom_minimum_size.x = LINE_WIDTH
+		for character in asking:
+			var who := HBoxContainer.new()
+			who.add_theme_constant_override("separation", 4)
+			who.add_child(_face(character.display_name, 24))
+			var name_label := Label.new()
+			name_label.text = character.display_name + ("  · %s" % character.home if character.home != "" else "")
+			name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			who.add_child(name_label)
+			flow.add_child(who)
+		_body.add_child(flow)
+
+
+## A quest as a card: the face of whoever gave it, its title, and what to do
+## next.
+func _quest_card(quest: QuestData, objective: String) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	var giver := QuestLog.get_character(quest.giver)
+	row.add_child(_face(giver.display_name if giver else "", 32))
+	var words := VBoxContainer.new()
+	words.add_theme_constant_override("separation", 0)
+	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var title := Label.new()
+	title.text = quest.title + ("  · from %s" % giver.display_name if giver else "")
+	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.5))
+	words.add_child(title)
+	var step := Label.new()
+	step.text = objective
+	step.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	step.custom_minimum_size.x = LINE_WIDTH - 40
+	words.add_child(step)
+	row.add_child(words)
+	_body.add_child(row)
+
+
+## A small framed portrait of [param speaker] (blank if they have none).
+func _face(speaker: String, side: int) -> Control:
+	var frame := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color("5a4634")
+	style.border_color = Color("c8a060")
+	style.set_border_width_all(1)
+	frame.add_theme_stylebox_override("panel", style)
+	frame.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	var picture := TextureRect.new()
+	picture.texture = Portraits.for_speaker(speaker)
+	picture.custom_minimum_size = Vector2(side, side)
+	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	frame.add_child(picture)
+	return frame
 
 
 # ---------------------------------------------------------------- the Backpack tab
@@ -493,7 +616,12 @@ func _slot(item: Dictionary) -> PanelContainer:
 		count.text = str(item.count)
 		count.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		count.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-		count.add_theme_constant_override("outline_size", 3)
+		# small, in the bottom-right corner, ringed in dark: clear of the art
+		count.size_flags_horizontal = Control.SIZE_SHRINK_END
+		count.size_flags_vertical = Control.SIZE_SHRINK_END
+		count.add_theme_font_size_override("font_size", 8)
+		count.add_theme_color_override("font_outline_color", Color("2a1f1a"))
+		count.add_theme_constant_override("outline_size", 4)
 		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		slot.add_child(count)
 	_slots.append(slot)
@@ -576,6 +704,17 @@ func _rule() -> ColorRect:
 	rule.custom_minimum_size = Vector2(LINE_WIDTH, 1)
 	rule.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	return rule
+
+
+## A strip that fades the page into the panel at its top or bottom edge.
+func _edge_fade(holder: Control, top: bool) -> TextureRect:
+	return MenuInput.edge_fade(holder, top, 8.0)
+
+
+## A line with a drawn checkbox in front of it (ticked or not).
+func _check_line(ticked: bool, text: String, color := Color.WHITE) -> void:
+	_line("     " + text, color)
+	MenuInput.badge(_body.get_child(_body.get_child_count() - 1), MenuInput.checkbox_texture(ticked))
 
 
 func _line(text: String, color := Color.WHITE) -> void:

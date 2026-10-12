@@ -25,10 +25,10 @@ func _ready() -> void:
 			_resize("Collision", body_size, Vector2(0, -body_size.y / 2.0))
 		if reach_size.x > 0.0:
 			_resize("Hitbox/Shape", reach_size, Vector2(0, -reach_size.y / 2.0 - 2.0))
-		if station == "campfire":
-			_add_fire_effects()
 	else:
 		queue_redraw()
+	if station == "campfire":
+		_add_fire_effects()
 
 
 func _add_sprite() -> void:
@@ -74,23 +74,122 @@ func _add_fire_effects() -> void:
 	add_child(light)
 
 
-## Placeholder art until real sprites exist.
+## Without painted art the station draws itself in pixels, in the sprites'
+## style (shaded from the upper left, a dark rim): a ring of stones round
+## burning logs with a flickering flame, a granite slab with mortar holes, or
+## a sand basin with water.
+const RIM := Color("2a1f1a")
+const STONE := Color("8a8a90")
+const STONE_LIT := Color("b0b0b6")
+const STONE_DARK := Color("5a5a62")
+const LOG := Color("6a4024")
+const LOG_LIT := Color("8a5a34")
+const FLAME := [Color("f8e070"), Color("f8a030"), Color("e05a20")]
+
+var _flicker := 0.0
+
+
+func _process(delta: float) -> void:
+	if texture or station != "campfire":
+		set_process(false)
+		return
+	_flicker += delta
+	if int(_flicker * 8.0) != int((_flicker - delta) * 8.0):
+		queue_redraw()
+
+
+func _px(x: float, y: float, w: float, h: float, color: Color) -> void:
+	draw_rect(Rect2(x, y, w, h), color)
+
+
 func _draw() -> void:
 	if texture:
 		return
 	match station:
 		"campfire":
-			for i in 5:
-				var angle := TAU * i / 5.0
-				draw_circle(Vector2(cos(angle), sin(angle) * 0.5) * 6 + Vector2(0, -3), 2.0, Color(0.5, 0.48, 0.45))
-			draw_colored_polygon(PackedVector2Array([Vector2(-3, -3), Vector2(3, -3), Vector2(0, -11)]), Color(1.0, 0.55, 0.15))
+			_draw_campfire()
 		"mortar":
-			draw_rect(Rect2(-10, -8, 20, 9), Color(0.6, 0.58, 0.55))
-			draw_circle(Vector2(-4, -4), 2.0, Color(0.35, 0.33, 0.3))
-			draw_circle(Vector2(4, -4), 2.0, Color(0.35, 0.33, 0.3))
+			# a low granite slab with two worn grinding holes
+			_px(-11, -8, 22, 9, RIM)
+			_px(-10, -7, 20, 7, STONE)
+			_px(-10, -7, 20, 1, STONE_LIT)
+			_px(-10, -2, 20, 2, STONE_DARK)
+			for x in [-6, 3]:
+				_px(x, -5, 4, 2, STONE_DARK.darkened(0.3))
+				_px(x, -5, 4, 1, RIM)
 		"leaching":
-			draw_circle(Vector2(0, -4), 7.0, Color(0.75, 0.68, 0.5))
-			draw_circle(Vector2(0, -4), 4.5, Color(0.4, 0.6, 0.8))
+			# a sand basin by the river with water standing in it
+			_px(-9, -9, 18, 10, RIM)
+			_px(-8, -8, 16, 8, Color("d8c090"))
+			_px(-8, -8, 16, 1, Color("ecd8a8"))
+			_px(-5, -6, 10, 4, Color("4a8ac8"))
+			_px(-5, -6, 10, 1, Color("8ac0e8"))
+
+
+func _draw_campfire() -> void:
+	# the stone ring, back stones first
+	var stones := [Vector2(-7, -6), Vector2(-3, -8), Vector2(2, -8), Vector2(6, -6), Vector2(7, -2), Vector2(-8, -2), Vector2(-4, 0), Vector2(1, 0), Vector2(5, 0)]
+	for at: Vector2 in stones.slice(0, 4):
+		_stone(at)
+	# crossed logs, glowing at the ends
+	_px(-6, -5, 12, 3, RIM)
+	_px(-5, -4, 10, 1, LOG_LIT)
+	_px(-5, -3, 10, 1, LOG)
+	_px(-2, -7, 4, 6, RIM)
+	_px(-1, -6, 2, 4, LOG_LIT)
+	_px(-5, -4, 1, 2, Color("f08030"))
+	_px(4, -4, 1, 2, Color("f08030"))
+	# the flame: three layers that lean and flicker
+	var frame := int(_flicker * 8.0) % 4
+	var lean: int = [0, 1, 0, -1][frame]
+	var tall: int = [0, 1, 2, 1][frame]
+	_px(-3 + lean, -10 - tall, 6, 6 + tall, FLAME[2])
+	_px(-2 + lean, -12 - tall, 4, 7 + tall, FLAME[1])
+	_px(-1 + lean, -13 - tall, 2, 6 + tall, FLAME[0])
+	_px(0 + lean * 2, -15 - tall, 1, 2, FLAME[1])
+	# front stones last, over the logs
+	for at: Vector2 in stones.slice(4):
+		_stone(at)
+
+
+func _stone(at: Vector2) -> void:
+	_px(at.x - 2, at.y - 2, 5, 4, RIM)
+	_px(at.x - 1, at.y - 1, 3, 2, STONE)
+	_px(at.x - 1, at.y - 1, 2, 1, STONE_LIT)
+	_px(at.x + 1, at.y, 1, 1, STONE_DARK)
+
+
+## The cooking menu for [param recipes]: each dish's name and picture, and a
+## card for each with what goes in (what you have of each, in red when short),
+## how much energy it gives, how long it takes, and its note. Then "Leave".
+static func menu_for(recipes: Array[RecipeData]) -> Dictionary:
+	var options := []
+	var icons := []
+	var details := []
+	for recipe in recipes:
+		var dish := ItemDB.get_item(recipe.output_id)
+		icons.append(dish.icon if dish else null)
+		options.append(recipe.display_name)
+		var rows := []
+		for id: String in recipe.inputs:
+			var item := ItemDB.get_item(id)
+			var need := int(recipe.inputs[id])
+			var have := Inventory.count(id)
+			rows.append([item.icon if item else null, "%s  %d/%d" % [item.display_name if item else id, have, need], have < need])
+		var facts := PackedStringArray()
+		var energy := FoodDB.energy(recipe.output_id)
+		if energy > 0:
+			facts.append("%d energy" % energy)
+		var minutes := Perks.recipe_minutes(recipe)
+		facts.append("%d min" % minutes if minutes < 60 else ("%d hr" % (minutes / 60) if minutes % 60 == 0 else "%d hr %d min" % [minutes / 60, minutes % 60]))
+		if recipe.output_count > 1:
+			facts.insert(0, "Makes %d" % recipe.output_count)
+		details.append({"title": "You'll need" if Recipes.can_make(recipe) else "You're short", "rows": rows,
+			"facts": " · ".join(facts), "note": recipe.description})
+	options.append("Leave")
+	icons.append(null)
+	details.append(null)
+	return {"options": options, "icons": icons, "details": details}
 
 
 func interact(player: Player) -> void:
@@ -98,14 +197,10 @@ func interact(player: Player) -> void:
 	if recipes.is_empty():
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s. You don't know anything to make here yet." % display_name}])
 		return
-	var options := []
-	for recipe in recipes:
-		var mark := "" if Recipes.can_make(recipe) else " (missing ingredients)"
-		options.append("%s: %s%s" % [recipe.display_name, Recipes.describe_inputs(recipe), mark])
-	options.append("Leave")
+	var menu := menu_for(recipes)
 	player.can_act = false
 	var box := DialogueBox.open(player)
-	var choice := await box.choose("%s. What will you make?" % display_name, options)
+	var choice := await box.choose("%s. What will you make?" % display_name, menu.options, "", menu.icons, menu.details)
 	if choice >= 0 and choice < recipes.size():
 		var recipe := recipes[choice]
 		if Recipes.make(recipe):
