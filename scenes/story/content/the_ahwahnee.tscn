@@ -4,6 +4,7 @@
 [ext_resource type="Resource" path="res://data/characters/royal_robbins.tres" id="2_r"]
 [ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="3_r"]
 [ext_resource type="Resource" path="res://data/routes/royal_arches.tres" id="4_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/shuttle_stop.tscn" id="5_r"]
 
 [node name="TheAhwahneeStory" type="Node2D"]
 
@@ -14,3 +15,7 @@ position = Vector2(1028, 238)
 [node name="RoyalArches" parent="." instance=ExtResource("3_r")]
 position = Vector2(1004, 226)
 route = ExtResource("4_r")
+
+[node name="ShuttleAhwahnee" parent="." instance=ExtResource("5_r")]
+position = Vector2(824, 764)
+stop_name = "The Ahwahnee"

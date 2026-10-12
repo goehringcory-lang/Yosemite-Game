@@ -125,6 +125,7 @@ func _ready() -> void:
 	await _check_controls(world)
 	await _check_menus(world)
 	await _check_central_hub(world)
+	await _check_getting_around(world)
 	await _check_curfew(world)
 
 	# Winter closes both seasonal roads.
@@ -442,6 +443,64 @@ func _check_central_hub(world: Node) -> void:
 		add_child(probe)
 		check(probe.get_spawn(dest.spawn) != null, "shuttle stop %s has a spot to land on" % dest.name)
 		probe.free()
+
+
+## Holding the run button covers ground faster, and the Ahwahnee is joined to
+## the rest of the Valley both ways: a trailhead sign on the Valley map leads
+## in, and the shuttle stops at its entrance circle.
+func _check_getting_around(world: Node) -> void:
+	var player: Player = world.player
+	world._enter_region("the_ahwahnee", "entrance_circle")
+	var walked := await _distance_moved(player, "move_down", false)
+	player.position = world.region.get_spawn("entrance_circle").position
+	var ran := await _distance_moved(player, "move_down", true)
+	check(walked > 4.0 and is_equal_approx(ran / walked, Player.RUN_BOOST), "holding run is %.2fx walking (%.1f px to %.1f px)" % [Player.RUN_BOOST, walked, ran])
+	var joypad := InputMap.action_get_events("run").any(func(e: InputEvent) -> bool: return e is InputEventJoypadButton or e is InputEventJoypadMotion)
+	var keyboard := InputMap.action_get_events("run").any(func(e: InputEvent) -> bool: return e is InputEventKey)
+	check(joypad and keyboard, "run works on keyboard and gamepad")
+
+	var stop: ShuttleStop = world.region.find_child("ShuttleAhwahnee", true, false)
+	check(stop != null and await _can_use(player, stop), "the Ahwahnee has a shuttle stop you can walk up to")
+	check(stop != null and stop.destinations().size() == ShuttleStop.STOPS.size() - 1, "it rides to every other stop")
+
+	# Out by Northside Drive and back in by the trailhead sign beside it.
+	var road: RegionExit = world.region.find_child("NorthsideDriveWest", true, false)
+	await world.go_to_region(road.target_region, road.target_spawn)
+	var door: RegionDoor = world.region.find_child("AhwahneeDoor", true, false)
+	check(door != null and door.position.distance_to(world.region.get_spawn(road.target_spawn).position) < 64.0,
+		"the way back into the Ahwahnee is beside where its road comes out")
+	check(door != null and await _can_use(player, door), "and it can be walked up to")
+	door.interact(player)
+	await get_tree().create_timer(2.5).timeout
+	check(world.region.region_id == "the_ahwahnee" and not player.test_move(player.global_transform, Vector2.ZERO),
+		"the sign leads back into the Ahwahnee grounds")
+	world._enter_region(Park.HOME_REGION, Park.HOME_SPAWN)
+
+
+## How far the player gets in a few physics frames of holding [param action].
+func _distance_moved(player: Player, action: String, run: bool) -> float:
+	await get_tree().physics_frame
+	var from := player.position
+	Input.action_press(action)
+	if run:
+		Input.action_press("run")
+	for i in 3:
+		await get_tree().physics_frame
+	Input.action_release(action)
+	Input.action_release("run")
+	await get_tree().physics_frame
+	return player.position.distance_to(from)
+
+
+## Standing just south of [param target] and facing it, is it what the
+## interact button would use?
+func _can_use(player: Player, target: Node2D) -> bool:
+	player.global_position = target.global_position + Vector2(0, 8)
+	player.facing = Vector2i.UP
+	player.interaction_area.position = Vector2(0, -12)
+	for i in 3:
+		await get_tree().physics_frame
+	return not player.test_move(player.global_transform, Vector2.ZERO) and player.get_target() == target
 
 
 ## The pass-out hour arriving mid-ride or mid-conversation isn't lost: the

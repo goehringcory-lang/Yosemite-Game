@@ -89,6 +89,12 @@ label = "Curry Village"
 target_region = "curry_village"
 target_spawn = "west_road"
 
+[node name="AhwahneeDoor" parent="." instance=ExtResource("door_r")]
+position = Vector2(3352, 632)
+label = "The Ahwahnee"
+target_region = "the_ahwahnee"
+target_spawn = "west_road"
+
 [node name="HigherCathedralSpire" parent="." instance=ExtResource("3_r")]
 position = Vector2(1512, 1688)
 route = ExtResource("spire_r")

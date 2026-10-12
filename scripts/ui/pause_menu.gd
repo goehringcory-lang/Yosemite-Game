@@ -13,7 +13,7 @@ signal closed
 enum Page { MAIN, SETTINGS, CONTROLS }
 
 const CONTROLS := [
-	["Walk", "WASD or arrow keys", "Left stick or D-pad"],
+	["Walk (hold to run)", "WASD or arrows (Shift)", "Stick or D-pad (B or RT)"],
 	["Talk, read, use", "E, Space, X, C, or click", "A or X"],
 	["Give a gift", "G", "LB"],
 	["Park and area map", "M (Tab: tabs)", "Back (LB/RB: tabs)"],
