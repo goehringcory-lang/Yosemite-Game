@@ -116,6 +116,11 @@ func _process(delta: float) -> void:
 			_try_spawn()
 	var view := _view().grow(40.0)
 	var player := _player_position()
+	if not active:
+		# dusk, rain or indoors: the birds still about fly off, quietly
+		for bird in _birds:
+			if bird.state != "fly":
+				_take_off(bird, bird.pos + Vector2(_rng.randf_range(-4.0, 4.0), 6.0), false)
 	for bird in _birds:
 		_update_bird(bird, delta, player)
 	for fly in _flies:
@@ -189,7 +194,7 @@ func _update_bird(bird: Dictionary, delta: float, player: Vector2) -> void:
 			bird.vel.y -= 30.0 * delta
 
 
-func _take_off(bird: Dictionary, player: Vector2) -> void:
+func _take_off(bird: Dictionary, player: Vector2, loud := true) -> void:
 	bird.state = "fly"
 	var away: Vector2 = (bird.pos - player).normalized()
 	if away == Vector2.ZERO:
@@ -202,7 +207,8 @@ func _take_off(bird: Dictionary, player: Vector2) -> void:
 			other.state = "fly"
 			other.vel = (bird.vel.rotated(_rng.randf_range(-0.4, 0.4))) * _rng.randf_range(0.9, 1.1)
 			other.facing = bird.facing
-	Sound.play("flutter", -4.0, 0.15)
+	if loud:
+		Sound.play("flutter", -4.0, 0.15)
 
 
 func _update_butterfly(fly: Dictionary, delta: float, active: bool) -> void:

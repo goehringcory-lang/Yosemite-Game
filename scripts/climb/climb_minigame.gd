@@ -1022,19 +1022,22 @@ func _draw_reachable() -> void:
 			label += " rest"
 		elif hold.get("fixed", false):
 			label += " fixed"
+		# the number in cream (the ring's colour says how hard; a green "-1"
+		# read as a gain), unless it's a rest or crux, which keep their colour
+		var ink: Color = color if hold.get("rest", false) or hold.get("crux", false) else UI.CREAM
 		# Left ring's label goes left, the middle one above, the right one
 		# right. Under a roof the three rings sit almost on top of each other,
 		# so their labels stack in a list beside them instead.
 		if _roof:
-			UI.outlined(_canvas, p + Vector2(9, -7 + (dx + 1) * 10), label, color, 10)
+			UI.outlined(_canvas, p + Vector2(9, -7 + (dx + 1) * 10), label, ink, 10)
 		else:
 			match dx:
 				-1:
-					UI.outlined(_canvas, p + Vector2(-9, -1), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_RIGHT)
+					UI.outlined(_canvas, p + Vector2(-9, -1), label, ink, 10, -1.0, HORIZONTAL_ALIGNMENT_RIGHT)
 				0:
-					UI.outlined(_canvas, p + Vector2(0, -11), label, color, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+					UI.outlined(_canvas, p + Vector2(0, -11), label, ink, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 				_:
-					UI.outlined(_canvas, p + Vector2(9, -1), label, color, 10)
+					UI.outlined(_canvas, p + Vector2(9, -1), label, ink, 10)
 		if state.stamina - cost <= 0 and not hold.get("crux", false):
 			UI.outlined(_canvas, p + Vector2(0, 17), "fall!", UI.WARN, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 

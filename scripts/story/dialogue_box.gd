@@ -173,6 +173,9 @@ func _ready() -> void:
 	_detail_panel.custom_minimum_size.x = DETAIL_WIDTH
 	_detail_panel.visible = false
 	row.add_child(_detail_panel)
+	# the card sits between the words and the face, so the face keeps the
+	# box's right end, as it does in Stardew Valley
+	row.move_child(_detail_panel, _portrait_frame.get_index())
 	_detail_column = VBoxContainer.new()
 	_detail_column.add_theme_constant_override("separation", 1)
 	_detail_panel.add_child(_detail_column)

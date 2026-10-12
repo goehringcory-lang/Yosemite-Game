@@ -255,13 +255,17 @@ func test_critters(world: Node) -> void:
 	check(critters._outdoors_by_day() == (not world.region.indoors and not rainy), "out by day in fair weather outdoors")
 	GameClock.minutes = 22 * 60
 	check(not critters._outdoors_by_day(), "not after dark")
+	var late := critters.add_bird("junco", world.player.global_position + Vector2(-80, 0))
+	critters._process(0.016)
+	check(late.state == "fly", "a bird still about after dark flies off")
 	GameClock.minutes = 10 * 60
-	var bird := critters.add_bird("robin", world.player.global_position + Vector2(80, 0))
-	critters._process(0.016)
-	check(bird.state != "fly", "a bird keeps pecking while you're far off")
-	bird.pos = world.player.global_position + Vector2(Critters.FLEE_DISTANCE - 6.0, 0)
-	critters._process(0.016)
-	check(bird.state == "fly" and bird.vel.x > 0.0, "and flies off away from you when you come close")
+	if critters._outdoors_by_day():
+		var bird := critters.add_bird("robin", world.player.global_position + Vector2(80, 0))
+		critters._process(0.016)
+		check(bird.state != "fly", "a bird keeps pecking while you're far off")
+		bird.pos = world.player.global_position + Vector2(Critters.FLEE_DISTANCE - 6.0, 0)
+		critters._process(0.016)
+		check(bird.state == "fly" and bird.vel.x > 0.0, "and flies off away from you when you come close")
 	var winter_kinds := []
 	for kind: String in Critters.BIRDS:
 		if GameClock.Season.WINTER in Critters.BIRDS[kind].seasons:

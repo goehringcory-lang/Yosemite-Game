@@ -62,6 +62,7 @@ func _ready() -> void:
 	add_child(day_log)
 	add_child(Critters.new())
 	add_child(Rustle.new())
+	add_child(StringLights.new())
 	var saved := SaveManager.peek_node(name)
 	var start := str(saved.get("region", Park.HOME_REGION))
 	if not ResourceLoader.exists(region_scene_path(start)):

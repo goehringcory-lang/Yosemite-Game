@@ -39,9 +39,10 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | The clock dial | A window of sky: the sun crosses over Half Dome, moon and stars at night, dawn, gold and dusk skies, clouds, rain and snow | `scripts/ui/clock_dial.gd` | test (sun rises left, high at noon, sets right; moon up at night; sky colors); shot `polish_clock_dial.png` |
 | The end-of-day tally | The day's page at bedtime: things found and given with pictures, gear, first ascents, quests, perks, recipes, dishes | `scripts/story/day_log.gd`, `scripts/ui/day_summary.gd` | test (counts, saved with the game, clears each morning, opens and closes); shot `polish_day_summary.png` |
 | Grass that moves as you walk through it | Ferns, bracken, shrubs and flowers sway in a damped wobble with a soft rustle when you brush past | `scripts/world/rustle.gd` | test (walking through sets a fern swaying; it leans, then settles upright) |
-| Critters | Steller's jays, juncos, robins and quail hop and peck, and fly off as you come near; butterflies on fair spring and summer days | `scripts/world/critters.gd`, `tools/npcgen/critter_art.gd` | test (by day outdoors only, flee when close, the right birds each season); shot `polish_critters.png` |
+| Critters | Steller's jays, juncos, robins and quail hop and peck, fly off as you come near, and leave at dusk or in rain; butterflies on fair spring and summer days | `scripts/world/critters.gd`, `tools/npcgen/critter_art.gd` | test (by day outdoors only, flee when close, the right birds each season); shot `polish_critters.png` |
 | Seasons you can see | Blossom and leaf drift, seasonal trees and ground, snow, waterfalls that run dry (existing) | `seasonal_*.gd`, `ambient_fx.gd`, `weather.gd` | smoke and audio tests |
 | Night lighting | Windows, lamps, tents and fires glow; fireflies (existing) | `night_light.gd`, `night_glow.gd` | by eye (`docs/camp4_night.png`) |
+| String lights at night | The bulbs strung over Curry Village's plaza glow after dusk with the lit windows | `scripts/world/string_lights.gd` | shot `polish_clock_23.png` |
 | Weather | Rain, snow, cloud shadows, overcast tint (existing) | `weather.gd`, `cloud_shadows.gd` | `docs/weather_winter_snow.png` |
 | Smooth camera and fades | Camera smoothing, fades between places (existing) | `player.tscn`, `hud.gd` | travel test |
 

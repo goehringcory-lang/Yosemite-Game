@@ -697,21 +697,23 @@ func _duff(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 ## and moss only sits in a few joints.
 func _flagstone(x: int, y: int, a: float, _n: float, r: float) -> Color:
 	var i := y * _pw + x
-	var wob_y := int((float(_nb[i]) / 255.0 - 0.5) * 6.0)
+	# Slabs about 16x9, a person standing on two or three of them: big slabs
+	# in straight courses read as a wall standing up, not a floor.
+	var wob_y := int((float(_nb[i]) / 255.0 - 0.5) * 4.0)
 	var yy := y + wob_y
-	var row := floori(float(yy) / 13.0)
-	var ly := yy - row * 13
-	var off := int(hash2(row, 3, seed_value) * 22.0)
+	var row := floori(float(yy) / 9.0)
+	var ly := yy - row * 9
+	var off := int(hash2(row, 3, seed_value) * 14.0)
 	var xs := x + off + int((float(_nb[i]) / 255.0 - 0.5) * 4.0)
-	# Vertical joints: one per 24-pixel column, each jittered within its column.
-	var k0 := floori(float(xs) / 24.0)
-	var p0 := k0 * 24 + int(hash2(k0, row, seed_value + 21) * 12.0)
+	# Vertical joints: one per 16-pixel column, each jittered within its column.
+	var k0 := floori(float(xs) / 16.0)
+	var p0 := k0 * 16 + int(hash2(k0, row, seed_value + 21) * 8.0)
 	var slab := k0
 	var start := p0
-	var stop := (k0 + 1) * 24 + int(hash2(k0 + 1, row, seed_value + 21) * 12.0)
+	var stop := (k0 + 1) * 16 + int(hash2(k0 + 1, row, seed_value + 21) * 8.0)
 	if xs < p0:
 		slab = k0 - 1
-		start = (k0 - 1) * 24 + int(hash2(k0 - 1, row, seed_value + 21) * 12.0)
+		start = (k0 - 1) * 16 + int(hash2(k0 - 1, row, seed_value + 21) * 8.0)
 		stop = p0
 	var lx := xs - start
 	var sw := stop - start
@@ -731,7 +733,7 @@ func _flagstone(x: int, y: int, a: float, _n: float, r: float) -> Color:
 	col = col.lightened(0.05 * smooth(0.55, 0.85, a))
 	if lx == 1 or ly == 1:
 		col = col.lightened(0.12)
-	elif lx >= sw - 2 or ly >= 12:
+	elif lx >= sw - 2 or ly >= 8:
 		col = col.darkened(0.1)
 	# Specks in small clusters, not per pixel.
 	var sp := hash2(x / 2, y / 2, 97)
