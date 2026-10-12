@@ -12,6 +12,8 @@ extends Node
 signal changed
 signal quest_started(quest: QuestData)
 signal quest_completed(quest: QuestData)
+## Sent on a first ascent of a route.
+signal ticked(route_id: String)
 
 const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/leonard_belay.tres"),
@@ -184,6 +186,7 @@ func record_climb(route_id: String) -> bool:
 		return false
 	climbed.append(route_id)
 	changed.emit()
+	ticked.emit(route_id)
 	return true
 
 

@@ -57,4 +57,16 @@ func _ready() -> void:
 	QuestLog.completed.append("clark_register")
 	await world.go_to_region("curry_mountain_shop", "arrival")
 	await _snap(dir, "marker", 40)
+	# The day's page at bedtime.
+	world.day_log.clear()
+	for id in ["miners_lettuce", "miners_lettuce", "miners_lettuce", "wild_strawberry", "sierra_onion", "black_oak_acorn", "black_oak_acorn", "acorn_cake"]:
+		Inventory.add(id)
+	Gear.add("quickdraw", 2)
+	world.day_log.ticks.append("Firefall Slab")
+	world.day_log.quests.append("Partner for the Apron")
+	world.day_log.perks.append("Enid's Eye")
+	world.day_log.dishes = 2
+	var page := DaySummary.open(world, world.day_log)
+	await _snap(dir, "day_summary", 90)
+	page.press()
 	get_tree().quit()

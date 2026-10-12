@@ -50,6 +50,7 @@ func _ready() -> void:
 	device_changed.connect(_refresh_status)
 	toasts = ItemToasts.new()
 	add_child(toasts)
+	move_child(toasts, fade.get_index()) # under the fade, so the black covers it
 	Inventory.added.connect(_on_item_added)
 	Gear.added.connect(_on_gear_added)
 	var panel := PanelContainer.new()
