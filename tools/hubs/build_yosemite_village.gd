@@ -721,6 +721,14 @@ func _dress_village() -> void:
 		_prop("garden_bench", foot(p[0], p[1]) + Vector2(0, 2))
 	for p in [[50, 22], [94, 22], [63, 23], [81, 23]]:
 		_prop(_pick("garden_urn"), foot(p[0], p[1]) + Vector2(0, -2))
+	# Flower barrels either side of each door, a bike rack by the store, and
+	# a fountain in the plaza, so the Village looks lived in.
+	var CS_ := "res://assets/sprites/curry/"
+	for door: Array in [[69, 17], [79, 17], [86, 17], [93, 17], [72, 29], [86, 29]]:
+		for side in [-2, 2]:
+			decor("Planter%d_%d_%d" % [door[0], door[1], side], CS_ + "planter.png", foot(door[0] + side, door[1] + 1) + Vector2(0, -2), Vector2(12, 6))
+	decor("BikeRack", CS_ + "bike_rack.png", foot(77, 30), Vector2(30, 6))
+	decor("PlazaFountain", S + "garden_fountain.png", foot(65, 27), Vector2(60, 20))
 	# Cars parked nose-in along the edges of the Village lot, leaving the
 	# walk from Degnan's door to the road and the shuttle kiosk clear.
 	var cars := [[82, 32, 0], [82, 35, 3], [95, 32, 7], [95, 35, 1]]
