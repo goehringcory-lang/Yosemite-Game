@@ -51,6 +51,7 @@ const DIM := Color(1, 1, 1, 0.6)
 const PANEL_POS := Vector2(30, 16)
 const PANEL_SIZE := Vector2(420, 238)
 const NAME_WIDTH := 96
+const VOLUME_SETTINGS := [Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME]
 
 var _panel: PanelContainer
 var _title: Label
@@ -60,6 +61,8 @@ var _page := Page.MAIN
 var _option_labels: Array[Label] = []
 var _goal_label: Label
 var _setting_names: Array[Label] = []
+## Volume setting -> its slider bar.
+var _sliders: Dictionary = {}
 var _setting_values: Array[Label] = []
 var _help_label: Label
 var _sample_label: Label
@@ -157,7 +160,7 @@ func _build_main() -> Control:
 
 func _build_settings() -> Control:
 	var page := VBoxContainer.new()
-	# Rows sit close so all nine settings, the help and the hint line fit.
+	# Rows sit close so all ten settings, the help and the hint line fit.
 	page.add_theme_constant_override("separation", 0)
 	for i in SETTING_NAMES.size():
 		var row := HBoxContainer.new()
@@ -165,6 +168,14 @@ func _build_settings() -> Control:
 		var name_label := _label(SETTING_NAMES[i])
 		name_label.custom_minimum_size.x = NAME_WIDTH
 		row.add_child(name_label)
+		if i in VOLUME_SETTINGS:
+			# a slider bar for each volume, ten notches, filled to the level
+			var bar := Control.new()
+			bar.custom_minimum_size = Vector2(52, 8)
+			bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			bar.draw.connect(_draw_slider.bind(bar, i))
+			row.add_child(bar)
+			_sliders[i] = bar
 		var value := _label("")
 		row.add_child(value)
 		page.add_child(row)
@@ -408,6 +419,8 @@ func _refresh() -> void:
 	for i in _setting_names.size():
 		_set_choice(_setting_names[i], SETTING_NAMES[i], i == _settings_cursor)
 		_setting_values[i].text = _setting_value(i)
+		if _sliders.has(i):
+			_sliders[i].queue_redraw()
 		_setting_values[i].modulate = DIM if i == Setting.WINDOW_SIZE and Settings.fullscreen else Color.WHITE
 	_help_label.text = SETTING_HELP[_settings_cursor]
 	if _settings_only and _settings_cursor == Setting.BACK:
@@ -443,6 +456,19 @@ func _setting_value(which: int) -> String:
 		_:
 			return ""
 	return "‹  %s  ›" % value
+
+
+## A volume's slider: ten notches, gold up to the level on the chosen row.
+func _draw_slider(bar: Control, which: int) -> void:
+	var level := _volume(which)
+	var chosen := which == _settings_cursor
+	var on := Color(1.0, 0.85, 0.5) if chosen else Color(0.95, 0.9, 0.78)
+	bar.draw_rect(Rect2(0, 0, 52, 8), Color("2a1f1a"))
+	for n in Settings.MAX_VOLUME:
+		var notch := Rect2(1 + n * 5, 1, 4, 6)
+		bar.draw_rect(notch, on if n < level else Color(0.35, 0.28, 0.22))
+		if n < level:
+			bar.draw_rect(Rect2(notch.position, Vector2(4, 1)), on.lightened(0.4))
 
 
 ## The level of volume setting [param which] (0 to Settings.MAX_VOLUME).
