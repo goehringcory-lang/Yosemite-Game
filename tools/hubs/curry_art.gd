@@ -472,10 +472,16 @@ func flagpole(phase := 0) -> Image:
 	K.vline(im, 4, 4, 44, c("eeeae0"))
 	K.ellipse(im, 5, 3, 1.6, 1.6, c("e0c060"))
 	# the flag, mid-wave, rippling along a different phase in each frame
+	# red and white stripes running along it, shaded where the cloth turns
 	for x in 16:
 		var wave := int(round(sin(x * 0.55 - phase * 2.1) * (0.6 + x * 0.09)))
-		K.rect(im, 6 + x, 6 + wave, 1, 9, c("a83a3a") if x % 8 < 4 else c("bf4a44"))
-		K.px(im, 6 + x, 6 + wave, c("d86a5a"))
+		var turned := cos(x * 0.55 - phase * 2.1) < -0.3
+		for row in 9:
+			var red := row % 2 == 0
+			var col := c("b8403c") if red else c("f2ece0")
+			if turned:
+				col = col.darkened(0.16)
+			K.px(im, 6 + x, 6 + wave + row, col)
 		if x > 0:
 			K.px(im, 6 + x, 15 + wave, c("7a2a2a"))
 	K.rect(im, 7, 8 + int(round(sin(-phase * 2.1) * 0.6)), 6, 5, c("2a3a7a"))
