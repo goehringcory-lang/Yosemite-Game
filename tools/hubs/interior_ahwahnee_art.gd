@@ -30,11 +30,12 @@ func _tone(col: Color, light: float, warm: float) -> Color:
 func _floor(im: Image, y0: int, y1: int, base: Color, seed_value: int) -> void:
 	var bias := base.get_luminance() - 0.36
 	for y in range(y0, y1):
-		var row := (y - y0) / 8
-		var in_row := (y - y0) % 8
+		# boards 40 long and 6 wide, a good deal smaller than a person
+		var row := (y - y0) / 6
+		var in_row := (y - y0) % 6
 		for x in W:
-			var shift := (row % 3) * 37
-			var plank := (x + shift) / 64
+			var shift := (row % 3) * 23
+			var plank := (x + shift) / 40
 			var n := K.hash2(plank, row, seed_value)
 			var t := 0.5 + bias * 1.3 + (n - 0.5) * 0.22 + (K.hash2(x / 3, y / 2, seed_value + 6) - 0.5) * 0.05
 			var idx := roundi(t * 5.0)
@@ -42,14 +43,14 @@ func _floor(im: Image, y0: int, y1: int, base: Color, seed_value: int) -> void:
 				idx = 0
 			elif in_row == 1:
 				idx += 1
-			elif in_row == 7:
+			elif in_row == 5:
 				idx -= 1
-			if (x + shift) % 64 == 0:
+			if (x + shift) % 40 == 0:
 				idx = 0
 			K.px(im, x, y, mat.timber[clampi(idx, 0, 5)])
 		for i in 10:
 			var gx := int(K.hash2(i, y, seed_value + 4) * W)
-			if in_row > 1 and in_row < 7 and K.hash2(gx, y, seed_value + 5) > 0.72:
+			if in_row > 1 and in_row < 5 and K.hash2(gx, y, seed_value + 5) > 0.72:
 				K.px(im, gx, y, mat.timber[1])
 				K.px(im, gx + 1, y, mat.timber[2])
 	for i in 26:
@@ -499,6 +500,31 @@ func shop_room() -> Image:
 	K.rect(im, 216, H - 18, 48, 2, c("e8dcc0"))
 	K.rect(im, 218, H - 4, 44, 4, c("3a5a8a"))
 	K.hline(im, 218, H - 4, 44, c("6a8aba"))
+	# gear hung along the wainscot: helmets, chalk bags and harnesses on pegs
+	for i in range(0, 13):
+		var gx := 34 + i * 34
+		if gx > 196 and gx < 290:
+			continue # the map's wall, left clear
+		K.px(im, gx, 63, c("c8ccd4"))
+		match i % 3:
+			0:
+				var hc := c(["e07a2a", "3a78c0", "e0b030", "c8402e"][i % 4])
+				K.ellipse(im, gx, 69, 6, 4.5, hc.darkened(0.25))
+				K.ellipse(im, gx - 1, 68, 5, 3.5, hc)
+				K.rect(im, gx - 6, 71, 13, 2, hc.darkened(0.35))
+				K.px(im, gx - 2, 66, hc.lightened(0.35))
+			1:
+				var bc := c(["3a9a5a", "8a4ad0", "c8402e", "2aa8a0"][i % 4])
+				K.rect(im, gx - 3, 66, 7, 9, bc)
+				K.rect(im, gx - 3, 66, 7, 2, bc.lightened(0.25))
+				K.rect(im, gx - 3, 74, 7, 1, bc.darkened(0.3))
+				K.hline(im, gx - 3, 65, 7, c("e8dcc0"))
+			_:
+				var wc := c(["3a3a46", "4a5a8a", "5a3a2a", "3a5a3a"][i % 4])
+				K.ring(im, gx - 3, 70, 3.0, 4.0, wc)
+				K.ring(im, gx + 3, 70, 3.0, 4.0, wc)
+				K.rect(im, gx - 1, 64, 3, 3, wc.lightened(0.2))
+				K.px(im, gx, 74, c("c8ccd4"))
 	# windows and the light they throw
 	_window_light(im, 40, 70, 30, 24, 96, 90, 30)
 	# a rug down the middle, and lantern sconces
