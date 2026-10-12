@@ -102,7 +102,10 @@ var _park_marker: Control
 var _area_marker: Control
 ## The bob-and-pulse step of the "you are here" pin, the only thing redrawn every frame.
 var _pin_phase := 0
-var _note_box: StyleBoxFlat
+var _note_box: StyleBox
+## The slim strip under the area map: the panels' dark board and gold edge,
+## without the wood frame, which is too deep for it.
+var _strip_box: StyleBoxFlat
 
 var _park_view: Control
 var _park_canvas: Control
@@ -839,8 +842,8 @@ func _draw_area_frame() -> void:
 		canvas.draw_rect(Rect2(plaque.position + Vector2(1, 0), Vector2(plaque.size.x - 2, 1)), WOOD_LIGHT)
 		canvas.draw_string_outline(font, Vector2(plaque.position.x + 8, 11), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, 2, WOOD_DARK)
 		canvas.draw_string(font, Vector2(plaque.position.x + 8, 11), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("fff3cf"))
-	# Footer panel, the same tidy panel as the park map's note.
-	canvas.draw_style_box(_note_box, Rect2(6, 246, 468, 22))
+	# Footer strip: the panels' board and gold edge, slim enough for one line.
+	canvas.draw_style_box(_strip_box, Rect2(6, 246, 468, 22))
 
 
 func _tab_chip(canvas: Control, font: Font, rect: Rect2, text: String, active: bool) -> void:
@@ -892,7 +895,7 @@ func _load_area_map() -> void:
 	_area_rect.size = shown
 	_area_canvas.position = _area_rect.position
 	_area_canvas.size = shown
-	_area_footer.position = Vector2(9, 247)
+	_area_footer.position = Vector2(10, 247)
 	# Where the signs go depends only on the hub's picture and data, so the
 	# search runs once per hub.
 	if _sign_cache.has(_hub_here):
@@ -944,6 +947,12 @@ func _build() -> void:
 	_park_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_park_view)
 	_note_box = _make_note_box()
+	_strip_box = StyleBoxFlat.new()
+	_strip_box.bg_color = Color("3a2a1e")
+	_strip_box.border_color = Color("c8a060")
+	_strip_box.set_border_width_all(1)
+	_strip_box.shadow_color = Color(0, 0, 0, 0.4)
+	_strip_box.shadow_size = 2
 	_park_frame = _overlay(_park_view, _draw_park_frame)
 	var map := TextureRect.new()
 	map.texture = PARK_MAP
@@ -1005,10 +1014,10 @@ func _build() -> void:
 	_area_view.add_child(_area_canvas)
 	_area_marker = _overlay(_area_canvas, _draw_area_marker)
 	_area_footer = _label(_area_view)
-	_area_footer.position = Vector2(8, 245)
+	_area_footer.position = Vector2(10, 245)
 	_area_footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_area_footer.custom_minimum_size.x = 462
-	_area_footer.size.x = 462
+	_area_footer.custom_minimum_size.x = 454
+	_area_footer.size.x = 454
 	_area_footer.add_theme_font_size_override("font_size", 8)
 	_area_hint = _label(_area_view)
 	_area_hint.position = Vector2(290, 4)
@@ -1041,13 +1050,11 @@ func _overlay(parent: Control, on_draw: Callable) -> Control:
 
 
 ## The tidy panel behind the notes: dark wood with a thin edge and a soft shadow.
-func _make_note_box() -> StyleBoxFlat:
-	var box := StyleBoxFlat.new()
-	box.bg_color = Color("3a2412")
-	box.border_color = WOOD_MID
-	box.set_border_width_all(1)
-	box.set_content_margin_all(4)
-	box.shadow_color = Color(0, 0, 0, 0.4)
-	box.shadow_size = 2
-	box.shadow_offset = Vector2(1, 1)
+## The game's own wood-and-gold panel, as on every other screen.
+func _make_note_box() -> StyleBox:
+	var box := ThemeDB.get_project_theme().get_stylebox("panel", "PanelContainer").duplicate() as StyleBox
+	box.content_margin_left = 7
+	box.content_margin_right = 7
+	box.content_margin_top = 5
+	box.content_margin_bottom = 5
 	return box

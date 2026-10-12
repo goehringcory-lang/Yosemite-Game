@@ -103,6 +103,7 @@ godot --headless --path . res://tools/mapgen/mapgen.tscn -- art park regions
 
 - Hub bounds, scale, and walkable elevation band are in `data/park/hubs/*.tres`.
 - Signs, place names, kiosks, spawn points, and where roads lead are in `tools/mapgen/hub_content.gd`.
+- After an `art park` run, `python3 tools/mapgen/pixel_map.py` turns the park map's smooth relief into pixel art (a small palette of shade ramps with ordered dithering; nothing moves).
 - Downloads are cached in `tools/mapgen/cache/`, which is git-ignored. The first run needs an internet connection.
 - To add a new area, such as Half Dome's summit for a climb, add a `HubData` (use `road_access = false` for climb-only areas) and an entry in `hub_content.gd`, then regenerate.
 
