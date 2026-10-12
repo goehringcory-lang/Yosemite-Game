@@ -311,6 +311,21 @@ func available_from(character_id: String) -> QuestData:
 	return null
 
 
+## What to show over this person's head: "!" when they have a new quest for
+## you or a quest has sent you to them, "?" when you can finish a quest of
+## theirs by talking to them, and "" otherwise.
+func marker_for(character_id: String) -> String:
+	for quest: QuestData in QUESTS:
+		if not active.has(quest.id):
+			continue
+		var step := current_step(quest)
+		if step.get("type") == "talk" and step.get("target") == character_id:
+			return "!"
+		if quest.giver == character_id and step.get("type") != "talk" and is_step_done(step):
+			return "?"
+	return "!" if available_from(character_id) else ""
+
+
 ## A quest this person would offer if it were the right season, or null.
 func waiting_for_season(character_id: String) -> QuestData:
 	for quest: QuestData in QUESTS:

@@ -60,6 +60,20 @@ func _ready() -> void:
 	var plaque := clock_panel.get_theme_stylebox("panel", "PanelContainer").duplicate() as StyleBoxTexture
 	plaque.texture = load("res://assets/ui/plaque.png")
 	clock_panel.add_theme_stylebox_override("panel", plaque)
+	# The sky dial sits on the time's row, under the date, so the plaque
+	# grows down rather than out toward the place name.
+	var labels := time_label.get_parent()
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	labels.add_child(row)
+	labels.move_child(row, time_label.get_index())
+	labels.remove_child(time_label)
+	var dial := ClockDial.new()
+	dial.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(dial)
+	time_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	time_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(time_label)
 	location_panel.add_theme_stylebox_override("panel", plaque)
 
 

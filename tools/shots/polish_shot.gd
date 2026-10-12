@@ -47,4 +47,14 @@ func _ready() -> void:
 	pause._show_page(PauseMenu.Page.SETTINGS)
 	await _snap(dir, "settings")
 	pause.close()
+	# The clock dial through the day, and someone with a quest for you.
+	for hour in [7, 13, 19, 23]:
+		GameClock.minutes = hour * 60
+		GameClock.time_changed.emit(GameClock.hour, GameClock.minute)
+		await _snap(dir, "clock_%d" % hour, 4)
+	GameClock.minutes = 11 * 60
+	GameClock.time_changed.emit(GameClock.hour, GameClock.minute)
+	QuestLog.completed.append("clark_register")
+	await world.go_to_region("curry_mountain_shop", "arrival")
+	await _snap(dir, "marker", 40)
 	get_tree().quit()

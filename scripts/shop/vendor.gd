@@ -12,8 +12,14 @@ extends StaticBody2D
 @export_range(0, 3) var facing := 0
 
 
+var _marker: QuestMarker
+
+
 func _ready() -> void:
 	queue_redraw()
+	if shop and shop.talk_target != "":
+		_marker = QuestMarker.new(shop.talk_target)
+		add_child(_marker)
 
 
 func _process(_delta: float) -> void:
@@ -73,6 +79,9 @@ func offer_name(offer: ShopOffer) -> String:
 
 func interact(player: Player) -> void:
 	player.can_act = false
+	if _marker:
+		_marker.hidden_while_talking = true
+		_marker.refresh()
 	var box := DialogueBox.open(player)
 	if shop.talk_target != "":
 		var story := QuestLog.talk_to(shop.talk_target, shop.keeper)
@@ -102,6 +111,9 @@ func interact(player: Player) -> void:
 			await box.say([{"speaker": shop.keeper, "text": "Deal. You hand over %s and get %s." % [Barter.describe(paid), offer_name(offer)]}])
 	box.close()
 	player.can_act = true
+	if _marker:
+		_marker.hidden_while_talking = false
+		_marker.refresh()
 
 
 func _owned(offer: ShopOffer) -> int:

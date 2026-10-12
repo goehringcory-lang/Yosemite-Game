@@ -30,6 +30,8 @@ var _stuck_time := 0.0
 var _talking := false
 var _sprite: Sprite2D
 var _rng := RandomNumberGenerator.new()
+## The "!" or "?" over their head.
+var quest_marker: QuestMarker
 
 
 func _ready() -> void:
@@ -55,6 +57,9 @@ func _ready() -> void:
 		add_child(_sprite)
 	_update_frame(false)
 	queue_redraw()
+	if character and not character.visitor:
+		quest_marker = QuestMarker.new(character.id)
+		add_child(quest_marker)
 
 
 func _find_region() -> Region:
@@ -121,6 +126,10 @@ func interact(player: Player) -> void:
 	velocity = Vector2.ZERO
 	_face(player.global_position - global_position)
 	_update_frame(false)
+	_hop()
+	if quest_marker:
+		quest_marker.hidden_while_talking = true
+		quest_marker.refresh()
 	if character and character.visitor:
 		var line := character.idle_lines[_rng.randi() % character.idle_lines.size()] if not character.idle_lines.is_empty() else ""
 		await DialogueBox.say_to(player, [{"speaker": character.display_name, "text": line}])
@@ -129,6 +138,19 @@ func interact(player: Player) -> void:
 		if QuestLog.final_entry_pending() and character.id == "galen_clark":
 			await _write_last_page(player)
 	_talking = false
+	if quest_marker:
+		quest_marker.hidden_while_talking = false
+		quest_marker.refresh()
+
+
+## A small hop of greeting when you start talking to them.
+func _hop() -> void:
+	var target: Node2D = _sprite if _sprite else self
+	if target == self:
+		return
+	var tween := create_tween()
+	tween.tween_property(_sprite, "position:y", -3.0, 0.07).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_sprite, "position:y", 0.0, 0.1).set_ease(Tween.EASE_IN)
 
 
 ## After The Last Page, Clark hands you the Register to write your own entry.
