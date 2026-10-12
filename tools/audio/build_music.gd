@@ -27,6 +27,7 @@ const MAJOR := [0, 2, 4, 5, 7, 9, 11]
 const DORIAN := [0, 2, 3, 5, 7, 9, 10]
 const MINOR := [0, 2, 3, 5, 7, 8, 10]
 const LYDIAN := [0, 2, 4, 6, 7, 9, 11]
+const MIXOLYDIAN := [0, 2, 4, 5, 7, 9, 10]
 
 ## Each piece: tempo, key (MIDI root), scale, one chord a bar (scale degrees,
 ## 0 = the tonic), the arpeggio (eighth notes into the chord's tones over two
@@ -55,6 +56,32 @@ const PIECES := {
 		"chords": [0, 5, 2, 6, 0, 5, 3, 4, 5, 2, 6, 3, 0, 5, 4, 0],
 		"arp": [0, -1, 4, -1, 3, -1, 4, -1], "arp_voice": "harp", "lead": "music_box",
 		"lead_octave": 24, "pad": 0.16, "bass": 0.3, "busy": 0.4,
+	},
+	# Each season's afternoon piece, so a day doesn't repeat one tune: a new
+	# key, tempo, mode, progression and voice for each.
+	"music_spring_b": {
+		"seed": 13, "bpm": 92.0, "root": 57, "scale": MAJOR,
+		"chords": [0, 3, 4, 0, 5, 3, 4, 4, 0, 3, 1, 4, 5, 3, 4, 0],
+		"arp": [0, 2, 3, 4, 3, 2, 4, 2], "arp_voice": "harp", "lead": "clarinet",
+		"lead_octave": 12, "pad": 0.08, "bass": 0.5, "busy": 0.6,
+	},
+	"music_summer_b": {
+		"seed": 29, "bpm": 104.0, "root": 55, "scale": MIXOLYDIAN,
+		"chords": [0, 6, 3, 0, 0, 6, 3, 4, 3, 6, 0, 4, 3, 6, 4, 0],
+		"arp": [0, 2, 4, 2, 4, 2, 3, 2], "arp_voice": "guitar", "lead": "flute",
+		"lead_octave": 12, "pad": 0.06, "bass": 0.6, "busy": 0.65, "swing": 0.1,
+	},
+	"music_fall_b": {
+		"seed": 31, "bpm": 70.0, "root": 50, "scale": DORIAN,
+		"chords": [0, 3, 0, 6, 5, 3, 4, 6, 0, 3, 5, 6, 3, 4, 6, 0],
+		"arp": [0, 4, 2, 4, 3, 4, 2, 4], "arp_voice": "harp", "lead": "flute",
+		"lead_octave": 12, "pad": 0.12, "bass": 0.45, "busy": 0.45,
+	},
+	"music_winter_b": {
+		"seed": 43, "bpm": 58.0, "root": 57, "scale": MINOR,
+		"chords": [0, 3, 6, 2, 5, 3, 4, 4, 0, 5, 3, 6, 2, 5, 4, 0],
+		"arp": [0, -1, 2, -1, 4, -1, 2, -1], "arp_voice": "bell", "lead": "clarinet",
+		"lead_octave": 0, "pad": 0.18, "bass": 0.3, "busy": 0.35,
 	},
 	"music_night": {
 		"seed": 53, "bpm": 60.0, "root": 53, "scale": MAJOR,

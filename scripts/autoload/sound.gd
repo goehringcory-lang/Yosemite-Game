@@ -27,6 +27,9 @@ const BUS_AMBIENCE := &"Ambience"
 const BUS_MUSIC := &"Music"
 ## The day's piece for each season (GameClock.Season order), and the night's.
 const SEASON_MUSIC := ["music_spring", "music_summer", "music_fall", "music_winter"]
+## Each season's afternoon piece (from AFTERNOON_FROM), so a day isn't one tune.
+const SEASON_MUSIC_AFTERNOON := ["music_spring_b", "music_summer_b", "music_fall_b", "music_winter_b"]
+const AFTERNOON_FROM := 13
 const NIGHT_MUSIC := "music_night"
 const TITLE_MUSIC := "music_title"
 ## Seconds of quiet between one piece and the next, at random in this range.
@@ -230,6 +233,8 @@ func music_choice() -> String:
 				return ""
 			if GameClock.hour >= NIGHT_FROM or GameClock.hour < NIGHT_UNTIL:
 				return NIGHT_MUSIC
+			if GameClock.hour >= AFTERNOON_FROM:
+				return SEASON_MUSIC_AFTERNOON[GameClock.season]
 			return SEASON_MUSIC[GameClock.season]
 	return ""
 

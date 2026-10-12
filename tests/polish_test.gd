@@ -160,12 +160,17 @@ func test_music() -> void:
 		var choice := Sound.music_choice()
 		var rainy: bool = Weather.today().rain > 0.4
 		check(choice == ("" if rainy else Sound.SEASON_MUSIC[season]), "%s mornings play %s" % [GameClock.SEASON_NAMES[season], choice if choice != "" else "nothing (rain)"])
+	GameClock.minutes = 15 * 60
+	for season in 4:
+		GameClock.season = season
+		var afternoon := Sound.music_choice()
+		check(afternoon in ["", Sound.SEASON_MUSIC_AFTERNOON[season]], "%s afternoons play a second piece (%s)" % [GameClock.SEASON_NAMES[season], afternoon])
 	GameClock.season = GameClock.Season.SUMMER
 	GameClock.minutes = 22 * 60
 	check(Sound.music_choice() in ["", Sound.NIGHT_MUSIC], "the night piece after 8 PM")
 	Sound.set_ambience("title")
 	check(Sound.music_choice() == Sound.TITLE_MUSIC, "the title theme on the title screen")
-	for piece: String in Sound.SEASON_MUSIC + [Sound.NIGHT_MUSIC, Sound.TITLE_MUSIC]:
+	for piece: String in Sound.SEASON_MUSIC + Sound.SEASON_MUSIC_AFTERNOON + [Sound.NIGHT_MUSIC, Sound.TITLE_MUSIC]:
 		check(ResourceLoader.exists(Sound.DIR + piece + ".wav"), "%s is built" % piece)
 	Settings.ensure_loaded()
 	check(Settings.music_volume >= 0 and Settings.music_volume <= Settings.MAX_VOLUME, "music has a volume setting")

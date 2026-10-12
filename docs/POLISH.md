@@ -50,7 +50,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 
 | Stardew hallmark | Here | Where | Checked by |
 |---|---|---|---|
-| A piece for each season | Spring, summer, fall and winter pieces, a night piece, and a looping title theme | `tools/audio/build_music.gd` | test (each is built; the right one plays for the hour, season, rain and the title) |
+| A piece for each season | Two pieces a season (one for mornings, one from 1 PM, each in its own key, tempo, mode and voice), a night piece, and a looping title theme | `tools/audio/build_music.gd` | test (each is built; the right one plays for the hour, season, rain and the title) |
 | Music comes and goes | One piece, then 30 to 75 seconds of ambience alone; quiet in the rain and on the wall, softer indoors, fades on a change | `Sound._update_music` | test (`music_choice`) |
 | Music in tune and balanced | Strings within 2 cents of true pitch over the range the pieces use, no note dropping out, each tune at 0.8 to 1.0 times its accompaniment | `_pluck` (all-pass tuning, decay stretching) | test (measured pitch and loudness of rendered notes); the mix was measured when the pieces were built |
 | A volume for music | Music has its own bus and setting | `settings.gd`, `pause_menu.gd` | test, settings test |
@@ -96,4 +96,4 @@ The last three independent reviews scored the game 6 to 6.5 of 10 against Starde
 - **Portraits are laid out on a 40-dot grid** and painted at the 80 px they show at (round shapes and shading at full resolution, eyes and mouths in two-pixel dots), with five-tone shading; Stardew's are 64 px and hand-drawn. Walking sprites are 16x24 (Stardew's are 16x32); the owner chose to keep that as the game's style, and the buildings were scaled to suit it.
 - **No hand-drawn art.** All art is drawn by code in a consistent style; Stardew's is hand-drawn by one artist. Cars are flat next to the 3/4-view buildings.
 - **The clock is a sky window**, not a dial with a hand.
-- **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew also has several pieces a season; here there is one.
+- **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew has several pieces a season; here there are two.
