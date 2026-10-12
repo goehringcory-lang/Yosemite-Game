@@ -3,6 +3,8 @@ extends CharacterBody2D
 ## The player: movement, facing, and talking to or using whatever is in front of them.
 
 const SPEED := 80.0
+## Holding the run button multiplies the walking speed by this.
+const RUN_BOOST := 1.75
 
 var facing := Vector2i.DOWN
 ## Set to false during cutscenes, menus, and sleeping.
@@ -45,7 +47,8 @@ func _physics_process(_delta: float) -> void:
 	var input := Vector2.ZERO
 	if can_act:
 		input = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	velocity = input * SPEED * (1.0 + Perks.bonus("muirs_stride"))
+	var running := input != Vector2.ZERO and Input.is_action_pressed("run")
+	velocity = input * SPEED * (1.0 + Perks.bonus("muirs_stride")) * (RUN_BOOST if running else 1.0)
 	move_and_slide()
 
 	if input != Vector2.ZERO:
@@ -54,6 +57,7 @@ func _physics_process(_delta: float) -> void:
 		else:
 			facing = Vector2i(0, signi(roundi(input.y)))
 		interaction_area.position = Vector2(facing) * 12.0
+	sprite.speed_scale = RUN_BOOST if running else 1.0
 	sprite.play(("walk_" if input != Vector2.ZERO else "idle_") + _direction_name())
 
 

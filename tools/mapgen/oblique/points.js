@@ -21,7 +21,7 @@ module.exports = {
     { id: 'lower_yosemite_fall', name: 'Lower Yosemite Fall', tier: 'place', osm: 'Lower Yosemite Falls Vista Point', label: [218, 68], blurb: 'Lower Fall drops 320 feet. Above it are the middle cascades and Upper Fall.' },
     { id: 'camp_4', name: 'Camp 4', tier: 'place', osm: 'Camp 4', label: [204, 96], stop: 'Camp 4', blurb: 'Climbers have camped here since the 1950s. It joined the National Register in 2003.' },
     { id: 'cooks_meadow', name: "Cook's Meadow", tier: 'place', osm: "Cook's Meadow", label: [258, 103], blurb: 'Open meadow under Yosemite Falls, good for foraging in season.' },
-    { id: 'ahwahnee', name: 'The Ahwahnee', tier: 'place', osm: 'Ahwahnee Hotel', label: [338, 80], blurb: 'Opened in 1927. Stone and concrete stained to look like redwood keep fire out.' },
+    { id: 'ahwahnee', name: 'The Ahwahnee', tier: 'place', osm: 'Ahwahnee Hotel', label: [338, 80], stop: 'The Ahwahnee', blurb: 'Opened in 1927. Stone and concrete stained to look like redwood keep fire out.' },
     { id: 'curry_village', name: 'Curry Village', tier: 'place', osm: 'Curry Village', label: [290, 121], stop: 'Curry Village', blurb: 'David and Jennie Curry opened Camp Curry here in 1899 with just seven tents.' },
     { id: 'lamon_homestead', name: 'Lamon Homestead', tier: 'home', at: [-119.5672, 37.7352], label: [366, 121], stop: 'Lamon Homestead (Curry orchard)', blurb: 'Your camp, beside what is left of James Lamon’s 1860s apple orchard.' },
     { id: 'happy_isles', name: 'Happy Isles', tier: 'place', osm: 'Happy Isles Trailhead', label: [382, 140], stop: 'Happy Isles', blurb: 'The John Muir Trail starts here, about 211 miles from Mount Whitney.' },

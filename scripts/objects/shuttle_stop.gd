@@ -7,6 +7,7 @@ extends StaticBody2D
 const STOPS := [
 	{"name": "Yosemite Village", "region": "yosemite_village", "spawn": "shuttle_village"},
 	{"name": "Camp 4", "region": "yosemite_village", "spawn": "shuttle_camp_4"},
+	{"name": "The Ahwahnee", "region": "the_ahwahnee", "spawn": "entrance_circle"},
 	{"name": "Lamon Homestead (Curry orchard)", "region": "lamon_homestead", "spawn": "shuttle"},
 	{"name": "Curry Village", "region": "curry_village", "spawn": "shuttle"},
 	{"name": "Happy Isles", "region": "yosemite_valley", "spawn": "happy_isles"},
