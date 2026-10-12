@@ -48,8 +48,17 @@ static func stamina(ci: CanvasItem, state: ClimbState, flash: float, shake: floa
 	# short enough that the number under it clears the bottom of the screen
 	var r := Rect2(SCREEN.x - 26 + roundf(shake), SCREEN.y - 100, 12, 76)
 	UI.energy_bar(ci, r, frac, state.stamina <= 25, flash)
-	# an "E" over the bar, as on Stardew's energy bar, and the number under it
-	UI.outlined(ci, Vector2(r.position.x + r.size.x / 2.0, r.position.y - 3), "E", UI.GOLD, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+	# a bolt over the bar, as on Stardew's energy bar, and the number under it
+	# a little lightning bolt over the bar for energy (a letter "E" read as
+	# the E key)
+	var b := Vector2(r.position.x + r.size.x / 2.0, r.position.y - 6).round()
+	var bolt := PackedVector2Array([b + Vector2(1, -6), b + Vector2(-3, 0), b + Vector2(0, 0), b + Vector2(-1, 4), b + Vector2(3, -2), b + Vector2(0, -2), b + Vector2(2, -6)])
+	var rim := PackedVector2Array()
+	for v in bolt:
+		rim.append(v + Vector2(0, 1))
+	ci.draw_colored_polygon(rim, UI.WOOD_DARK)
+	ci.draw_polyline(bolt + PackedVector2Array([bolt[0]]), UI.WOOD_DARK, 1.0)
+	ci.draw_colored_polygon(bolt, UI.GOLD)
 	UI.outlined(ci, Vector2(r.position.x + r.size.x / 2.0, r.end.y + 10), "%d" % maxi(state.stamina, 0), UI.WARN if state.stamina <= 25 else UI.CREAM, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 
 
