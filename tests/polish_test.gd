@@ -29,6 +29,7 @@ func _ready() -> void:
 	test_markers()
 	test_dial()
 	test_music()
+	test_tuning()
 	await test_day_log(world)
 	SaveManager.delete_save()
 	print("OK: %d failure(s)" % failures if failures == 0 else "FAILED: %d failure(s)" % failures)
@@ -132,6 +133,70 @@ func test_music() -> void:
 	GameClock.minutes = saved_minutes
 	GameClock.season = saved_season
 	Sound.set_ambience(mode)
+
+
+## Renders single plucked notes from the music builder and measures their
+## pitch and loudness, so the strings stay in tune with the pad and the tune,
+## and no note of an arpeggio drops out.
+func test_tuning() -> void:
+	var builder: Object = load("res://tools/audio/build_music.gd").new()
+	builder._rng.seed = 1
+	var rate: int = builder.RATE
+	var worst := 0.0
+	var worst_note := 0
+	var quietest := INF
+	var loudest := 0.0
+	var jump := 1.0
+	var last := 0.0
+	for note in range(43, 97, 3):
+		var hz: float = builder.midi_hz(note)
+		var buf := PackedFloat32Array()
+		buf.resize(int(0.5 * rate))
+		builder._pluck(buf, 0.0, hz, 0.3, 0.998, 3200.0, false)
+		var cents := _pitch_cents(buf, rate, hz)
+		if absf(cents) > absf(worst):
+			worst = cents
+			worst_note = note
+		var energy := 0.0
+		for i in range(int(0.02 * rate), int(0.2 * rate)):
+			energy += buf[i] * buf[i]
+		var rms := sqrt(energy / (0.18 * rate))
+		# the notes the pieces pluck, MIDI 50 to 90 (see PIECES)
+		if note >= 49 and note <= 91:
+			quietest = minf(quietest, rms)
+			loudest = maxf(loudest, rms)
+			if last > 0.0:
+				jump = maxf(jump, maxf(rms / last, last / rms))
+			last = rms
+	check(absf(worst) < 6.0, "plucked strings are in tune: worst %+.1f cents (MIDI %d)" % [worst, worst_note])
+	check(loudest / quietest < 4.5, "plucked notes taper gently with pitch: loudest %.1f times the quietest" % (loudest / quietest))
+	check(jump < 1.6, "no plucked note drops out next to its neighbors: biggest step %.2fx" % jump)
+
+
+## How far [param buf]'s pitch is from [param hz], in cents: the strongest of
+## a fine scan of frequencies around it (a windowed Goertzel at each).
+func _pitch_cents(buf: PackedFloat32Array, rate: int, hz: float) -> float:
+	var from := int(0.05 * rate)
+	var span := 2048
+	var best := 0.0
+	var best_power := -1.0
+	for step in range(-40, 41):
+		var cents := step * 1.5
+		var f := hz * pow(2.0, cents / 1200.0)
+		var w := TAU * f / rate
+		var coeff := 2.0 * cos(w)
+		var s1 := 0.0
+		var s2 := 0.0
+		for i in span:
+			var window := 0.5 - 0.5 * cos(TAU * i / span)
+			var s0 := buf[from + i] * window + coeff * s1 - s2
+			s2 = s1
+			s1 = s0
+		var power := s1 * s1 + s2 * s2 - coeff * s1 * s2
+		if power > best_power:
+			best_power = power
+			best = cents
+	return best
 
 
 func test_day_log(world: Node) -> void:

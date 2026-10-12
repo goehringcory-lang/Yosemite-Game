@@ -74,6 +74,9 @@ var _rng := RandomNumberGenerator.new()
 
 
 func _init() -> void:
+	# Loaded by a test (not run with -s), it only lends out its instruments.
+	if Engine.get_main_loop() != null and Engine.get_main_loop() != self:
+		return
 	var only := OS.get_environment("MUSIC_ONLY")
 	for piece_name: String in PIECES:
 		if only != "" and only != piece_name:
@@ -297,7 +300,7 @@ func _render(spec: Dictionary) -> PackedFloat32Array:
 				"flute":
 					_wind(buf, at, dur, hz, 0.22, [1.0, 0.22, 0.06], 0.012, loop)
 				"whistle":
-					_wind(buf, at, dur, hz, 0.15, [1.0, 0.05, 0.0], 0.008, loop)
+					_wind(buf, at, dur, hz, 0.25, [1.0, 0.05, 0.0], 0.008, loop)
 				"clarinet":
 					_wind(buf, at, dur, hz, 0.2, [1.0, 0.02, 0.35, 0.02, 0.15], 0.006, loop)
 				"music_box":
@@ -317,15 +320,51 @@ func _put(buf: PackedFloat32Array, i: int, v: float, loop: bool) -> void:
 
 ## A plucked string (Karplus-Strong): a burst of filtered noise circulating in
 ## a delay line one period long, softened a little on every pass.
+##
+## The averaging that softens it shortens the loop by half a sample, and the
+## line can only be a whole number of samples long, which put high notes up
+## to a quarter-tone out of tune. An all-pass filter in the loop adds the
+## missing fraction of a sample (Jaffe and Smith), so every string is in tune
+## with the pad and the tune.
 func _pluck(buf: PackedFloat32Array, at: float, hz: float, amp: float, decay: float, brightness: float, loop: bool) -> void:
-	var period := maxi(2, int(RATE / hz))
+	var exact := RATE / hz
+	# A high string makes many more trips round the loop each second, so it
+	# would die far sooner than a low one; lighten its damping (the weight
+	# of the newer sample, S) and its loss per trip to match (Jaffe and
+	# Smith's decay stretching). [param decay] is the loss per trip at 220 Hz.
+	var stretch := clampf(0.5 * 330.0 / hz, 0.1, 0.5)
+	decay = pow(decay, 220.0 / hz) if hz > 220.0 else decay
+	# loop delay = period - S (damping) + frac (all-pass), frac in [0.5, 1.5)
+	var period := maxi(2, floori(exact + stretch - 0.5))
+	var frac := exact - period + stretch
+	var coef := (1.0 - frac) / (1.0 + frac)
+	var ap_in := 0.0
+	var ap_out := 0.0
 	var line := PackedFloat32Array()
 	line.resize(period)
 	var a := 1.0 - exp(-TAU * brightness / RATE)
 	var low := 0.0
+	# The string's shape when let go: pulled out at a point a third of the
+	# way along (a triangle), with a little noise for the bite of the pick.
 	for i in period:
+		var x := float(i) / period
+		var shape := x / 0.3 if x < 0.3 else (1.0 - x) / 0.7
 		low += a * (_rng.randf_range(-1.0, 1.0) - low)
-		line[i] = low * 2.5
+		line[i] = shape + low * 0.5
+	# Take out the burst's average (the string would hold it as a silent
+	# offset) and set its energy, so every note of an arpeggio is as loud
+	# as the next however few samples a high string has.
+	var mean := 0.0
+	for v in line:
+		mean += v
+	mean /= period
+	var energy := 0.0
+	for i in period:
+		line[i] -= mean
+		energy += line[i] * line[i]
+	var gain := 0.5 / maxf(sqrt(energy / period), 0.0001)
+	for i in period:
+		line[i] *= gain
 	var start := int(at * RATE)
 	var n := int(minf(3.0, 2.2 * 220.0 / hz + 1.2) * RATE)
 	var idx := 0
@@ -333,7 +372,10 @@ func _pluck(buf: PackedFloat32Array, at: float, hz: float, amp: float, decay: fl
 	for i in n:
 		var v := line[idx]
 		var next := line[(idx + 1) % period]
-		line[idx] = (v + next) * 0.5 * decay
+		var soft := (v * (1.0 - stretch) + next * stretch) * decay
+		ap_out = coef * soft + ap_in - coef * ap_out
+		ap_in = soft
+		line[idx] = ap_out
 		# a gentle body: a one-pole smoothing of the string
 		prev += 0.6 * (v - prev)
 		var env := minf(1.0, float(i) / 40.0)
