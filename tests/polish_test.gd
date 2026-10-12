@@ -449,7 +449,7 @@ func test_friendship(world: Node) -> void:
 	journal.open()
 	var found := false
 	for child in journal._body.get_children():
-		if child is HBoxContainer and child.get_child_count() > 0 and child.get_child(0) is Label and child.get_child(0).text == "John Muir":
+		if child is HBoxContainer and child.get_children().any(func(n: Node) -> bool: return n is Label and n.text == "John Muir"):
 			found = child.get_child_count() >= 1 + Friendship.MAX_HEARTS
 	journal.close()
 	check(found, "the Journal shows Muir's hearts")

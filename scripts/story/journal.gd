@@ -369,9 +369,11 @@ func _friends() -> void:
 	for character in known:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 1)
-		row.add_child(_face(character.display_name, 16))
+		var face := _face(character.display_name, 16)
+		face.custom_minimum_size.x = 20 # a little room after the face
+		row.add_child(face)
 		var name_label := Label.new()
-		name_label.text = " " + character.display_name
+		name_label.text = character.display_name
 		name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		name_label.custom_minimum_size.x = 124
 		row.add_child(name_label)
