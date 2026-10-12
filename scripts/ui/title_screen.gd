@@ -80,23 +80,64 @@ func _build_background() -> void:
 	add_child(_shimmer)
 
 
+## The logo: the name in carved gold letters, a deep dark extrusion under
+## them, a lighter gold on the top half of each letter like a sign catching
+## the sun, and a small pixel divider above the tagline.
+const LOGO_TOP := 22.0
+const LOGO_SIZE := 38
+const GOLD_LIGHT := Color("ffe9a8")
+const GOLD_DEEP := Color("e0a238")
+const LOGO_INK := Color("2a1608")
+const LOGO_EXTRUDE := Color("5a3418")
+
+
+func _logo_label(text: String, color: Color, outline: int, at: Vector2) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.add_theme_font_size_override("font_size", LOGO_SIZE)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_outline_color", LOGO_INK)
+	label.add_theme_constant_override("outline_size", outline)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.position = at
+	label.size = Vector2(SCREEN.x, 50)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return label
+
+
 func _build_title() -> void:
-	var title := Label.new()
-	title.text = ProjectSettings.get_setting("application/config/name")
-	title.add_theme_font_size_override("font_size", 36)
-	title.add_theme_color_override("font_color", HEADING)
-	title.add_theme_color_override("font_outline_color", Color(0.12, 0.08, 0.06))
-	title.add_theme_constant_override("outline_size", 6)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.position = Vector2(0, 26)
-	title.size = Vector2(SCREEN.x, 48)
-	add_child(title)
+	var name: String = ProjectSettings.get_setting("application/config/name")
+	# the extrusion: the letters stacked downward in dark wood
+	for dy in [4, 3, 2]:
+		add_child(_logo_label(name, LOGO_EXTRUDE, 8, Vector2(0, LOGO_TOP + dy)))
+	add_child(_logo_label(name, GOLD_DEEP, 6, Vector2(0, LOGO_TOP)))
+	# the lit top half of each letter, clipped to the upper part of the line
+	var lit := Control.new()
+	lit.clip_contents = true
+	lit.position = Vector2(0, LOGO_TOP)
+	lit.size = Vector2(SCREEN.x, 27)
+	lit.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lit.add_child(_logo_label(name, GOLD_LIGHT, 0, Vector2.ZERO))
+	add_child(lit)
+	# a divider: two gold rules either side of a small diamond
+	var divider := Control.new()
+	divider.position = Vector2(SCREEN.x / 2.0 - 60, LOGO_TOP + 56)
+	divider.size = Vector2(120, 5)
+	divider.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	divider.draw.connect(func() -> void:
+		for side in [Rect2(0, 2, 52, 1), Rect2(68, 2, 52, 1)]:
+			divider.draw_rect(side.grow(1), LOGO_INK)
+			divider.draw_rect(side, GOLD_DEEP)
+		var d := PackedVector2Array([Vector2(60, -1), Vector2(64, 3), Vector2(60, 7), Vector2(56, 3)])
+		divider.draw_colored_polygon(d, LOGO_INK)
+		divider.draw_colored_polygon(PackedVector2Array([Vector2(60, 0), Vector2(63, 3), Vector2(60, 6), Vector2(57, 3)]), GOLD_LIGHT))
+	add_child(divider)
 	var tagline := Label.new()
 	tagline.text = ProjectSettings.get_setting("application/config/description")
 	tagline.add_theme_color_override("font_outline_color", Color(0.12, 0.08, 0.06))
 	tagline.add_theme_constant_override("outline_size", 4)
 	tagline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	tagline.position = Vector2(0, 72)
+	tagline.position = Vector2(0, LOGO_TOP + 63)
 	tagline.size = Vector2(SCREEN.x, 16)
 	add_child(tagline)
 
