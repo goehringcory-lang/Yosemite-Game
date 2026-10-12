@@ -119,9 +119,18 @@ func shaded(cx: float, cy: float, rx: float, ry: float, c, from_y := -100, to_y 
 				continue
 			var lit := -dx * 0.7 - dy * 0.6
 			var shade := base
-			if lit < -0.45:
-				shade = darker(base, 0.2)
-			elif lit > 0.55 and d > 0.35:
+			# five tones: a deep shadow at the far edge, the shadow with a
+			# checkered (dithered) step into it, the base, a light, and a
+			# small shine where the light falls straightest
+			if lit < -0.78:
+				shade = darker(base, 0.32)
+			elif lit < -0.42:
+				shade = darker(base, 0.18)
+			elif lit < -0.28 and (x + y) % 2 == 0:
+				shade = darker(base, 0.18)
+			elif lit > 0.82 and d > 0.45:
+				shade = lighter(base, 0.24)
+			elif lit > 0.5 and d > 0.3:
 				shade = lighter(base, 0.12)
 			px(x, y, shade)
 

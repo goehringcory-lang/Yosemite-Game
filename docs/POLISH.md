@@ -57,7 +57,7 @@ Two separate reviewers, given only screenshots and asked to be harsh, judged the
 
 Their biggest remaining point was typography: Stardew uses one pixel font, and this game uses Noto Sans because a pixel font (Tiny5) was found too hard to read. The game now uses DotGothic16 by default: a pixel font, like Stardew's, whose letters stay distinct at the small sizes (B and G, C and O, 5 and S, 2 and 8 all read apart), so it answers the readability problem that ruled out Tiny5. **Settings > Font** switches back to smooth Noto Sans for anyone who prefers it (`docs/polish_pixel_font.png`). A third review found that the first pixel font tried (Pixelify Sans) joined "fi" into a shape like "A" and that its B read as G, so it was replaced with DotGothic16.
 
-The third reviewer scored the default build 6.5 of 10 against Stardew Valley, before the pixel font became the default, the portraits doubled and the volume sliders. What they said meets the bar: the world art and props, day and night lighting with lamp and fire glow, the item icons, the frame and tab system across the book and conversations, the friendship hearts, and the day's page.
+The third reviewer scored the default build 6.5 of 10 against Stardew Valley, before the pixel font became the default, the portraits doubled (and gained richer shading), the volume sliders, the logo, the pixel-art park map and the shared frames on the climbing screen. What they said meets the bar: the world art and props, day and night lighting with lamp and fire glow, the item icons, the frame and tab system across the book and conversations, the friendship hearts, and the day's page.
 
 | Stardew hallmark | Here | Where | Checked by |
 |---|---|---|---|
@@ -65,8 +65,8 @@ The third reviewer scored the default build 6.5 of 10 against Stardew Valley, be
 
 ## Not done
 
-- **People are small.** Portraits now show at 80 px (painted at 40 and doubled, against Stardew's 64), but their shading is simple, and the walking sprites are small next to the detailed scenery.
-- **Some screens are less illustrated than Stardew's.** The title is a working name in plain type, the park travel map is a smooth hillshade rather than pixel art, and the climbing screen's parchment notes use a different frame style from the rest.
+- **Walking sprites are small.** Portraits show at 80 px (painted at 40 and doubled, against Stardew's 64) with five-tone shading and highlights, but the people walking about are small next to the detailed scenery.
+- **The name is a working title.** The title screen now has a drawn logo (gold, extruded, with a divider), and the park map is pixel art in the game's frames, as are the climbing screen's notes; the words "Yosemite Game" are still a placeholder for the owner to choose.
 
 - **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew also has several pieces a season; here there is one.
 - **Only visitors keep a daily routine.** Visitors head home in the evening, each at their own hour, come back in the morning, and half stay in when it rains; the people with quests stay where they are so you can always find them for their stories. Stardew's villagers walk full timetables between home, work and the saloon.
