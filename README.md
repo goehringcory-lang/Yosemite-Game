@@ -15,6 +15,7 @@ godot project.godot         # opens the editor; press F5 to play
 |---|---|---|
 | Move | WASD / arrow keys | Left stick / D-pad |
 | Talk, read, pick up, use | E, Space, X, C, or click | A or X |
+| Give a gift (facing someone) | G | LB |
 | Park and area map | M (Tab or mouse wheel switches tabs) | Back (LB / RB switch tabs) |
 | Journal (the Register, guidebook, perks) | J | Y |
 | Quests | Q | Y, then LB / RB |
@@ -53,6 +54,7 @@ The small touches that make the Valley feel alive, in the spirit of Stardew Vall
 
 - **Item cards.** Whatever you pick up, cook, buy, or are given slides in on a card at the bottom left: its picture, its name, and how many. A second strawberry while the card is up counts it ("Wild Strawberry x2") with a little bump instead of stacking another card. New gear gets a brighter chime. Forage and story items hop up off the ground and fly into your pack. The cards ride above a conversation box and hide under the book (`scripts/ui/item_toasts.gd`, `scripts/world/pickup_pop.gd`).
 - **Portraits and voices.** Everyone who talks has a portrait in a frame at the right of the conversation box, in one of four moods (neutral, happy, sad, surprised) that each line picks, by name (`"mood": "happy"`) or from its words (`Portraits.mood_for`), painted by `tools/npcgen/portraits.gd` from the same look data as their walking sprite (`docs/cast_portraits.png` shows the whole cast). Their words type out with soft blips at a pitch of their own (`scripts/story/portraits.gd`), the box rises in with a swish, and choosing and confirming click like the other menus.
+- **Friends and gifts.** Each person has up to five hearts, earned by talking each day, finishing their quests, and a gift once a week: face them and press G (LB on a gamepad), then pick something from your pack. Everyone likes good food, and each person loves a couple of things from their story (John Muir's dry bread crusts and tea, Enid Michael's wild greens); nothing ever loses you a heart. Hearts show in the Journal's Friends section, rise over the person as they grow, and are listed on the day's page (`scripts/story/friendship.gd`, `gift_giving.gd`).
 - **Quest bubbles.** Someone with something for you wears a bobbing speech bubble: an orange **!** for a new quest (or a quest that sent you to them) and a blue **?** when talking to them finishes one (`QuestLog.marker_for`, `scripts/story/quest_marker.gd`). Shopkeepers with quests have one too, and people give a small hop when you start talking.
 - **The clock's sky.** Beside the time, a little window of sky: the sun climbs over Half Dome and sets, the moon and stars follow at night, the sky turns from dawn to gold to dusk, and the day's clouds, rain or snow show in it (`scripts/ui/clock_dial.gd`).
 - **Music.** Six short pieces, one for each season by day, one for the night, and the title theme. They play the way Stardew's do: a piece now and then, with the birds and wind on their own in between. Music rests in the rain and on the wall, comes in softer indoors, and fades when the hour or the season calls for another piece. See [Sound](#sound).
@@ -67,6 +69,7 @@ The small touches that make the Valley feel alive, in the spirit of Stardew Vall
 ![The day's page](docs/polish_day_summary.png)
 ![Birds on the plaza](docs/polish_critters.png)
 ![A shop with pictures](docs/polish_shop.png)
+![Giving Wren a gift: the prompt, the choice, her thanks, and the Friends page](docs/polish_gifts.png)
 ![The clock's sky at 7 AM, 1 PM, 7 PM and 11 PM](docs/polish_clock_dial.png)
 
 ## The map of Yosemite

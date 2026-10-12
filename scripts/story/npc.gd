@@ -130,6 +130,8 @@ func interact(player: Player) -> void:
 	if quest_marker:
 		quest_marker.hidden_while_talking = true
 		quest_marker.refresh()
+	if character and not character.visitor:
+		Friendship.note_talk(character.id)
 	if character and character.visitor:
 		var line := character.idle_lines[_rng.randi() % character.idle_lines.size()] if not character.idle_lines.is_empty() else ""
 		await DialogueBox.say_to(player, [{"speaker": character.display_name, "text": line}])
@@ -141,6 +143,23 @@ func interact(player: Player) -> void:
 	if quest_marker:
 		quest_marker.hidden_while_talking = false
 		quest_marker.refresh()
+
+
+## True if this person keeps friendship hearts (visitors just pass through).
+func can_receive_gift() -> bool:
+	return character != null and not character.visitor and GiftGiving.possible(character.id)
+
+
+func receive_gift(player: Player) -> void:
+	if character == null or character.visitor or _talking:
+		return
+	_talking = true
+	velocity = Vector2.ZERO
+	_face(player.global_position - global_position)
+	_update_frame(false)
+	_hop()
+	await GiftGiving.offer(player, character.id, character.display_name, self)
+	_talking = false
 
 
 ## A small hop of greeting when you start talking to them.

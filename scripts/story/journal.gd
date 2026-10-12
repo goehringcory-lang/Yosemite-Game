@@ -312,6 +312,7 @@ func _refresh_more() -> void:
 
 func _journal_page() -> void:
 	_register()
+	_friends()
 	if QuestLog.final_entry >= 0:
 		_heading("The last page")
 		var entry: String = QuestLog.FINAL_ENTRIES[QuestLog.final_entry].entry
@@ -335,6 +336,39 @@ func _register() -> void:
 			_line("     " + note, DIM)
 		if page.review:
 			_line("     (Placeholder pending tribal review.)", DIM)
+
+
+## Everyone you've got to know, with their hearts (Friendship).
+func _friends() -> void:
+	var known: Array[CharacterData] = []
+	for character: CharacterData in QuestLog.CHARACTERS + QuestLog.STAFF:
+		if int(Friendship.points.get(character.id, 0)) > 0:
+			known.append(character)
+	_heading("Friends")
+	if known.is_empty():
+		_line("Talk with people each day, finish their quests, and bring them a gift now and then (G) to get to know them.", DIM)
+		return
+	known.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return Friendship.points[a.id] > Friendship.points[b.id])
+	for character in known:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 1)
+		var name_label := Label.new()
+		name_label.text = character.display_name
+		name_label.custom_minimum_size.x = 120
+		row.add_child(name_label)
+		var hearts := Friendship.hearts(character.id)
+		for i in Friendship.MAX_HEARTS:
+			var heart := TextureRect.new()
+			heart.texture = Hearts.texture(i < hearts)
+			heart.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+			heart.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			row.add_child(heart)
+		if not Friendship.can_gift(character.id):
+			var note := Label.new()
+			note.text = "   gift given this week"
+			note.add_theme_color_override("font_color", DIM)
+			row.add_child(note)
+		_body.add_child(row)
 
 
 ## The guidebook's tick list: every route, its grade, the gear it needs, and

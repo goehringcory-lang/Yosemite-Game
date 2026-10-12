@@ -79,6 +79,7 @@ func _build(log: DayLog) -> void:
 		_list("Quests finished", log.quests)
 		_list("Perks learned", log.perks)
 		_list("Recipes learned", log.recipes)
+		_list("Friendships", log.friends)
 		if log.dishes > 0:
 			_list("At the fire", PackedStringArray(["%d %s cooked" % [log.dishes, "dish" if log.dishes == 1 else "dishes"]]))
 	_footer = _label("", DIM)

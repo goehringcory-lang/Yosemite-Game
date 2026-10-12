@@ -12,6 +12,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | Shop and cooking menus show the goods | Pictures beside every trade and every dish, highlight across the row | `DialogueBox.choose(..., icons)`, `vendor.gd`, `station.gd` | shots `polish_shop.png`, `polish_campfire.png`; story test (long lists fit) |
 | Menu sounds | Tick to move, knock to choose, swish to open and close (book, pause menu, conversations, the day's page) | `scripts/autoload/sound.gd`, `MenuInput.pop_in` | audio test (every sound played exists) |
 | Menus animate | The book, pause menu and conversation box fade and grow or rise into place | `MenuInput.pop_in`, `dialogue_box.gd` | by eye |
+| Text never collides | Long place names drop their leading parts so the banner never runs into the clock | `HUD.set_location` | test |
 | Interact prompt | "E  Talk to Wren" over the player, in gamepad names on a gamepad | `hud.gd` (existing) | settings test |
 | A save message | "Good morning! Your game was saved." | `world.gd` (existing) | smoke test |
 
@@ -22,6 +23,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | Portraits in conversation, with expressions | A portrait for all 40 people (and the player) in four moods (neutral, happy, sad, surprised), painted from the same look data as their sprite; each line picks its mood (named, or read from its words) | `tools/npcgen/portraits.gd`, `scripts/story/portraits.gd` | test (every member of the cast has one, each mood is its own face, lines read as the right mood); `docs/cast_portraits.png`, `docs/portrait_moods.png` |
 | Each person sounds like themself | Text types out with blips at a pitch of their own | `Portraits.voice_pitch` | test (same every time, different between people, in a pleasant range) |
 | A "!" over people with a quest | Orange "!" for a new quest, blue "?" to hand one in; on shopkeepers too | `QuestLog.marker_for`, `scripts/story/quest_marker.gd` | test (Clark "!" at the start, gone once taken; "?" when ready); shot `polish_quest_marker.png` |
+| Friendship hearts and gifts | Five hearts per person, from talking each day, finishing their quests, and one gift a week (G or LB while facing them); everyone has loves drawn from their story (Muir's dry crusts and tea), likes good food, and never thinks less of you; hearts in the Journal's Friends section, a heart pop and chime, and new hearts on the day's page | `scripts/story/friendship.gd`, `gift_giving.gd`, `hearts.gd` | test (daily talk once, loved and liked gifts, weekly limit, hearts one at a time, quest warmth, saved, everyone has real loves, Journal shows hearts); shot `polish_gifts.png` |
 | People react when you talk | They turn to face you and give a small hop | `npc.gd` | by eye |
 | People walk about | Wanderers stroll round their spot (existing) | `npc.gd` | cast test |
 
@@ -51,6 +53,5 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 ## Not done
 
 - **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew also has several pieces a season; here there is one.
-- **No friendship or gifts.** Stardew's hearts and gifting are a game system rather than polish, and the story here is built on quests instead.
 - **No daily schedules.** People stay round their spot rather than following a timetable through the day.
 - **No hand-drawn art pass.** All the art is drawn by code in a consistent style; Stardew's is hand-drawn by one artist.

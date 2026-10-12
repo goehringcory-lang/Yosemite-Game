@@ -116,8 +116,22 @@ func _on_gear_added(id: String, amount: int) -> void:
 
 
 ## The location banner at the top of the screen.
+## Parts of a long name ("Yosemite Valley · Curry Village · ...") are dropped
+## from the front until it fits between the screen's left side and the clock.
 func set_location(text: String) -> void:
-	location_label.text = text
+	var parts := text.split(" · ")
+	# the banner is centered, so its right edge is half its width past the middle
+	var middle := get_viewport().get_visible_rect().size.x / 2.0
+	var clock_left := clock_panel.get_global_rect().position.x
+	var room := 2.0 * (clock_left - 4.0 - middle)
+	location_label.text = " · ".join(parts)
+	while parts.size() > 1 and location_panel.get_combined_minimum_size().x > room:
+		parts.remove_at(0)
+		location_label.text = " · ".join(parts)
+	# keep it centered at its new width
+	var width := roundf(location_panel.get_combined_minimum_size().x / 2.0) * 2.0
+	location_panel.offset_left = -width / 2.0
+	location_panel.offset_right = width / 2.0
 
 
 ## Shows a sign's text until the player walks away from it.
@@ -213,6 +227,8 @@ func _update_prompt() -> void:
 	if target == null:
 		return
 	prompt_label.text = "%s  %s" % [interact_button(), Player.prompt_for(target)]
+	if target.has_method("can_receive_gift") and target.can_receive_gift():
+		prompt_label.text += "    %s  Give a gift" % prompt("G", "LB")
 	prompt_panel.size = Vector2.ZERO
 	var screen := _player.get_global_transform_with_canvas().origin
 	var size := prompt_panel.get_combined_minimum_size()

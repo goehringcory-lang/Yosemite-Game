@@ -15,6 +15,7 @@ enum Page { MAIN, SETTINGS, CONTROLS }
 const CONTROLS := [
 	["Walk", "WASD or arrow keys", "Left stick or D-pad"],
 	["Talk, read, use", "E, Space, X, C, or click", "A or X"],
+	["Give a gift (facing someone)", "G", "LB"],
 	["Park and area map", "M (Tab switches tabs)", "Back (LB/RB switch tabs)"],
 	["Journal, quests, backpack", "J, Q, B (Tab switches tabs)", "Y (LB/RB switch tabs)"],
 	["Pause, settings", "Esc", "Start"],

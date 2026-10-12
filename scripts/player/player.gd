@@ -62,6 +62,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if can_act and (event.is_action_pressed("interact") or event.is_action_pressed("use_tool")):
 		get_viewport().set_input_as_handled()
 		_interact()
+	elif can_act and event.is_action_pressed("gift"):
+		var target := get_target()
+		if target and target.has_method("receive_gift"):
+			get_viewport().set_input_as_handled()
+			target.receive_gift(self)
 
 
 func _interact() -> void:

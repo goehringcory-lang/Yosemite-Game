@@ -77,6 +77,7 @@ func _ready() -> void:
 		Recipes.start_new_game()
 		QuestLog.start_new_game()
 		Perks.start_new_game()
+		Friendship.start_new_game()
 		if forage:
 			forage.respawn()
 	hud.bind_player(player)

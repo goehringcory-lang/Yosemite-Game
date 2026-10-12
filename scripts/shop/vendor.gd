@@ -85,7 +85,19 @@ func offer_name(offer: ShopOffer) -> String:
 	return name if offer.amount == 1 else ItemDB.count_name(offer.amount, name)
 
 
+## Shopkeepers with a name in the story keep friendship hearts too.
+func can_receive_gift() -> bool:
+	return shop != null and shop.talk_target != "" and GiftGiving.possible(shop.talk_target)
+
+
+func receive_gift(player: Player) -> void:
+	if shop and shop.talk_target != "":
+		await GiftGiving.offer(player, shop.talk_target, shop.keeper, self)
+
+
 func interact(player: Player) -> void:
+	if shop and shop.talk_target != "":
+		Friendship.note_talk(shop.talk_target)
 	player.can_act = false
 	if _marker:
 		_marker.hidden_while_talking = true

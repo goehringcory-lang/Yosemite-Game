@@ -57,6 +57,7 @@ func _init() -> void:
 	_save("talk", _talk(), RATE_FX, -15.0)
 	_save("flutter", _flutter(72), RATE_FX, -12.0)
 	_save("rustle", _rustle(73), RATE_FX, -14.0)
+	_save("heart", _chime([76, 81, 88], 0.09, 1.0), RATE_FX, -8.0)
 	print("Sounds written to %s. Run godot --headless --path . --import next." % OUT)
 	quit()
 

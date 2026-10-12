@@ -32,6 +32,8 @@ func _ready() -> void:
 	test_tuning()
 	await test_critters(world)
 	await test_rustle(world)
+	await test_location_fits(world)
+	test_friendship(world)
 	await test_day_log(world)
 	SaveManager.delete_save()
 	print("OK: %d failure(s)" % failures if failures == 0 else "FAILED: %d failure(s)" % failures)
@@ -244,6 +246,16 @@ func test_critters(world: Node) -> void:
 	await get_tree().process_frame
 
 
+func test_location_fits(world: Node) -> void:
+	world.hud.set_location("Yosemite Valley · Curry Village · Glacier Point Apron trail")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var banner: Rect2 = world.hud.location_panel.get_global_rect()
+	var clock: Rect2 = world.hud.clock_panel.get_global_rect()
+	check(not banner.intersects(clock), "a long place name keeps clear of the clock (%s)" % world.hud.location_label.text)
+	check(world.hud.location_label.text.ends_with("Glacier Point Apron trail"), "and keeps the place you're in")
+
+
 func test_rustle(world: Node) -> void:
 	await world.go_to_region("curry_village", "arrival")
 	var rustle: Rustle = null
@@ -268,6 +280,66 @@ func test_rustle(world: Node) -> void:
 	for i in 10:
 		rustle._process(0.1)
 	check(not rustle.is_swaying(plant) and plant.skew == 0.0, "and settles back upright")
+
+
+func test_friendship(world: Node) -> void:
+	Friendship.start_new_game()
+	check(Friendship.hearts("john_muir") == 0, "nobody knows you at the start")
+	Friendship.note_talk("john_muir")
+	Friendship.note_talk("john_muir")
+	check(Friendship.points.john_muir == Friendship.TALK_POINTS, "talking counts once a day")
+	check(Friendship.taste("john_muir", "dry_crusts") == "loved", "Muir loves dry crusts")
+	check(Friendship.taste("john_muir", "trail_mix") == "liked", "and likes any good food")
+	check(Friendship.taste("john_muir", "black_oak_acorn") == "plain", "raw acorns are just polite thanks")
+	check(not Friendship.is_giftable("sequoia_cone") and not Friendship.is_giftable("model_a_axle"), "story things can't be given away")
+	check(Friendship.is_giftable("wild_strawberry"), "forage can")
+	Inventory.add("dry_crusts", 2)
+	var hearts_before := Friendship.hearts("john_muir")
+	var thanks := Friendship.give("john_muir", "dry_crusts")
+	check(thanks != "" and Portraits.mood_for(thanks) != "neutral", "a loved gift gets warm thanks: %s" % thanks)
+	check(Friendship.hearts("john_muir") == hearts_before + 0 or Friendship.points.john_muir == Friendship.TALK_POINTS + Friendship.LOVED_POINTS, "and loved points (%d)" % Friendship.points.john_muir)
+	check(Inventory.count("dry_crusts") == 1, "the gift leaves your pack")
+	check(not Friendship.can_gift("john_muir") and Friendship.give("john_muir", "dry_crusts") == "", "one gift a week")
+	GameClock.day += Friendship.GIFT_EVERY
+	check(Friendship.can_gift("john_muir"), "and another the week after")
+	GameClock.day -= Friendship.GIFT_EVERY
+	var gained := []
+	Friendship.heart_gained.connect(func(id: String, n: int) -> void: gained.append([id, n]))
+	Friendship.add("john_muir", 200)
+	check(Friendship.hearts("john_muir") == 2 and gained.size() == 2, "hearts come one at a time (%s)" % [gained])
+	Friendship.add("john_muir", 10000)
+	check(Friendship.hearts("john_muir") == Friendship.MAX_HEARTS, "up to %d hearts" % Friendship.MAX_HEARTS)
+	var quest := QuestLog.get_quest("clark_register")
+	var clark_before := int(Friendship.points.get("galen_clark", 0))
+	QuestLog.quest_completed.emit(quest)
+	check(int(Friendship.points.get("galen_clark", 0)) == clark_before + Friendship.QUEST_POINTS, "finishing someone's quest warms them to you")
+	var saved := Friendship.save_data()
+	Friendship.start_new_game()
+	Friendship.load_data(saved)
+	check(Friendship.hearts("john_muir") == Friendship.MAX_HEARTS and not Friendship.can_gift("john_muir"), "hearts and gifts are saved")
+	var bad := []
+	for id: String in Friendship.LOVES:
+		if QuestLog.get_character(id) == null:
+			bad.append(id)
+		for item: String in Friendship.LOVES[id]:
+			if not Friendship.is_giftable(item):
+				bad.append("%s:%s" % [id, item])
+	check(bad.is_empty(), "every love is a real person and a real gift %s" % [bad])
+	var missing := []
+	for character: CharacterData in QuestLog.CHARACTERS + QuestLog.STAFF:
+		if not Friendship.LOVES.has(character.id):
+			missing.append(character.id)
+	check(missing.is_empty(), "everyone has something they love %s" % [missing])
+	var journal := get_tree().get_first_node_in_group("journal")
+	journal.open()
+	var found := false
+	for child in journal._body.get_children():
+		if child is HBoxContainer and child.get_child_count() > 0 and child.get_child(0) is Label and child.get_child(0).text == "John Muir":
+			found = child.get_child_count() >= 1 + Friendship.MAX_HEARTS
+	journal.close()
+	check(found, "the Journal shows Muir's hearts")
+	Inventory.remove("dry_crusts", Inventory.count("dry_crusts"))
+	Friendship.start_new_game()
 
 
 func test_day_log(world: Node) -> void:

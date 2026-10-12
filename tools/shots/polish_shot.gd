@@ -111,6 +111,43 @@ func _ready() -> void:
 				rustle.brush(other, 1.0)
 		await get_tree().create_timer(0.12).timeout
 		await _snap(dir, "rustle", 1)
+	# Giving Wren a gift: the prompt, the choice, her thanks and the hearts.
+	var wren: NPC = null
+	for node in get_tree().get_nodes_in_group("persist") + world.region.find_children("*", "NPC", true, false):
+		if node is NPC and node.character and node.character.id == "wren_alvarez":
+			wren = node
+	if wren:
+		Inventory.add("trail_mix", 2)
+		Inventory.add("wild_strawberry", 3)
+		Friendship.add("wren_alvarez", 90)
+		world.player.global_position = wren.global_position + Vector2(0, 14)
+		world.player.facing = Vector2i.UP
+		world.player.interaction_area.position = Vector2(0, -12)
+		await get_tree().create_timer(0.8).timeout
+		await _snap(dir, "gift_prompt", 2)
+		wren.receive_gift(world.player)
+		await get_tree().create_timer(0.3).timeout
+		await _snap(dir, "gift_choice", 2)
+		var gift_box: DialogueBox = get_tree().get_first_node_in_group("dialogue_box")
+		gift_box.press(true)
+		await get_tree().create_timer(0.35).timeout
+		gift_box.reveal_all()
+		await _snap(dir, "gift_thanks", 1)
+		while is_instance_valid(gift_box) and gift_box.is_inside_tree():
+			gift_box.press(true)
+			await get_tree().create_timer(0.1).timeout
+		Friendship.add("john_muir", 340)
+		Friendship.add("galen_clark", 150)
+		var book := get_tree().get_first_node_in_group("journal")
+		book.open()
+		await get_tree().process_frame
+		book._scroll.scroll_vertical = 0
+		for child in book._body.get_children():
+			if child is Label and child.text == "Friends":
+				await get_tree().process_frame
+				book._scroll.ensure_control_visible(child)
+		await _snap(dir, "friends", 4)
+		book.close()
 	# The day's page at bedtime.
 	world.day_log.clear()
 	for id in ["miners_lettuce", "miners_lettuce", "miners_lettuce", "wild_strawberry", "sierra_onion", "black_oak_acorn", "black_oak_acorn", "acorn_cake"]:
