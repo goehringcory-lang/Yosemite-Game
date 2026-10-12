@@ -87,6 +87,20 @@ func _ready() -> void:
 			fade.offsets = PackedFloat32Array([0.0, 0.15, 0.85, 1.0])
 			fade.colors = PackedColorArray([Color(1, 1, 1, 0.0), Color(1, 1, 1, 0.9), Color(1, 1, 1, 0.9), Color(1, 1, 1, 0.0)])
 	color_ramp = fade
+	if effect == "mist" or effect == "smoke":
+		# Puffs in whole pixels with a dithered edge, fading in steps, so
+		# they read as pixel art and don't blur into a soft blob.
+		texture = _puff()
+		fade.interpolation_mode = Gradient.GRADIENT_INTERPOLATE_CONSTANT
+		var steps := Gradient.new()
+		steps.interpolation_mode = Gradient.GRADIENT_INTERPOLATE_CONSTANT
+		var tint: Color = fade.colors[1]
+		steps.offsets = PackedFloat32Array([0.0, 0.15, 0.35, 0.7, 0.88])
+		steps.colors = PackedColorArray([Color(tint, tint.a * 0.4), Color(tint, tint.a * 0.75), Color(tint, tint.a), Color(tint, tint.a * 0.6), Color(tint, tint.a * 0.3)])
+		color_ramp = steps
+		scale_amount_min = 1.0
+		scale_amount_max = 1.0
+		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	# Fires crackle and waterfalls roar, heard from nearby.
 	if effect == "sparks":
 		add_child(SoundEmitter.make("campfire", 150.0, 0.8))
@@ -118,6 +132,17 @@ func _process(_delta: float) -> void:
 		# Chimneys smoke in the cold months and at either end of the day.
 		var hour := GameClock.hour
 		emitting = GameClock.season >= GameClock.Season.FALL or hour < 9 or hour >= 17
+
+
+## A 7x6 puff: a solid middle and a checkered rim.
+static func _puff() -> Texture2D:
+	var im := Image.create_empty(7, 6, false, Image.FORMAT_RGBA8)
+	for y in 6:
+		for x in 7:
+			var d := Vector2((x - 3.0) / 3.5, (y - 2.5) / 3.0).length()
+			if d < 0.62 or (d < 1.0 and (x + y) % 2 == 0):
+				im.set_pixel(x, y, Color.WHITE)
+	return ImageTexture.create_from_image(im)
 
 
 func _darkness() -> float:
