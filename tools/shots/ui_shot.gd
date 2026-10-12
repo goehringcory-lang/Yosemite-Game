@@ -70,7 +70,8 @@ func _ready() -> void:
 	box.say([{"speaker": "Marty Kessler", "text": "Wren is looking for a partner. Take this guidebook, check the grades, and go find her at the foot of Firefall Slab."}])
 	box.reveal_all()
 	await _snap(dir, scale, "dialogue")
-	box.choose("What do you want?", ["Trail mix for 12 food energy", "Dried apples for 8 food energy", "Nothing, thanks"], "Clerk")
+	box.choose("What do you want?", ["Trail Mix · 12 energy", "Dried Apples · 8 energy", "Nothing, thanks"], "Village Store clerk",
+		[ItemDB.get_item("trail_mix").icon, ItemDB.get_item("dried_apples").icon, null])
 	box.reveal_all()
 	await _snap(dir, scale, "dialogue_choice")
 	box.close()

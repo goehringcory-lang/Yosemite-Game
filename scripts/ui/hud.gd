@@ -14,6 +14,8 @@ const LOCATION_SHOWN := 4.0
 const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary"]
 
 var _player: Player
+## The food energy you carry, under the time.
+var food_label: Label
 var _location_text := ""
 var _location_tween: Tween
 var _status: Label
@@ -96,8 +98,32 @@ func _ready() -> void:
 	dial.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(dial)
 	time_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	time_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(time_label)
+	var right := VBoxContainer.new()
+	right.add_theme_constant_override("separation", 0)
+	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(right)
+	right.add_child(time_label)
+	# The food you carry, which is what you trade with, under the time, as
+	# Stardew Valley keeps your gold under its clock.
+	var purse := HBoxContainer.new()
+	purse.alignment = BoxContainer.ALIGNMENT_END
+	purse.add_theme_constant_override("separation", 2)
+	var apple := TextureRect.new()
+	var fruit := ItemDB.get_item("lamon_apple")
+	apple.texture = fruit.icon if fruit else null
+	apple.custom_minimum_size = Vector2(12, 12)
+	apple.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	apple.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	apple.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	purse.add_child(apple)
+	food_label = Label.new()
+	food_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.5))
+	food_label.tooltip_text = "Food energy you carry (what you trade with)"
+	purse.add_child(food_label)
+	right.add_child(purse)
+	Inventory.changed.connect(_refresh_food)
+	_refresh_food()
 	location_panel.add_theme_stylebox_override("panel", plaque)
 
 
@@ -285,6 +311,10 @@ func fade_to_black() -> void:
 
 func fade_from_black() -> void:
 	await create_tween().tween_property(fade, "color:a", 0.0, 0.6).finished
+
+
+func _refresh_food() -> void:
+	food_label.text = "%d energy" % Barter.purse()
 
 
 func _refresh_clock() -> void:

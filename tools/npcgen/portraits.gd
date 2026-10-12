@@ -149,6 +149,52 @@ func shaded(cx: float, cy: float, rx: float, ry: float, c, from_y := -100, to_y 
 				im.set_pixel(x, y, shade)
 
 
+## Light from the upper left on the whole silhouette: a lit edge where the
+## figure meets the air above or to the left, and shadow where it meets it
+## below or to the right, so hair, hats and shirts read as round instead of
+## flat fills. Only the outer edge is touched, never eyes or mouths.
+func _rim_light() -> void:
+	_form_shade()
+	var src := im.duplicate() as Image
+	for y in R:
+		for x in R:
+			var c := src.get_pixel(x, y)
+			if c.a < 0.5:
+				continue
+			var air_up := y < K or src.get_pixel(x, y - K).a < 0.5
+			var air_left := x < K or src.get_pixel(x - K, y).a < 0.5
+			var air_down := y >= R - K or src.get_pixel(x, y + K).a < 0.5
+			var air_right := x >= R - K or src.get_pixel(x + K, y).a < 0.5
+			if (air_up or air_left) and not (air_down or air_right):
+				im.set_pixel(x, y, c.lightened(0.16))
+			elif (air_down or air_right) and not (air_up or air_left) and y < R - 1:
+				im.set_pixel(x, y, c.darkened(0.2))
+
+
+## Rounds the wide flat fills (shirts, hat crowns, hair): along each row, a
+## run of one color darkens over its far third, through a dithered step, and
+## lightens a touch at its near end.
+func _form_shade() -> void:
+	var src := im.duplicate() as Image
+	for y in R:
+		var x := 0
+		while x < R:
+			var c := src.get_pixel(x, y)
+			var end := x + 1
+			while end < R and src.get_pixel(end, y) == c:
+				end += 1
+			var run := end - x
+			if c.a > 0.5 and run >= 12:
+				for i in run:
+					var t := float(i) / run
+					var at := x + i
+					if t > 0.72 or (t > 0.62 and (at + y) % 2 == 0):
+						im.set_pixel(at, y, c.darkened(0.14))
+					elif t < 0.12:
+						im.set_pixel(at, y, c.lightened(0.07))
+			x = end
+
+
 func outline() -> void:
 	var edge: Array[Vector2i] = []
 	for y in R:
@@ -189,6 +235,7 @@ func paint(look: Dictionary, id: String, mood := "neutral") -> Image:
 	if look.get("glasses", false):
 		_glasses()
 	_mouth(mood, skin)
+	_rim_light()
 	# a rim as heavy as one dot (two pixels), like every sprite in the game
 	for i in K:
 		outline()
