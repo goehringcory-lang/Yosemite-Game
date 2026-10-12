@@ -2,8 +2,15 @@
 
 [ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1_item"]
 
+[ext_resource type="Texture2D" path="res://assets/sprites/food_items.png" id="food_icons"]
+
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("food_icons")
+region = Rect2(176, 0, 16, 16)
+
 [resource]
 script = ExtResource("1_item")
 id = "dry_crusts"
 display_name = "Dry Crusts"
 description = "Bread sliced thin and dried hard by the fire, the way John Muir carried it. Light, plain, and it keeps for weeks."
+icon = SubResource("icon")
