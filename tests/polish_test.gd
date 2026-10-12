@@ -35,6 +35,7 @@ func _ready() -> void:
 	await test_location_fits(world)
 	await test_screens_fit(world)
 	await test_routines(world)
+	await test_vendors_drawn(world)
 	test_friendship(world)
 	await test_day_log(world)
 	SaveManager.delete_save()
@@ -85,6 +86,12 @@ func test_portraits() -> void:
 	check(happy != null and plain != null and happy.region != plain.region, "a happy face is a different picture")
 	for mood: String in Portraits.MOODS:
 		check(Portraits.for_speaker("Galen Clark", mood) != null, "Galen Clark has a %s face" % mood)
+	var faceless := []
+	for path in ["camp4_rack", "camp4_bigwall", "village_store", "curry_store", "curry_mountain_shop"]:
+		var shop: ShopData = load("res://data/shops/%s.tres" % path)
+		if Portraits.for_speaker(shop.keeper) == null:
+			faceless.append(shop.keeper)
+	check(faceless.is_empty(), "every shopkeeper has a portrait %s" % [faceless])
 	check(Portraits.mood_for("Thank you, that's wonderful.") == "happy", "thanks read as happy")
 	check(Portraits.mood_for("I'm sorry. We lost the whole grove.") == "sad", "a loss reads as sad")
 	check(Portraits.mood_for("Oh! You found it?") == "surprised", "\"Oh!\" reads as surprised")
@@ -297,6 +304,18 @@ func test_screens_fit(world: Node) -> void:
 	await get_tree().process_frame
 	check(screen.encloses(pause._panel.get_global_rect()), "and so does Settings (%s)" % pause._panel.get_global_rect())
 	pause.close()
+
+
+## No shopkeeper is left as a plain placeholder figure.
+func test_vendors_drawn(world: Node) -> void:
+	var plain := []
+	for region in ["yosemite_village", "curry_store", "curry_mountain_shop"]:
+		await world.go_to_region(region, "arrival")
+		for vendor in world.region.find_children("*", "Vendor", true, false):
+			if vendor.sprite_sheet == null:
+				plain.append("%s/%s" % [region, vendor.name])
+	check(plain.is_empty(), "every shopkeeper is drawn from a sprite sheet %s" % [plain])
+	await world.go_to_region("curry_village", "arrival")
 
 
 func test_routines(world: Node) -> void:

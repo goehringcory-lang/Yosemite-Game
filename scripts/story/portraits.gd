@@ -26,6 +26,9 @@ const PORTRAIT_DIR := "res://assets/sprites/portraits/"
 ## portrait they use.
 const EXTRA := {
 	"Camp Curry Store clerk": "curry_store_clerk",
+	"Village Store clerk": "village_store_clerk",
+	"Camp 4 climber": "camp4_rack_trader",
+	"Big-wall climber": "camp4_bigwall_trader",
 }
 
 ## Display name -> portrait name, built on first use.

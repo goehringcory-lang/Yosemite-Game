@@ -122,6 +122,9 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_duff_1.png" id="119_62c11"]
 [ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_duff_2.png" id="120_cypdu"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/lamp_wrought_glow.png" id="121_j82ws"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/camp4_rack_trader.png" id="900_rack"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/camp4_bigwall_trader.png" id="901_bigwall"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/village_store_clerk.png" id="902_clerk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_76ggx"]
 size = Vector2(76, 21.28)
@@ -1961,6 +1964,7 @@ collision_mask = 0
 script = ExtResource("38_u8m40")
 shop = ExtResource("39_as1d0")
 color = Color(0.8, 0.45, 0.2, 1)
+sprite_sheet = ExtResource("900_rack")
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/RackTrader" unique_id=2096218312]
 position = Vector2(0, -2)
@@ -1989,6 +1993,7 @@ collision_mask = 0
 script = ExtResource("38_u8m40")
 shop = ExtResource("41_m8kna")
 color = Color(0.35, 0.5, 0.75, 1)
+sprite_sheet = ExtResource("901_bigwall")
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/BigWallTrader" unique_id=1670587538]
 position = Vector2(0, -2)
@@ -2202,6 +2207,7 @@ collision_mask = 0
 script = ExtResource("38_u8m40")
 shop = ExtResource("47_mjpip")
 color = Color(0.3, 0.5, 0.35, 1)
+sprite_sheet = ExtResource("902_clerk")
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/StoreClerk" unique_id=1345195510]
 position = Vector2(0, -2)

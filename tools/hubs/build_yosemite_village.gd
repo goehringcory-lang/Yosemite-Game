@@ -489,6 +489,14 @@ func _fire_ring(node_name: String, at_pos: Vector2, lit: bool) -> void:
 	ambient(ring, "smoke", Vector2(0, -18), Vector2(2, 1))
 
 
+## Each trader's walking sheet (tools/npcgen), by node name.
+const VENDOR_SHEETS := {
+	"RackTrader": "res://assets/sprites/npcs/camp4_rack_trader.png",
+	"BigWallTrader": "res://assets/sprites/npcs/camp4_bigwall_trader.png",
+	"StoreClerk": "res://assets/sprites/npcs/village_store_clerk.png",
+}
+
+
 func _vendor(node_name: String, shop_path: String, at: Vector2, color: Color) -> void:
 	var vendor := StaticBody2D.new()
 	vendor.name = node_name
@@ -496,6 +504,8 @@ func _vendor(node_name: String, shop_path: String, at: Vector2, color: Color) ->
 	vendor.set_script(load("res://scripts/shop/vendor.gd"))
 	vendor.set("shop", load(shop_path))
 	vendor.set("color", color)
+	if VENDOR_SHEETS.has(node_name):
+		vendor.set("sprite_sheet", load(VENDOR_SHEETS[node_name]))
 	vendor.position = at
 	var shape := CollisionShape2D.new()
 	shape.name = "Collision"
