@@ -33,7 +33,7 @@ A prompt above the player's head shows what the interact button will do ("E  Rea
 
 **The title screen** comes up first, over a pixel painting of the Valley (El Capitan, Half Dome, Bridalveil Fall, which shimmers; `assets/ui/title_background.png`): Continue (when there's a save), New Game, Settings, Credits and Quit. New Game asks first if there's a save, and the old save stays on disk until your first save or night's sleep replaces it, so quitting before then loses nothing. Credits has two pages: the credits (the map data, elevation, font and engine), which scroll by themselves, and Licenses, the full license texts the game has to carry (Godot's and its libraries', read from the engine, and the font's). The code is `scripts/ui/title_screen.gd` and `scripts/ui/credits.gd`; `SHOT_DIR=/tmp/shots xvfb-run -a godot --path . res://tools/shots/title_shot.tscn` photographs them (`docs/ui_title.png`, `docs/ui_credits.png`).
 
-**Settings** are on the pause menu (Esc, then Settings) and on the title screen, and are kept in `user://settings.cfg`, apart from your save: text speed (Slow, Normal, Fast, Instant), full screen, window size (whole steps of 480x270, up to what fits your screen), whether your next main-story step shows under the clock, button prompts (Auto, or always keyboard or always gamepad), and three volumes (the whole game, sound effects, and ambience, in steps of 10%). The code is `scripts/ui/settings.gd`.
+**Settings** are on the pause menu (Esc, then Settings) and on the title screen, and are kept in `user://settings.cfg`, apart from your save: text speed (Slow, Normal, Fast, Instant), full screen, window size (whole steps of 480x270, up to what fits your screen), whether your next main-story step shows under the clock, button prompts (Auto, or always keyboard or always gamepad), and four volumes (the whole game, music, sound effects, and ambience, in steps of 10%). The code is `scripts/ui/settings.gd`.
 
 Controls are set in **Project > Project Settings > Input Map**.
 
@@ -45,7 +45,24 @@ Climbing runs on food. Each morning, wild forage appears around your camp, depen
 
 As you play, the valley teaches you **perks**: small, permanent bonuses earned from people and experience, never bought. Foraging 25 finds earns *Enid's Eye* (one more find each morning), learning to belay from Dick Leonard earns *Leonard's Belay* (more rest at each ledge), two weeks of mornings earns *Muir's Stride* (a quicker walk), and so on. The Journal lists all eight and how to earn the rest. They're in `scripts/story/perks.gd`, and [docs/DESIGN.md](docs/DESIGN.md#perks) has the table.
 
-Sleep in the tent to end the day, which also saves the game. You can also save any time from the pause menu (Esc, then Save game): it keeps where you're standing, the time of day, and everything you're carrying, and Continue on the title screen picks up right there. If you're still up at 2 AM you pass out, and the game moves to the next day anyway.
+Sleep in the tent to end the day, which also saves the game. First comes the day's page: the date, then what the day brought, counted out one by one (see [Game feel](#game-feel)). You can also save any time from the pause menu (Esc, then Save game): it keeps where you're standing, the time of day, and everything you're carrying, and Continue on the title screen picks up right there. If you're still up at 2 AM you pass out, and the game moves to the next day anyway.
+
+## Game feel
+
+The small touches that make the Valley feel alive, in the spirit of Stardew Valley. The tests are in `tests/polish_test.tscn`, and `SHOT_DIR=/tmp/shots xvfb-run -a godot --path . res://tools/shots/polish_shot.tscn` photographs each one.
+
+- **Item cards.** Whatever you pick up, cook, buy, or are given slides in on a card at the bottom left: its picture, its name, and how many. A second strawberry while the card is up counts it ("Wild Strawberry x2") with a little bump instead of stacking another card. New gear gets a brighter chime. Forage and story items hop up off the ground and fly into your pack. The cards ride above a conversation box and hide under the book (`scripts/ui/item_toasts.gd`, `scripts/world/pickup_pop.gd`).
+- **Portraits and voices.** Everyone who talks has a portrait in a frame at the right of the conversation box, painted by `tools/npcgen/portraits.gd` from the same look data as their walking sprite (`docs/cast_portraits.png` shows the whole cast). Their words type out with soft blips at a pitch of their own (`scripts/story/portraits.gd`), the box rises in with a swish, and choosing and confirming click like the other menus.
+- **Quest bubbles.** Someone with something for you wears a bobbing speech bubble: an orange **!** for a new quest (or a quest that sent you to them) and a blue **?** when talking to them finishes one (`QuestLog.marker_for`, `scripts/story/quest_marker.gd`). Shopkeepers with quests have one too, and people give a small hop when you start talking.
+- **The clock's sky.** Beside the time, a little window of sky: the sun climbs over Half Dome and sets, the moon and stars follow at night, the sky turns from dawn to gold to dusk, and the day's clouds, rain or snow show in it (`scripts/ui/clock_dial.gd`).
+- **Music.** Six short pieces, one for each season by day, one for the night, and the title theme. They play the way Stardew's do: a piece now and then, with the birds and wind on their own in between. Music rests in the rain and on the wall, comes in softer indoors, and fades when the hour or the season calls for another piece. See [Sound](#sound).
+- **The day's page.** When you sleep, a page comes up over the black before morning: what you found and were given (with pictures), new gear, first ascents, finished quests, perks, recipes, and dishes cooked, or "A quiet day in the Valley" (`scripts/story/day_log.gd`, `scripts/ui/day_summary.gd`).
+- **Every food has a picture.** The acorn chain and the campfire dishes are drawn by `tools/ui/food_icons.gd` in the forage icons' style.
+
+![Item cards](docs/polish_toasts.png)
+![A conversation with a portrait](docs/polish_dialogue.png)
+![The day's page](docs/polish_day_summary.png)
+![The clock's sky at 7 AM, 1 PM, 7 PM and 11 PM](docs/polish_clock_dial.png)
 
 ## The map of Yosemite
 
@@ -251,13 +268,23 @@ godot --headless --path . -s res://tools/audio/build_sounds.gd
 godot --headless --path . --import
 ```
 
-The `Sound` autoload (`scripts/autoload/sound.gd`) plays them on three buses (Master, Effects, Ambience), each with a volume on the Settings page.
+The `Sound` autoload (`scripts/autoload/sound.gd`) plays them on four buses (Master, Music, Effects, Ambience), each with a volume on the Settings page.
+
+The music is composed and synthesized the same way, by `tools/audio/build_music.gd` (about a minute; `MUSIC_ONLY=music_fall` builds one piece):
+
+```bash
+godot --headless --path . -s res://tools/audio/build_music.gd
+godot --headless --path . --import
+```
+
+Each piece is 16 bars in four phrases (A A' B A''). A two-bar motif is made up from the piece's seed (mostly stepwise, a leap answered by a step back, strong beats on chord tones), carried as a sequence over the next chords, answered by a new motif, and brought home to the tonic. Under it: plucked arpeggios from a Karplus-Strong string (a guitar, a harp, or bells at night), a soft pad, a bass on the downbeats, and a little room reverb. The tune is on flute in spring, a whistle in summer, clarinet in fall (Dorian), and a music box in winter (minor). The world pieces are played once with a rest of 30 to 75 seconds between them; the title theme is built as a seamless loop.
 
 - **Ambience.** Four loops fade into each other: birds by day (mountain chickadees, a warbler, a far-off Steller's jay), crickets and a great horned owl at night, wind, and rain. Their mix follows the hour (crossing over at dawn and dusk), the season (fewer birds and no crickets in winter, more wind), the day's weather, and the place: indoors you hear only rain on the roof, and Glacier Point and Tuolumne are windy. Up on the climbing screen the wind rises.
 - **Campfires and waterfalls.** `scripts/world/sound_emitter.gd` places a looping sound in the world that gets louder as you walk up to it. Every fire's sparks crackle, every waterfall's mist roars (Lower Yosemite Fall, Staircase Falls, Royal Arch Cascade), and on the hub maps each Place named for a fall gets one (Yosemite Falls, Bridalveil, Illilouette). Falls are loudest in spring and down to a trickle by fall.
 - **Footsteps.** Each step (`scripts/player/footfall.gd`) is dirt and duff, a squelch in the rain, a crunch in snow or on frozen winter ground, or boards indoors.
 - **Climbing.** Moves scrape on the granite; clipping a bolt, placing a cam, chalking up, eating, aiding or jugging, falling onto the rope, a perfect crux and topping out each have their own sound (hooked into `_events()` in `climb_minigame.gd`).
-- **Menus.** A soft tick to move and a wooden knock to choose, on the title screen and pause menu.
+- **Menus.** A soft tick to move and a wooden knock to choose, on the title screen, pause menu and conversations, and a swish as a conversation or the day's page opens.
+- **Getting things and talking.** A bubbly pop for an item, a chime for new gear, a jingle for a finished quest, and the talking blip, pitched for each speaker.
 
 ## Story
 
@@ -390,9 +417,10 @@ godot --headless --path . res://tests/settings_test.tscn
 godot --headless --path . res://tests/side_quests_test.tscn   # seasonal and time-of-day side stories
 godot --headless --path . res://tests/title_test.tscn
 godot --headless --path . res://tests/audio_test.tscn
+godot --headless --path . res://tests/polish_test.tscn
 ```
 
-The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds). The perks test earns each perk, checks its effect where it's hooked in, the HUD message and Journal section, and that perks survive a save. The settings test saves and reloads the settings (in its own file), drives the pause menu's Settings page with keys, and checks pinned button prompts, the HUD hiding under the journal, and the dialogue reveal and skip. The side quests test plays the side stories that depend on the season or the hour (Clark at the Mariposa Grove, Enid Michael at dawn, Hodges in fall, Degnan in winter, Muir after dark) and checks their Register pages say what is real. The title test drives the title screen with keys (with and without a save, New Game asking first, Settings and Credits), checks the credits carry the OpenStreetMap credit and the license texts, and that a new game starts fresh without deleting the old save. The audio test checks that every sound the game plays exists, that loops repeat over their whole length, that the buses follow the volume settings, how the ambience follows the hour, season, weather and place, and that fires, waterfalls, footsteps and the climbing screen make their sounds.
+The story test covers quests, gear, food spoilage, the chuckah, recipes, and the climbing rules. The world story test boots the real game and checks that people, climbs, and cooking spots are placed, the first quest works, and the Journal opens. The cast test checks that every quest's people, items, gear, and routes exist, that the gear curve lets you finish every quest, and that everyone stands on open ground. The eggs test checks the Easter eggs in docs/DESIGN.md (it takes about 15 seconds). The perks test earns each perk, checks its effect where it's hooked in, the HUD message and Journal section, and that perks survive a save. The settings test saves and reloads the settings (in its own file), drives the pause menu's Settings page with keys, and checks pinned button prompts, the HUD hiding under the journal, and the dialogue reveal and skip. The side quests test plays the side stories that depend on the season or the hour (Clark at the Mariposa Grove, Enid Michael at dawn, Hodges in fall, Degnan in winter, Muir after dark) and checks their Register pages say what is real. The title test drives the title screen with keys (with and without a save, New Game asking first, Settings and Credits), checks the credits carry the OpenStreetMap credit and the license texts, and that a new game starts fresh without deleting the old save. The audio test checks that every sound the game plays exists, that loops repeat over their whole length, that the buses follow the volume settings, how the ambience follows the hour, season, weather and place, and that fires, waterfalls, footsteps and the climbing screen make their sounds. The polish test checks that every item has a picture, that item cards count and stack, that everyone who speaks has a portrait and a voice of their own, the quest bubbles' ! and ?, the clock's sun and sky, that the music fits the hour, season, weather and title screen, and that the day's page counts the day, is saved, and starts over each morning.
 
 ### Performance bench
 

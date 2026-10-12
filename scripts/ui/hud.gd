@@ -53,6 +53,7 @@ func _ready() -> void:
 	move_child(toasts, fade.get_index()) # under the fade, so the black covers it
 	Inventory.added.connect(_on_item_added)
 	Gear.added.connect(_on_gear_added)
+	QuestLog.quest_completed.connect(func(_quest: QuestData) -> void: Sound.play("quest_done", 0.0, 0.0))
 	var panel := PanelContainer.new()
 	_status = Label.new()
 	panel.add_child(_status)
