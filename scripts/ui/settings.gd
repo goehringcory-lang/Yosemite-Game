@@ -39,6 +39,12 @@ static var effects_volume := MAX_VOLUME
 ## Volume of the music, 0 to MAX_VOLUME.
 static var music_volume := 8
 static var ambience_volume := MAX_VOLUME
+## The UI's letters: smooth (Noto Sans, the default, easiest to read) or a
+## pixel font (Pixelify Sans) that matches the pixel art, as in Stardew Valley.
+static var pixel_font := false
+const SMOOTH_FONT := "res://assets/fonts/NotoSans-Regular.ttf"
+const PIXEL_FONT := "res://assets/fonts/PixelifySans.ttf"
+static var _fonts: Dictionary = {}
 
 static var _loaded := false
 ## True once settings came from a file or the player changed one, so the
@@ -49,6 +55,34 @@ static var _customized := false
 static func ensure_loaded() -> void:
 	if not _loaded:
 		load_settings()
+		apply_font()
+
+
+## The font for the UI, as chosen: Noto Sans, or crisp Pixelify Sans.
+static func ui_font() -> Font:
+	ensure_loaded()
+	var path := PIXEL_FONT if pixel_font else SMOOTH_FONT
+	if not _fonts.has(path):
+		var font := load(path) as FontFile
+		if font == null:
+			return ThemeDB.fallback_font
+		if path == PIXEL_FONT:
+			font = font.duplicate() as FontFile
+			font.antialiasing = TextServer.FONT_ANTIALIASING_NONE
+			font.hinting = TextServer.HINTING_NONE
+			font.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
+		_fonts[path] = font
+	return _fonts[path]
+
+
+## Puts the chosen font on every screen that uses the project's theme.
+static func apply_font() -> void:
+	var theme := ThemeDB.get_project_theme()
+	if theme == null:
+		return
+	var font := ui_font()
+	if theme.default_font != font:
+		theme.default_font = font
 
 
 ## Reads [member path]; missing keys keep their defaults.
@@ -67,6 +101,7 @@ static func load_settings() -> void:
 	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
 	music_volume = clampi(int(config.get_value("audio", "music", music_volume)), 0, MAX_VOLUME)
 	ambience_volume = clampi(int(config.get_value("audio", "ambience", ambience_volume)), 0, MAX_VOLUME)
+	pixel_font = bool(config.get_value("display", "pixel_font", pixel_font))
 
 
 static func save() -> Error:
@@ -81,6 +116,7 @@ static func save() -> Error:
 	config.set_value("audio", "effects", effects_volume)
 	config.set_value("audio", "music", music_volume)
 	config.set_value("audio", "ambience", ambience_volume)
+	config.set_value("display", "pixel_font", pixel_font)
 	return config.save(path)
 
 
@@ -93,6 +129,7 @@ static func reset_defaults() -> void:
 	effects_volume = MAX_VOLUME
 	music_volume = 8
 	ambience_volume = MAX_VOLUME
+	pixel_font = false
 	_customized = false
 
 

@@ -51,6 +51,16 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | A volume for music | Music has its own bus and setting | `settings.gd`, `pause_menu.gd` | test, settings test |
 | Living ambience | Birds, crickets, wind, rain, fires, waterfalls, footsteps by surface (existing) | `sound.gd`, `sound_emitter.gd`, `footfall.gd` | audio test |
 
+## Two independent reviews
+
+Two separate reviewers, given only screenshots and asked to be harsh, judged the game against Stardew Valley. The first found text running off the Controls page and both maps, the day's page over the clock, item cards under menus, the gift prompt covering the person, placeholder shopkeepers and a placeholder campfire, ASCII cursors, and a crowded climbing HUD. All of that is fixed, and the second reviewer confirmed it from new screenshots, rating the presentation about 6.5 of 10 against Stardew (up from about 5). Their next round (padding inside panels, the world dimming behind menus, drawn checkboxes and arrows, fades at scroll edges, a card behind messages, at most four item cards) is fixed too.
+
+Their biggest remaining point was typography: Stardew uses one pixel font, and this game uses Noto Sans because a pixel font (Tiny5) was found too hard to read. So the choice is now the player's: **Settings > Font** switches every screen, the climbing screen included, to Pixelify Sans, a pixel font that is still easy to read (`docs/polish_pixel_font.png`). Smooth stays the default.
+
+| Stardew hallmark | Here | Where | Checked by |
+|---|---|---|---|
+| A pixel font that matches the art | Settings > Font: Smooth (Noto Sans) or Pixel (Pixelify Sans, SIL Open Font License, credited with its license) | `Settings.ui_font`, `apply_font` | test (switches the theme and the climbing screen, saved, smooth by default, license present) |
+
 ## Not done
 
 - **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew also has several pieces a season; here there is one.

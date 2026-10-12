@@ -30,6 +30,7 @@ func _ready() -> void:
 	test_dial()
 	test_music()
 	test_tuning()
+	test_font_setting()
 	await test_critters(world)
 	await test_rustle(world)
 	await test_location_fits(world)
@@ -430,6 +431,31 @@ func test_friendship(world: Node) -> void:
 	check(found, "the Journal shows Muir's hearts")
 	Inventory.remove("dry_crusts", Inventory.count("dry_crusts"))
 	Friendship.start_new_game()
+
+
+## Settings > Font swaps every screen to the pixel font and back, and is saved.
+func test_font_setting() -> void:
+	var saved_path := Settings.path
+	Settings.path = "user://polish_test_settings.cfg"
+	Settings.load_settings()
+	check(not Settings.pixel_font, "letters are smooth by default, easiest to read")
+	var theme := ThemeDB.get_project_theme()
+	Settings.pixel_font = true
+	Settings.apply_font()
+	check(theme.default_font.resource_path.ends_with("PixelifySans.ttf") or theme.default_font == Settings.ui_font(), "the pixel font goes on every themed screen")
+	check(load("res://scripts/climb/art/climb_ui.gd").font() == Settings.ui_font(), "and on the climbing screen")
+	Settings.save()
+	Settings.pixel_font = false
+	Settings.load_settings()
+	check(Settings.pixel_font, "the choice is saved")
+	Settings.pixel_font = false
+	Settings.apply_font()
+	check(theme.default_font == Settings.ui_font() and not Settings.pixel_font, "and smooth letters come back")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(Settings.path))
+	Settings.path = saved_path
+	Settings.load_settings()
+	check(FileAccess.file_exists(Credits.PIXEL_FONT_LICENSE), "the pixel font's license is in the project")
+	check(Credits.licenses_bbcode().contains("Pixelify Sans"), "and on the Licenses page")
 
 
 func test_day_log(world: Node) -> void:

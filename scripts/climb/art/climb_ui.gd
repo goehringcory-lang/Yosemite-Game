@@ -30,6 +30,9 @@ static var _font: Font
 
 
 static func font() -> Font:
+	# the pixel font, when chosen in Settings, is used here too
+	if Settings.pixel_font:
+		return Settings.ui_font()
 	if _font == null:
 		var loaded := load(FONT_PATH) as FontFile
 		if loaded != null:

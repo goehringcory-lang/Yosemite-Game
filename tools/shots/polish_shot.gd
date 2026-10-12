@@ -16,6 +16,11 @@ func _snap(dir: String, shot_name: String, frames := 8) -> void:
 func _ready() -> void:
 	SaveManager.save_path = "user://polish_shot_save.json"
 	SaveManager.delete_save()
+	# SHOT_PIXEL_FONT=1 shoots with the pixel font (Settings > Font).
+	if OS.get_environment("SHOT_PIXEL_FONT") == "1":
+		Settings.ensure_loaded()
+		Settings.pixel_font = true
+		Settings.apply_font()
 	var world: Node = load("res://scenes/world/world.tscn").instantiate()
 	add_child(world)
 	await get_tree().process_frame

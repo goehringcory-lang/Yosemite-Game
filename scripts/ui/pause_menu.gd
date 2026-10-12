@@ -30,13 +30,14 @@ enum Option { RESUME, SAVE, SETTINGS, CONTROLS, QUIT }
 const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Quit to desktop"]
 const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again to quit."
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Volume", "Music", "Sound effects", "Ambience", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, FONT, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Font", "Volume", "Music", "Sound effects", "Ambience", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill the screen. The picture stays sharp in whole-pixel steps.",
 	"The window's size, in whole steps of 480 x 270.",
 	"Which buttons hints name. Auto follows the last device you used.",
+	"Smooth letters are easiest to read; pixel letters match the art.",
 	"How loud the whole game is.",
 	"The songs for each season, the night, and the title screen.",
 	"Footsteps, climbing, and menus.",
@@ -176,8 +177,6 @@ func _build_settings() -> Control:
 	page.add_child(_help_label)
 	_sample_label = _label(SPEED_SAMPLE)
 	page.add_child(_sample_label)
-	page.add_child(_spacer(2))
-	page.add_child(_label("Settings save as soon as you change them.", DIM))
 	return page
 
 
@@ -349,6 +348,9 @@ func change_setting(which: int, step: int) -> void:
 		Setting.TEXT_SPEED:
 			Settings.text_speed = wrapi(Settings.text_speed + step, 0, Settings.TextSpeed.size()) as Settings.TextSpeed
 			_restart_sample()
+		Setting.FONT:
+			Settings.pixel_font = not Settings.pixel_font
+			Settings.apply_font()
 		Setting.FULLSCREEN:
 			Settings.fullscreen = not Settings.fullscreen
 		Setting.WINDOW_SIZE:
@@ -426,6 +428,8 @@ func _setting_value(which: int) -> String:
 	match which:
 		Setting.TEXT_SPEED:
 			value = Settings.TEXT_SPEED_NAMES[Settings.text_speed]
+		Setting.FONT:
+			value = "Pixel" if Settings.pixel_font else "Smooth"
 		Setting.FULLSCREEN:
 			value = "On" if Settings.fullscreen else "Off"
 		Setting.WINDOW_SIZE:
