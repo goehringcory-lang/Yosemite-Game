@@ -1013,8 +1013,9 @@ func _draw_reachable() -> void:
 		if hold.get("rest", false):
 			color = UI.GOOD
 		_canvas.draw_arc(p, 7.0, 0, TAU, 16, Color(color, pulse), 1.0)
-		var key: String = ["<", "^", ">"][dx + 1]
-		var label := "%s %d" % [key, cost]
+		_chevron(p, dx, Color(color, pulse))
+		# what the move costs, in energy
+		var label := "-%d" % cost
 		if hold.get("crux", false):
 			label += " crux"
 		elif hold.get("rest", false):
@@ -1036,6 +1037,18 @@ func _draw_reachable() -> void:
 					UI.outlined(_canvas, p + Vector2(9, -1), label, color, 10)
 		if state.stamina - cost <= 0 and not hold.get("crux", false):
 			UI.outlined(_canvas, p + Vector2(0, 17), "fall!", UI.WARN, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+## A small arrow inside a hold's ring, pointing the way that move goes:
+## up-left, up, or up-right.
+func _chevron(at: Vector2, dx: int, color: Color) -> void:
+	var dir := Vector2(dx, -1.0).normalized()
+	var side := Vector2(-dir.y, dir.x)
+	var tip := at.round() + dir * 3.5
+	var back := at.round() - dir * 1.5
+	var arrow := PackedVector2Array([tip, back + side * 3.0, back - side * 3.0])
+	_canvas.draw_colored_polygon(arrow, Color(UI.SHADOW, color.a))
+	_canvas.draw_colored_polygon(PackedVector2Array([tip - dir * 0.8, back + side * 2.0, back - side * 2.0]), color)
 
 
 func _cost_color(cost: int) -> Color:

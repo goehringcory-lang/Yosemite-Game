@@ -41,6 +41,8 @@ static func stamina(ci: CanvasItem, state: ClimbState, flash: float, shake: floa
 	var frac := clampf(state.stamina / float(ClimbState.MAX_STAMINA), 0.0, 1.0)
 	var r := Rect2(SCREEN.x - 26 + roundf(shake), SCREEN.y - 96, 12, 80)
 	UI.energy_bar(ci, r, frac, state.stamina <= 25, flash)
+	# an "E" over the bar, as on Stardew's energy bar, and the number under it
+	UI.outlined(ci, Vector2(r.position.x + r.size.x / 2.0, r.position.y - 3), "E", UI.GOLD, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 	UI.text(ci, Vector2(r.position.x - 3, r.end.y + 12), "%d" % maxi(state.stamina, 0), UI.WARN if state.stamina <= 25 else UI.CREAM, 10)
 
 

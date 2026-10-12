@@ -516,6 +516,9 @@ static func slot(ci: CanvasItem, pos: Vector2, id: String, count := -1, dim := f
 		ci.draw_texture(icon_texture(id), pos.round() + Vector2(4, 4), Color(0.2, 0.1, 0.0, 0.25))
 	icon(ci, id, pos + Vector2(3, 3), Color(1, 1, 1, 0.35) if dim else Color.WHITE)
 	if count >= 0:
+		# the count on a small dark badge in the corner, inside the slot
 		var s := str(count)
-		var w := text_width(s, 10)
-		text(ci, pos + Vector2(17 - w, 17), s, CREAM if not dim else Color(CREAM, 0.5), 10)
+		var w := text_width(s, 8)
+		var badge := Rect2((pos + Vector2(18 - w - 2, 11)).round(), Vector2(w + 2, 8))
+		ci.draw_rect(badge, Color(0.1, 0.07, 0.05, 0.8))
+		text(ci, pos + Vector2(17 - w, 18), s, CREAM if not dim else Color(CREAM, 0.5), 8)
