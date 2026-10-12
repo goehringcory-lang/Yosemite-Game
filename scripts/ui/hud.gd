@@ -125,6 +125,18 @@ func _ready() -> void:
 	Inventory.changed.connect(_refresh_food)
 	_refresh_food()
 	location_panel.add_theme_stylebox_override("panel", plaque)
+	# The use prompt is a slim bubble, not a full frame, so it doesn't cover
+	# the person or the sign you're facing.
+	var bubble := StyleBoxFlat.new()
+	bubble.bg_color = Color(0.11, 0.08, 0.06, 0.82)
+	bubble.border_color = Color(0.78, 0.63, 0.38, 0.9)
+	bubble.set_border_width_all(1)
+	bubble.set_corner_radius_all(2)
+	bubble.content_margin_left = 4.0
+	bubble.content_margin_right = 4.0
+	bubble.content_margin_top = 0.0
+	bubble.content_margin_bottom = 1.0
+	prompt_panel.add_theme_stylebox_override("panel", bubble)
 
 
 func bind_player(player: Player) -> void:
@@ -302,7 +314,7 @@ func _update_prompt() -> void:
 	if target is CanvasItem:
 		screen.y = minf(screen.y, (target as CanvasItem).get_global_transform_with_canvas().origin.y)
 	var size := prompt_panel.get_combined_minimum_size()
-	prompt_panel.position = (screen + Vector2(-size.x / 2.0, -46)).clamp(Vector2(2, 2), get_viewport().get_visible_rect().size - size - Vector2(2, 2)).round()
+	prompt_panel.position = (screen + Vector2(-size.x / 2.0, -40)).clamp(Vector2(2, 2), get_viewport().get_visible_rect().size - size - Vector2(2, 2)).round()
 
 
 func fade_to_black() -> void:
