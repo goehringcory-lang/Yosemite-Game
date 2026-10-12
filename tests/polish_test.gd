@@ -451,6 +451,11 @@ func test_font_setting() -> void:
 	Settings.apply_font()
 	check(theme.default_font == Settings.ui_font(), "the pixel font goes on every themed screen")
 	check(load("res://scripts/climb/art/climb_ui.gd").font() == Settings.ui_font(), "and on the climbing screen")
+	# proportional, so "Village" doesn't read "Vi l lage"
+	var pixel := Settings.ui_font()
+	var narrow := pixel.get_string_size("i", HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
+	var wide := pixel.get_string_size("m", HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
+	check(narrow * 2.0 < wide, "the pixel font sets an i narrower than an m (%.0f, %.0f)" % [narrow, wide])
 	Settings.save()
 	Settings.pixel_font = false
 	Settings.load_settings()

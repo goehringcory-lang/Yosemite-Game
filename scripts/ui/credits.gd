@@ -34,7 +34,8 @@ const CREDITS := [
 	]],
 	["Fonts", [
 		"Noto Sans, © 2022 The Noto Project Authors, and",
-		"DotGothic16, © 2020 The DotGothic16 Project Authors,",
+		"DotGothic16, © 2020 The DotGothic16 Project Authors",
+		"(its Latin letters set proportionally for this game),",
 		"both under the SIL Open Font License 1.1.",
 	]],
 	["Engine", [
@@ -155,7 +156,7 @@ static func licenses_bbcode() -> String:
 	out.append("[color=#%s]Noto Sans[/color]" % gold)
 	out.append(_escape(FileAccess.get_file_as_string(FONT_LICENSE)) if FileAccess.file_exists(FONT_LICENSE) \
 		else "Copyright 2022 The Noto Project Authors. SIL Open Font License, Version 1.1.")
-	out.append("[color=#%s]DotGothic16[/color]" % gold)
+	out.append("[color=#%s]DotGothic16 (as DotGothic16 Prop, its Latin letters set proportionally by tools/fonts/proportional.py)[/color]" % gold)
 	out.append(_escape(FileAccess.get_file_as_string(PIXEL_FONT_LICENSE)) if FileAccess.file_exists(PIXEL_FONT_LICENSE) \
 		else "Copyright 2020 The DotGothic16 Project Authors. SIL Open Font License, Version 1.1.")
 	out.append("[color=#%s]Libraries in Godot Engine[/color]" % gold)

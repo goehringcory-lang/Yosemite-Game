@@ -44,7 +44,7 @@ static var ambience_volume := MAX_VOLUME
 ## Noto Sans.
 static var pixel_font := true
 const SMOOTH_FONT := "res://assets/fonts/NotoSans-Regular.ttf"
-const PIXEL_FONT := "res://assets/fonts/DotGothic16-Regular.ttf"
+const PIXEL_FONT := "res://assets/fonts/DotGothic16Prop-Regular.ttf"
 static var _fonts: Dictionary = {}
 
 static var _loaded := false

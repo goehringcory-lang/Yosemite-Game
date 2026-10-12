@@ -61,7 +61,7 @@ The third reviewer scored the default build 6.5 of 10 against Stardew Valley, be
 
 | Stardew hallmark | Here | Where | Checked by |
 |---|---|---|---|
-| A pixel font that matches the art | DotGothic16 by default (SIL Open Font License, credited with its license); Settings > Font switches to Noto Sans | `Settings.ui_font`, `apply_font` | test (switches the theme and the climbing screen, saved, pixel by default, license present; every screen checked to fit with both fonts) |
+| A pixel font that matches the art | DotGothic16 by default (SIL Open Font License, credited with its license), with its Latin letters made proportional (`tools/fonts/proportional.py`) after a fourth review found the fixed-width "i" and "l" left gaps ("Vi l lage"); Settings > Font switches to Noto Sans | `Settings.ui_font`, `apply_font` | test (switches the theme and the climbing screen, saved, pixel by default, an i narrower than an m, license present; every screen checked to fit with both fonts) |
 
 ## Not done
 
