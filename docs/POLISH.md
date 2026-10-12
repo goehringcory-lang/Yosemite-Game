@@ -83,13 +83,34 @@ Three more reviews followed (the fourth, fifth and sixth), each given fresh scre
 - Birds stayed out after dark. They now leave at dusk and in rain.
 - The place-name banner now fades after you arrive.
 
+A seventh and an eighth review (after the game was named Valley Days) scored 6 and 6.5. What they found and what was done:
+
+- **The HUD didn't show what you trade with.** The clock now shows the food energy you carry, as Stardew keeps your gold under its clock.
+- **Portraits looked flat.** They're painted at 80 px with form shading and a rim of light.
+- **Menus were text with dead space.** Quests are now cards with the giver's face and a "Looking for help" list. Settings has a card about the chosen setting, Friends have faces, and the gift menu shows who you're giving to.
+- **Item cards sat over people.** They're one width, three at most, and hide during a conversation unless fresh.
+- **The use prompt covered heads and signs.** It's now a slim bubble.
+- **Placeholder-looking art.**
+  - Trail mix is now a paper sack.
+  - The flag has stripes.
+  - Cars have a rear face in 3/4 view.
+  - The Mountain Shop has finer floorboards and gear on its walls, and its crash pad no longer has scribbled lettering.
+  - Waterfall mist and smoke are pixel puffs.
+- **Frame seams.** The panel and plaque edges no longer stretch into light strips.
+- **Layout bugs.**
+  - A lamp no longer stands in a bench or glows through a tree.
+  - A string of lights no longer floats.
+  - Map labels keep clear of the pin and markers.
+- **The climb.** Slab holds are readable, the energy bar has a bolt instead of an "E", and move costs are no longer green.
+- **Music.** Each season has a second, afternoon piece.
+
 | Stardew hallmark | Here | Where | Checked by |
 |---|---|---|---|
 | A pixel font that matches the art | DotGothic16 by default (SIL Open Font License, credited with its license), with its Latin letters made proportional (`tools/fonts/proportional.py`) after a fourth review found the fixed-width "i" and "l" left gaps ("Vi l lage"); Settings > Font switches to Noto Sans | `Settings.ui_font`, `apply_font` | test (switches the theme and the climbing screen, saved, pixel by default, an i narrower than an m, license present; every screen checked to fit with both fonts) |
 
 ## Not done
 
-The last three independent reviews scored the game 6 to 6.5 of 10 against Stardew Valley. It is not at Stardew's level. What holds it back, in the reviewers' words and ours:
+The last five independent reviews scored the game 6 to 6.5 of 10 against Stardew Valley. It is not at Stardew's level. What holds it back, in the reviewers' words and ours:
 
 - **The world is sparser than Stardew's.** Plazas, lawns and lots have less clutter (crates, flower strips, wear paths, edging) than Stardew's dense towns. Curry Village's buildings keep their first size.
 - **People keep close to one spot.** Visitors go home at night, and the people with quests stroll about their spot through the day and stand at it overnight, so their stories are always within a few steps; Stardew's villagers walk full timetables between home, work and the saloon.
