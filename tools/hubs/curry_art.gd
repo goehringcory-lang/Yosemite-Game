@@ -1077,5 +1077,24 @@ func car(style: int, paint: Color) -> Image:
 			K.rect(im, x0 + 4, 24, 8, 6, c("b8b0a0"))                    # roof air conditioner
 			K.rect(im, x0 + body_w - 10, 40, 6, 8, c("d8d0b8"))
 			K.rect(im, x0 + 4, 22, 2, h - 30, c("a89f8a"))               # ladder
+	# The back of the car, seen from above and behind like the buildings:
+	# a shaded rear panel with tail lights and a plate, the bumper, and the
+	# rear tyres under it, so the car stands up instead of lying flat.
+	var face := 8
+	var top := h - 4 - face
+	K.rect(im, x0, top, body_w, face, paint.darkened(0.22))
+	K.hline(im, x0, top, body_w, paint.lightened(0.2))
+	K.vline(im, x0, top, face, paint.darkened(0.08))
+	K.vline(im, x0 + body_w - 1, top, face, paint.darkened(0.4))
+	K.rect(im, x0 + 1, top + 2, 4, 3, c("d8402e"))
+	K.px(im, x0 + 1, top + 2, c("ff8a6a"))
+	K.rect(im, x0 + body_w - 5, top + 2, 4, 3, c("d8402e"))
+	K.px(im, x0 + body_w - 5, top + 2, c("ff8a6a"))
+	K.rect(im, x0 + body_w / 2 - 3, top + 3, 6, 3, c("efe6cf"))
+	K.hline(im, x0 + body_w / 2 - 2, top + 4, 4, c("3a5a8a"))
+	K.rect(im, x0 + 1, h - 5, body_w - 2, 2, c("c8c8c0"))
+	K.hline(im, x0 + 1, h - 5, body_w - 2, c("f0f0ea"))
+	K.rect(im, x0, h - 3, 5, 3, c("1c1c20"))
+	K.rect(im, x0 + body_w - 5, h - 3, 5, 3, c("1c1c20"))
 	K.outline(im)
 	return im
