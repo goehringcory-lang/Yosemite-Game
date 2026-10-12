@@ -928,9 +928,9 @@ func chair(variant: int) -> Image:
 	return im
 
 
-## 16x16 icons: pilot bread, cheddar, dried apricots, jerky, chocolate.
+## 16x16 icons: pilot bread, cheddar, dried apricots, jerky, chocolate, King Cobra.
 func store_foods() -> Image:
-	var im := K.make(80, 16)
+	var im := K.make(96, 16)
 	# pilot bread: a stack of pale round crackers
 	for k in 3:
 		K.ellipse(im, 8.0, 11.0 - k * 2.5, 6.0, 2.6, c("d8b878"))
@@ -965,6 +965,16 @@ func store_foods() -> Image:
 		K.vline(im, x, 7, 6, c("3a2010"))
 	K.rect(im, 66, 10, 12, 3, c("c8a038"))
 	K.px(im, 70, 11, c("f0d878"))
+	# King Cobra: a tall black can with gold bands and a red label
+	K.rect(im, 85, 3, 6, 11, c("22201e"))
+	K.vline(im, 85, 4, 9, c("4a4642"))
+	K.rect(im, 85, 3, 6, 1, c("c8ccd0"))
+	K.rect(im, 85, 13, 6, 1, c("9aa0a6"))
+	K.hline(im, 85, 6, 6, c("d8a830"))
+	K.hline(im, 85, 10, 6, c("d8a830"))
+	K.rect(im, 87, 7, 3, 3, c("c8281e"))
+	K.px(im, 88, 8, c("f0d878"))
+	K.px(im, 88, 2, c("9aa0a6"))
 	K.outline(im)
 	return im
 

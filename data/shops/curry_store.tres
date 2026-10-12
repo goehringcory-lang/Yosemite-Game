@@ -44,9 +44,15 @@ kind = "item"
 id = "dried_apples"
 price = 20
 
+[sub_resource type="Resource" id="Resource_kc0br"]
+script = ExtResource("1_xlpgx")
+kind = "item"
+id = "king_cobra"
+price = 24
+
 [resource]
 script = ExtResource("2_2q41s")
 keeper = "Camp Curry Store clerk"
 greeting = "Morning! Fresh forage on the counter and I'll put food that keeps in your pack. Everything here travels well."
 nothing_yet = "We're all out. Deliveries come up the road tomorrow."
-offers = Array[ExtResource("1_xlpgx")]([SubResource("Resource_1cihp"), SubResource("Resource_iunkh"), SubResource("Resource_2mwp8"), SubResource("Resource_32eci"), SubResource("Resource_7ahe6"), SubResource("Resource_v12q2"), SubResource("Resource_d2sps")])
+offers = Array[ExtResource("1_xlpgx")]([SubResource("Resource_1cihp"), SubResource("Resource_iunkh"), SubResource("Resource_2mwp8"), SubResource("Resource_32eci"), SubResource("Resource_7ahe6"), SubResource("Resource_v12q2"), SubResource("Resource_d2sps"), SubResource("Resource_kc0br")])

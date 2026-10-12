@@ -49,6 +49,7 @@ const ITEMS := [
 	preload("res://data/food/dried_apricots.tres"),
 	preload("res://data/food/beef_jerky.tres"),
 	preload("res://data/food/chocolate_bar.tres"),
+	preload("res://data/food/king_cobra.tres"),
 ]
 
 var _by_id: Dictionary = {}
