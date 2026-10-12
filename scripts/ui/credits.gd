@@ -67,6 +67,8 @@ const DRIFT_WAIT := 1.5
 var _panel: PanelContainer
 var _title: Label
 var _text: RichTextLabel
+var _fade_above: TextureRect
+var _fade_below: TextureRect
 var _footer: Label
 var _page := Page.CREDITS
 ## The Credits page drifts until the player scrolls it by hand.
@@ -107,6 +109,8 @@ func _ready() -> void:
 	_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_text.add_theme_constant_override("line_separation", 1)
 	column.add_child(_text)
+	_fade_above = MenuInput.edge_fade(_text, true)
+	_fade_below = MenuInput.edge_fade(_text, false)
 	_footer = Label.new()
 	_footer.modulate = DIM
 	column.add_child(_footer)
@@ -232,6 +236,8 @@ func _process(delta: float) -> void:
 				_wait = DRIFT_WAIT * 2.0
 	_scroll = clampf(_scroll, 0.0, end)
 	bar.value = roundf(_scroll)
+	_fade_above.visible = _scroll > 0.5
+	_fade_below.visible = _scroll < end - 0.5
 
 
 func _footer_text() -> String:

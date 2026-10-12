@@ -637,35 +637,7 @@ func _rule() -> ColorRect:
 
 ## A strip that fades the page into the panel at its top or bottom edge.
 func _edge_fade(holder: Control, top: bool) -> TextureRect:
-	var gradient := Gradient.new()
-	var paper := Color(37 / 255.0, 27 / 255.0, 20 / 255.0) if not top else Color(52 / 255.0, 36 / 255.0, 22 / 255.0)
-	gradient.set_color(0, Color(paper, 1.0 if top else 0.0))
-	gradient.set_color(1, Color(paper, 0.0 if top else 1.0))
-	# solid over the outer third, so a row cut off at the edge never shows
-	# as a sliver of half letters
-	gradient.add_point(0.35 if top else 0.65, Color(paper, 1.0))
-	var texture := GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.fill_from = Vector2(0, 0)
-	texture.fill_to = Vector2(0, 1)
-	texture.width = 4
-	texture.height = 16
-	var fade := TextureRect.new()
-	fade.texture = texture
-	fade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	fade.stretch_mode = TextureRect.STRETCH_SCALE
-	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	fade.anchor_right = 1.0
-	fade.offset_right = -8.0 # leave the scroll bar clear
-	if top:
-		fade.offset_bottom = 8.0
-	else:
-		fade.anchor_top = 1.0
-		fade.anchor_bottom = 1.0
-		fade.offset_top = -18.0
-	fade.visible = false
-	holder.add_child(fade)
-	return fade
+	return MenuInput.edge_fade(holder, top, 8.0)
 
 
 ## A line with a drawn checkbox in front of it (ticked or not).

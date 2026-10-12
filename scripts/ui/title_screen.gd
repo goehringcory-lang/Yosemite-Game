@@ -35,6 +35,7 @@ var _shimmer: Control
 var _menu: PanelContainer
 var _hint: Label
 var _footer: Label
+var _footer_band: PanelContainer
 var _fade: ColorRect
 var _select_style: StyleBoxTexture
 var _plain_style: StyleBoxEmpty
@@ -134,12 +135,31 @@ func _build_title() -> void:
 	add_child(divider)
 	var tagline := Label.new()
 	tagline.text = ProjectSettings.get_setting("application/config/description")
-	tagline.add_theme_color_override("font_outline_color", Color(0.12, 0.08, 0.06))
-	tagline.add_theme_constant_override("outline_size", 4)
-	tagline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	tagline.position = Vector2(0, LOGO_TOP + 63)
-	tagline.size = Vector2(SCREEN.x, 16)
-	add_child(tagline)
+	_on_band(tagline, LOGO_TOP + 63)
+
+
+## Sets [param label] on a soft dark band across the picture at [param y], so
+## its letters stay crisp over the busy painting without a heavy outline.
+func _on_band(label: Label, y: float) -> PanelContainer:
+	var band := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.1, 0.07, 0.05, 0.62)
+	style.content_margin_left = 8.0
+	style.content_margin_right = 8.0
+	style.content_margin_top = 0.0
+	style.content_margin_bottom = 1.0
+	band.add_theme_stylebox_override("panel", style)
+	label.add_theme_color_override("font_outline_color", Color(0.12, 0.08, 0.06))
+	label.add_theme_constant_override("outline_size", 2)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	band.add_child(label)
+	band.position.y = y
+	# centred whenever it knows its width
+	var centre := func() -> void: band.position.x = roundf((SCREEN.x - band.size.x) / 2.0)
+	band.resized.connect(centre)
+	add_child(band)
+	centre.call_deferred()
+	return band
 
 
 func _build_menu() -> void:
@@ -174,20 +194,15 @@ func _build_menu() -> void:
 	_hint = Label.new()
 	_hint.add_theme_color_override("font_color", HEADING)
 	_hint.add_theme_color_override("font_outline_color", Color(0.12, 0.08, 0.06))
-	_hint.add_theme_constant_override("outline_size", 4)
+	_hint.add_theme_constant_override("outline_size", 2)
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_hint.position = Vector2(40, 228)
 	_hint.size = Vector2(SCREEN.x - 80, 16)
 	add_child(_hint)
 	_footer = Label.new()
-	_footer.modulate = DIM
-	_footer.add_theme_color_override("font_outline_color", Color(0.12, 0.08, 0.06))
-	_footer.add_theme_constant_override("outline_size", 4)
-	_footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_footer.position = Vector2(0, SCREEN.y - 18)
-	_footer.size = Vector2(SCREEN.x, 16)
-	add_child(_footer)
+	_footer.add_theme_color_override("font_color", Color(1, 1, 1, 0.8))
+	_footer_band = _on_band(_footer, SCREEN.y - 17)
 
 
 ## The options on the menu now, in order (Continue only with a save).
@@ -277,7 +292,7 @@ func _refresh() -> void:
 	var covered := _pause.is_open() or _credits.is_open()
 	_menu.visible = not covered
 	_hint.visible = not covered
-	_footer.visible = not covered
+	_footer_band.visible = not covered
 	for i in _labels.size():
 		var chosen := i == _cursor
 		_labels[i].text = "   " + OPTION_NAMES[_options[i]]

@@ -154,3 +154,39 @@ static func badge(label: Control, texture: Texture2D, right := false, flip := fa
 	icon.offset_top = -size.y / 2.0
 	icon.offset_bottom = size.y / 2.0
 	icon.visible = texture != null
+
+
+## A strip over the top or bottom edge of [param holder] that fades a
+## scrolling page into the panel behind it, solid over its outer third so a
+## row cut off at the edge never shows as a sliver of half letters. The
+## colors are the theme panel's paper at its top and bottom. Starts hidden;
+## show it while there's more page past that edge. [param right_gap] leaves a
+## scroll bar clear.
+static func edge_fade(holder: Control, top: bool, right_gap := 0.0) -> TextureRect:
+	var gradient := Gradient.new()
+	var paper := Color(37 / 255.0, 27 / 255.0, 20 / 255.0) if not top else Color(52 / 255.0, 36 / 255.0, 22 / 255.0)
+	gradient.set_color(0, Color(paper, 1.0 if top else 0.0))
+	gradient.set_color(1, Color(paper, 0.0 if top else 1.0))
+	gradient.add_point(0.35 if top else 0.65, Color(paper, 1.0))
+	var texture := GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.fill_from = Vector2(0, 0)
+	texture.fill_to = Vector2(0, 1)
+	texture.width = 4
+	texture.height = 16
+	var fade := TextureRect.new()
+	fade.texture = texture
+	fade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	fade.stretch_mode = TextureRect.STRETCH_SCALE
+	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fade.anchor_right = 1.0
+	fade.offset_right = -right_gap
+	if top:
+		fade.offset_bottom = 8.0
+	else:
+		fade.anchor_top = 1.0
+		fade.anchor_bottom = 1.0
+		fade.offset_top = -18.0
+	fade.visible = false
+	holder.add_child(fade)
+	return fade
