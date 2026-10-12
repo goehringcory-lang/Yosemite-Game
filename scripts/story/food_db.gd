@@ -45,6 +45,7 @@ const FOODS := {
 	"chocolate_bar": {"energy": 24, "shelf_life": 60},
 	"cheddar_wedge": {"energy": 28, "shelf_life": 12},
 	"beef_jerky": {"energy": 32, "shelf_life": 45},
+	"king_cobra": {"energy": 14, "shelf_life": 90},
 }
 
 

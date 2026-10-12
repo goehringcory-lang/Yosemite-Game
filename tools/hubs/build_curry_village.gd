@@ -72,6 +72,7 @@ func _build_foods() -> void:
 		["dried_apricots", "Dried Apricots", "Sun-dried and chewy. A little sweet, a little tart, and they keep for weeks.", 2],
 		["beef_jerky", "Beef Jerky", "Salty strips that last a season in a pack. Chewy, and easy to eat on the move.", 3],
 		["chocolate_bar", "Chocolate Bar", "A thick bar wrapped in foil. Melts in August, so keep it in the shade.", 4],
+		["king_cobra", "King Cobra", "A tall black can of malt liquor, cold from the store's cooler. Not much of a meal, but it keeps.", 5],
 	]
 	for food: Array in foods:
 		var item := ItemData.new()
@@ -116,7 +117,7 @@ func _build_shops() -> void:
 		"We're all out. Deliveries come up the road tomorrow.",
 		[_offer("item", "pilot_bread", 30), _offer("item", "dried_apricots", 26), _offer("item", "chocolate_bar", 36),
 		_offer("item", "cheddar_wedge", 40), _offer("item", "beef_jerky", 46), _offer("item", "trail_mix", 40),
-		_offer("item", "dried_apples", 20)]),
+		_offer("item", "dried_apples", 20), _offer("item", "king_cobra", 24)]),
 		"res://data/shops/curry_store.tres")
 	# The clerk, Marty Kessler, is also a quest giver (data/characters/staff/).
 	save_resource(_shop("Marty Kessler",
