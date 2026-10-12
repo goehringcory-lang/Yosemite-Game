@@ -16,6 +16,14 @@ extends CanvasLayer
 const NAME_COLOR := Color(1.0, 0.85, 0.5)
 const CURSOR := "> "
 const HINT_COLOR := Color(1, 1, 1, 0.6)
+## The text's width with and without a portrait beside it.
+const TEXT_WIDTH := 456.0
+const TEXT_WIDTH_PORTRAIT := 404.0
+## A talking blip every this many letters while a person's line types out.
+const BLIP_EVERY := 3
+## How far the box rises as it opens, in pixels, and how long it takes.
+const OPEN_RISE := 8.0
+const OPEN_TIME := 0.14
 ## How far the next arrow bobs, in pixels, and how many bobs a second.
 const ARROW_BOB := 1.0
 const ARROW_SPEED := 1.2
@@ -38,6 +46,13 @@ var _select_style: StyleBoxTexture
 var _plain_style: StyleBoxEmpty
 var _arrow: TextureRect
 var _hint_text_width := 0.0
+## The speaker's face, in a frame at the right of the box.
+var _portrait_frame: PanelContainer
+var _portrait: TextureRect
+## The speaker's voice pitch, and the last letter that blipped.
+var _voice := 1.0
+var _blipped := 0
+var _speaker := ""
 ## 0 while waiting, 1 after confirm, -1 after cancel.
 var _answer := 0
 
@@ -47,6 +62,11 @@ static func open(from: Node) -> DialogueBox:
 	var box := DialogueBox.new()
 	from.get_tree().root.add_child(box)
 	return box
+
+
+## The screen row of the box's top edge, so the HUD can keep clear of it.
+func top() -> float:
+	return _panel.get_global_rect().position.y if _panel else 0.0
 
 
 ## Shows [param lines] with the player frozen, then closes the box.
@@ -80,9 +100,30 @@ func _ready() -> void:
 	_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_panel.custom_minimum_size = Vector2(464, 78)
 	root.add_child(_panel)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	_panel.add_child(row)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 1)
-	_panel.add_child(column)
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(column)
+	_portrait_frame = PanelContainer.new()
+	var frame := StyleBoxFlat.new()
+	frame.bg_color = Color("5a4634")
+	frame.border_color = Color("c8a060")
+	frame.set_border_width_all(1)
+	frame.set_content_margin_all(1)
+	frame.shadow_color = Color(0, 0, 0, 0.35)
+	frame.shadow_offset = Vector2(1, 1)
+	frame.shadow_size = 1
+	_portrait_frame.add_theme_stylebox_override("panel", frame)
+	_portrait_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_portrait_frame.visible = false
+	row.add_child(_portrait_frame)
+	_portrait = TextureRect.new()
+	_portrait.custom_minimum_size = Vector2(40, 40)
+	_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_portrait_frame.add_child(_portrait)
 	_name_label = Label.new()
 	_name_label.add_theme_color_override("font_color", NAME_COLOR)
 	# a brass-edged tab on the box's top-left edge, the speaker's name sitting in it
@@ -96,7 +137,7 @@ func _ready() -> void:
 	column.add_child(_name_label)
 	_text_label = Label.new()
 	_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_text_label.custom_minimum_size = Vector2(456, 0)
+	_text_label.custom_minimum_size = Vector2(TEXT_WIDTH, 0)
 	column.add_child(_text_label)
 	_options_box = VBoxContainer.new()
 	_options_box.add_theme_constant_override("separation", 0)
@@ -125,6 +166,13 @@ func _ready() -> void:
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud:
 		hud.device_changed.connect(_refresh_hint)
+	# The box rises into place as it opens.
+	root.modulate.a = 0.0
+	root.position.y = OPEN_RISE
+	var tween := create_tween().set_parallel()
+	tween.tween_property(root, "modulate:a", 1.0, OPEN_TIME)
+	tween.tween_property(root, "position:y", 0.0, OPEN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	Sound.play("ui_open", -2.0)
 
 
 ## A nine-slice style from a texture, with its corners [param margin] pixels in.
@@ -186,6 +234,13 @@ func close() -> void:
 func _show(speaker: String, text: String, options: Array) -> void:
 	_name_label.text = speaker
 	_name_label.visible = speaker != ""
+	var face := Portraits.for_speaker(speaker)
+	_portrait.texture = face
+	_portrait_frame.visible = face != null
+	_text_label.custom_minimum_size.x = TEXT_WIDTH_PORTRAIT if face else TEXT_WIDTH
+	_speaker = speaker
+	_voice = Portraits.voice_pitch(speaker)
+	_blipped = 0
 	_text_label.text = text
 	_options = PackedStringArray(options)
 	_shown = 0.0 if Settings.chars_per_second() > 0.0 else float(text.length())
@@ -214,10 +269,24 @@ func _process(delta: float) -> void:
 			reveal_all()
 		else:
 			_text_label.visible_characters = int(_shown)
+			_blip()
 	elif _options.is_empty() and _hint_label.text != "":
 		# The next arrow bobs beside "Next", so the box reads as waiting for you.
 		_hint_time += delta
 		_position_arrow()
+
+
+## A soft syllable in the speaker's voice as their words type out. Narration
+## (no speaker) types out silently.
+func _blip() -> void:
+	var at := int(_shown)
+	if _speaker == "" or at - _blipped < BLIP_EVERY or at >= _text_label.text.length():
+		return
+	_blipped = at
+	var letter := _text_label.text[at]
+	if letter == " " or letter == "." or letter == ",":
+		return
+	Sound.play("talk", 0.0, 0.06, _voice)
 
 
 ## Shows the bobbing arrow just left of the "Next" hint, and hides it otherwise.
@@ -282,17 +351,21 @@ func _input(event: InputEvent) -> void:
 			reveal_all() # the first press finishes the page
 		else:
 			_answer = 1
+			Sound.play("ui_select", -3.0)
 	elif event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_answer = -1
+		Sound.play("ui_back")
 	elif not _options.is_empty() and (MenuInput.pressed(event, "move_up") or MenuInput.pressed(event, "ui_up")):
 		get_viewport().set_input_as_handled()
 		_cursor = wrapi(_cursor - 1, 0, _options.size())
 		_refresh_options()
+		Sound.play("ui_move")
 	elif not _options.is_empty() and (MenuInput.pressed(event, "move_down") or MenuInput.pressed(event, "ui_down")):
 		get_viewport().set_input_as_handled()
 		_cursor = wrapi(_cursor + 1, 0, _options.size())
 		_refresh_options()
+		Sound.play("ui_move")
 
 
 ## For tests: act as if the player pressed confirm (true) or cancel (false).

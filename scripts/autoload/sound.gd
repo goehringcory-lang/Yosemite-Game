@@ -88,7 +88,8 @@ func _set_bus(bus: StringName, level: int) -> void:
 ## Plays sound [param id] once. [param volume_db] is relative to the sound's
 ## own level; [param jitter] varies the pitch a little each time so repeats
 ## don't sound stamped.
-func play(id: String, volume_db := 0.0, jitter := 0.05) -> void:
+## [param pitch] sets the pitch it varies around (a speaker's voice, say).
+func play(id: String, volume_db := 0.0, jitter := 0.05, pitch := 1.0) -> void:
 	var stream := _stream(_pick(id))
 	if stream == null:
 		return
@@ -96,7 +97,7 @@ func play(id: String, volume_db := 0.0, jitter := 0.05) -> void:
 	_next = (_next + 1) % _pool.size()
 	player.stream = stream
 	player.volume_db = volume_db
-	player.pitch_scale = 1.0 + randf_range(-jitter, jitter)
+	player.pitch_scale = pitch * (1.0 + randf_range(-jitter, jitter))
 	player.play()
 
 

@@ -33,4 +33,13 @@ func _ready() -> void:
 	Inventory.add("acorn_cake")
 	Gear.add("cam")
 	await _snap(dir, "toasts", 20)
+	# A conversation with a portrait, and a shop's choices.
+	var box := DialogueBox.open(world.player)
+	box.say([{"speaker": "Wren Alvarez", "text": "Heels low, trust the rubber. That's all slab is. Well, that and not looking down. Ready when you are: I'll belay first."}])
+	box.reveal_all()
+	await _snap(dir, "dialogue")
+	box.choose("What'll it be? Everything here trades for food.", ["A cam for 40 food energy", "Two quickdraws for 24 food energy", "Nothing, thanks"], "Marty Kessler")
+	box.reveal_all()
+	await _snap(dir, "dialogue_choice")
+	box.close()
 	get_tree().quit()

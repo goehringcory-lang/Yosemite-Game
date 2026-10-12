@@ -120,7 +120,9 @@ func hide_info() -> void:
 
 func _process(_delta: float) -> void:
 	# Cards ride above a conversation box (shops, cooking) so they stay readable.
-	toasts.bottom_margin = 100.0 if not get_tree().get_nodes_in_group("dialogue_box").is_empty() else 44.0
+	toasts.bottom_margin = 44.0
+	for box: DialogueBox in get_tree().get_nodes_in_group("dialogue_box"):
+		toasts.bottom_margin = maxf(toasts.bottom_margin, get_viewport().get_visible_rect().size.y - box.top() + 4.0)
 	if info_panel.visible and _player and _player.global_position.distance_to(_info_anchor) > INFO_CLOSE_DISTANCE:
 		hide_info()
 	_update_cover()
