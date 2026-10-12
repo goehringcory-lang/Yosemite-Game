@@ -523,12 +523,15 @@ func _color(k: int, x: int, y: int, i: int, tx: int, ty: int) -> Color:
 func _forest(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 	# Mossy forest floor in four tone steps: blue-green moss in the shade,
 	# olive in the light, and warm needle-duff patches where the field runs high.
+	# Tones kept close, so the floor reads as one calm ground with tufts on
+	# it (far-apart steps read as a busy camouflage), the duff only where
+	# the field runs highest, and twigs few.
 	var lvl := _nat_tone(a * 0.6 + b * 0.4, x, y)
-	var col: Color = [c("3b5a3f"), c("4a6636"), c("5d7a3c"), c("6f7a40")][lvl]
-	if _nat_tone(clampf(b * 1.6 - 0.6, 0.0, 1.0), x, y) == 3:
-		col = c("7a5a37")
+	var col: Color = [c("41603f"), c("4a6636"), c("54703a"), c("5f783c")][lvl]
+	if _nat_tone(clampf(b * 2.2 - 1.3, 0.0, 1.0), x, y) == 3:
+		col = c("6f5a3a")
 	# Needle litter and twigs as small clusters.
-	var twig := _nat_pair(x, y, 9, 311, 0.2)
+	var twig := _nat_pair(x, y, 9, 311, 0.07)
 	if twig == 1:
 		col = c("a88a58")
 	elif twig == 2:
