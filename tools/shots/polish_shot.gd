@@ -42,6 +42,27 @@ func _ready() -> void:
 	box.reveal_all()
 	await _snap(dir, "dialogue_choice")
 	box.close()
+	# A shop and the campfire, with pictures of what's on offer.
+	var shop_box := DialogueBox.open(world.player)
+	shop_box.choose("You're carrying 148 energy of food. What do you want?",
+		["Quickdraw x2 for 24 food energy", "Cam for 40 food energy", "Haul bag for 60 food energy", "Done"], "Marty Kessler",
+		[Gear.get_gear("quickdraw").icon, Gear.get_gear("cam").icon, Gear.get_gear("haul_bag").icon, null])
+	shop_box.reveal_all()
+	await _snap(dir, "shop")
+	shop_box.close()
+	var fire_box := DialogueBox.open(world.player)
+	var dishes := ["acorn_mush", "acorn_cake", "elderberry_sauce", "roasted_morels", "yerba_buena_tea", "spring_greens"]
+	var names := []
+	var pictures := []
+	for id in dishes:
+		names.append(ItemDB.get_item(id).display_name)
+		pictures.append(ItemDB.get_item(id).icon)
+	names.append("Leave")
+	pictures.append(null)
+	fire_box.choose("Campfire. What will you make?", names, "", pictures)
+	fire_box.reveal_all()
+	await _snap(dir, "campfire")
+	fire_box.close()
 	var pause := get_tree().get_first_node_in_group("pause_menu")
 	pause.open()
 	pause._show_page(PauseMenu.Page.SETTINGS)

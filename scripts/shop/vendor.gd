@@ -68,6 +68,14 @@ func buy(offer: ShopOffer) -> Dictionary:
 	return paid
 
 
+## The picture of what [param offer] gets you.
+func offer_icon(offer: ShopOffer) -> Texture2D:
+	if offer.kind == "gear" and Gear.get_gear(offer.id):
+		return Gear.get_gear(offer.id).icon
+	var item := ItemDB.get_item(offer.id)
+	return item.icon if item else null
+
+
 func offer_name(offer: ShopOffer) -> String:
 	var name := offer.id
 	if offer.kind == "gear" and Gear.get_gear(offer.id):
@@ -95,12 +103,15 @@ func interact(player: Player) -> void:
 			await box.say([{"speaker": shop.keeper, "text": shop.nothing_yet}])
 			break
 		var options := []
+		var icons := []
 		for offer in offers:
+			icons.append(offer_icon(offer))
 			options.append("%s for %d food energy%s" % [offer_name(offer), offer.price,
 				"" if Barter.can_afford(offer.price) else " (not enough food)"])
 		options.append("Done")
+		icons.append(null)
 		var prompt := "You're carrying %d energy of food. What do you want?" % Barter.purse()
-		var choice := await box.choose(prompt, options, shop.keeper)
+		var choice := await box.choose(prompt, options, shop.keeper, icons)
 		if choice < 0 or choice >= offers.size():
 			break
 		var offer := offers[choice]

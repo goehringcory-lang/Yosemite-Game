@@ -6,6 +6,7 @@ extends CanvasLayer
 ##   var box := DialogueBox.open(player)
 ##   await box.say(lines)             # lines: [{"speaker": "...", "text": "..."}]
 ##   var i := await box.choose("Build it?", ["Yes", "No"])   # -1 if cancelled
+##   var i := await box.choose("Buy?", names, "Clerk", icons)  # a picture per option (or null)
 ##   box.close()
 ##
 ## Or, for a one-off conversation: DialogueBox.say_to(player, lines)
@@ -37,6 +38,9 @@ var _hint_label: Label
 var _shown := 0.0
 var _hint_time := 0.0
 var _options: PackedStringArray = []
+## A picture for each option (or null), when the list has any: the shops'
+## goods, the campfire's dishes.
+var _icons: Array = []
 var _cursor := 0
 var _opened_frame := 0
 ## The brass tag the speaker's name sits on, the bar behind the chosen option,
@@ -218,11 +222,13 @@ static func pages(text: String) -> PackedStringArray:
 
 
 ## Returns the chosen option's index, or -1 if the player cancels.
-func choose(prompt: String, options: Array, speaker := "") -> int:
+func choose(prompt: String, options: Array, speaker := "", icons := []) -> int:
 	_cursor = 0
+	_icons = icons
 	_show(speaker, prompt, options)
 	var confirmed: bool = await _next_input()
 	var picked := _cursor if confirmed else -1
+	_icons = []
 	_show("", "", [])
 	return picked
 
@@ -322,6 +328,7 @@ func _refresh_options() -> void:
 	for child in _options_box.get_children():
 		_options_box.remove_child(child)
 		child.queue_free()
+	var pictures := _icons.any(func(icon: Variant) -> bool: return icon != null)
 	for i in _options.size():
 		var label := Label.new()
 		label.text = (CURSOR if i == _cursor else "  ") + _options[i]
@@ -330,7 +337,33 @@ func _refresh_options() -> void:
 			label.add_theme_stylebox_override("normal", _select_style)
 		else:
 			label.add_theme_stylebox_override("normal", _plain_style)
-		_options_box.add_child(label)
+		if not pictures:
+			_options_box.add_child(label)
+			continue
+		# a picture after the cursor; options without one keep the column
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 3)
+		var picture := TextureRect.new()
+		picture.custom_minimum_size = Vector2(16, 16)
+		picture.texture = _icons[i] if i < _icons.size() else null
+		picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		var cursor := Label.new()
+		cursor.text = CURSOR.strip_edges() if i == _cursor else " "
+		cursor.custom_minimum_size.x = 8
+		cursor.add_theme_color_override("font_color", NAME_COLOR)
+		label.text = _options[i]
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(cursor)
+		row.add_child(picture)
+		row.add_child(label)
+		# the highlight runs under the whole row, picture and all
+		label.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+		var holder := PanelContainer.new()
+		holder.add_theme_stylebox_override("panel", _select_style if i == _cursor else _plain_style)
+		holder.add_child(row)
+		_options_box.add_child(holder)
 
 
 ## Waits for confirm (true) or cancel (false).

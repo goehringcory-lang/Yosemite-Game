@@ -99,13 +99,17 @@ func interact(player: Player) -> void:
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s. You don't know anything to make here yet." % display_name}])
 		return
 	var options := []
+	var icons := []
 	for recipe in recipes:
+		var dish := ItemDB.get_item(recipe.output_id)
+		icons.append(dish.icon if dish else null)
 		var mark := "" if Recipes.can_make(recipe) else " (missing ingredients)"
 		options.append("%s: %s%s" % [recipe.display_name, Recipes.describe_inputs(recipe), mark])
 	options.append("Leave")
+	icons.append(null)
 	player.can_act = false
 	var box := DialogueBox.open(player)
-	var choice := await box.choose("%s. What will you make?" % display_name, options)
+	var choice := await box.choose("%s. What will you make?" % display_name, options, "", icons)
 	if choice >= 0 and choice < recipes.size():
 		var recipe := recipes[choice]
 		if Recipes.make(recipe):
