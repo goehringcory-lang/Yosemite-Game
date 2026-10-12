@@ -619,6 +619,9 @@ func _marker_rects() -> Array[Rect2]:
 		rects.append(Rect2((_v2(kiosk.anchor) * s - Vector2(3, 8)).floor() - Vector2(1, 1), Vector2(9, 10)))
 	for climb: Dictionary in _view.climbs:
 		rects.append(Rect2((_v2(climb.anchor) * s).floor() - Vector2(6, 6), Vector2(13, 13)))
+	# the "you are here" pin, head and all
+	if _here != Vector2.ZERO:
+		rects.append(Rect2((_view_point(_here) * s).floor() - Vector2(6, 17), Vector2(13, 20)))
 	return rects
 
 
@@ -646,7 +649,7 @@ func _place_signs() -> void:
 				for other: Rect2 in placed:
 					cost += _overlap(rect.grow(2), other) * 4.0
 				for marker: Rect2 in markers:
-					cost += _overlap(rect, marker) * 4.0
+					cost += _overlap(rect.grow(1), marker) * 8.0
 				if cost < best_cost:
 					best_cost = cost
 					best = rect.position
