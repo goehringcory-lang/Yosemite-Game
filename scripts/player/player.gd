@@ -94,3 +94,7 @@ func load_data(data: Dictionary) -> void:
 	position = Vector2(data.get("x", position.x), data.get("y", position.y))
 	facing = Vector2i(int(data.get("facing_x", 0)), int(data.get("facing_y", 1)))
 	interaction_area.position = Vector2(facing) * 12.0
+
+
+func _draw() -> void:
+	GroundShadow.draw_under(self)

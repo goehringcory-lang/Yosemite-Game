@@ -72,7 +72,7 @@ static func ui_font() -> Font:
 			# a touch of smoothing keeps the strokes even at the small sizes
 			font.antialiasing = TextServer.FONT_ANTIALIASING_GRAY
 			font.hinting = TextServer.HINTING_NONE
-			font.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
+			font.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_AUTO
 			# no ligatures: every letter stays its own
 			var ts := TextServerManager.get_primary_interface()
 			font.opentype_feature_overrides = {

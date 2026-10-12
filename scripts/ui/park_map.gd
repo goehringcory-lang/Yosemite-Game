@@ -368,7 +368,7 @@ func _refresh() -> void:
 	_area_view.visible = _tab == Tab.AREA
 	var hub := Park.get_hub(_selected)
 	_name_label.text = hub.display_name
-	_sub_label.text = "%s. %s" % [hub.get_elevation_text(), hub.tagline]
+	_sub_label.text = "%s. %s%s" % [hub.get_elevation_text(), hub.tagline, "" if hub.tagline.ends_with(".") else "."]
 	_desc_label.text = hub.description
 	_acts_label.text = "\n".join(Array(hub.activities).map(func(a: String) -> String: return "• " + a))
 	_route_label.text = _route_text(hub)

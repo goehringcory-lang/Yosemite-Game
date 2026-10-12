@@ -485,6 +485,9 @@ func test_font_setting() -> void:
 	var narrow := pixel.get_string_size("i", HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
 	var wide := pixel.get_string_size("m", HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
 	check(narrow * 2.0 < wide, "the pixel font sets an i narrower than an m (%.0f, %.0f)" % [narrow, wide])
+	var one := pixel.get_string_size("1", HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
+	var eight := pixel.get_string_size("8", HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
+	check(is_equal_approx(one, eight), "and its digits all one width, so the clock lines up (%.1f, %.1f)" % [one, eight])
 	Settings.save()
 	Settings.pixel_font = false
 	Settings.load_settings()

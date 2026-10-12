@@ -19,7 +19,7 @@ enum Page { CREDITS, LICENSES }
 const CREDITS := [
 	["", ["A cozy pixel exploration game set in Yosemite National Park."]],
 	["Made by", ["Cory Goehring"]],
-	["Map data", [
+	["Maps", [
 		"Map data © OpenStreetMap contributors,",
 		"available under the Open Database License (ODbL).",
 		"openstreetmap.org/copyright",

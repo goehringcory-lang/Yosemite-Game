@@ -117,6 +117,7 @@ func _find_region() -> Region:
 
 ## Placeholder figure in the character's color when there's no sprite sheet.
 func _draw() -> void:
+	GroundShadow.draw_under(self)
 	if _sprite:
 		return
 	var color := character.color if character else Color.GRAY

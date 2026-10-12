@@ -28,6 +28,7 @@ func _process(_delta: float) -> void:
 
 
 func _draw() -> void:
+	GroundShadow.draw_under(self)
 	if sprite_sheet:
 		# A slow breath so the shopkeeper isn't a statue.
 		var bob := -1.0 if int(Time.get_ticks_msec() / 700) % 2 == 1 else 0.0

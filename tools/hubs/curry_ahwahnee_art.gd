@@ -946,7 +946,7 @@ func registration() -> Image:
 func store() -> Image:
 	var im := _base_store()
 	_weather(im, 23, 702)
-	_porch_lamp(im, 31, 24)
+	_porch_lamp(im, 23, 35) # beside the door, clear of the sign
 	return im
 
 

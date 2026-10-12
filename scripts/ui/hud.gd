@@ -9,9 +9,13 @@ const INFO_CLOSE_DISTANCE := 24.0
 ## Gap (pixels) between the message and the sign panel it sits above.
 const MESSAGE_GAP := 2.0
 ## Groups of the screens that hide the HUD while they're open.
+## Seconds the place name stays up after you arrive.
+const LOCATION_SHOWN := 4.0
 const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary"]
 
 var _player: Player
+var _location_text := ""
+var _location_tween: Tween
 var _status: Label
 ## The "you got this" cards at the bottom left.
 var toasts: ItemToasts
@@ -137,6 +141,10 @@ func _on_gear_added(id: String, amount: int) -> void:
 ## Parts of a long name ("Yosemite Valley · Curry Village · ...") are dropped
 ## from the front until it fits between the screen's left side and the clock.
 func set_location(text: String) -> void:
+	if text == _location_text:
+		return
+	_location_text = text
+	_show_location_banner()
 	var parts := text.split(" · ")
 	# the banner is centered, so its right edge is half its width past the middle
 	var middle := get_viewport().get_visible_rect().size.x / 2.0
@@ -150,6 +158,17 @@ func set_location(text: String) -> void:
 	var width := roundf(location_panel.get_combined_minimum_size().x / 2.0) * 2.0
 	location_panel.offset_left = -width / 2.0
 	location_panel.offset_right = width / 2.0
+
+
+## The place name shows as you arrive, then fades after a few seconds, as
+## in Stardew Valley; it comes back each time you go somewhere new.
+func _show_location_banner() -> void:
+	if _location_tween:
+		_location_tween.kill()
+	location_panel.modulate.a = 1.0
+	_location_tween = create_tween()
+	_location_tween.tween_interval(LOCATION_SHOWN)
+	_location_tween.tween_property(location_panel, "modulate:a", 0.0, 0.8)
 
 
 ## Shows a sign's text until the player walks away from it.

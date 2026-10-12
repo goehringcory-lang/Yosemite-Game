@@ -14,6 +14,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | Menu sounds | Tick to move, knock to choose, swish to open and close (book, pause menu, conversations, the day's page) | `scripts/autoload/sound.gd`, `MenuInput.pop_in` | audio test (every sound played exists) |
 | Menus animate | The book, pause menu and conversation box fade and grow or rise into place | `MenuInput.pop_in`, `dialogue_box.gd` | by eye |
 | Text never collides | Long place names drop their leading parts so the banner never runs into the clock | `HUD.set_location` | test |
+| The place name shows as you arrive | The banner names where you are, then fades after four seconds, and comes back when you go somewhere new | `HUD.set_location` | by eye |
 | Interact prompt | "E  Talk to Wren" over the player, in gamepad names on a gamepad | `hud.gd` (existing) | settings test |
 | A save message | "Good morning! Your game was saved." | `world.gd` (existing) | smoke test |
 
@@ -26,6 +27,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | A "!" over people with a quest | Orange "!" for a new quest, blue "?" to hand one in; on shopkeepers too | `QuestLog.marker_for`, `scripts/story/quest_marker.gd` | test (Clark "!" at the start, gone once taken; "?" when ready); shot `polish_quest_marker.png` |
 | Friendship hearts and gifts | Five hearts per person, from talking each day, finishing their quests, and one gift a week (G or LB while facing them); everyone has loves drawn from their story (Muir's dry crusts and tea), likes good food, and never thinks less of you; hearts in the Journal's Friends section, a heart pop and chime, and new hearts on the day's page | `scripts/story/friendship.gd`, `gift_giving.gd`, `hearts.gd` | test (daily talk once, loved and liked gifts, weekly limit, hearts one at a time, quest warmth, saved, everyone has real loves, Journal shows hearts); shot `polish_gifts.png` |
 | People react when you talk | They turn to face you and give a small hop | `npc.gd` | by eye |
+| People stand on the ground | A soft oval shadow under the player, every person and every shopkeeper | `scripts/world/ground_shadow.gd` | shot `polish_gift_prompt.png` |
 | People keep hours | Visitors go home between 8 and 10 PM and come back at 7 AM, fading out and in; about half stay in on rainy days | `NPC.is_out` | test (home at night and can't be talked to, back in the morning, quest givers always there) |
 | People walk about | Wanderers stroll round their spot (existing) | `npc.gd` | cast test |
 
