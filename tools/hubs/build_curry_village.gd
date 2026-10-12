@@ -369,7 +369,7 @@ func _place_plaza() -> void:
 	night_light(fire, Vector2(0, -6), 70.0, 1.2, 0.35)
 	ambient(fire, "sparks", Vector2(0, -8), Vector2(3, 1))
 	animate(decor("Flagpole", CS + "flagpole.png", foot(45.5, 39), Vector2(6, 4)), 3, 2.5)
-	for lamp in [[33, 38.6], [47, 38.6], [61, 38.6], [72, 38.6], [40.2, 44.5], [65.5, 44.5], [30, 45], [74, 46], [54.6, 47.5]]:
+	for lamp in [[33, 38.6], [47, 38.6], [61, 38.6], [72, 38.6], [40.2, 44.5], [65.5, 44.5], [30, 45], [74, 46], [49.4, 47.5]]:
 		_lamp("Lamp%d_%d" % [lamp[0], int(lamp[1] * 10)], lamp[0], lamp[1])
 	for bench in [[46.5, 43.6, 0], [57.5, 43.6, 1], [52, 46.6, 2], [52, 39.6, 3]]:
 		_prop("garden_bench", foot(bench[0], bench[1]) + Vector2(0, 2), "Bench%d" % bench[2])

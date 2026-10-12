@@ -131,7 +131,7 @@ func interact(player: Player) -> void:
 			icons.append(offer_icon(offer))
 			# the card beside the list says the rest (and shows a price you
 			# can't meet in red)
-			options.append("%s · %d energy" % [offer_name(offer), offer.price])
+			options.append("%s · costs %d" % [offer_name(offer), offer.price])
 			details.append(offer_card(offer))
 		options.append("Done")
 		icons.append(null)

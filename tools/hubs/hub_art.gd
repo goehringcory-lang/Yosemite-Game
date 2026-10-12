@@ -22,7 +22,7 @@ func save_all() -> void:
 func _store_items() -> Image:
 	var im := Image.create_empty(32, 16, false, Image.FORMAT_RGBA8)
 	# Trail mix: a kraft-paper sack with its top rolled over, lit from the
-	# left, and a little spill of almonds, raisins and oats at its foot.
+	# left, with a printed label.
 	var kraft := [c("8a6232"), c("b08048"), c("c89a5a"), c("dcb478")]
 	for y in range(4, 14):
 		var w := 9 if y > 5 else 8
@@ -40,10 +40,6 @@ func _store_items() -> Image:
 	art.rect(im, 6, 8, 3, 1, c("3f6b3a"))
 	art.rect(im, 6, 9, 3, 1, c("4f8048"))
 	art.px(im, 7, 10, c("6a4228"))
-	# the spill: almonds, raisins and oats
-	for p in [[11, 13, "b8784a"], [13, 14, "a0663a"], [12, 12, "3a1e22"], [14, 12, "4a2830"], [10, 14, "e8d8a8"], [13, 11, "e8d8a8"]]:
-		art.px(im, p[0], p[1], c(p[2]))
-	art.px(im, 12, 14, c("b8784a"))
 	art.outline(im, Rect2i(0, 0, 16, 16), Art.OUTLINE)
 	for p in [[20, 6], [25, 8], [21, 11], [26, 12]]:
 		art.ellipse(im, p[0] + 0.5, p[1] + 0.5, 3, 2.2, c("e8c878"))

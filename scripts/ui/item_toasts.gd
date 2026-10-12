@@ -97,7 +97,7 @@ func _make_card(icon: Texture2D, entry: Dictionary) -> PanelContainer:
 
 
 func _set_text(entry: Dictionary, display_name: String) -> void:
-	entry.label.text = display_name if entry.count == 1 else "%s  x%d" % [display_name, entry.count]
+	entry.label.text = display_name if entry.count == 1 else "%s x%d" % [display_name, entry.count]
 
 
 ## A quick pop when a card's count goes up.

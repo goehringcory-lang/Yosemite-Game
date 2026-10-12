@@ -56,7 +56,7 @@ func _ready() -> void:
 	for ware: Array in wares:
 		var piece := Gear.get_gear(ware[0])
 		var label: String = piece.display_name if ware[1] == 1 else "%s x%d" % [piece.display_name, ware[1]]
-		ware_names.append("%s · %d energy" % [label, ware[2]])
+		ware_names.append("%s · costs %d" % [label, ware[2]])
 		ware_icons.append(piece.icon)
 		ware_cards.append({"title": label, "rows": [[null, "Costs %d of your 148 energy" % ware[2], ware[2] > 148]],
 			"facts": "You have %d" % Gear.count(ware[0]), "note": piece.description})

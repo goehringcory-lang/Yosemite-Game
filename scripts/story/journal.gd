@@ -348,7 +348,7 @@ func _register() -> void:
 		return
 	_heading("The Guardian's Register: %d page%s" % [pages.size(), "" if pages.size() == 1 else "s"])
 	for page: Dictionary in pages:
-		_line("%s: %s" % [page.by, page.text])
+		_line("%s · %s" % [page.by, page.text])
 		for note: String in page.notes:
 			_line("     " + note, DIM)
 		if page.review:
@@ -369,9 +369,11 @@ func _friends() -> void:
 	for character in known:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 1)
+		row.add_child(_face(character.display_name, 16))
 		var name_label := Label.new()
-		name_label.text = character.display_name
-		name_label.custom_minimum_size.x = 120
+		name_label.text = " " + character.display_name
+		name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		name_label.custom_minimum_size.x = 124
 		row.add_child(name_label)
 		var hearts := Friendship.hearts(character.id)
 		for i in Friendship.MAX_HEARTS:
@@ -473,7 +475,7 @@ func _quests_page() -> void:
 			who.add_theme_constant_override("separation", 4)
 			who.add_child(_face(character.display_name, 24))
 			var name_label := Label.new()
-			name_label.text = character.display_name + (" (%s)" % character.home if character.home != "" else "")
+			name_label.text = character.display_name + ("  · %s" % character.home if character.home != "" else "")
 			name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			who.add_child(name_label)
 			flow.add_child(who)
@@ -491,7 +493,7 @@ func _quest_card(quest: QuestData, objective: String) -> void:
 	words.add_theme_constant_override("separation", 0)
 	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var title := Label.new()
-	title.text = quest.title + ("  (main story)" if quest.main_line else "") + ("  · from %s" % giver.display_name if giver else "")
+	title.text = quest.title + ("  · from %s" % giver.display_name if giver else "")
 	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.5))
 	words.add_child(title)
 	var step := Label.new()

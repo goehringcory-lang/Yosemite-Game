@@ -318,6 +318,8 @@ func _refresh_food() -> void:
 
 
 func _refresh_clock() -> void:
+	if food_label:
+		_refresh_food()
 	date_label.text = "%s, Year %d" % [GameClock.get_date_string(), GameClock.year]
 	time_label.text = GameClock.get_time_string()
 
