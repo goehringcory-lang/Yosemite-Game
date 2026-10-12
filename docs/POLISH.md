@@ -56,7 +56,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | A volume for music | Music has its own bus and setting | `settings.gd`, `pause_menu.gd` | test, settings test |
 | Living ambience | Birds, crickets, wind, rain, fires, waterfalls, footsteps by surface (existing) | `sound.gd`, `sound_emitter.gd`, `footfall.gd` | audio test |
 
-## Two independent reviews
+## Independent reviews
 
 Two separate reviewers, given only screenshots and asked to be harsh, judged the game against Stardew Valley. The first found text running off the Controls page and both maps, the day's page over the clock, item cards under menus, the gift prompt covering the person, placeholder shopkeepers and a placeholder campfire, ASCII cursors, and a crowded climbing HUD. All of that is fixed, and the second reviewer confirmed it from new screenshots, rating the presentation about 6.5 of 10 against Stardew (up from about 5). Their next round (padding inside panels, the world dimming behind menus, drawn checkboxes and arrows, fades at scroll edges, a card behind messages, at most four item cards) is fixed too.
 
@@ -64,15 +64,37 @@ Their biggest remaining point was typography: Stardew uses one pixel font, and t
 
 The third reviewer scored the default build 6.5 of 10 against Stardew Valley, before the pixel font became the default, the portraits doubled (and gained richer shading), the volume sliders, the logo, the pixel-art park map and the shared frames on the climbing screen. What they said meets the bar: the world art and props, day and night lighting with lamp and fire glow, the item icons, the frame and tab system across the book and conversations, the friendship hearts, and the day's page.
 
+Three more reviews followed (the fourth, fifth and sixth), each given fresh screenshots of every screen and asked to score fresh against Stardew Valley. They scored 6.5, 6 and 6 of 10. Each found new things, and these were fixed:
+
+- The pixel font is monospaced Japanese DotGothic16, so "i" and "l" floated in gaps ("Vi l lage"). Its Latin letters were made proportional (`tools/fonts/proportional.py`); digits stay one width so the clock reads "1:00", not "100".
+- Text at small sizes was unevenly spaced, so text is now placed at subpixel positions.
+- Half-cut rows showed at the bottom of the journal, backpack and credits. The scroll fades now go solid at the edge.
+- Backpack counts ran into the art; they are now small, in the corner and ringed.
+- The day's page ran headings into values; headings now sit in a column.
+- The campfire and shops showed long one-line recipes. They now have a card about the choice under the cursor.
+- The pause menu was half empty. It now has your portrait and a tally of the game.
+- The title's tagline and hints were blurred by heavy outlines. They now sit on soft bands.
+- The climb's energy number ran off the screen. Its height bar now has a summit mark, and its move costs are no longer green.
+- Nobody had a shadow. Everyone does now.
+- The Camp Curry Store's lamp hung over its sign.
+- Yosemite Village's buildings were barely two people tall. They were redrawn 1.45 times larger, with doors people fit and paved walks to every door, and cars were parked in the empty lot.
+- The paving's flagstones were as wide as a person, so plazas read as walls. The slabs are smaller now.
+- String lights stayed dark at night. They now light at dusk.
+- Birds stayed out after dark. They now leave at dusk and in rain.
+- The place-name banner now fades after you arrive.
+
 | Stardew hallmark | Here | Where | Checked by |
 |---|---|---|---|
 | A pixel font that matches the art | DotGothic16 by default (SIL Open Font License, credited with its license), with its Latin letters made proportional (`tools/fonts/proportional.py`) after a fourth review found the fixed-width "i" and "l" left gaps ("Vi l lage"); Settings > Font switches to Noto Sans | `Settings.ui_font`, `apply_font` | test (switches the theme and the climbing screen, saved, pixel by default, an i narrower than an m, license present; every screen checked to fit with both fonts) |
 
 ## Not done
 
-- **Walking sprites are small.** Portraits show at 80 px (painted at 40 and doubled, against Stardew's 64) with five-tone shading and highlights. The Yosemite Village buildings were redrawn 1.45 times larger, so a shop stands about three people tall with a door a person fits, but the people themselves are still 24 px, and Curry Village's buildings keep their first size.
-- **The name is a working title.** The title screen now has a drawn logo (gold, extruded, with a divider), and the park map is pixel art in the game's frames, as are the climbing screen's notes; the words "Yosemite Game" are still a placeholder for the owner to choose.
+The last three independent reviews scored the game 6 to 6.5 of 10 against Stardew Valley. It is not at Stardew's level. What holds it back, in the reviewers' words and ours:
 
+- **The world is sparser than Stardew's.** Plazas, lawns and lots have less clutter (crates, flower strips, wear paths, edging) than Stardew's dense towns. Curry Village's buildings keep their first size.
+- **People keep the same spot all day.** Visitors go home at night and stay in some rainy days, but the people with quests stand where they are from morning to midnight so their stories are always reachable; Stardew's villagers walk full timetables.
+- **Portraits are painted at 40 px** (shown at 80) with five-tone shading; Stardew's are 64 px and hand-drawn. Walking sprites are 24 px tall.
+- **No hand-drawn art.** All art is drawn by code in a consistent style; Stardew's is hand-drawn by one artist. Cars are flat next to the 3/4-view buildings.
+- **The clock is a sky window**, not a dial with a hand.
+- **The name is a working title** ("Yosemite Game"), for the owner to choose.
 - **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew also has several pieces a season; here there is one.
-- **Only visitors keep a daily routine.** Visitors head home in the evening, each at their own hour, come back in the morning, and half stay in when it rains; the people with quests stay where they are so you can always find them for their stories. Stardew's villagers walk full timetables between home, work and the saloon.
-- **No hand-drawn art pass.** All the art is drawn by code in a consistent style; Stardew's is hand-drawn by one artist.
