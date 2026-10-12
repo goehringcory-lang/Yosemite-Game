@@ -68,7 +68,7 @@ The third reviewer scored the default build 6.5 of 10 against Stardew Valley, be
 
 ## Not done
 
-- **Walking sprites are small.** Portraits show at 80 px (painted at 40 and doubled, against Stardew's 64) with five-tone shading and highlights, but the people walking about are small next to the detailed scenery.
+- **Walking sprites are small.** Portraits show at 80 px (painted at 40 and doubled, against Stardew's 64) with five-tone shading and highlights. The Yosemite Village buildings were redrawn 1.45 times larger, so a shop stands about three people tall with a door a person fits, but the people themselves are still 24 px, and Curry Village's buildings keep their first size.
 - **The name is a working title.** The title screen now has a drawn logo (gold, extruded, with a divider), and the park map is pixel art in the game's frames, as are the climbing screen's notes; the words "Yosemite Game" are still a placeholder for the owner to choose.
 
 - **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew also has several pieces a season; here there is one.

@@ -14,14 +14,18 @@ const FloraArt = preload("res://tools/hubs/ahwahnee_flora_art.gd")
 const OUT := "res://assets/sprites/buildings/"
 
 ## Building name -> size and look.
+## How much bigger than first drawn the village buildings stand, so a shop is
+## three or four people tall, as in Stardew Valley, with a door a person fits.
+const VILLAGE_SCALE := 1.45
+
 const BUILDINGS := {
-	"village_store": {"goods": true, "size": Vector2i(80, 56), "wall": "timber", "label": "VILLAGE STORE", "seed": 11, "roof": ["2a2a22", "3a3c2c", "4d5238", "62684a", "7b815b", "989d76"], "windows": [14, 66], "gable": 20, "chimney": 60, "awning": true},
-	"welcome_center": {"flag": true, "size": Vector2i(64, 46), "wall": "stone", "label": "WELCOME", "seed": 23, "roof": ["24262a", "34383e", "484e56", "5e666e", "7a828a", "9aa2a8"], "windows": [11, 53], "gable": 32, "chimney": 46},
-	"museum": {"portico": true, "size": Vector2i(56, 46), "wall": "stone", "label": "MUSEUM", "seed": 37, "roof": ["2c2822", "443c32", "5e5242", "786a54", "948468", "b0a07e"], "windows": [9, 19, 37, 47], "chimney": 8, "low": true},
-	"bests_studio": {"size": Vector2i(44, 38), "wall": "board", "label": "BEST'S", "seed": 41, "roof": ["2e2218", "4a3422", "644630", "7e5c3e", "9a7650", "b89468"], "windows": [9, 35], "gable": 22, "tone": 3},
-	"degnans": {"size": Vector2i(48, 40), "wall": "stucco", "label": "DEGNAN'S", "seed": 53, "roof": ["34201a", "55301f", "74402a", "92583a", "ae7248", "c98c5c"], "windows": [9, 39], "chimney": 36, "awning": true, "awning_a": "9a3a2a", "awning_b": "e8d8b0"},
-	"wilderness_center": {"size": Vector2i(40, 36), "wall": "board", "label": "PERMITS", "seed": 67, "roof": ["1c2a22", "2a4030", "3a5640", "4d6e50", "658a64", "84a67c"], "windows": [8, 32], "tone": 2, "green": true},
-	"valley_lodge": {"size": Vector2i(72, 44), "wall": "timber", "label": "LODGE", "seed": 79, "windows": [10, 22, 50, 62], "gable": 36, "chimney": 56, "pitch": 12},
+	"village_store": {"goods": true, "size": Vector2i(80, 56), "wall": "timber", "label": "VILLAGE STORE", "seed": 11, "roof": ["2a2a22", "3a3c2c", "4d5238", "62684a", "7b815b", "989d76"], "windows": [14, 66], "gable": 20, "chimney": 60, "awning": true, "scale": VILLAGE_SCALE},
+	"welcome_center": {"flag": true, "size": Vector2i(64, 46), "wall": "stone", "label": "WELCOME", "seed": 23, "roof": ["24262a", "34383e", "484e56", "5e666e", "7a828a", "9aa2a8"], "windows": [11, 53], "gable": 32, "chimney": 46, "scale": VILLAGE_SCALE},
+	"museum": {"portico": true, "size": Vector2i(56, 46), "wall": "stone", "label": "MUSEUM", "seed": 37, "roof": ["2c2822", "443c32", "5e5242", "786a54", "948468", "b0a07e"], "windows": [9, 19, 37, 47], "chimney": 8, "low": true, "scale": VILLAGE_SCALE},
+	"bests_studio": {"size": Vector2i(44, 38), "wall": "board", "label": "BEST'S", "seed": 41, "roof": ["2e2218", "4a3422", "644630", "7e5c3e", "9a7650", "b89468"], "windows": [9, 35], "gable": 22, "tone": 3, "scale": VILLAGE_SCALE},
+	"degnans": {"size": Vector2i(48, 40), "wall": "stucco", "label": "DEGNAN'S", "seed": 53, "roof": ["34201a", "55301f", "74402a", "92583a", "ae7248", "c98c5c"], "windows": [9, 39], "chimney": 36, "awning": true, "awning_a": "9a3a2a", "awning_b": "e8d8b0", "scale": VILLAGE_SCALE},
+	"wilderness_center": {"size": Vector2i(40, 36), "wall": "board", "label": "PERMITS", "seed": 67, "roof": ["1c2a22", "2a4030", "3a5640", "4d6e50", "658a64", "84a67c"], "windows": [8, 32], "tone": 2, "green": true, "scale": VILLAGE_SCALE},
+	"valley_lodge": {"size": Vector2i(72, 44), "wall": "timber", "label": "LODGE", "seed": 79, "windows": [10, 22, 50, 62], "gable": 36, "chimney": 56, "pitch": 12, "scale": VILLAGE_SCALE},
 }
 
 const PROPS := ["umacha", "chuckah", "bear_box", "shuttle_stop"]
@@ -360,7 +364,16 @@ func awning(im: Image, x: int, y: int, w: int, depth: int, a: Color, b: Color) -
 ## keys) for a building that isn't in the table. Options with no "label" get
 ## no sign, and "dark" leaves the wall lantern off.
 func building(sprite_name: String, options := {}) -> Array:
-	var o: Dictionary = options if not options.is_empty() else BUILDINGS[sprite_name]
+	var o: Dictionary = (options if not options.is_empty() else BUILDINGS[sprite_name]).duplicate()
+	# "scale" grows a building and its openings together (see VILLAGE_SCALE)
+	var k: float = o.get("scale", 1.0)
+	if k != 1.0:
+		var base: Vector2i = o["size"]
+		o["size"] = Vector2i(roundi(base.x * k / 2.0) * 2, roundi(base.y * k / 2.0) * 2)
+		o["windows"] = (o["windows"] as Array).map(func(x: int) -> int: return roundi(x * k))
+		for key in ["gable", "chimney"]:
+			if o.has(key):
+				o[key] = roundi(int(o[key]) * k)
 	var size: Vector2i = o["size"]
 	var w := size.x
 	var h := size.y
@@ -395,20 +408,22 @@ func building(sprite_name: String, options := {}) -> Array:
 	_vb_eave(im, 0, wall_top - 2, w)
 
 	# Windows, door, sign.
-	var win_h := clampi(body_h - 7, 4, 8)
+	var win_w := roundi(6 * k / 2.0) * 2
+	var win_h := clampi(body_h - 7, 4, roundi(8 * k))
 	for wx: int in o["windows"]:
-		_vb_window(im, wx - 3, wall_top + 3, 6, win_h, K.hash2(wx, sd, 5) < 0.55, sd + wx)
+		_vb_window(im, wx - win_w / 2, wall_top + 3, win_w, win_h, K.hash2(wx, sd, 5) < 0.55, sd + wx)
 	var door_cx := w / 2
 	if o.has("gable") and not o.get("low", false):
 		door_cx = w / 2
-	var door_h := mini(wall_h - 3, 13)
-	plank_door(im, door_cx, h - 2, door_h, sd + 500)
+	var door_h := mini(wall_h - 3, roundi(13 * k))
+	plank_door(im, door_cx, h - 2, door_h, sd + 500, roundi(8 * k / 2.0) * 2)
 	if o.get("awning", false):
-		var aw := mini(w - 18, 38)
+		var aw := mini(w - 18, roundi(38 * k))
 		awning(im, door_cx - aw / 2, wall_top + 1, aw, 5, Color(o.get("awning_a", "3f6b4a")), Color(o.get("awning_b", "e6d8b0")))
 	if o.has("label"):
 		sign_board(im, door_cx, wall_top - 8 if not o.get("awning", false) else wall_top - 9, o["label"])
 
+	o["_win_w"] = win_w
 	_dress(im, o, sd, wall_top, win_h, door_cx, o.get("awning", false))
 	# Ambient occlusion on the sunless side, and a lit lip on the near side.
 	shade(im, w - 8, wall_top, 7, body_h + 1, timber[0], 0.0, 0.85, 0.34, false)
@@ -431,10 +446,11 @@ func _dress(im: Image, o: Dictionary, sd: int, wall_top: int, win_h: int, door_c
 		if wins.size() >= 4 and i % 2 == 1:
 			continue
 		var wx: int = wins[i]
+		var half: int = o.get("_win_w", 6) / 2 + 1
 		var by := wall_top + 3 + win_h + 1
-		K.rect(im, wx - 4, by, 8, 2, timber[1])
-		K.hline(im, wx - 4, by, 8, timber[3])
-		for fx in range(wx - 3, wx + 4):
+		K.rect(im, wx - half, by, half * 2, 2, timber[1])
+		K.hline(im, wx - half, by, half * 2, timber[3])
+		for fx in range(wx - half + 1, wx + half):
 			var tall := K.hash2(fx, sd, 7) > 0.45
 			K.px(im, fx, by - 1, leaf[3])
 			if tall:

@@ -716,5 +716,10 @@ func _dress_village() -> void:
 		_prop("garden_bench", foot(p[0], p[1]) + Vector2(0, 2))
 	for p in [[50, 22], [94, 22], [63, 23], [81, 23]]:
 		_prop(_pick("garden_urn"), foot(p[0], p[1]) + Vector2(0, -2))
+	# Cars parked nose-in along the edges of the Village lot, leaving the
+	# walk from Degnan's door to the road and the shuttle kiosk clear.
+	var cars := [[82, 32, 0], [82, 35, 3], [95, 32, 7], [95, 35, 1]]
+	for car: Array in cars:
+		decor("Car%d_%d" % [car[0], car[1]], "res://assets/sprites/curry/car_%d.png" % car[2], foot(car[0], car[1]), Vector2(24, 12))
 	_ambient("MeadowFireflies", "fireflies", Vector2(72, 43) * T, Vector2(24, 4) * T)
 	_ambient("CreekFireflies", "fireflies", Vector2(46, 28) * T, Vector2(3, 14) * T)
