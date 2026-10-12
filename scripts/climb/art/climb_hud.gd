@@ -24,9 +24,15 @@ static func route_plate(ci: CanvasItem, state: ClimbState, feet: int) -> void:
 
 
 static func topo_bar(ci: CanvasItem, state: ClimbState, progress: float) -> void:
-	var bar := Rect2(SCREEN.x - 10, 28, 4, 138)
+	var bar := Rect2(SCREEN.x - 10, 28, 4, 126)
 	UI.glass(ci, Rect2(bar.position + Vector2(-3, -6), bar.size + Vector2(6, 12)), 0.5)
 	ci.draw_rect(bar, Color(0.12, 0.1, 0.14, 0.9))
+	# a little summit on top, so it reads as the way to the top and not a
+	# second energy bar
+	var peak := Vector2(bar.position.x + bar.size.x / 2.0, bar.position.y - 13)
+	ci.draw_colored_polygon(PackedVector2Array([peak + Vector2(0, -1), peak + Vector2(6, 6), peak + Vector2(-6, 6)]), UI.WOOD_DARK)
+	ci.draw_colored_polygon(PackedVector2Array([peak, peak + Vector2(5, 5), peak + Vector2(-5, 5)]), UI.CREAM)
+	ci.draw_colored_polygon(PackedVector2Array([peak, peak + Vector2(2, 2), peak + Vector2(-2, 2)]), Color.WHITE)
 	var n := state.route.pitches.size()
 	for i in n + 1:
 		var y := bar.end.y - bar.size.y * float(i) / n
@@ -39,11 +45,12 @@ static func topo_bar(ci: CanvasItem, state: ClimbState, progress: float) -> void
 
 static func stamina(ci: CanvasItem, state: ClimbState, flash: float, shake: float) -> void:
 	var frac := clampf(state.stamina / float(ClimbState.MAX_STAMINA), 0.0, 1.0)
-	var r := Rect2(SCREEN.x - 26 + roundf(shake), SCREEN.y - 96, 12, 80)
+	# short enough that the number under it clears the bottom of the screen
+	var r := Rect2(SCREEN.x - 26 + roundf(shake), SCREEN.y - 100, 12, 76)
 	UI.energy_bar(ci, r, frac, state.stamina <= 25, flash)
 	# an "E" over the bar, as on Stardew's energy bar, and the number under it
 	UI.outlined(ci, Vector2(r.position.x + r.size.x / 2.0, r.position.y - 3), "E", UI.GOLD, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
-	UI.text(ci, Vector2(r.position.x - 3, r.end.y + 12), "%d" % maxi(state.stamina, 0), UI.WARN if state.stamina <= 25 else UI.CREAM, 10)
+	UI.outlined(ci, Vector2(r.position.x + r.size.x / 2.0, r.end.y + 10), "%d" % maxi(state.stamina, 0), UI.WARN if state.stamina <= 25 else UI.CREAM, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 ## The rack as a Stardew-style toolbar. Slots light up when what they do is
