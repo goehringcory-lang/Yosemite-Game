@@ -53,6 +53,11 @@ func notify(key: String, icon: Texture2D, display_name: String, amount: int) -> 
 	_layout()
 
 
+## True if a card was added or counted up within [param seconds].
+func has_fresh(seconds := 1.5) -> bool:
+	return _cards.any(func(entry: Dictionary) -> bool: return entry.time < seconds)
+
+
 ## Number of cards showing (for tests).
 func count() -> int:
 	return _cards.size()

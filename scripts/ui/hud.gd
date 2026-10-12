@@ -259,8 +259,10 @@ func _update_cover() -> void:
 		var screen := get_tree().get_first_node_in_group(group)
 		if screen and screen.is_open():
 			menu = true
-	# Cards stay up during a conversation (a shop, the fire), not under a menu.
-	toasts.visible = not menu
+	# Cards hide under a menu, and during a conversation unless they're
+	# fresh (what you just bought or cooked), so they don't sit over the
+	# person you're talking to.
+	toasts.visible = not menu and (not covered or toasts.has_fresh())
 	_dim.color.a = move_toward(_dim.color.a, 0.42 if menu else 0.0, get_process_delta_time() * 3.0)
 	covered = covered or menu
 	if covered == _covered:
