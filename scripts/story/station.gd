@@ -159,23 +159,48 @@ func _stone(at: Vector2) -> void:
 	_px(at.x + 1, at.y, 1, 1, STONE_DARK)
 
 
+## The cooking menu for [param recipes]: each dish's name and picture, and a
+## card for each with what goes in (what you have of each, in red when short),
+## how much energy it gives, how long it takes, and its note. Then "Leave".
+static func menu_for(recipes: Array[RecipeData]) -> Dictionary:
+	var options := []
+	var icons := []
+	var details := []
+	for recipe in recipes:
+		var dish := ItemDB.get_item(recipe.output_id)
+		icons.append(dish.icon if dish else null)
+		options.append(recipe.display_name)
+		var rows := []
+		for id: String in recipe.inputs:
+			var item := ItemDB.get_item(id)
+			var need := int(recipe.inputs[id])
+			var have := Inventory.count(id)
+			rows.append([item.icon if item else null, "%s  %d/%d" % [item.display_name if item else id, have, need], have < need])
+		var facts := PackedStringArray()
+		var energy := FoodDB.energy(recipe.output_id)
+		if energy > 0:
+			facts.append("%d energy" % energy)
+		var minutes := Perks.recipe_minutes(recipe)
+		facts.append("%d min" % minutes if minutes < 60 else ("%d hr" % (minutes / 60) if minutes % 60 == 0 else "%d hr %d min" % [minutes / 60, minutes % 60]))
+		if recipe.output_count > 1:
+			facts.insert(0, "Makes %d" % recipe.output_count)
+		details.append({"title": "You'll need" if Recipes.can_make(recipe) else "You're short", "rows": rows,
+			"facts": " · ".join(facts), "note": recipe.description})
+	options.append("Leave")
+	icons.append(null)
+	details.append(null)
+	return {"options": options, "icons": icons, "details": details}
+
+
 func interact(player: Player) -> void:
 	var recipes := Recipes.known_for(station)
 	if recipes.is_empty():
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s. You don't know anything to make here yet." % display_name}])
 		return
-	var options := []
-	var icons := []
-	for recipe in recipes:
-		var dish := ItemDB.get_item(recipe.output_id)
-		icons.append(dish.icon if dish else null)
-		var mark := "" if Recipes.can_make(recipe) else " (missing ingredients)"
-		options.append("%s: %s%s" % [recipe.display_name, Recipes.describe_inputs(recipe), mark])
-	options.append("Leave")
-	icons.append(null)
+	var menu := menu_for(recipes)
 	player.can_act = false
 	var box := DialogueBox.open(player)
-	var choice := await box.choose("%s. What will you make?" % display_name, options, "", icons)
+	var choice := await box.choose("%s. What will you make?" % display_name, menu.options, "", menu.icons, menu.details)
 	if choice >= 0 and choice < recipes.size():
 		var recipe := recipes[choice]
 		if Recipes.make(recipe):

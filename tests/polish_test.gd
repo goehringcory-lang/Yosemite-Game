@@ -44,6 +44,7 @@ func _ready() -> void:
 	Settings.apply_font()
 	await test_routines(world)
 	await test_vendors_drawn(world)
+	await test_detail_cards(world)
 	test_friendship(world)
 	await test_day_log(world)
 	SaveManager.delete_save()
@@ -441,6 +442,34 @@ func test_friendship(world: Node) -> void:
 
 
 ## Settings > Font swaps every screen to the pixel font and back, and is saved.
+## The campfire and the shops show a card about the choice under the cursor:
+## what goes in (short in red), energy, time; and it fits beside the list.
+func test_detail_cards(world: Node) -> void:
+	Recipes.learn("acorn_cake")
+	if Inventory.count("leached_acorn_meal") > 0:
+		Inventory.remove("leached_acorn_meal", Inventory.count("leached_acorn_meal"))
+	var menu := Station.menu_for(Recipes.known_for("campfire"))
+	check(menu.options.size() == menu.details.size() and menu.options[-1] == "Leave" and menu.details[-1] == null,
+		"one card per dish, none for Leave")
+	var cake: Dictionary = menu.details[menu.options.find("Acorn Cake")]
+	check(cake.rows.any(func(row: Array) -> bool: return row[1].begins_with("Leached Acorn Meal") and row[2]),
+		"a missing ingredient shows in red with what you have")
+	check(cake.facts.contains("45 energy") and cake.facts.contains("Makes 2"), "and the dish's energy and yield: " + cake.facts)
+	var box := DialogueBox.open(world.player)
+	box.choose("Campfire. What will you make?", menu.options, "", [], menu.details)
+	box.reveal_all()
+	for i in 3:
+		await get_tree().process_frame
+	check(box._detail_panel.visible and box._detail_column.get_child_count() >= 3, "the card shows beside the list")
+	var screen := Rect2(Vector2.ZERO, Vector2(480, 270))
+	check(screen.encloses(box._panel.get_global_rect()), "and the box still fits the screen")
+	box._cursor = menu.options.size() - 1
+	box._refresh_options()
+	check(box._detail_column.get_child_count() == 0, "Leave has an empty card")
+	box.close()
+	await get_tree().process_frame
+
+
 func test_font_setting() -> void:
 	var saved_path := Settings.path
 	Settings.path = "user://polish_test_settings.cfg"

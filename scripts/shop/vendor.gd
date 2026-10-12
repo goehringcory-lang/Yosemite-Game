@@ -85,6 +85,15 @@ func offer_name(offer: ShopOffer) -> String:
 	return name if offer.amount == 1 else ItemDB.count_name(offer.amount, name)
 
 
+## The card beside the list for [param offer]: what it is, what it costs
+## against the food you carry, and how many you have already.
+func offer_card(offer: ShopOffer) -> Dictionary:
+	var thing: Resource = Gear.get_gear(offer.id) if offer.kind == "gear" else ItemDB.get_item(offer.id)
+	var rows := [[null, "Costs %d of your %d energy" % [offer.price, Barter.purse()], not Barter.can_afford(offer.price)]]
+	return {"title": offer_name(offer), "rows": rows, "facts": "You have %d" % _owned(offer),
+		"note": thing.description if thing else ""}
+
+
 ## Shopkeepers with a name in the story keep friendship hearts too.
 func can_receive_gift() -> bool:
 	return shop != null and shop.talk_target != "" and GiftGiving.possible(shop.talk_target)
@@ -116,14 +125,18 @@ func interact(player: Player) -> void:
 			break
 		var options := []
 		var icons := []
+		var details := []
 		for offer in offers:
 			icons.append(offer_icon(offer))
-			options.append("%s for %d food energy%s" % [offer_name(offer), offer.price,
-				"" if Barter.can_afford(offer.price) else " (not enough food)"])
+			# the card beside the list says the rest (and shows a price you
+			# can't meet in red)
+			options.append("%s · %d energy" % [offer_name(offer), offer.price])
+			details.append(offer_card(offer))
 		options.append("Done")
 		icons.append(null)
+		details.append(null)
 		var prompt := "You're carrying %d energy of food. What do you want?" % Barter.purse()
-		var choice := await box.choose(prompt, options, shop.keeper, icons)
+		var choice := await box.choose(prompt, options, shop.keeper, icons, details)
 		if choice < 0 or choice >= offers.size():
 			break
 		var offer := offers[choice]

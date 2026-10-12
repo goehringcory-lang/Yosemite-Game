@@ -49,22 +49,28 @@ func _ready() -> void:
 	box.close()
 	# A shop and the campfire, with pictures of what's on offer.
 	var shop_box := DialogueBox.open(world.player)
+	var wares := [["quickdraw", 2, 24], ["cam", 1, 40], ["haul_bag", 1, 60]]
+	var ware_names := []
+	var ware_icons := []
+	var ware_cards := []
+	for ware: Array in wares:
+		var piece := Gear.get_gear(ware[0])
+		var label: String = piece.display_name if ware[1] == 1 else "%s x%d" % [piece.display_name, ware[1]]
+		ware_names.append("%s · %d energy" % [label, ware[2]])
+		ware_icons.append(piece.icon)
+		ware_cards.append({"title": label, "rows": [[null, "Costs %d of your 148 energy" % ware[2], ware[2] > 148]],
+			"facts": "You have %d" % Gear.count(ware[0]), "note": piece.description})
 	shop_box.choose("You're carrying 148 energy of food. What do you want?",
-		["Quickdraw x2 for 24 food energy", "Cam for 40 food energy", "Haul bag for 60 food energy", "Done"], "Marty Kessler",
-		[Gear.get_gear("quickdraw").icon, Gear.get_gear("cam").icon, Gear.get_gear("haul_bag").icon, null])
+		ware_names + ["Done"], "Marty Kessler", ware_icons + [null], ware_cards + [null])
 	shop_box.reveal_all()
 	await _snap(dir, "shop")
 	shop_box.close()
 	var fire_box := DialogueBox.open(world.player)
-	var dishes := ["acorn_mush", "acorn_cake", "elderberry_sauce", "roasted_morels", "yerba_buena_tea", "spring_greens"]
-	var names := []
-	var pictures := []
-	for id in dishes:
-		names.append(ItemDB.get_item(id).display_name)
-		pictures.append(ItemDB.get_item(id).icon)
-	names.append("Leave")
-	pictures.append(null)
-	fire_box.choose("Campfire. What will you make?", names, "", pictures)
+	# the real campfire menu, knowing a few recipes, with enough for some
+	for id in ["acorn_cake", "elderberry_sauce", "spring_greens"]:
+		Recipes.learn(id)
+	var fire_menu := Station.menu_for(Recipes.known_for("campfire"))
+	fire_box.choose("Campfire. What will you make?", fire_menu.options, "", fire_menu.icons, fire_menu.details)
 	fire_box.reveal_all()
 	await _snap(dir, "campfire")
 	fire_box.close()

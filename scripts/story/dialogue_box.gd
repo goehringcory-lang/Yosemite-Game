@@ -21,6 +21,11 @@ const HINT_COLOR := Color(1, 1, 1, 0.6)
 ## The text's width with and without a portrait beside it.
 const TEXT_WIDTH := 456.0
 const TEXT_WIDTH_PORTRAIT := 364.0
+## The card beside a list of choices that tells about the one picked, like
+## Stardew Valley's crafting and shop menus (see choose's details).
+const DETAIL_WIDTH := 168.0
+const DETAIL_SHORT := Color(1.0, 0.55, 0.42)
+const DETAIL_DIM := Color(1, 1, 1, 0.65)
 ## Portraits are painted at 40 px and shown at exactly twice that, so they
 ## stay crisp and read at a glance, like Stardew's 64 px faces.
 const PORTRAIT_SIZE := Vector2(80, 80)
@@ -45,6 +50,9 @@ var _options: PackedStringArray = []
 ## A picture for each option (or null), when the list has any: the shops'
 ## goods, the campfire's dishes.
 var _icons: Array = []
+var _details: Array = []
+var _detail_panel: PanelContainer
+var _detail_column: VBoxContainer
 var _cursor := 0
 var _opened_frame := 0
 ## The brass tag the speaker's name sits on, the bar behind the chosen option,
@@ -152,6 +160,22 @@ func _ready() -> void:
 	_options_box = VBoxContainer.new()
 	_options_box.add_theme_constant_override("separation", 0)
 	column.add_child(_options_box)
+	_detail_panel = PanelContainer.new()
+	var card := StyleBoxFlat.new()
+	card.bg_color = Color(0, 0, 0, 0.22)
+	card.border_color = Color(0.78, 0.63, 0.38, 0.55)
+	card.border_width_left = 1
+	card.content_margin_left = 6.0
+	card.content_margin_right = 4.0
+	card.content_margin_top = 3.0
+	card.content_margin_bottom = 3.0
+	_detail_panel.add_theme_stylebox_override("panel", card)
+	_detail_panel.custom_minimum_size.x = DETAIL_WIDTH
+	_detail_panel.visible = false
+	row.add_child(_detail_panel)
+	_detail_column = VBoxContainer.new()
+	_detail_column.add_theme_constant_override("separation", 1)
+	_detail_panel.add_child(_detail_column)
 	# Pushes the hint to the bottom edge of the box.
 	var filler := Control.new()
 	filler.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -229,13 +253,20 @@ static func pages(text: String) -> PackedStringArray:
 
 
 ## Returns the chosen option's index, or -1 if the player cancels.
-func choose(prompt: String, options: Array, speaker := "", icons := []) -> int:
+##
+## [param details], if given, has a card per option shown beside the list for
+## the one under the cursor: {"title": String, "rows": [[icon or null, text,
+## short (true draws it in red)], ...], "facts": String, "note": String}. Options without one
+## (Leave) show an empty card.
+func choose(prompt: String, options: Array, speaker := "", icons := [], details := []) -> int:
 	_cursor = 0
 	_icons = icons
+	_details = details
 	_show(speaker, prompt, options)
 	var confirmed: bool = await _next_input()
 	var picked := _cursor if confirmed else -1
 	_icons = []
+	_details = []
 	_show("", "", [])
 	return picked
 
@@ -250,7 +281,7 @@ func _show(speaker: String, text: String, options: Array, mood := "neutral") -> 
 	var face := Portraits.for_speaker(speaker, mood)
 	_portrait.texture = face
 	_portrait_frame.visible = face != null
-	_text_label.custom_minimum_size.x = TEXT_WIDTH_PORTRAIT if face else TEXT_WIDTH
+	_text_label.custom_minimum_size.x = (TEXT_WIDTH_PORTRAIT if face else TEXT_WIDTH) - (DETAIL_WIDTH + 6.0 if not _details.is_empty() else 0.0)
 	_speaker = speaker
 	_voice = Portraits.voice_pitch(speaker)
 	_blipped = 0
@@ -335,6 +366,7 @@ func _refresh_options() -> void:
 	for child in _options_box.get_children():
 		_options_box.remove_child(child)
 		child.queue_free()
+	_refresh_detail()
 	var pictures := _icons.any(func(icon: Variant) -> bool: return icon != null)
 	for i in _options.size():
 		var label := Label.new()
@@ -372,6 +404,50 @@ func _refresh_options() -> void:
 		holder.add_theme_stylebox_override("panel", _select_style if i == _cursor else _plain_style)
 		holder.add_child(row)
 		_options_box.add_child(holder)
+
+
+## Fills the card beside the list for the option under the cursor.
+func _refresh_detail() -> void:
+	_detail_panel.visible = not _details.is_empty() and not _options.is_empty()
+	for child in _detail_column.get_children():
+		_detail_column.remove_child(child)
+		child.queue_free()
+	if not _detail_panel.visible or _cursor >= _details.size() or not _details[_cursor] is Dictionary:
+		return
+	var card: Dictionary = _details[_cursor]
+	if card.get("title", "") != "":
+		var title := Label.new()
+		title.text = card.title
+		title.add_theme_color_override("font_color", NAME_COLOR)
+		_detail_column.add_child(title)
+	for entry: Array in card.get("rows", []):
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override("separation", 3)
+		if entry[0] != null:
+			var picture := TextureRect.new()
+			picture.custom_minimum_size = Vector2(16, 16)
+			picture.texture = entry[0]
+			picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			line.add_child(picture)
+		var text := Label.new()
+		text.text = entry[1]
+		if entry.size() > 2 and entry[2]:
+			text.add_theme_color_override("font_color", DETAIL_SHORT)
+		line.add_child(text)
+		_detail_column.add_child(line)
+	if card.get("facts", "") != "":
+		var facts := Label.new()
+		facts.text = card.facts
+		_detail_column.add_child(facts)
+	if card.get("note", "") != "":
+		var note := Label.new()
+		note.text = card.note
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		note.custom_minimum_size.x = DETAIL_WIDTH - 10.0
+		note.add_theme_color_override("font_color", DETAIL_DIM)
+		_detail_column.add_child(note)
 
 
 ## Waits for confirm (true) or cancel (false).
