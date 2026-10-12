@@ -435,7 +435,7 @@ func _quests_page() -> void:
 	_heading("Main story")
 	var main := QuestLog.main_objective()
 	if not main.is_empty():
-		_line("%s: %s" % [main.quest.title, main.objective])
+		_quest_card(main.quest, main.objective)
 	elif not QuestLog.has_guidebook():
 		_line("Pick up a climbing guidebook at the Mountain Shop in Curry Village.")
 	elif QuestLog.final_entry_pending():
@@ -445,14 +445,81 @@ func _quests_page() -> void:
 	else:
 		_line("Explore, and talk to people around the valley.", DIM)
 
-	var objectives := QuestLog.objectives()
-	_heading("Open quests (%d)" % objectives.size())
-	if objectives.is_empty():
+	var open: Array[QuestData] = []
+	for quest: QuestData in QuestLog.QUESTS:
+		if QuestLog.active.has(quest.id) and (main.is_empty() or quest != main.quest):
+			open.append(quest)
+	_heading("Open quests (%d)" % open.size())
+	if open.is_empty():
 		_line("No open quests. Talk to people around the valley.", DIM)
-	for text in objectives:
-		_line("• " + text)
-	if Array(objectives).any(func(text: String) -> bool: return text.begins_with("* ")):
-		_line("* Part of the main story.", DIM)
+	for quest in open:
+		_quest_card(quest, QuestLog.objective_text(quest))
+
+	# Who has something for you, as on a help-wanted board.
+	var asking: Array[CharacterData] = []
+	for character: CharacterData in QuestLog.CHARACTERS:
+		var offer: QuestData = QuestLog.available_from(character.id)
+		# the main story's next step is already shown above
+		if offer != null and (main.is_empty() or offer != main.quest):
+			asking.append(character)
+	if not asking.is_empty():
+		_heading("Looking for help (%d)" % asking.size())
+		var flow := HFlowContainer.new()
+		flow.add_theme_constant_override("h_separation", 10)
+		flow.add_theme_constant_override("v_separation", 4)
+		flow.custom_minimum_size.x = LINE_WIDTH
+		for character in asking:
+			var who := HBoxContainer.new()
+			who.add_theme_constant_override("separation", 4)
+			who.add_child(_face(character.display_name, 24))
+			var name_label := Label.new()
+			name_label.text = character.display_name + (" (%s)" % character.home if character.home != "" else "")
+			name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			who.add_child(name_label)
+			flow.add_child(who)
+		_body.add_child(flow)
+
+
+## A quest as a card: the face of whoever gave it, its title, and what to do
+## next.
+func _quest_card(quest: QuestData, objective: String) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	var giver := QuestLog.get_character(quest.giver)
+	row.add_child(_face(giver.display_name if giver else "", 32))
+	var words := VBoxContainer.new()
+	words.add_theme_constant_override("separation", 0)
+	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var title := Label.new()
+	title.text = quest.title + ("  (main story)" if quest.main_line else "") + ("  · from %s" % giver.display_name if giver else "")
+	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.5))
+	words.add_child(title)
+	var step := Label.new()
+	step.text = objective
+	step.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	step.custom_minimum_size.x = LINE_WIDTH - 40
+	words.add_child(step)
+	row.add_child(words)
+	_body.add_child(row)
+
+
+## A small framed portrait of [param speaker] (blank if they have none).
+func _face(speaker: String, side: int) -> Control:
+	var frame := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color("5a4634")
+	style.border_color = Color("c8a060")
+	style.set_border_width_all(1)
+	frame.add_theme_stylebox_override("panel", style)
+	frame.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	var picture := TextureRect.new()
+	picture.texture = Portraits.for_speaker(speaker)
+	picture.custom_minimum_size = Vector2(side, side)
+	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	frame.add_child(picture)
+	return frame
 
 
 # ---------------------------------------------------------------- the Backpack tab
