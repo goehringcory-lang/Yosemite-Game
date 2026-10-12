@@ -376,6 +376,12 @@ func _place_plaza() -> void:
 	for planter in [[30, 36.2], [37.5, 36.2], [43, 36.2], [50, 36.2], [52.2, 36.2], [60.2, 36.2], [62, 36.2], [70, 36.2], [74.5, 36.2]]:
 		decor("Planter%d" % int(planter[0] * 10), CS + "planter_%d.png" % (int(planter[0] * 10) % 4), foot(planter[0], planter[1]), Vector2(12, 5))
 	decor("BikeRack", CS + "bike_rack.png", foot(46, 48.4), Vector2(30, 5))
+	# Bear-proof bins, as at every Yosemite plaza, a second bike rack by the
+	# store, and a cooler left by a patio table.
+	for bin in [[41, 39.2], [67, 39.2], [57.5, 47.6], [35.5, 45.2]]:
+		decor("BearBin%d" % int(bin[0] * 10), "res://assets/sprites/buildings/bear_box.png", foot(bin[0], bin[1]), Vector2(14, 6))
+	decor("BikeRackStore", CS + "bike_rack.png", foot(63.5, 37.2), Vector2(30, 5))
+	decor("Cooler", CS + "cooler.png", foot(50.4, 41.2), Vector2(12, 4))
 	decor("Fountain", CS + "fountain.png", foot(74.5, 42), Vector2(10, 5))
 	# Patio tables in front of the Pavilion and the pizza deck.
 	for tbl in [[44, 40.6], [49, 40.8], [37, 47], [44.6, 47.6], [61, 41]]:
