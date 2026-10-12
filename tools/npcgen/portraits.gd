@@ -4,7 +4,10 @@ extends SceneTree
 ## conversation box. Each one is saved under the name of the person's sprite
 ## sheet, so assets/sprites/npcs/wren_alvarez.png gets
 ## assets/sprites/portraits/wren_alvarez.png, and the player gets player.png.
-## Also writes docs/cast_portraits.png, every portrait side by side.
+## Each file is a strip of four 40x40 faces, one per mood in MOODS order
+## (neutral, happy, sad, surprised); the conversation box picks one per line.
+## Also writes docs/cast_portraits.png (every neutral face side by side) and
+## docs/portrait_moods.png (a few people in all four moods).
 ##
 ##   godot --headless --path . -s res://tools/npcgen/portraits.gd
 ##   godot --headless --path . --import
@@ -19,6 +22,8 @@ const BLUSH := Color("e07a70")
 const MOUTH := Color("9a4a44")
 const GLINT := Color("fbf6ea")
 const EYE_WHITE := Color("f4eee2")
+## Must match Portraits.MOODS.
+const MOODS := ["neutral", "happy", "sad", "surprised"]
 
 var im: Image
 var _rng := RandomNumberGenerator.new()
@@ -29,16 +34,38 @@ func _init() -> void:
 	var ids: Array = Looks.LOOKS.keys()
 	ids.sort()
 	var all: Array[Image] = []
+	var strips: Dictionary = {}
 	for id: String in ids:
-		var image := paint(Looks.LOOKS[id], id)
-		image.save_png(OUT_DIR + id + ".png")
-		all.append(image)
-	var player := paint(Looks.PLAYER, "player")
+		var strip := _strip(Looks.LOOKS[id], id)
+		strip.save_png(OUT_DIR + id + ".png")
+		all.append(strip.get_region(Rect2i(0, 0, S, S)))
+		strips[id] = strip
+	var player := _strip(Looks.PLAYER, "player")
 	player.save_png(OUT_DIR + "player.png")
-	all.append(player)
+	all.append(player.get_region(Rect2i(0, 0, S, S)))
 	_save_sheet(all)
+	_save_moods([strips.galen_clark, strips.wren_alvarez, strips.maria_lebrado, strips.warren_harding])
 	print("%d portraits written to %s. Run godot --headless --path . --import next." % [all.size(), OUT_DIR])
 	quit()
+
+
+## Every mood of one person, side by side.
+func _strip(look: Dictionary, id: String) -> Image:
+	var strip := Image.create_empty(S * MOODS.size(), S, false, Image.FORMAT_RGBA8)
+	for i in MOODS.size():
+		strip.blit_rect(paint(look, id, MOODS[i]), Rect2i(0, 0, S, S), Vector2i(i * S, 0))
+	return strip
+
+
+func _save_moods(strips: Array) -> void:
+	var sheet := Image.create_empty(S * MOODS.size() + 8, strips.size() * (S + 4) + 4, false, Image.FORMAT_RGBA8)
+	sheet.fill(Color("e8dfcc"))
+	for r in strips.size():
+		for i in MOODS.size():
+			sheet.fill_rect(Rect2i(4 + i * S, 4 + r * (S + 4), S - 2, S), Color("6a5440"))
+		sheet.blend_rect(strips[r], Rect2i(0, 0, S * MOODS.size(), S), Vector2i(4, 4 + r * (S + 4)))
+	sheet.resize(sheet.get_width() * 3, sheet.get_height() * 3, Image.INTERPOLATE_NEAREST)
+	sheet.save_png("res://docs/portrait_moods.png")
 
 
 func _save_sheet(all: Array[Image]) -> void:
@@ -116,7 +143,7 @@ func outline() -> void:
 
 # ------------------------------------------------------------ the portrait
 
-func paint(look: Dictionary, id: String) -> Image:
+func paint(look: Dictionary, id: String, mood := "neutral") -> Image:
 	im = Image.create_empty(S, S, false, Image.FORMAT_RGBA8)
 	_rng.seed = hash(id)
 	var skin := col(look.get("skin", Looks.SKIN_FAIR))
@@ -130,7 +157,7 @@ func paint(look: Dictionary, id: String) -> Image:
 	if look.has("bandana"):
 		_bandana(col(look.bandana))
 	_head(skin)
-	_face(look, skin)
+	_face(look, skin, mood)
 	_hair_front(hair, style, hat != "" and hat not in ["headband", "scarf", "bonnet"])
 	if look.get("beard", "none") != "none":
 		_beard(look.beard, col(look.get("beard_color", hair)))
@@ -138,6 +165,7 @@ func paint(look: Dictionary, id: String) -> Image:
 		_hat(hat, col(look.get("hat_color", "5a4a3a")), col(look.get("hat_band", darker(look.get("hat_color", "5a4a3a"), 0.4))), hair)
 	if look.get("glasses", false):
 		_glasses()
+	_mouth(mood, skin)
 	outline()
 	return im
 
@@ -250,29 +278,76 @@ func _head(skin: Color) -> void:
 	px(27, 24, Color(0, 0, 0, 0))
 
 
-func _face(look: Dictionary, skin: Color) -> void:
+func _face(look: Dictionary, skin: Color, mood: String) -> void:
 	var eyes := col(look.get("eyes", "2a1f1a"))
 	var brow := darker(col(look.get("hair", "4a3020")), 0.15)
 	if look.get("hair_style", "") == "bald" or col(look.get("hair", "4a3020")).get_luminance() > 0.6:
 		brow = darker(skin, 0.35)
-	# brows
-	rect(15, 16, 3, 1, brow)
-	rect(22, 16, 3, 1, brow)
-	# eyes: a white, the iris, a glint
+	# brows: level, raised (happy, surprised), or tilted up in the middle (sad)
+	match mood:
+		"happy", "surprised":
+			rect(15, 15, 3, 1, brow)
+			rect(22, 15, 3, 1, brow)
+		"sad":
+			rect(15, 16, 2, 1, brow)
+			px(17, 15, brow)
+			px(22, 15, brow)
+			rect(23, 16, 2, 1, brow)
+		_:
+			rect(15, 16, 3, 1, brow)
+			rect(22, 16, 3, 1, brow)
+	# eyes: a white, the iris, a glint; wide when surprised, cast down when sad,
+	# and creased into happy arcs
 	for x0 in [15, 22]:
-		rect(x0, 18, 3, 2, EYE_WHITE)
-		rect(x0 + 1, 18, 2, 2, eyes)
-		px(x0 + 1, 18, GLINT)
+		match mood:
+			"happy":
+				rect(x0, 19, 3, 1, eyes)
+				px(x0 + 1, 18, eyes)
+			"surprised":
+				rect(x0, 17, 3, 3, EYE_WHITE)
+				rect(x0 + 1, 18, 1, 2, eyes)
+				px(x0 + 1, 18, GLINT)
+			"sad":
+				rect(x0, 18, 3, 2, EYE_WHITE)
+				rect(x0 + 1, 19, 2, 1, eyes)
+				rect(x0, 18, 3, 1, darker(skin, 0.15))
+			_:
+				rect(x0, 18, 3, 2, EYE_WHITE)
+				rect(x0 + 1, 18, 2, 2, eyes)
+				px(x0 + 1, 18, GLINT)
 	# nose and its shadow
 	px(20, 20, darker(skin, 0.12))
 	px(20, 21, darker(skin, 0.2))
 	px(21, 21, darker(skin, 0.28))
-	# blush and mouth
-	px(14, 22, BLUSH.lerp(skin, 0.4))
-	px(26, 22, BLUSH.lerp(skin, 0.4))
-	rect(18, 23, 4, 1, MOUTH)
-	px(17, 22, darker(skin, 0.18))
-	px(22, 22, darker(skin, 0.18))
+	# blush, warmer when happy; the mouth comes last (see _mouth)
+	var blush := BLUSH.lerp(skin, 0.15 if mood == "happy" else 0.4)
+	px(14, 22, blush)
+	px(26, 22, blush)
+	if mood == "happy":
+		px(13, 22, blush.lerp(skin, 0.5))
+		px(27, 22, blush.lerp(skin, 0.5))
+
+
+## The mouth, drawn over any beard so the mood always shows.
+func _mouth(mood: String, skin: Color) -> void:
+	match mood:
+		"happy":
+			rect(18, 24, 4, 1, MOUTH)
+			px(17, 23, MOUTH)
+			px(22, 23, MOUTH)
+			rect(18, 23, 4, 1, Color("f4eee2"))
+		"sad":
+			rect(18, 23, 4, 1, MOUTH)
+			px(17, 24, MOUTH)
+			px(22, 24, MOUTH)
+		"surprised":
+			rect(19, 23, 2, 2, darker(MOUTH, 0.35))
+			px(18, 23, MOUTH)
+			px(21, 23, MOUTH)
+		_:
+			rect(18, 23, 4, 1, MOUTH)
+			px(17, 22, darker(skin, 0.18))
+			px(22, 22, darker(skin, 0.18))
 
 
 func _hair_front(hair: Color, style: String, under_hat: bool) -> void:
@@ -321,7 +396,6 @@ func _beard(kind: String, c: Color) -> void:
 			rect(17, 22, 6, 1, c)
 			rect(18, 24, 4, 3, c)
 			px(19, 27, darker(c, 0.15))
-			rect(19, 23, 2, 1, Color(MOUTH))
 		"short", "long":
 			var bottom := 28 if kind == "short" else 36
 			for y in range(19, bottom):
@@ -334,7 +408,6 @@ func _beard(kind: String, c: Color) -> void:
 						strand = darker(strand, 0.18)
 					px(x, y, strand)
 			rect(17, 22, 6, 1, darker(c, 0.1))
-			rect(18, 23, 4, 1, MOUTH)
 			if kind == "long":
 				for y in range(27, 36, 3):
 					px(18 + y % 4, y, lighter(c, 0.15))

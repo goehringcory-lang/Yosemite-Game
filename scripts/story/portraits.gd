@@ -5,9 +5,22 @@ extends RefCounted
 ## the speaker's display name is looked up among the characters in
 ## data/characters/ (staff and visitors too).
 ##
-##   Portraits.for_speaker("Wren Alvarez")   # a Texture2D, or null
+##   Portraits.for_speaker("Wren Alvarez")             # a Texture2D, or null
+##   Portraits.for_speaker("Wren Alvarez", "happy")    # one of MOODS
+##
+## Each portrait file is a strip of four faces, one per mood. A line in a
+## conversation can name its mood ({"speaker", "text", "mood"}); otherwise
+## mood_for() reads it from the words.
 
 const CHARACTER_DIR := "res://data/characters/"
+const MOODS := ["neutral", "happy", "sad", "surprised"]
+const SIZE := 40
+## Words that make a line sad or glad (whole words, any case).
+const SAD_WORDS := ["sorry", "lost", "died", "dead", "miss", "missed", "afraid", "worried", "worry",
+	"sad", "tired", "grief", "burned", "hurt", "fear", "lonely", "ruined", "broken", "gone forever"]
+const GLAD_WORDS := ["thank", "thanks", "wonderful", "glad", "great", "love", "beautiful", "perfect", "good",
+	"fine", "ha", "haha", "welcome", "congratulations", "proud", "happy", "best", "well done"]
+const SURPRISE_STARTS := ["oh!", "oh,", "what?", "wow", "really?", "goodness", "well!", "my!", "look!", "whoa"]
 const PORTRAIT_DIR := "res://assets/sprites/portraits/"
 ## Speakers who aren't characters (shopkeepers named in data/shops/), by the
 ## portrait they use.
@@ -18,9 +31,11 @@ const EXTRA := {
 ## Display name -> portrait name, built on first use.
 static var _names: Dictionary = {}
 static var _cache: Dictionary = {}
+static var _sheets: Dictionary = {}
 
 
-static func for_speaker(speaker: String) -> Texture2D:
+## The speaker's face in [param mood] (one of MOODS), or null.
+static func for_speaker(speaker: String, mood := "neutral") -> Texture2D:
 	if speaker == "":
 		return null
 	if _names.is_empty():
@@ -30,10 +45,48 @@ static func for_speaker(speaker: String) -> Texture2D:
 	var portrait: String = _names.get(speaker, "")
 	if portrait == "":
 		return null
-	if not _cache.has(portrait):
-		var path := PORTRAIT_DIR + portrait + ".png"
-		_cache[portrait] = load(path) if ResourceLoader.exists(path) else null
-	return _cache[portrait]
+	var key := portrait + ":" + mood
+	if not _cache.has(key):
+		if not _sheets.has(portrait):
+			var path := PORTRAIT_DIR + portrait + ".png"
+			_sheets[portrait] = load(path) if ResourceLoader.exists(path) else null
+		var sheet: Texture2D = _sheets[portrait]
+		if sheet == null:
+			_cache[key] = null
+		else:
+			var face := AtlasTexture.new()
+			face.atlas = sheet
+			var index := maxi(0, MOODS.find(mood))
+			# an older single-face file has only the neutral face
+			if sheet.get_width() < SIZE * MOODS.size():
+				index = 0
+			face.region = Rect2(index * SIZE, 0, SIZE, SIZE)
+			_cache[key] = face
+	return _cache[key]
+
+
+## The mood a line reads as, from its words: surprised if it opens with "Oh!"
+## or the like, sad if it has words of loss or worry, happy if it exclaims or
+## has words of thanks and gladness, and otherwise neutral.
+static func mood_for(text: String) -> String:
+	var lower := text.strip_edges().to_lower()
+	if lower == "":
+		return "neutral"
+	for start: String in SURPRISE_STARTS:
+		if lower.begins_with(start):
+			return "surprised"
+	var words := PackedStringArray()
+	for word in lower.replace("'", " ").split(" ", false):
+		words.append(word.strip_edges().trim_suffix(".").trim_suffix(",").trim_suffix("!").trim_suffix("?").trim_suffix(";").trim_suffix(":"))
+	for word: String in SAD_WORDS:
+		if word.contains(" ") and lower.contains(word) or word in words:
+			return "sad"
+	if "!" in lower:
+		return "happy"
+	for word: String in GLAD_WORDS:
+		if word.contains(" ") and lower.contains(word) or word in words:
+			return "happy"
+	return "neutral"
 
 
 ## A speaking voice for [param speaker]: a pitch for the talking blip that is

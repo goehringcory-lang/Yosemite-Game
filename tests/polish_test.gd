@@ -68,6 +68,16 @@ func test_portraits() -> void:
 	check(Portraits.for_speaker("Wren Alvarez") != null, "Wren has a portrait")
 	check(Portraits.for_speaker("") == null, "narration has no portrait")
 	check(Portraits.for_speaker("Camp Curry Store clerk") != null, "the store clerk has a portrait")
+	var happy := Portraits.for_speaker("Wren Alvarez", "happy") as AtlasTexture
+	var plain := Portraits.for_speaker("Wren Alvarez") as AtlasTexture
+	check(happy != null and plain != null and happy.region != plain.region, "a happy face is a different picture")
+	for mood: String in Portraits.MOODS:
+		check(Portraits.for_speaker("Galen Clark", mood) != null, "Galen Clark has a %s face" % mood)
+	check(Portraits.mood_for("Thank you, that's wonderful.") == "happy", "thanks read as happy")
+	check(Portraits.mood_for("I'm sorry. We lost the whole grove.") == "sad", "a loss reads as sad")
+	check(Portraits.mood_for("Oh! You found it?") == "surprised", "\"Oh!\" reads as surprised")
+	check(Portraits.mood_for("The trail goes up past the falls.") == "neutral", "a plain line stays neutral")
+	check(Portraits.mood_for("Never take the last one.") == "neutral", "advice isn't sad")
 	check(is_equal_approx(Portraits.voice_pitch("Galen Clark"), Portraits.voice_pitch("Galen Clark")), "a voice is the same every time")
 	check(Portraits.voice_pitch("Galen Clark") != Portraits.voice_pitch("Wren Alvarez"), "people sound different")
 	var lo := 10.0

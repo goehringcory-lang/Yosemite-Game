@@ -197,8 +197,9 @@ const PAGE_CHARS := 220
 
 func say(lines: Array) -> void:
 	for line: Dictionary in lines:
+		var mood: String = line.get("mood", Portraits.mood_for(line.get("text", "")))
 		for page in pages(line.get("text", "")):
-			_show(line.get("speaker", ""), page, [])
+			_show(line.get("speaker", ""), page, [], mood)
 			await _next_input()
 
 
@@ -237,10 +238,10 @@ func close() -> void:
 	queue_free()
 
 
-func _show(speaker: String, text: String, options: Array) -> void:
+func _show(speaker: String, text: String, options: Array, mood := "neutral") -> void:
 	_name_label.text = speaker
 	_name_label.visible = speaker != ""
-	var face := Portraits.for_speaker(speaker)
+	var face := Portraits.for_speaker(speaker, mood)
 	_portrait.texture = face
 	_portrait_frame.visible = face != null
 	_text_label.custom_minimum_size.x = TEXT_WIDTH_PORTRAIT if face else TEXT_WIDTH

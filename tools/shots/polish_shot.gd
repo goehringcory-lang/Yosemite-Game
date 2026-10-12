@@ -35,7 +35,7 @@ func _ready() -> void:
 	await _snap(dir, "toasts", 20)
 	# A conversation with a portrait, and a shop's choices.
 	var box := DialogueBox.open(world.player)
-	box.say([{"speaker": "Wren Alvarez", "text": "Heels low, trust the rubber. That's all slab is. Well, that and not looking down. Ready when you are: I'll belay first."}])
+	box.say([{"speaker": "Wren Alvarez", "text": "You made it! Heels low, trust the rubber. That's all slab is. Well, that and not looking down. I'll belay first."}])
 	box.reveal_all()
 	await _snap(dir, "dialogue")
 	box.choose("What'll it be? Everything here trades for food.", ["A cam for 40 food energy", "Two quickdraws for 24 food energy", "Nothing, thanks"], "Marty Kessler")

@@ -19,7 +19,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 
 | Stardew hallmark | Here | Where | Checked by |
 |---|---|---|---|
-| Portraits in conversation | A portrait for all 40 people (and the player), painted from the same look data as their sprite | `tools/npcgen/portraits.gd`, `scripts/story/portraits.gd` | test (every member of the cast has one); `docs/cast_portraits.png` |
+| Portraits in conversation, with expressions | A portrait for all 40 people (and the player) in four moods (neutral, happy, sad, surprised), painted from the same look data as their sprite; each line picks its mood (named, or read from its words) | `tools/npcgen/portraits.gd`, `scripts/story/portraits.gd` | test (every member of the cast has one, each mood is its own face, lines read as the right mood); `docs/cast_portraits.png`, `docs/portrait_moods.png` |
 | Each person sounds like themself | Text types out with blips at a pitch of their own | `Portraits.voice_pitch` | test (same every time, different between people, in a pleasant range) |
 | A "!" over people with a quest | Orange "!" for a new quest, blue "?" to hand one in; on shopkeepers too | `QuestLog.marker_for`, `scripts/story/quest_marker.gd` | test (Clark "!" at the start, gone once taken; "?" when ready); shot `polish_quest_marker.png` |
 | People react when you talk | They turn to face you and give a small hop | `npc.gd` | by eye |
@@ -50,7 +50,6 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 ## Not done
 
 - **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew also has several pieces a season; here there is one.
-- **Portraits have one expression.** Stardew's portraits change with the mood of the line (happy, sad, surprised). These would need expression variants and tags in the dialogue.
 - **No friendship or gifts.** Stardew's hearts and gifting are a game system rather than polish, and the story here is built on quests instead.
 - **No daily schedules.** People stay round their spot rather than following a timetable through the day.
 - **Grass and bushes don't sway as you walk through them.** The ground is one painted picture, so this would need separate plant sprites.
