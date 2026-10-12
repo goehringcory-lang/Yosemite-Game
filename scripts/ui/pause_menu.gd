@@ -471,9 +471,10 @@ func _footer_text() -> String:
 	return "[%s] Choose   [%s] Select   [%s] Resume" % [choose, ok, back]
 
 
-## A menu line: "> ", gold and a highlight bar when chosen, so it shows without the color too.
+## A menu line: an arrow, gold and a highlight bar when chosen, so it shows without the color too.
 func _set_choice(label: Label, text: String, chosen: bool) -> void:
-	label.text = ("> " if chosen else "  ") + text
+	label.text = "   " + text
+	MenuInput.mark(label, chosen)
 	label.add_theme_color_override("font_color", HEADING if chosen else Color.WHITE)
 	label.add_theme_stylebox_override("normal", _select_style if chosen else _plain_style)
 

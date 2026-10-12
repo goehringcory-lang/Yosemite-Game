@@ -15,7 +15,8 @@ extends CanvasLayer
 ## while it's still appearing shows the whole page, and confirm again goes on.
 
 const NAME_COLOR := Color(1.0, 0.85, 0.5)
-const CURSOR := "> "
+## Room left at the start of each option for the arrow (MenuInput.mark).
+const CURSOR := "   "
 const HINT_COLOR := Color(1, 1, 1, 0.6)
 ## The text's width with and without a portrait beside it.
 const TEXT_WIDTH := 456.0
@@ -332,7 +333,8 @@ func _refresh_options() -> void:
 	var pictures := _icons.any(func(icon: Variant) -> bool: return icon != null)
 	for i in _options.size():
 		var label := Label.new()
-		label.text = (CURSOR if i == _cursor else "  ") + _options[i]
+		label.text = CURSOR + _options[i]
+		MenuInput.mark(label, i == _cursor)
 		if i == _cursor:
 			label.add_theme_color_override("font_color", NAME_COLOR)
 			label.add_theme_stylebox_override("normal", _select_style)
@@ -350,11 +352,11 @@ func _refresh_options() -> void:
 		picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		var cursor := Label.new()
-		cursor.text = CURSOR.strip_edges() if i == _cursor else " "
-		cursor.custom_minimum_size.x = 8
-		cursor.add_theme_color_override("font_color", NAME_COLOR)
+		var cursor := Control.new()
+		cursor.custom_minimum_size = Vector2(8, 14)
+		MenuInput.mark(cursor, i == _cursor)
 		label.text = _options[i]
+		MenuInput.mark(label, false) # the arrow goes in its own column here
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(cursor)
 		row.add_child(picture)

@@ -60,3 +60,54 @@ static func pop_in(panel: Control) -> void:
 	tween.tween_property(panel, "modulate:a", 1.0, 0.12)
 	tween.tween_property(panel, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	Sound.play("ui_open")
+
+
+## The pointer beside the chosen line of a menu: a small gold arrow with a
+## dark rim, drawn once.
+static var _cursor: ImageTexture
+const CURSOR_SHAPE := [
+	"#....",
+	"##...",
+	"#=#..",
+	"#==#.",
+	"#==#.",
+	"#=#..",
+	"##...",
+	"#....",
+]
+
+
+static func cursor_texture() -> Texture2D:
+	if _cursor:
+		return _cursor
+	var im := Image.create_empty(5, 8, false, Image.FORMAT_RGBA8)
+	for y in CURSOR_SHAPE.size():
+		for x in 5:
+			match CURSOR_SHAPE[y][x]:
+				"#":
+					im.set_pixel(x, y, Color("2a1f1a"))
+				"=":
+					im.set_pixel(x, y, Color("ffe08a") if y < 4 else Color("e0a040"))
+	_cursor = ImageTexture.create_from_image(im)
+	return _cursor
+
+
+## Shows the arrow at the left of [param label] when [param chosen] (the
+## label's text should start with two spaces to leave it room).
+static func mark(label: Control, chosen: bool) -> void:
+	var arrow := label.get_node_or_null("Cursor") as TextureRect
+	if arrow == null:
+		if not chosen:
+			return
+		arrow = TextureRect.new()
+		arrow.name = "Cursor"
+		arrow.texture = cursor_texture()
+		arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		arrow.anchor_top = 0.5
+		arrow.anchor_bottom = 0.5
+		arrow.offset_left = 1.0
+		arrow.offset_right = 6.0
+		arrow.offset_top = -4.0
+		arrow.offset_bottom = 4.0
+		label.add_child(arrow)
+	arrow.visible = chosen

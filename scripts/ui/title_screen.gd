@@ -114,6 +114,11 @@ func _build_menu() -> void:
 	_menu = PanelContainer.new()
 	_menu.position = MENU_POS
 	_menu.custom_minimum_size.x = MENU_WIDTH
+	# a little more room under the last line, clear of the frame
+	var frame := _menu.get_theme_stylebox("panel").duplicate() as StyleBox
+	frame.content_margin_bottom = 7.0
+	frame.content_margin_top = 5.0
+	_menu.add_theme_stylebox_override("panel", frame)
 	add_child(_menu)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 2)
@@ -234,7 +239,8 @@ func _refresh() -> void:
 	_footer.visible = not covered
 	for i in _labels.size():
 		var chosen := i == _cursor
-		_labels[i].text = ("> " if chosen else "  ") + OPTION_NAMES[_options[i]]
+		_labels[i].text = "   " + OPTION_NAMES[_options[i]]
+		MenuInput.mark(_labels[i], chosen)
 		_labels[i].add_theme_color_override("font_color", HEADING if chosen else Color.WHITE)
 		_labels[i].add_theme_stylebox_override("normal", _select_style if chosen else _plain_style)
 	_hint.text = NEW_GAME_CONFIRM if _confirm_new else ""
