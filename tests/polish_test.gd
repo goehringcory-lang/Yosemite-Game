@@ -33,6 +33,7 @@ func _ready() -> void:
 	await test_critters(world)
 	await test_rustle(world)
 	await test_location_fits(world)
+	await test_screens_fit(world)
 	await test_routines(world)
 	test_friendship(world)
 	await test_day_log(world)
@@ -255,6 +256,40 @@ func test_location_fits(world: Node) -> void:
 	var clock: Rect2 = world.hud.clock_panel.get_global_rect()
 	check(not banner.intersects(clock), "a long place name keeps clear of the clock (%s)" % world.hud.location_label.text)
 	check(world.hud.location_label.text.ends_with("Glacier Point Apron trail"), "and keeps the place you're in")
+
+
+## Nothing runs off its panel or the screen: the travel map's description
+## for every hub, the area map's hint line, and the Controls page.
+func test_screens_fit(world: Node) -> void:
+	var screen := get_viewport().get_visible_rect()
+	world.open_travel_map()
+	await get_tree().process_frame
+	var map: ParkMap = world.park_map
+	var too_tall := []
+	for hub: String in ParkMap.HUB_ORDER:
+		map._select(hub)
+		await get_tree().process_frame
+		if map._info_panel.get_combined_minimum_size().y > ParkMap.INFO_RECT.size.y:
+			too_tall.append("%s %.0f" % [hub, map._info_panel.get_combined_minimum_size().y])
+	check(too_tall.is_empty(), "every hub's travel note fits its panel %s" % [too_tall])
+	map.close()
+	world.open_map()
+	await get_tree().process_frame
+	check(map._area_hint.get_combined_minimum_size().x <= map._area_hint.size.x + 0.5, "the area map's hint fits its slot (%.0f of %.0f)" % [map._area_hint.get_combined_minimum_size().x, map._area_hint.size.x])
+	map.close()
+	await get_tree().process_frame
+	var pause := get_tree().get_first_node_in_group("pause_menu")
+	pause.open()
+	pause._show_page(PauseMenu.Page.CONTROLS)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var panel: Rect2 = pause._panel.get_global_rect()
+	check(screen.encloses(panel), "the Controls page fits the screen (%s)" % panel)
+	pause._show_page(PauseMenu.Page.SETTINGS)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	check(screen.encloses(pause._panel.get_global_rect()), "and so does Settings (%s)" % pause._panel.get_global_rect())
+	pause.close()
 
 
 func test_routines(world: Node) -> void:

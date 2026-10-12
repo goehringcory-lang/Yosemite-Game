@@ -120,6 +120,8 @@ var _desc_label: Label
 var _acts_label: Label
 var _route_label: Label
 var _hint_label: Label
+## The travel map's description panel (for tests: its text must fit).
+var _info_panel: PanelContainer
 
 
 func _ready() -> void:
@@ -951,21 +953,28 @@ func _build() -> void:
 	panel.add_theme_stylebox_override("panel", _note_box)
 	_park_view.add_child(panel)
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 4)
+	box.add_theme_constant_override("separation", 2)
 	panel.add_child(box)
+	# The panel is a fixed size; the longest hub's text has to fit it whole.
+	panel.clip_contents = true
+	_info_panel = panel
 	_name_label = _label(box)
-	_name_label.add_theme_font_size_override("font_size", 20)
+	_name_label.add_theme_font_size_override("font_size", 17)
 	_name_label.add_theme_color_override("font_color", GOLD)
 	_sub_label = _label(box)
+	_sub_label.add_theme_font_size_override("font_size", 9)
 	_sub_label.add_theme_color_override("font_color", SUBHEAD)
 	_desc_label = _label(box)
+	_desc_label.add_theme_font_size_override("font_size", 9)
 	_acts_label = _label(box)
+	_acts_label.add_theme_font_size_override("font_size", 9)
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(spacer)
 	_route_label = _label(box)
 	_hint_label = _label(box)
 	_hint_label.modulate = DIM
+	_hint_label.add_theme_font_size_override("font_size", 8)
 
 	_area_view = Control.new()
 	_area_view.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -994,6 +1003,7 @@ func _build() -> void:
 	_area_hint.position = Vector2(290, 4)
 	_area_hint.size = Vector2(184, 12)
 	_area_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_area_hint.add_theme_font_size_override("font_size", 8)
 	_area_hint.modulate = DIM
 	_area_hint.visible = true
 
