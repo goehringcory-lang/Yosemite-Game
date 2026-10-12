@@ -50,6 +50,8 @@ const HEADING := Color(1.0, 0.85, 0.5)
 const DIM := Color(1, 1, 1, 0.6)
 const PANEL_POS := Vector2(30, 16)
 const PANEL_SIZE := Vector2(420, 238)
+## The width of the card beside the pause menu's choices.
+const CARD_WIDTH := 132.0
 const NAME_WIDTH := 96
 const VOLUME_SETTINGS := [Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME]
 
@@ -60,6 +62,8 @@ var _pages: Array[Control] = []
 var _page := Page.MAIN
 var _option_labels: Array[Label] = []
 var _goal_label: Label
+var _card_date: Label
+var _card_stats: Label
 var _setting_names: Array[Label] = []
 ## Volume setting -> its slider bar.
 var _sliders: Dictionary = {}
@@ -141,8 +145,12 @@ func _style(path: String, margin: float) -> StyleBoxTexture:
 
 
 func _build_main() -> Control:
+	var both := HBoxContainer.new()
+	both.add_theme_constant_override("separation", 8)
 	var page := VBoxContainer.new()
 	page.add_theme_constant_override("separation", 2)
+	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	both.add_child(page)
 	for option in OPTIONS:
 		var label := _label(option)
 		page.add_child(label)
@@ -151,11 +159,79 @@ func _build_main() -> Control:
 	page.add_child(_label("Goal", HEADING))
 	_goal_label = _label("")
 	_goal_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_goal_label.custom_minimum_size.x = PANEL_SIZE.x - 16
+	_goal_label.custom_minimum_size.x = PANEL_SIZE.x - 16 - CARD_WIDTH - 8
 	page.add_child(_goal_label)
 	page.add_child(_spacer(4))
-	page.add_child(_label("Save here any time. Sleeping in your tent saves too.", DIM))
-	return page
+	var note := _label("Save here any time. Sleeping in your tent saves too.", DIM)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size.x = _goal_label.custom_minimum_size.x
+	page.add_child(note)
+	both.add_child(_build_card())
+	return both
+
+
+## The card beside the pause menu, like the player's page in Stardew Valley's
+## menu: your face, the day, and how your time in the Valley is going.
+func _build_card() -> Control:
+	var card := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0.2)
+	style.border_color = Color(0.78, 0.63, 0.38, 0.55)
+	style.border_width_left = 1
+	style.content_margin_left = 8.0
+	style.content_margin_right = 4.0
+	style.content_margin_top = 4.0
+	style.content_margin_bottom = 4.0
+	card.add_theme_stylebox_override("panel", style)
+	card.custom_minimum_size.x = CARD_WIDTH
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 1)
+	card.add_child(column)
+	var frame := PanelContainer.new()
+	var frame_style := StyleBoxFlat.new()
+	frame_style.bg_color = Color("5a4634")
+	frame_style.border_color = Color("c8a060")
+	frame_style.set_border_width_all(1)
+	frame_style.set_content_margin_all(1)
+	frame.add_theme_stylebox_override("panel", frame_style)
+	frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var face := TextureRect.new()
+	face.texture = Portraits.for_speaker("You")
+	face.custom_minimum_size = Vector2(48, 48)
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	face.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	frame.add_child(face)
+	frame.visible = face.texture != null
+	column.add_child(frame)
+	_card_date = _label("", HEADING)
+	_card_date.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(_card_date)
+	_card_stats = _label("")
+	_card_stats.add_theme_constant_override("line_spacing", 0)
+	column.add_child(_card_stats)
+	return card
+
+
+## What the card says: today, and a tally of the game so far.
+static func card_text() -> PackedStringArray:
+	var gear := 0
+	for id: String in Gear.owned:
+		gear += int(Gear.owned[id])
+	var friends := 0
+	var hearts := 0
+	for id: String in Friendship.points:
+		var h := Friendship.hearts(id)
+		hearts += h
+		if h > 0:
+			friends += 1
+	return PackedStringArray([
+		"Food: %d energy" % Barter.purse(),
+		"Gear: %d piece%s" % [gear, "" if gear == 1 else "s"],
+		"Friends: %d (%d hearts)" % [friends, hearts],
+		"Quests done: %d" % QuestLog.completed.size(),
+		"Climbs: %d" % QuestLog.climbed.size(),
+	])
 
 
 func _build_settings() -> Control:
@@ -416,6 +492,8 @@ func _refresh() -> void:
 			text = QUIT_SAVED if _just_saved else QUIT_CONFIRM
 		_set_choice(_option_labels[i], text, i == _cursor)
 	_goal_label.text = HUD.objective_text() if HUD.objective_text() != "" else "Explore, and talk to people around the valley."
+	_card_date.text = "%s, Year %d" % [GameClock.get_date_string(), GameClock.year]
+	_card_stats.text = "\n".join(card_text())
 	for i in _setting_names.size():
 		_set_choice(_setting_names[i], SETTING_NAMES[i], i == _settings_cursor)
 		_setting_values[i].text = _setting_value(i)

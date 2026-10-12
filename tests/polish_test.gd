@@ -31,6 +31,7 @@ func _ready() -> void:
 	test_music()
 	test_tuning()
 	test_font_setting()
+	test_pause_card()
 	await test_critters(world)
 	await test_rustle(world)
 	await test_location_fits(world)
@@ -468,6 +469,13 @@ func test_detail_cards(world: Node) -> void:
 	check(box._detail_column.get_child_count() == 0, "Leave has an empty card")
 	box.close()
 	await get_tree().process_frame
+
+
+## The pause menu's card shows your face and a tally of the game.
+func test_pause_card() -> void:
+	check(Portraits.for_speaker("You") != null, "the player has a portrait for the pause menu's card")
+	var lines := PauseMenu.card_text()
+	check(lines.size() == 5 and lines[0].begins_with("Food: ") and lines[2].begins_with("Friends: "), "and the card tallies food, gear, friends, quests and climbs")
 
 
 func test_font_setting() -> void:
