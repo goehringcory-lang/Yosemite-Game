@@ -13,6 +13,8 @@ const COVERING_GROUPS := ["journal", "pause_menu", "park_map"]
 
 var _player: Player
 var _status: Label
+## The "you got this" cards at the bottom left.
+var toasts: ItemToasts
 var _message_tween: Tween
 var _info_anchor := Vector2.ZERO
 ## True while a menu, map or conversation covers the screen.
@@ -46,6 +48,10 @@ func _ready() -> void:
 	GameClock.time_changed.connect(_refresh_clock.unbind(2))
 	GameClock.day_started.connect(_refresh_clock.unbind(3))
 	device_changed.connect(_refresh_status)
+	toasts = ItemToasts.new()
+	add_child(toasts)
+	Inventory.added.connect(_on_item_added)
+	Gear.added.connect(_on_gear_added)
 	var panel := PanelContainer.new()
 	_status = Label.new()
 	panel.add_child(_status)
@@ -78,6 +84,21 @@ func show_message(text: String) -> void:
 	_message_tween.tween_property(message_label, "modulate:a", 0.0, 0.6)
 
 
+func _on_item_added(id: String, amount: int) -> void:
+	var item := ItemDB.get_item(id)
+	if item:
+		toasts.notify(id, item.icon, item.display_name, amount)
+		Sound.play("pickup", 0.0, 0.08)
+
+
+## New gear is a bigger moment than a berry: it gets the brighter chime.
+func _on_gear_added(id: String, amount: int) -> void:
+	var gear := Gear.get_gear(id)
+	if gear:
+		toasts.notify("gear:" + id, gear.icon, gear.display_name, amount)
+		Sound.play("item_get", 0.0, 0.0)
+
+
 ## The location banner at the top of the screen.
 func set_location(text: String) -> void:
 	location_label.text = text
@@ -98,6 +119,8 @@ func hide_info() -> void:
 
 
 func _process(_delta: float) -> void:
+	# Cards ride above a conversation box (shops, cooking) so they stay readable.
+	toasts.bottom_margin = 100.0 if not get_tree().get_nodes_in_group("dialogue_box").is_empty() else 44.0
 	if info_panel.visible and _player and _player.global_position.distance_to(_info_anchor) > INFO_CLOSE_DISTANCE:
 		hide_info()
 	_update_cover()
@@ -135,6 +158,7 @@ func _update_cover() -> void:
 	for panel: Control in [clock_panel, location_panel, status_bar, info_panel]:
 		panel.modulate.a = alpha
 	message_label.visible = not covered
+	toasts.visible = not get_tree().get_nodes_in_group("journal").any(func(n: Node) -> bool: return n.is_open())
 
 
 ## The pickup message sits at the bottom left, or above the sign panel while one is open.

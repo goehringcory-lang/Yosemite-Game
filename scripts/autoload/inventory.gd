@@ -2,6 +2,8 @@ extends Node
 ## What the player is carrying, as item id -> count.
 
 signal changed
+## Sent when the player gets something, so the HUD can show it.
+signal added(id: String, amount: int)
 
 var items: Dictionary = {}
 
@@ -18,6 +20,7 @@ func count(id: String) -> int:
 func add(id: String, amount := 1) -> void:
 	items[id] = count(id) + amount
 	changed.emit()
+	added.emit(id, amount)
 
 
 func remove(id: String, amount := 1) -> bool:
