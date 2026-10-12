@@ -47,6 +47,7 @@ func save_all() -> void:
 	sheets["store_foods"] = store_foods()
 	for i in 4:
 		sheets["chair_%d" % i] = chair(i)
+		sheets["planter_%d" % i] = planter(i)
 	for sprite_name: String in sheets:
 		(sheets[sprite_name] as Image).save_png(ProjectSettings.globalize_path(DIR + sprite_name + ".png"))
 
@@ -572,7 +573,7 @@ func bench() -> Image:
 	return im
 
 
-func planter() -> Image:
+func planter(_variant := 0) -> Image:
 	var im := K.make(18, 20)
 	K.shadow(im, 9.0, 18.0, 7.0, 1.6)
 	K.barrel(im, 3, 9, 12, 9, c("9a6c44"))

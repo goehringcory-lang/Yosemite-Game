@@ -578,7 +578,18 @@ func bench() -> Image:
 
 ## A wooden tub full of flowers: staves with a lit edge, iron hoops, dark soil,
 ## leaf clumps, and blooms in clusters of two to four pixels.
-func planter() -> Image:
+## Flower barrels come in a few plantings, so a row of them isn't one stamp:
+## 0 mixed, 1 red geraniums, 2 yellow and orange, 3 lavender and white.
+const PLANTINGS := [
+	["e04a6a", "f2d25c", "b06ad0", "f2ecd6", "e04a6a", "f2d25c", "b06ad0", "e8704a"],
+	["d8402e", "e8604a", "d8402e", "f08a6a", "c83a2e", "e8604a", "d8402e", "f08a6a"],
+	["f2d25c", "e8a030", "f2d25c", "f8e888", "e8a030", "f2d25c", "e8704a", "f8e888"],
+	["a98ad8", "f2ecd6", "8a6ac8", "f2ecd6", "a98ad8", "c8b4f0", "8a6ac8", "f2ecd6"],
+]
+
+
+func planter(variant := 0) -> Image:
+	var blooms: Array = PLANTINGS[variant % PLANTINGS.size()]
 	var im := K.make(18, 20)
 	K.shadow(im, 9.0, 18.0, 7.0, 1.6, 0.3)
 	var ramp := _ramp5(Color("9a6c44"))
@@ -605,8 +616,10 @@ func planter() -> Image:
 		K.ellipse(im, lf[0] + 0.5, lf[1] + 0.5, 2.2, 1.6, Color("3f7a3a"))
 		K.px(im, lf[0], lf[1] - 1, Color("7ab860"))
 	# blooms in clusters
-	for f in [[4, 3, "e04a6a"], [8, 2, "f2d25c"], [12, 3, "b06ad0"], [6, 5, "f2ecd6"], [10, 5, "e04a6a"], [14, 4, "f2d25c"], [2, 4, "b06ad0"], [16, 5, "e8704a"]]:
-		var col := Color(f[2])
+	var spots := [[4, 3], [8, 2], [12, 3], [6, 5], [10, 5], [14, 4], [2, 4], [16, 5]]
+	for k in spots.size():
+		var f: Array = spots[k]
+		var col := Color(blooms[k])
 		K.rect(im, f[0] - 1, f[1] - 1, 3, 2, col)
 		K.px(im, f[0] - 1, f[1] - 1, col.lightened(0.3))
 		K.px(im, f[0], f[1] - 1, col.lightened(0.15))

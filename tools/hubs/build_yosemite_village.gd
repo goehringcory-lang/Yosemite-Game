@@ -726,7 +726,8 @@ func _dress_village() -> void:
 	var CS_ := "res://assets/sprites/curry/"
 	for door: Array in [[69, 17], [79, 17], [86, 17], [93, 17], [72, 29], [86, 29]]:
 		for side in [-2, 2]:
-			decor("Planter%d_%d_%d" % [door[0], door[1], side], CS_ + "planter.png", foot(door[0] + side, door[1] + 1) + Vector2(0, -2), Vector2(12, 6))
+			# each door's pair matches, and the doors differ
+			decor("Planter%d_%d_%d" % [door[0], door[1], side], CS_ + "planter_%d.png" % ((door[0] + door[1]) % 4), foot(door[0] + side, door[1] + 1) + Vector2(0, -2), Vector2(12, 6))
 	decor("BikeRack", CS_ + "bike_rack.png", foot(77, 30), Vector2(30, 6))
 	decor("PlazaFountain", S + "garden_fountain.png", foot(65, 27), Vector2(60, 20))
 	# Cars parked nose-in along the edges of the Village lot, leaving the

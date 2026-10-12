@@ -374,7 +374,7 @@ func _place_plaza() -> void:
 	for bench in [[46.5, 43.6, 0], [57.5, 43.6, 1], [52, 46.6, 2], [52, 39.6, 3]]:
 		_prop("garden_bench", foot(bench[0], bench[1]) + Vector2(0, 2), "Bench%d" % bench[2])
 	for planter in [[30, 36.2], [37.5, 36.2], [43, 36.2], [50, 36.2], [52.2, 36.2], [60.2, 36.2], [62, 36.2], [70, 36.2], [74.5, 36.2]]:
-		decor("Planter%d" % int(planter[0] * 10), CS + "planter.png", foot(planter[0], planter[1]), Vector2(12, 5))
+		decor("Planter%d" % int(planter[0] * 10), CS + "planter_%d.png" % (int(planter[0] * 10) % 4), foot(planter[0], planter[1]), Vector2(12, 5))
 	decor("BikeRack", CS + "bike_rack.png", foot(46, 48.4), Vector2(30, 5))
 	decor("Fountain", CS + "fountain.png", foot(74.5, 42), Vector2(10, 5))
 	# Patio tables in front of the Pavilion and the pizza deck.
