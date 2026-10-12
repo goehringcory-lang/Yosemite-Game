@@ -18,9 +18,9 @@ static func route_plate(ci: CanvasItem, state: ClimbState, feet: int) -> void:
 	var sub := "%s  ·  %s" % [state.pitch_name(), Guidebook.yds_label(state.route.grade) if Guidebook.yds(state.route.grade) > 0.0 else state.route.grade.split(",")[0]]
 	UI.ink(ci, Vector2(14, 32), sub, UI.INK_SOFT, 10, 142)
 	# Altimeter under it.
-	var a := Rect2(6, 44, 60, 14)
-	UI.glass(ci, a)
-	UI.text(ci, Vector2(11, 55), "%d ft" % feet, UI.CREAM, 10)
+	var a := Rect2(6, 43, 60, 18)
+	UI.panel(ci, a)
+	UI.ink(ci, Vector2(12, 56), "%d ft" % feet, UI.INK, 10)
 
 
 static func topo_bar(ci: CanvasItem, state: ClimbState, progress: float) -> void:
@@ -82,10 +82,10 @@ static func toolbar(ci: CanvasItem, state: ClimbState, time: float, usable: Dict
 static func hints(ci: CanvasItem, text: String, x: float) -> void:
 	if text == "":
 		return
-	var w := UI.text_width(text, 10) + 10
-	var r := Rect2(x, SCREEN.y - 24, w, 14)
-	UI.glass(ci, r, 0.62)
-	UI.text(ci, Vector2(r.position.x + 5, r.position.y + 10), text, UI.CREAM, 10)
+	var w := UI.text_width(text, 10) + 16
+	var r := Rect2(x, SCREEN.y - 28, w, 18)
+	UI.panel(ci, r)
+	UI.ink(ci, Vector2(r.position.x + 8, r.position.y + 13), text, UI.INK, 10)
 
 
 ## What just happened, as a parchment note under the route plate.
@@ -95,7 +95,8 @@ static func toast(ci: CanvasItem, text: String, age: float) -> void:
 	var alpha := 1.0 if age < 5.0 else clampf(1.0 - (age - 5.0) / 1.0, 0.0, 1.0)
 	if alpha <= 0.0:
 		return
-	var lines := UI.wrap_lines(text, 170.0, 10)
+	# wrapped to the board inside the frame (174 wide, text 8 in from each side)
+	var lines := UI.wrap_lines(text, 158.0, 10)
 	var r := Rect2(SCREEN.x - 190, 8, 174, 12 + lines.size() * 11)
 	ci.modulate.a = alpha
 	UI.panel(ci, r)

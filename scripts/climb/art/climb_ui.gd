@@ -1,8 +1,8 @@
 class_name ClimbUI
 extends RefCounted
-## The climbing screen's look-and-feel: a crisp pixel font, warm wood-and-
-## parchment panels (in the spirit of Stardew's menus), and a set of tiny
-## gear icons. Everything draws onto a CanvasItem during its draw pass.
+## The climbing screen's look-and-feel: the game's font, wood-framed panels
+## in the same dark brown with a gold edge as every other screen (the pause
+## menu, the book, conversations), and a set of tiny gear icons. Everything draws onto a CanvasItem during its draw pass.
 
 const FONT_PATH := "res://assets/fonts/NotoSans-Regular.ttf"
 
@@ -11,18 +11,20 @@ const WOOD_DARK := Color("3a2414")
 const WOOD := Color("7a4a24")
 const WOOD_LIGHT := Color("b07a3a")
 const WOOD_HI := Color("d8a458")
-const PAPER := Color("f2dcaa")
-const PAPER_SHADE := Color("dcbe86")
-const PAPER_DARK := Color("c4a06a")
-const INK := Color("4a2c16")
-const INK_SOFT := Color("7a5a38")
+# The "paper" is the dark board of the game's panels, and "ink" is cream.
+const PAPER := Color("3a2a1e")
+const PAPER_SHADE := Color("4a3626")
+const PAPER_DARK := Color("24180f")
+const GILT := Color("c8a060")
+const INK := Color("f2e6c8")
+const INK_SOFT := Color("c8b090")
 const CREAM := Color("fff4d6")
 const SHADOW := Color(0.07, 0.04, 0.03, 0.9)
 
 const GOOD := Color("7ac24a")
-const GOOD_DARK := Color("3f7a2a")
+const GOOD_DARK := Color("9ad06a")
 const WARN := Color("e8663a")
-const WARN_DARK := Color("9a3418")
+const WARN_DARK := Color("f09060")
 const GOLD := Color("f6c040")
 const SKY_BLUE := Color("5aa8e0")
 
@@ -134,7 +136,7 @@ static func panel(ci: CanvasItem, r: Rect2, paper := PAPER, frame := true) -> vo
 			ci.draw_rect(Rect2(r.position + Vector2(gx, 2 + k % 2), Vector2(4, 1)), WOOD_LIGHT)
 			ci.draw_rect(Rect2(r.position + Vector2(gx + 5, r.size.y - 3 - k % 2), Vector2(3, 1)), WOOD_DARK)
 		var inner := r.grow(-3)
-		ci.draw_rect(inner, PAPER_DARK)
+		ci.draw_rect(inner, GILT) # the gold edge round the board
 		ci.draw_rect(inner.grow(-1), paper)
 		# The paper sits in a recess: the frame throws a shadow across its top
 		# and left, and the bottom and right catch a little light.
