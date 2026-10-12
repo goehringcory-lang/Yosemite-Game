@@ -57,6 +57,25 @@ func _ready() -> void:
 	QuestLog.completed.append("clark_register")
 	await world.go_to_region("curry_mountain_shop", "arrival")
 	await _snap(dir, "marker", 40)
+	# Birds and butterflies on a fair spring morning.
+	GameClock.minutes = 10 * 60
+	await world.go_to_region("curry_village", "arrival")
+	await get_tree().create_timer(9.0).timeout
+	var critters: Critters = null
+	for child in world.get_children():
+		if child is Critters:
+			critters = child
+	print("CRITTERS ", critters.counts())
+	await _snap(dir, "critters", 2)
+	# walk up to the nearest bird so it takes off
+	var nearest := Vector2.INF
+	for bird in critters._birds:
+		if bird.pos.distance_to(world.player.global_position) < nearest.distance_to(world.player.global_position):
+			nearest = bird.pos
+	if nearest != Vector2.INF:
+		world.player.global_position = nearest + Vector2(20, 0)
+		await get_tree().create_timer(0.25).timeout
+		await _snap(dir, "critters_flee", 1)
 	# The day's page at bedtime.
 	world.day_log.clear()
 	for id in ["miners_lettuce", "miners_lettuce", "miners_lettuce", "wild_strawberry", "sierra_onion", "black_oak_acorn", "black_oak_acorn", "acorn_cake"]:

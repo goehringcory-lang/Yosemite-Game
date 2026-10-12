@@ -55,6 +55,7 @@ func _init() -> void:
 	_save("item_get", _chime([72, 76, 79, 84], 0.07, 0.9), RATE_FX, -7.0)
 	_save("quest_done", _chime([67, 72, 76, 79, 76, 84], 0.1, 1.2), RATE_FX, -6.0)
 	_save("talk", _talk(), RATE_FX, -15.0)
+	_save("flutter", _flutter(72), RATE_FX, -12.0)
 	print("Sounds written to %s. Run godot --headless --path . --import next." % OUT)
 	quit()
 
@@ -515,6 +516,17 @@ func _talk() -> PackedFloat32Array:
 		phase += TAU * lerpf(330.0, 300.0, t) / RATE_FX
 		var env := minf(t * 12.0, 1.0) * pow(1.0 - t, 1.5)
 		buf[i] = (sin(phase) + 0.35 * sin(phase * 2.0) + 0.12 * sin(phase * 3.0)) * env
+	return buf
+
+
+## Wings taking off: a quick run of soft feathery beats.
+func _flutter(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(0.42, RATE_FX)
+	for k in 7:
+		var at := k * 0.055 * (1.0 + k * 0.04)
+		var start := int(at * RATE_FX)
+		_add_noise(buf, RATE_FX, 0.6 * pow(0.85, k), 2400.0, 500.0, start, mini(start + int(0.035 * RATE_FX), buf.size()))
 	return buf
 
 

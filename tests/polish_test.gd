@@ -30,6 +30,7 @@ func _ready() -> void:
 	test_dial()
 	test_music()
 	test_tuning()
+	await test_critters(world)
 	await test_day_log(world)
 	SaveManager.delete_save()
 	print("OK: %d failure(s)" % failures if failures == 0 else "FAILED: %d failure(s)" % failures)
@@ -197,6 +198,39 @@ func _pitch_cents(buf: PackedFloat32Array, rate: int, hz: float) -> float:
 			best_power = power
 			best = cents
 	return best
+
+
+func test_critters(world: Node) -> void:
+	var critters: Critters = null
+	for child in world.get_children():
+		if child is Critters:
+			critters = child
+	check(critters != null, "the world has birds and butterflies")
+	if critters == null:
+		return
+	var saved_minutes := GameClock.minutes
+	var saved_season := GameClock.season
+	GameClock.minutes = 10 * 60
+	GameClock.season = GameClock.Season.SUMMER
+	var rainy: bool = Weather.today().rain > 0.0
+	check(critters._outdoors_by_day() == (not world.region.indoors and not rainy), "out by day in fair weather outdoors")
+	GameClock.minutes = 22 * 60
+	check(not critters._outdoors_by_day(), "not after dark")
+	GameClock.minutes = 10 * 60
+	var bird := critters.add_bird("robin", world.player.global_position + Vector2(80, 0))
+	critters._process(0.016)
+	check(bird.state != "fly", "a bird keeps pecking while you're far off")
+	bird.pos = world.player.global_position + Vector2(Critters.FLEE_DISTANCE - 6.0, 0)
+	critters._process(0.016)
+	check(bird.state == "fly" and bird.vel.x > 0.0, "and flies off away from you when you come close")
+	var winter_kinds := []
+	for kind: String in Critters.BIRDS:
+		if GameClock.Season.WINTER in Critters.BIRDS[kind].seasons:
+			winter_kinds.append(kind)
+	check(not "robin" in winter_kinds and "junco" in winter_kinds, "juncos stay the winter, robins don't")
+	GameClock.minutes = saved_minutes
+	GameClock.season = saved_season
+	await get_tree().process_frame
 
 
 func test_day_log(world: Node) -> void:
