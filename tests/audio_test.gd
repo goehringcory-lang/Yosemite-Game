@@ -100,10 +100,10 @@ func test_volumes() -> void:
 	add_child(pause)
 	pause.change_setting(PauseMenu.Setting.MASTER_VOLUME, -1)
 	check(Settings.master_volume == 7 and is_equal_approx(AudioServer.get_bus_volume_linear(0), 0.7), "the pause menu's Volume row turns the game down at once")
-	check(pause._setting_value(PauseMenu.Setting.MASTER_VOLUME) == "<  70%  >", "and shows it as a percentage")
+	check(pause._setting_value(PauseMenu.Setting.MASTER_VOLUME) == "‹  70%  ›", "and shows it as a percentage")
 	for i in 12:
 		pause.change_setting(PauseMenu.Setting.EFFECTS_VOLUME, -1)
-	check(Settings.effects_volume == 0 and pause._setting_value(PauseMenu.Setting.EFFECTS_VOLUME) == "<  Off  >", "Sound effects stops at Off")
+	check(Settings.effects_volume == 0 and pause._setting_value(PauseMenu.Setting.EFFECTS_VOLUME) == "‹  Off  ›", "Sound effects stops at Off")
 	pause.open_settings()
 	pause._settings_cursor = PauseMenu.Setting.AMBIENCE_VOLUME
 	var press := InputEventAction.new()

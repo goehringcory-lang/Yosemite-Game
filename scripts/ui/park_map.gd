@@ -367,7 +367,7 @@ func _refresh() -> void:
 	_name_label.text = hub.display_name
 	_sub_label.text = "%s. %s" % [hub.get_elevation_text(), hub.tagline]
 	_desc_label.text = hub.description
-	_acts_label.text = "\n".join(Array(hub.activities).map(func(a: String) -> String: return "- " + a))
+	_acts_label.text = "\n".join(Array(hub.activities).map(func(a: String) -> String: return "• " + a))
 	_route_label.text = _route_text(hub)
 	_route_label.modulate = GOLD if _legs.has(_selected) and _legs[_selected].open else (TEXT if _selected == _hub_here else CLOSED)
 	var tab_hint := "[%s] Area" % _button("Tab")
@@ -413,7 +413,7 @@ func _refresh_area_text() -> void:
 		elif _shuttle_from != "" and stop_name == _shuttle_from:
 			lines += "  You are at this stop."
 		elif stop_name != "":
-			lines += "  Valley shuttle stop."
+			lines += " Valley shuttle stop."
 	else:
 		lines = "You are at %s." % _here_name
 	_area_footer.text = lines

@@ -42,6 +42,8 @@ var _panel: PanelContainer
 var _tab := Tab.JOURNAL
 var _tab_labels: Array[Label] = []
 var _scroll: ScrollContainer
+var _fade_below: TextureRect
+var _fade_above: TextureRect
 var _body: VBoxContainer
 ## The Backpack's slots in reading order, what each one holds
 ## ({"name", "count", "facts", "description"}), and the one under the cursor.
@@ -88,7 +90,17 @@ func _ready() -> void:
 	_scroll.custom_minimum_size.x = LINE_WIDTH + 8
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	column.add_child(_scroll)
+	# The page sits in a holder with a soft fade at whichever edge has more
+	# to scroll to, so a line is never sliced off hard at the edge.
+	var holder := Control.new()
+	holder.custom_minimum_size.x = LINE_WIDTH + 8
+	holder.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	holder.clip_contents = true
+	column.add_child(holder)
+	_scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
+	holder.add_child(_scroll)
+	_fade_below = _edge_fade(holder, false)
+	_fade_above = _edge_fade(holder, true)
 	_detail = VBoxContainer.new()
 	_detail.add_theme_constant_override("separation", 0)
 	column.add_child(_detail)
@@ -296,16 +308,21 @@ func _refresh_hints() -> void:
 		MenuInput.button(tree, "%s/Esc" % TAB_KEYS[_tab], close_key)]
 
 
-## "More v" while there's more page below, "^ More above" at the end of a long page.
+## "More below" with a down arrow while there's more page below, "More above" with an up arrow at the end of a long page.
 func _refresh_more() -> void:
 	var bar := _scroll.get_v_scroll_bar()
 	var hidden_below := bar.max_value - bar.page - _scroll.scroll_vertical
+	_fade_below.visible = hidden_below > 1.0
+	_fade_above.visible = _scroll.scroll_vertical > 0
 	if hidden_below > 1.0:
-		_more.text = "More below  v"
+		_more.text = "More below   "
+		MenuInput.badge(_more, load("res://assets/ui/next.png"), true)
 	elif _scroll.scroll_vertical > 0:
-		_more.text = "^  More above"
+		_more.text = "More above   "
+		MenuInput.badge(_more, load("res://assets/ui/next.png"), true, true)
 	else:
 		_more.text = ""
+		MenuInput.badge(_more, null, true)
 
 
 # ---------------------------------------------------------------- the Journal tab
@@ -388,9 +405,8 @@ func _guidebook() -> void:
 		if route.guide_chapter != chapter:
 			chapter = route.guide_chapter
 			_line(chapter.to_upper(), DIM)
-		var box := "[x]" if entry.ticked else "[ ]"
 		var star := " *" if entry.main else ""
-		_line("%s %s%s  %s" % [box, route.display_name, star, route.grade], Color(0.7, 1.0, 0.7) if entry.ticked else Color.WHITE)
+		_check_line(entry.ticked, "%s%s  %s" % [route.display_name, star, route.grade], Color(0.7, 1.0, 0.7) if entry.ticked else Color.WHITE)
 		if not entry.ticked:
 			var need: String = Guidebook.gear_text(route)
 			if entry.ready:
@@ -410,7 +426,7 @@ func _perks() -> void:
 		else:
 			var p := Perks.progress(perk)
 			var count := " (%d of %d)" % [p[0], p[1]] if p[1] > 1 else ""
-			_line("[ ] %s: %s%s" % [perk.name, perk.how, count], DIM)
+			_check_line(false, "%s: %s%s" % [perk.name, perk.how, count], DIM)
 
 
 # ---------------------------------------------------------------- the Quests tab
@@ -434,7 +450,7 @@ func _quests_page() -> void:
 	if objectives.is_empty():
 		_line("No open quests. Talk to people around the valley.", DIM)
 	for text in objectives:
-		_line("- " + text)
+		_line("• " + text)
 	if Array(objectives).any(func(text: String) -> bool: return text.begins_with("* ")):
 		_line("* Part of the main story.", DIM)
 
@@ -612,6 +628,42 @@ func _rule() -> ColorRect:
 	rule.custom_minimum_size = Vector2(LINE_WIDTH, 1)
 	rule.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	return rule
+
+
+## A strip that fades the page into the panel at its top or bottom edge.
+func _edge_fade(holder: Control, top: bool) -> TextureRect:
+	var gradient := Gradient.new()
+	var paper := Color(37 / 255.0, 27 / 255.0, 20 / 255.0) if not top else Color(52 / 255.0, 36 / 255.0, 22 / 255.0)
+	gradient.set_color(0, Color(paper, 1.0 if top else 0.0))
+	gradient.set_color(1, Color(paper, 0.0 if top else 1.0))
+	var texture := GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.fill_from = Vector2(0, 0)
+	texture.fill_to = Vector2(0, 1)
+	texture.width = 4
+	texture.height = 16
+	var fade := TextureRect.new()
+	fade.texture = texture
+	fade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	fade.stretch_mode = TextureRect.STRETCH_SCALE
+	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fade.anchor_right = 1.0
+	fade.offset_right = -8.0 # leave the scroll bar clear
+	if top:
+		fade.offset_bottom = 8.0
+	else:
+		fade.anchor_top = 1.0
+		fade.anchor_bottom = 1.0
+		fade.offset_top = -14.0
+	fade.visible = false
+	holder.add_child(fade)
+	return fade
+
+
+## A line with a drawn checkbox in front of it (ticked or not).
+func _check_line(ticked: bool, text: String, color := Color.WHITE) -> void:
+	_line("     " + text, color)
+	MenuInput.badge(_body.get_child(_body.get_child_count() - 1), MenuInput.checkbox_texture(ticked))
 
 
 func _line(text: String, color := Color.WHITE) -> void:

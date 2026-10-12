@@ -438,7 +438,7 @@ func _setting_value(which: int) -> String:
 			value = _volume_text(_volume(which))
 		_:
 			return ""
-	return "<  %s  >" % value
+	return "‹  %s  ›" % value
 
 
 ## The level of volume setting [param which] (0 to Settings.MAX_VOLUME).

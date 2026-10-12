@@ -170,7 +170,7 @@ func _process(delta: float) -> void:
 	if _queue.is_empty():
 		if not _done:
 			_done = true
-			_footer.text = "[%s] Sleep" % MenuInput.button(get_tree(), "E", "A")
+			_footer.text = "[%s] Good morning" % MenuInput.button(get_tree(), "E", "A")
 			create_tween().tween_property(_footer, "modulate:a", 1.0, 0.3)
 		return
 	_reveal_time -= delta

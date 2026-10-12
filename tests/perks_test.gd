@@ -68,8 +68,8 @@ func test_fresh_game(world: Node) -> void:
 	check(Perks.recipe_minutes(FLOUR) == FLOUR.minutes, "the mortar takes its usual time")
 	var lines := _journal_lines()
 	check("Perks: what the valley taught you (0 of %d)" % Perks.PERKS.size() in lines, "the Journal has a Perks section")
-	check("[ ] Enid's Eye: Pick up 25 wild plants and berries. (0 of 25)" in lines, "a perk to earn says how, with progress")
-	check(lines.any(func(l: String) -> bool: return l.begins_with("[ ] Lamon's Cellar:") and not "of 1)" in l), "a quest perk shows no count")
+	check("Enid's Eye: Pick up 25 wild plants and berries. (0 of 25)" in lines, "a perk to earn says how, with progress")
+	check(lines.any(func(l: String) -> bool: return l.begins_with("Lamon's Cellar:") and not "of 1)" in l), "a quest perk shows no count")
 
 
 ## The text of every line on the Journal page.
@@ -79,7 +79,7 @@ func _journal_lines() -> Array[String]:
 	var lines: Array[String] = []
 	for label in journal._body.get_children():
 		if label is Label:
-			lines.append(label.text)
+			lines.append(label.text.strip_edges()) # checkbox lines leave room for the box
 	journal.close()
 	return lines
 

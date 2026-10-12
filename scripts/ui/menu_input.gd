@@ -111,3 +111,46 @@ static func mark(label: Control, chosen: bool) -> void:
 		arrow.offset_bottom = 4.0
 		label.add_child(arrow)
 	arrow.visible = chosen
+
+
+static var _boxes: Dictionary = {}
+
+
+## A small checkbox, ticked or empty, for lists like the guidebook's.
+static func checkbox_texture(ticked: bool) -> Texture2D:
+	if _boxes.has(ticked):
+		return _boxes[ticked]
+	var im := Image.create_empty(8, 8, false, Image.FORMAT_RGBA8)
+	var rim := Color("2a1f1a")
+	for y in range(0, 8):
+		for x in range(0, 8):
+			var edge := x == 0 or y == 0 or x == 7 or y == 7
+			im.set_pixel(x, y, rim if edge else Color("e8dcc0") if ticked else Color("5a4a3c"))
+	if ticked:
+		for p in [Vector2i(2, 4), Vector2i(3, 5), Vector2i(4, 4), Vector2i(5, 3), Vector2i(6, 2), Vector2i(2, 3), Vector2i(3, 4)]:
+			im.set_pixelv(p, Color("3a8a3a"))
+	_boxes[ticked] = ImageTexture.create_from_image(im)
+	return _boxes[ticked]
+
+
+## Puts a picture at the left (or, with [param right], the right) of
+## [param label], vertically centered; its text should leave room for it.
+static func badge(label: Control, texture: Texture2D, right := false, flip := false) -> void:
+	var icon := label.get_node_or_null("Badge") as TextureRect
+	if icon == null:
+		icon = TextureRect.new()
+		icon.name = "Badge"
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		label.add_child(icon)
+	icon.texture = texture
+	icon.flip_v = flip
+	var size := texture.get_size() if texture else Vector2.ZERO
+	icon.anchor_top = 0.5
+	icon.anchor_bottom = 0.5
+	icon.anchor_left = 1.0 if right else 0.0
+	icon.anchor_right = icon.anchor_left
+	icon.offset_left = -size.x if right else 1.0
+	icon.offset_right = 0.0 if right else 1.0 + size.x
+	icon.offset_top = -size.y / 2.0
+	icon.offset_bottom = size.y / 2.0
+	icon.visible = texture != null

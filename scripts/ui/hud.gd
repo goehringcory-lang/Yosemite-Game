@@ -15,6 +15,8 @@ var _player: Player
 var _status: Label
 ## The "you got this" cards at the bottom left.
 var toasts: ItemToasts
+## Darkens the world behind the pause menu and the book.
+var _dim: ColorRect
 var _message_tween: Tween
 var _info_anchor := Vector2.ZERO
 ## True while a menu, map or conversation covers the screen.
@@ -48,6 +50,22 @@ func _ready() -> void:
 	GameClock.time_changed.connect(_refresh_clock.unbind(2))
 	GameClock.day_started.connect(_refresh_clock.unbind(3))
 	device_changed.connect(_refresh_status)
+	_dim = ColorRect.new()
+	_dim.color = Color(0.03, 0.02, 0.06, 0.0)
+	_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_dim)
+	move_child(_dim, 0)
+	# Messages ("You fell asleep at...", what a find is) sit on a dark card
+	# rather than floating over the world.
+	var card := StyleBoxFlat.new()
+	card.bg_color = Color(0.1, 0.07, 0.05, 0.72)
+	card.border_color = Color(0.55, 0.4, 0.22, 0.9)
+	card.set_border_width_all(1)
+	card.set_content_margin_all(3)
+	card.content_margin_left = 5
+	card.content_margin_right = 5
+	message_label.add_theme_stylebox_override("normal", card)
 	toasts = ItemToasts.new()
 	add_child(toasts)
 	move_child(toasts, fade.get_index()) # under the fade, so the black covers it
@@ -186,6 +204,7 @@ func _update_cover() -> void:
 			menu = true
 	# Cards stay up during a conversation (a shop, the fire), not under a menu.
 	toasts.visible = not menu
+	_dim.color.a = move_toward(_dim.color.a, 0.42 if menu else 0.0, get_process_delta_time() * 3.0)
 	covered = covered or menu
 	if covered == _covered:
 		return
