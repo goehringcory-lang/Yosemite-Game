@@ -6,7 +6,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 
 | Stardew hallmark | Here | Where | Checked by |
 |---|---|---|---|
-| "Item get" cards at the corner with picture and count | Cards slide in at the bottom left; repeats count up ("x2") with a bump; gear gets a brighter chime | `scripts/ui/item_toasts.gd` | test (stacking, counting, at most 5); shot `polish_toasts.png` |
+| "Item get" cards at the corner with picture and count | Cards slide in at the bottom left; repeats count up ("x2") with a bump; gear gets a brighter chime | `scripts/ui/item_toasts.gd` | test (stacking, counting, at most 3); shot `polish_toasts.png` |
 | Things you pick up fly into you | Forage and story items hop up and fly into the player | `scripts/world/pickup_pop.gd` | smoke test picks forage up |
 | Every item has a picture | All 38 items, including the 12 cooked foods that showed only names before | `tools/ui/food_icons.gd` | test (every item has an icon) |
 | Shop and cooking menus show the goods | Pictures beside every trade and every dish, highlight across the row | `DialogueBox.choose(..., icons)`, `vendor.gd`, `station.gd` | shots `polish_shop.png`, `polish_campfire.png`; story test (long lists fit) |
@@ -58,7 +58,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 
 ## Independent reviews
 
-Two separate reviewers, given only screenshots and asked to be harsh, judged the game against Stardew Valley. The first found text running off the Controls page and both maps, the day's page over the clock, item cards under menus, the gift prompt covering the person, placeholder shopkeepers and a placeholder campfire, ASCII cursors, and a crowded climbing HUD. All of that is fixed, and the second reviewer confirmed it from new screenshots, rating the presentation about 6.5 of 10 against Stardew (up from about 5). Their next round (padding inside panels, the world dimming behind menus, drawn checkboxes and arrows, fades at scroll edges, a card behind messages, at most four item cards) is fixed too.
+Two separate reviewers, given only screenshots and asked to be harsh, judged the game against Stardew Valley. The first found text running off the Controls page and both maps, the day's page over the clock, item cards under menus, the gift prompt covering the person, placeholder shopkeepers and a placeholder campfire, ASCII cursors, and a crowded climbing HUD. All of that is fixed, and the second reviewer confirmed it from new screenshots, rating the presentation about 6.5 of 10 against Stardew (up from about 5). Their next round (padding inside panels, the world dimming behind menus, drawn checkboxes and arrows, fades at scroll edges, a card behind messages, at most four item cards, since cut to three of one width) is fixed too.
 
 Their biggest remaining point was typography: Stardew uses one pixel font, and this game uses Noto Sans because a pixel font (Tiny5) was found too hard to read. The game now uses DotGothic16 by default: a pixel font, like Stardew's, whose letters stay distinct at the small sizes (B and G, C and O, 5 and S, 2 and 8 all read apart), so it answers the readability problem that ruled out Tiny5. **Settings > Font** switches back to smooth Noto Sans for anyone who prefers it (`docs/polish_pixel_font.png`). A third review found that the first pixel font tried (Pixelify Sans) joined "fi" into a shape like "A" and that its B read as G, so it was replaced with DotGothic16.
 

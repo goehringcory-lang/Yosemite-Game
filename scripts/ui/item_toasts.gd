@@ -9,7 +9,9 @@ extends Control
 const HOLD := 3.0
 const FADE := 0.4
 ## Most cards at once; the oldest goes when another comes.
-const MAX_CARDS := 4
+const MAX_CARDS := 3
+## Every card is at least this wide, so a stack reads as one even column.
+const CARD_WIDTH := 124.0
 const CARD_HEIGHT := 20.0
 const GAP := 2.0
 ## Pixels the card slides in from the left.
@@ -73,6 +75,7 @@ func _make_card(icon: Texture2D, entry: Dictionary) -> PanelContainer:
 	style.content_margin_bottom = 2.0
 	style.content_margin_right = 5.0
 	card.add_theme_stylebox_override("panel", style)
+	card.custom_minimum_size.x = CARD_WIDTH
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 4)
 	card.add_child(row)
