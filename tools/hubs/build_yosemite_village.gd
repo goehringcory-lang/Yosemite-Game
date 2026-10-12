@@ -193,6 +193,11 @@ func _layout() -> void:
 	_rect(88, 22, 89, 30, Terrain.PAVED)
 	_rect(82, 31, 96, 36, Terrain.PARKING)
 	_rect(62, 32, 63, 37, Terrain.PAVED)
+	# A paved walk from each door down to the mall or the lot, so no door
+	# opens onto grass.
+	for door_x in [69, 79, 86, 93]:
+		_rect(door_x - 1, 18, door_x + 1, 18, Terrain.PAVED)
+	_rect(85, 30, 87, 30, Terrain.PAVED)
 	# Cook's Meadow between the road and the river.
 	_rect(46, 39, 97, 47, Terrain.MEADOW)
 	_rect(52, 43, 58, 45, Terrain.WET_MEADOW)
