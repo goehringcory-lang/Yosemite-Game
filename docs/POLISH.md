@@ -29,7 +29,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | Friendship hearts and gifts | Five hearts per person, from talking each day, finishing their quests, and one gift a week (G or LB while facing them); everyone has loves drawn from their story (Muir's dry crusts and tea), likes good food, and never thinks less of you; hearts in the Journal's Friends section, a heart pop and chime, and new hearts on the day's page | `scripts/story/friendship.gd`, `gift_giving.gd`, `hearts.gd` | test (daily talk once, loved and liked gifts, weekly limit, hearts one at a time, quest warmth, saved, everyone has real loves, Journal shows hearts); shot `polish_gifts.png` |
 | People react when you talk | They turn to face you and give a small hop | `npc.gd` | by eye |
 | People stand on the ground | A soft oval shadow under the player, every person and every shopkeeper | `scripts/world/ground_shadow.gd` | shot `polish_gift_prompt.png` |
-| People keep hours | Visitors go home between 8 and 10 PM and come back at 7 AM, fading out and in; about half stay in on rainy days | `NPC.is_out` | test (home at night and can't be talked to, back in the morning, quest givers always there) |
+| People keep hours | Visitors go home between 8 and 10 PM and come back at 7 AM, fading out and in; about half stay in on rainy days. People with quests keep a day near their spot: at their post first thing, strolling about it from 9 to 5, nearer in the evening, standing at it overnight | `NPC.is_out`, `NPC.roam_radius` | test (home at night and can't be talked to, back in the morning, quest givers stand overnight and stroll by day) |
 | People walk about | Wanderers stroll round their spot (existing) | `npc.gd` | cast test |
 
 ## Time and place
@@ -92,7 +92,7 @@ Three more reviews followed (the fourth, fifth and sixth), each given fresh scre
 The last three independent reviews scored the game 6 to 6.5 of 10 against Stardew Valley. It is not at Stardew's level. What holds it back, in the reviewers' words and ours:
 
 - **The world is sparser than Stardew's.** Plazas, lawns and lots have less clutter (crates, flower strips, wear paths, edging) than Stardew's dense towns. Curry Village's buildings keep their first size.
-- **People keep the same spot all day.** Visitors go home at night and stay in some rainy days, but the people with quests stand where they are from morning to midnight so their stories are always reachable; Stardew's villagers walk full timetables.
+- **People keep close to one spot.** Visitors go home at night, and the people with quests stroll about their spot through the day and stand at it overnight, so their stories are always within a few steps; Stardew's villagers walk full timetables between home, work and the saloon.
 - **Portraits are painted at 40 px** (shown at 80) with five-tone shading; Stardew's are 64 px and hand-drawn. Walking sprites are 24 px tall.
 - **No hand-drawn art.** All art is drawn by code in a consistent style; Stardew's is hand-drawn by one artist. Cars are flat next to the 3/4-view buildings.
 - **The clock is a sky window**, not a dial with a hand.

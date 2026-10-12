@@ -351,6 +351,12 @@ func test_routines(world: Node) -> void:
 	check(not visitor.is_out() and not visitor.visible, "visitors go home at night")
 	check(not visitor.get_node("Hitbox").monitorable, "and can't be talked to while they're gone")
 	check(local.is_out(), "people with stories to tell stay where you can find them")
+	check(local.roam_radius() == 0.0, "and stand at their spot overnight")
+	GameClock.minutes = 13 * 60
+	check(local.roam_radius() >= NPC.STROLL, "they stroll about it through the middle of the day")
+	GameClock.minutes = 19 * 60
+	check(local.roam_radius() > 0.0 and local.roam_radius() < NPC.STROLL, "and keep nearer in the evening")
+	GameClock.minutes = 23 * 60
 	GameClock.minutes = 10 * 60
 	visitor._routine_check = 0.0
 	visitor._process(0.016)

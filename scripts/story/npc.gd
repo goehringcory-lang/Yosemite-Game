@@ -41,6 +41,11 @@ var _routine_check := 0.0
 const HOME_FROM := 20.0
 const HOME_SPREAD := 2.0
 const OUT_FROM := 7.0
+## People with quests keep a day of their own close to their spot, so you can
+## always find them: at their post first thing, strolling about it through
+## the middle of the day (up to STROLL px), staying nearer in the evening, and
+## standing at it again overnight.
+const STROLL := 36.0
 
 
 func _ready() -> void:
@@ -55,8 +60,9 @@ func _ready() -> void:
 	_target = _home
 	_rng.seed = hash(name)
 	_wait = _rng.randf_range(0.5, 3.0)
-	# Wanderers bump into the map (layer 1) and the player (layer 2).
-	collision_mask = 3 if wander_radius > 0.0 else 0
+	# Wanderers (and quest givers, who stroll by day) bump into the map
+	# (layer 1) and the player (layer 2).
+	collision_mask = 3 if wander_radius > 0.0 or (character and not character.visitor) else 0
 	if character and character.sprite_sheet:
 		_sprite = Sprite2D.new()
 		_sprite.texture = character.sprite_sheet
@@ -127,13 +133,38 @@ func _draw() -> void:
 	draw_rect(Rect2(1, -3, 3, 3), color.darkened(0.4))
 
 
+## How far from their spot they wander now: their own wander radius, or for
+## people with quests, their time of day (see STROLL).
+func roam_radius() -> float:
+	if character == null or character.visitor:
+		return wander_radius
+	var hour := GameClock.minutes / 60.0
+	if hour >= 9.0 and hour < 17.0:
+		return maxf(wander_radius, STROLL)
+	if hour >= 17.0 and hour < 21.0:
+		return maxf(wander_radius, STROLL * 0.5)
+	if hour >= 21.0 or hour < 6.0:
+		return 0.0
+	return wander_radius
+
+
 func _physics_process(delta: float) -> void:
-	if wander_radius <= 0.0 or _talking:
+	if _talking:
 		return
+	var radius := roam_radius()
+	if radius <= 0.0:
+		# standing at their spot: walk back to it first if they're out
+		if global_position.distance_to(_home) <= 2.0 or _stuck_time > 1.0:
+			if velocity != Vector2.ZERO:
+				velocity = Vector2.ZERO
+				_update_frame(false)
+			return
+		_target = _home
+		_wait = 0.0
 	if _wait > 0.0:
 		_wait -= delta
 		if _wait <= 0.0:
-			_target = _home + Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(0.3, 1.0) * wander_radius
+			_target = _home + Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(0.3, 1.0) * radius
 			_stuck_time = 0.0
 		return
 	var to_target := _target - global_position
