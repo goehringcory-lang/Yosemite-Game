@@ -49,7 +49,7 @@ Sleep in the tent to end the day, which also saves the game. First comes the day
 
 ## Game feel
 
-The small touches that make the Valley feel alive, in the spirit of Stardew Valley. The tests are in `tests/polish_test.tscn`, and `SHOT_DIR=/tmp/shots xvfb-run -a godot --path . res://tools/shots/polish_shot.tscn` photographs each one.
+The small touches that make the Valley feel alive, in the spirit of Stardew Valley. [docs/POLISH.md](docs/POLISH.md) goes through Stardew's hallmarks one by one: what this game does for each, where it lives, how it's checked, and what isn't done. The tests are in `tests/polish_test.tscn`, and `SHOT_DIR=/tmp/shots xvfb-run -a godot --path . res://tools/shots/polish_shot.tscn` photographs each one.
 
 - **Item cards.** Whatever you pick up, cook, buy, or are given slides in on a card at the bottom left: its picture, its name, and how many. A second strawberry while the card is up counts it ("Wild Strawberry x2") with a little bump instead of stacking another card. New gear gets a brighter chime. Forage and story items hop up off the ground and fly into your pack. The cards ride above a conversation box and hide under the book (`scripts/ui/item_toasts.gd`, `scripts/world/pickup_pop.gd`).
 - **Portraits and voices.** Everyone who talks has a portrait in a frame at the right of the conversation box, painted by `tools/npcgen/portraits.gd` from the same look data as their walking sprite (`docs/cast_portraits.png` shows the whole cast). Their words type out with soft blips at a pitch of their own (`scripts/story/portraits.gd`), the box rises in with a swish, and choosing and confirming click like the other menus.
@@ -57,11 +57,15 @@ The small touches that make the Valley feel alive, in the spirit of Stardew Vall
 - **The clock's sky.** Beside the time, a little window of sky: the sun climbs over Half Dome and sets, the moon and stars follow at night, the sky turns from dawn to gold to dusk, and the day's clouds, rain or snow show in it (`scripts/ui/clock_dial.gd`).
 - **Music.** Six short pieces, one for each season by day, one for the night, and the title theme. They play the way Stardew's do: a piece now and then, with the birds and wind on their own in between. Music rests in the rain and on the wall, comes in softer indoors, and fades when the hour or the season calls for another piece. See [Sound](#sound).
 - **The day's page.** When you sleep, a page comes up over the black before morning: what you found and were given (with pictures), new gear, first ascents, finished quests, perks, recipes, and dishes cooked, or "A quiet day in the Valley" (`scripts/story/day_log.gd`, `scripts/ui/day_summary.gd`).
+- **Birds and butterflies.** Steller's jays, juncos, robins and California quail hop and peck about on open ground and flutter off as you come near; butterflies drift over on fair spring and summer days (`scripts/world/critters.gd`, sprites from `tools/npcgen/critter_art.gd`).
+- **Pictures in the shops and at the fire.** Every trade and every dish in a choice list shows its picture (`DialogueBox.choose` takes an icon per option).
 - **Every food has a picture.** The acorn chain and the campfire dishes are drawn by `tools/ui/food_icons.gd` in the forage icons' style.
 
 ![Item cards](docs/polish_toasts.png)
 ![A conversation with a portrait](docs/polish_dialogue.png)
 ![The day's page](docs/polish_day_summary.png)
+![Birds on the plaza](docs/polish_critters.png)
+![A shop with pictures](docs/polish_shop.png)
 ![The clock's sky at 7 AM, 1 PM, 7 PM and 11 PM](docs/polish_clock_dial.png)
 
 ## The map of Yosemite
