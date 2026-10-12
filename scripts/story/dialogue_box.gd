@@ -20,7 +20,10 @@ const CURSOR := "   "
 const HINT_COLOR := Color(1, 1, 1, 0.6)
 ## The text's width with and without a portrait beside it.
 const TEXT_WIDTH := 456.0
-const TEXT_WIDTH_PORTRAIT := 404.0
+const TEXT_WIDTH_PORTRAIT := 364.0
+## Portraits are painted at 40 px and shown at exactly twice that, so they
+## stay crisp and read at a glance, like Stardew's 64 px faces.
+const PORTRAIT_SIZE := Vector2(80, 80)
 ## A talking blip every this many letters while a person's line types out.
 const BLIP_EVERY := 3
 ## How far the box rises as it opens, in pixels, and how long it takes.
@@ -126,7 +129,9 @@ func _ready() -> void:
 	_portrait_frame.visible = false
 	row.add_child(_portrait_frame)
 	_portrait = TextureRect.new()
-	_portrait.custom_minimum_size = Vector2(40, 40)
+	_portrait.custom_minimum_size = PORTRAIT_SIZE
+	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_portrait_frame.add_child(_portrait)
 	_name_label = Label.new()
