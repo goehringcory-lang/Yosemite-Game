@@ -9,7 +9,7 @@ const INFO_CLOSE_DISTANCE := 24.0
 ## Gap (pixels) between the message and the sign panel it sits above.
 const MESSAGE_GAP := 2.0
 ## Groups of the screens that hide the HUD while they're open.
-const COVERING_GROUPS := ["journal", "pause_menu", "park_map"]
+const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary"]
 
 var _player: Player
 var _status: Label
@@ -179,10 +179,14 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Hides the HUD while the journal, pause menu, map or a conversation is open.
 func _update_cover() -> void:
 	var covered := not get_tree().get_nodes_in_group("dialogue_box").is_empty()
+	var menu := false
 	for group: String in COVERING_GROUPS:
 		var screen := get_tree().get_first_node_in_group(group)
 		if screen and screen.is_open():
-			covered = true
+			menu = true
+	# Cards stay up during a conversation (a shop, the fire), not under a menu.
+	toasts.visible = not menu
+	covered = covered or menu
 	if covered == _covered:
 		return
 	_covered = covered
@@ -190,7 +194,6 @@ func _update_cover() -> void:
 	for panel: Control in [clock_panel, location_panel, status_bar, info_panel]:
 		panel.modulate.a = alpha
 	message_label.visible = not covered
-	toasts.visible = not get_tree().get_nodes_in_group("journal").any(func(n: Node) -> bool: return n.is_open())
 
 
 ## The pickup message sits at the bottom left, or above the sign panel while one is open.
@@ -231,6 +234,9 @@ func _update_prompt() -> void:
 		prompt_label.text += "    %s  Give a gift" % prompt("G", "LB")
 	prompt_panel.size = Vector2.ZERO
 	var screen := _player.get_global_transform_with_canvas().origin
+	# Above whichever head is higher, so it never covers the person you face.
+	if target is CanvasItem:
+		screen.y = minf(screen.y, (target as CanvasItem).get_global_transform_with_canvas().origin.y)
 	var size := prompt_panel.get_combined_minimum_size()
 	prompt_panel.position = (screen + Vector2(-size.x / 2.0, -46)).clamp(Vector2(2, 2), get_viewport().get_visible_rect().size - size - Vector2(2, 2)).round()
 

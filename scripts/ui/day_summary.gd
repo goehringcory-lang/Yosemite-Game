@@ -38,9 +38,15 @@ static func open(from: Node, log: DayLog) -> DaySummary:
 
 func _ready() -> void:
 	layer = 60
+	add_to_group("day_summary") # the HUD steps back while it's up
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_opened_frame = Engine.get_process_frames()
 	Sound.play("ui_open")
+
+
+## Always open while it exists (HUD checks this to hide itself).
+func is_open() -> bool:
+	return true
 
 
 func _build(log: DayLog) -> void:
@@ -48,6 +54,12 @@ func _build(log: DayLog) -> void:
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
+	# the world dims behind the page
+	var dim := ColorRect.new()
+	dim.color = Color(0.03, 0.02, 0.05, 0.6)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(dim)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.add_child(center)
@@ -141,7 +153,7 @@ func _chips(heading: String, counts: Dictionary, describe: Callable) -> void:
 			picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 			chip.add_child(picture)
-			chip.add_child(_label("x%d" % counts[id]))
+			chip.add_child(_label("%s x%d" % [info[1], counts[id]]))
 		else:
 			chip.add_child(_label("%s x%d" % [info[1], counts[id]]))
 		flow.add_child(chip)

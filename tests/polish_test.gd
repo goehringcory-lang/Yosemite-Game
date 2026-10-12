@@ -62,6 +62,13 @@ func test_toasts(world: Node) -> void:
 	for id in ["miners_lettuce", "sierra_onion", "yampah", "black_oak_acorn", "acorn_cake", "trail_mix"]:
 		Inventory.add(id)
 	check(toasts.count() <= ItemToasts.MAX_CARDS, "no more than %d cards at once" % ItemToasts.MAX_CARDS)
+	var pause := get_tree().get_first_node_in_group("pause_menu")
+	pause.open()
+	world.hud._update_cover()
+	check(not toasts.visible, "cards hide under the pause menu")
+	pause.close()
+	world.hud._update_cover()
+	check(toasts.visible, "and come back after")
 
 
 func test_portraits() -> void:
