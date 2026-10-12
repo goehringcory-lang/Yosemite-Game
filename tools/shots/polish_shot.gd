@@ -125,13 +125,15 @@ func _ready() -> void:
 		Inventory.add("trail_mix", 2)
 		Inventory.add("wild_strawberry", 3)
 		Friendship.add("wren_alvarez", 90)
-		world.player.global_position = wren.global_position + Vector2(0, 14)
-		world.player.facing = Vector2i.UP
-		world.player.interaction_area.position = Vector2(0, -12)
+		# beside her, facing her, so neither hides the other
+		world.player.global_position = wren.global_position + Vector2(18, 0)
+		world.player.facing = Vector2i.LEFT
+		world.player.interaction_area.position = Vector2(-12, 0)
 		await get_tree().create_timer(0.8).timeout
 		await _snap(dir, "gift_prompt", 2)
 		wren.receive_gift(world.player)
 		await get_tree().create_timer(0.3).timeout
+		get_tree().get_first_node_in_group("dialogue_box").reveal_all()
 		await _snap(dir, "gift_choice", 2)
 		var gift_box: DialogueBox = get_tree().get_first_node_in_group("dialogue_box")
 		gift_box.press(true)

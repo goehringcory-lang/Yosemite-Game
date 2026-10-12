@@ -545,7 +545,12 @@ func _slot(item: Dictionary) -> PanelContainer:
 		count.text = str(item.count)
 		count.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		count.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-		count.add_theme_constant_override("outline_size", 3)
+		# small, in the bottom-right corner, ringed in dark: clear of the art
+		count.size_flags_horizontal = Control.SIZE_SHRINK_END
+		count.size_flags_vertical = Control.SIZE_SHRINK_END
+		count.add_theme_font_size_override("font_size", 8)
+		count.add_theme_color_override("font_outline_color", Color("2a1f1a"))
+		count.add_theme_constant_override("outline_size", 4)
 		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		slot.add_child(count)
 	_slots.append(slot)
@@ -636,6 +641,9 @@ func _edge_fade(holder: Control, top: bool) -> TextureRect:
 	var paper := Color(37 / 255.0, 27 / 255.0, 20 / 255.0) if not top else Color(52 / 255.0, 36 / 255.0, 22 / 255.0)
 	gradient.set_color(0, Color(paper, 1.0 if top else 0.0))
 	gradient.set_color(1, Color(paper, 0.0 if top else 1.0))
+	# solid over the outer third, so a row cut off at the edge never shows
+	# as a sliver of half letters
+	gradient.add_point(0.35 if top else 0.65, Color(paper, 1.0))
 	var texture := GradientTexture2D.new()
 	texture.gradient = gradient
 	texture.fill_from = Vector2(0, 0)
@@ -654,7 +662,7 @@ func _edge_fade(holder: Control, top: bool) -> TextureRect:
 	else:
 		fade.anchor_top = 1.0
 		fade.anchor_bottom = 1.0
-		fade.offset_top = -14.0
+		fade.offset_top = -18.0
 	fade.visible = false
 	holder.add_child(fade)
 	return fade

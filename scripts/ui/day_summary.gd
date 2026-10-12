@@ -17,6 +17,8 @@ const DIM := Color(1, 1, 1, 0.6)
 ## Seconds between each thing counted out.
 const STEP := 0.09
 const ICON := Vector2(16, 16)
+## The headings of one-line entries sit in a column this wide, like a ledger.
+const HEADING_WIDTH := 92.0
 
 var _panel: PanelContainer
 var _column: VBoxContainer
@@ -114,13 +116,15 @@ func _section(heading: String) -> void:
 	_hide(label)
 
 
-## One line: the heading, then the names after it, wrapping if need be.
+## One line: the heading in its column, then the names, wrapping if need be.
 func _list(heading: String, names: PackedStringArray) -> void:
 	if names.is_empty():
 		return
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
-	row.add_child(_label(heading, HEADING))
+	var head := _label(heading, HEADING)
+	head.custom_minimum_size.x = HEADING_WIDTH
+	row.add_child(head)
 	var text := _label("  ·  ".join(names))
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
