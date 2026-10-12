@@ -6,10 +6,16 @@ extends Node
 ## That includes nodes in regions the player has left (World keeps them in
 ## memory) and saved data for regions not visited yet this session, so give
 ## persist nodes names that are unique across regions.
-## On Linux the file lives in ~/.local/share/godot/app_userdata/Yosemite Game/
+## On Linux the file lives in ~/.local/share/godot/app_userdata/Valley Days/
+## (a save from when the game was called Yosemite Game is copied over; see
+## OldUserDir).
 
 ## Tests point this at a separate file so they never touch a real save.
 var save_path := "user://save.json"
+
+
+func _init() -> void:
+	OldUserDir.migrate()
 const SAVE_VERSION := 1
 
 ## Saved data for persist nodes that weren't in the tree when the game

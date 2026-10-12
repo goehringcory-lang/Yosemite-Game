@@ -1,4 +1,4 @@
-# Yosemite Game
+# Valley Days
 
 A cozy pixel exploration game set in Yosemite, built with **Godot 4.7** (GDScript). You meet real people from the park's history, hear their stories, and earn the climbing gear that opens up more of the park.
 
@@ -456,8 +456,8 @@ The maps are made from data under these licenses. The credit is on the game's cr
 
 ```bash
 mkdir -p build/windows build/macos build/linux
-godot --headless --path . --export-release "Windows" "build/windows/Yosemite Game.exe"
-godot --headless --path . --export-release "macOS" "build/macos/Yosemite Game.zip"
+godot --headless --path . --export-release "Windows" "build/windows/Valley Days.exe"
+godot --headless --path . --export-release "macOS" "build/macos/Valley Days.zip"
 godot --headless --path . --export-release "Linux" "build/linux/YosemiteGame.x86_64"
 ```
 

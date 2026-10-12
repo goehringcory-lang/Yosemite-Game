@@ -93,8 +93,7 @@ The last three independent reviews scored the game 6 to 6.5 of 10 against Starde
 
 - **The world is sparser than Stardew's.** Plazas, lawns and lots have less clutter (crates, flower strips, wear paths, edging) than Stardew's dense towns. Curry Village's buildings keep their first size.
 - **People keep close to one spot.** Visitors go home at night, and the people with quests stroll about their spot through the day and stand at it overnight, so their stories are always within a few steps; Stardew's villagers walk full timetables between home, work and the saloon.
-- **Portraits are laid out on a 40-dot grid** and painted at the 80 px they show at (round shapes and shading at full resolution, eyes and mouths in two-pixel dots), with five-tone shading; Stardew's are 64 px and hand-drawn. Walking sprites are 24 px tall.
+- **Portraits are laid out on a 40-dot grid** and painted at the 80 px they show at (round shapes and shading at full resolution, eyes and mouths in two-pixel dots), with five-tone shading; Stardew's are 64 px and hand-drawn. Walking sprites are 16x24 (Stardew's are 16x32); the owner chose to keep that as the game's style, and the buildings were scaled to suit it.
 - **No hand-drawn art.** All art is drawn by code in a consistent style; Stardew's is hand-drawn by one artist. Cars are flat next to the 3/4-view buildings.
 - **The clock is a sky window**, not a dial with a hand.
-- **The name is a working title** ("Yosemite Game"), for the owner to choose.
 - **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew also has several pieces a season; here there is one.

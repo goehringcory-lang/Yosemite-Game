@@ -54,6 +54,7 @@ static var _customized := false
 
 
 static func ensure_loaded() -> void:
+	OldUserDir.migrate()
 	if not _loaded:
 		load_settings()
 		apply_font()
