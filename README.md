@@ -334,7 +334,7 @@ Black oaks change color with the seasons: new pale leaves in spring, gold and ru
 ## Project layout
 
 ```
-project.godot            480×270 base resolution, scaled up in whole-number steps with nearest-neighbor filtering
+project.godot            960×540 view on a 32px tile grid (menus lay out on 480×270, see docs/ART32.md), scaled up in whole-number steps with nearest-neighbor filtering
 scenes/
   ui/title_screen.tscn   main scene: the title screen (Continue, New Game, Settings, Credits, Quit)
   world/world.tscn       the game: loads one region at a time, plus player, lighting, HUD, park map

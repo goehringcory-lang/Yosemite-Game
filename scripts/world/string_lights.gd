@@ -50,12 +50,17 @@ static func glow_for(texture: Texture2D) -> Texture2D:
 			var c := source.get_pixel(x, y)
 			if c.a < 0.5 or c.r < 0.95 or c.g < 0.75:
 				continue
-			for dy in range(-2, 3):
-				for dx in range(-2, 3):
+			# The bulbs are 2x2 blocks on the 2x art: the same 5x5 halo, in 2px cells.
+			for dy in range(-5, 6):
+				for dx in range(-5, 6):
 					var at := Vector2i(x + dx, y + dy)
+					var cx := ((x + dx) >> 1) - (x >> 1)
+					var cy := ((y + dy) >> 1) - (y >> 1)
+					if absi(cx) > 2 or absi(cy) > 2:
+						continue
 					if at.x < 0 or at.y < 0 or at.x >= size.x or at.y >= size.y:
 						continue
-					var a := 0.55 if dx == 0 and dy == 0 else (0.28 if absi(dx) + absi(dy) <= 1 else 0.1)
+					var a := 0.55 if cx == 0 and cy == 0 else (0.28 if absi(cx) + absi(cy) <= 1 else 0.1)
 					var old := out.get_pixelv(at)
 					out.set_pixelv(at, Color(1.0, 0.82, 0.45, maxf(old.a, a)))
 	var made := ImageTexture.create_from_image(out)

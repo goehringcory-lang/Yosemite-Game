@@ -6,7 +6,7 @@ extends Sprite2D
 ##
 ##   PickupPop.spawn(sprite, player)
 
-const HOP := 10.0
+const HOP := 20.0
 const HOP_TIME := 0.16
 const FLY_TIME := 0.18
 
@@ -39,7 +39,7 @@ func _ready() -> void:
 func _fly(t: float, from: Vector2) -> void:
 	if not is_instance_valid(_player):
 		return
-	var to: Vector2 = (get_parent() as Node2D).to_local(_player.global_position + Vector2(0, -10))
+	var to: Vector2 = (get_parent() as Node2D).to_local(_player.global_position + Vector2(0, -20))
 	position = from.lerp(to, t)
 	scale = Vector2.ONE * lerpf(1.0, 0.4, t)
 	modulate.a = lerpf(1.0, 0.6, t)

@@ -16,7 +16,7 @@ func _ready() -> void:
 	material = add
 	_light = NightLight.new()
 	_light.strength = 0.6
-	_light.radius = 14.0
+	_light.radius = 28.0
 	_light.lit_hours = Vector2i(FROM_HOUR, TO_HOUR)
 	add_child(_light)
 	_light.color = Color(0.86, 0.95, 1.0) # a white LED, cooler than the lanterns
@@ -28,5 +28,5 @@ func _process(_delta: float) -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(-1, -1, 2, 1), Color(3.0, 3.0, 3.0, 1.0))
-	draw_rect(Rect2(-2, 0, 4, 1), Color(1.5, 1.8, 2.1, 0.8))
+	draw_rect(Rect2(-2, -2, 4, 2), Color(3.0, 3.0, 3.0, 1.0))
+	draw_rect(Rect2(-4, 0, 8, 2), Color(1.5, 1.8, 2.1, 0.8))

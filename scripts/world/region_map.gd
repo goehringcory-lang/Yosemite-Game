@@ -14,7 +14,7 @@ extends Node2D
 ## A 1-pixel-per-tile picture of this map, shown on the area map screen.
 @export_file("*.png") var area_map_path := ""
 
-const TILE := 16.0
+const TILE := 32.0
 
 
 func position_to_lonlat(pos: Vector2) -> Vector2:

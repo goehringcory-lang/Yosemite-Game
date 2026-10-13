@@ -35,7 +35,7 @@ const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prom
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill the screen. The picture stays sharp in whole-pixel steps.",
-	"The window's size, in whole steps of 480 x 270.",
+	"The window's size, in whole steps of 960 x 540.",
 	"Which buttons hints name. Auto follows the last device you used.",
 	"Smooth letters are easiest to read; pixel letters match the art.",
 	"How loud the whole game is.",
@@ -92,6 +92,7 @@ var _plain_style: StyleBoxEmpty
 
 func _ready() -> void:
 	layer = 28
+	UiScale.layer(self)
 	add_to_group("pause_menu")
 	Settings.ensure_loaded()
 	Settings.apply(get_window())

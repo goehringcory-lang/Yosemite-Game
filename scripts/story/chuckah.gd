@@ -28,7 +28,7 @@ func _ready() -> void:
 		_art.name = "Art"
 		add_child(_art)
 		move_child(_art, 0)
-		for spec: Array in [["Collision", body_size, Vector2(0, -body_size.y / 2.0)], ["Hitbox/Shape", reach_size, Vector2(0, -reach_size.y / 2.0 - 2.0)]]:
+		for spec: Array in [["Collision", body_size, Vector2(0, -body_size.y / 2.0)], ["Hitbox/Shape", reach_size, Vector2(0, -reach_size.y / 2.0 - 4.0)]]:
 			var size: Vector2 = spec[1]
 			var shape_node := get_node_or_null(spec[0] as String) as CollisionShape2D
 			if size.x > 0.0 and shape_node:
@@ -42,7 +42,7 @@ func _ready() -> void:
 func _refresh_art() -> void:
 	if _art:
 		_art.texture = texture_built if Granary.chuckahs_built > 0 else texture_empty
-		_art.offset = Vector2(0, -_art.texture.get_height() / 2.0 + 4.0)
+		_art.offset = Vector2(0, -_art.texture.get_height() / 2.0 + 8.0)
 	else:
 		queue_redraw()
 
@@ -53,13 +53,13 @@ func _draw() -> void:
 		return
 	var pole := Color(0.45, 0.32, 0.2)
 	if Granary.chuckahs_built == 0:
-		draw_line(Vector2(-6, 0), Vector2(0, -18), pole, 1.0)
-		draw_line(Vector2(6, 0), Vector2(0, -18), pole, 1.0)
+		draw_line(Vector2(-12, 0), Vector2(0, -36), pole, 2.0)
+		draw_line(Vector2(12, 0), Vector2(0, -36), pole, 2.0)
 		return
-	draw_line(Vector2(-7, 0), Vector2(-5, -8), pole, 2.0)
-	draw_line(Vector2(7, 0), Vector2(5, -8), pole, 2.0)
-	draw_colored_polygon(PackedVector2Array([Vector2(-7, -8), Vector2(7, -8), Vector2(5, -24), Vector2(-5, -24)]), Color(0.7, 0.58, 0.35))
-	draw_colored_polygon(PackedVector2Array([Vector2(-7, -24), Vector2(7, -24), Vector2(0, -30)]), Color(0.45, 0.55, 0.3))
+	draw_line(Vector2(-14, 0), Vector2(-10, -16), pole, 4.0)
+	draw_line(Vector2(14, 0), Vector2(10, -16), pole, 4.0)
+	draw_colored_polygon(PackedVector2Array([Vector2(-14, -16), Vector2(14, -16), Vector2(10, -48), Vector2(-10, -48)]), Color(0.7, 0.58, 0.35))
+	draw_colored_polygon(PackedVector2Array([Vector2(-14, -48), Vector2(14, -48), Vector2(0, -60)]), Color(0.45, 0.55, 0.3))
 
 
 func interact(player: Player) -> void:

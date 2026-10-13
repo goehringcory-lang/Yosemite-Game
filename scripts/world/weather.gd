@@ -17,7 +17,7 @@ const COUNTS := {"snow": 130, "rain": 55, "petal": 30, "leaf": 30, "fluff": 12, 
 ## flat and the view clear enough to see the player.
 const MAX_FLAKES := 140
 ## Extra room round the view, so flakes don't pop in at the edges.
-const MARGIN := 12.0
+const MARGIN := 24.0
 
 ## Kind of each flake (an index into KINDS) and its state.
 const KINDS := ["snow", "rain", "petal", "leaf", "fluff", "firefly", "mote"]
@@ -97,7 +97,7 @@ func _process(delta: float) -> void:
 		_key = key
 		_populate()
 	_time += delta
-	var wind := 4.0 + 5.0 * sin(_time * 0.13) + 2.0 * sin(_time * 0.41 + 1.0)
+	var wind := 8.0 + 10.0 * sin(_time * 0.13) + 4.0 * sin(_time * 0.41 + 1.0)
 	var area := _view.grow(MARGIN)
 	for i in _pos.size():
 		var p := _pos[i]
@@ -106,19 +106,19 @@ func _process(delta: float) -> void:
 		var v := Vector2.ZERO
 		match _kind[i]:
 			0: # snow: slow, swaying
-				v = Vector2(wind * 0.6 + sin(_time * 1.3 + ph) * 5.0, 9.0 + 9.0 * d)
+				v = Vector2(wind * 0.6 + sin(_time * 1.3 + ph) * 10.0, 18.0 + 18.0 * d)
 			1: # rain: fast slanted streaks
-				v = Vector2(wind * 3.0 + 18.0, 150.0 + 60.0 * d)
+				v = Vector2(wind * 3.0 + 36.0, 300.0 + 120.0 * d)
 			2: # petals: flutter on the breeze
-				v = Vector2(wind * 1.4 + sin(_time * 2.1 + ph) * 9.0, 6.0 + 5.0 * d + cos(_time * 2.1 + ph) * 3.0)
+				v = Vector2(wind * 1.4 + sin(_time * 2.1 + ph) * 18.0, 12.0 + 10.0 * d + cos(_time * 2.1 + ph) * 6.0)
 			3: # leaves: swing side to side as they fall
-				v = Vector2(wind * 1.2 + sin(_time * 1.6 + ph) * 14.0, 8.0 + 8.0 * d)
+				v = Vector2(wind * 1.2 + sin(_time * 1.6 + ph) * 28.0, 16.0 + 16.0 * d)
 			4: # fluff: hangs in the air
-				v = Vector2(wind * 0.8 + sin(_time * 0.7 + ph) * 3.0, sin(_time * 0.9 + ph * 2.0) * 3.0 - 0.6)
+				v = Vector2(wind * 0.8 + sin(_time * 0.7 + ph) * 6.0, sin(_time * 0.9 + ph * 2.0) * 6.0 - 1.2)
 			5: # fireflies: slow wandering loops
-				v = Vector2(cos(_time * 0.6 + ph) * 6.0, sin(_time * 0.8 + ph * 1.7) * 4.0)
+				v = Vector2(cos(_time * 0.6 + ph) * 12.0, sin(_time * 0.8 + ph * 1.7) * 8.0)
 			6: # light motes: barely moving, drifting up through the sun
-				v = Vector2(wind * 0.3 + cos(_time * 0.4 + ph) * 4.0, sin(_time * 0.5 + ph * 1.3) * 3.0 - 1.2)
+				v = Vector2(wind * 0.3 + cos(_time * 0.4 + ph) * 8.0, sin(_time * 0.5 + ph * 1.3) * 6.0 - 2.4)
 		p += v * delta
 		# Wrap round the view, in world space.
 		p = area.position + Vector2(fposmod(p.x - area.position.x, area.size.x), fposmod(p.y - area.position.y, area.size.y))
@@ -192,45 +192,45 @@ func _draw() -> void:
 			0:
 				if d > 0.94:
 					# The nearest flakes: a soft plus.
-					draw_rect(Rect2(p + Vector2(-1, 0), Vector2(3, 1)), c)
-					draw_rect(Rect2(p + Vector2(0, -1), Vector2(1, 3)), c)
+					draw_rect(Rect2(p + Vector2(-2, 0), Vector2(6, 2)), c)
+					draw_rect(Rect2(p + Vector2(0, -2), Vector2(2, 6)), c)
 				elif d > 0.6:
-					draw_rect(Rect2(p, Vector2(2, 2)), c)
+					draw_rect(Rect2(p, Vector2(4, 4)), c)
 				else:
-					draw_rect(Rect2(p, Vector2.ONE), c)
+					draw_rect(Rect2(p, Vector2(2, 2)), c)
 			1:
 				# A thin streak along the fall direction.
-				draw_rect(Rect2(p, Vector2.ONE), c)
-				draw_rect(Rect2(p + Vector2(-1, -2), Vector2.ONE), c)
+				draw_rect(Rect2(p, Vector2(2, 2)), c)
+				draw_rect(Rect2(p + Vector2(-2, -4), Vector2(2, 2)), c)
 				if d > 0.5:
-					draw_rect(Rect2(p + Vector2(-1, -4), Vector2.ONE), Color(c, c.a * 0.6))
+					draw_rect(Rect2(p + Vector2(-2, -8), Vector2(2, 2)), Color(c, c.a * 0.6))
 			2:
 				# Petals turn over: wide, then edge-on.
 				if fmod(_time * 2.0 + _phase[i], TAU) < PI:
-					draw_rect(Rect2(p, Vector2(2, 2)), c)
-					draw_rect(Rect2(p + Vector2(1, 1), Vector2.ONE), c.darkened(0.15))
+					draw_rect(Rect2(p, Vector2(4, 4)), c)
+					draw_rect(Rect2(p + Vector2(2, 2), Vector2(2, 2)), c.darkened(0.15))
 				else:
-					draw_rect(Rect2(p, Vector2(2, 1)), c.darkened(0.08))
+					draw_rect(Rect2(p, Vector2(4, 2)), c.darkened(0.08))
 			3:
 				# Leaves tumble through three shapes, with a darker vein.
 				var vein := c.darkened(0.35)
 				match int(fposmod(_time * 3.0 + _phase[i] * 2.0, 3.0)):
 					0:
-						draw_rect(Rect2(p, Vector2(3, 2)), c)
-						draw_rect(Rect2(p + Vector2(0, 1), Vector2(2, 1)), vein)
+						draw_rect(Rect2(p, Vector2(6, 4)), c)
+						draw_rect(Rect2(p + Vector2(0, 2), Vector2(4, 2)), vein)
 					1:
-						draw_rect(Rect2(p, Vector2(2, 2)), c)
-						draw_rect(Rect2(p + Vector2(1, 1), Vector2.ONE), vein)
+						draw_rect(Rect2(p, Vector2(4, 4)), c)
+						draw_rect(Rect2(p + Vector2(2, 2), Vector2(2, 2)), vein)
 					_:
-						draw_rect(Rect2(p, Vector2(1, 3)), c)
-						draw_rect(Rect2(p + Vector2(0, 2), Vector2.ONE), vein)
+						draw_rect(Rect2(p, Vector2(2, 6)), c)
+						draw_rect(Rect2(p + Vector2(0, 4), Vector2(2, 2)), vein)
 			4:
 				var twinkle := 0.6 + 0.4 * sin(_time * 3.0 + _phase[i] * 5.0)
-				draw_rect(Rect2(p, Vector2.ONE), Color(c, c.a * twinkle))
+				draw_rect(Rect2(p, Vector2(2, 2)), Color(c, c.a * twinkle))
 			6:
 				# A fleck of sunlight: a pixel that catches the light now and then.
 				var shine := clampf(0.5 + 0.5 * sin(_time * 1.1 + _phase[i] * 4.0), 0.0, 1.0)
-				draw_rect(Rect2(p, Vector2.ONE), Color(c, c.a * shine))
+				draw_rect(Rect2(p, Vector2(2, 2)), Color(c, c.a * shine))
 
 
 func _draw_fireflies() -> void:
@@ -242,14 +242,14 @@ func _draw_fireflies() -> void:
 		if blink <= 0.0:
 			continue
 		var p := _pos[i].floor()
-		_fireflies.draw_rect(Rect2(p, Vector2.ONE), Color(0.85, 1.0, 0.3, blink))
+		_fireflies.draw_rect(Rect2(p, Vector2(2, 2)), Color(0.85, 1.0, 0.3, blink))
 		var halo := Color(0.55, 0.7, 0.12, blink * 0.4)
-		_fireflies.draw_rect(Rect2(p + Vector2(-1, 0), Vector2(3, 1)), halo)
-		_fireflies.draw_rect(Rect2(p + Vector2(0, -1), Vector2(1, 3)), halo)
+		_fireflies.draw_rect(Rect2(p + Vector2(-2, 0), Vector2(6, 2)), halo)
+		_fireflies.draw_rect(Rect2(p + Vector2(0, -2), Vector2(2, 6)), halo)
 		# A faint outer glow on the corners, so the glow is round, not a plus.
 		var corner := Color(0.5, 0.66, 0.1, blink * 0.14)
-		for d in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
-			_fireflies.draw_rect(Rect2(p + d, Vector2.ONE), corner)
+		for d in [Vector2(-2, -2), Vector2(2, -2), Vector2(-2, 2), Vector2(2, 2)]:
+			_fireflies.draw_rect(Rect2(p + d, Vector2(2, 2)), corner)
 
 
 func _camera_view() -> Rect2:

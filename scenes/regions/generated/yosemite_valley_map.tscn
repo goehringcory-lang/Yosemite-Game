@@ -17,16 +17,16 @@
 [ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="13_rx6v6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_27omh"]
-size = Vector2(42, 13)
+size = Vector2(84, 26)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v7gyp"]
-size = Vector2(14, 11)
+size = Vector2(28, 22)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dgut2"]
-size = Vector2(16, 48)
+size = Vector2(32, 96)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1j7ld"]
-size = Vector2(16, 48)
+size = Vector2(32, 96)
 
 [node name="Map" type="Node2D" unique_id=1611727734]
 y_sort_enabled = true
@@ -70,1940 +70,1940 @@ y_sort_enabled = true
 [node name="Footprints" type="StaticBody2D" parent="Buildings" unique_id=1217810732]
 
 [node name="S_2928_457" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=367274445]
-position = Vector2(2928, 456.5)
+position = Vector2(5856, 913)
 shape = SubResource("RectangleShape2D_27omh")
 
 [node name="S_2976_521" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1109637623]
-position = Vector2(2976, 520.5)
+position = Vector2(5952, 1041)
 shape = SubResource("RectangleShape2D_27omh")
 
 [node name="S_2592_713" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1119485637]
-position = Vector2(2592, 712.5)
+position = Vector2(5184, 1425)
 shape = SubResource("RectangleShape2D_27omh")
 
 [node name="S_2600_793" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=2127860231]
-position = Vector2(2600, 792.5)
+position = Vector2(5200, 1585)
 shape = SubResource("RectangleShape2D_27omh")
 
 [node name="S_2968_426" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1323367929]
-position = Vector2(2968, 425.5)
+position = Vector2(5936, 851)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2824_442" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1154573562]
-position = Vector2(2824, 441.5)
+position = Vector2(5648, 883)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2872_442" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1903135392]
-position = Vector2(2872, 441.5)
+position = Vector2(5744, 883)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2984_458" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=94069618]
-position = Vector2(2984, 457.5)
+position = Vector2(5968, 915)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2808_474" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=779862886]
-position = Vector2(2808, 473.5)
+position = Vector2(5616, 947)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2856_474" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1153659530]
-position = Vector2(2856, 473.5)
+position = Vector2(5712, 947)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3032_474" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1058340334]
-position = Vector2(3032, 473.5)
+position = Vector2(6064, 947)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2824_506" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1410631161]
-position = Vector2(2824, 505.5)
+position = Vector2(5648, 1011)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2872_506" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=990041967]
-position = Vector2(2872, 505.5)
+position = Vector2(5744, 1011)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2936_506" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1022462419]
-position = Vector2(2936, 505.5)
+position = Vector2(5872, 1011)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3016_506" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=716092558]
-position = Vector2(3016, 505.5)
+position = Vector2(6032, 1011)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3064_506" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=718184036]
-position = Vector2(3064, 505.5)
+position = Vector2(6128, 1011)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3112_506" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1021411794]
-position = Vector2(3112, 505.5)
+position = Vector2(6224, 1011)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2856_538" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=583554722]
-position = Vector2(2856, 537.5)
+position = Vector2(5712, 1075)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2904_538" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=205858748]
-position = Vector2(2904, 537.5)
+position = Vector2(5808, 1075)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3016_538" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1558714055]
-position = Vector2(3016, 537.5)
+position = Vector2(6032, 1075)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3064_538" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=935196184]
-position = Vector2(3064, 537.5)
+position = Vector2(6128, 1075)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3112_538" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1317620175]
-position = Vector2(3112, 537.5)
+position = Vector2(6224, 1075)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2952_570" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1103055796]
-position = Vector2(2952, 569.5)
+position = Vector2(5904, 1139)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3112_570" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1092440762]
-position = Vector2(3112, 569.5)
+position = Vector2(6224, 1139)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3048_586" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1728522452]
-position = Vector2(3048, 585.5)
+position = Vector2(6096, 1171)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3096_602" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1910202870]
-position = Vector2(3096, 601.5)
+position = Vector2(6192, 1203)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3144_602" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=341882473]
-position = Vector2(3144, 601.5)
+position = Vector2(6288, 1203)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3320_602" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=126800711]
-position = Vector2(3320, 601.5)
+position = Vector2(6640, 1203)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3384_602" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1401457587]
-position = Vector2(3384, 601.5)
+position = Vector2(6768, 1203)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_4104_602" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1461558931]
-position = Vector2(4104, 601.5)
+position = Vector2(8208, 1203)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2696_634" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1062998774]
-position = Vector2(2696, 633.5)
+position = Vector2(5392, 1267)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3112_634" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=866069232]
-position = Vector2(3112, 633.5)
+position = Vector2(6224, 1267)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3416_634" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1466186134]
-position = Vector2(3416, 633.5)
+position = Vector2(6832, 1267)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2776_650" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1793777305]
-position = Vector2(2776, 649.5)
+position = Vector2(5552, 1299)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2632_666" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=591737604]
-position = Vector2(2632, 665.5)
+position = Vector2(5264, 1331)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2680_666" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1054387008]
-position = Vector2(2680, 665.5)
+position = Vector2(5360, 1331)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3064_682" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1012643071]
-position = Vector2(3064, 681.5)
+position = Vector2(6128, 1363)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2632_698" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=946961169]
-position = Vector2(2632, 697.5)
+position = Vector2(5264, 1395)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3608_698" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=866053287]
-position = Vector2(3608, 697.5)
+position = Vector2(7216, 1395)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2552_730" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1913599852]
-position = Vector2(2552, 729.5)
+position = Vector2(5104, 1459)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3240_730" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=400165109]
-position = Vector2(3240, 729.5)
+position = Vector2(6480, 1459)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3672_730" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1125789621]
-position = Vector2(3672, 729.5)
+position = Vector2(7344, 1459)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3928_730" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=558577897]
-position = Vector2(3928, 729.5)
+position = Vector2(7856, 1459)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3160_746" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1433117872]
-position = Vector2(3160, 745.5)
+position = Vector2(6320, 1491)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3720_746" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=167658922]
-position = Vector2(3720, 745.5)
+position = Vector2(7440, 1491)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2648_762" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1593399976]
-position = Vector2(2648, 761.5)
+position = Vector2(5296, 1523)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3208_762" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=668058600]
-position = Vector2(3208, 761.5)
+position = Vector2(6416, 1523)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3560_762" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=2021024827]
-position = Vector2(3560, 761.5)
+position = Vector2(7120, 1523)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3608_762" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1729147583]
-position = Vector2(3608, 761.5)
+position = Vector2(7216, 1523)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3128_778" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1259674005]
-position = Vector2(3128, 777.5)
+position = Vector2(6256, 1555)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3176_794" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1149661648]
-position = Vector2(3176, 793.5)
+position = Vector2(6352, 1587)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3224_794" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1475638564]
-position = Vector2(3224, 793.5)
+position = Vector2(6448, 1587)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3608_794" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=24704505]
-position = Vector2(3608, 793.5)
+position = Vector2(7216, 1587)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2456_810" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1472173698]
-position = Vector2(2456, 809.5)
+position = Vector2(4912, 1619)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3128_810" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1728367151]
-position = Vector2(3128, 809.5)
+position = Vector2(6256, 1619)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2552_826" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1652400182]
-position = Vector2(2552, 825.5)
+position = Vector2(5104, 1651)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_2824_826" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=744773004]
-position = Vector2(2824, 825.5)
+position = Vector2(5648, 1651)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3176_826" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=685624922]
-position = Vector2(3176, 825.5)
+position = Vector2(6352, 1651)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3224_826" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=618183231]
-position = Vector2(3224, 825.5)
+position = Vector2(6448, 1651)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3576_826" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=641611563]
-position = Vector2(3576, 825.5)
+position = Vector2(7152, 1651)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3640_826" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1171977889]
-position = Vector2(3640, 825.5)
+position = Vector2(7280, 1651)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3688_826" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1819463482]
-position = Vector2(3688, 825.5)
+position = Vector2(7376, 1651)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3240_858" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=913992297]
-position = Vector2(3240, 857.5)
+position = Vector2(6480, 1715)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3592_858" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1216792892]
-position = Vector2(3592, 857.5)
+position = Vector2(7184, 1715)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3608_890" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1104916606]
-position = Vector2(3608, 889.5)
+position = Vector2(7216, 1779)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3352_906" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=553023690]
-position = Vector2(3352, 905.5)
+position = Vector2(6704, 1811)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3416_906" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1108825077]
-position = Vector2(3416, 905.5)
+position = Vector2(6832, 1811)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3544_906" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1849993754]
-position = Vector2(3544, 905.5)
+position = Vector2(7088, 1811)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3288_922" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1573974057]
-position = Vector2(3288, 921.5)
+position = Vector2(6576, 1843)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3592_922" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1839967289]
-position = Vector2(3592, 921.5)
+position = Vector2(7184, 1843)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3336_938" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=893968602]
-position = Vector2(3336, 937.5)
+position = Vector2(6672, 1875)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3384_938" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1123549089]
-position = Vector2(3384, 937.5)
+position = Vector2(6768, 1875)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3544_938" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=750560915]
-position = Vector2(3544, 937.5)
+position = Vector2(7088, 1875)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3272_954" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1504574271]
-position = Vector2(3272, 953.5)
+position = Vector2(6544, 1907)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3592_954" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=237438477]
-position = Vector2(3592, 953.5)
+position = Vector2(7184, 1907)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3320_970" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=889963018]
-position = Vector2(3320, 969.5)
+position = Vector2(6640, 1939)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3368_970" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=933979057]
-position = Vector2(3368, 969.5)
+position = Vector2(6736, 1939)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3432_970" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1111247803]
-position = Vector2(3432, 969.5)
+position = Vector2(6864, 1939)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3480_970" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1104965067]
-position = Vector2(3480, 969.5)
+position = Vector2(6960, 1939)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3528_970" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1444900293]
-position = Vector2(3528, 969.5)
+position = Vector2(7056, 1939)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3640_970" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=2110915244]
-position = Vector2(3640, 969.5)
+position = Vector2(7280, 1939)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3576_986" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1709480144]
-position = Vector2(3576, 985.5)
+position = Vector2(7152, 1971)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3384_1002" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1619379969]
-position = Vector2(3384, 1001.5)
+position = Vector2(6768, 2003)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3432_1002" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1597351611]
-position = Vector2(3432, 1001.5)
+position = Vector2(6864, 2003)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3576_1018" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1892285400]
-position = Vector2(3576, 1017.5)
+position = Vector2(7152, 2035)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3704_1018" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1822020596]
-position = Vector2(3704, 1017.5)
+position = Vector2(7408, 2035)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3752_1050" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=314241674]
-position = Vector2(3752, 1049.5)
+position = Vector2(7504, 2099)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3752_1082" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=489368705]
-position = Vector2(3752, 1081.5)
+position = Vector2(7504, 2163)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3800_1082" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1942875152]
-position = Vector2(3800, 1081.5)
+position = Vector2(7600, 2163)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3800_1114" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=670502260]
-position = Vector2(3800, 1113.5)
+position = Vector2(7600, 2227)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3768_1178" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=916529642]
-position = Vector2(3768, 1177.5)
+position = Vector2(7536, 2355)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3848_1226" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=908025402]
-position = Vector2(3848, 1225.5)
+position = Vector2(7696, 2451)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3000_1242" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=434402502]
-position = Vector2(3000, 1241.5)
+position = Vector2(6000, 2483)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3416_1290" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=258831059]
-position = Vector2(3416, 1289.5)
+position = Vector2(6832, 2579)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_1928_1322" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1777957643]
-position = Vector2(1928, 1321.5)
+position = Vector2(3856, 2643)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3400_1322" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1134152274]
-position = Vector2(3400, 1321.5)
+position = Vector2(6800, 2643)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3304_1354" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=628638482]
-position = Vector2(3304, 1353.5)
+position = Vector2(6608, 2707)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3368_1354" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=559442157]
-position = Vector2(3368, 1353.5)
+position = Vector2(6736, 2707)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3144_1386" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1575498241]
-position = Vector2(3144, 1385.5)
+position = Vector2(6288, 2771)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3272_1418" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=980850195]
-position = Vector2(3272, 1417.5)
+position = Vector2(6544, 2835)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3864_1466" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=29419996]
-position = Vector2(3864, 1465.5)
+position = Vector2(7728, 2931)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3352_1498" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=1408527083]
-position = Vector2(3352, 1497.5)
+position = Vector2(6704, 2995)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="S_3000_1962" type="CollisionShape2D" parent="Buildings/Footprints" unique_id=132247975]
-position = Vector2(3000, 1961.5)
+position = Vector2(6000, 3923)
 shape = SubResource("RectangleShape2D_v7gyp")
 
 [node name="Lodge_183_28" type="Sprite2D" parent="Buildings" unique_id=1610961080]
-position = Vector2(2928, 460)
+position = Vector2(5856, 920)
 texture = ExtResource("4_q3rd1")
-offset = Vector2(0, -19)
+offset = Vector2(0, -38)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Lodge_183_28" unique_id=1451576170]
 texture = ExtResource("5_plp7l")
-offset = Vector2(0, -19)
+offset = Vector2(0, -38)
 script = ExtResource("6_4h6bk")
 
 [node name="Lodge_186_32" type="Sprite2D" parent="Buildings" unique_id=1503885343]
-position = Vector2(2976, 524)
+position = Vector2(5952, 1048)
 texture = ExtResource("4_q3rd1")
-offset = Vector2(0, -19)
+offset = Vector2(0, -38)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Lodge_186_32" unique_id=1269303234]
 texture = ExtResource("5_plp7l")
-offset = Vector2(0, -19)
+offset = Vector2(0, -38)
 script = ExtResource("6_4h6bk")
 
 [node name="Lodge_162_44" type="Sprite2D" parent="Buildings" unique_id=93604194]
-position = Vector2(2592, 716)
+position = Vector2(5184, 1432)
 texture = ExtResource("4_q3rd1")
-offset = Vector2(0, -19)
+offset = Vector2(0, -38)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Lodge_162_44" unique_id=383471205]
 texture = ExtResource("5_plp7l")
-offset = Vector2(0, -19)
+offset = Vector2(0, -38)
 script = ExtResource("6_4h6bk")
 
 [node name="Lodge_162_49" type="Sprite2D" parent="Buildings" unique_id=1090286179]
-position = Vector2(2600, 796)
+position = Vector2(5200, 1592)
 texture = ExtResource("4_q3rd1")
-offset = Vector2(0, -19)
+offset = Vector2(0, -38)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Lodge_162_49" unique_id=1923310665]
 texture = ExtResource("5_plp7l")
-offset = Vector2(0, -19)
+offset = Vector2(0, -38)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_185_26" type="Sprite2D" parent="Buildings" unique_id=358443951]
 modulate = Color(0.936598, 0.936598, 0.919926, 1)
-position = Vector2(2968, 428)
+position = Vector2(5936, 856)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_185_26" unique_id=1642525412]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_176_27" type="Sprite2D" parent="Buildings" unique_id=1000972961]
 modulate = Color(0.9518507, 0.9518507, 0.9397466, 1)
-position = Vector2(2824, 444)
+position = Vector2(5648, 888)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_176_27" unique_id=786027075]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_179_27" type="Sprite2D" parent="Buildings" unique_id=221104668]
 modulate = Color(0.934221, 0.934221, 0.9168511, 1)
-position = Vector2(2872, 444)
+position = Vector2(5744, 888)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_179_27" unique_id=2116128836]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_186_28" type="Sprite2D" parent="Buildings" unique_id=494659352]
 modulate = Color(0.9342104, 0.9342104, 0.9168374, 1)
-position = Vector2(2984, 460)
+position = Vector2(5968, 920)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_186_28" unique_id=2057637923]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_175_29" type="Sprite2D" parent="Buildings" unique_id=1450897096]
 modulate = Color(1.0249991, 1.0249991, 1.0369571, 1)
-position = Vector2(2808, 476)
+position = Vector2(5616, 952)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_175_29" unique_id=1872194546]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_178_29" type="Sprite2D" parent="Buildings" unique_id=1196067846]
 modulate = Color(0.935288, 0.935288, 0.9182309, 1)
-position = Vector2(2856, 476)
+position = Vector2(5712, 952)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_178_29" unique_id=2047596991]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_189_29" type="Sprite2D" parent="Buildings" unique_id=1912578115]
 modulate = Color(1.0300405, 1.0300405, 1.0437883, 1)
-position = Vector2(3032, 476)
+position = Vector2(6064, 952)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_189_29" unique_id=851697599]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_176_31" type="Sprite2D" parent="Buildings" unique_id=1615924406]
 modulate = Color(0.95138013, 0.95138013, 0.93913275, 1)
-position = Vector2(2824, 508)
+position = Vector2(5648, 1016)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_176_31" unique_id=339711556]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_179_31" type="Sprite2D" parent="Buildings" unique_id=1892053632]
 modulate = Color(1.0392697, 1.0392697, 1.056338, 1)
-position = Vector2(2872, 508)
+position = Vector2(5744, 1016)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_179_31" unique_id=181554289]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_183_31" type="Sprite2D" parent="Buildings" unique_id=2073368036]
 modulate = Color(0.9361849, 0.9361849, 0.9193913, 1)
-position = Vector2(2936, 508)
+position = Vector2(5872, 1016)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_183_31" unique_id=1515562061]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_188_31" type="Sprite2D" parent="Buildings" unique_id=194654354]
 modulate = Color(1.0242764, 1.0242764, 1.0359793, 1)
-position = Vector2(3016, 508)
+position = Vector2(6032, 1016)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_188_31" unique_id=183108924]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_191_31" type="Sprite2D" parent="Buildings" unique_id=1253861631]
 modulate = Color(0.9436958, 0.9436958, 0.9291301, 1)
-position = Vector2(3064, 508)
+position = Vector2(6128, 1016)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_191_31" unique_id=2120102592]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_194_31" type="Sprite2D" parent="Buildings" unique_id=1117434379]
 modulate = Color(0.945579, 0.945579, 0.9315778, 1)
-position = Vector2(3112, 508)
+position = Vector2(6224, 1016)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_194_31" unique_id=1542386517]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_178_33" type="Sprite2D" parent="Buildings" unique_id=769476508]
 modulate = Color(1.0273654, 1.0273654, 1.0401614, 1)
-position = Vector2(2856, 540)
+position = Vector2(5712, 1080)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_178_33" unique_id=1709882137]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_181_33" type="Sprite2D" parent="Buildings" unique_id=1917216376]
 modulate = Color(0.9663, 0.9663, 0.95866627, 1)
-position = Vector2(2904, 540)
+position = Vector2(5808, 1080)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_181_33" unique_id=1608824334]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_188_33" type="Sprite2D" parent="Buildings" unique_id=971740061]
 modulate = Color(1.003706, 1.003706, 1.0082916, 1)
-position = Vector2(3016, 540)
+position = Vector2(6032, 1080)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_188_33" unique_id=405155984]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_191_33" type="Sprite2D" parent="Buildings" unique_id=1583114642]
 modulate = Color(1.0326751, 1.0326751, 1.047365, 1)
-position = Vector2(3064, 540)
+position = Vector2(6128, 1080)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_191_33" unique_id=933034882]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_194_33" type="Sprite2D" parent="Buildings" unique_id=116789975]
 modulate = Color(0.9431294, 0.9431294, 0.92839444, 1)
-position = Vector2(3112, 540)
+position = Vector2(6224, 1080)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_194_33" unique_id=2010671720]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_184_35" type="Sprite2D" parent="Buildings" unique_id=251752952]
 modulate = Color(0.93617517, 0.93617517, 0.9193787, 1)
-position = Vector2(2952, 572)
+position = Vector2(5904, 1144)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_184_35" unique_id=102395749]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_194_35" type="Sprite2D" parent="Buildings" unique_id=179726850]
 modulate = Color(0.99562484, 0.99562484, 0.9974916, 1)
-position = Vector2(3112, 572)
+position = Vector2(6224, 1144)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_194_35" unique_id=1567706057]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_190_36" type="Sprite2D" parent="Buildings" unique_id=1040551812]
 modulate = Color(0.94469553, 0.94469553, 0.9304293, 1)
-position = Vector2(3048, 588)
+position = Vector2(6096, 1176)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_190_36" unique_id=2018808206]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_193_37" type="Sprite2D" parent="Buildings" unique_id=1973207966]
 modulate = Color(0.9722382, 0.9722382, 0.966482, 1)
-position = Vector2(3096, 604)
+position = Vector2(6192, 1208)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_193_37" unique_id=765133213]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_196_37" type="Sprite2D" parent="Buildings" unique_id=566231054]
 modulate = Color(0.9676007, 0.9676007, 0.96037614, 1)
-position = Vector2(3144, 604)
+position = Vector2(6288, 1208)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_196_37" unique_id=428687723]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_207_37" type="Sprite2D" parent="Buildings" unique_id=1714687756]
 modulate = Color(0.9415017, 0.9415017, 0.9262812, 1)
-position = Vector2(3320, 604)
+position = Vector2(6640, 1208)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_207_37" unique_id=672065051]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_211_37" type="Sprite2D" parent="Buildings" unique_id=1409519518]
 modulate = Color(1.0155302, 1.0155302, 1.0241724, 1)
-position = Vector2(3384, 604)
+position = Vector2(6768, 1208)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_211_37" unique_id=1161835136]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_256_37" type="Sprite2D" parent="Buildings" unique_id=810628920]
 modulate = Color(1.0197562, 1.0197562, 1.0298709, 1)
-position = Vector2(4104, 604)
+position = Vector2(8208, 1208)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_256_37" unique_id=872436568]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_168_39" type="Sprite2D" parent="Buildings" unique_id=1723511873]
 modulate = Color(1.0258714, 1.0258714, 1.0381378, 1)
-position = Vector2(2696, 636)
+position = Vector2(5392, 1272)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_168_39" unique_id=995205372]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_194_39" type="Sprite2D" parent="Buildings" unique_id=1194014335]
 modulate = Color(0.9489668, 0.9489668, 0.93598706, 1)
-position = Vector2(3112, 636)
+position = Vector2(6224, 1272)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_194_39" unique_id=1162437232]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_213_39" type="Sprite2D" parent="Buildings" unique_id=1383538822]
 modulate = Color(0.98238164, 0.98238164, 0.97988695, 1)
-position = Vector2(3416, 636)
+position = Vector2(6832, 1272)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_213_39" unique_id=1608107635]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_173_40" type="Sprite2D" parent="Buildings" unique_id=1316543647]
 modulate = Color(0.93338335, 0.93338335, 0.9157683, 1)
-position = Vector2(2776, 652)
+position = Vector2(5552, 1304)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_173_40" unique_id=1580146250]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_164_41" type="Sprite2D" parent="Buildings" unique_id=427679037]
 modulate = Color(1.0270997, 1.0270997, 1.0398015, 1)
-position = Vector2(2632, 668)
+position = Vector2(5264, 1336)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_164_41" unique_id=828919011]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_167_41" type="Sprite2D" parent="Buildings" unique_id=1090043640]
 modulate = Color(0.97728884, 0.97728884, 0.973148, 1)
-position = Vector2(2680, 668)
+position = Vector2(5360, 1336)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_167_41" unique_id=919947771]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_191_42" type="Sprite2D" parent="Buildings" unique_id=2020442901]
 modulate = Color(1.0374777, 1.0374777, 1.0538968, 1)
-position = Vector2(3064, 684)
+position = Vector2(6128, 1368)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_191_42" unique_id=423703782]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_164_43" type="Sprite2D" parent="Buildings" unique_id=844061816]
 modulate = Color(0.9391149, 0.9391149, 0.92318594, 1)
-position = Vector2(2632, 700)
+position = Vector2(5264, 1400)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_164_43" unique_id=1430849452]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_225_43" type="Sprite2D" parent="Buildings" unique_id=1003647370]
 modulate = Color(0.9606792, 0.9606792, 0.95128983, 1)
-position = Vector2(3608, 700)
+position = Vector2(7216, 1400)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_225_43" unique_id=1663325739]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_159_45" type="Sprite2D" parent="Buildings" unique_id=807165543]
 modulate = Color(0.97160393, 0.97160393, 0.9656461, 1)
-position = Vector2(2552, 732)
+position = Vector2(5104, 1464)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_159_45" unique_id=155850656]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_202_45" type="Sprite2D" parent="Buildings" unique_id=1663484117]
 modulate = Color(0.93087745, 0.93087745, 0.9125322, 1)
-position = Vector2(3240, 732)
+position = Vector2(6480, 1464)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_202_45" unique_id=816630455]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_229_45" type="Sprite2D" parent="Buildings" unique_id=1307933911]
 modulate = Color(0.9340591, 0.9340591, 0.9166417, 1)
-position = Vector2(3672, 732)
+position = Vector2(7344, 1464)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_229_45" unique_id=1478953333]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_245_45" type="Sprite2D" parent="Buildings" unique_id=2142442602]
 modulate = Color(1.0382519, 1.0382519, 1.0549511, 1)
-position = Vector2(3928, 732)
+position = Vector2(7856, 1464)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_245_45" unique_id=2066790848]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_197_46" type="Sprite2D" parent="Buildings" unique_id=1424365545]
 modulate = Color(0.99330944, 0.99330944, 0.9944052, 1)
-position = Vector2(3160, 748)
+position = Vector2(6320, 1496)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_197_46" unique_id=539136173]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_232_46" type="Sprite2D" parent="Buildings" unique_id=777300915]
 modulate = Color(0.9837459, 0.9837459, 0.98169506, 1)
-position = Vector2(3720, 748)
+position = Vector2(7440, 1496)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_232_46" unique_id=1338889931]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_165_47" type="Sprite2D" parent="Buildings" unique_id=810493330]
 modulate = Color(0.9566041, 0.9566041, 0.9459553, 1)
-position = Vector2(2648, 764)
+position = Vector2(5296, 1528)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_165_47" unique_id=1484215085]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_200_47" type="Sprite2D" parent="Buildings" unique_id=1417969907]
 modulate = Color(0.95035547, 0.95035547, 0.93779665, 1)
-position = Vector2(3208, 764)
+position = Vector2(6416, 1528)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_200_47" unique_id=1404525378]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_222_47" type="Sprite2D" parent="Buildings" unique_id=1824622297]
 modulate = Color(1.013537, 1.013537, 1.0214889, 1)
-position = Vector2(3560, 764)
+position = Vector2(7120, 1528)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_222_47" unique_id=166677510]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_225_47" type="Sprite2D" parent="Buildings" unique_id=798582626]
 modulate = Color(0.94622266, 0.94622266, 0.93241495, 1)
-position = Vector2(3608, 764)
+position = Vector2(7216, 1528)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_225_47" unique_id=1740483844]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_195_48" type="Sprite2D" parent="Buildings" unique_id=111613278]
 modulate = Color(1.0014488, 1.0014488, 1.0052706, 1)
-position = Vector2(3128, 780)
+position = Vector2(6256, 1560)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_195_48" unique_id=1840189729]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_198_49" type="Sprite2D" parent="Buildings" unique_id=496965700]
 modulate = Color(0.951406, 0.951406, 0.9391665, 1)
-position = Vector2(3176, 796)
+position = Vector2(6352, 1592)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(96, 96, 32, 48)
+region_rect = Rect2(192, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_198_49" unique_id=376200154]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(96, 96, 32, 48)
+region_rect = Rect2(192, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_201_49" type="Sprite2D" parent="Buildings" unique_id=333691585]
 modulate = Color(1.0160795, 1.0160795, 1.0249126, 1)
-position = Vector2(3224, 796)
+position = Vector2(6448, 1592)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_201_49" unique_id=1862082705]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_225_49" type="Sprite2D" parent="Buildings" unique_id=2121774100]
 modulate = Color(0.94133455, 0.94133455, 0.9260644, 1)
-position = Vector2(3608, 796)
+position = Vector2(7216, 1592)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_225_49" unique_id=404290397]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_153_50" type="Sprite2D" parent="Buildings" unique_id=768034413]
 modulate = Color(0.9825317, 0.9825317, 0.98008585, 1)
-position = Vector2(2456, 812)
+position = Vector2(4912, 1624)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_153_50" unique_id=1098058639]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_195_50" type="Sprite2D" parent="Buildings" unique_id=971438950]
 modulate = Color(1.0335108, 1.0335108, 1.0485005, 1)
-position = Vector2(3128, 812)
+position = Vector2(6256, 1624)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(96, 96, 32, 48)
+region_rect = Rect2(192, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_195_50" unique_id=532077955]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(96, 96, 32, 48)
+region_rect = Rect2(192, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_159_51" type="Sprite2D" parent="Buildings" unique_id=193558299]
 modulate = Color(1.0461174, 1.0461174, 1.0656859, 1)
-position = Vector2(2552, 828)
+position = Vector2(5104, 1656)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_159_51" unique_id=263181704]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_176_51" type="Sprite2D" parent="Buildings" unique_id=365113373]
 modulate = Color(1.0050049, 1.0050049, 1.0100315, 1)
-position = Vector2(2824, 828)
+position = Vector2(5648, 1656)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_176_51" unique_id=819409268]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_198_51" type="Sprite2D" parent="Buildings" unique_id=677646846]
 modulate = Color(0.9512349, 0.9512349, 0.9389433, 1)
-position = Vector2(3176, 828)
+position = Vector2(6352, 1656)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(96, 96, 32, 48)
+region_rect = Rect2(192, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_198_51" unique_id=1233682940]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(96, 96, 32, 48)
+region_rect = Rect2(192, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_201_51" type="Sprite2D" parent="Buildings" unique_id=2020769005]
 modulate = Color(0.99961704, 0.99961704, 1.0028214, 1)
-position = Vector2(3224, 828)
+position = Vector2(6448, 1656)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_201_51" unique_id=1819827961]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_223_51" type="Sprite2D" parent="Buildings" unique_id=1135308781]
 modulate = Color(0.948517, 0.948517, 0.93540126, 1)
-position = Vector2(3576, 828)
+position = Vector2(7152, 1656)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_223_51" unique_id=59428323]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_227_51" type="Sprite2D" parent="Buildings" unique_id=982470141]
 modulate = Color(0.95527303, 0.95527303, 0.9442151, 1)
-position = Vector2(3640, 828)
+position = Vector2(7280, 1656)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_227_51" unique_id=1883307144]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_230_51" type="Sprite2D" parent="Buildings" unique_id=11742084]
 modulate = Color(0.94764835, 0.94764835, 0.9342702, 1)
-position = Vector2(3688, 828)
+position = Vector2(7376, 1656)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_230_51" unique_id=178571473]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_202_53" type="Sprite2D" parent="Buildings" unique_id=1316482685]
 modulate = Color(0.9699838, 0.9699838, 0.963512, 1)
-position = Vector2(3240, 860)
+position = Vector2(6480, 1720)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(96, 96, 32, 48)
+region_rect = Rect2(192, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_202_53" unique_id=1126582319]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(96, 96, 32, 48)
+region_rect = Rect2(192, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_224_53" type="Sprite2D" parent="Buildings" unique_id=1730094155]
 modulate = Color(1.0143238, 1.0143238, 1.022548, 1)
-position = Vector2(3592, 860)
+position = Vector2(7184, 1720)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_224_53" unique_id=288283179]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_225_55" type="Sprite2D" parent="Buildings" unique_id=548060982]
 modulate = Color(1.0343714, 1.0343714, 1.0496701, 1)
-position = Vector2(3608, 892)
+position = Vector2(7216, 1784)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_225_55" unique_id=158655398]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_209_56" type="Sprite2D" parent="Buildings" unique_id=1484048073]
 modulate = Color(0.9747941, 0.9747941, 0.9698532, 1)
-position = Vector2(3352, 908)
+position = Vector2(6704, 1816)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_209_56" unique_id=595590491]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_213_56" type="Sprite2D" parent="Buildings" unique_id=1037577674]
 modulate = Color(0.958747, 0.958747, 0.94875914, 1)
-position = Vector2(3416, 908)
+position = Vector2(6832, 1816)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_213_56" unique_id=1921424582]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_221_56" type="Sprite2D" parent="Buildings" unique_id=1710536827]
 modulate = Color(1.0274147, 1.0274147, 1.0402281, 1)
-position = Vector2(3544, 908)
+position = Vector2(7088, 1816)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_221_56" unique_id=310019317]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_205_57" type="Sprite2D" parent="Buildings" unique_id=841481816]
 modulate = Color(0.99292916, 0.99292916, 0.9938987, 1)
-position = Vector2(3288, 924)
+position = Vector2(6576, 1848)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_205_57" unique_id=960398342]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_224_57" type="Sprite2D" parent="Buildings" unique_id=1332668344]
 modulate = Color(1.043872, 1.043872, 1.0626172, 1)
-position = Vector2(3592, 924)
+position = Vector2(7184, 1848)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_224_57" unique_id=1370178084]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_208_58" type="Sprite2D" parent="Buildings" unique_id=930064926]
 modulate = Color(0.94652945, 0.94652945, 0.93281406, 1)
-position = Vector2(3336, 940)
+position = Vector2(6672, 1880)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_208_58" unique_id=1039198493]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_211_58" type="Sprite2D" parent="Buildings" unique_id=1763286490]
 modulate = Color(1.0182189, 1.0182189, 1.0277965, 1)
-position = Vector2(3384, 940)
+position = Vector2(6768, 1880)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_211_58" unique_id=388852029]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_221_58" type="Sprite2D" parent="Buildings" unique_id=602919967]
 modulate = Color(1.021481, 1.021481, 1.0322001, 1)
-position = Vector2(3544, 940)
+position = Vector2(7088, 1880)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(96, 96, 32, 48)
+region_rect = Rect2(192, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_221_58" unique_id=1564657502]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(96, 96, 32, 48)
+region_rect = Rect2(192, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_204_59" type="Sprite2D" parent="Buildings" unique_id=1002899863]
 modulate = Color(0.99857736, 0.99857736, 1.0014324, 1)
-position = Vector2(3272, 956)
+position = Vector2(6544, 1912)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_204_59" unique_id=1438056994]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_224_59" type="Sprite2D" parent="Buildings" unique_id=1779966611]
 modulate = Color(1.0335563, 1.0335563, 1.0485624, 1)
-position = Vector2(3592, 956)
+position = Vector2(7184, 1912)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_224_59" unique_id=176295845]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_207_60" type="Sprite2D" parent="Buildings" unique_id=1551552412]
 modulate = Color(1.0329287, 1.0329287, 1.0477093, 1)
-position = Vector2(3320, 972)
+position = Vector2(6640, 1944)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_207_60" unique_id=1982623396]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_210_60" type="Sprite2D" parent="Buildings" unique_id=1440583761]
 modulate = Color(0.94412726, 0.94412726, 0.92969066, 1)
-position = Vector2(3368, 972)
+position = Vector2(6736, 1944)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_210_60" unique_id=906192906]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_214_60" type="Sprite2D" parent="Buildings" unique_id=730034567]
 modulate = Color(0.9593775, 0.9593775, 0.9495847, 1)
-position = Vector2(3432, 972)
+position = Vector2(6864, 1944)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_214_60" unique_id=1237618861]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_217_60" type="Sprite2D" parent="Buildings" unique_id=1286934270]
 modulate = Color(0.9524915, 0.9524915, 0.9405827, 1)
-position = Vector2(3480, 972)
+position = Vector2(6960, 1944)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_217_60" unique_id=618596489]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_220_60" type="Sprite2D" parent="Buildings" unique_id=80503733]
 modulate = Color(0.9402598, 0.9402598, 0.9246703, 1)
-position = Vector2(3528, 972)
+position = Vector2(7056, 1944)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_220_60" unique_id=2095651402]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_227_60" type="Sprite2D" parent="Buildings" unique_id=1392162145]
 modulate = Color(0.97432244, 0.97432244, 0.9692308, 1)
-position = Vector2(3640, 972)
+position = Vector2(7280, 1944)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_227_60" unique_id=958358754]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_223_61" type="Sprite2D" parent="Buildings" unique_id=1456190382]
 modulate = Color(0.9657416, 0.9657416, 0.9579324, 1)
-position = Vector2(3576, 988)
+position = Vector2(7152, 1976)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_223_61" unique_id=1620284307]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_211_62" type="Sprite2D" parent="Buildings" unique_id=330904525]
 modulate = Color(1.0455374, 1.0455374, 1.0648929, 1)
-position = Vector2(3384, 1004)
+position = Vector2(6768, 2008)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_211_62" unique_id=480590195]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_214_62" type="Sprite2D" parent="Buildings" unique_id=1185055487]
 modulate = Color(0.9432308, 0.9432308, 0.9285261, 1)
-position = Vector2(3432, 1004)
+position = Vector2(6864, 2008)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_214_62" unique_id=1259094664]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_223_63" type="Sprite2D" parent="Buildings" unique_id=1622252484]
 modulate = Color(1.0063941, 1.0063941, 1.0118939, 1)
-position = Vector2(3576, 1020)
+position = Vector2(7152, 2040)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_223_63" unique_id=1132232270]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_231_63" type="Sprite2D" parent="Buildings" unique_id=984412883]
 modulate = Color(1.0401964, 1.0401964, 1.0576011, 1)
-position = Vector2(3704, 1020)
+position = Vector2(7408, 2040)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_231_63" unique_id=1900900600]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_234_65" type="Sprite2D" parent="Buildings" unique_id=1849952180]
 modulate = Color(0.9900548, 0.9900548, 0.9900729, 1)
-position = Vector2(3752, 1052)
+position = Vector2(7504, 2104)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_234_65" unique_id=1901283500]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_234_67" type="Sprite2D" parent="Buildings" unique_id=1037629490]
 modulate = Color(0.96826893, 0.96826893, 0.9612551, 1)
-position = Vector2(3752, 1084)
+position = Vector2(7504, 2168)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_234_67" unique_id=1094705808]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_237_67" type="Sprite2D" parent="Buildings" unique_id=1559562959]
 modulate = Color(0.9763568, 0.9763568, 0.9719166, 1)
-position = Vector2(3800, 1084)
+position = Vector2(7600, 2168)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_237_67" unique_id=347388574]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_237_69" type="Sprite2D" parent="Buildings" unique_id=1773971037]
 modulate = Color(1.0121198, 1.0121198, 1.0195824, 1)
-position = Vector2(3800, 1116)
+position = Vector2(7600, 2232)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_237_69" unique_id=1440344309]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_235_73" type="Sprite2D" parent="Buildings" unique_id=571029146]
 modulate = Color(1.0319896, 1.0319896, 1.0464338, 1)
-position = Vector2(3768, 1180)
+position = Vector2(7536, 2360)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_235_73" unique_id=2053121370]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_240_76" type="Sprite2D" parent="Buildings" unique_id=1114068996]
 modulate = Color(0.97191954, 0.97191954, 0.966062, 1)
-position = Vector2(3848, 1228)
+position = Vector2(7696, 2456)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_240_76" unique_id=481231977]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_187_77" type="Sprite2D" parent="Buildings" unique_id=1481831908]
 modulate = Color(0.9847841, 0.9847841, 0.983072, 1)
-position = Vector2(3000, 1244)
+position = Vector2(6000, 2488)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_187_77" unique_id=1273469539]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_213_80" type="Sprite2D" parent="Buildings" unique_id=1452497317]
 modulate = Color(0.9767726, 0.9767726, 0.9724659, 1)
-position = Vector2(3416, 1292)
+position = Vector2(6832, 2584)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_213_80" unique_id=1268874192]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_120_82" type="Sprite2D" parent="Buildings" unique_id=372324266]
 modulate = Color(1.0270591, 1.0270591, 1.0397464, 1)
-position = Vector2(1928, 1324)
+position = Vector2(3856, 2648)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_120_82" unique_id=620215612]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_212_82" type="Sprite2D" parent="Buildings" unique_id=819427203]
 modulate = Color(1.0311594, 1.0311594, 1.0453068, 1)
-position = Vector2(3400, 1324)
+position = Vector2(6800, 2648)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_212_82" unique_id=595523041]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_206_84" type="Sprite2D" parent="Buildings" unique_id=1989370688]
 modulate = Color(0.95848066, 0.95848066, 0.94841045, 1)
-position = Vector2(3304, 1356)
+position = Vector2(6608, 2712)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_206_84" unique_id=619580111]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_210_84" type="Sprite2D" parent="Buildings" unique_id=1945826110]
 modulate = Color(0.94198906, 0.94198906, 0.9269138, 1)
-position = Vector2(3368, 1356)
+position = Vector2(6736, 2712)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_210_84" unique_id=1041866425]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_196_86" type="Sprite2D" parent="Buildings" unique_id=1512288557]
 modulate = Color(0.98035, 0.98035, 0.9771965, 1)
-position = Vector2(3144, 1388)
+position = Vector2(6288, 2776)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_196_86" unique_id=2065235230]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_204_88" type="Sprite2D" parent="Buildings" unique_id=1755281691]
 modulate = Color(0.99469817, 0.99469817, 0.99625593, 1)
-position = Vector2(3272, 1420)
+position = Vector2(6544, 2840)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_204_88" unique_id=1687527212]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(160, 96, 32, 48)
+region_rect = Rect2(320, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_241_91" type="Sprite2D" parent="Buildings" unique_id=2086434871]
 modulate = Color(1.025925, 1.025925, 1.0382105, 1)
-position = Vector2(3864, 1468)
+position = Vector2(7728, 2936)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_241_91" unique_id=1247663414]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(192, 96, 32, 48)
+region_rect = Rect2(384, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_209_93" type="Sprite2D" parent="Buildings" unique_id=705242376]
 modulate = Color(1.0118622, 1.0118622, 1.0192361, 1)
-position = Vector2(3352, 1500)
+position = Vector2(6704, 3000)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_209_93" unique_id=599879499]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="Cabin_187_122" type="Sprite2D" parent="Buildings" unique_id=1655296915]
 modulate = Color(0.96447355, 0.96447355, 0.95626706, 1)
-position = Vector2(3000, 1964)
+position = Vector2(6000, 3928)
 texture = ExtResource("7_hdncx")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 
 [node name="Glow" type="Sprite2D" parent="Buildings/Cabin_187_122" unique_id=106538933]
 texture = ExtResource("8_umlbn")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 region_enabled = true
-region_rect = Rect2(128, 96, 32, 48)
+region_rect = Rect2(256, 192, 64, 96)
 script = ExtResource("6_4h6bk")
 
 [node name="OakCanopy" type="TileMapLayer" parent="." unique_id=1313017042]
@@ -2016,415 +2016,415 @@ script = ExtResource("3_q3rd1")
 y_sort_enabled = true
 
 [node name="Sign_Yosemite_Valley" parent="Objects" unique_id=544210696 instance=ExtResource("4_plp7l")]
-position = Vector2(3080, 620)
+position = Vector2(6160, 1240)
 title = "Yosemite Valley"
 text = "Glaciers and the Merced River carved this valley, about seven miles long and a mile wide. Its granite walls rise 3,000 feet and more above a floor near 4,000 feet."
 
 [node name="Sign_Yosemite_Falls" parent="Objects" unique_id=1215118689 instance=ExtResource("4_plp7l")]
-position = Vector2(2744, 588)
+position = Vector2(5488, 1176)
 title = "Yosemite Falls"
 text = "From top to bottom, Yosemite Falls drops 2,425 feet in three parts. It roars in late spring with snowmelt and can dry to a trickle by late summer."
 
 [node name="Sign_Lower_Yosemite_Fall" parent="Objects" unique_id=717276297 instance=ExtResource("4_plp7l")]
-position = Vector2(2680, 476)
+position = Vector2(5360, 952)
 title = "Lower Yosemite Fall"
 text = "Lower Yosemite Fall drops 320 feet. Above it are the middle cascades and Upper Yosemite Fall, which alone falls 1,430 feet."
 
 [node name="Sign_El_Capitan" parent="Objects" unique_id=2050137884 instance=ExtResource("4_plp7l")]
-position = Vector2(1608, 1532)
+position = Vector2(3216, 3064)
 title = "El Capitan"
 text = "El Capitan rises about 3,000 feet from the Valley floor. Climbers first reached the top by the Nose in 1958, after 47 days of climbing spread over 18 months."
 
 [node name="Sign_Tunnel_View" parent="Objects" unique_id=1952581337 instance=ExtResource("4_plp7l")]
-position = Vector2(136, 1852)
+position = Vector2(272, 3704)
 title = "Tunnel View"
 text = "This view opened with the Wawona Tunnel in 1933. El Capitan stands on the left, Bridalveil Fall on the right, and Half Dome in the distance."
 
 [node name="Sign_Bridalveil_Fall" parent="Objects" unique_id=263818919 instance=ExtResource("4_plp7l")]
-position = Vector2(1064, 1756)
+position = Vector2(2128, 3512)
 title = "Bridalveil Fall"
 text = "Bridalveil Fall drops 620 feet and flows all year. On windy days its spray blows sideways across the cliff."
 
 [node name="Sign_The_Merced_River" parent="Objects" unique_id=290762935 instance=ExtResource("4_plp7l")]
-position = Vector2(2584, 1004)
+position = Vector2(5168, 2008)
 title = "The Merced River"
 text = "The Merced flows from the high country through the Valley and on to the San Joaquin River. Congress named it a Wild and Scenic River in 1987."
 
 [node name="Sign_Camp_4" parent="Objects" unique_id=1051218507 instance=ExtResource("4_plp7l")]
-position = Vector2(2504, 764)
+position = Vector2(5008, 1528)
 title = "Camp 4"
 text = "Climbers have camped here since the 1950s, the golden age of big-wall climbing. Camp 4 was added to the National Register of Historic Places in 2003."
 
 [node name="Sign_Curry_Village" parent="Objects" unique_id=1320095308 instance=ExtResource("4_plp7l")]
-position = Vector2(3464, 956)
+position = Vector2(6928, 1912)
 title = "Curry Village"
 text = "David and Jennie Curry opened Camp Curry here in 1899 with just seven tents."
 
 [node name="Sign_Glacier_Point_Apron" parent="Objects" unique_id=1870925923 instance=ExtResource("4_plp7l")]
-position = Vector2(3352, 1036)
+position = Vector2(6704, 2072)
 title = "Glacier Point Apron"
 text = "Smooth, low-angle granite slabs sweep up from here toward Glacier Point. The rim is 3,200 feet above you."
 
 [node name="Sign_Happy_Isles" parent="Objects" unique_id=1527282740 instance=ExtResource("4_plp7l")]
-position = Vector2(3912, 1148)
+position = Vector2(7824, 2296)
 title = "Happy Isles"
 text = "The John Muir Trail starts here and runs about 211 miles to the summit of Mount Whitney."
 
 [node name="Sign_Mirror_Lake" parent="Objects" unique_id=1530766941 instance=ExtResource("4_plp7l")]
-position = Vector2(4120, 540)
+position = Vector2(8240, 1080)
 title = "Mirror Lake"
 text = "Tenaya Creek forms this seasonal lake below Half Dome. It is slowly filling with sand and gravel, and by late summer it is often a meadow."
 
 [node name="Sign_The_Ahwahnee" parent="Objects" unique_id=1610986659 instance=ExtResource("4_plp7l")]
-position = Vector2(3384, 636)
+position = Vector2(6768, 1272)
 title = "The Ahwahnee"
 text = "The Ahwahnee opened in 1927. To resist fire, its builders used stone and concrete stained to look like redwood."
 
 [node name="Sign_Yosemite_Valley_Chapel" parent="Objects" unique_id=2010226883 instance=ExtResource("4_plp7l")]
-position = Vector2(2840, 828)
+position = Vector2(5680, 1656)
 title = "Yosemite Valley Chapel"
 text = "The chapel was built in 1879 and moved to this spot in 1901."
 
 [node name="Sign_Lamon_Orchard" parent="Objects" unique_id=1930126042 instance=ExtResource("4_plp7l")]
-position = Vector2(3592, 1052)
+position = Vector2(7184, 2104)
 title = "Lamon Orchard"
 text = "In the 1860s, homesteader James Lamon planted apple trees near here. Some of his orchard still grows beside Curry Village."
 
 [node name="Travel_Yosemite_Village_Parking" parent="Objects" unique_id=1585990593 instance=ExtResource("6_hdncx")]
-position = Vector2(3032, 700)
+position = Vector2(6064, 1400)
 label = "Yosemite Village Parking"
 
 [node name="Travel_Curry_Village_Parking" parent="Objects" unique_id=777642155 instance=ExtResource("6_hdncx")]
-position = Vector2(3464, 924)
+position = Vector2(6928, 1848)
 label = "Curry Village Parking"
 
 [node name="Door_Lamon_Homestead" parent="Objects" unique_id=30927176 instance=ExtResource("8_27omh")]
-position = Vector2(3544, 1020)
+position = Vector2(7088, 2040)
 label = "Lamon Homestead"
 target_region = "lamon_homestead"
 target_spawn = "gate"
 
 [node name="Door_Yosemite_Village" parent="Objects" unique_id=507534468 instance=ExtResource("8_27omh")]
-position = Vector2(3048, 668)
+position = Vector2(6096, 1336)
 label = "Yosemite Village"
 target_region = "yosemite_village"
 target_spawn = "arrival"
 
 [node name="Door_Camp_4" parent="Objects" unique_id=1021389719 instance=ExtResource("8_27omh")]
-position = Vector2(2472, 764)
+position = Vector2(4944, 1528)
 label = "Camp 4"
 target_region = "yosemite_village"
 target_spawn = "camp_4"
 
 [node name="Door_Cooks_Meadow_and_the_Village" parent="Objects" unique_id=1830246430 instance=ExtResource("8_27omh")]
-position = Vector2(2776, 572)
+position = Vector2(5552, 1144)
 label = "Cook's Meadow and the Village"
 target_region = "yosemite_village"
 target_spawn = "cooks_meadow"
 
 [node name="Shuttle_Curry_Village" parent="Objects" unique_id=1333494725 instance=ExtResource("10_4c77h")]
-position = Vector2(3448, 1020)
+position = Vector2(6896, 2040)
 stop_name = "Curry Village"
 
 [node name="Shuttle_Happy_Isles" parent="Objects" unique_id=33672648 instance=ExtResource("10_4c77h")]
-position = Vector2(3864, 1148)
+position = Vector2(7728, 2296)
 stop_name = "Happy Isles"
 
 [node name="Shuttle_Mirror_Lake_Trailhead" parent="Objects" unique_id=342742812 instance=ExtResource("10_4c77h")]
-position = Vector2(3816, 876)
+position = Vector2(7632, 1752)
 stop_name = "Mirror Lake Trailhead"
 
 [node name="Shuttle_El_Capitan_Meadow" parent="Objects" unique_id=168742149 instance=ExtResource("10_4c77h")]
-position = Vector2(1560, 1516)
+position = Vector2(3120, 3032)
 stop_name = "El Capitan Meadow"
 
 [node name="Places" type="Node2D" parent="." unique_id=1505521253]
 
 [node name="Yosemite_Village" type="Marker2D" parent="Places" unique_id=436974087]
-position = Vector2(2981.0222, 545.3721)
+position = Vector2(5962.0444, 1090.7442)
 script = ExtResource("12_v2hfx")
 display_name = "Yosemite Village"
-radius = 99.55555555555556
+radius = 199.1111
 show_on_map = true
 
 [node name="Cooks_Meadow" type="Marker2D" parent="Places" unique_id=1026255256]
-position = Vector2(2866.2488, 667.3109)
+position = Vector2(5732.4976, 1334.6218)
 script = ExtResource("12_v2hfx")
 display_name = "Cook's Meadow"
-radius = 92.44444444444444
+radius = 184.8889
 show_on_map = true
 
 [node name="Leidig_Meadow" type="Marker2D" parent="Places" unique_id=1612549818]
-position = Vector2(2452.3477, 950.6306)
+position = Vector2(4904.6954, 1901.2612)
 script = ExtResource("12_v2hfx")
 display_name = "Leidig Meadow"
-radius = 78.22222222222223
+radius = 156.4444
 
 [node name="El_Capitan_Meadow" type="Marker2D" parent="Places" unique_id=1025082671]
-position = Vector2(1447.8422, 1546.9268)
+position = Vector2(2895.6844, 3093.8536)
 script = ExtResource("12_v2hfx")
 display_name = "El Capitan Meadow"
-radius = 106.66666666666669
+radius = 213.3333
 show_on_map = true
 
 [node name="Bridalveil_Fall" type="Marker2D" parent="Places" unique_id=700882684]
-position = Vector2(1056.6565, 1752.1152)
+position = Vector2(2113.313, 3504.2304)
 script = ExtResource("12_v2hfx")
 display_name = "Bridalveil Fall"
-radius = 88.88888888888889
+radius = 177.7778
 show_on_map = true
 
 [node name="Tunnel_View" type="Marker2D" parent="Places" unique_id=921142506]
-position = Vector2(159.99014, 1832.2035)
+position = Vector2(319.9803, 3664.407)
 script = ExtResource("12_v2hfx")
 display_name = "Tunnel View"
-radius = 56.888888888888886
+radius = 113.7778
 show_on_map = true
 
 [node name="Valley_View" type="Marker2D" parent="Places" unique_id=1034429755]
-position = Vector2(630.79974, 1764.9113)
+position = Vector2(1261.5995, 3529.8226)
 script = ExtResource("12_v2hfx")
 display_name = "Valley View"
-radius = 53.333333333333336
+radius = 106.6667
 
 [node name="Yosemite_Valley_Lodge" type="Marker2D" parent="Places" unique_id=1365098535]
-position = Vector2(2617.0952, 724.8179)
+position = Vector2(5234.1904, 1449.6358)
 script = ExtResource("12_v2hfx")
 display_name = "Yosemite Valley Lodge"
-radius = 71.11111111111111
+radius = 142.2222
 
 [node name="Camp_4" type="Marker2D" parent="Places" unique_id=2098086343]
-position = Vector2(2502.561, 780.81946)
+position = Vector2(5005.122, 1561.6389)
 script = ExtResource("12_v2hfx")
 display_name = "Camp 4"
-radius = 53.333333333333336
+radius = 106.6667
 show_on_map = true
 
 [node name="Lower_Yosemite_Fall" type="Marker2D" parent="Places" unique_id=1375126833]
-position = Vector2(2696.241, 476.4239)
+position = Vector2(5392.482, 952.8478)
 script = ExtResource("12_v2hfx")
 display_name = "Lower Yosemite Fall"
-radius = 60.44444444444444
+radius = 120.8889
 show_on_map = true
 
 [node name="The_Ahwahnee" type="Marker2D" parent="Places" unique_id=612195768]
-position = Vector2(3375.5554, 623.6538)
+position = Vector2(6751.1108, 1247.3076)
 script = ExtResource("12_v2hfx")
 display_name = "The Ahwahnee"
-radius = 56.888888888888886
+radius = 113.7778
 show_on_map = true
 
 [node name="Ahwahnee_Meadow" type="Marker2D" parent="Places" unique_id=1873947665]
-position = Vector2(3273.933, 611.761)
+position = Vector2(6547.866, 1223.522)
 script = ExtResource("12_v2hfx")
 display_name = "Ahwahnee Meadow"
 
 [node name="Curry_Village" type="Marker2D" parent="Places" unique_id=371249707]
-position = Vector2(3403.053, 943.7057)
+position = Vector2(6806.106, 1887.4114)
 script = ExtResource("12_v2hfx")
 display_name = "Curry Village"
-radius = 85.33333333333333
+radius = 170.6667
 show_on_map = true
 
 [node name="Glacier_Point_Apron" type="Marker2D" parent="Places" unique_id=1293927999]
-position = Vector2(3347.101, 1057.6659)
+position = Vector2(6694.202, 2115.3318)
 script = ExtResource("12_v2hfx")
 display_name = "Glacier Point Apron"
-radius = 53.333333333333336
+radius = 106.6667
 
 [node name="Stoneman_Meadow" type="Marker2D" parent="Places" unique_id=1335572004]
-position = Vector2(3483.8726, 844.3481)
+position = Vector2(6967.7452, 1688.6962)
 script = ExtResource("12_v2hfx")
 display_name = "Stoneman Meadow"
 
 [node name="Housekeeping_Camp" type="Marker2D" parent="Places" unique_id=549583924]
-position = Vector2(3202.9172, 804.4545)
+position = Vector2(6405.8344, 1608.909)
 script = ExtResource("12_v2hfx")
 display_name = "Housekeeping Camp"
-radius = 53.333333333333336
+radius = 106.6667
 
 [node name="Happy_Isles" type="Marker2D" parent="Places" unique_id=125415203]
-position = Vector2(3893.2307, 1151.4534)
+position = Vector2(7786.4614, 2302.9068)
 script = ExtResource("12_v2hfx")
 display_name = "Happy Isles"
-radius = 78.22222222222223
+radius = 156.4444
 show_on_map = true
 
 [node name="Mirror_Lake" type="Marker2D" parent="Places" unique_id=844772144]
-position = Vector2(4147.406, 534.6836)
+position = Vector2(8294.812, 1069.3672)
 script = ExtResource("12_v2hfx")
 display_name = "Mirror Lake"
-radius = 78.22222222222223
+radius = 156.4444
 show_on_map = true
 
 [node name="Upper_Pines" type="Marker2D" parent="Places" unique_id=996467657]
-position = Vector2(3718.4404, 1034.3319)
+position = Vector2(7436.8808, 2068.6638)
 script = ExtResource("12_v2hfx")
 display_name = "Upper Pines"
-radius = 71.11111111111111
+radius = 142.2222
 
 [node name="Lower_Pines" type="Marker2D" parent="Places" unique_id=1944161751]
-position = Vector2(3576.1694, 843.5954)
+position = Vector2(7152.3388, 1687.1908)
 script = ExtResource("12_v2hfx")
 display_name = "Lower Pines"
-radius = 56.888888888888886
+radius = 113.7778
 
 [node name="North_Pines" type="Marker2D" parent="Places" unique_id=148258614]
-position = Vector2(3615.1445, 786.23895)
+position = Vector2(7230.289, 1572.4779)
 script = ExtResource("12_v2hfx")
 display_name = "North Pines"
 
 [node name="Swinging_Bridge" type="Marker2D" parent="Places" unique_id=1141823085]
-position = Vector2(2580.033, 1010.99786)
+position = Vector2(5160.066, 2021.9957)
 script = ExtResource("12_v2hfx")
 display_name = "Swinging Bridge"
-radius = 46.22222222222222
+radius = 92.4444
 
 [node name="Sentinel_Bridge" type="Marker2D" parent="Places" unique_id=1997952087]
-position = Vector2(2891.8337, 702.38715)
+position = Vector2(5783.6674, 1404.7743)
 script = ExtResource("12_v2hfx")
 display_name = "Sentinel Bridge"
-radius = 39.111111111111114
+radius = 78.2222
 
 [node name="Yosemite_Valley_Chapel" type="Marker2D" parent="Places" unique_id=2048200910]
-position = Vector2(2831.5776, 827.939)
+position = Vector2(5663.1552, 1655.878)
 script = ExtResource("12_v2hfx")
 display_name = "Yosemite Valley Chapel"
-radius = 32.0
+radius = 64
 
 [node name="Cathedral_Beach" type="Marker2D" parent="Places" unique_id=1309990869]
-position = Vector2(1785.2278, 1543.0127)
+position = Vector2(3570.4556, 3086.0254)
 script = ExtResource("12_v2hfx")
 display_name = "Cathedral Beach"
-radius = 53.333333333333336
+radius = 106.6667
 
 [node name="Four_Mile_Trailhead" type="Marker2D" parent="Places" unique_id=1726663933]
-position = Vector2(2513.0818, 1106.1403)
+position = Vector2(5026.1636, 2212.2806)
 script = ExtResource("12_v2hfx")
 display_name = "Four Mile Trailhead"
-radius = 32.0
+radius = 64
 
 [node name="Lamon_Orchard" type="Marker2D" parent="Places" unique_id=1675570783]
-position = Vector2(3597.9285, 1057.6659)
+position = Vector2(7195.857, 2115.3318)
 script = ExtResource("12_v2hfx")
 display_name = "Lamon Orchard"
-radius = 53.333333333333336
+radius = 106.6667
 
 [node name="El_Capitan" type="Marker2D" parent="Places" unique_id=944225043]
-position = Vector2(1391.1729, 1096.3551)
+position = Vector2(2782.3458, 2192.7102)
 script = ExtResource("12_v2hfx")
 display_name = "El Capitan"
-radius = 0.0
+radius = 0
 show_banner = false
 show_on_map = true
 
 [node name="Half_Dome" type="Marker2D" parent="Places" unique_id=299323709]
-position = Vector2(4661.9727, 631.3314)
+position = Vector2(9323.9454, 1262.6628)
 script = ExtResource("12_v2hfx")
 display_name = "Half Dome"
-radius = 0.0
+radius = 0
 show_banner = false
 show_on_map = true
 
 [node name="Glacier_Point" type="Marker2D" parent="Places" unique_id=371123608]
-position = Vector2(3395.1624, 1236.359)
+position = Vector2(6790.3248, 2472.718)
 script = ExtResource("12_v2hfx")
 display_name = "Glacier Point"
-radius = 0.0
+radius = 0
 show_banner = false
 show_on_map = true
 
 [node name="Yosemite_Falls" type="Marker2D" parent="Places" unique_id=1861200751]
-position = Vector2(2671.1343, 198.52371)
+position = Vector2(5342.2686, 397.0474)
 script = ExtResource("12_v2hfx")
 display_name = "Yosemite Falls"
-radius = 0.0
+radius = 0
 show_banner = false
 show_on_map = true
 
 [node name="Sentinel_Rock" type="Marker2D" parent="Places" unique_id=1762661314]
-position = Vector2(2743.585, 1307.8663)
+position = Vector2(5487.17, 2615.7326)
 script = ExtResource("12_v2hfx")
 display_name = "Sentinel Rock"
-radius = 0.0
+radius = 0
 show_banner = false
 show_on_map = true
 
 [node name="Cathedral_Rocks" type="Marker2D" parent="Places" unique_id=29976281]
-position = Vector2(1391.6511, 1825.128)
+position = Vector2(2783.3022, 3650.256)
 script = ExtResource("12_v2hfx")
 display_name = "Cathedral Rocks"
-radius = 0.0
+radius = 0
 show_banner = false
 show_on_map = true
 
 [node name="Royal_Arches" type="Marker2D" parent="Places" unique_id=1213885439]
-position = Vector2(3505.8708, 502.16653)
+position = Vector2(7011.7416, 1004.3331)
 script = ExtResource("12_v2hfx")
 display_name = "Royal Arches"
-radius = 0.0
+radius = 0
 show_banner = false
 show_on_map = true
 
 [node name="Three_Brothers" type="Marker2D" parent="Places" unique_id=1275250954]
-position = Vector2(2129.5476, 794.3682)
+position = Vector2(4259.0952, 1588.7364)
 script = ExtResource("12_v2hfx")
 display_name = "Three Brothers"
-radius = 0.0
+radius = 0
 show_banner = false
 show_on_map = true
 
 [node name="Spawns" type="Node2D" parent="." unique_id=222013994]
 
 [node name="arrival" type="Marker2D" parent="Spawns" unique_id=638977211]
-position = Vector2(3048, 696)
+position = Vector2(6096, 1392)
 
 [node name="lamon_homestead" type="Marker2D" parent="Spawns" unique_id=1686663589]
-position = Vector2(3560, 1032)
+position = Vector2(7120, 2064)
 
 [node name="apron_base" type="Marker2D" parent="Spawns" unique_id=71639304]
-position = Vector2(3352, 1048)
+position = Vector2(6704, 2096)
 
 [node name="camp_4" type="Marker2D" parent="Spawns" unique_id=810185271]
-position = Vector2(2488, 776)
+position = Vector2(4976, 1552)
 
 [node name="cooks_meadow" type="Marker2D" parent="Spawns" unique_id=1037325579]
-position = Vector2(2760, 584)
+position = Vector2(5520, 1168)
 
 [node name="curry_village" type="Marker2D" parent="Spawns" unique_id=1427821440]
-position = Vector2(3464, 968)
+position = Vector2(6928, 1936)
 
 [node name="happy_isles" type="Marker2D" parent="Spawns" unique_id=824084836]
-position = Vector2(3896, 1144)
+position = Vector2(7792, 2288)
 
 [node name="mirror_lake" type="Marker2D" parent="Spawns" unique_id=397080173]
-position = Vector2(3832, 872)
+position = Vector2(7664, 1744)
 
 [node name="el_capitan_meadow" type="Marker2D" parent="Spawns" unique_id=1726241761]
-position = Vector2(1608, 1512)
+position = Vector2(3216, 3024)
 
 [node name="yosemite_valley_lodge" type="Marker2D" parent="Spawns" unique_id=1975190693]
-position = Vector2(2632, 728)
+position = Vector2(5264, 1456)
 
 [node name="the_ahwahnee" type="Marker2D" parent="Spawns" unique_id=770858392]
-position = Vector2(3384, 616)
+position = Vector2(6768, 1232)
 
 [node name="tunnel_view" type="Marker2D" parent="Spawns" unique_id=1505813585]
-position = Vector2(152, 1832)
+position = Vector2(304, 3664)
 
 [node name="four_mile_trailhead" type="Marker2D" parent="Spawns" unique_id=35491134]
-position = Vector2(2520, 1112)
+position = Vector2(5040, 2224)
 
 [node name="northside_west" type="Marker2D" parent="Spawns" unique_id=1554052213]
-position = Vector2(2312, 872)
+position = Vector2(4624, 1744)
 
 [node name="southside_sentinel" type="Marker2D" parent="Spawns" unique_id=1041917291]
-position = Vector2(2872, 792)
+position = Vector2(5744, 1584)
 
 [node name="Exits" type="Node2D" parent="." unique_id=1962731939]
 
 [node name="Wawona_Tunnel_west" type="Area2D" parent="Exits" unique_id=2109586649]
-position = Vector2(8, 1832)
+position = Vector2(16, 3664)
 script = ExtResource("13_rx6v6")
 label = "Wawona Tunnel"
 travel_to = "wawona"
@@ -2433,7 +2433,7 @@ travel_to = "wawona"
 shape = SubResource("RectangleShape2D_dgut2")
 
 [node name="Northside_Drive_west" type="Area2D" parent="Exits" unique_id=1745807887]
-position = Vector2(8, 1704)
+position = Vector2(16, 3408)
 script = ExtResource("13_rx6v6")
 label = "Northside Drive"
 travel_to = "el_portal"

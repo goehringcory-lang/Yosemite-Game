@@ -70,6 +70,7 @@ var _slot_chosen_style: StyleBoxFlat
 
 func _ready() -> void:
 	layer = 25
+	UiScale.layer(self)
 	add_to_group("journal")
 	_build_styles()
 	_panel = PanelContainer.new()

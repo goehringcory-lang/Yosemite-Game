@@ -79,6 +79,7 @@ var _scroll := 0.0
 
 func _ready() -> void:
 	layer = 30
+	UiScale.layer(self)
 	add_to_group("credits")
 	_panel = PanelContainer.new()
 	_panel.position = PANEL_POS

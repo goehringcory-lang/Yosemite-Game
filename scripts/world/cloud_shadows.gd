@@ -8,8 +8,8 @@ extends Node2D
 ## indoors.
 
 const SHADER := preload("res://assets/shaders/cloud_shadows.gdshader")
-## How fast the clouds drift, in pixels a second.
-const WIND := Vector2(-4.0, -1.5)
+## How fast the clouds drift, in world pixels a second.
+const WIND := Vector2(-8.0, -3.0)
 const STRENGTH := 0.16
 
 var _drift := Vector2.ZERO
@@ -50,7 +50,7 @@ func _process(delta: float) -> void:
 	if camera:
 		size /= camera.zoom
 		center = camera.get_screen_center_position()
-	var view := Rect2((center - size / 2.0).floor() - Vector2(2, 2), size.ceil() + Vector2(4, 4))
+	var view := Rect2((center - size / 2.0).floor() - Vector2(4, 4), size.ceil() + Vector2(8, 8))
 	if view != _view:
 		_view = view
 		queue_redraw()

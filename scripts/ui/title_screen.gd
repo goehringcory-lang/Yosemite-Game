@@ -46,6 +46,7 @@ var _credits: Credits
 func _ready() -> void:
 	add_to_group("title_screen")
 	size = SCREEN
+	scale = Vector2(UiScale.FACTOR, UiScale.FACTOR)
 	Settings.ensure_loaded()
 	Settings.apply(get_window())
 	_build_background()
@@ -70,6 +71,8 @@ func _ready() -> void:
 func _build_background() -> void:
 	var background := TextureRect.new()
 	background.texture = load(BACKGROUND)
+	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE # the painting is 32px-grade (960x540)
+	background.stretch_mode = TextureRect.STRETCH_SCALE
 	background.size = SCREEN
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)

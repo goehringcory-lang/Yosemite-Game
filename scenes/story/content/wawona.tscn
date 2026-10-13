@@ -10,16 +10,16 @@
 [node name="VisitorStageLady" parent="." instance=ExtResource("1_r")]
 character = ExtResource("2_r")
 spot = "wawona_hotel"
-offset = Vector2(-24, 16)
-wander_radius = 24.0
+offset = Vector2(-48, 32)
+wander_radius = 48
 
 [node name="VisitorStageGent" parent="." instance=ExtResource("1_r")]
 character = ExtResource("3_r")
 spot = "wawona_hotel"
-offset = Vector2(36, 20)
-wander_radius = 24.0
+offset = Vector2(72, 40)
+wander_radius = 48
 
 [node name="SequoiaCone" parent="." instance=ExtResource("4_r")]
-position = Vector2(2472, 2088)
+position = Vector2(4944, 4176)
 item_id = "sequoia_cone"
 found_text = "It lay among the duff at the foot of the Grizzly Giant, one of the thousands of cones the old tree carries. Galen Clark asked for one."

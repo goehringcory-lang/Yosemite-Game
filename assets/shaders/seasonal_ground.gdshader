@@ -40,7 +40,8 @@ void fragment() {
 	rgb = mix(rgb, tint * (0.35 + lum * 1.05), k);
 	rgb = mix(rgb, vec3(dot(rgb, vec3(0.299, 0.587, 0.114))), desaturate * (1.0 - water * 0.7));
 	// frost: small clumps of whitened pixels, mostly on grass, hardly on paving
-	vec2 px = floor(UV / TEXTURE_PIXEL_SIZE);
+	// the art is drawn at 2x, so work in 2x2 blocks of texture pixels
+	vec2 px = floor(floor(UV / TEXTURE_PIXEL_SIZE) * 0.5);
 	float n = hash(floor(px / 3.0)) * 0.65 + hash(px) * 0.35;
 	float cover = frost * (0.08 + 0.92 * grass) * (1.0 - water);
 	float f = step(1.0 - cover, n);

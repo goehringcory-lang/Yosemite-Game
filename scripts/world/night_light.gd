@@ -5,8 +5,8 @@ extends PointLight2D
 
 ## How bright it gets at full night.
 @export var strength := 1.0
-## Radius in pixels.
-@export var radius := 40.0
+## Radius in world pixels.
+@export var radius := 80.0
 ## 0 is steady; higher flickers like a flame.
 @export_range(0.0, 1.0) var flicker := 0.0
 ## Only lit during these hours, from (included) to (excluded), wrapping past

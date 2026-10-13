@@ -19,7 +19,7 @@ const ROWS := {Vector2i.DOWN: 0, Vector2i.UP: 1, Vector2i.LEFT: 2, Vector2i.RIGH
 @export var offset := Vector2.ZERO
 ## How far they stroll from where they start. 0 = stays put.
 @export var wander_radius := 0.0
-@export var walk_speed := 16.0
+@export var walk_speed := 32.0
 ## For someone who moves house during the story (CharacterData.early_home):
 ## which of their two homes this node stands at. They're only here while
 ## they live here.
@@ -51,7 +51,7 @@ const OUT_FROM := 7.0
 ## always find them: at their post first thing, strolling about it through
 ## the middle of the day (up to STROLL px), staying nearer in the evening, and
 ## standing at it again overnight.
-const STROLL := 36.0
+const STROLL := 72.0
 
 
 func _ready() -> void:
@@ -74,7 +74,7 @@ func _ready() -> void:
 		_sprite.texture = character.sprite_sheet
 		_sprite.hframes = 3
 		_sprite.vframes = 4
-		_sprite.offset = Vector2(0, -11)
+		_sprite.offset = Vector2(0, -22)
 		add_child(_sprite)
 	_update_frame(false)
 	queue_redraw()
@@ -157,10 +157,10 @@ func _draw() -> void:
 	if _sprite:
 		return
 	var color := character.color if character else Color.GRAY
-	draw_rect(Rect2(-4, -14, 8, 11), color)
-	draw_circle(Vector2(0, -17), 3.5, Color(0.8, 0.62, 0.48))
-	draw_rect(Rect2(-4, -3, 3, 3), color.darkened(0.4))
-	draw_rect(Rect2(1, -3, 3, 3), color.darkened(0.4))
+	draw_rect(Rect2(-8, -28, 16, 22), color)
+	draw_circle(Vector2(0, -34), 7.0, Color(0.8, 0.62, 0.48))
+	draw_rect(Rect2(-8, -6, 6, 6), color.darkened(0.4))
+	draw_rect(Rect2(2, -6, 6, 6), color.darkened(0.4))
 
 
 ## How far from their spot they wander now: their own wander radius, or for
@@ -186,7 +186,7 @@ func _physics_process(delta: float) -> void:
 	var radius := roam_radius()
 	if radius <= 0.0:
 		# standing at their spot: walk back to it first if they're out
-		if global_position.distance_to(_home) <= 2.0 or _stuck_time > 1.0:
+		if global_position.distance_to(_home) <= 4.0 or _stuck_time > 1.0:
 			if velocity != Vector2.ZERO:
 				velocity = Vector2.ZERO
 				_update_frame(false)
@@ -200,7 +200,7 @@ func _physics_process(delta: float) -> void:
 			_stuck_time = 0.0
 		return
 	var to_target := _target - global_position
-	if to_target.length() < 2.0 or _stuck_time > 1.0:
+	if to_target.length() < 4.0 or _stuck_time > 1.0:
 		velocity = Vector2.ZERO
 		_wait = _rng.randf_range(1.5, 5.0)
 		_update_frame(false)
@@ -280,7 +280,7 @@ func _hop() -> void:
 	if target == self:
 		return
 	var tween := create_tween()
-	tween.tween_property(_sprite, "position:y", -3.0, 0.07).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_sprite, "position:y", -6.0, 0.07).set_ease(Tween.EASE_OUT)
 	tween.tween_property(_sprite, "position:y", 0.0, 0.1).set_ease(Tween.EASE_IN)
 
 

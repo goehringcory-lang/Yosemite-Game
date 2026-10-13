@@ -14,47 +14,47 @@
 [node name="LamonHomesteadStory" type="Node2D"]
 
 [node name="Chuckah" parent="." instance=ExtResource("1_r")]
-position = Vector2(1068, 410)
+position = Vector2(2136, 820)
 texture_empty = ExtResource("6_r")
 texture_built = ExtResource("7_r")
-body_size = Vector2(30, 8)
-reach_size = Vector2(38, 40)
+body_size = Vector2(60, 16)
+reach_size = Vector2(76, 80)
 
 [node name="Campfire" parent="." instance=ExtResource("2_r")]
-position = Vector2(1000, 472)
+position = Vector2(2000, 944)
 station = "campfire"
 display_name = "Campfire"
 texture = ExtResource("8_r")
 frames = 4
 fps = 6.0
-ground_inset = 6
-body_size = Vector2(26, 8)
-reach_size = Vector2(36, 24)
+ground_inset = 12
+body_size = Vector2(52, 16)
+reach_size = Vector2(72, 48)
 
 [node name="BedrockMortar" parent="." instance=ExtResource("2_r")]
-position = Vector2(906, 500)
+position = Vector2(1812, 1000)
 station = "mortar"
 display_name = "Bedrock mortar"
 texture = ExtResource("9_r")
-ground_inset = 5
-body_size = Vector2(50, 10)
-reach_size = Vector2(60, 26)
+ground_inset = 10
+body_size = Vector2(100, 20)
+reach_size = Vector2(120, 52)
 
 [node name="LeachingBasin" parent="." instance=ExtResource("2_r")]
-position = Vector2(1130, 450)
+position = Vector2(2260, 900)
 station = "leaching"
 display_name = "Leaching basin"
 texture = ExtResource("10_r")
-ground_inset = 6
-body_size = Vector2(30, 8)
-reach_size = Vector2(40, 22)
+ground_inset = 12
+body_size = Vector2(60, 16)
+reach_size = Vector2(80, 44)
 
 [node name="GalenClark" parent="." instance=ExtResource("3_r")]
 character = ExtResource("4_r")
 spot = "gate"
-offset = Vector2(24, -16)
+offset = Vector2(48, -32)
 
 [node name="JamesLamon" parent="." instance=ExtResource("3_r")]
 character = ExtResource("5_r")
 spot = "home"
-offset = Vector2(40, 0)
+offset = Vector2(80, 0)

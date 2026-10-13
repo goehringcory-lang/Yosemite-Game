@@ -12,18 +12,18 @@
 
 [node name="RoyalRobbins" parent="." instance=ExtResource("1_r")]
 character = ExtResource("2_r")
-position = Vector2(1028, 238)
+position = Vector2(2056, 476)
 
 [node name="RoyalArches" parent="." instance=ExtResource("3_r")]
-position = Vector2(1004, 226)
+position = Vector2(2008, 452)
 route = ExtResource("4_r")
 
 [node name="ShuttleAhwahnee" parent="." instance=ExtResource("5_r")]
-position = Vector2(824, 764)
+position = Vector2(1648, 1528)
 stop_name = "The Ahwahnee"
 
 [node name="GuardianCaveMouth" parent="." instance=ExtResource("6_r")]
-position = Vector2(1128, 228)
+position = Vector2(2256, 456)
 label = "the gap in the talus"
 target_region = "guardian_cave"
 target_spawn = "door"
@@ -32,4 +32,4 @@ locked_text = "Two fallen blocks lean together at the foot of the Royal Arches, 
 
 [node name="Sprite" parent="GuardianCaveMouth" index="0"]
 texture = ExtResource("7_r")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)

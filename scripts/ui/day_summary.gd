@@ -40,6 +40,7 @@ static func open(from: Node, log: DayLog) -> DaySummary:
 
 func _ready() -> void:
 	layer = 60
+	UiScale.layer(self)
 	add_to_group("day_summary") # the HUD steps back while it's up
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_opened_frame = Engine.get_process_frames()
@@ -53,7 +54,7 @@ func is_open() -> bool:
 
 func _build(log: DayLog) -> void:
 	var root := Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	UiScale.fit(root)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	# the world dims behind the page

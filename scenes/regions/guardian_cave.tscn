@@ -9,13 +9,13 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/cave/cave_room.png" id="7_nbk1j"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_i0vkl"]
-size = Vector2(30, 10)
+size = Vector2(60, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o1kx5"]
-size = Vector2(34, 22)
+size = Vector2(68, 44)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1yuyc"]
-size = Vector2(44, 10)
+size = Vector2(88, 20)
 
 [node name="GuardianCave" type="Node2D" unique_id=756254625]
 y_sort_enabled = true
@@ -49,16 +49,16 @@ script = ExtResource("3_wspqt")
 y_sort_enabled = true
 
 [node name="GuardianMirror" type="StaticBody2D" parent="Entities" unique_id=1362834356]
-position = Vector2(240, 96)
+position = Vector2(480, 192)
 collision_mask = 0
 script = ExtResource("4_gyuyh")
 
 [node name="Sprite" type="Sprite2D" parent="Entities/GuardianMirror" unique_id=219088380]
 texture = ExtResource("5_mvm80")
-offset = Vector2(0, -23)
+offset = Vector2(0, -46)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/GuardianMirror" unique_id=632756274]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_i0vkl")
 
 [node name="Hitbox" type="Area2D" parent="Entities/GuardianMirror" unique_id=1368953198]
@@ -67,26 +67,26 @@ collision_mask = 0
 monitoring = false
 
 [node name="Shape" type="CollisionShape2D" parent="Entities/GuardianMirror/Hitbox" unique_id=1080743368]
-position = Vector2(0, -11)
+position = Vector2(0, -22)
 shape = SubResource("RectangleShape2D_o1kx5")
 
 [node name="Markers" type="Node2D" parent="." unique_id=1669336876]
 
 [node name="door" type="Marker2D" parent="Markers" unique_id=701815561]
-position = Vector2(240, 244)
+position = Vector2(480, 488)
 
 [node name="mirror" type="Marker2D" parent="Markers" unique_id=1987959444]
-position = Vector2(240, 110)
+position = Vector2(480, 220)
 
 [node name="gathering" type="Marker2D" parent="Markers" unique_id=119125429]
-position = Vector2(240, 184)
+position = Vector2(480, 368)
 
 [node name="Places" type="Node2D" parent="." unique_id=1993627758]
 
 [node name="Exits" type="Node2D" parent="." unique_id=123465689]
 
 [node name="ToAhwahnee" type="Area2D" parent="Exits" unique_id=1312725393]
-position = Vector2(240, 268)
+position = Vector2(480, 536)
 script = ExtResource("6_dfr2k")
 label = "The Ahwahnee"
 target_region = "the_ahwahnee"

@@ -23,58 +23,58 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/shop_room.png" id="21_dsj7a"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c3xfk"]
-size = Vector2(96, 16)
+size = Vector2(192, 32)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kcunp"]
-size = Vector2(8, 4)
+size = Vector2(16, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6r2ul"]
-size = Vector2(36, 44)
+size = Vector2(72, 88)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qsqv0"]
-size = Vector2(70, 12)
+size = Vector2(140, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7nfpe"]
-size = Vector2(66, 10)
+size = Vector2(132, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_br3ms"]
-size = Vector2(66, 14)
+size = Vector2(132, 28)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_whqru"]
-size = Vector2(66, 14)
+size = Vector2(132, 28)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pl3lt"]
-size = Vector2(30, 12)
+size = Vector2(60, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jvabv"]
-size = Vector2(58, 12)
+size = Vector2(116, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4cm7t"]
-size = Vector2(38, 8)
+size = Vector2(76, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oykn2"]
-size = Vector2(18, 8)
+size = Vector2(36, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ta7wa"]
-size = Vector2(26, 8)
+size = Vector2(52, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7bbs0"]
-size = Vector2(10, 5)
+size = Vector2(20, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_30i65"]
-size = Vector2(12, 4)
+size = Vector2(24, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ei34n"]
-size = Vector2(18, 14)
+size = Vector2(36, 28)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_easho"]
-size = Vector2(12, 4)
+size = Vector2(24, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5ycgy"]
-size = Vector2(18, 14)
+size = Vector2(36, 28)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2jkf8"]
-size = Vector2(44, 10)
+size = Vector2(88, 20)
 
 [node name="CurryMountainShop" type="Node2D" unique_id=656778507]
 y_sort_enabled = true
@@ -108,19 +108,19 @@ script = ExtResource("3_2diyi")
 y_sort_enabled = true
 
 [node name="Counter" type="StaticBody2D" parent="Entities" unique_id=175319800]
-position = Vector2(386, 138)
+position = Vector2(772, 276)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Counter" unique_id=1284769188]
 texture = ExtResource("4_nvc5f")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Counter" unique_id=596731626]
-position = Vector2(0, -8)
+position = Vector2(0, -16)
 shape = SubResource("RectangleShape2D_c3xfk")
 
 [node name="ShopClerk" type="StaticBody2D" parent="Entities" unique_id=974902776]
-position = Vector2(386, 110)
+position = Vector2(772, 220)
 collision_mask = 0
 script = ExtResource("5_o2dg4")
 shop = ExtResource("6_se844")
@@ -128,7 +128,7 @@ color = Color(0.3, 0.4, 0.55, 1)
 sprite_sheet = ExtResource("7_85yoq")
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/ShopClerk" unique_id=976715678]
-position = Vector2(0, -2)
+position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_kcunp")
 
 [node name="Hitbox" type="Area2D" parent="Entities/ShopClerk" unique_id=1195890793]
@@ -137,133 +137,133 @@ collision_mask = 0
 monitoring = false
 
 [node name="Shape" type="CollisionShape2D" parent="Entities/ShopClerk/Hitbox" unique_id=60549070]
-position = Vector2(0, 8)
+position = Vector2(0, 16)
 shape = SubResource("RectangleShape2D_6r2ul")
 
 [node name="PracticeWall" type="StaticBody2D" parent="Entities" unique_id=1800086577]
-position = Vector2(76, 178)
+position = Vector2(152, 356)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/PracticeWall" unique_id=597067511]
 texture = ExtResource("8_qlxbd")
-offset = Vector2(0, -48)
+offset = Vector2(0, -96)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/PracticeWall" unique_id=1687562701]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_qsqv0")
 
 [node name="CrashPad" type="StaticBody2D" parent="Entities" unique_id=1762459734]
-position = Vector2(76, 200)
+position = Vector2(152, 400)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/CrashPad" unique_id=360191146]
 texture = ExtResource("9_85kk6")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/CrashPad" unique_id=1382741187]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_7nfpe")
 
 [node name="GlassCase" type="StaticBody2D" parent="Entities" unique_id=774099822]
-position = Vector2(196, 208)
+position = Vector2(392, 416)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/GlassCase" unique_id=1478896466]
 texture = ExtResource("10_yytm0")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/GlassCase" unique_id=366746666]
-position = Vector2(0, -7)
+position = Vector2(0, -14)
 shape = SubResource("RectangleShape2D_br3ms")
 
 [node name="GlassCase2" type="StaticBody2D" parent="Entities" unique_id=221784990]
-position = Vector2(292, 208)
+position = Vector2(584, 416)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/GlassCase2" unique_id=294386158]
 texture = ExtResource("10_yytm0")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/GlassCase2" unique_id=727686627]
-position = Vector2(0, -7)
+position = Vector2(0, -14)
 shape = SubResource("RectangleShape2D_whqru")
 
 [node name="PackRack" type="StaticBody2D" parent="Entities" unique_id=1722095801]
-position = Vector2(444, 200)
+position = Vector2(888, 400)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/PackRack" unique_id=474182473]
 texture = ExtResource("11_bdi0w")
-offset = Vector2(0, -27)
+offset = Vector2(0, -54)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/PackRack" unique_id=994601550]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_pl3lt")
 
 [node name="Workbench" type="StaticBody2D" parent="Entities" unique_id=1523765610]
-position = Vector2(108, 250)
+position = Vector2(216, 500)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Workbench" unique_id=931496517]
 texture = ExtResource("12_kbcy8")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Workbench" unique_id=1858178845]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_jvabv")
 
 [node name="BootBench" type="StaticBody2D" parent="Entities" unique_id=873364363]
-position = Vector2(352, 250)
+position = Vector2(704, 500)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/BootBench" unique_id=1707530416]
 texture = ExtResource("13_jtqvo")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/BootBench" unique_id=1195688856]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_4cm7t")
 
 [node name="Stove" type="StaticBody2D" parent="Entities" unique_id=909843580]
-position = Vector2(444, 132)
+position = Vector2(888, 264)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Stove" unique_id=1665111089]
 texture = ExtResource("14_l77ut")
-offset = Vector2(0, -22)
+offset = Vector2(0, -44)
 hframes = 2
 script = ExtResource("15_6bm0k")
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Stove" unique_id=1209014520]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_oykn2")
 
 [node name="RopeBin" type="StaticBody2D" parent="Entities" unique_id=1479838396]
-position = Vector2(150, 124)
+position = Vector2(300, 248)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/RopeBin" unique_id=916378098]
 texture = ExtResource("16_x644f")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/RopeBin" unique_id=1793684613]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_ta7wa")
 
 [node name="Stool" type="StaticBody2D" parent="Entities" unique_id=1660412095]
-position = Vector2(350, 132)
+position = Vector2(700, 264)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Stool" unique_id=1769388886]
 texture = ExtResource("17_4qd00")
-offset = Vector2(0, -9)
+offset = Vector2(0, -18)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Stool" unique_id=1720728437]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_7bbs0")
 
 [node name="SchoolBoard" type="StaticBody2D" parent="Entities" unique_id=1473712618]
-position = Vector2(200, 110)
+position = Vector2(400, 220)
 collision_mask = 0
 script = ExtResource("18_6yltn")
 title = "Mountaineering School"
@@ -271,10 +271,10 @@ text = "The Yosemite Mountaineering School teaches from Curry Village: knots, be
 
 [node name="Sprite" type="Sprite2D" parent="Entities/SchoolBoard" unique_id=174542000]
 texture = ExtResource("19_h0t4h")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/SchoolBoard" unique_id=1366005436]
-position = Vector2(0, -2)
+position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_30i65")
 
 [node name="Hitbox" type="Area2D" parent="Entities/SchoolBoard" unique_id=1174398565]
@@ -283,11 +283,11 @@ collision_mask = 0
 monitoring = false
 
 [node name="Shape" type="CollisionShape2D" parent="Entities/SchoolBoard/Hitbox" unique_id=361006204]
-position = Vector2(0, -7)
+position = Vector2(0, -14)
 shape = SubResource("RectangleShape2D_ei34n")
 
 [node name="NoseNotice" type="StaticBody2D" parent="Entities" unique_id=530006670]
-position = Vector2(250, 110)
+position = Vector2(500, 220)
 collision_mask = 0
 script = ExtResource("18_6yltn")
 title = "The Nose, 1958"
@@ -295,10 +295,10 @@ text = "A photograph of Warren Harding, Wayne Merry and George Whitmore at the t
 
 [node name="Sprite" type="Sprite2D" parent="Entities/NoseNotice" unique_id=1935054704]
 texture = ExtResource("19_h0t4h")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/NoseNotice" unique_id=1092003117]
-position = Vector2(0, -2)
+position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_easho")
 
 [node name="Hitbox" type="Area2D" parent="Entities/NoseNotice" unique_id=2033217313]
@@ -307,26 +307,26 @@ collision_mask = 0
 monitoring = false
 
 [node name="Shape" type="CollisionShape2D" parent="Entities/NoseNotice/Hitbox" unique_id=656528725]
-position = Vector2(0, -7)
+position = Vector2(0, -14)
 shape = SubResource("RectangleShape2D_5ycgy")
 
 [node name="Markers" type="Node2D" parent="." unique_id=102993663]
 
 [node name="door" type="Marker2D" parent="Markers" unique_id=2028494369]
-position = Vector2(240, 244)
+position = Vector2(480, 488)
 
 [node name="counter" type="Marker2D" parent="Markers" unique_id=1664864813]
-position = Vector2(386, 150)
+position = Vector2(772, 300)
 
 [node name="customer" type="Marker2D" parent="Markers" unique_id=520850722]
-position = Vector2(244, 190)
+position = Vector2(488, 380)
 
 [node name="Places" type="Node2D" parent="." unique_id=1280141650]
 
 [node name="Exits" type="Node2D" parent="." unique_id=1999133129]
 
 [node name="ToCurry" type="Area2D" parent="Exits" unique_id=188613702]
-position = Vector2(240, 268)
+position = Vector2(480, 536)
 script = ExtResource("20_67kdo")
 label = "Curry Village"
 target_region = "curry_village"

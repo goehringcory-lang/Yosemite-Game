@@ -21,55 +21,55 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/curry/interiors/store_room.png" id="19_36sji"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vksbj"]
-size = Vector2(120, 16)
+size = Vector2(240, 32)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kqfbx"]
-size = Vector2(8, 4)
+size = Vector2(16, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3bn0h"]
-size = Vector2(36, 44)
+size = Vector2(72, 88)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f4wdt"]
-size = Vector2(18, 8)
+size = Vector2(36, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iqn50"]
-size = Vector2(20, 5)
+size = Vector2(40, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_22avl"]
-size = Vector2(12, 5)
+size = Vector2(24, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_72mor"]
-size = Vector2(22, 8)
+size = Vector2(44, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oslct"]
-size = Vector2(44, 12)
+size = Vector2(88, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_af8nx"]
-size = Vector2(44, 12)
+size = Vector2(88, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dnuqd"]
-size = Vector2(44, 12)
+size = Vector2(88, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f5ogb"]
-size = Vector2(44, 12)
+size = Vector2(88, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_w3or2"]
-size = Vector2(48, 12)
+size = Vector2(96, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vy8gx"]
-size = Vector2(48, 12)
+size = Vector2(96, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_60ien"]
-size = Vector2(30, 10)
+size = Vector2(60, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j6t5w"]
-size = Vector2(12, 4)
+size = Vector2(24, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_62ofh"]
-size = Vector2(18, 14)
+size = Vector2(36, 28)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tgype"]
-size = Vector2(44, 10)
+size = Vector2(88, 20)
 
 [node name="CurryStore" type="Node2D" unique_id=635149248]
 y_sort_enabled = true
@@ -103,19 +103,19 @@ script = ExtResource("3_vcfnc")
 y_sort_enabled = true
 
 [node name="Counter" type="StaticBody2D" parent="Entities" unique_id=477880541]
-position = Vector2(240, 136)
+position = Vector2(480, 272)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Counter" unique_id=88359018]
 texture = ExtResource("4_5bqex")
-offset = Vector2(0, -19)
+offset = Vector2(0, -38)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Counter" unique_id=1582121431]
-position = Vector2(0, -8)
+position = Vector2(0, -16)
 shape = SubResource("RectangleShape2D_vksbj")
 
 [node name="StoreClerk" type="StaticBody2D" parent="Entities" unique_id=1519905483]
-position = Vector2(240, 110)
+position = Vector2(480, 220)
 collision_mask = 0
 script = ExtResource("5_7500b")
 shop = ExtResource("6_h4kb5")
@@ -123,7 +123,7 @@ color = Color(0.3, 0.5, 0.35, 1)
 sprite_sheet = ExtResource("7_e6lbq")
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/StoreClerk" unique_id=846788538]
-position = Vector2(0, -2)
+position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_kqfbx")
 
 [node name="Hitbox" type="Area2D" parent="Entities/StoreClerk" unique_id=840434365]
@@ -132,145 +132,145 @@ collision_mask = 0
 monitoring = false
 
 [node name="Shape" type="CollisionShape2D" parent="Entities/StoreClerk/Hitbox" unique_id=246436602]
-position = Vector2(0, 8)
+position = Vector2(0, 16)
 shape = SubResource("RectangleShape2D_3bn0h")
 
 [node name="Stove" type="StaticBody2D" parent="Entities" unique_id=1559563060]
-position = Vector2(40, 104)
+position = Vector2(80, 208)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Stove" unique_id=2018501151]
 texture = ExtResource("8_4rj5x")
-offset = Vector2(0, -22)
+offset = Vector2(0, -44)
 hframes = 2
 script = ExtResource("9_51xwn")
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Stove" unique_id=1374006093]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_f4wdt")
 
 [node name="Chalkboard" type="StaticBody2D" parent="Entities" unique_id=225368405]
-position = Vector2(84, 100)
+position = Vector2(168, 200)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Chalkboard" unique_id=972820369]
 texture = ExtResource("10_e8a67")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Chalkboard" unique_id=1214717579]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_iqn50")
 
 [node name="Postcards" type="StaticBody2D" parent="Entities" unique_id=197963262]
-position = Vector2(408, 100)
+position = Vector2(816, 200)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Postcards" unique_id=1035112076]
 texture = ExtResource("11_jqs5k")
-offset = Vector2(0, -20)
+offset = Vector2(0, -40)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Postcards" unique_id=726282997]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_22avl")
 
 [node name="Cooler" type="StaticBody2D" parent="Entities" unique_id=778796183]
-position = Vector2(446, 104)
+position = Vector2(892, 208)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Cooler" unique_id=1136268508]
 texture = ExtResource("12_de6yc")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Cooler" unique_id=801268377]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_72mor")
 
 [node name="ShelfW1" type="StaticBody2D" parent="Entities" unique_id=915408521]
-position = Vector2(74, 168)
+position = Vector2(148, 336)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/ShelfW1" unique_id=645716144]
 texture = ExtResource("13_a8a0c")
-offset = Vector2(0, -23)
+offset = Vector2(0, -46)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/ShelfW1" unique_id=968317941]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_oslct")
 
 [node name="ShelfW2" type="StaticBody2D" parent="Entities" unique_id=1202815166]
-position = Vector2(74, 226)
+position = Vector2(148, 452)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/ShelfW2" unique_id=161257822]
 texture = ExtResource("13_a8a0c")
-offset = Vector2(0, -23)
+offset = Vector2(0, -46)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/ShelfW2" unique_id=2006659932]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_af8nx")
 
 [node name="ShelfE1" type="StaticBody2D" parent="Entities" unique_id=1006401666]
-position = Vector2(406, 168)
+position = Vector2(812, 336)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/ShelfE1" unique_id=999700138]
 texture = ExtResource("13_a8a0c")
-offset = Vector2(0, -23)
+offset = Vector2(0, -46)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/ShelfE1" unique_id=456210889]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_dnuqd")
 
 [node name="ShelfE2" type="StaticBody2D" parent="Entities" unique_id=1007312043]
-position = Vector2(406, 226)
+position = Vector2(812, 452)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/ShelfE2" unique_id=240507285]
 texture = ExtResource("13_a8a0c")
-offset = Vector2(0, -23)
+offset = Vector2(0, -46)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/ShelfE2" unique_id=1170749392]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_f5ogb")
 
 [node name="Produce1" type="StaticBody2D" parent="Entities" unique_id=1340396074]
-position = Vector2(178, 196)
+position = Vector2(356, 392)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Produce1" unique_id=259005440]
 texture = ExtResource("14_682k0")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Produce1" unique_id=297786874]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_w3or2")
 
 [node name="Produce2" type="StaticBody2D" parent="Entities" unique_id=1465138006]
-position = Vector2(302, 196)
+position = Vector2(604, 392)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Produce2" unique_id=801991325]
 texture = ExtResource("14_682k0")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Produce2" unique_id=95942865]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_vy8gx")
 
 [node name="Barrels" type="StaticBody2D" parent="Entities" unique_id=43808466]
-position = Vector2(446, 252)
+position = Vector2(892, 504)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Barrels" unique_id=1999196432]
 texture = ExtResource("15_1k3as")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Barrels" unique_id=730893665]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_60ien")
 
 [node name="StoreNotice" type="StaticBody2D" parent="Entities" unique_id=1931037178]
-position = Vector2(150, 108)
+position = Vector2(300, 216)
 collision_mask = 0
 script = ExtResource("16_6um8m")
 title = "Camp Curry Store"
@@ -278,10 +278,10 @@ text = "Postcards, matches, film, ice and groceries since 1899. Bring a pack: th
 
 [node name="Sprite" type="Sprite2D" parent="Entities/StoreNotice" unique_id=1079478477]
 texture = ExtResource("17_87feh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/StoreNotice" unique_id=255436838]
-position = Vector2(0, -2)
+position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_j6t5w")
 
 [node name="Hitbox" type="Area2D" parent="Entities/StoreNotice" unique_id=1661205230]
@@ -290,26 +290,26 @@ collision_mask = 0
 monitoring = false
 
 [node name="Shape" type="CollisionShape2D" parent="Entities/StoreNotice/Hitbox" unique_id=1912813011]
-position = Vector2(0, -7)
+position = Vector2(0, -14)
 shape = SubResource("RectangleShape2D_62ofh")
 
 [node name="Markers" type="Node2D" parent="." unique_id=90388489]
 
 [node name="door" type="Marker2D" parent="Markers" unique_id=1137486378]
-position = Vector2(240, 244)
+position = Vector2(480, 488)
 
 [node name="counter" type="Marker2D" parent="Markers" unique_id=460144449]
-position = Vector2(240, 148)
+position = Vector2(480, 296)
 
 [node name="customer" type="Marker2D" parent="Markers" unique_id=883641271]
-position = Vector2(244, 232)
+position = Vector2(488, 464)
 
 [node name="Places" type="Node2D" parent="." unique_id=1679366475]
 
 [node name="Exits" type="Node2D" parent="." unique_id=1261589238]
 
 [node name="ToCurry" type="Area2D" parent="Exits" unique_id=1408700386]
-position = Vector2(240, 268)
+position = Vector2(480, 536)
 script = ExtResource("18_0e4hx")
 label = "Curry Village"
 target_region = "curry_village"

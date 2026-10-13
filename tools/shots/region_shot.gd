@@ -35,7 +35,7 @@ func _ready() -> void:
 		await world.go_to_region(region_id, at[0])
 		if at.size() > 1:
 			var xy := at[1].split(":")
-			world.player.global_position = Vector2(float(xy[0]), float(xy[1])) * 16.0
+			world.player.global_position = Vector2(float(xy[0]), float(xy[1])) * 32.0
 			world.player.get_node("Camera").reset_smoothing()
 		world.hud.visible = false
 		GameClock.paused = true

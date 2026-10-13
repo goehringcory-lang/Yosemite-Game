@@ -98,10 +98,11 @@ static func say_to(player: Player, lines: Array) -> void:
 
 func _ready() -> void:
 	layer = 30
+	UiScale.layer(self)
 	add_to_group("dialogue_box") # World waits for the box to close before passing the player out
 	_opened_frame = Engine.get_process_frames()
 	var root := Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	UiScale.fit(root)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	# Sits on the bottom edge of the screen and grows upward, so a long list of

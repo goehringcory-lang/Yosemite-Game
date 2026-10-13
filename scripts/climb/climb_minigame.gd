@@ -115,11 +115,12 @@ func setup(p_route: RouteData, seed := -1) -> void:
 
 func _ready() -> void:
 	layer = 20
+	UiScale.layer(self)
 	add_to_group("climb_screen") # Sound plays the wind while it's up
 	profile = ClimbProfiles.get_profile(route.id)
 	belayer_look = ClimbProfiles.belayer_look(route)
 	_canvas = Control.new()
-	_canvas.set_anchors_preset(Control.PRESET_FULL_RECT)
+	UiScale.fit(_canvas)
 	_canvas.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_canvas.draw.connect(_draw_screen)
 	add_child(_canvas)

@@ -12,7 +12,7 @@ extends StaticBody2D
 @export var texture: Texture2D
 @export var frames := 1
 @export var fps := 0.0
-@export var ground_inset := 4
+@export var ground_inset := 8
 ## Footprint and reach in pixels (zero keeps the scene's default sizes).
 @export var body_size := Vector2.ZERO
 @export var reach_size := Vector2.ZERO
@@ -24,7 +24,7 @@ func _ready() -> void:
 		if body_size.x > 0.0:
 			_resize("Collision", body_size, Vector2(0, -body_size.y / 2.0))
 		if reach_size.x > 0.0:
-			_resize("Hitbox/Shape", reach_size, Vector2(0, -reach_size.y / 2.0 - 2.0))
+			_resize("Hitbox/Shape", reach_size, Vector2(0, -reach_size.y / 2.0 - 4.0))
 	else:
 		queue_redraw()
 	if station == "campfire":
@@ -60,15 +60,15 @@ func _add_fire_effects() -> void:
 	sparks.name = "Sparks"
 	sparks.set_script(load("res://scripts/world/ambient_fx.gd"))
 	sparks.set("effect", "sparks")
-	sparks.set("area", Vector2(4, 1))
-	sparks.position = Vector2(0, -12)
+	sparks.set("area", Vector2(8, 2))
+	sparks.position = Vector2(0, -24)
 	sparks.z_index = 6
 	add_child(sparks)
 	var light := PointLight2D.new()
 	light.name = "NightLight"
 	light.set_script(load("res://scripts/world/night_light.gd"))
-	light.position = Vector2(0, -10)
-	light.set("radius", 70.0)
+	light.position = Vector2(0, -20)
+	light.set("radius", 140.0)
 	light.set("strength", 1.0)
 	light.set("flicker", 0.35)
 	add_child(light)
@@ -99,7 +99,8 @@ func _process(delta: float) -> void:
 
 
 func _px(x: float, y: float, w: float, h: float, color: Color) -> void:
-	draw_rect(Rect2(x, y, w, h), color)
+	# Coordinates below are in the old 16px art grid: draw each at 2x.
+	draw_rect(Rect2(x * 2.0, y * 2.0, w * 2.0, h * 2.0), color)
 
 
 func _draw() -> void:

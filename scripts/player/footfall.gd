@@ -7,7 +7,7 @@ extends Node2D
 ## they stay where they were made. Player adds one as a child.
 
 ## Pixels walked between steps (the walk cycle's footfalls).
-const STEP_DISTANCE := 10.0
+const STEP_DISTANCE := 20.0
 const PUFF_LIFE := 0.45
 const BREATH_LIFE := 1.1
 const BREATH_EVERY := 2.4
@@ -49,19 +49,19 @@ func _process(delta: float) -> void:
 	var moved := feet.distance_to(_last)
 	_last = feet
 	# A jump (a door, a spawn) is not a step.
-	if moved > 0.0 and moved < 8.0:
+	if moved > 0.0 and moved < 16.0:
 		_walked += moved
 		if _walked >= STEP_DISTANCE:
 			_walked = 0.0
 			_left = not _left
-			_step(feet + Vector2(-2 if _left else 2, 0))
+			_step(feet + Vector2(-4 if _left else 4, 0))
 	_breath_timer -= delta
 	if _breath_timer <= 0.0:
 		_breath_timer = BREATH_EVERY + randf() * 0.6
 		if _cold():
 			var facing: Vector2i = body.get("facing") if "facing" in body else Vector2i.DOWN
-			var mouth := feet + Vector2(0, -16) + Vector2(facing) * Vector2(5, 2)
-			_add([mouth, 0.0, 1, Color(0.95, 0.97, 1.0, 0.55), Vector2(facing.x * 4.0, -3.0)])
+			var mouth := feet + Vector2(0, -32) + Vector2(facing) * Vector2(10, 4)
+			_add([mouth, 0.0, 1, Color(0.95, 0.97, 1.0, 0.55), Vector2(facing.x * 8.0, -6.0)])
 	var i := 0
 	while i < _puffs.size():
 		var puff: Array = _puffs[i]
@@ -142,12 +142,12 @@ func _draw() -> void:
 		var c: Color = puff[3]
 		c.a *= 1.0 - t
 		# Three motes spreading out from the heel and settling.
-		var spread := floorf(1.0 + t * 3.0)
-		var lift := floorf(t * 2.0)
-		draw_rect(Rect2(p + Vector2(-spread, -lift), Vector2.ONE), c)
-		draw_rect(Rect2(p + Vector2(spread, -lift), Vector2.ONE), c)
+		var spread := floorf(1.0 + t * 3.0) * 2.0
+		var lift := floorf(t * 2.0) * 2.0
+		draw_rect(Rect2(p + Vector2(-spread, -lift), Vector2(2, 2)), c)
+		draw_rect(Rect2(p + Vector2(spread, -lift), Vector2(2, 2)), c)
 		if t < 0.5:
-			draw_rect(Rect2(p + Vector2(0, -1 - lift), Vector2.ONE), c)
+			draw_rect(Rect2(p + Vector2(0, -2 - lift), Vector2(2, 2)), c)
 
 
 func _draw_breath() -> void:
@@ -159,8 +159,8 @@ func _draw_breath() -> void:
 		var c: Color = puff[3]
 		c.a *= 1.0 - t
 		# A little cloud that grows from one pixel to a soft plus.
-		_breath.draw_rect(Rect2(p, Vector2.ONE), c)
+		_breath.draw_rect(Rect2(p, Vector2(2, 2)), c)
 		if t > 0.15:
-			_breath.draw_rect(Rect2(p + Vector2(-1, 0), Vector2(3, 1)), Color(c, c.a * 0.7))
+			_breath.draw_rect(Rect2(p + Vector2(-2, 0), Vector2(6, 2)), Color(c, c.a * 0.7))
 		if t > 0.4:
-			_breath.draw_rect(Rect2(p + Vector2(0, -1), Vector2(1, 3)), Color(c, c.a * 0.5))
+			_breath.draw_rect(Rect2(p + Vector2(0, -2), Vector2(2, 6)), Color(c, c.a * 0.5))

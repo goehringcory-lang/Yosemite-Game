@@ -4,10 +4,10 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/trailhead.png" id="2_rq8yh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1mxag"]
-size = Vector2(6, 4)
+size = Vector2(12, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3kks7"]
-size = Vector2(16, 20)
+size = Vector2(32, 40)
 
 [node name="RegionDoor" type="StaticBody2D" unique_id=30927176]
 collision_mask = 0
@@ -15,10 +15,10 @@ script = ExtResource("1_3ktiq")
 
 [node name="Sprite" type="Sprite2D" parent="." unique_id=368305163]
 texture = ExtResource("2_rq8yh")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="." unique_id=1430132549]
-position = Vector2(0, -2)
+position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_1mxag")
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=55197871]
@@ -27,5 +27,5 @@ collision_mask = 0
 monitoring = false
 
 [node name="Shape" type="CollisionShape2D" parent="Hitbox" unique_id=319396433]
-position = Vector2(0, -10)
+position = Vector2(0, -20)
 shape = SubResource("RectangleShape2D_3kks7")

@@ -47,7 +47,7 @@ func _ready() -> void:
 
 func test_persistence() -> void:
 	Settings.load_settings()
-	check(Settings.text_speed == Settings.TextSpeed.NORMAL and not Settings.fullscreen and Settings.window_scale == 3
+	check(Settings.text_speed == Settings.TextSpeed.NORMAL and not Settings.fullscreen and Settings.window_scale == 2
 		and Settings.prompts == Settings.Prompts.AUTO, "no settings file gives the defaults")
 	Settings.text_speed = Settings.TextSpeed.FAST
 	Settings.fullscreen = true

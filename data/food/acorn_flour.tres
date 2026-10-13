@@ -6,7 +6,7 @@
 
 [sub_resource type="AtlasTexture" id="icon"]
 atlas = ExtResource("food_icons")
-region = Rect2(0, 0, 16, 16)
+region = Rect2(0, 0, 32, 32)
 
 [resource]
 script = ExtResource("1_item")

@@ -129,6 +129,7 @@ var _info_panel: PanelContainer
 
 func _ready() -> void:
 	layer = 20
+	UiScale.layer(self)
 	add_to_group("park_map")
 	visible = false
 	_build()
@@ -950,7 +951,7 @@ func _load_view() -> void:
 
 func _build() -> void:
 	var root := Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	UiScale.fit(root)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	var bg := ColorRect.new()
