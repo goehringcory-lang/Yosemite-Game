@@ -115,7 +115,7 @@ static func _lit(col: Color, pal: Dictionary, tint: float, fade: float) -> Color
 
 ## The air between the valley and the far walls: pale, and a little blue.
 static func _haze(pal: Dictionary) -> Color:
-	return (pal.low as Color).lerp(pal.mid, 0.45).lerp(Color("a4c8ec"), 0.22)
+	return (pal.low as Color).lerp(pal.mid, 0.45).lerp(Color("63b3c6"), 0.22)
 
 
 ## The haze color a layer fades toward, and the rock tones at that depth.
@@ -137,15 +137,15 @@ static func _body(pal: Dictionary, l: int) -> Dictionary:
 	return {
 		"ramp": ramp,
 		"hi": ramp[0], "lit": ramp[1], "body": ramp[2], "shade": ramp[3], "deep": ramp[4],
-		"tree_dk": _lit(Color("173826"), pal, 0.06, fade * 0.6),
-		"tree": _lit(Color("24502f"), pal, 0.08, fade * 0.6),
-		"tree_lit": _lit(Color("4f8a48"), pal, 0.2, fade * 0.6),
-		"snow": _lit(Color("fbfdff"), pal, 0.3, fade * 0.4),
-		"snow_shade": _lit(Color("b4c6e4"), pal, 0.1, fade * 0.45),
-		"ice": _lit(Color("8cc4ec"), pal, 0.1, fade * 0.45),
-		"ice_dk": _lit(Color("5c92cc"), pal, 0.05, fade * 0.45),
-		"water": _lit(Color("f4fbff"), pal, 0.3, fade * 0.5),
-		"water_edge": _lit(Color("a8d0ec"), pal, 0.1, fade * 0.5),
+		"tree_dk": _lit(Color("1d3f2b"), pal, 0.06, fade * 0.6),
+		"tree": _lit(Color("2c5c37"), pal, 0.08, fade * 0.6),
+		"tree_lit": _lit(Color("437f45"), pal, 0.2, fade * 0.6),
+		"snow": _lit(Color("f5eee0"), pal, 0.3, fade * 0.4),
+		"snow_shade": _lit(Color("9fd8d9"), pal, 0.1, fade * 0.45),
+		"ice": _lit(Color("63b3c6"), pal, 0.1, fade * 0.45),
+		"ice_dk": _lit(Color("3a86a8"), pal, 0.05, fade * 0.45),
+		"water": _lit(Color("d6f1ee"), pal, 0.3, fade * 0.5),
+		"water_edge": _lit(Color("9fd8d9"), pal, 0.1, fade * 0.5),
 		"haze": haze,
 		"fade": fade,
 	}
@@ -750,35 +750,35 @@ static func _floor(im: Image, kind: String, pal: Dictionary, rng: RandomNumberGe
 	var alpine := kind in ["tuolumne", "moraine"]
 	var night: bool = pal.get("lum", 1.0) < 0.8
 	# Colors, far (hazy) to near (rich).
-	var f_far := _lit(Color("386a3e"), pal, 0.15, 0.26)
-	var f_mid := _lit(Color("2c5434"), pal, 0.12, 0.12)
-	var f_near := _lit(Color("234630"), pal, 0.1, 0.04)
-	var f_lit := _lit(Color("4f8650"), pal, 0.22, 0.14)
-	var f_dk := _lit(Color("163122"), pal, 0.08, 0.06)
-	var meadow := _lit(Color("a2b858"), pal, 0.3, 0.16)
-	var meadow_lit := _lit(Color("c4d070"), pal, 0.35, 0.12)
-	var meadow_dk := _lit(Color("7a9446"), pal, 0.2, 0.12)
-	var water := _lit(Color("5e9ed4"), pal, 0.2, 0.15)
-	var water_dk := _lit(Color("3e78b4"), pal, 0.1, 0.1)
-	var spark := _lit(Color("f4fbff"), pal, 0.3, 0.08)
-	var sand := _lit(Color("d8c898"), pal, 0.3, 0.12)
+	var f_far := _lit(Color("2c5c37"), pal, 0.15, 0.26)
+	var f_mid := _lit(Color("2c5c37"), pal, 0.12, 0.12)
+	var f_near := _lit(Color("1d3f2b"), pal, 0.1, 0.04)
+	var f_lit := _lit(Color("437f45"), pal, 0.22, 0.14)
+	var f_dk := _lit(Color("12291d"), pal, 0.08, 0.06)
+	var meadow := _lit(Color("aecb62"), pal, 0.3, 0.16)
+	var meadow_lit := _lit(Color("d3e48a"), pal, 0.35, 0.12)
+	var meadow_dk := _lit(Color("5c8f3c"), pal, 0.2, 0.12)
+	var water := _lit(Color("3a86a8"), pal, 0.2, 0.15)
+	var water_dk := _lit(Color("3a86a8"), pal, 0.1, 0.1)
+	var spark := _lit(Color("d6f1ee"), pal, 0.3, 0.08)
+	var sand := _lit(Color("d6bd88"), pal, 0.3, 0.12)
 	if alpine:
-		f_far = _lit(Color("3c5a40"), pal, 0.15, 0.4)
-		f_mid = _lit(Color("34523a"), pal, 0.12, 0.2)
-		f_near = _lit(Color("2c4832"), pal, 0.1, 0.08)
-		f_lit = _lit(Color("668e58"), pal, 0.2, 0.14)
-		meadow = _lit(Color("b4b868"), pal, 0.3, 0.16)
-		meadow_lit = _lit(Color("d2d27c"), pal, 0.35, 0.12)
-		meadow_dk = _lit(Color("8c9a50"), pal, 0.2, 0.12)
+		f_far = _lit(Color("2c5c37"), pal, 0.15, 0.4)
+		f_mid = _lit(Color("1d3f2b"), pal, 0.12, 0.2)
+		f_near = _lit(Color("1d3f2b"), pal, 0.1, 0.08)
+		f_lit = _lit(Color("437f45"), pal, 0.2, 0.14)
+		meadow = _lit(Color("aecb62"), pal, 0.3, 0.16)
+		meadow_lit = _lit(Color("d3e48a"), pal, 0.35, 0.12)
+		meadow_dk = _lit(Color("5c8f3c"), pal, 0.2, 0.12)
 	if kind == "moraine":
-		f_far = _lit(Color("8c8c94"), pal, 0.2, 0.4)
-		f_mid = _lit(Color("7a7a84"), pal, 0.15, 0.22)
-		f_near = _lit(Color("686874"), pal, 0.1, 0.08)
-		f_lit = _lit(Color("c4c8d4"), pal, 0.3, 0.14)
-		f_dk = _lit(Color("4c4c58"), pal, 0.08, 0.06)
-		meadow = _lit(Color("a8a89c"), pal, 0.25, 0.16)
-		meadow_lit = _lit(Color("d4d4cc"), pal, 0.3, 0.12)
-		meadow_dk = _lit(Color("84847c"), pal, 0.15, 0.12)
+		f_far = _lit(Color("93918f"), pal, 0.2, 0.4)
+		f_mid = _lit(Color("6a6a70"), pal, 0.15, 0.22)
+		f_near = _lit(Color("6a6a70"), pal, 0.1, 0.08)
+		f_lit = _lit(Color("bdb8ae"), pal, 0.3, 0.14)
+		f_dk = _lit(Color("47464d"), pal, 0.08, 0.06)
+		meadow = _lit(Color("bdb8ae"), pal, 0.25, 0.16)
+		meadow_lit = _lit(Color("e4ddcc"), pal, 0.3, 0.12)
+		meadow_dk = _lit(Color("93918f"), pal, 0.15, 0.12)
 	# The forest floor, in depth bands, over an undulating far edge.
 	var edges := PackedInt32Array()
 	edges.resize(w)
@@ -819,7 +819,7 @@ static func _floor(im: Image, kind: String, pal: Dictionary, rng: RandomNumberGe
 			var gy := m.y + rng.randi_range(-ry, ry) * 2 / 3
 			_px(im, gx, gy, meadow_dk if k % 3 else meadow_lit)
 			if k % 9 == 0 and not alpine:
-				_px(im, gx, gy - 1, _lit(Color("f4d848") if k % 2 == 0 else Color("f0f0e8"), pal, 0.2, 0.1))
+				_px(im, gx, gy - 1, _lit(Color("f1cf6a") if k % 2 == 0 else Color("f5eee0"), pal, 0.2, 0.1))
 	# Canopy: round treetops, small and hazy far, big and dark near.
 	var count := 500 + w * (h - top) / 180
 	for i in count:
@@ -877,7 +877,7 @@ static func _floor(im: Image, kind: String, pal: Dictionary, rng: RandomNumberGe
 			_roads(im, top + 28, pal, w)
 			# A scatter of tents at a campground edge.
 			for i in 7:
-				_tent(im, 330 + i * 9, top + 24 + (i % 2) * 3, [Color("c84a3a"), Color("e8c040"), Color("4a78c8"), Color("e8e0c8")][i % 4], pal, night)
+				_tent(im, 330 + i * 9, top + 24 + (i % 2) * 3, [Color("b3362b"), Color("d8a63b"), Color("6f5aa6"), Color("e4ddcc")][i % 4], pal, night)
 		"moraine":
 			# Meltwater pools and boulders.
 			for i in 16:
@@ -897,8 +897,8 @@ static func _floor(im: Image, kind: String, pal: Dictionary, rng: RandomNumberGe
 				var tx := rng.randi_range(0, w - 5)
 				var ty := rng.randi_range(top + 20, top + 150)
 				var tz := rng.randi_range(2, 4)
-				_rect(im, tx, ty, tz, tz - 1, _lit(Color("a8a0a0"), pal, 0.25, 0.1))
-				_rect(im, tx + 1, ty + tz - 1, tz, 1, _lit(Color("5c5864"), pal, 0.1, 0.08))
+				_rect(im, tx, ty, tz, tz - 1, _lit(Color("93918f"), pal, 0.25, 0.1))
+				_rect(im, tx + 1, ty + tz - 1, tz, 1, _lit(Color("6a6a70"), pal, 0.1, 0.08))
 		"mist_wall":
 			# Spray drifting through the dark trees.
 			for i in 22:
@@ -910,12 +910,12 @@ static func _floor(im: Image, kind: String, pal: Dictionary, rng: RandomNumberGe
 			for i in 40:
 				var bx := rng.randi_range(0, w - 5)
 				var by := rng.randi_range(top + 30, top + 150)
-				_rect(im, bx, by, 3, 2, _lit(Color("c0b4a0"), pal, 0.3, 0.1))
-				_rect(im, bx + 1, by + 2, 3, 1, _lit(Color("6a647a"), pal, 0.1, 0.08))
+				_rect(im, bx, by, 3, 2, _lit(Color("bdb8ae"), pal, 0.3, 0.1))
+				_rect(im, bx + 1, by + 2, 3, 1, _lit(Color("6a6a70"), pal, 0.1, 0.08))
 	# Cloud shadows drifting over the floor, by day.
 	if not night and pal.get("lum", 1.0) > 0.9:
 		var sh := P.make(110, 24)
-		var dark := Color(0.05, 0.1, 0.2, 0.16)
+		var dark := Color(0.078, 0.184, 0.278, 0.16)
 		for dy in range(-10, 11):
 			var k := 1.0 - float(dy * dy) / 100.0
 			var half := int(52.0 * sqrt(maxf(k, 0.0)))
@@ -926,18 +926,18 @@ static func _floor(im: Image, kind: String, pal: Dictionary, rng: RandomNumberGe
 
 ## Two roads along the valley, the Southside and Northside Drives.
 static func _roads(im: Image, y0: int, pal: Dictionary, w: int) -> void:
-	var road := _lit(Color("a8a094"), pal, 0.25, 0.14)
-	var edge := _lit(Color("5c5a58"), pal, 0.1, 0.1)
+	var road := _lit(Color("93918f"), pal, 0.25, 0.14)
+	var edge := _lit(Color("6a6a70"), pal, 0.1, 0.1)
 	for x in w:
 		var y := y0 + int(sin(x * 0.015 + 0.5) * 6.0)
 		_px(im, x, y, road)
 		_px(im, x, y + 1, edge)
 		if x % 8 < 3:
-			_px(im, x, y, _lit(Color("e8e0b0"), pal, 0.3, 0.1))
+			_px(im, x, y, _lit(Color("d6bd88"), pal, 0.3, 0.1))
 
 
 static func _roof_cols(pal: Dictionary) -> Array[Color]:
-	return [_lit(Color("a8602e"), pal, 0.2, 0.12), _lit(Color("8a4a2a"), pal, 0.15, 0.1), _lit(Color("b87848"), pal, 0.2, 0.12), _lit(Color("7a5a40"), pal, 0.15, 0.1)]
+	return [_lit(Color("a84a1c"), pal, 0.2, 0.12), _lit(Color("7e531c"), pal, 0.15, 0.1), _lit(Color("92693d"), pal, 0.2, 0.12), _lit(Color("86694b"), pal, 0.15, 0.1)]
 
 
 ## A tiny tent-cabin or cabin: roof ridge, roof shade, wall and a door.
@@ -946,8 +946,8 @@ static func _cabin(im: Image, x: int, y: int, roof: Color, wall: Color, night: b
 	_rect(im, x, y + 1, 6, 1, roof)
 	_rect(im, x, y + 2, 6, 3, wall)
 	_rect(im, x + 5, y + 2, 1, 3, wall.darkened(0.25))
-	_px(im, x + 2, y + 3, _lit(Color("5a3a28"), pal, 0.1, 0.05) if not night else Color("ffd870"))
-	_rect(im, x + 1, y + 5, 6, 1, _lit(Color("163122"), pal, 0.1, 0.05))
+	_px(im, x + 2, y + 3, _lit(Color("47301f"), pal, 0.1, 0.05) if not night else Color("f1cf6a"))
+	_rect(im, x + 1, y + 5, 6, 1, _lit(Color("12291d"), pal, 0.1, 0.05))
 
 
 static func _tent(im: Image, x: int, y: int, col: Color, pal: Dictionary, night: bool) -> void:
@@ -956,15 +956,15 @@ static func _tent(im: Image, x: int, y: int, col: Color, pal: Dictionary, night:
 	_rect(im, x, y + 1, 3, 1, c)
 	_rect(im, x, y + 2, 3, 1, c.darkened(0.25))
 	if night:
-		_px(im, x + 1, y + 2, Color("ffd870"))
+		_px(im, x + 1, y + 2, Color("f1cf6a"))
 
 
 ## Curry Village: tidy rows of canvas tent-cabins under the pines, with the
 ## dining pavilion and a lit window or two at night.
 static func _curry(im: Image, top: int, pal: Dictionary, night: bool, rng: RandomNumberGenerator) -> void:
 	var roofs := _roof_cols(pal)
-	var canvas := _lit(Color("e8e0c8"), pal, 0.3, 0.1)
-	var tan := _lit(Color("c8b090"), pal, 0.2, 0.1)
+	var canvas := _lit(Color("e4ddcc"), pal, 0.3, 0.1)
+	var tan := _lit(Color("d6bd88"), pal, 0.2, 0.1)
 	for row in 3:
 		for k in 8:
 			var x := 300 + k * 9 + row * 3
@@ -972,44 +972,44 @@ static func _curry(im: Image, top: int, pal: Dictionary, night: bool, rng: Rando
 			var rc: Color = roofs[(k + row) % 4]
 			_cabin(im, x, y, rc, canvas if (k + row) % 2 == 0 else tan, night, pal)
 		# Paths between the rows.
-		_rect(im, 297 + row * 3, top + 62 + row * 12, 84, 1, _lit(Color("c8b898"), pal, 0.25, 0.12))
+		_rect(im, 297 + row * 3, top + 62 + row * 12, 84, 1, _lit(Color("d6bd88"), pal, 0.25, 0.12))
 	# The pavilion and the Village store, bigger roofs near the road.
 	_rect(im, 392, top + 44, 16, 2, roofs[1])
 	_rect(im, 390, top + 46, 20, 4, tan)
-	_rect(im, 394, top + 47, 2, 2, Color("ffd870") if night else _lit(Color("4a6a8a"), pal, 0.1, 0.1))
-	_rect(im, 398, top + 47, 2, 2, Color("ffd870") if night else _lit(Color("4a6a8a"), pal, 0.1, 0.1))
-	_rect(im, 390, top + 50, 20, 1, _lit(Color("163122"), pal, 0.1, 0.05))
+	_rect(im, 394, top + 47, 2, 2, Color("f1cf6a") if night else _lit(Color("235679"), pal, 0.1, 0.1))
+	_rect(im, 398, top + 47, 2, 2, Color("f1cf6a") if night else _lit(Color("235679"), pal, 0.1, 0.1))
+	_rect(im, 390, top + 50, 20, 1, _lit(Color("12291d"), pal, 0.1, 0.05))
 	# Parked cars.
 	for k in 5:
-		_rect(im, 420 + k * 5, top + 52, 3, 2, [Color("c84a3a"), Color("e8e0c8"), Color("4a78c8"), Color("3a3a40"), Color("e8c040")][k])
+		_rect(im, 420 + k * 5, top + 52, 3, 2, [Color("b3362b"), Color("e4ddcc"), Color("6f5aa6"), Color("47464d"), Color("d8a63b")][k])
 
 
 ## Camp 4: a clearing of small colorful tents, picnic tables and fire pits.
 static func _camp4(im: Image, top: int, pal: Dictionary, night: bool, rng: RandomNumberGenerator) -> void:
-	var cols := [Color("c84a3a"), Color("e8c040"), Color("4a78c8"), Color("e8e0c8"), Color("58a050"), Color("d8782a")]
+	var cols := [Color("b3362b"), Color("d8a63b"), Color("6f5aa6"), Color("e4ddcc"), Color("5c8f3c"), Color("d9772a")]
 	# The clearing.
-	var clear := _lit(Color("a09060"), pal, 0.25, 0.14)
+	var clear := _lit(Color("b0925f"), pal, 0.25, 0.14)
 	_ell(im, 365, top + 66, 66, 10, clear)
 	for i in 22:
 		var x := 310 + rng.randi_range(0, 110)
 		var y := top + 58 + rng.randi_range(0, 16)
 		_tent(im, x, y, cols[i % cols.size()], pal, night)
 		if i % 4 == 0:
-			_px(im, x + 4, y + 2, Color("ff9a30") if night else _lit(Color("5a4a40"), pal, 0.1, 0.1))
+			_px(im, x + 4, y + 2, Color("f7a64a") if night else _lit(Color("5e4a38"), pal, 0.1, 0.1))
 	for i in 4:
 		var rc: Color = _roof_cols(pal)[i % 4]
-		_cabin(im, 410 + i * 11 - 20 * (i / 3), top + 48 + (i % 2) * 3 + (i / 3) * 14, rc, _lit(Color("a08868"), pal, 0.2, 0.1), night, pal)
+		_cabin(im, 410 + i * 11 - 20 * (i / 3), top + 48 + (i % 2) * 3 + (i / 3) * 14, rc, _lit(Color("b0925f"), pal, 0.2, 0.1), night, pal)
 
 
 ## The Ahwahnee: a long, many-gabled lodge of stone and timber with its
 ## lawns, and an avenue of pines.
 static func _ahwahnee(im: Image, top: int, pal: Dictionary, night: bool, rng: RandomNumberGenerator) -> void:
-	var lawn := _lit(Color("78b050"), pal, 0.3, 0.12)
-	var roof := _lit(Color("8a5a40"), pal, 0.2, 0.1)
-	var roof_lit := _lit(Color("b07a58"), pal, 0.25, 0.1)
-	var stone := _lit(Color("a89478"), pal, 0.25, 0.1)
-	var stone_dk := _lit(Color("6a5a4c"), pal, 0.12, 0.08)
-	var win := Color("ffd870") if night else _lit(Color("4a6888"), pal, 0.1, 0.1)
+	var lawn := _lit(Color("84b04a"), pal, 0.3, 0.12)
+	var roof := _lit(Color("86694b"), pal, 0.2, 0.1)
+	var roof_lit := _lit(Color("92693d"), pal, 0.25, 0.1)
+	var stone := _lit(Color("b0925f"), pal, 0.25, 0.1)
+	var stone_dk := _lit(Color("5e4a38"), pal, 0.12, 0.08)
+	var win := Color("f1cf6a") if night else _lit(Color("235679"), pal, 0.1, 0.1)
 	var x := 306
 	var y := top + 50
 	_ell(im, x + 40, y + 12, 70, 9, lawn)
@@ -1030,20 +1030,20 @@ static func _ahwahnee(im: Image, top: int, pal: Dictionary, night: bool, rng: Ra
 		_rect(im, x + 22 + k * 14, y - 4, 6, 3, roof)
 		_px(im, x + 24 + k * 14, y - 5, roof_lit)
 	# A shadow along the foot and pines flanking it.
-	_rect(im, x - 1, y + 7, 82, 1, _lit(Color("163122"), pal, 0.1, 0.05))
+	_rect(im, x - 1, y + 7, 82, 1, _lit(Color("12291d"), pal, 0.1, 0.05))
 	for k in 6:
 		_conifer(im, x - 8 + k * 2, y - 2 + (k % 2), 7, _body(pal, 2), true)
 		_conifer(im, x + 88 - k * 2, y - 2 + (k % 2), 7, _body(pal, 2), true)
 	# Parking.
 	for k in 8:
-		_rect(im, x + 14 + k * 4, y + 17, 3, 2, [Color("c84a3a"), Color("e8e0c8"), Color("4a78c8"), Color("3a3a40")][k % 4])
+		_rect(im, x + 14 + k * 4, y + 17, 3, 2, [Color("b3362b"), Color("e4ddcc"), Color("6f5aa6"), Color("47464d")][k % 4])
 
 
 ## El Cap Meadow: the long road with a line of tiny cars pulled over, and
 ## the boardwalk with little people looking up.
 static func _el_cap_meadow(im: Image, top: int, pal: Dictionary, rng: RandomNumberGenerator) -> void:
-	var cols := [Color("c84a3a"), Color("e8e0c8"), Color("4a78c8"), Color("3a3a40"), Color("e8c040"), Color("58a050")]
-	var glass := _lit(Color("304860"), pal, 0.1, 0.08)
+	var cols := [Color("b3362b"), Color("e4ddcc"), Color("6f5aa6"), Color("47464d"), Color("d8a63b"), Color("5c8f3c")]
+	var glass := _lit(Color("235679"), pal, 0.1, 0.08)
 	for x in range(10, 470, 1):
 		var y := top + 48 + int(sin(x * 0.015 + 0.5) * 6.0)
 		if x % 24 == 5:
@@ -1051,9 +1051,9 @@ static func _el_cap_meadow(im: Image, top: int, pal: Dictionary, rng: RandomNumb
 			_rect(im, x, y - 2, 4, 2, cc)
 			_px(im, x + 1, y - 2, glass)
 			_px(im, x + 2, y - 2, glass)
-			_px(im, x, y, _lit(Color("20201c"), pal, 0.05, 0.05))
+			_px(im, x, y, _lit(Color("2a1b14"), pal, 0.05, 0.05))
 	# The boardwalk and the people on it.
-	var wood := _lit(Color("c0a070"), pal, 0.25, 0.1)
+	var wood := _lit(Color("b0925f"), pal, 0.25, 0.1)
 	for x in range(180, 360):
 		var y2 := top + 76 + int(sin(x * 0.04) * 3.0)
 		_px(im, x, y2, wood)
@@ -1061,4 +1061,4 @@ static func _el_cap_meadow(im: Image, top: int, pal: Dictionary, rng: RandomNumb
 		var x2 := 190 + i * 14 + rng.randi_range(-3, 3)
 		var y3 := top + 75 + int(sin(x2 * 0.04) * 3.0)
 		_px(im, x2, y3 - 1, _lit(cols[i % cols.size()], pal, 0.2, 0.08))
-		_px(im, x2, y3 - 2, _lit(Color("e8c8a0"), pal, 0.2, 0.08))
+		_px(im, x2, y3 - 2, _lit(Color("d6bd88"), pal, 0.2, 0.08))

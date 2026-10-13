@@ -11,23 +11,23 @@
 [node name="JamesMccauley" parent="." instance=ExtResource("1_r")]
 character = ExtResource("2_r")
 spot = "apron_top"
-offset = Vector2(32, -16)
+offset = Vector2(64, -32)
 
 [node name="EnidMichael" parent="." instance=ExtResource("1_r")]
 character = ExtResource("3_r")
 spot = "sentinel_dome"
-offset = Vector2(16, -8)
-wander_radius = 16.0
+offset = Vector2(32, -16)
+wander_radius = 32
 stays = 2
 
 [node name="VisitorPainter" parent="." instance=ExtResource("1_r")]
 character = ExtResource("4_r")
 spot = "apron_top"
-offset = Vector2(-40, 24)
-wander_radius = 24.0
+offset = Vector2(-80, 48)
+wander_radius = 48
 
 [node name="FourMileTrail" parent="." instance=ExtResource("5_r")]
-position = Vector2(936, 1040)
+position = Vector2(1872, 2080)
 label = "Four Mile Trail, down to Curry Village"
 target_region = "curry_village"
 target_spawn = "apron_trailhead"

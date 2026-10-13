@@ -33,8 +33,8 @@ static func draw(ci: CanvasItem, info: Dictionary, state: ClimbState, route: Rou
 	# The haul bag hangs below.
 	if state.has_haul_bag:
 		var sway := sin(time * 0.9) * 1.5
-		ci.draw_line(Vector2(cx - 70, cy + 22), Vector2(cx - 70 + sway, cy + 56), Color("5a1a12"), 3.0)
-		ci.draw_line(Vector2(cx - 70, cy + 22), Vector2(cx - 70 + sway, cy + 56), Color("d8452e"), 1.0)
+		ci.draw_line(Vector2(cx - 70, cy + 22), Vector2(cx - 70 + sway, cy + 56), Color("47301f"), 3.0)
+		ci.draw_line(Vector2(cx - 70, cy + 22), Vector2(cx - 70 + sway, cy + 56), Color("b3362b"), 1.0)
 		ci.draw_texture(UI.icon_texture("haul_bag"), Vector2(cx - 76 + sway, cy + 56))
 	# Two people, eating by headlamp, facing each other across the stove.
 	var partner := ClimbProfiles.belayer_look(route)
@@ -61,10 +61,10 @@ static func draw(ci: CanvasItem, info: Dictionary, state: ClimbState, route: Rou
 static func _sky(ci: CanvasItem, time: float) -> void:
 	if _sky_tex == null:
 		var im := P.make(480, 270)
-		var top := Color("070a22")
-		var mid := Color("1a1c4a")
-		var low := Color("40305e")
-		var rim := Color("6a4468")
+		var top := Color("15141c")
+		var mid := Color("2d3050")
+		var low := Color("2d3050")
+		var rim := Color("2d3050")
 		for y in 270:
 			var t := y / 190.0
 			var c := top.lerp(mid, clampf(t * 1.4, 0.0, 1.0)) if t < 0.7 else mid.lerp(low, clampf((t - 0.7) / 0.3, 0.0, 1.0))
@@ -84,14 +84,14 @@ static func _sky(ci: CanvasItem, time: float) -> void:
 		var t := i / 39.0
 		var px := 60.0 + t * 360.0
 		var py := 120.0 - t * 90.0 + sin(t * 6.0) * 6.0
-		ci.draw_circle(Vector2(px, py), 22.0, Color(0.7, 0.75, 1.0, 0.012))
+		ci.draw_circle(Vector2(px, py), 22.0, Color(0.388, 0.702, 0.776, 0.012))
 	# Stars, twinkling, a few brighter ones with a cross.
 	for i in 130:
 		var x := floorf(P.noise(i, 1, 4) * 480.0)
 		var y := floorf(P.noise(i, 2, 4) * 160.0)
 		var tw := 0.5 + 0.5 * sin(time * (0.8 + P.noise(i, 3, 4) * 3.0) + i)
 		var warm := P.noise(i, 4, 4)
-		var col := Color(1, 1, 0.95) if warm < 0.6 else (Color(1.0, 0.85, 0.7) if warm < 0.8 else Color(0.75, 0.85, 1.0))
+		var col := Color(0.961, 0.933, 0.878) if warm < 0.6 else (Color(0.839, 0.741, 0.533) if warm < 0.8 else Color(0.839, 0.945, 0.933))
 		col.a = 0.3 + 0.7 * tw
 		ci.draw_rect(Rect2(x, y, 1, 1), col)
 		if i % 13 == 0:
@@ -107,21 +107,21 @@ static func _sky(ci: CanvasItem, time: float) -> void:
 	# The moon, with a soft halo and a few craters.
 	var mc := Vector2(398, 44)
 	for i in 4:
-		ci.draw_circle(mc, 30.0 - i * 5.0, Color(0.8, 0.85, 1.0, 0.035))
-	ci.draw_circle(mc, 11, Color("2a2a30"))
-	ci.draw_circle(mc, 10, Color("e8e6dc"))
-	ci.draw_circle(mc + Vector2(-2, -2), 7, Color("f6f4ea"))
-	ci.draw_circle(mc + Vector2(4, 3), 3, Color("d0ccbc"))
-	ci.draw_circle(mc + Vector2(-4, 3), 2, Color("d8d4c4"))
-	ci.draw_circle(mc + Vector2(2, -5), 2, Color("d8d4c4"))
+		ci.draw_circle(mc, 30.0 - i * 5.0, Color(0.839, 0.945, 0.933, 0.035))
+	ci.draw_circle(mc, 11, Color("2b2a30"))
+	ci.draw_circle(mc, 10, Color("f5eee0"))
+	ci.draw_circle(mc + Vector2(-2, -2), 7, Color("f5eee0"))
+	ci.draw_circle(mc + Vector2(4, 3), 3, Color("e4ddcc"))
+	ci.draw_circle(mc + Vector2(-4, 3), 2, Color("e4ddcc"))
+	ci.draw_circle(mc + Vector2(2, -5), 2, Color("e4ddcc"))
 
 
 static func _valley(ci: CanvasItem, time: float) -> void:
 	# Far ridgelines and the valley floor: moonlit rims, layered fog.
 	for l in 4:
 		var base := 146 + l * 16
-		var col := Color("232a52").lerp(Color("0a0e22"), l / 3.0)
-		var rim := Color("5a6aa0").lerp(Color("2a3262"), l / 3.0)
+		var col := Color("2d3050").lerp(Color("15141c"), l / 3.0)
+		var rim := Color("6f5aa6").lerp(Color("2d3050"), l / 3.0)
 		for x in range(int(WALL_W) - 10, int(SCREEN.x)):
 			var top := base - 22 + int(sin(x * (0.013 + l * 0.01) + l) * 12.0 + sin(x * 0.04 + l * 2.0) * 4.0 + P.noise(x / 3, l, 5) * 3.0)
 			ci.draw_rect(Rect2(x, top, 1, SCREEN.y - top), col)
@@ -134,7 +134,7 @@ static func _valley(ci: CanvasItem, time: float) -> void:
 	for i in 90:
 		var tx := 330.0 + P.noise(i, 11, 7) * 150.0
 		var ty := 200.0 + P.noise(i, 12, 7) * 55.0
-		ci.draw_rect(Rect2(floorf(tx), floorf(ty), 1, 2), Color("070a16"))
+		ci.draw_rect(Rect2(floorf(tx), floorf(ty), 1, 2), Color("15141c"))
 	# Campfires, lamps and a ribbon of headlights on the Valley road.
 	for i in 16:
 		var fx := floorf(340.0 + P.noise(i, 5, 9) * 135.0)
@@ -145,7 +145,7 @@ static func _valley(ci: CanvasItem, time: float) -> void:
 		ci.draw_rect(Rect2(fx, fy, 1, 1), Color(1.0, 0.95, 0.7, 0.6 + 0.4 * flick))
 	for i in 6:
 		var rx := fposmod(time * (4.0 + i) + i * 77.0, 150.0)
-		ci.draw_rect(Rect2(345.0 + rx, 236 + (i % 2) * 2, 1, 1), Color(1, 0.95, 0.75, 0.8) if i % 2 == 0 else Color(1, 0.3, 0.2, 0.7))
+		ci.draw_rect(Rect2(345.0 + rx, 236 + (i % 2) * 2, 1, 1), Color(0.961, 0.933, 0.878, 0.8) if i % 2 == 0 else Color(0.702, 0.212, 0.169, 0.7))
 
 
 # ---------------------------------------------------------------- wall
@@ -153,13 +153,13 @@ static func _valley(ci: CanvasItem, time: float) -> void:
 static func _wall(ci: CanvasItem) -> void:
 	if _wall_tex == null:
 		var im := P.make(WALL_W, 270)
-		var base := Color("1c1e30")
+		var base := Color("15141c")
 		for y in 270:
 			for x in WALL_W:
 				var n := P.smooth_noise(x * 0.07, y * 0.015, 2) * 0.6 + P.smooth_noise(x * 0.3, y * 0.06, 6) * 0.4
-				var c := base.lerp(Color("30334c"), n)
+				var c := base.lerp(Color("2d3050"), n)
 				# Left of the wall is lit a bit warmer from the camp, right edge by the moon.
-				c = c.lerp(Color("4a4a64"), clampf((x - 280.0) / 50.0, 0.0, 1.0) * 0.5)
+				c = c.lerp(Color("47464d"), clampf((x - 280.0) / 50.0, 0.0, 1.0) * 0.5)
 				im.set_pixel(x, y, c)
 		# Vertical cracks and dark streaks.
 		for i in 9:
@@ -171,13 +171,13 @@ static func _wall(ci: CanvasItem) -> void:
 				if P.noise(y, i, 13) > 0.7:
 					x += 1 if P.noise(y, i, 14) > 0.5 else -1
 				x = clampi(x, 0, WALL_W - 1)
-				im.set_pixel(x, y, Color("11121f"))
+				im.set_pixel(x, y, Color("15141c"))
 				if x + 1 < WALL_W:
-					im.set_pixel(x + 1, y, Color("2c2e48"))
+					im.set_pixel(x + 1, y, Color("2d3050"))
 		# Edge of the wall, catching the moon.
 		for y in 270:
 			for k in 4:
-				im.set_pixel(WALL_W - 4 + k, y, [Color("2a2c44"), Color("40425a"), Color("5a5c78"), Color("8a8cb0")][k])
+				im.set_pixel(WALL_W - 4 + k, y, [Color("2d3050"), Color("2d3050"), Color("6a6a70"), Color("93918f")][k])
 		_wall_tex = ImageTexture.create_from_image(im)
 	ci.draw_texture(_wall_tex, Vector2.ZERO)
 
@@ -214,26 +214,26 @@ static func _ledge(ci: CanvasItem, cx: float, cy: float) -> void:
 	var lx := cx - 108.0
 	var lw := 236.0
 	# The shelf: a block of granite with a lit top and a shadowed face.
-	ci.draw_rect(Rect2(lx, cy + 8, lw, 12), Color("4a4c68"))
-	ci.draw_rect(Rect2(lx, cy + 8, lw, 2), Color("9a9ab8"))
-	ci.draw_rect(Rect2(lx, cy + 10, lw, 1), Color("7a7a98"))
-	ci.draw_rect(Rect2(lx, cy + 17, lw, 3), Color("2a2c44"))
-	ci.draw_rect(Rect2(lx, cy + 20, lw - 8, 5), Color("14162a"))
+	ci.draw_rect(Rect2(lx, cy + 8, lw, 12), Color("47464d"))
+	ci.draw_rect(Rect2(lx, cy + 8, lw, 2), Color("93918f"))
+	ci.draw_rect(Rect2(lx, cy + 10, lw, 1), Color("6a6a70"))
+	ci.draw_rect(Rect2(lx, cy + 17, lw, 3), Color("2d3050"))
+	ci.draw_rect(Rect2(lx, cy + 20, lw - 8, 5), Color("15141c"))
 	for i in 10:
 		var x := lx + P.noise(i, 20, 2) * lw
-		ci.draw_rect(Rect2(x, cy + 11 + P.noise(i, 21, 2) * 5.0, 3, 1), Color("3a3c58"))
+		ci.draw_rect(Rect2(x, cy + 11 + P.noise(i, 21, 2) * 5.0, 3, 1), Color("2d3050"))
 	# Sleeping bags rolled out behind, rack and rope coil hung on an anchor.
-	ci.draw_rect(Rect2(cx - 100, cy - 4, 30, 12), Color("3a5a8a"))
-	ci.draw_rect(Rect2(cx - 100, cy - 4, 30, 2), Color("5a7aaa"))
-	ci.draw_rect(Rect2(cx - 100, cy + 6, 30, 2), Color("24384a"))
-	ci.draw_rect(Rect2(cx + 70, cy - 4, 32, 12), Color("8a3a3a"))
-	ci.draw_rect(Rect2(cx + 70, cy - 4, 32, 2), Color("aa5a4a"))
-	ci.draw_rect(Rect2(cx + 70, cy + 6, 32, 2), Color("5a2424"))
+	ci.draw_rect(Rect2(cx - 100, cy - 4, 30, 12), Color("235679"))
+	ci.draw_rect(Rect2(cx - 100, cy - 4, 30, 2), Color("3a86a8"))
+	ci.draw_rect(Rect2(cx - 100, cy + 6, 30, 2), Color("142f47"))
+	ci.draw_rect(Rect2(cx + 70, cy - 4, 32, 12), Color("6b4829"))
+	ci.draw_rect(Rect2(cx + 70, cy - 4, 32, 2), Color("92693d"))
+	ci.draw_rect(Rect2(cx + 70, cy + 6, 32, 2), Color("47301f"))
 	# Anchor bolts and a small gear rack on the wall above.
 	for k in [-50.0, 60.0]:
-		ci.draw_rect(Rect2(cx + k, cy - 70, 3, 3), Color("c8ccd4"))
+		ci.draw_rect(Rect2(cx + k, cy - 70, 3, 3), Color("bdb8ae"))
 	for i in 5:
-		ci.draw_texture(ClimbSprites.hardware("cam", i), Vector2(cx + 96 + i * 6, cy - 70 + (i % 2) * 2), Color(1, 1, 1, 0.9))
+		ci.draw_texture(ClimbSprites.hardware("cam", i), Vector2(cx + 96 + i * 6, cy - 70 + (i % 2) * 2), Color(0.961, 0.933, 0.878, 0.9))
 
 
 static func _portaledge(ci: CanvasItem, cx: float, cy: float, time: float) -> void:
@@ -243,25 +243,25 @@ static func _portaledge(ci: CanvasItem, cx: float, cy: float, time: float) -> vo
 	for k in [-72.0, 72.0]:
 		var top := Vector2(cx + k * 0.8, anchor_y)
 		var bot := Vector2(cx + k + sway, cy + 8)
-		ci.draw_line(top, bot, Color("3a1812"), 3.0)
-		ci.draw_line(top, bot, Color("d8452e"), 1.0)
-		ci.draw_rect(Rect2(top.x - 2, top.y - 3, 5, 6), Color("2a1f1a"))
-		ci.draw_rect(Rect2(top.x - 1, top.y - 2, 3, 4), Color("c8ccd4"))
-		ci.draw_rect(Rect2(top.x - 1, top.y - 2, 3, 1), Color("f4f6fa"))
+		ci.draw_line(top, bot, Color("2a1b14"), 3.0)
+		ci.draw_line(top, bot, Color("b3362b"), 1.0)
+		ci.draw_rect(Rect2(top.x - 2, top.y - 3, 5, 6), Color("2a1b14"))
+		ci.draw_rect(Rect2(top.x - 1, top.y - 2, 3, 4), Color("bdb8ae"))
+		ci.draw_rect(Rect2(top.x - 1, top.y - 2, 3, 1), Color("f5eee0"))
 	# The bed: orange nylon, a lit top edge, a dark underside and aluminium tubes.
 	var bx := cx - 82.0 + sway
-	ci.draw_rect(Rect2(bx, cy + 9, 164, 6), Color("1a1a24"))
-	ci.draw_rect(Rect2(bx - 2, cy + 6, 168, 3), Color("c8ccd4"))
-	ci.draw_rect(Rect2(bx - 2, cy + 6, 168, 1), Color("f4f6fa"))
-	ci.draw_rect(Rect2(bx, cy + 9, 164, 6), Color("e88a30"))
-	ci.draw_rect(Rect2(bx, cy + 9, 164, 1), Color("f8b060"))
-	ci.draw_rect(Rect2(bx, cy + 14, 164, 1), Color("a85a1c"))
+	ci.draw_rect(Rect2(bx, cy + 9, 164, 6), Color("15141c"))
+	ci.draw_rect(Rect2(bx - 2, cy + 6, 168, 3), Color("bdb8ae"))
+	ci.draw_rect(Rect2(bx - 2, cy + 6, 168, 1), Color("f5eee0"))
+	ci.draw_rect(Rect2(bx, cy + 9, 164, 6), Color("d9772a"))
+	ci.draw_rect(Rect2(bx, cy + 9, 164, 1), Color("f7a64a"))
+	ci.draw_rect(Rect2(bx, cy + 14, 164, 1), Color("a84a1c"))
 	for k in range(0, 160, 10):
-		ci.draw_rect(Rect2(bx + 4 + k, cy + 10, 1, 4), Color("c0661c"))
+		ci.draw_rect(Rect2(bx + 4 + k, cy + 10, 1, 4), Color("d9772a"))
 	# Struts and the haul line underneath.
 	for k in range(-70, 76, 20):
-		ci.draw_rect(Rect2(cx + k + sway, cy + 15, 2, 6), Color("6a6e78"))
-	ci.draw_rect(Rect2(bx + 6, cy + 20, 152, 1), Color("3a3e48"))
+		ci.draw_rect(Rect2(cx + k + sway, cy + 15, 2, 6), Color("6a6a70"))
+	ci.draw_rect(Rect2(bx + 6, cy + 20, 152, 1), Color("47464d"))
 
 
 static func _headlamps(ci: CanvasItem, a: Vector2, b: Vector2, target: Vector2, time: float) -> void:
@@ -273,33 +273,33 @@ static func _headlamps(ci: CanvasItem, a: Vector2, b: Vector2, target: Vector2, 
 		var flick := 0.08 + 0.01 * sin(time * 3.0 + dir)
 		ci.draw_colored_polygon(PackedVector2Array([from, to + Vector2(-9, 2), to + Vector2(9, 6)]), Color(1.0, 0.95, 0.75, flick))
 		ci.draw_colored_polygon(PackedVector2Array([from, to + Vector2(-5, 3), to + Vector2(5, 5)]), Color(1.0, 0.95, 0.75, flick))
-		ci.draw_rect(Rect2(from.x + dir * -1.0 - 1, from.y - 6, 3, 2), Color("fff4c0"))
+		ci.draw_rect(Rect2(from.x + dir * -1.0 - 1, from.y - 6, 3, 2), Color("f5eee0"))
 		ci.draw_rect(Rect2(from.x + dir * -1.0, from.y - 6, 1, 1), Color.WHITE)
 
 
 static func _stove(ci: CanvasItem, cx: float, cy: float, time: float) -> void:
 	# A little canister stove with a blue ring of flame under a dented pot.
 	var flick := int(time * 12.0) % 3
-	ci.draw_rect(Rect2(cx - 8, cy + 4, 16, 4), Color("2a2a30"))
-	ci.draw_rect(Rect2(cx - 8, cy + 4, 16, 1), Color("6a707e"))
-	ci.draw_rect(Rect2(cx - 6, cy + 1, 12, 3), Color("505868"))
-	ci.draw_rect(Rect2(cx - 6, cy + 1, 12, 1), Color("8a90a0"))
+	ci.draw_rect(Rect2(cx - 8, cy + 4, 16, 4), Color("2b2a30"))
+	ci.draw_rect(Rect2(cx - 8, cy + 4, 16, 1), Color("6a6a70"))
+	ci.draw_rect(Rect2(cx - 6, cy + 1, 12, 3), Color("47464d"))
+	ci.draw_rect(Rect2(cx - 6, cy + 1, 12, 1), Color("93918f"))
 	# Blue base flame with an orange tip, three frames.
 	for i in 5:
 		var fx := cx - 5 + i * 2.5
 		var h := 2 + ((i + flick) % 3)
-		ci.draw_rect(Rect2(fx, cy - h + 1, 2, h), Color("5aa8e0"))
-		ci.draw_rect(Rect2(fx, cy - h + 1, 2, 1), Color("f0c870"))
-	ci.draw_circle(Vector2(cx, cy - 2), 14.0, Color(0.4, 0.6, 1.0, 0.04))
+		ci.draw_rect(Rect2(fx, cy - h + 1, 2, h), Color("3a86a8"))
+		ci.draw_rect(Rect2(fx, cy - h + 1, 2, 1), Color("f1cf6a"))
+	ci.draw_circle(Vector2(cx, cy - 2), 14.0, Color(0.435, 0.353, 0.651, 0.04))
 	# Pot: steel with a rolled rim, a bale handle and a lid.
-	ci.draw_rect(Rect2(cx - 8, cy - 13, 16, 12), Color("9a9eaa"))
-	ci.draw_rect(Rect2(cx - 8, cy - 13, 3, 12), Color("c8ccd4"))
-	ci.draw_rect(Rect2(cx + 4, cy - 13, 4, 12), Color("6a707e"))
-	ci.draw_rect(Rect2(cx - 9, cy - 14, 18, 2), Color("d8dce4"))
-	ci.draw_rect(Rect2(cx - 9, cy - 12, 18, 1), Color("4a5060"))
-	ci.draw_rect(Rect2(cx - 8, cy - 2, 16, 1), Color("4a5060"))
-	ci.draw_rect(Rect2(cx - 3, cy - 10, 5, 3), Color("2a2a30"))
-	ci.draw_arc(Vector2(cx, cy - 14), 8.0, PI, TAU, 10, Color("2a2a30"), 1.0)
+	ci.draw_rect(Rect2(cx - 8, cy - 13, 16, 12), Color("93918f"))
+	ci.draw_rect(Rect2(cx - 8, cy - 13, 3, 12), Color("bdb8ae"))
+	ci.draw_rect(Rect2(cx + 4, cy - 13, 4, 12), Color("6a6a70"))
+	ci.draw_rect(Rect2(cx - 9, cy - 14, 18, 2), Color("d6f1ee"))
+	ci.draw_rect(Rect2(cx - 9, cy - 12, 18, 1), Color("47464d"))
+	ci.draw_rect(Rect2(cx - 8, cy - 2, 16, 1), Color("47464d"))
+	ci.draw_rect(Rect2(cx - 3, cy - 10, 5, 3), Color("2b2a30"))
+	ci.draw_arc(Vector2(cx, cy - 14), 8.0, PI, TAU, 10, Color("2b2a30"), 1.0)
 
 
 static func _meal(ci: CanvasItem, cx: float, cy: float, time: float) -> void:
@@ -313,12 +313,12 @@ static func _meal(ci: CanvasItem, cx: float, cy: float, time: float) -> void:
 		ci.draw_rect(Rect2(floorf(sx), floorf(sy), sz, sz), Color(1, 1, 1, a))
 	# Bowls on the ledge and a spoon, a mug for each.
 	for k in [-26.0, 20.0]:
-		ci.draw_rect(Rect2(cx + k, cy + 5, 7, 3), Color("d8d0b8"))
+		ci.draw_rect(Rect2(cx + k, cy + 5, 7, 3), Color("e4ddcc"))
 		ci.draw_rect(Rect2(cx + k, cy + 5, 7, 1), Color.WHITE)
-		ci.draw_rect(Rect2(cx + k + 1, cy + 4, 5, 1), Color("a8501a"))
-		ci.draw_rect(Rect2(cx + k + 6, cy + 3, 1, 4), Color("6a707e"))
-	ci.draw_rect(Rect2(cx + 30, cy + 3, 4, 5), Color("3a78c8"))
-	ci.draw_rect(Rect2(cx + 30, cy + 3, 4, 1), Color("8ac0f0"))
+		ci.draw_rect(Rect2(cx + k + 1, cy + 4, 5, 1), Color("a84a1c"))
+		ci.draw_rect(Rect2(cx + k + 6, cy + 3, 1, 4), Color("6a6a70"))
+	ci.draw_rect(Rect2(cx + 30, cy + 3, 4, 5), Color("6f5aa6"))
+	ci.draw_rect(Rect2(cx + 30, cy + 3, 4, 1), Color("63b3c6"))
 
 
 # ---------------------------------------------------------------- card

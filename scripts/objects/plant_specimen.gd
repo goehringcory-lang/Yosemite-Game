@@ -52,11 +52,11 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	if not is_wanted() or _glint <= 0.0:
 		return
-	var at := Vector2(4, -13)
+	var at := Vector2(8, -26)
 	var color := Color(GLINT, _glint)
-	var arm := 1 + int(_glint * 2.0)
-	draw_rect(Rect2(at.x - arm, at.y, arm * 2 + 1, 1), color)
-	draw_rect(Rect2(at.x, at.y - arm, 1, arm * 2 + 1), color)
+	var arm := 2 + 2 * int(_glint * 2.0)
+	draw_rect(Rect2(at.x - arm, at.y, arm * 2 + 2, 2), color)
+	draw_rect(Rect2(at.x, at.y - arm, 2, arm * 2 + 2), color)
 
 
 func get_prompt() -> String:

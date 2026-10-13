@@ -13,24 +13,24 @@
 [node name="JohnMuir" parent="." instance=ExtResource("1_r")]
 character = ExtResource("2_r")
 spot = "cathedral_lakes_trailhead"
-offset = Vector2(-20, -12)
-wander_radius = 16.0
+offset = Vector2(-40, -24)
+wander_radius = 32
 
 [node name="CathedralPeak" parent="." instance=ExtResource("3_r")]
-position = Vector2(200, 1144)
+position = Vector2(400, 2288)
 route = ExtResource("4_r")
 
 [node name="CarrieBethel" parent="." instance=ExtResource("1_r")]
 character = ExtResource("5_r")
 spot = "soda_springs"
-offset = Vector2(16, 8)
+offset = Vector2(32, 16)
 
 [node name="LyellGlacier" parent="." instance=ExtResource("3_r")]
-position = Vector2(2800, 840)
+position = Vector2(5600, 1680)
 route = ExtResource("6_r")
 
 [node name="VisitorBackpacker" parent="." instance=ExtResource("1_r")]
 character = ExtResource("7_r")
 spot = "arrival"
-offset = Vector2(40, 0)
-wander_radius = 48.0
+offset = Vector2(80, 0)
+wander_radius = 96

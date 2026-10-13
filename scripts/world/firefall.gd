@@ -13,9 +13,9 @@ extends Node2D
 ## [method GameClock.is_firefall_time] is true.
 
 const MESSAGE := "Someone calls up to the rim: 'Let the fire fall!'"
-## How far the embers fall, in pixels. The granite wall is about 55 px tall; the
+## How far the embers fall, in pixels. The granite wall is about 110 px tall; the
 ## rest runs down over the talus below it.
-const LENGTH := 96.0
+const LENGTH := 192.0
 const SPAWN_RATE := 140.0
 const MAX_EMBERS := 420
 ## Seconds the glow takes to build once the call has gone up, and to die away.
@@ -74,16 +74,16 @@ func _step_embers(delta: float) -> void:
 	while _spawn_acc >= 1.0 and _embers.size() < MAX_EMBERS:
 		_spawn_acc -= 1.0
 		_embers.append({
-			"x": _rng.randf_range(-2.0, 2.0),
-			"y": _rng.randf_range(0.0, 2.0),
-			"v": _rng.randf_range(26.0, 44.0),
-			"drift": _rng.randf_range(-1.5, 1.5),
+			"x": _rng.randf_range(-4.0, 4.0),
+			"y": _rng.randf_range(0.0, 4.0),
+			"v": _rng.randf_range(52.0, 88.0),
+			"drift": _rng.randf_range(-3.0, 3.0),
 			"tall": _rng.randf() < 0.45,
 		})
 	_spawn_acc = minf(_spawn_acc, 1.0)
 	for i in range(_embers.size() - 1, -1, -1):
 		var ember := _embers[i]
-		ember.v += 14.0 * delta
+		ember.v += 28.0 * delta
 		ember.y += ember.v * delta
 		ember.x += ember.drift * delta
 		if ember.y >= LENGTH:
@@ -101,36 +101,36 @@ func _draw() -> void:
 		var scaled := t * (PALETTE.size() - 1)
 		var base: int = mini(int(scaled), PALETTE.size() - 2)
 		var color: Color = PALETTE[base].lerp(PALETTE[base + 1], scaled - base)
-		color.a = (1.0 - smoothstep(0.55, 1.0, t)) * minf(ember.y / 3.0, 1.0)
+		color.a = (1.0 - smoothstep(0.55, 1.0, t)) * minf(ember.y / 6.0, 1.0)
 		var pos := _ribbon_at(ember.y) + Vector2(ember.x, 0.0)
-		draw_rect(Rect2(Vector2(roundf(pos.x), roundf(pos.y)), Vector2(1, 2 if ember.tall else 1)), color)
+		draw_rect(Rect2(Vector2(roundf(pos.x), roundf(pos.y)), Vector2(2, 4 if ember.tall else 2)), color)
 
 
 ## The ribbon sways a pixel or two as it falls.
 func _ribbon_at(y: float) -> Vector2:
-	return Vector2(sin(y * 0.07 + _time * 0.6) * 1.6, y)
+	return Vector2(sin(y * 0.035 + _time * 0.6) * 3.2, y)
 
 
-## A faint light on the granite either side of the ribbon, in 4-pixel steps.
+## A faint light on the granite either side of the ribbon, in 8-pixel steps.
 func _draw_wall_wash(glow: float) -> void:
-	for step in int(LENGTH / 4.0):
-		var y := step * 4.0
+	for step in int(LENGTH / 8.0):
+		var y := step * 8.0
 		var fade := (1.0 - y / LENGTH) * glow
 		var cx := roundf(_ribbon_at(y).x)
-		draw_rect(Rect2(cx - 5, y, 11, 4), Color(1.0, 0.45, 0.1, 0.14 * fade))
-		draw_rect(Rect2(cx - 2, y, 5, 4), Color(1.0, 0.6, 0.2, 0.24 * fade))
+		draw_rect(Rect2(cx - 10, y, 22, 8), Color(1.0, 0.45, 0.1, 0.14 * fade))
+		draw_rect(Rect2(cx - 4, y, 10, 8), Color(1.0, 0.6, 0.2, 0.24 * fade))
 	# Where the embers die away at the foot of the wall.
 	draw_set_transform(Vector2(0, LENGTH), 0.0, Vector2(1.0, 0.3))
 	for i in 3:
-		draw_circle(Vector2.ZERO, 12.0 - i * 3.5, Color(1.0, 0.4, 0.1, 0.035 * glow))
+		draw_circle(Vector2.ZERO, 24.0 - i * 7.0, Color(1.0, 0.4, 0.1, 0.035 * glow))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 ## The glow pool where the fire is pushed over the edge, in flat steps.
 func _draw_rim_pool(glow: float) -> void:
-	draw_set_transform(Vector2(0, 1), 0.0, Vector2(1.0, 0.25))
+	draw_set_transform(Vector2(0, 2), 0.0, Vector2(1.0, 0.25))
 	for i in 5:
-		var radius := 34.0 - i * 6.0
+		var radius := 68.0 - i * 12.0
 		draw_circle(Vector2.ZERO, radius, Color(1.0, 0.55 + i * 0.07, 0.15 + i * 0.1, 0.17 * glow))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 

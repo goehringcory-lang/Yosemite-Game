@@ -13,7 +13,7 @@ extends AudioStreamPlayer2D
 var _check := 0.0
 
 
-## An emitter of [param sound] heard out to [param reach] pixels.
+## An emitter of [param sound] heard out to [param reach] world pixels.
 static func make(sound_id: String, reach: float, level_at_source := 1.0) -> SoundEmitter:
 	var emitter := SoundEmitter.new()
 	emitter.name = "Sound_" + sound_id
@@ -34,7 +34,7 @@ static func attach_waterfalls(region: Region) -> void:
 		var label := place.display_name
 		if not (label.ends_with(" Fall") or label.ends_with(" Falls") or label.ends_with(" Cascade")) or label.contains("Firefall"):
 			continue
-		place.add_child(make("waterfall", 360.0, 1.0))
+		place.add_child(make("waterfall", 720.0, 1.0))
 
 
 func _ready() -> void:

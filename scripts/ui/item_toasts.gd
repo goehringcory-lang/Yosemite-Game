@@ -16,8 +16,8 @@ const CARD_HEIGHT := 20.0
 const GAP := 2.0
 ## Pixels the card slides in from the left.
 const SLIDE := 24.0
-const NAME_COLOR := Color(1.0, 0.92, 0.72)
-const COUNT_COLOR := Color(1.0, 0.85, 0.5)
+const NAME_COLOR := Color(1, 0.831, 0.541)
+const COUNT_COLOR := Color(1, 0.831, 0.541)
 
 ## Each entry: {"key", "card", "count", "label", "time"}.
 var _cards: Array[Dictionary] = []
@@ -28,7 +28,7 @@ var bottom_margin := 44.0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	UiScale.fit(self)
 
 
 ## Shows (or adds to) the card for [param key].
@@ -136,7 +136,7 @@ func _process(delta: float) -> void:
 
 ## Newest card at the bottom, older ones stacked above.
 func _layout() -> void:
-	var bottom := get_viewport_rect().size.y - bottom_margin
+	var bottom := UiScale.SCREEN.y - bottom_margin
 	for i in range(_cards.size() - 1, -1, -1):
 		var card: Control = _cards[i].card
 		var y := bottom - CARD_HEIGHT - (_cards.size() - 1 - i) * (CARD_HEIGHT + GAP)

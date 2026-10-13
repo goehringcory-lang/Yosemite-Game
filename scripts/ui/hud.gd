@@ -21,6 +21,8 @@ var _location_tween: Tween
 var _status: Label
 ## The "you got this" cards at the bottom left.
 var toasts: ItemToasts
+## The menu-sized root every HUD element sits under (see UiScale).
+var _screen: Control
 ## Darkens the world behind the pause menu and the book.
 var _dim: ColorRect
 var _message_tween: Tween
@@ -52,29 +54,31 @@ var _gamepad := false
 
 func _ready() -> void:
 	add_to_group("hud")
+	UiScale.layer(self)
+	_screen = UiScale.wrap_children(self)
 	message_label.modulate.a = 0.0
 	GameClock.time_changed.connect(_refresh_clock.unbind(2))
 	GameClock.day_started.connect(_refresh_clock.unbind(3))
 	device_changed.connect(_refresh_status)
 	_dim = ColorRect.new()
-	_dim.color = Color(0.03, 0.02, 0.06, 0.0)
+	_dim.color = Color(0.082, 0.078, 0.11, 0)
 	_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_dim)
-	move_child(_dim, 0)
+	_screen.add_child(_dim)
+	_screen.move_child(_dim, 0)
 	# Messages ("You fell asleep at...", what a find is) sit on a dark card
 	# rather than floating over the world.
 	var card := StyleBoxFlat.new()
-	card.bg_color = Color(0.1, 0.07, 0.05, 0.72)
-	card.border_color = Color(0.55, 0.4, 0.22, 0.9)
+	card.bg_color = Color(0.165, 0.106, 0.078, 0.72)
+	card.border_color = Color(0.573, 0.412, 0.239, 0.9)
 	card.set_border_width_all(1)
 	card.set_content_margin_all(3)
 	card.content_margin_left = 5
 	card.content_margin_right = 5
 	message_label.add_theme_stylebox_override("normal", card)
 	toasts = ItemToasts.new()
-	add_child(toasts)
-	move_child(toasts, fade.get_index()) # under the fade, so the black covers it
+	_screen.add_child(toasts)
+	_screen.move_child(toasts, fade.get_index()) # under the fade, so the black covers it
 	Inventory.added.connect(_on_item_added)
 	Gear.added.connect(_on_gear_added)
 	QuestLog.quest_completed.connect(func(_quest: QuestData) -> void: Sound.play("quest_done", 0.0, 0.0))
@@ -118,7 +122,7 @@ func _ready() -> void:
 	apple.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	purse.add_child(apple)
 	food_label = Label.new()
-	food_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.5))
+	food_label.add_theme_color_override("font_color", Color(1, 0.831, 0.541))
 	food_label.tooltip_text = "Food energy you carry (what you trade with)"
 	purse.add_child(food_label)
 	right.add_child(purse)
@@ -128,8 +132,8 @@ func _ready() -> void:
 	# The use prompt is a slim bubble, not a full frame, so it doesn't cover
 	# the person or the sign you're facing.
 	var bubble := StyleBoxFlat.new()
-	bubble.bg_color = Color(0.11, 0.08, 0.06, 0.82)
-	bubble.border_color = Color(0.78, 0.63, 0.38, 0.9)
+	bubble.bg_color = Color(0.165, 0.106, 0.078, 0.82)
+	bubble.border_color = Color(0.69, 0.573, 0.373, 0.9)
 	bubble.set_border_width_all(1)
 	bubble.set_corner_radius_all(2)
 	bubble.content_margin_left = 4.0
@@ -185,7 +189,7 @@ func set_location(text: String) -> void:
 	_show_location_banner()
 	var parts := text.split(" · ")
 	# the banner is centered, so its right edge is half its width past the middle
-	var middle := get_viewport().get_visible_rect().size.x / 2.0
+	var middle := UiScale.SCREEN.x / 2.0
 	var clock_left := clock_panel.get_global_rect().position.x
 	var room := 2.0 * (clock_left - 4.0 - middle)
 	location_label.text = " · ".join(parts)
@@ -227,7 +231,7 @@ func _process(_delta: float) -> void:
 	# Cards ride above a conversation box (shops, cooking) so they stay readable.
 	toasts.bottom_margin = 44.0
 	for box: DialogueBox in get_tree().get_nodes_in_group("dialogue_box"):
-		toasts.bottom_margin = maxf(toasts.bottom_margin, get_viewport().get_visible_rect().size.y - box.top() + 4.0)
+		toasts.bottom_margin = maxf(toasts.bottom_margin, UiScale.SCREEN.y - box.top() + 4.0)
 	if info_panel.visible and _player and _player.global_position.distance_to(_info_anchor) > INFO_CLOSE_DISTANCE:
 		hide_info()
 	_update_cover()
@@ -311,12 +315,12 @@ func _update_prompt() -> void:
 	if target.has_method("can_receive_gift") and target.can_receive_gift():
 		prompt_label.text += "    %s  Give a gift" % prompt("G", "LB")
 	prompt_panel.size = Vector2.ZERO
-	var screen := _player.get_global_transform_with_canvas().origin
+	var screen := UiScale.from_view(_player.get_global_transform_with_canvas().origin)
 	# Above whichever head is higher, so it never covers the person you face.
 	if target is CanvasItem:
-		screen.y = minf(screen.y, (target as CanvasItem).get_global_transform_with_canvas().origin.y)
+		screen.y = minf(screen.y, UiScale.from_view((target as CanvasItem).get_global_transform_with_canvas().origin).y)
 	var size := prompt_panel.get_combined_minimum_size()
-	prompt_panel.position = (screen + Vector2(-size.x / 2.0, -40)).clamp(Vector2(2, 2), get_viewport().get_visible_rect().size - size - Vector2(2, 2)).round()
+	prompt_panel.position = (screen + Vector2(-size.x / 2.0, -40)).clamp(Vector2(2, 2), UiScale.SCREEN - size - Vector2(2, 2)).round()
 
 
 func fade_to_black() -> void:

@@ -28,11 +28,11 @@ const ROCKS := {
 	"ice": ["4a6ca8", "7a9ccc", "b0cce6", "dcecf8", "f8fcff"],
 }
 
-const STREAK := Color("2e2a34")
-const LICHEN_ORANGE := Color("d8943a")
-const LICHEN_YELLOW := Color("c8c050")
-const LICHEN_GREEN := Color("8aa85a")
-const MOSS := Color("5a7a3a")
+const STREAK := Color("2b2a30")
+const LICHEN_ORANGE := Color("f7a64a")
+const LICHEN_YELLOW := Color("f1cf6a")
+const LICHEN_GREEN := Color("84b04a")
+const MOSS := Color("437f45")
 
 
 ## The rock colors for [param rock_key] lit by [param pal] (ClimbSky.palette):
@@ -56,17 +56,17 @@ static func colors(rock_key: String, pal: Dictionary) -> Dictionary:
 	# Hue shift: the shadows drift toward blue-violet and the lights toward
 	# warm cream, so the granite reads as lit stone rather than grey paint.
 	# The violet is kept to the deepest tone; mid-tones stay neutral granite.
-	out["deep"] = (out["deep"] as Color).lerp(Color("3c3c6e"), 0.3)
-	out["shade"] = (out["shade"] as Color).lerp(Color("4a4870"), 0.08)
-	out["lit"] = (out["lit"] as Color).lerp(Color("ffe6b4"), 0.1)
-	out["hi"] = (out["hi"] as Color).lerp(Color("fff4d8"), 0.18)
+	out["deep"] = (out["deep"] as Color).lerp(Color("2d3050"), 0.3)
+	out["shade"] = (out["shade"] as Color).lerp(Color("2d3050"), 0.08)
+	out["lit"] = (out["lit"] as Color).lerp(Color("d6bd88"), 0.1)
+	out["hi"] = (out["hi"] as Color).lerp(Color("f5eee0"), 0.18)
 	out["seam"] = _light(Color(hexes[0]).darkened(0.35), tint, lum)
 	out["streak"] = _light(STREAK, tint, lum)
 	out["lichen_o"] = _light(LICHEN_ORANGE, tint, lum)
 	out["lichen_y"] = _light(LICHEN_YELLOW, tint, lum)
 	out["lichen_g"] = _light(LICHEN_GREEN, tint, lum)
 	out["moss"] = _light(MOSS, tint, lum)
-	out["chalk"] = _light(Color("efe6d6"), tint, minf(lum + 0.1, 1.1))
+	out["chalk"] = _light(Color("f5eee0"), tint, minf(lum + 0.1, 1.1))
 	out["tint"] = tint
 	out["lum"] = lum
 	return out
@@ -396,7 +396,7 @@ static func _ragged_edge(im: Image, c: Dictionary, rng: RandomNumberGenerator, s
 		y += run
 	for yy in h:
 		var e := edge[yy]
-		im.fill_rect(Rect2i(e, yy, w - e, 1), Color(0, 0, 0, 0))
+		im.fill_rect(Rect2i(e, yy, w - e, 1), Color(0.082, 0.078, 0.11, 0))
 		im.fill_rect(Rect2i(maxi(e - 4, 0), yy, 3, 1), tone(c, 3.6))
 		im.set_pixel(maxi(e - 1, 0), yy, c.seam.darkened(0.3))
 	return edge
@@ -568,7 +568,7 @@ static func _chimney(im: Image, c: Dictionary, rng: RandomNumberGenerator, deco:
 	# into the slot.
 	P.rect(im, left - 3, 0, 3, h, tone(c, 3.9))
 	P.rect(im, left, 0, 2, h, c.seam)
-	P.rect(im, left + 2, 0, 3, h, Color(0, 0, 0, 0.25))
+	P.rect(im, left + 2, 0, 3, h, Color(0.082, 0.078, 0.11, 0.25))
 	P.rect(im, right - 2, 0, 2, h, c.seam)
 	P.rect(im, right, 0, 1, h, c.seam)
 	P.rect(im, right + 1, 0, 1, h, tone(c, 2.4))
@@ -895,7 +895,7 @@ static func _ledge(im: Image, c: Dictionary, rng: RandomNumberGenerator, y: int,
 		P.px(im, x, y + jy + 2, tone(c, 3.0))
 		P.px(im, x, y + jy + thick, low)
 		P.px(im, x, y + jy + thick + 1, c.deep)
-		P.px(im, x, y + jy + thick + 2, Color(0, 0, 0, 0.3))
+		P.px(im, x, y + jy + thick + 2, Color(0.082, 0.078, 0.11, 0.3))
 		if P.noise(x, 3, 9) < 0.06:
 			P.px(im, x, y + jy + 3, c.seam)
 	for i in 5:
@@ -906,9 +906,9 @@ static func _ledge(im: Image, c: Dictionary, rng: RandomNumberGenerator, y: int,
 		# Anchor bolts with a shiny chain.
 		for i in 2:
 			var bx := int(L.GRID_X + 1.6 * L.COL_W) + i * 26
-			P.rect(im, bx, y - 3, 3, 3, Color("c8ccd4"))
-			P.px(im, bx, y - 3, Color("f4f6fa"))
-			P.px(im, bx + 1, y - 1, Color("505868"))
+			P.rect(im, bx, y - 3, 3, 3, Color("bdb8ae"))
+			P.px(im, bx, y - 3, Color("f5eee0"))
+			P.px(im, bx + 1, y - 1, Color("47464d"))
 
 
 static func _hold(im: Image, c: Dictionary, rng: RandomNumberGenerator, p: Vector2i, hold: Dictionary, base: int, style: String) -> void:
@@ -970,8 +970,8 @@ static func _hold(im: Image, c: Dictionary, rng: RandomNumberGenerator, p: Vecto
 		P.rect(im, p.x - 10, p.y + 4, 21, 2, tone(c, 3.8))
 		P.rect(im, p.x - 10, p.y + 6, 21, 2, c.seam)
 	if hold.get("fixed", false):
-		P.rect(im, p.x - 9, p.y - 3, 2, 8, Color("e8c040"))
-		P.rect(im, p.x - 9, p.y - 3, 1, 8, Color("f8e080"))
+		P.rect(im, p.x - 9, p.y - 3, 2, 8, Color("d8a63b"))
+		P.rect(im, p.x - 9, p.y - 3, 1, 8, Color("f1cf6a"))
 	if hold.get("crux", false):
 		# A chalky scar where everybody pulls.
 		for i in 6:

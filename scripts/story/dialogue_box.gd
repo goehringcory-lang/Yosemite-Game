@@ -14,18 +14,18 @@ extends CanvasLayer
 ## Text appears letter by letter at the Text speed setting (Settings); confirm
 ## while it's still appearing shows the whole page, and confirm again goes on.
 
-const NAME_COLOR := Color(1.0, 0.85, 0.5)
+const NAME_COLOR := Color(1, 0.831, 0.541)
 ## Room left at the start of each option for the arrow (MenuInput.mark).
 const CURSOR := "   "
-const HINT_COLOR := Color(1, 1, 1, 0.6)
+const HINT_COLOR := Color(0.961, 0.933, 0.878, 0.6)
 ## The text's width with and without a portrait beside it.
 const TEXT_WIDTH := 456.0
 const TEXT_WIDTH_PORTRAIT := 364.0
 ## The card beside a list of choices that tells about the one picked, like
 ## Stardew Valley's crafting and shop menus (see choose's details).
 const DETAIL_WIDTH := 168.0
-const DETAIL_SHORT := Color(1.0, 0.55, 0.42)
-const DETAIL_DIM := Color(1, 1, 1, 0.65)
+const DETAIL_SHORT := Color(0.851, 0.467, 0.165)
+const DETAIL_DIM := Color(0.961, 0.933, 0.878, 0.65)
 ## Portraits are painted at 40 px and shown at exactly twice that, so they
 ## stay crisp and read at a glance, like Stardew's 64 px faces.
 const PORTRAIT_SIZE := Vector2(80, 80)
@@ -98,10 +98,11 @@ static func say_to(player: Player, lines: Array) -> void:
 
 func _ready() -> void:
 	layer = 30
+	UiScale.layer(self)
 	add_to_group("dialogue_box") # World waits for the box to close before passing the player out
 	_opened_frame = Engine.get_process_frames()
 	var root := Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	UiScale.fit(root)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	# Sits on the bottom edge of the screen and grows upward, so a long list of
@@ -125,11 +126,11 @@ func _ready() -> void:
 	row.add_child(column)
 	_portrait_frame = PanelContainer.new()
 	var frame := StyleBoxFlat.new()
-	frame.bg_color = Color("5a4634")
-	frame.border_color = Color("c8a060")
+	frame.bg_color = Color("5e4a38")
+	frame.border_color = Color("b0925f")
 	frame.set_border_width_all(1)
 	frame.set_content_margin_all(1)
-	frame.shadow_color = Color(0, 0, 0, 0.35)
+	frame.shadow_color = Color(0.082, 0.078, 0.11, 0.35)
 	frame.shadow_offset = Vector2(1, 1)
 	frame.shadow_size = 1
 	_portrait_frame.add_theme_stylebox_override("panel", frame)
@@ -162,8 +163,8 @@ func _ready() -> void:
 	column.add_child(_options_box)
 	_detail_panel = PanelContainer.new()
 	var card := StyleBoxFlat.new()
-	card.bg_color = Color(0, 0, 0, 0.22)
-	card.border_color = Color(0.78, 0.63, 0.38, 0.55)
+	card.bg_color = Color(0.082, 0.078, 0.11, 0.22)
+	card.border_color = Color(0.69, 0.573, 0.373, 0.55)
 	card.border_width_left = 1
 	card.content_margin_left = 6.0
 	card.content_margin_right = 4.0

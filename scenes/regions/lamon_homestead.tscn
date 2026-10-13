@@ -44,331 +44,331 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/log_fallen_a.png" id="40_80lqk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_y7rw6"]
-size = Vector2(6, 5)
+size = Vector2(12, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0e1cq"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0a5vw"]
-size = Vector2(9, 5)
+size = Vector2(18, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oo7ym"]
-size = Vector2(36, 10)
+size = Vector2(72, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_08asn"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q5dwl"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ruu5b"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dk5cd"]
-size = Vector2(19, 8)
+size = Vector2(38, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tevk3"]
-size = Vector2(46, 12)
+size = Vector2(92, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yynjr"]
-size = Vector2(9, 5)
+size = Vector2(18, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_flykn"]
-size = Vector2(6, 5)
+size = Vector2(12, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_i0yrg"]
-size = Vector2(7, 5)
+size = Vector2(14, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2iiqc"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8lsts"]
-size = Vector2(9, 5)
+size = Vector2(18, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qxg4f"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_m0vk2"]
-size = Vector2(36, 10)
+size = Vector2(72, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_auqhw"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6tknk"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6hi1h"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rswhj"]
-size = Vector2(19, 8)
+size = Vector2(38, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v588a"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o8fqf"]
-size = Vector2(6, 4)
+size = Vector2(12, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6dk88"]
-size = Vector2(36, 10)
+size = Vector2(72, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_uaww8"]
-size = Vector2(19, 8)
+size = Vector2(38, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x4085"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wloqj"]
-size = Vector2(6, 5)
+size = Vector2(12, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1s6rx"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sf13c"]
-size = Vector2(36, 10)
+size = Vector2(72, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cpk67"]
-size = Vector2(6, 5)
+size = Vector2(12, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1q06c"]
-size = Vector2(6, 5)
+size = Vector2(12, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0wvgq"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ffug5"]
-size = Vector2(9, 5)
+size = Vector2(18, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0k6ey"]
-size = Vector2(6, 5)
+size = Vector2(12, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p2to4"]
-size = Vector2(19, 8)
+size = Vector2(38, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qjx7x"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0a8ke"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mvqhy"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_npg8w"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7uqap"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bvbjm"]
-size = Vector2(9, 5)
+size = Vector2(18, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mtv8p"]
-size = Vector2(36, 10)
+size = Vector2(72, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o7pqu"]
-size = Vector2(36, 10)
+size = Vector2(72, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mnf54"]
-size = Vector2(19, 8)
+size = Vector2(38, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xsmca"]
-size = Vector2(19, 8)
+size = Vector2(38, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_16ot6"]
-size = Vector2(19, 8)
+size = Vector2(38, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_y1nxm"]
-size = Vector2(36, 10)
+size = Vector2(72, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_54s1y"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ek2ba"]
-size = Vector2(6, 4)
+size = Vector2(12, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5tt3c"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cf1rc"]
-size = Vector2(19, 8)
+size = Vector2(38, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xlt8v"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1f5rs"]
-size = Vector2(7, 5)
+size = Vector2(14, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kp5x3"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bkj7f"]
-size = Vector2(36, 10)
+size = Vector2(72, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7ojui"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xvo0c"]
-size = Vector2(9, 5)
+size = Vector2(18, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hp2xa"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3lr7v"]
-size = Vector2(19, 8)
+size = Vector2(38, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_20swe"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n0pii"]
-size = Vector2(46, 12)
+size = Vector2(92, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_grmie"]
-size = Vector2(46, 12)
+size = Vector2(92, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_aqyv4"]
-size = Vector2(9, 5)
+size = Vector2(18, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dmi48"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vh3u3"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d5txn"]
-size = Vector2(46, 12)
+size = Vector2(92, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rfn1y"]
-size = Vector2(46, 12)
+size = Vector2(92, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f2cqa"]
-size = Vector2(46, 12)
+size = Vector2(92, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ab4ru"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jjtsb"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_r2toq"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8lvts"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nikqm"]
-size = Vector2(36, 10)
+size = Vector2(72, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_k367s"]
-size = Vector2(6, 5)
+size = Vector2(12, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hvc5q"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ilv8g"]
-size = Vector2(46, 12)
+size = Vector2(92, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7hb64"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fgs3r"]
-size = Vector2(6, 4)
+size = Vector2(12, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rfgd5"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_el3ny"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_perln"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kehn3"]
-size = Vector2(6, 5)
+size = Vector2(12, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f36fs"]
-size = Vector2(19, 8)
+size = Vector2(38, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tn3o4"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_uai8o"]
-size = Vector2(46, 12)
+size = Vector2(92, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_blxte"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g3xot"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_41pgv"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j5ib0"]
-size = Vector2(46, 12)
+size = Vector2(92, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_roxu3"]
-size = Vector2(36, 10)
+size = Vector2(72, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wx2ud"]
-size = Vector2(21, 8)
+size = Vector2(42, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dh3in"]
-size = Vector2(31, 10)
+size = Vector2(62, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3c3rf"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hprek"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tk4ms"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sg1dr"]
-size = Vector2(46, 12)
+size = Vector2(92, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1idr2"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mtlag"]
-size = Vector2(46, 12)
+size = Vector2(92, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a5yvs"]
-size = Vector2(36, 10)
+size = Vector2(72, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wp23e"]
-size = Vector2(25, 9)
+size = Vector2(50, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1g4ol"]
-size = Vector2(14, 6)
+size = Vector2(28, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_m388i"]
-size = Vector2(19, 7)
+size = Vector2(38, 14)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4f2jm"]
-size = Vector2(14, 6)
+size = Vector2(28, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mt2qd"]
-size = Vector2(19, 7)
+size = Vector2(38, 14)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jw2s2"]
-size = Vector2(10, 5)
+size = Vector2(20, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_frukc"]
-size = Vector2(14, 6)
+size = Vector2(28, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wvsvx"]
-size = Vector2(56, 7)
+size = Vector2(112, 14)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_encdo"]
-size = Vector2(56, 7)
+size = Vector2(112, 14)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fdvms"]
-size = Vector2(12, 16)
+size = Vector2(24, 32)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xpw10"]
-size = Vector2(28, 10)
+size = Vector2(56, 20)
 
 [node name="LamonHomestead" type="Node2D" unique_id=2126971732]
 script = ExtResource("1_cty7p")
@@ -396,22 +396,22 @@ tile_set = ExtResource("2_kbph2")
 y_sort_enabled = true
 
 [node name="Tent" parent="Entities" unique_id=1982925934 instance=ExtResource("4_h0nib")]
-position = Vector2(152, 128)
+position = Vector2(304, 256)
 
 [node name="BlackOak1" parent="Entities" unique_id=1903779846 instance=ExtResource("6_1sda5")]
-position = Vector2(232, 78)
+position = Vector2(464, 156)
 
 [node name="BlackOak2" parent="Entities" unique_id=632109657 instance=ExtResource("6_1sda5")]
-position = Vector2(280, 46)
+position = Vector2(560, 92)
 
 [node name="BlackOak3" parent="Entities" unique_id=1317428202 instance=ExtResource("6_1sda5")]
-position = Vector2(296, 110)
+position = Vector2(592, 220)
 
 [node name="BlackOak4" parent="Entities" unique_id=2126348920 instance=ExtResource("6_1sda5")]
-position = Vector2(392, 398)
+position = Vector2(784, 796)
 
 [node name="BlackOak5" parent="Entities" unique_id=2108620711 instance=ExtResource("6_1sda5")]
-position = Vector2(456, 318)
+position = Vector2(912, 636)
 
 [node name="Forage" type="Node2D" parent="Entities" unique_id=931206950 node_paths=PackedStringArray("ground")]
 y_sort_enabled = true
@@ -419,2894 +419,2894 @@ script = ExtResource("7_b63qy")
 ground = NodePath("../../Ground")
 
 [node name="LamonHomesteadSign" parent="Entities" unique_id=544210696 instance=ExtResource("8_skv85")]
-position = Vector2(72, 172)
+position = Vector2(144, 344)
 title = "Lamon Homestead"
 text = "James Lamon began farming near here in 1859 and planted apple trees. He was one of the first non-Native settlers to live in Yosemite Valley year-round."
 
 [node name="ShuttleStop" parent="Entities" unique_id=1333494725 instance=ExtResource("7_cty7p")]
-position = Vector2(40, 162)
+position = Vector2(80, 324)
 stop_name = "Lamon Homestead (Curry orchard)"
 
 [node name="GateSign" parent="Entities" unique_id=30927176 instance=ExtResource("8_kbph2")]
-position = Vector2(24, 172)
+position = Vector2(48, 344)
 label = "Curry Village"
 target_region = "curry_village"
 target_spawn = "homestead"
 
 [node name="NorthTrailSign" parent="Entities" unique_id=505824225 instance=ExtResource("8_kbph2")]
-position = Vector2(184, 22)
+position = Vector2(368, 44)
 label = "The Ahwahnee"
 target_region = "ahwahnee_trail"
 target_spawn = "south_entry"
 
 [node name="Dec_0" type="StaticBody2D" parent="Entities" unique_id=1953875882]
-position = Vector2(8.696623, 15.243598)
+position = Vector2(17.3932, 30.4872)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_0" unique_id=1740692929]
 texture = ExtResource("10_lg0ff")
-offset = Vector2(0, -61)
+offset = Vector2(0, -122)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_0" unique_id=1624148302]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_y7rw6")
 
 [node name="Dec_1" type="StaticBody2D" parent="Entities" unique_id=1209273870]
-position = Vector2(25.020908, 13.9814625)
+position = Vector2(50.0418, 27.9629)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_1" unique_id=1809418085]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_2" type="StaticBody2D" parent="Entities" unique_id=429428820]
-position = Vector2(37.08418, 14.310684)
+position = Vector2(74.1684, 28.6214)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_2" unique_id=1271360196]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_2" unique_id=197776009]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_0e1cq")
 
 [node name="Dec_3" type="StaticBody2D" parent="Entities" unique_id=1586569985]
-position = Vector2(55.248356, 14.383714)
+position = Vector2(110.4967, 28.7674)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_3" unique_id=80830406]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_4" type="StaticBody2D" parent="Entities" unique_id=2052822745]
-position = Vector2(71.37169, 14.995857)
+position = Vector2(142.7434, 29.9917)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_4" unique_id=1092081440]
 texture = ExtResource("13_d6omp")
-offset = Vector2(0, -45)
+offset = Vector2(0, -90)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_4" unique_id=405317336]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_0a5vw")
 
 [node name="Dec_5" type="StaticBody2D" parent="Entities" unique_id=289938830]
-position = Vector2(91.923065, 15.030801)
+position = Vector2(183.8461, 30.0616)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_5" unique_id=2141477673]
 texture = ExtResource("14_m8vvf")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_5" unique_id=856095054]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_oo7ym")
 
 [node name="Dec_6" type="StaticBody2D" parent="Entities" unique_id=688634244]
-position = Vector2(105.162926, 14.123976)
+position = Vector2(210.3259, 28.248)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_6" unique_id=1678561501]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_6" unique_id=2080683301]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_08asn")
 
 [node name="Dec_7" type="StaticBody2D" parent="Entities" unique_id=73899330]
-position = Vector2(122.20684, 14.86894)
+position = Vector2(244.4137, 29.7379)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_7" unique_id=1333219432]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_7" unique_id=1890492135]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_q5dwl")
 
 [node name="Dec_8" type="StaticBody2D" parent="Entities" unique_id=272423516]
-position = Vector2(213.83345, 15.7933855)
+position = Vector2(427.6669, 31.5868)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_8" unique_id=531998869]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_8" unique_id=1935089701]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_ruu5b")
 
 [node name="Dec_9" type="StaticBody2D" parent="Entities" unique_id=1683087440]
-position = Vector2(231.65208, 15.462391)
+position = Vector2(463.3042, 30.9248)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_9" unique_id=1005553428]
 texture = ExtResource("17_n0eoa")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_9" unique_id=1969106874]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_dk5cd")
 
 [node name="Dec_10" type="StaticBody2D" parent="Entities" unique_id=1532582656]
-position = Vector2(247.65573, 14.071882)
+position = Vector2(495.3115, 28.1438)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_10" unique_id=54004423]
 texture = ExtResource("18_3c27n")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_10" unique_id=2035389552]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_tevk3")
 
 [node name="Dec_11" type="StaticBody2D" parent="Entities" unique_id=83358542]
-position = Vector2(260.0293, 13.842272)
+position = Vector2(520.0586, 27.6845)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_11" unique_id=1550050168]
 texture = ExtResource("19_ay6nl")
-offset = Vector2(0, -45)
+offset = Vector2(0, -90)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_11" unique_id=414378462]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_yynjr")
 
 [node name="Dec_12" type="StaticBody2D" parent="Entities" unique_id=643302027]
-position = Vector2(283.56287, 14.297578)
+position = Vector2(567.1257, 28.5952)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_12" unique_id=1210617147]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_13" type="StaticBody2D" parent="Entities" unique_id=1636974419]
-position = Vector2(292.52188, 15.822918)
+position = Vector2(585.0438, 31.6458)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_13" unique_id=159560903]
 texture = ExtResource("20_d6586")
-offset = Vector2(0, -52)
+offset = Vector2(0, -104)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_13" unique_id=1169926410]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_flykn")
 
 [node name="Dec_14" type="StaticBody2D" parent="Entities" unique_id=427425746]
-position = Vector2(307.20453, 13.407513)
+position = Vector2(614.4091, 26.815)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_14" unique_id=300340852]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_15" type="StaticBody2D" parent="Entities" unique_id=106638002]
-position = Vector2(332.28586, 13.838788)
+position = Vector2(664.5717, 27.6776)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_15" unique_id=448869035]
 texture = ExtResource("21_vcq7p")
-offset = Vector2(0, -53)
+offset = Vector2(0, -106)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_15" unique_id=1072449311]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_i0yrg")
 
 [node name="Dec_16" type="StaticBody2D" parent="Entities" unique_id=2017133937]
-position = Vector2(346.9659, 13.778749)
+position = Vector2(693.9318, 27.5575)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_16" unique_id=1772267296]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_16" unique_id=1664469552]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_2iiqc")
 
 [node name="Dec_17" type="StaticBody2D" parent="Entities" unique_id=273367779]
-position = Vector2(362.41663, 13.446861)
+position = Vector2(724.8333, 26.8937)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_17" unique_id=1921051859]
 texture = ExtResource("22_pheqh")
-offset = Vector2(0, -45)
+offset = Vector2(0, -90)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_17" unique_id=58229264]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_8lsts")
 
 [node name="Dec_18" type="StaticBody2D" parent="Entities" unique_id=1068683956]
-position = Vector2(377.01215, 15.597331)
+position = Vector2(754.0243, 31.1947)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_18" unique_id=1520047875]
 texture = ExtResource("23_b51eo")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Dec_19" type="StaticBody2D" parent="Entities" unique_id=770519974]
-position = Vector2(395.67007, 15.682423)
+position = Vector2(791.3401, 31.3648)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_19" unique_id=1975281569]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_20" type="StaticBody2D" parent="Entities" unique_id=1287152761]
-position = Vector2(408.01718, 14.062008)
+position = Vector2(816.0344, 28.124)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_20" unique_id=141470372]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_20" unique_id=1571663067]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_qxg4f")
 
 [node name="Dec_21" type="StaticBody2D" parent="Entities" unique_id=711334677]
-position = Vector2(427.02176, 15.010747)
+position = Vector2(854.0435, 30.0215)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_21" unique_id=1672461676]
 texture = ExtResource("14_m8vvf")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_21" unique_id=1281634024]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_m0vk2")
 
 [node name="Dec_22" type="StaticBody2D" parent="Entities" unique_id=1017972054]
-position = Vector2(435.73788, 15.81539)
+position = Vector2(871.4758, 31.6308)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_22" unique_id=1800185310]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_22" unique_id=1991120392]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_auqhw")
 
 [node name="Dec_23" type="StaticBody2D" parent="Entities" unique_id=1943903877]
-position = Vector2(460.7984, 14.134318)
+position = Vector2(921.5968, 28.2686)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_23" unique_id=586069296]
 texture = ExtResource("24_o7fjw")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Dec_24" type="StaticBody2D" parent="Entities" unique_id=558953939]
-position = Vector2(475.72256, 13.839536)
+position = Vector2(951.4451, 27.6791)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_24" unique_id=297237433]
 texture = ExtResource("24_o7fjw")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Dec_25" type="StaticBody2D" parent="Entities" unique_id=1473266259]
-position = Vector2(489.42603, 13.864744)
+position = Vector2(978.8521, 27.7295)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_25" unique_id=1845120186]
 texture = ExtResource("24_o7fjw")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Dec_26" type="StaticBody2D" parent="Entities" unique_id=594447822]
-position = Vector2(500.1834, 15.363726)
+position = Vector2(1000.3668, 30.7275)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_26" unique_id=2056450770]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_27" type="StaticBody2D" parent="Entities" unique_id=666361146]
-position = Vector2(524.5694, 14.279323)
+position = Vector2(1049.1388, 28.5586)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_27" unique_id=2128367825]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_27" unique_id=1638172371]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_6tknk")
 
 [node name="Dec_28" type="StaticBody2D" parent="Entities" unique_id=1189909025]
-position = Vector2(538.5528, 15.649355)
+position = Vector2(1077.1056, 31.2987)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_28" unique_id=1818635275]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_28" unique_id=925224389]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_6hi1h")
 
 [node name="Dec_29" type="StaticBody2D" parent="Entities" unique_id=562396464]
-position = Vector2(550.8209, 15.133874)
+position = Vector2(1101.6418, 30.2677)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_29" unique_id=117297953]
 texture = ExtResource("17_n0eoa")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_29" unique_id=1730972700]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_rswhj")
 
 [node name="Dec_30" type="StaticBody2D" parent="Entities" unique_id=612778468]
-position = Vector2(572.8863, 14.047612)
+position = Vector2(1145.7726, 28.0952)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_30" unique_id=275910580]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_30" unique_id=963197074]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_v588a")
 
 [node name="Dec_31" type="StaticBody2D" parent="Entities" unique_id=1369726218]
-position = Vector2(588.0093, 15.656215)
+position = Vector2(1176.0186, 31.3124)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_31" unique_id=1192086544]
 texture = ExtResource("25_to0rd")
-offset = Vector2(0, -25)
+offset = Vector2(0, -50)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_31" unique_id=1603246591]
-position = Vector2(0, -2)
+position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_o8fqf")
 
 [node name="Dec_32" type="StaticBody2D" parent="Entities" unique_id=615431574]
-position = Vector2(602.3699, 15.588613)
+position = Vector2(1204.7398, 31.1772)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_32" unique_id=1952233717]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_33" type="StaticBody2D" parent="Entities" unique_id=1265021288]
-position = Vector2(614.83966, 15.425599)
+position = Vector2(1229.6793, 30.8512)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_33" unique_id=1806999185]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_34" type="StaticBody2D" parent="Entities" unique_id=927436618]
-position = Vector2(634.8988, 14.613724)
+position = Vector2(1269.7976, 29.2274)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_34" unique_id=1445292753]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_35" type="StaticBody2D" parent="Entities" unique_id=419392817]
-position = Vector2(11.601089, 29.577982)
+position = Vector2(23.2022, 59.156)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_35" unique_id=1074204115]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_36" type="StaticBody2D" parent="Entities" unique_id=1439393458]
-position = Vector2(633.8381, 30.940964)
+position = Vector2(1267.6762, 61.8819)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_36" unique_id=1682390541]
 texture = ExtResource("24_o7fjw")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Dec_37" type="StaticBody2D" parent="Entities" unique_id=2027652306]
-position = Vector2(8.529543, 47.325584)
+position = Vector2(17.0591, 94.6512)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_37" unique_id=1105297205]
 texture = ExtResource("24_o7fjw")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Dec_38" type="StaticBody2D" parent="Entities" unique_id=563011597]
-position = Vector2(631.8135, 45.472836)
+position = Vector2(1263.627, 90.9457)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_38" unique_id=658515378]
 texture = ExtResource("14_m8vvf")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_38" unique_id=759049979]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_6dk88")
 
 [node name="Dec_39" type="StaticBody2D" parent="Entities" unique_id=1540337855]
-position = Vector2(11.0868635, 61.700153)
+position = Vector2(22.1737, 123.4003)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_39" unique_id=1272343510]
 texture = ExtResource("17_n0eoa")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_39" unique_id=311997656]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_uaww8")
 
 [node name="Dec_40" type="StaticBody2D" parent="Entities" unique_id=1480537482]
-position = Vector2(627.9505, 62.89666)
+position = Vector2(1255.901, 125.7933)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_40" unique_id=248894433]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_40" unique_id=1524366025]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_x4085")
 
 [node name="Dec_41" type="StaticBody2D" parent="Entities" unique_id=761262924]
-position = Vector2(8.7782, 79.79727)
+position = Vector2(17.5564, 159.5945)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_41" unique_id=40138419]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_42" type="StaticBody2D" parent="Entities" unique_id=1121982252]
-position = Vector2(73.715164, 78.18949)
+position = Vector2(147.4303, 156.379)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_42" unique_id=1198012368]
 texture = ExtResource("10_lg0ff")
-offset = Vector2(0, -61)
+offset = Vector2(0, -122)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_42" unique_id=282364924]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_wloqj")
 
 [node name="Dec_43" type="StaticBody2D" parent="Entities" unique_id=409973848]
-position = Vector2(362.28824, 77.112175)
+position = Vector2(724.5765, 154.2243)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_43" unique_id=1615967026]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_44" type="StaticBody2D" parent="Entities" unique_id=1785288428]
-position = Vector2(634.5611, 79.581825)
+position = Vector2(1269.1222, 159.1636)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_44" unique_id=275713871]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_45" type="StaticBody2D" parent="Entities" unique_id=743737453]
-position = Vector2(4.136156, 94.27653)
+position = Vector2(8.2723, 188.5531)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_45" unique_id=580561866]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_45" unique_id=1117277302]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_1s6rx")
 
 [node name="Dec_46" type="StaticBody2D" parent="Entities" unique_id=740076144]
-position = Vector2(635.85077, 95.88633)
+position = Vector2(1271.7015, 191.7727)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_46" unique_id=714486829]
 texture = ExtResource("14_m8vvf")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_46" unique_id=1907915309]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_sf13c")
 
 [node name="Dec_47" type="StaticBody2D" parent="Entities" unique_id=2069081400]
-position = Vector2(8.850625, 109.58748)
+position = Vector2(17.7013, 219.175)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_47" unique_id=1324285456]
 texture = ExtResource("20_d6586")
-offset = Vector2(0, -52)
+offset = Vector2(0, -104)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_47" unique_id=1301800794]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_cpk67")
 
 [node name="Dec_48" type="StaticBody2D" parent="Entities" unique_id=1865805196]
-position = Vector2(627.8847, 111.09811)
+position = Vector2(1255.7694, 222.1962)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_48" unique_id=2114946142]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_49" type="StaticBody2D" parent="Entities" unique_id=1495326458]
-position = Vector2(3.7315297, 126.8088)
+position = Vector2(7.4631, 253.6176)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_49" unique_id=1143898340]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_50" type="StaticBody2D" parent="Entities" unique_id=2062827662]
-position = Vector2(311.72305, 125.82257)
+position = Vector2(623.4461, 251.6451)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_50" unique_id=639187547]
 texture = ExtResource("20_d6586")
-offset = Vector2(0, -52)
+offset = Vector2(0, -104)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_50" unique_id=1311397409]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_1q06c")
 
 [node name="Dec_51" type="StaticBody2D" parent="Entities" unique_id=1638703052]
-position = Vector2(633.5343, 126.19166)
+position = Vector2(1267.0686, 252.3833)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_51" unique_id=209951444]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_51" unique_id=452820647]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_0wvgq")
 
 [node name="Dec_52" type="StaticBody2D" parent="Entities" unique_id=1053985197]
-position = Vector2(4.857643, 141.8912)
+position = Vector2(9.7153, 283.7824)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_52" unique_id=1306977811]
 texture = ExtResource("19_ay6nl")
-offset = Vector2(0, -45)
+offset = Vector2(0, -90)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_52" unique_id=1777915337]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_ffug5")
 
 [node name="Dec_53" type="StaticBody2D" parent="Entities" unique_id=226274472]
-position = Vector2(634.9841, 141.84802)
+position = Vector2(1269.9682, 283.696)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_53" unique_id=1781915993]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_54" type="StaticBody2D" parent="Entities" unique_id=1865543981]
-position = Vector2(403.73322, 157.37389)
+position = Vector2(807.4664, 314.7478)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_54" unique_id=1121705068]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_55" type="StaticBody2D" parent="Entities" unique_id=874714884]
-position = Vector2(628.9372, 158.3238)
+position = Vector2(1257.8744, 316.6476)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_55" unique_id=651969113]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_56" type="StaticBody2D" parent="Entities" unique_id=215533828]
-position = Vector2(628.234, 173.33363)
+position = Vector2(1256.468, 346.6673)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_56" unique_id=986138358]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_57" type="StaticBody2D" parent="Entities" unique_id=1625337519]
-position = Vector2(636.2492, 190.8609)
+position = Vector2(1272.4984, 381.7218)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_57" unique_id=849981153]
 texture = ExtResource("27_shysj")
-offset = Vector2(0, -61)
+offset = Vector2(0, -122)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_57" unique_id=71369434]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_0k6ey")
 
 [node name="Dec_58" type="StaticBody2D" parent="Entities" unique_id=109069787]
-position = Vector2(389.29074, 206.59218)
+position = Vector2(778.5815, 413.1844)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_58" unique_id=1008150058]
 texture = ExtResource("17_n0eoa")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_58" unique_id=1509453588]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_p2to4")
 
 [node name="Dec_59" type="StaticBody2D" parent="Entities" unique_id=466473462]
-position = Vector2(420.27808, 207.75435)
+position = Vector2(840.5562, 415.5087)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_59" unique_id=1057162228]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_59" unique_id=1897469666]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_qjx7x")
 
 [node name="Dec_60" type="StaticBody2D" parent="Entities" unique_id=1132391033]
-position = Vector2(627.2439, 207.13872)
+position = Vector2(1254.4878, 414.2774)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_60" unique_id=742788824]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_60" unique_id=1728725651]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_0a8ke")
 
 [node name="Dec_61" type="StaticBody2D" parent="Entities" unique_id=739801998]
-position = Vector2(375.89365, 223.96362)
+position = Vector2(751.7873, 447.9272)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_61" unique_id=1918366323]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_61" unique_id=1305985439]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_mvqhy")
 
 [node name="Dec_62" type="StaticBody2D" parent="Entities" unique_id=640303990]
-position = Vector2(404.32513, 223.24345)
+position = Vector2(808.6503, 446.4869)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_62" unique_id=1674295560]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_62" unique_id=46814573]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_npg8w")
 
 [node name="Dec_63" type="StaticBody2D" parent="Entities" unique_id=1642398425]
-position = Vector2(631.6342, 221.60837)
+position = Vector2(1263.2684, 443.2167)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_63" unique_id=1436917995]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_63" unique_id=174745254]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_7uqap")
 
 [node name="Dec_64" type="StaticBody2D" parent="Entities" unique_id=327988350]
-position = Vector2(5.060013, 237.7867)
+position = Vector2(10.12, 475.5734)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_64" unique_id=2105663576]
 texture = ExtResource("22_pheqh")
-offset = Vector2(0, -45)
+offset = Vector2(0, -90)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_64" unique_id=400096651]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_bvbjm")
 
 [node name="Dec_65" type="StaticBody2D" parent="Entities" unique_id=878358110]
-position = Vector2(632.7856, 238.65318)
+position = Vector2(1265.5712, 477.3064)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_65" unique_id=1811975188]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_66" type="StaticBody2D" parent="Entities" unique_id=1311036730]
-position = Vector2(9.192656, 253.42896)
+position = Vector2(18.3853, 506.8579)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_66" unique_id=22918266]
 texture = ExtResource("14_m8vvf")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_66" unique_id=2132387878]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_mtv8p")
 
 [node name="Dec_67" type="StaticBody2D" parent="Entities" unique_id=325360288]
-position = Vector2(443.54144, 255.90005)
+position = Vector2(887.0829, 511.8001)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_67" unique_id=1304560991]
 texture = ExtResource("14_m8vvf")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_67" unique_id=574643154]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_o7pqu")
 
 [node name="Dec_68" type="StaticBody2D" parent="Entities" unique_id=141956149]
-position = Vector2(634.8063, 254.44388)
+position = Vector2(1269.6126, 508.8878)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_68" unique_id=1535150205]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_69" type="StaticBody2D" parent="Entities" unique_id=1091369908]
-position = Vector2(3.9095197, 269.02686)
+position = Vector2(7.819, 538.0537)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_69" unique_id=1837051967]
 texture = ExtResource("17_n0eoa")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_69" unique_id=928121276]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_mnf54")
 
 [node name="Dec_70" type="StaticBody2D" parent="Entities" unique_id=1019113816]
-position = Vector2(630.85297, 269.93326)
+position = Vector2(1261.7059, 539.8665)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_70" unique_id=351568612]
 texture = ExtResource("17_n0eoa")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_70" unique_id=1038688757]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_xsmca")
 
 [node name="Dec_71" type="StaticBody2D" parent="Entities" unique_id=1247219269]
-position = Vector2(3.2207851, 285.56003)
+position = Vector2(6.4416, 571.1201)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_71" unique_id=1771372159]
 texture = ExtResource("17_n0eoa")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_71" unique_id=1483679498]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_16ot6")
 
 [node name="Dec_72" type="StaticBody2D" parent="Entities" unique_id=764160867]
-position = Vector2(636.7357, 286.81992)
+position = Vector2(1273.4714, 573.6398)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_72" unique_id=986610231]
 texture = ExtResource("14_m8vvf")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_72" unique_id=1134109082]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_y1nxm")
 
 [node name="Dec_73" type="StaticBody2D" parent="Entities" unique_id=1847649854]
-position = Vector2(11.258444, 302.10574)
+position = Vector2(22.5169, 604.2115)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_73" unique_id=1283468009]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_74" type="StaticBody2D" parent="Entities" unique_id=1119005204]
-position = Vector2(635.42773, 302.80032)
+position = Vector2(1270.8555, 605.6006)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_74" unique_id=2006399130]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_74" unique_id=599369134]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_54s1y")
 
 [node name="Dec_75" type="StaticBody2D" parent="Entities" unique_id=60871965]
-position = Vector2(5.794879, 319.94412)
+position = Vector2(11.5898, 639.8882)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_75" unique_id=1163478216]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_76" type="StaticBody2D" parent="Entities" unique_id=1128400159]
-position = Vector2(52.993233, 319.60306)
+position = Vector2(105.9865, 639.2061)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_76" unique_id=472878182]
 texture = ExtResource("25_to0rd")
-offset = Vector2(0, -25)
+offset = Vector2(0, -50)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_76" unique_id=1162364947]
-position = Vector2(0, -2)
+position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_ek2ba")
 
 [node name="Dec_77" type="StaticBody2D" parent="Entities" unique_id=1674583037]
-position = Vector2(631.7165, 317.7913)
+position = Vector2(1263.433, 635.5826)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_77" unique_id=782047298]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_77" unique_id=1872998488]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_5tt3c")
 
 [node name="Dec_78" type="StaticBody2D" parent="Entities" unique_id=624908677]
-position = Vector2(3.6729248, 334.96585)
+position = Vector2(7.3458, 669.9317)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_78" unique_id=795549568]
 texture = ExtResource("17_n0eoa")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_78" unique_id=1256231353]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_cf1rc")
 
 [node name="Dec_79" type="StaticBody2D" parent="Entities" unique_id=2011043102]
-position = Vector2(635.3399, 333.24973)
+position = Vector2(1270.6798, 666.4995)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_79" unique_id=1744217644]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_79" unique_id=1256909964]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_xlt8v")
 
 [node name="Dec_80" type="StaticBody2D" parent="Entities" unique_id=572401930]
-position = Vector2(9.400606, 349.09528)
+position = Vector2(18.8012, 698.1906)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_80" unique_id=297349601]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_81" type="StaticBody2D" parent="Entities" unique_id=1807509344]
-position = Vector2(419.41565, 349.68948)
+position = Vector2(838.8313, 699.379)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_81" unique_id=201427219]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_82" type="StaticBody2D" parent="Entities" unique_id=413515968]
-position = Vector2(627.4421, 351.7224)
+position = Vector2(1254.8842, 703.4448)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_82" unique_id=56943020]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_83" type="StaticBody2D" parent="Entities" unique_id=2085920653]
-position = Vector2(4.759926, 365.71515)
+position = Vector2(9.5199, 731.4303)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_83" unique_id=594158358]
 texture = ExtResource("21_vcq7p")
-offset = Vector2(0, -53)
+offset = Vector2(0, -106)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_83" unique_id=228785189]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_1f5rs")
 
 [node name="Dec_84" type="StaticBody2D" parent="Entities" unique_id=1799797504]
-position = Vector2(636.0611, 366.26102)
+position = Vector2(1272.1222, 732.522)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_84" unique_id=1372136998]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_84" unique_id=1107794888]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_kp5x3")
 
 [node name="Dec_85" type="StaticBody2D" parent="Entities" unique_id=1605572232]
-position = Vector2(6.5828886, 382.6754)
+position = Vector2(13.1658, 765.3508)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_85" unique_id=1958087538]
 texture = ExtResource("14_m8vvf")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_85" unique_id=1272764819]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_bkj7f")
 
 [node name="Dec_86" type="StaticBody2D" parent="Entities" unique_id=967944218]
-position = Vector2(628.76855, 381.8539)
+position = Vector2(1257.5371, 763.7078)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_86" unique_id=939183578]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_86" unique_id=1593262633]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_7ojui")
 
 [node name="Dec_87" type="StaticBody2D" parent="Entities" unique_id=720501346]
-position = Vector2(7.592543, 399.51382)
+position = Vector2(15.1851, 799.0276)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_87" unique_id=1698070854]
 texture = ExtResource("19_ay6nl")
-offset = Vector2(0, -45)
+offset = Vector2(0, -90)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_87" unique_id=482227059]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_xvo0c")
 
 [node name="Dec_88" type="StaticBody2D" parent="Entities" unique_id=1147357974]
-position = Vector2(636.07635, 397.35385)
+position = Vector2(1272.1527, 794.7077)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_88" unique_id=1695464837]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_88" unique_id=1046091501]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_hp2xa")
 
 [node name="Dec_89" type="StaticBody2D" parent="Entities" unique_id=394783868]
-position = Vector2(6.4878654, 415.42093)
+position = Vector2(12.9757, 830.8419)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_89" unique_id=41174468]
 texture = ExtResource("17_n0eoa")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_89" unique_id=814096912]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_3lr7v")
 
 [node name="Dec_90" type="StaticBody2D" parent="Entities" unique_id=1864335116]
-position = Vector2(630.1462, 414.35675)
+position = Vector2(1260.2924, 828.7135)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_90" unique_id=1988757043]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_91" type="StaticBody2D" parent="Entities" unique_id=1392504522]
-position = Vector2(6.032329, 429.94955)
+position = Vector2(12.0647, 859.8991)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_91" unique_id=312555299]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_91" unique_id=426291449]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_20swe")
 
 [node name="Dec_92" type="StaticBody2D" parent="Entities" unique_id=919674783]
-position = Vector2(252.8188, 429.6142)
+position = Vector2(505.6376, 859.2284)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_92" unique_id=762571869]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_93" type="StaticBody2D" parent="Entities" unique_id=89688192]
-position = Vector2(628.98035, 429.4946)
+position = Vector2(1257.9607, 858.9892)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_93" unique_id=921741698]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_94" type="StaticBody2D" parent="Entities" unique_id=1740982515]
-position = Vector2(8.968407, 445.10623)
+position = Vector2(17.9368, 890.2125)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_94" unique_id=1788182890]
 texture = ExtResource("18_3c27n")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_94" unique_id=842929462]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_n0pii")
 
 [node name="Dec_95" type="StaticBody2D" parent="Entities" unique_id=2068047715]
-position = Vector2(628.8356, 446.6194)
+position = Vector2(1257.6712, 893.2388)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_95" unique_id=1636597858]
 texture = ExtResource("18_3c27n")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_95" unique_id=1026271041]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_grmie")
 
 [node name="Dec_96" type="StaticBody2D" parent="Entities" unique_id=1104254519]
-position = Vector2(9.082307, 461.31656)
+position = Vector2(18.1646, 922.6331)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_96" unique_id=45815076]
 texture = ExtResource("13_d6omp")
-offset = Vector2(0, -45)
+offset = Vector2(0, -90)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_96" unique_id=88642423]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_aqyv4")
 
 [node name="Dec_97" type="StaticBody2D" parent="Entities" unique_id=1403338782]
-position = Vector2(627.3925, 463.46533)
+position = Vector2(1254.785, 926.9307)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_97" unique_id=1515725811]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_98" type="StaticBody2D" parent="Entities" unique_id=1743180640]
-position = Vector2(6.684106, 477.99014)
+position = Vector2(13.3682, 955.9803)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_98" unique_id=871918835]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_98" unique_id=1548269427]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_dmi48")
 
 [node name="Dec_99" type="StaticBody2D" parent="Entities" unique_id=1529324218]
-position = Vector2(27.72976, 479.7605)
+position = Vector2(55.4595, 959.521)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_99" unique_id=1791053287]
 texture = ExtResource("24_o7fjw")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Dec_100" type="StaticBody2D" parent="Entities" unique_id=2146645360]
-position = Vector2(44.523952, 477.16965)
+position = Vector2(89.0479, 954.3393)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_100" unique_id=911234287]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_100" unique_id=2123857105]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_vh3u3")
 
 [node name="Dec_101" type="StaticBody2D" parent="Entities" unique_id=1343884848]
-position = Vector2(53.85668, 477.41647)
+position = Vector2(107.7134, 954.8329)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_101" unique_id=1541662852]
 texture = ExtResource("18_3c27n")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_101" unique_id=322282406]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_d5txn")
 
 [node name="Dec_102" type="StaticBody2D" parent="Entities" unique_id=415460673]
-position = Vector2(76.73564, 477.44574)
+position = Vector2(153.4713, 954.8915)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_102" unique_id=1194786939]
 texture = ExtResource("18_3c27n")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_102" unique_id=61666276]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_rfn1y")
 
 [node name="Dec_103" type="StaticBody2D" parent="Entities" unique_id=1046188900]
-position = Vector2(86.981995, 477.69046)
+position = Vector2(173.964, 955.3809)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_103" unique_id=1809860959]
 texture = ExtResource("18_3c27n")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_103" unique_id=270020455]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_f2cqa")
 
 [node name="Dec_104" type="StaticBody2D" parent="Entities" unique_id=1991645732]
-position = Vector2(100.41929, 477.79117)
+position = Vector2(200.8386, 955.5823)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_104" unique_id=2125796047]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_105" type="StaticBody2D" parent="Entities" unique_id=2029424512]
-position = Vector2(119.95519, 479.6662)
+position = Vector2(239.9104, 959.3324)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_105" unique_id=577877268]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_105" unique_id=522054599]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_ab4ru")
 
 [node name="Dec_106" type="StaticBody2D" parent="Entities" unique_id=491707535]
-position = Vector2(135.6814, 479.32724)
+position = Vector2(271.3628, 958.6545)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_106" unique_id=113190988]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_106" unique_id=58780227]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_jjtsb")
 
 [node name="Dec_107" type="StaticBody2D" parent="Entities" unique_id=2055735056]
-position = Vector2(154.749, 478.70795)
+position = Vector2(309.498, 957.4159)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_107" unique_id=204401896]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_108" type="StaticBody2D" parent="Entities" unique_id=141700168]
-position = Vector2(165.61623, 477.90875)
+position = Vector2(331.2325, 955.8175)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_108" unique_id=465353506]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_108" unique_id=1267215667]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_r2toq")
 
 [node name="Dec_109" type="StaticBody2D" parent="Entities" unique_id=314267873]
-position = Vector2(188.63528, 477.77084)
+position = Vector2(377.2706, 955.5417)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_109" unique_id=1294602908]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_109" unique_id=631328595]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_8lvts")
 
 [node name="Dec_110" type="StaticBody2D" parent="Entities" unique_id=1900941538]
-position = Vector2(204.1944, 478.0859)
+position = Vector2(408.3888, 956.1718)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_110" unique_id=858717915]
 texture = ExtResource("14_m8vvf")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_110" unique_id=1771775307]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_nikqm")
 
 [node name="Dec_111" type="StaticBody2D" parent="Entities" unique_id=1327808820]
-position = Vector2(213.23384, 478.80957)
+position = Vector2(426.4677, 957.6191)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_111" unique_id=42363277]
 texture = ExtResource("20_d6586")
-offset = Vector2(0, -52)
+offset = Vector2(0, -104)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_111" unique_id=761770269]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_k367s")
 
 [node name="Dec_112" type="StaticBody2D" parent="Entities" unique_id=1608164038]
-position = Vector2(228.43286, 477.41025)
+position = Vector2(456.8657, 954.8205)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_112" unique_id=1232792782]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_112" unique_id=6613062]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_hvc5q")
 
 [node name="Dec_113" type="StaticBody2D" parent="Entities" unique_id=1045348324]
-position = Vector2(243.02243, 479.97827)
+position = Vector2(486.0449, 959.9565)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_113" unique_id=1824142960]
 texture = ExtResource("18_3c27n")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_113" unique_id=1622564328]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_ilv8g")
 
 [node name="Dec_114" type="StaticBody2D" parent="Entities" unique_id=2125890613]
-position = Vector2(267.38663, 477.03778)
+position = Vector2(534.7733, 954.0756)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_114" unique_id=893917710]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_115" type="StaticBody2D" parent="Entities" unique_id=1330778195]
-position = Vector2(279.70657, 477.79562)
+position = Vector2(559.4131, 955.5912)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_115" unique_id=1804673097]
 texture = ExtResource("24_o7fjw")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Dec_116" type="StaticBody2D" parent="Entities" unique_id=28938334]
-position = Vector2(291.0967, 478.40817)
+position = Vector2(582.1934, 956.8163)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_116" unique_id=527592006]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_116" unique_id=436579218]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_7hb64")
 
 [node name="Dec_117" type="StaticBody2D" parent="Entities" unique_id=502586230]
-position = Vector2(308.12103, 477.1136)
+position = Vector2(616.2421, 954.2272)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_117" unique_id=571377097]
 texture = ExtResource("25_to0rd")
-offset = Vector2(0, -25)
+offset = Vector2(0, -50)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_117" unique_id=1631363333]
-position = Vector2(0, -2)
+position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_fgs3r")
 
 [node name="Dec_118" type="StaticBody2D" parent="Entities" unique_id=780991339]
-position = Vector2(328.78366, 477.1228)
+position = Vector2(657.5673, 954.2456)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_118" unique_id=915436695]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_118" unique_id=1761284809]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_rfgd5")
 
 [node name="Dec_119" type="StaticBody2D" parent="Entities" unique_id=108559891]
-position = Vector2(341.30713, 478.1911)
+position = Vector2(682.6143, 956.3822)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_119" unique_id=1235489428]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_119" unique_id=1003708457]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_el3ny")
 
 [node name="Dec_120" type="StaticBody2D" parent="Entities" unique_id=615782637]
-position = Vector2(364.07492, 479.75342)
+position = Vector2(728.1498, 959.5068)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_120" unique_id=1936110613]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_120" unique_id=1321767283]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_perln")
 
 [node name="Dec_121" type="StaticBody2D" parent="Entities" unique_id=1883283748]
-position = Vector2(371.3047, 479.57874)
+position = Vector2(742.6094, 959.1575)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_121" unique_id=1779342326]
 texture = ExtResource("28_1sdy6")
-offset = Vector2(0, -61)
+offset = Vector2(0, -122)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_121" unique_id=1228595847]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_kehn3")
 
 [node name="Dec_122" type="StaticBody2D" parent="Entities" unique_id=486820391]
-position = Vector2(393.85934, 477.54016)
+position = Vector2(787.7187, 955.0803)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_122" unique_id=773567834]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_123" type="StaticBody2D" parent="Entities" unique_id=341583688]
-position = Vector2(408.71106, 479.4548)
+position = Vector2(817.4221, 958.9096)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_123" unique_id=531511852]
 texture = ExtResource("17_n0eoa")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_123" unique_id=1558382050]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_f36fs")
 
 [node name="Dec_124" type="StaticBody2D" parent="Entities" unique_id=1927800856]
-position = Vector2(422.79327, 477.0802)
+position = Vector2(845.5865, 954.1604)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_124" unique_id=1179239925]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_125" type="StaticBody2D" parent="Entities" unique_id=1604887935]
-position = Vector2(444.71313, 477.6292)
+position = Vector2(889.4263, 955.2584)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_125" unique_id=502154260]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_126" type="StaticBody2D" parent="Entities" unique_id=1559638738]
-position = Vector2(453.64407, 479.11847)
+position = Vector2(907.2881, 958.2369)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_126" unique_id=1399824587]
 texture = ExtResource("24_o7fjw")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Dec_127" type="StaticBody2D" parent="Entities" unique_id=2000505028]
-position = Vector2(470.4507, 477.78036)
+position = Vector2(940.9014, 955.5607)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_127" unique_id=227376392]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_127" unique_id=2131694266]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_tn3o4")
 
 [node name="Dec_128" type="StaticBody2D" parent="Entities" unique_id=1110696865]
-position = Vector2(487.1438, 477.19318)
+position = Vector2(974.2876, 954.3864)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_128" unique_id=753995101]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_129" type="StaticBody2D" parent="Entities" unique_id=470991968]
-position = Vector2(499.1882, 478.21402)
+position = Vector2(998.3764, 956.428)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_129" unique_id=71896628]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_130" type="StaticBody2D" parent="Entities" unique_id=562056575]
-position = Vector2(518.5969, 477.2517)
+position = Vector2(1037.1938, 954.5034)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_130" unique_id=872281062]
 texture = ExtResource("18_3c27n")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_130" unique_id=430172872]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_uai8o")
 
 [node name="Dec_131" type="StaticBody2D" parent="Entities" unique_id=1973458223]
-position = Vector2(532.6281, 477.07388)
+position = Vector2(1065.2562, 954.1478)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_131" unique_id=226536916]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_131" unique_id=816496640]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_blxte")
 
 [node name="Dec_132" type="StaticBody2D" parent="Entities" unique_id=581019363]
-position = Vector2(547.61707, 478.29984)
+position = Vector2(1095.2341, 956.5997)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_132" unique_id=918019988]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_132" unique_id=188575768]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_g3xot")
 
 [node name="Dec_133" type="StaticBody2D" parent="Entities" unique_id=1625406913]
-position = Vector2(566.788, 477.63928)
+position = Vector2(1133.576, 955.2786)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_133" unique_id=1184615412]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_133" unique_id=1673498845]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_41pgv")
 
 [node name="Dec_134" type="StaticBody2D" parent="Entities" unique_id=1122514182]
-position = Vector2(588.73816, 477.164)
+position = Vector2(1177.4763, 954.328)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_134" unique_id=1785292387]
 texture = ExtResource("18_3c27n")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_134" unique_id=179355632]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_j5ib0")
 
 [node name="Dec_135" type="StaticBody2D" parent="Entities" unique_id=165262129]
-position = Vector2(597.3398, 479.27353)
+position = Vector2(1194.6796, 958.5471)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_135" unique_id=1379355081]
 texture = ExtResource("14_m8vvf")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_135" unique_id=754960539]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_roxu3")
 
 [node name="Dec_136" type="StaticBody2D" parent="Entities" unique_id=449705172]
-position = Vector2(616.4044, 477.2501)
+position = Vector2(1232.8088, 954.5002)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_136" unique_id=1453601487]
 texture = ExtResource("12_2j7tg")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_136" unique_id=1167992620]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_wx2ud")
 
 [node name="Dec_137" type="StaticBody2D" parent="Entities" unique_id=161523511]
-position = Vector2(635.4604, 477.3891)
+position = Vector2(1270.9208, 954.7782)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_137" unique_id=1039125961]
 texture = ExtResource("16_qv42s")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_137" unique_id=240137582]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_dh3in")
 
 [node name="Dec_PlantWildflowersC149" type="StaticBody2D" parent="Entities" unique_id=604119022]
-position = Vector2(76.331474, 268.98245)
+position = Vector2(152.6629, 537.9649)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC149" unique_id=2053336282]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC150" type="StaticBody2D" parent="Entities" unique_id=962505979]
-position = Vector2(599.507, 431.73486)
+position = Vector2(1199.014, 863.4697)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC150" unique_id=959607639]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC151" type="StaticBody2D" parent="Entities" unique_id=2098797592]
-position = Vector2(483.91907, 461.3652)
+position = Vector2(967.8381, 922.7304)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC151" unique_id=1419538546]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB152" type="StaticBody2D" parent="Entities" unique_id=559613193]
-position = Vector2(76.41886, 283.64813)
+position = Vector2(152.8377, 567.2963)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB152" unique_id=600324573]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA153" type="StaticBody2D" parent="Entities" unique_id=958643782]
-position = Vector2(125.932816, 30.000498)
+position = Vector2(251.8656, 60.001)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA153" unique_id=791266115]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC154" type="StaticBody2D" parent="Entities" unique_id=1627284209]
-position = Vector2(220.7635, 331.78583)
+position = Vector2(441.527, 663.5717)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC154" unique_id=670976039]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC155" type="StaticBody2D" parent="Entities" unique_id=1280934202]
-position = Vector2(122.73595, 380.03302)
+position = Vector2(245.4719, 760.066)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC155" unique_id=297466691]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA156" type="StaticBody2D" parent="Entities" unique_id=940827748]
-position = Vector2(264.28946, 302.8217)
+position = Vector2(528.5789, 605.6434)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA156" unique_id=582599245]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC157" type="StaticBody2D" parent="Entities" unique_id=44797253]
-position = Vector2(252.45322, 270.47598)
+position = Vector2(504.9064, 540.952)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC157" unique_id=1355428652]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB158" type="StaticBody2D" parent="Entities" unique_id=1570345711]
-position = Vector2(90.015205, 110.95375)
+position = Vector2(180.0304, 221.9075)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB158" unique_id=1696532028]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB159" type="StaticBody2D" parent="Entities" unique_id=410895090]
-position = Vector2(53.640354, 431.73853)
+position = Vector2(107.2807, 863.4771)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB159" unique_id=375324073]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB160" type="StaticBody2D" parent="Entities" unique_id=1120715400]
-position = Vector2(99.6249, 347.08722)
+position = Vector2(199.2498, 694.1744)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB160" unique_id=1201545111]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC161" type="StaticBody2D" parent="Entities" unique_id=1223262703]
-position = Vector2(76.891846, 331.04303)
+position = Vector2(153.7837, 662.0861)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC161" unique_id=315136618]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB162" type="StaticBody2D" parent="Entities" unique_id=492044059]
-position = Vector2(45.34056, 333.92722)
+position = Vector2(90.6811, 667.8544)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB162" unique_id=264608400]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA163" type="StaticBody2D" parent="Entities" unique_id=1599952082]
-position = Vector2(354.23398, 124.08758)
+position = Vector2(708.468, 248.1752)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA163" unique_id=1153890275]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC164" type="StaticBody2D" parent="Entities" unique_id=1874102726]
-position = Vector2(413.25015, 75.36409)
+position = Vector2(826.5003, 150.7282)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC164" unique_id=898228544]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA165" type="StaticBody2D" parent="Entities" unique_id=1780199450]
-position = Vector2(152.04265, 350.43204)
+position = Vector2(304.0853, 700.8641)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA165" unique_id=511401]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA166" type="StaticBody2D" parent="Entities" unique_id=2038195154]
-position = Vector2(29.338608, 461.3834)
+position = Vector2(58.6772, 922.7668)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA166" unique_id=1154677976]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC167" type="StaticBody2D" parent="Entities" unique_id=322630967]
-position = Vector2(309.91943, 347.0655)
+position = Vector2(619.8389, 694.131)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC167" unique_id=2123381798]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA168" type="StaticBody2D" parent="Entities" unique_id=1911803602]
-position = Vector2(278.1893, 429.19226)
+position = Vector2(556.3786, 858.3845)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA168" unique_id=1061737376]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA169" type="StaticBody2D" parent="Entities" unique_id=1970268118]
-position = Vector2(187.86374, 300.325)
+position = Vector2(375.7275, 600.65)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA169" unique_id=1141787908]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC170" type="StaticBody2D" parent="Entities" unique_id=1640030693]
-position = Vector2(612.6706, 142.32593)
+position = Vector2(1225.3412, 284.6519)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC170" unique_id=1768392272]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB171" type="StaticBody2D" parent="Entities" unique_id=1031465552]
-position = Vector2(392.83405, 347.60013)
+position = Vector2(785.6681, 695.2003)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB171" unique_id=268971639]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC172" type="StaticBody2D" parent="Entities" unique_id=701266373]
-position = Vector2(323.13583, 158.74251)
+position = Vector2(646.2717, 317.485)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC172" unique_id=1242512985]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB173" type="StaticBody2D" parent="Entities" unique_id=1251817250]
-position = Vector2(72.98343, 316.96124)
+position = Vector2(145.9669, 633.9225)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB173" unique_id=1097971474]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA174" type="StaticBody2D" parent="Entities" unique_id=1770862764]
-position = Vector2(381.0405, 333.57837)
+position = Vector2(762.081, 667.1567)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA174" unique_id=305572426]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC175" type="StaticBody2D" parent="Entities" unique_id=1942773250]
-position = Vector2(596.56714, 142.60887)
+position = Vector2(1193.1343, 285.2177)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC175" unique_id=1579594854]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA176" type="StaticBody2D" parent="Entities" unique_id=1216460652]
-position = Vector2(316.36475, 271.46826)
+position = Vector2(632.7295, 542.9365)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA176" unique_id=928652782]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA177" type="StaticBody2D" parent="Entities" unique_id=256534870]
-position = Vector2(427.35803, 287.73187)
+position = Vector2(854.7161, 575.4637)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA177" unique_id=775014367]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA178" type="StaticBody2D" parent="Entities" unique_id=1787650919]
-position = Vector2(306.35648, 349.07263)
+position = Vector2(612.713, 698.1453)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA178" unique_id=1515922178]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB179" type="StaticBody2D" parent="Entities" unique_id=1876703872]
-position = Vector2(115.32248, 379.83347)
+position = Vector2(230.645, 759.6669)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB179" unique_id=715112210]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB180" type="StaticBody2D" parent="Entities" unique_id=974166967]
-position = Vector2(234.63733, 413.80698)
+position = Vector2(469.2747, 827.614)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB180" unique_id=1877718067]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA181" type="StaticBody2D" parent="Entities" unique_id=1025076633]
-position = Vector2(170.00148, 287.76495)
+position = Vector2(340.003, 575.5299)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA181" unique_id=1340029499]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC182" type="StaticBody2D" parent="Entities" unique_id=1351634348]
-position = Vector2(201.16394, 93.17961)
+position = Vector2(402.3279, 186.3592)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC182" unique_id=10128587]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB183" type="StaticBody2D" parent="Entities" unique_id=867610260]
-position = Vector2(386.32983, 237.82936)
+position = Vector2(772.6597, 475.6587)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB183" unique_id=853566826]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA184" type="StaticBody2D" parent="Entities" unique_id=1887196701]
-position = Vector2(75.10963, 331.5174)
+position = Vector2(150.2193, 663.0348)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA184" unique_id=1701279033]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB185" type="StaticBody2D" parent="Entities" unique_id=1768938855]
-position = Vector2(218.5455, 413.74252)
+position = Vector2(437.091, 827.485)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB185" unique_id=1325568384]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB186" type="StaticBody2D" parent="Entities" unique_id=2078152690]
-position = Vector2(251.42526, 347.0263)
+position = Vector2(502.8505, 694.0526)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB186" unique_id=1694810480]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB187" type="StaticBody2D" parent="Entities" unique_id=1611791665]
-position = Vector2(221.93669, 413.51077)
+position = Vector2(443.8734, 827.0215)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB187" unique_id=1414818095]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA188" type="StaticBody2D" parent="Entities" unique_id=455350641]
-position = Vector2(435.6171, 413.11838)
+position = Vector2(871.2342, 826.2368)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA188" unique_id=890259363]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC189" type="StaticBody2D" parent="Entities" unique_id=1333463477]
-position = Vector2(311.19687, 47.54983)
+position = Vector2(622.3937, 95.0997)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC189" unique_id=1786451760]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC190" type="StaticBody2D" parent="Entities" unique_id=644022480]
-position = Vector2(567.1504, 235.35321)
+position = Vector2(1134.3008, 470.7064)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC190" unique_id=770079548]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB191" type="StaticBody2D" parent="Entities" unique_id=377064500]
-position = Vector2(189.6849, 444.99246)
+position = Vector2(379.3698, 889.9849)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB191" unique_id=2019719098]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC192" type="StaticBody2D" parent="Entities" unique_id=955304479]
-position = Vector2(332.6124, 271.395)
+position = Vector2(665.2248, 542.79)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC192" unique_id=1556584644]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC193" type="StaticBody2D" parent="Entities" unique_id=931006654]
-position = Vector2(612.8284, 252.62302)
+position = Vector2(1225.6568, 505.246)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC193" unique_id=764213265]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC194" type="StaticBody2D" parent="Entities" unique_id=329529247]
-position = Vector2(34.116665, 285.44086)
+position = Vector2(68.2333, 570.8817)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC194" unique_id=1139595662]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA195" type="StaticBody2D" parent="Entities" unique_id=1091661404]
-position = Vector2(459.26447, 63.537918)
+position = Vector2(918.5289, 127.0758)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA195" unique_id=499498906]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA196" type="StaticBody2D" parent="Entities" unique_id=1261415705]
-position = Vector2(457.99893, 45.383358)
+position = Vector2(915.9979, 90.7667)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA196" unique_id=633924106]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA197" type="StaticBody2D" parent="Entities" unique_id=895735998]
-position = Vector2(77.35011, 236.689)
+position = Vector2(154.7002, 473.378)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA197" unique_id=1951976321]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC198" type="StaticBody2D" parent="Entities" unique_id=1629612687]
-position = Vector2(156.69214, 301.3048)
+position = Vector2(313.3843, 602.6096)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC198" unique_id=1873893294]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA199" type="StaticBody2D" parent="Entities" unique_id=1152642136]
-position = Vector2(291.8955, 300.0565)
+position = Vector2(583.791, 600.113)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA199" unique_id=1505351548]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA200" type="StaticBody2D" parent="Entities" unique_id=1229539669]
-position = Vector2(165.71143, 415.69864)
+position = Vector2(331.4229, 831.3973)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA200" unique_id=402302677]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC201" type="StaticBody2D" parent="Entities" unique_id=1630845239]
-position = Vector2(122.156494, 29.977661)
+position = Vector2(244.313, 59.9553)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC201" unique_id=669303499]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC202" type="StaticBody2D" parent="Entities" unique_id=960117229]
-position = Vector2(599.0268, 157.6137)
+position = Vector2(1198.0536, 315.2274)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC202" unique_id=190043908]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC203" type="StaticBody2D" parent="Entities" unique_id=1606242398]
-position = Vector2(595.88074, 44.366695)
+position = Vector2(1191.7615, 88.7334)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC203" unique_id=63488994]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA204" type="StaticBody2D" parent="Entities" unique_id=144158304]
-position = Vector2(298.43353, 428.73608)
+position = Vector2(596.8671, 857.4722)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA204" unique_id=689378680]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB205" type="StaticBody2D" parent="Entities" unique_id=835548920]
-position = Vector2(355.90744, 254.20587)
+position = Vector2(711.8149, 508.4117)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB205" unique_id=1320141015]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB206" type="StaticBody2D" parent="Entities" unique_id=942117673]
-position = Vector2(571.974, 316.7326)
+position = Vector2(1143.948, 633.4652)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB206" unique_id=1056802077]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA207" type="StaticBody2D" parent="Entities" unique_id=1887000388]
-position = Vector2(404.16846, 335.3058)
+position = Vector2(808.3369, 670.6116)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA207" unique_id=917672662]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC208" type="StaticBody2D" parent="Entities" unique_id=317109726]
-position = Vector2(344.11456, 399.71036)
+position = Vector2(688.2291, 799.4207)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC208" unique_id=1431635129]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersA209" type="StaticBody2D" parent="Entities" unique_id=598619725]
-position = Vector2(450.36398, 46.278637)
+position = Vector2(900.728, 92.5573)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersA209" unique_id=1554950238]
 texture = ExtResource("31_gb4hi")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB210" type="StaticBody2D" parent="Entities" unique_id=274532171]
-position = Vector2(406.60602, 111.80082)
+position = Vector2(813.212, 223.6016)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB210" unique_id=488470503]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB211" type="StaticBody2D" parent="Entities" unique_id=558272769]
-position = Vector2(235.38568, 363.17307)
+position = Vector2(470.7714, 726.3461)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB211" unique_id=1930361203]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB212" type="StaticBody2D" parent="Entities" unique_id=836910577]
-position = Vector2(342.52902, 93.011734)
+position = Vector2(685.058, 186.0235)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB212" unique_id=1671551432]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB213" type="StaticBody2D" parent="Entities" unique_id=534194550]
-position = Vector2(231.70935, 285.60873)
+position = Vector2(463.4187, 571.2175)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB213" unique_id=639161086]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB214" type="StaticBody2D" parent="Entities" unique_id=168036591]
-position = Vector2(194.05238, 446.47964)
+position = Vector2(388.1048, 892.9593)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB214" unique_id=1063061556]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB215" type="StaticBody2D" parent="Entities" unique_id=684031229]
-position = Vector2(86.40723, 43.818058)
+position = Vector2(172.8145, 87.6361)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB215" unique_id=1267291737]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC216" type="StaticBody2D" parent="Entities" unique_id=353700897]
-position = Vector2(596.95746, 268.8039)
+position = Vector2(1193.9149, 537.6078)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC216" unique_id=793818462]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersC217" type="StaticBody2D" parent="Entities" unique_id=1619248247]
-position = Vector2(328.2774, 318.49222)
+position = Vector2(656.5548, 636.9844)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersC217" unique_id=1360447687]
 texture = ExtResource("29_7ahpo")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantWildflowersB218" type="StaticBody2D" parent="Entities" unique_id=204481469]
-position = Vector2(19.762207, 63.823627)
+position = Vector2(39.5244, 127.6473)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantWildflowersB218" unique_id=1677240596]
 texture = ExtResource("30_84h6x")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Dec_PlantLupine219" type="StaticBody2D" parent="Entities" unique_id=1748070193]
-position = Vector2(506.90088, 92.55074)
+position = Vector2(1013.8018, 185.1015)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantLupine219" unique_id=91782456]
 texture = ExtResource("32_qj4e4")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Dec_PlantLupine220" type="StaticBody2D" parent="Entities" unique_id=760264111]
-position = Vector2(490.41968, 429.74524)
+position = Vector2(980.8394, 859.4905)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantLupine220" unique_id=828913968]
 texture = ExtResource("32_qj4e4")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Dec_PlantLupine221" type="StaticBody2D" parent="Entities" unique_id=1073241624]
-position = Vector2(204.76736, 428.23917)
+position = Vector2(409.5347, 856.4783)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantLupine221" unique_id=188329794]
 texture = ExtResource("32_qj4e4")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Dec_PlantLupine222" type="StaticBody2D" parent="Entities" unique_id=808212179]
-position = Vector2(23.081911, 398.46887)
+position = Vector2(46.1638, 796.9377)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantLupine222" unique_id=720559146]
 texture = ExtResource("32_qj4e4")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Dec_PlantLupine223" type="StaticBody2D" parent="Entities" unique_id=1084953550]
-position = Vector2(71.85267, 317.4912)
+position = Vector2(143.7053, 634.9824)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantLupine223" unique_id=1995902359]
 texture = ExtResource("32_qj4e4")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Dec_PlantLupine224" type="StaticBody2D" parent="Entities" unique_id=1149971447]
-position = Vector2(357.8907, 28.352089)
+position = Vector2(715.7814, 56.7042)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantLupine224" unique_id=74062709]
 texture = ExtResource("32_qj4e4")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Dec_PlantLupine225" type="StaticBody2D" parent="Entities" unique_id=896881134]
-position = Vector2(153.66167, 219.31747)
+position = Vector2(307.3233, 438.6349)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantLupine225" unique_id=2002807549]
 texture = ExtResource("32_qj4e4")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Dec_PlantLupine226" type="StaticBody2D" parent="Entities" unique_id=748253932]
-position = Vector2(58.443787, 269.2177)
+position = Vector2(116.8876, 538.4354)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantLupine226" unique_id=716385095]
 texture = ExtResource("32_qj4e4")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Dec_PlantLupine227" type="StaticBody2D" parent="Entities" unique_id=1751561099]
-position = Vector2(610.3988, 239.75893)
+position = Vector2(1220.7976, 479.5179)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantLupine227" unique_id=111123291]
 texture = ExtResource("32_qj4e4")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Dec_PlantLupine228" type="StaticBody2D" parent="Entities" unique_id=2037924093]
-position = Vector2(44.642605, 319.92645)
+position = Vector2(89.2852, 639.8529)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantLupine228" unique_id=2105491104]
 texture = ExtResource("32_qj4e4")
-offset = Vector2(0, -12)
+offset = Vector2(0, -24)
 
 [node name="Dec_PlantPaintbrush229" type="StaticBody2D" parent="Entities" unique_id=1513873423]
-position = Vector2(29.993126, 447.07312)
+position = Vector2(59.9863, 894.1462)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantPaintbrush229" unique_id=1019075921]
 texture = ExtResource("33_dx5il")
-offset = Vector2(0, -11)
+offset = Vector2(0, -22)
 
 [node name="Dec_PlantPaintbrush230" type="StaticBody2D" parent="Entities" unique_id=2062002301]
-position = Vector2(201.5578, 429.1917)
+position = Vector2(403.1156, 858.3834)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantPaintbrush230" unique_id=144754790]
 texture = ExtResource("33_dx5il")
-offset = Vector2(0, -11)
+offset = Vector2(0, -22)
 
 [node name="Dec_PlantPaintbrush231" type="StaticBody2D" parent="Entities" unique_id=1901230495]
-position = Vector2(345.9938, 157.14723)
+position = Vector2(691.9876, 314.2945)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantPaintbrush231" unique_id=1748283926]
 texture = ExtResource("33_dx5il")
-offset = Vector2(0, -11)
+offset = Vector2(0, -22)
 
 [node name="Dec_PlantPaintbrush232" type="StaticBody2D" parent="Entities" unique_id=726388644]
-position = Vector2(471.9962, 95.05267)
+position = Vector2(943.9924, 190.1053)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantPaintbrush232" unique_id=1233869933]
 texture = ExtResource("33_dx5il")
-offset = Vector2(0, -11)
+offset = Vector2(0, -22)
 
 [node name="Dec_PlantPaintbrush233" type="StaticBody2D" parent="Entities" unique_id=346649835]
-position = Vector2(77.03993, 94.1664)
+position = Vector2(154.0799, 188.3328)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantPaintbrush233" unique_id=1003171972]
 texture = ExtResource("33_dx5il")
-offset = Vector2(0, -11)
+offset = Vector2(0, -22)
 
 [node name="Dec_PlantPaintbrush234" type="StaticBody2D" parent="Entities" unique_id=1753619540]
-position = Vector2(259.0318, 142.44078)
+position = Vector2(518.0636, 284.8816)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantPaintbrush234" unique_id=773349914]
 texture = ExtResource("33_dx5il")
-offset = Vector2(0, -11)
+offset = Vector2(0, -22)
 
 [node name="Dec_PlantTallGrassA235" type="StaticBody2D" parent="Entities" unique_id=268247302]
-position = Vector2(420.75162, 301.85892)
+position = Vector2(841.5032, 603.7178)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA235" unique_id=1548646000]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA236" type="StaticBody2D" parent="Entities" unique_id=1134644885]
-position = Vector2(594.3629, 347.4356)
+position = Vector2(1188.7258, 694.8712)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA236" unique_id=1219231327]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB237" type="StaticBody2D" parent="Entities" unique_id=64693225]
-position = Vector2(164.61589, 253.37845)
+position = Vector2(329.2318, 506.7569)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB237" unique_id=596349177]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA238" type="StaticBody2D" parent="Entities" unique_id=1960198985]
-position = Vector2(295.4468, 427.57895)
+position = Vector2(590.8936, 855.1579)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA238" unique_id=1050599737]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA239" type="StaticBody2D" parent="Entities" unique_id=456888116]
-position = Vector2(297.58112, 222.09683)
+position = Vector2(595.1622, 444.1937)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA239" unique_id=1771951826]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB240" type="StaticBody2D" parent="Entities" unique_id=718549901]
-position = Vector2(249.2387, 379.60037)
+position = Vector2(498.4774, 759.2007)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB240" unique_id=1290504399]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA241" type="StaticBody2D" parent="Entities" unique_id=383649009]
-position = Vector2(453.3977, 460.33203)
+position = Vector2(906.7954, 920.6641)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA241" unique_id=1553397842]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB242" type="StaticBody2D" parent="Entities" unique_id=613158651]
-position = Vector2(553.6658, 221.5009)
+position = Vector2(1107.3316, 443.0018)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB242" unique_id=506075626]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA243" type="StaticBody2D" parent="Entities" unique_id=1697176504]
-position = Vector2(611.04987, 111.6539)
+position = Vector2(1222.0997, 223.3078)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA243" unique_id=1393560032]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA244" type="StaticBody2D" parent="Entities" unique_id=1293746735]
-position = Vector2(93.68777, 252.12094)
+position = Vector2(187.3755, 504.2419)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA244" unique_id=1902571159]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA245" type="StaticBody2D" parent="Entities" unique_id=522066168]
-position = Vector2(59.22961, 332.28912)
+position = Vector2(118.4592, 664.5782)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA245" unique_id=1948481140]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA246" type="StaticBody2D" parent="Entities" unique_id=2084090784]
-position = Vector2(387.25317, 109.22054)
+position = Vector2(774.5063, 218.4411)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA246" unique_id=1150387998]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA247" type="StaticBody2D" parent="Entities" unique_id=934472232]
-position = Vector2(578.7505, 332.98978)
+position = Vector2(1157.501, 665.9796)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA247" unique_id=598498806]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB248" type="StaticBody2D" parent="Entities" unique_id=421938465]
-position = Vector2(329.20493, 271.91885)
+position = Vector2(658.4099, 543.8377)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB248" unique_id=212709228]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB249" type="StaticBody2D" parent="Entities" unique_id=871140349]
-position = Vector2(307.02554, 155.9285)
+position = Vector2(614.0511, 311.857)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB249" unique_id=443658695]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA250" type="StaticBody2D" parent="Entities" unique_id=1689456942]
-position = Vector2(147.21744, 347.88538)
+position = Vector2(294.4349, 695.7708)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA250" unique_id=1009844881]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB251" type="StaticBody2D" parent="Entities" unique_id=2141584739]
-position = Vector2(457.69174, 366.728)
+position = Vector2(915.3835, 733.456)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB251" unique_id=1812981722]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA252" type="StaticBody2D" parent="Entities" unique_id=1062855998]
-position = Vector2(130.70915, 380.05606)
+position = Vector2(261.4183, 760.1121)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA252" unique_id=1745554189]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA253" type="StaticBody2D" parent="Entities" unique_id=562047690]
-position = Vector2(360.37204, 252.49297)
+position = Vector2(720.7441, 504.9859)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA253" unique_id=1611384998]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA254" type="StaticBody2D" parent="Entities" unique_id=1618763865]
-position = Vector2(136.74876, 363.39847)
+position = Vector2(273.4975, 726.7969)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA254" unique_id=876432622]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA255" type="StaticBody2D" parent="Entities" unique_id=155252666]
-position = Vector2(55.84182, 383.37915)
+position = Vector2(111.6836, 766.7583)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA255" unique_id=44624065]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA256" type="StaticBody2D" parent="Entities" unique_id=778028282]
-position = Vector2(294.8661, 382.51788)
+position = Vector2(589.7322, 765.0358)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA256" unique_id=895359279]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA257" type="StaticBody2D" parent="Entities" unique_id=1539939156]
-position = Vector2(370.32013, 255.06143)
+position = Vector2(740.6403, 510.1229)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA257" unique_id=837423237]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB258" type="StaticBody2D" parent="Entities" unique_id=1805071222]
-position = Vector2(244.20605, 365.38446)
+position = Vector2(488.4121, 730.7689)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB258" unique_id=1903701528]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB259" type="StaticBody2D" parent="Entities" unique_id=1849769671]
-position = Vector2(602.68225, 459.75412)
+position = Vector2(1205.3645, 919.5082)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB259" unique_id=2007616556]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA260" type="StaticBody2D" parent="Entities" unique_id=1476113188]
-position = Vector2(85.26848, 61.08734)
+position = Vector2(170.537, 122.1747)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA260" unique_id=1794093004]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB261" type="StaticBody2D" parent="Entities" unique_id=1033229400]
-position = Vector2(458.22723, 29.373428)
+position = Vector2(916.4545, 58.7469)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB261" unique_id=529042055]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA262" type="StaticBody2D" parent="Entities" unique_id=20864625]
-position = Vector2(428.87888, 93.55752)
+position = Vector2(857.7578, 187.115)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA262" unique_id=556352719]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA263" type="StaticBody2D" parent="Entities" unique_id=1449051890]
-position = Vector2(115.24483, 47.623352)
+position = Vector2(230.4897, 95.2467)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA263" unique_id=66142917]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA264" type="StaticBody2D" parent="Entities" unique_id=506911755]
-position = Vector2(438.1646, 382.41037)
+position = Vector2(876.3292, 764.8207)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA264" unique_id=1623222807]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB265" type="StaticBody2D" parent="Entities" unique_id=122887791]
-position = Vector2(361.36032, 319.78003)
+position = Vector2(722.7206, 639.5601)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB265" unique_id=1626972191]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB266" type="StaticBody2D" parent="Entities" unique_id=439847548]
-position = Vector2(29.4066, 379.39276)
+position = Vector2(58.8132, 758.7855)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB266" unique_id=31276614]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB267" type="StaticBody2D" parent="Entities" unique_id=867554789]
-position = Vector2(617.8467, 237.12213)
+position = Vector2(1235.6934, 474.2443)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB267" unique_id=145513516]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB268" type="StaticBody2D" parent="Entities" unique_id=1742962408]
-position = Vector2(418.40225, 77.2036)
+position = Vector2(836.8045, 154.4072)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB268" unique_id=1068634502]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB269" type="StaticBody2D" parent="Entities" unique_id=258361519]
-position = Vector2(35.811714, 395.242)
+position = Vector2(71.6234, 790.484)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB269" unique_id=241008191]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB270" type="StaticBody2D" parent="Entities" unique_id=669595344]
-position = Vector2(169.52824, 445.7412)
+position = Vector2(339.0565, 891.4824)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB270" unique_id=1357774724]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB271" type="StaticBody2D" parent="Entities" unique_id=2114756107]
-position = Vector2(408.51105, 300.232)
+position = Vector2(817.0221, 600.464)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB271" unique_id=946190521]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB272" type="StaticBody2D" parent="Entities" unique_id=2076802155]
-position = Vector2(84.7551, 429.15436)
+position = Vector2(169.5102, 858.3087)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB272" unique_id=236750545]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassB273" type="StaticBody2D" parent="Entities" unique_id=1401139996]
-position = Vector2(330.5669, 78.23026)
+position = Vector2(661.1338, 156.4605)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassB273" unique_id=135897792]
 texture = ExtResource("35_oxfwh")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantTallGrassA274" type="StaticBody2D" parent="Entities" unique_id=365849288]
-position = Vector2(360.8065, 237.3194)
+position = Vector2(721.613, 474.6388)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantTallGrassA274" unique_id=1653251521]
 texture = ExtResource("34_2rjw3")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubB275" type="StaticBody2D" parent="Entities" unique_id=1282620776]
-position = Vector2(98.832985, 236.13356)
+position = Vector2(197.666, 472.2671)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubB275" unique_id=1773207636]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubA276" type="StaticBody2D" parent="Entities" unique_id=1981208611]
-position = Vector2(234.9542, 316.35397)
+position = Vector2(469.9084, 632.7079)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubA276" unique_id=323164093]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubB277" type="StaticBody2D" parent="Entities" unique_id=371151709]
-position = Vector2(23.055561, 413.0617)
+position = Vector2(46.1111, 826.1234)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubB277" unique_id=358963724]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubB278" type="StaticBody2D" parent="Entities" unique_id=187854603]
-position = Vector2(570.29, 254.59787)
+position = Vector2(1140.58, 509.1957)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubB278" unique_id=2048263203]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubB279" type="StaticBody2D" parent="Entities" unique_id=725290082]
-position = Vector2(245.81679, 412.2973)
+position = Vector2(491.6336, 824.5946)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubB279" unique_id=588352978]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubB280" type="StaticBody2D" parent="Entities" unique_id=271872024]
-position = Vector2(90.3266, 381.30112)
+position = Vector2(180.6532, 762.6022)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubB280" unique_id=1210124584]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubB281" type="StaticBody2D" parent="Entities" unique_id=187975322]
-position = Vector2(395.27396, 253.7303)
+position = Vector2(790.5479, 507.4606)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubB281" unique_id=1938528966]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubB282" type="StaticBody2D" parent="Entities" unique_id=1157327216]
-position = Vector2(213.91437, 301.92938)
+position = Vector2(427.8287, 603.8588)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubB282" unique_id=623720570]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubA283" type="StaticBody2D" parent="Entities" unique_id=123879100]
-position = Vector2(308.04803, 47.633163)
+position = Vector2(616.0961, 95.2663)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubA283" unique_id=1268361997]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubA284" type="StaticBody2D" parent="Entities" unique_id=1064313573]
-position = Vector2(427.14655, 445.0596)
+position = Vector2(854.2931, 890.1192)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubA284" unique_id=806472047]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubA285" type="StaticBody2D" parent="Entities" unique_id=1737379254]
-position = Vector2(327.80344, 381.26694)
+position = Vector2(655.6069, 762.5339)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubA285" unique_id=1877480122]
 texture = ExtResource("26_swu7y")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubB286" type="StaticBody2D" parent="Entities" unique_id=950710731]
-position = Vector2(425.83533, 444.6321)
+position = Vector2(851.6707, 889.2642)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubB286" unique_id=559981451]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubB287" type="StaticBody2D" parent="Entities" unique_id=1063427330]
-position = Vector2(197.23912, 334.0479)
+position = Vector2(394.4782, 668.0958)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubB287" unique_id=693246830]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantShrubB288" type="StaticBody2D" parent="Entities" unique_id=1884876093]
-position = Vector2(36.533195, 315.1332)
+position = Vector2(73.0664, 630.2664)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantShrubB288" unique_id=1525231906]
 texture = ExtResource("11_g7pp1")
-offset = Vector2(0, -8)
+offset = Vector2(0, -16)
 
 [node name="Dec_PlantCattails289" type="StaticBody2D" parent="Entities" unique_id=950343799]
-position = Vector2(444.02078, 398.7137)
+position = Vector2(888.0416, 797.4274)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantCattails289" unique_id=1244724894]
 texture = ExtResource("36_lordu")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)
 
 [node name="Dec_PlantCattails290" type="StaticBody2D" parent="Entities" unique_id=1814941889]
-position = Vector2(525.27094, 75.36439)
+position = Vector2(1050.5419, 150.7288)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantCattails290" unique_id=416114696]
 texture = ExtResource("36_lordu")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)
 
 [node name="Dec_PlantCattails291" type="StaticBody2D" parent="Entities" unique_id=1311337552]
-position = Vector2(442.86032, 399.403)
+position = Vector2(885.7206, 798.806)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantCattails291" unique_id=482640953]
 texture = ExtResource("36_lordu")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)
 
 [node name="Dec_PlantCattails292" type="StaticBody2D" parent="Entities" unique_id=1454848897]
-position = Vector2(500.0305, 47.73599)
+position = Vector2(1000.061, 95.472)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantCattails292" unique_id=749788301]
 texture = ExtResource("36_lordu")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)
 
 [node name="Dec_PlantCattails293" type="StaticBody2D" parent="Entities" unique_id=147294714]
-position = Vector2(435.98267, 93.01256)
+position = Vector2(871.9653, 186.0251)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantCattails293" unique_id=2057948674]
 texture = ExtResource("36_lordu")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)
 
 [node name="Dec_PlantCattails294" type="StaticBody2D" parent="Entities" unique_id=805230076]
-position = Vector2(444.97665, 221.65047)
+position = Vector2(889.9533, 443.3009)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantCattails294" unique_id=1619013621]
 texture = ExtResource("36_lordu")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)
 
 [node name="Dec_PlantCattails295" type="StaticBody2D" parent="Entities" unique_id=1261729055]
-position = Vector2(474.03275, 77.62047)
+position = Vector2(948.0655, 155.2409)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantCattails295" unique_id=469017147]
 texture = ExtResource("36_lordu")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)
 
 [node name="Dec_PlantCattails296" type="StaticBody2D" parent="Entities" unique_id=37768945]
-position = Vector2(440.2648, 127.78388)
+position = Vector2(880.5296, 255.5678)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_PlantCattails296" unique_id=2053932548]
 texture = ExtResource("36_lordu")
-offset = Vector2(0, -15)
+offset = Vector2(0, -30)
 
 [node name="Dec_RockGraniteC297" type="StaticBody2D" parent="Entities" unique_id=1345973792]
-position = Vector2(131.994, 286.94446)
+position = Vector2(263.988, 573.8889)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockGraniteC297" unique_id=2132460310]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockGraniteC297" unique_id=228400876]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_3c3rf")
 
 [node name="Dec_RockGraniteC298" type="StaticBody2D" parent="Entities" unique_id=1134797565]
-position = Vector2(389.96326, 446.84723)
+position = Vector2(779.9265, 893.6945)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockGraniteC298" unique_id=553443035]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockGraniteC298" unique_id=1984962988]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_hprek")
 
 [node name="Dec_RockGraniteC299" type="StaticBody2D" parent="Entities" unique_id=445163153]
-position = Vector2(405.73987, 301.1581)
+position = Vector2(811.4797, 602.3162)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockGraniteC299" unique_id=2033376655]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockGraniteC299" unique_id=1603177983]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_tk4ms")
 
 [node name="Dec_RockGraniteA300" type="StaticBody2D" parent="Entities" unique_id=2145765594]
-position = Vector2(153.56946, 459.38437)
+position = Vector2(307.1389, 918.7687)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockGraniteA300" unique_id=898572640]
 texture = ExtResource("18_3c27n")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockGraniteA300" unique_id=112827812]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_sg1dr")
 
 [node name="Dec_RockGraniteC301" type="StaticBody2D" parent="Entities" unique_id=2096000226]
-position = Vector2(103.43465, 287.5041)
+position = Vector2(206.8693, 575.0082)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockGraniteC301" unique_id=1584362009]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockGraniteC301" unique_id=446010718]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_1idr2")
 
 [node name="Dec_RockGraniteA302" type="StaticBody2D" parent="Entities" unique_id=184941532]
-position = Vector2(473.08994, 59.88126)
+position = Vector2(946.1799, 119.7625)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockGraniteA302" unique_id=1637856978]
 texture = ExtResource("18_3c27n")
-offset = Vector2(0, -17)
+offset = Vector2(0, -34)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockGraniteA302" unique_id=89297946]
-position = Vector2(0, -6)
+position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_mtlag")
 
 [node name="Dec_RockGraniteB303" type="StaticBody2D" parent="Entities" unique_id=1118586250]
-position = Vector2(420.25418, 29.110067)
+position = Vector2(840.5084, 58.2201)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockGraniteB303" unique_id=1670159988]
 texture = ExtResource("14_m8vvf")
-offset = Vector2(0, -13)
+offset = Vector2(0, -26)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockGraniteB303" unique_id=832488268]
-position = Vector2(0, -5)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_a5yvs")
 
 [node name="Dec_RockGraniteC304" type="StaticBody2D" parent="Entities" unique_id=746464997]
-position = Vector2(589.7148, 318.76706)
+position = Vector2(1179.4296, 637.5341)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockGraniteC304" unique_id=1712004389]
 texture = ExtResource("15_rorra")
-offset = Vector2(0, -10)
+offset = Vector2(0, -20)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockGraniteC304" unique_id=207774428]
-position = Vector2(0, -4.5)
+position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_wp23e")
 
 [node name="Dec_RockRiverB305" type="StaticBody2D" parent="Entities" unique_id=72599460]
-position = Vector2(484.44095, 75.79169)
+position = Vector2(968.8819, 151.5834)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockRiverB305" unique_id=1634754614]
 texture = ExtResource("37_p6fn7")
-offset = Vector2(0, -4.5)
+offset = Vector2(0, -9)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockRiverB305" unique_id=1647922858]
-position = Vector2(0, -3)
+position = Vector2(0, -6)
 shape = SubResource("RectangleShape2D_1g4ol")
 
 [node name="Dec_RockRiverA306" type="StaticBody2D" parent="Entities" unique_id=604352868]
-position = Vector2(438.85013, 269.64194)
+position = Vector2(877.7003, 539.2839)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockRiverA306" unique_id=303763696]
 texture = ExtResource("38_bysx6")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockRiverA306" unique_id=1174072801]
-position = Vector2(0, -3.5)
+position = Vector2(0, -7)
 shape = SubResource("RectangleShape2D_m388i")
 
 [node name="Dec_RockRiverB307" type="StaticBody2D" parent="Entities" unique_id=1091626868]
-position = Vector2(445.52716, 59.866188)
+position = Vector2(891.0543, 119.7324)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockRiverB307" unique_id=1709348842]
 texture = ExtResource("37_p6fn7")
-offset = Vector2(0, -4.5)
+offset = Vector2(0, -9)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockRiverB307" unique_id=542892048]
-position = Vector2(0, -3)
+position = Vector2(0, -6)
 shape = SubResource("RectangleShape2D_4f2jm")
 
 [node name="Dec_RockRiverA308" type="StaticBody2D" parent="Entities" unique_id=293338475]
-position = Vector2(445.92694, 127.367645)
+position = Vector2(891.8539, 254.7353)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockRiverA308" unique_id=1512853003]
 texture = ExtResource("38_bysx6")
-offset = Vector2(0, -6)
+offset = Vector2(0, -12)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockRiverA308" unique_id=1469050810]
-position = Vector2(0, -3.5)
+position = Vector2(0, -7)
 shape = SubResource("RectangleShape2D_mt2qd")
 
 [node name="Dec_RockRiverC309" type="StaticBody2D" parent="Entities" unique_id=608567100]
-position = Vector2(519.73627, 429.88998)
+position = Vector2(1039.4725, 859.78)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockRiverC309" unique_id=426830028]
 texture = ExtResource("39_g8awv")
-offset = Vector2(0, -3)
+offset = Vector2(0, -6)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockRiverC309" unique_id=568299376]
-position = Vector2(0, -2.5)
+position = Vector2(0, -5)
 shape = SubResource("RectangleShape2D_jw2s2")
 
 [node name="Dec_RockRiverB310" type="StaticBody2D" parent="Entities" unique_id=964966723]
-position = Vector2(504.04266, 399.09238)
+position = Vector2(1008.0853, 798.1848)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_RockRiverB310" unique_id=1873946078]
 texture = ExtResource("37_p6fn7")
-offset = Vector2(0, -4.5)
+offset = Vector2(0, -9)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_RockRiverB310" unique_id=1983755803]
-position = Vector2(0, -3)
+position = Vector2(0, -6)
 shape = SubResource("RectangleShape2D_frukc")
 
 [node name="Dec_LogFallenA311" type="StaticBody2D" parent="Entities" unique_id=107170717]
-position = Vector2(277.2321, 285.22836)
+position = Vector2(554.4642, 570.4567)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_LogFallenA311" unique_id=1733210149]
 texture = ExtResource("40_80lqk")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_LogFallenA311" unique_id=53418431]
-position = Vector2(0, -3.5)
+position = Vector2(0, -7)
 shape = SubResource("RectangleShape2D_wvsvx")
 
 [node name="Dec_LogFallenA312" type="StaticBody2D" parent="Entities" unique_id=881095882]
-position = Vector2(275.63757, 411.90503)
+position = Vector2(551.2751, 823.8101)
 collision_mask = 0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Dec_LogFallenA312" unique_id=1825340889]
 texture = ExtResource("40_80lqk")
-offset = Vector2(0, -7)
+offset = Vector2(0, -14)
 
 [node name="Collision" type="CollisionShape2D" parent="Entities/Dec_LogFallenA312" unique_id=1810177220]
-position = Vector2(0, -3.5)
+position = Vector2(0, -7)
 shape = SubResource("RectangleShape2D_encdo")
 
 [node name="Spawns" type="Node2D" parent="." unique_id=2117057822]
 
 [node name="home" type="Marker2D" parent="Spawns" unique_id=93272338]
-position = Vector2(152, 152)
+position = Vector2(304, 304)
 
 [node name="gate" type="Marker2D" parent="Spawns" unique_id=365604834]
-position = Vector2(40, 184)
+position = Vector2(80, 368)
 
 [node name="north_gate" type="Marker2D" parent="Spawns" unique_id=1676173787]
-position = Vector2(160, 30)
+position = Vector2(320, 60)
 
 [node name="Places" type="Node2D" parent="." unique_id=876210676]
 
 [node name="LamonHomestead" type="Marker2D" parent="Places" unique_id=285800982]
-position = Vector2(320, 240)
+position = Vector2(640, 480)
 script = ExtResource("9_jd5to")
 display_name = "Lamon Homestead"
-radius = 0.0
+radius = 0
 show_banner = false
 
 [node name="Exits" type="Node2D" parent="." unique_id=484092688]
 
 [node name="ToCurryVillage" type="Area2D" parent="Exits" unique_id=1774414398]
-position = Vector2(8, 184)
+position = Vector2(16, 368)
 script = ExtResource("10_xc7fm")
 label = "Curry Village"
 target_region = "curry_village"
@@ -3316,7 +3316,7 @@ target_spawn = "homestead"
 shape = SubResource("RectangleShape2D_fdvms")
 
 [node name="NorthToAhwahnee" type="Area2D" parent="Exits" unique_id=1555815311]
-position = Vector2(160, 6)
+position = Vector2(320, 12)
 script = ExtResource("10_xc7fm")
 label = "The Ahwahnee"
 target_region = "ahwahnee_trail"
@@ -3328,4 +3328,4 @@ shape = SubResource("RectangleShape2D_xpw10")
 [node name="Markers" type="Node2D" parent="." unique_id=427842465]
 
 [node name="shuttle" type="Marker2D" parent="Markers" unique_id=809237072]
-position = Vector2(56, 184)
+position = Vector2(112, 368)

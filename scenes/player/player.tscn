@@ -4,10 +4,10 @@
 [ext_resource type="SpriteFrames" path="res://assets/sprites/player_frames.tres" id="2_gmlin"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lvxji"]
-size = Vector2(10, 6)
+size = Vector2(20, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p47bc"]
-size = Vector2(12, 12)
+size = Vector2(24, 24)
 
 [node name="Player" type="CharacterBody2D" unique_id=306573633]
 collision_layer = 2
@@ -17,14 +17,14 @@ script = ExtResource("1_dovo2")
 [node name="Sprite" type="AnimatedSprite2D" parent="." unique_id=1727705912]
 sprite_frames = ExtResource("2_gmlin")
 animation = &"idle_down"
-offset = Vector2(0, -11)
+offset = Vector2(0, -22)
 
 [node name="Collision" type="CollisionShape2D" parent="." unique_id=1789725718]
-position = Vector2(0, -3)
+position = Vector2(0, -6)
 shape = SubResource("RectangleShape2D_lvxji")
 
 [node name="InteractionArea" type="Area2D" parent="." unique_id=1828131034]
-position = Vector2(0, 12)
+position = Vector2(0, 24)
 collision_layer = 0
 collision_mask = 4
 monitorable = false

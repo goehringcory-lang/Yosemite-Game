@@ -2,7 +2,7 @@ class_name Player
 extends CharacterBody2D
 ## The player: movement, facing, and talking to or using whatever is in front of them.
 
-const SPEED := 80.0
+const SPEED := 160.0
 ## Holding the run button multiplies the walking speed by this.
 const RUN_BOOST := 1.75
 
@@ -56,7 +56,7 @@ func _physics_process(_delta: float) -> void:
 			facing = Vector2i(signi(roundi(input.x)), 0)
 		else:
 			facing = Vector2i(0, signi(roundi(input.y)))
-		interaction_area.position = Vector2(facing) * 12.0
+		interaction_area.position = Vector2(facing) * 24.0
 	sprite.speed_scale = RUN_BOOST if running else 1.0
 	sprite.play(("walk_" if input != Vector2.ZERO else "idle_") + _direction_name())
 
@@ -97,7 +97,7 @@ func save_data() -> Dictionary:
 func load_data(data: Dictionary) -> void:
 	position = Vector2(data.get("x", position.x), data.get("y", position.y))
 	facing = Vector2i(int(data.get("facing_x", 0)), int(data.get("facing_y", 1)))
-	interaction_area.position = Vector2(facing) * 12.0
+	interaction_area.position = Vector2(facing) * 24.0
 
 
 func _draw() -> void:

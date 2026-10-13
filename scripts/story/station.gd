@@ -12,7 +12,7 @@ extends StaticBody2D
 @export var texture: Texture2D
 @export var frames := 1
 @export var fps := 0.0
-@export var ground_inset := 4
+@export var ground_inset := 8
 ## Footprint and reach in pixels (zero keeps the scene's default sizes).
 @export var body_size := Vector2.ZERO
 @export var reach_size := Vector2.ZERO
@@ -24,7 +24,7 @@ func _ready() -> void:
 		if body_size.x > 0.0:
 			_resize("Collision", body_size, Vector2(0, -body_size.y / 2.0))
 		if reach_size.x > 0.0:
-			_resize("Hitbox/Shape", reach_size, Vector2(0, -reach_size.y / 2.0 - 2.0))
+			_resize("Hitbox/Shape", reach_size, Vector2(0, -reach_size.y / 2.0 - 4.0))
 	else:
 		queue_redraw()
 	if station == "campfire":
@@ -60,15 +60,15 @@ func _add_fire_effects() -> void:
 	sparks.name = "Sparks"
 	sparks.set_script(load("res://scripts/world/ambient_fx.gd"))
 	sparks.set("effect", "sparks")
-	sparks.set("area", Vector2(4, 1))
-	sparks.position = Vector2(0, -12)
+	sparks.set("area", Vector2(8, 2))
+	sparks.position = Vector2(0, -24)
 	sparks.z_index = 6
 	add_child(sparks)
 	var light := PointLight2D.new()
 	light.name = "NightLight"
 	light.set_script(load("res://scripts/world/night_light.gd"))
-	light.position = Vector2(0, -10)
-	light.set("radius", 70.0)
+	light.position = Vector2(0, -20)
+	light.set("radius", 140.0)
 	light.set("strength", 1.0)
 	light.set("flicker", 0.35)
 	add_child(light)
@@ -78,13 +78,13 @@ func _add_fire_effects() -> void:
 ## style (shaded from the upper left, a dark rim): a ring of stones round
 ## burning logs with a flickering flame, a granite slab with mortar holes, or
 ## a sand basin with water.
-const RIM := Color("2a1f1a")
-const STONE := Color("8a8a90")
-const STONE_LIT := Color("b0b0b6")
-const STONE_DARK := Color("5a5a62")
-const LOG := Color("6a4024")
-const LOG_LIT := Color("8a5a34")
-const FLAME := [Color("f8e070"), Color("f8a030"), Color("e05a20")]
+const RIM := Color("2a1b14")
+const STONE := Color("93918f")
+const STONE_LIT := Color("bdb8ae")
+const STONE_DARK := Color("6a6a70")
+const LOG := Color("6b4829")
+const LOG_LIT := Color("92693d")
+const FLAME := [Color("f1cf6a"), Color("f7a64a"), Color("d9772a")]
 
 var _flicker := 0.0
 
@@ -99,7 +99,8 @@ func _process(delta: float) -> void:
 
 
 func _px(x: float, y: float, w: float, h: float, color: Color) -> void:
-	draw_rect(Rect2(x, y, w, h), color)
+	# Coordinates below are in the old 16px art grid: draw each at 2x.
+	draw_rect(Rect2(x * 2.0, y * 2.0, w * 2.0, h * 2.0), color)
 
 
 func _draw() -> void:
@@ -120,10 +121,10 @@ func _draw() -> void:
 		"leaching":
 			# a sand basin by the river with water standing in it
 			_px(-9, -9, 18, 10, RIM)
-			_px(-8, -8, 16, 8, Color("d8c090"))
-			_px(-8, -8, 16, 1, Color("ecd8a8"))
-			_px(-5, -6, 10, 4, Color("4a8ac8"))
-			_px(-5, -6, 10, 1, Color("8ac0e8"))
+			_px(-8, -8, 16, 8, Color("d6bd88"))
+			_px(-8, -8, 16, 1, Color("d6bd88"))
+			_px(-5, -6, 10, 4, Color("3a86a8"))
+			_px(-5, -6, 10, 1, Color("63b3c6"))
 
 
 func _draw_campfire() -> void:
@@ -137,8 +138,8 @@ func _draw_campfire() -> void:
 	_px(-5, -3, 10, 1, LOG)
 	_px(-2, -7, 4, 6, RIM)
 	_px(-1, -6, 2, 4, LOG_LIT)
-	_px(-5, -4, 1, 2, Color("f08030"))
-	_px(4, -4, 1, 2, Color("f08030"))
+	_px(-5, -4, 1, 2, Color("d9772a"))
+	_px(4, -4, 1, 2, Color("d9772a"))
 	# the flame: three layers that lean and flicker
 	var frame := int(_flicker * 8.0) % 4
 	var lean: int = [0, 1, 0, -1][frame]

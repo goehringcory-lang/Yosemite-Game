@@ -202,9 +202,9 @@ func _check_unstick(world: Node) -> void:
 	# Find something solid near the arrival (a tree or a building) to drop the player in.
 	var origin := player.global_position
 	var solid := Vector2.INF
-	for r in range(16, 320, 8):
+	for r in range(32, 640, 16):
 		for i in 16:
-			var p := origin + Vector2.from_angle(i * TAU / 16.0) * r
+			var p := origin + Vector2.from_angle(i * TAU / 32.0) * r
 			if player.test_move(Transform2D(0.0, p), Vector2.ZERO):
 				solid = p
 				break
@@ -213,7 +213,7 @@ func _check_unstick(world: Node) -> void:
 	check(solid != Vector2.INF, "found a solid spot near the El Portal arrival")
 	player.global_position = solid
 	await world._unstick_player()
-	check(not player.test_move(player.global_transform, Vector2.ZERO) and player.global_position.distance_to(solid) <= 96.0,
+	check(not player.test_move(player.global_transform, Vector2.ZERO) and player.global_position.distance_to(solid) <= 192.0,
 		"a player dropped in a tree is moved to open ground (%s)" % player.global_position)
 	world._enter_region(Park.HOME_REGION, Park.HOME_SPAWN)
 
@@ -225,12 +225,12 @@ func _check_wake_up(world: Node) -> void:
 	Inventory.add("wild_strawberry", 1)
 	Larder.batches["wild_strawberry"] = [1]
 	player.facing = Vector2i.LEFT
-	player.interaction_area.position = Vector2(-12, 0)
+	player.interaction_area.position = Vector2(-24, 0)
 	await world.sleep()
 	var message: String = world.hud.message_label.text
 	check("Good morning" in message and "Spoiled overnight" in message,
 		"the morning message keeps the spoiled-food note (%s)" % message.replace("\n", " / "))
-	check(player.facing == Vector2i.DOWN and player.interaction_area.position == Vector2(0, 12), "after waking the interaction area faces down")
+	check(player.facing == Vector2i.DOWN and player.interaction_area.position == Vector2(0, 24), "after waking the interaction area faces down")
 
 
 ## Esc closes a sign before it opens the pause menu, button hints follow the
@@ -400,11 +400,11 @@ func _check_central_hub(world: Node) -> void:
 	check(world.region.region_id == "yosemite_village", "driving to the Valley arrives in Yosemite Village")
 	var region: Region = world.region
 	var open := _walkable_cells(region)
-	var start := Vector2i(region.get_spawn("arrival").position / 16.0)
+	var start := Vector2i(region.get_spawn("arrival").position / 32.0)
 	var reached := _flood(open, start)
 	var unreachable := PackedStringArray()
 	for marker in region.get_node("Markers").get_children():
-		if not reached.has(Vector2i((marker as Node2D).position / 16.0)):
+		if not reached.has(Vector2i((marker as Node2D).position / 32.0)):
 			unreachable.append(marker.name)
 	check(unreachable.is_empty(), "every spot in the Village hub is reachable on foot (%s)" % ", ".join(unreachable))
 	var ground := region.get_ground()
@@ -416,7 +416,7 @@ func _check_central_hub(world: Node) -> void:
 	var board: Node2D = region.find_child("Camp4Sign", true, false)
 	world.player.position = board.position + Vector2(0, 14)
 	world.player.facing = Vector2i.UP
-	world.player.interaction_area.position = Vector2(0, -12)
+	world.player.interaction_area.position = Vector2(0, -24)
 	for i in 4:
 		await get_tree().physics_frame
 	await get_tree().process_frame
@@ -482,7 +482,7 @@ func _check_getting_around(world: Node) -> void:
 	var road: RegionExit = world.region.find_child("NorthsideDriveWest", true, false)
 	await world.go_to_region(road.target_region, road.target_spawn)
 	var door: RegionDoor = world.region.find_child("AhwahneeDoor", true, false)
-	check(door != null and door.position.distance_to(world.region.get_spawn(road.target_spawn).position) < 64.0,
+	check(door != null and door.position.distance_to(world.region.get_spawn(road.target_spawn).position) < 128.0,
 		"the way back into the Ahwahnee is beside where its road comes out")
 	check(door != null and await _can_use(player, door), "and it can be walked up to")
 	door.interact(player)
@@ -512,7 +512,7 @@ func _distance_moved(player: Player, action: String, run: bool) -> float:
 func _can_use(player: Player, target: Node2D) -> bool:
 	player.global_position = target.global_position + Vector2(0, 8)
 	player.facing = Vector2i.UP
-	player.interaction_area.position = Vector2(0, -12)
+	player.interaction_area.position = Vector2(0, -24)
 	for i in 3:
 		await get_tree().physics_frame
 	return not player.test_move(player.global_transform, Vector2.ZERO) and player.get_target() == target
@@ -572,9 +572,9 @@ func _walkable_cells(region: Region) -> Dictionary:
 		var shape := body.get_node_or_null("Collision") as CollisionShape2D
 		if shape and shape.shape is RectangleShape2D:
 			var rect := Rect2((body as Node2D).position + shape.position - shape.shape.size / 2.0, shape.shape.size)
-			for y in range(floori(rect.position.y / 16.0), floori(rect.end.y / 16.0) + 1):
-				for x in range(floori(rect.position.x / 16.0), floori(rect.end.x / 16.0) + 1):
-					if rect.grow(-minf(3.0, minf(rect.size.x, rect.size.y) / 3.0)).intersects(Rect2(x * 16, y * 16, 16, 16)):
+			for y in range(floori(rect.position.y / 32.0), floori(rect.end.y / 32.0) + 1):
+				for x in range(floori(rect.position.x / 32.0), floori(rect.end.x / 32.0) + 1):
+					if rect.grow(-minf(6.0, minf(rect.size.x, rect.size.y) / 3.0)).intersects(Rect2(x * 32, y * 32, 32, 32)):
 						open.erase(Vector2i(x, y))
 	return open
 

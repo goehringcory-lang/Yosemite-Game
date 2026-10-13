@@ -37,7 +37,7 @@ static func dress(region: Region) -> void:
 				boulder.extra_hours = Vector2i(0, 4)
 				var lamp := Headlamp.new()
 				lamp.name = "Headlamp"
-				lamp.position = Vector2(6, -26)
+				lamp.position = Vector2(12, -52)
 				boulder.add_child(lamp)
 		"wawona":
 			var clark := _sign(region, "Sign_Clarks_Station")
@@ -55,7 +55,7 @@ static func _sign(region: Region, node_name: String) -> InfoSign:
 static func _bear_boxes(region: Region) -> void:
 	for node in region.entities.get_children():
 		if node is StaticBody2D and "BearBox" in String(node.name) and not node is InfoSign:
-			make_readable(node, "Bear Box", BEAR_BOX_TEXT, Vector2(20, 16), Vector2(0, -6))
+			make_readable(node, "Bear Box", BEAR_BOX_TEXT, Vector2(40, 32), Vector2(0, -12))
 
 
 ## Gives a plain prop an InfoSign's behavior: the sign script and a hitbox the

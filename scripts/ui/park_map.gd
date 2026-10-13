@@ -33,41 +33,41 @@ const NUDGE_X := [0, 4, -4, 8, -8, 12, -12, 16, -16, 24, -24]
 const NUDGE_Y := [0, 3, -3, 6, -6, 9, -9, 12, -12, 15, -15, 18, -18]
 const SCREEN := Vector2(480, 270)
 
-const INK := Color("1a1410")
-const GOLD := Color("ffd24a")
-const CLOSED := Color("e0503c")
-const LOCKED := Color("9a948a")
-const TEXT := Color("f7f0dc")
-const DIM := Color(0.97, 0.94, 0.86, 0.6)
+const INK := Color("2a1b14")
+const GOLD := Color("f1cf6a")
+const CLOSED := Color("b3362b")
+const LOCKED := Color("93918f")
+const TEXT := Color("f5eee0")
+const DIM := Color(0.961, 0.933, 0.878, 0.6)
 ## Sub-heading text: light enough to read on the dark panel.
-const SUBHEAD := Color("d9cdb0")
+const SUBHEAD := Color("e4ddcc")
 
 # Illustrated area map: wood frame, parchment signs, slate ribbons.
-const WOOD_PLANK := Color("2a190b")
-const WOOD_PLANK_LINE := Color("34210f")
-const WOOD_DARK := Color("1b0f07")
-const WOOD_MID := Color("8a5a2e")
-const WOOD_LIGHT := Color("c98f4d")
-const PARCHMENT := Color("f6e5b5")
-const PARCHMENT_SHADE := Color("e2c684")
-const BROWN := Color("3b2416")
-const SLATE := Color("2b3550")
-const SLATE_SHADE := Color("1f2740")
-const SLATE_DARK := Color("141a2b")
-const CREAM := Color("f6ecd0")
-const SIGN_GOLD := Color("f4c94a")
-const SIGN_GOLD_SHADE := Color("d9a52c")
-const FALL_BLUE := Color("9fd3ee")
-const GEAR_LOCKED := Color("6d7488")
-const KIOSK_GREEN := Color("4f9a3c")
-const HERE_RED := Color("ff5a3c")
-const PARCHMENT_LIGHT := Color("fff6dc")
-const SIGN_GOLD_LIGHT := Color("ffe58a")
-const SLATE_LIGHT := Color("3d4868")
+const WOOD_PLANK := Color("2a1b14")
+const WOOD_PLANK_LINE := Color("47301f")
+const WOOD_DARK := Color("2a1b14")
+const WOOD_MID := Color("7e531c")
+const WOOD_LIGHT := Color("ad7a22")
+const PARCHMENT := Color("d6bd88")
+const PARCHMENT_SHADE := Color("d6bd88")
+const BROWN := Color("47301f")
+const SLATE := Color("2d3050")
+const SLATE_SHADE := Color("142f47")
+const SLATE_DARK := Color("15141c")
+const CREAM := Color("f5eee0")
+const SIGN_GOLD := Color("f1cf6a")
+const SIGN_GOLD_SHADE := Color("d8a63b")
+const FALL_BLUE := Color("9fd8d9")
+const GEAR_LOCKED := Color("6a6a70")
+const KIOSK_GREEN := Color("5c8f3c")
+const HERE_RED := Color("b3362b")
+const PARCHMENT_LIGHT := Color("f5eee0")
+const SIGN_GOLD_LIGHT := Color("f1cf6a")
+const SLATE_LIGHT := Color("235679")
 ## Width of the wooden frame around a picture, in pixels.
 const FRAME_WIDTH := 4.0
-const WOOD_BEVEL := Color("a86d38")
-const WOOD_SHADE := Color("6b4322")
+const WOOD_BEVEL := Color("92693d")
+const WOOD_SHADE := Color("6b4829")
 
 ## The gamepad's name for each keyboard control the map's hints mention.
 const GAMEPAD_BUTTONS := {"Arrows": "D-pad", "E": "A", "Esc": "B", "M": "Back", "Tab": "LB/RB"}
@@ -129,6 +129,7 @@ var _info_panel: PanelContainer
 
 func _ready() -> void:
 	layer = 20
+	UiScale.layer(self)
 	add_to_group("park_map")
 	visible = false
 	_build()
@@ -738,7 +739,7 @@ func _draw_kiosk(canvas: Control, at: Vector2) -> void:
 	canvas.draw_rect(Rect2(o, Vector2(9, 6)), INK)
 	canvas.draw_rect(Rect2(o + Vector2(1, 1), Vector2(7, 4)), WOOD_MID)
 	canvas.draw_rect(Rect2(o + Vector2(2, 2), Vector2(5, 2)), KIOSK_GREEN)
-	canvas.draw_rect(Rect2(o + Vector2(2, 2), Vector2(2, 1)), Color("e8f7c8"))
+	canvas.draw_rect(Rect2(o + Vector2(2, 2), Vector2(2, 1)), Color("f5eee0"))
 	canvas.draw_rect(Rect2(o + Vector2(2, 6), Vector2(1, 2)), INK)
 	canvas.draw_rect(Rect2(o + Vector2(6, 6), Vector2(1, 2)), INK)
 
@@ -749,12 +750,12 @@ func _draw_climb(canvas: Control, at: Vector2, ready: bool) -> void:
 	canvas.draw_colored_polygon(_diamond(c + Vector2(1, 1), 5.0), Color(INK, 0.5))
 	canvas.draw_colored_polygon(_diamond(c, 5.0), INK)
 	canvas.draw_colored_polygon(_diamond(c, 3.5), SIGN_GOLD if ready else GEAR_LOCKED)
-	canvas.draw_rect(Rect2(c + Vector2(-2, -1), Vector2(1, 1)), SIGN_GOLD_LIGHT if ready else Color("b9b3a6"))
+	canvas.draw_rect(Rect2(c + Vector2(-2, -1), Vector2(1, 1)), SIGN_GOLD_LIGHT if ready else Color("bdb8ae"))
 	if ready:
 		canvas.draw_rect(Rect2(c + Vector2(0, -2), Vector2(1, 4)), BROWN)
 	else:
-		canvas.draw_rect(Rect2(c + Vector2(-1, 0), Vector2(3, 2)), Color("e9e3d0"))
-		canvas.draw_rect(Rect2(c + Vector2(0, -1), Vector2(1, 1)), Color("e9e3d0"))
+		canvas.draw_rect(Rect2(c + Vector2(-1, 0), Vector2(3, 2)), Color("e4ddcc"))
+		canvas.draw_rect(Rect2(c + Vector2(0, -1), Vector2(1, 1)), Color("e4ddcc"))
 
 
 func _diamond(c: Vector2, r: float) -> PackedVector2Array:
@@ -775,7 +776,7 @@ func _draw_pin(canvas: Control, at: Vector2) -> void:
 	canvas.draw_circle(head, 4.0, INK)
 	canvas.draw_colored_polygon(PackedVector2Array([tip, head + Vector2(-3, 0.5), head + Vector2(3, 0.5)]), HERE_RED)
 	canvas.draw_circle(head, 3.0, HERE_RED)
-	canvas.draw_rect(Rect2(head + Vector2(-2, -2), Vector2(1, 1)), Color(1, 1, 1, 0.85))
+	canvas.draw_rect(Rect2(head + Vector2(-2, -2), Vector2(1, 1)), Color(0.961, 0.933, 0.878, 0.85))
 
 
 ## The "you are here" pin on the park map.
@@ -807,8 +808,8 @@ func _draw_planks(canvas: Control) -> void:
 func _draw_frame(canvas: Control, picture: Rect2) -> void:
 	var outer := picture.grow(FRAME_WIDTH)
 	var inner := outer.grow(-1)
-	canvas.draw_rect(Rect2(outer.position + Vector2(2, 3), outer.size), Color(0, 0, 0, 0.16))
-	canvas.draw_rect(Rect2(outer.position + Vector2(1, 2), outer.size), Color(0, 0, 0, 0.3))
+	canvas.draw_rect(Rect2(outer.position + Vector2(2, 3), outer.size), Color(0.082, 0.078, 0.11, 0.16))
+	canvas.draw_rect(Rect2(outer.position + Vector2(1, 2), outer.size), Color(0.082, 0.078, 0.11, 0.3))
 	canvas.draw_rect(outer, WOOD_DARK)
 	canvas.draw_rect(inner, WOOD_MID)
 	canvas.draw_rect(Rect2(outer.position, Vector2(outer.size.x, 1)), WOOD_LIGHT)
@@ -858,16 +859,16 @@ func _draw_area_frame() -> void:
 		canvas.draw_rect(Rect2(plaque.position + Vector2(1, 0), plaque.size - Vector2(2, 1)), WOOD_MID)
 		canvas.draw_rect(Rect2(plaque.position + Vector2(1, 0), Vector2(plaque.size.x - 2, 1)), WOOD_LIGHT)
 		canvas.draw_string_outline(font, Vector2(plaque.position.x + 8, 11), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, 2, WOOD_DARK)
-		canvas.draw_string(font, Vector2(plaque.position.x + 8, 11), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("fff3cf"))
+		canvas.draw_string(font, Vector2(plaque.position.x + 8, 11), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color("f5eee0"))
 	# Footer strip: the panels' board and gold edge, slim enough for one line.
 	canvas.draw_style_box(_strip_box, Rect2(6, 246, 468, 22))
 
 
 func _tab_chip(canvas: Control, font: Font, rect: Rect2, text: String, active: bool) -> void:
 	canvas.draw_rect(rect, WOOD_DARK)
-	canvas.draw_rect(Rect2(rect.position + Vector2(1, 1), rect.size - Vector2(2, 1)), PARCHMENT if active else Color("5b3a1d"))
+	canvas.draw_rect(Rect2(rect.position + Vector2(1, 1), rect.size - Vector2(2, 1)), PARCHMENT if active else Color("6b4829"))
 	var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x
-	canvas.draw_string(font, rect.position + Vector2(floorf((rect.size.x - width) / 2.0), rect.size.y - 3), text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, BROWN if active else Color("e9d3a0"))
+	canvas.draw_string(font, rect.position + Vector2(floorf((rect.size.x - width) / 2.0), rect.size.y - 3), text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, BROWN if active else Color("d6bd88"))
 
 
 ## A small flat sign: a 1 px dark outline, a lit top edge, a shaded bottom
@@ -950,11 +951,11 @@ func _load_view() -> void:
 
 func _build() -> void:
 	var root := Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	UiScale.fit(root)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	var bg := ColorRect.new()
-	bg.color = Color(0.07, 0.06, 0.05, 0.94)
+	bg.color = Color(0.082, 0.078, 0.11, 0.94)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(bg)
@@ -965,10 +966,10 @@ func _build() -> void:
 	root.add_child(_park_view)
 	_note_box = _make_note_box()
 	_strip_box = StyleBoxFlat.new()
-	_strip_box.bg_color = Color("3a2a1e")
-	_strip_box.border_color = Color("c8a060")
+	_strip_box.bg_color = Color("47301f")
+	_strip_box.border_color = Color("b0925f")
 	_strip_box.set_border_width_all(1)
-	_strip_box.shadow_color = Color(0, 0, 0, 0.4)
+	_strip_box.shadow_color = Color(0.082, 0.078, 0.11, 0.4)
 	_strip_box.shadow_size = 2
 	_park_frame = _overlay(_park_view, _draw_park_frame)
 	var map := TextureRect.new()

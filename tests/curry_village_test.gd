@@ -107,7 +107,7 @@ func _ready() -> void:
 
 	# Standing at the counter, you can talk to the clerk.
 	world.player.global_position = keeper.global_position + Vector2(0, 40)
-	world.player.interaction_area.position = Vector2(0, -12)
+	world.player.interaction_area.position = Vector2(0, -24)
 	for _i in 4:
 		await get_tree().physics_frame
 	var talks: bool = world.player.interaction_area.get_overlapping_areas().any(func(a: Area2D) -> bool: return a.get_parent() == keeper)
@@ -165,7 +165,7 @@ func _check_region(region: Region) -> void:
 	var ground := region.get_ground()
 	check(ground.get_used_rect().size == Vector2i(100, 64), "the village is 100 x 64 tiles")
 	var painting := region.get_node_or_null("GroundArt") as Sprite2D
-	check(painting != null and painting.texture.get_size() == Vector2(1600, 1024), "the ground is one painted picture")
+	check(painting != null and painting.texture.get_size() == Vector2(3200, 2048), "the ground is one painted picture")
 	check(not ground.visible, "the tile ground underneath stays hidden")
 	var tents := region.find_children("TentCabin*", "StaticBody2D", true, false)
 	check(tents.size() >= 48, "the camp has its tent cabins (%d)" % tents.size())
@@ -173,17 +173,17 @@ func _check_region(region: Region) -> void:
 	for prop in ["Registration", "Pavilion", "CurryStore", "MountainShop", "PizzaDeck", "Amphitheater", "Pool", "FirefallBoard", "Flagpole", "EntranceArch"]:
 		check(region.find_child(prop, true, false) != null, "%s is there" % prop)
 	var open := _walkable(region)
-	var start := Vector2i(region.get_spawn("homestead").position / 16.0)
+	var start := Vector2i(region.get_spawn("homestead").position / 32.0)
 	var reached := _flood(open, start)
 	var unreachable := PackedStringArray()
 	for spawn in ["arrival", "shuttle", "store_door", "shop_door", "registration_porch", "plaza", "apron_trailhead", "west_road", "east_road", "campsite_west", "campsite_center", "campsite_east"]:
-		if not reached.has(Vector2i(region.get_spawn(spawn).position / 16.0)):
+		if not reached.has(Vector2i(region.get_spawn(spawn).position / 32.0)):
 			unreachable.append(spawn)
 	check(unreachable.is_empty(), "every spot can be walked to from the gate %s" % unreachable)
 	var exits := PackedStringArray()
 	for exit: Area2D in region.get_node("Exits").get_children():
 		var near := false
-		var cell := Vector2i(exit.position / 16.0)
+		var cell := Vector2i(exit.position / 32.0)
 		for dy in range(-3, 4):
 			for dx in range(-3, 4):
 				near = near or reached.has(cell + Vector2i(dx, dy))
@@ -192,7 +192,7 @@ func _check_region(region: Region) -> void:
 	check(exits.is_empty(), "every door and road exit can be reached %s" % exits)
 	var signs := PackedStringArray()
 	for info: InfoSign in region.find_children("*", "InfoSign", true, false):
-		var cell := Vector2i(info.position / 16.0)
+		var cell := Vector2i(info.position / 32.0)
 		var near := false
 		for dy in range(-3, 3):
 			for dx in range(-3, 4):
@@ -203,7 +203,7 @@ func _check_region(region: Region) -> void:
 	var stuck := PackedStringArray()
 	for node in region.entities.get_children():
 		if node is TravelPoint or node is ShuttleStop:
-			var cell := Vector2i((node as Node2D).position / 16.0)
+			var cell := Vector2i((node as Node2D).position / 32.0)
 			var near := false
 			for dy in range(-2, 3):
 				for dx in range(-2, 3):
@@ -228,9 +228,9 @@ func _check_inside(room: Region, label: String) -> void:
 	for spawn in ["door", "counter", "customer"]:
 		check(room.get_spawn(spawn) != null, "the %s has a %s spot" % [label, spawn])
 	var open := _walkable(room)
-	var reached := _flood(open, Vector2i(room.get_spawn("door").position / 16.0))
-	check(reached.has(Vector2i(room.get_spawn("customer").position / 16.0)), "the customer's spot in the %s can be walked to" % label)
-	var counter_cell := Vector2i(room.get_spawn("counter").position / 16.0)
+	var reached := _flood(open, Vector2i(room.get_spawn("door").position / 32.0))
+	check(reached.has(Vector2i(room.get_spawn("customer").position / 32.0)), "the customer's spot in the %s can be walked to" % label)
+	var counter_cell := Vector2i(room.get_spawn("counter").position / 32.0)
 	var can_reach_counter := false
 	for dy in range(-1, 3):
 		for dx in range(-1, 2):
@@ -284,9 +284,9 @@ func _walkable(region: Region) -> Dictionary:
 			var shape := shape_node as CollisionShape2D
 			if shape and shape.shape is RectangleShape2D:
 				var rect := Rect2((body as Node2D).position + shape.position - shape.shape.size / 2.0, shape.shape.size)
-				for y in range(floori(rect.position.y / 16.0), floori(rect.end.y / 16.0) + 1):
-					for x in range(floori(rect.position.x / 16.0), floori(rect.end.x / 16.0) + 1):
-						if rect.grow(-minf(3.0, minf(rect.size.x, rect.size.y) / 3.0)).intersects(Rect2(x * 16, y * 16, 16, 16)):
+				for y in range(floori(rect.position.y / 32.0), floori(rect.end.y / 32.0) + 1):
+					for x in range(floori(rect.position.x / 32.0), floori(rect.end.x / 32.0) + 1):
+						if rect.grow(-minf(6.0, minf(rect.size.x, rect.size.y) / 3.0)).intersects(Rect2(x * 32, y * 32, 32, 32)):
 							open.erase(Vector2i(x, y))
 	return open
 

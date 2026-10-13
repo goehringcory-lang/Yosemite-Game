@@ -1,14 +1,14 @@
 shader_type canvas_item;
 // Soft shadows of clouds drifting over the ground (see scripts/world/cloud_shadows.gd).
 // Works in world pixels, so it stays as crisp as the art: the noise is sampled
-// once per world pixel and the shade comes in a few flat steps (a soft ramp
+// once per 2x2 world pixels (one pixel of the 2x art) and the shade comes in a few flat steps (a soft ramp
 // from rim to core, never a per-pixel dither).
 
 uniform vec2 drift = vec2(0.0);
 // 0 clear sky .. 1 overcast
 uniform float coverage : hint_range(0.0, 1.0) = 0.4;
 uniform float strength : hint_range(0.0, 1.0) = 0.14;
-uniform float scale = 150.0;
+uniform float scale = 300.0;
 uniform vec3 shade : source_color = vec3(0.1, 0.13, 0.24);
 
 varying vec2 world;
@@ -35,7 +35,7 @@ void vertex() {
 }
 
 void fragment() {
-	vec2 px = floor(world);
+	vec2 px = floor(world * 0.5) * 2.0;
 	vec2 p = (px + drift) / scale;
 	// stretched along the wind, like real cumulus shadows
 	p.y *= 1.4;

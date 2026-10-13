@@ -8,8 +8,8 @@ extends CPUParticles2D
 ## "drift" is blossom petals in spring and falling leaves in fall, and nothing
 ## the rest of the year.
 @export_enum("smoke", "mist", "sparks", "fireflies", "drift") var effect := "smoke"
-## Half the width and height of the area it spreads over, in pixels.
-@export var area := Vector2(2, 1)
+## Half the width and height of the area it spreads over, in pixels (world px).
+@export var area := Vector2(4, 2)
 
 var _tint: CanvasModulate
 
@@ -25,11 +25,11 @@ func _ready() -> void:
 			lifetime = 4.0
 			direction = Vector2(0.25, -1)
 			spread = 14.0
-			gravity = Vector2(1.5, -1.0)
-			initial_velocity_min = 5.0
-			initial_velocity_max = 9.0
-			scale_amount_min = 1.6
-			scale_amount_max = 3.2
+			gravity = Vector2(3.0, -2.0)
+			initial_velocity_min = 10.0
+			initial_velocity_max = 18.0
+			scale_amount_min = 3.2
+			scale_amount_max = 6.4
 			fade.offsets = PackedFloat32Array([0.0, 0.25, 1.0])
 			fade.colors = PackedColorArray([Color(0.9, 0.9, 0.9, 0.0), Color(0.9, 0.9, 0.9, 0.5), Color(0.75, 0.75, 0.78, 0.0)])
 		"mist":
@@ -38,10 +38,10 @@ func _ready() -> void:
 			direction = Vector2(0, -1)
 			spread = 30.0
 			gravity = Vector2.ZERO
-			initial_velocity_min = 2.0
-			initial_velocity_max = 6.0
-			scale_amount_min = 2.0
-			scale_amount_max = 5.0
+			initial_velocity_min = 4.0
+			initial_velocity_max = 12.0
+			scale_amount_min = 4.0
+			scale_amount_max = 10.0
 			fade.offsets = PackedFloat32Array([0.0, 0.3, 1.0])
 			fade.colors = PackedColorArray([Color(1, 1, 1, 0.0), Color(0.92, 0.97, 1.0, 0.32), Color(0.92, 0.97, 1.0, 0.0)])
 		"sparks":
@@ -49,11 +49,11 @@ func _ready() -> void:
 			lifetime = 1.3
 			direction = Vector2(0, -1)
 			spread = 25.0
-			gravity = Vector2(0, -3)
-			initial_velocity_min = 8.0
-			initial_velocity_max = 16.0
-			scale_amount_min = 1.0
-			scale_amount_max = 1.4
+			gravity = Vector2(0, -6)
+			initial_velocity_min = 16.0
+			initial_velocity_max = 32.0
+			scale_amount_min = 2.0
+			scale_amount_max = 2.8
 			fade.offsets = PackedFloat32Array([0.0, 0.2, 1.0])
 			fade.colors = PackedColorArray([Color(1, 0.85, 0.3, 0.0), Color(1, 0.7, 0.25, 1.0), Color(0.9, 0.3, 0.1, 0.0)])
 		"fireflies":
@@ -62,12 +62,12 @@ func _ready() -> void:
 			direction = Vector2(1, 0)
 			spread = 180.0
 			gravity = Vector2.ZERO
-			initial_velocity_min = 2.0
-			initial_velocity_max = 6.0
+			initial_velocity_min = 4.0
+			initial_velocity_max = 12.0
 			angular_velocity_min = -30.0
 			angular_velocity_max = 30.0
-			scale_amount_min = 1.0
-			scale_amount_max = 1.5
+			scale_amount_min = 2.0
+			scale_amount_max = 3.0
 			emitting = false
 			fade.offsets = PackedFloat32Array([0.0, 0.3, 0.7, 1.0])
 			fade.colors = PackedColorArray([Color(0.6, 0.8, 0.2, 0.0), Color(0.9, 1.0, 0.4, 0.9), Color(0.9, 1.0, 0.4, 0.9), Color(0.6, 0.8, 0.2, 0.0)])
@@ -76,19 +76,19 @@ func _ready() -> void:
 			lifetime = 7.0
 			direction = Vector2(1, 1)
 			spread = 35.0
-			gravity = Vector2(3.0, 4.0)
-			initial_velocity_min = 1.0
-			initial_velocity_max = 4.0
+			gravity = Vector2(6.0, 8.0)
+			initial_velocity_min = 2.0
+			initial_velocity_max = 8.0
 			angular_velocity_min = -60.0
 			angular_velocity_max = 60.0
-			scale_amount_min = 1.0
-			scale_amount_max = 1.6
+			scale_amount_min = 2.0
+			scale_amount_max = 3.2
 			emitting = false
 			fade.offsets = PackedFloat32Array([0.0, 0.15, 0.85, 1.0])
 			fade.colors = PackedColorArray([Color(1, 1, 1, 0.0), Color(1, 1, 1, 0.9), Color(1, 1, 1, 0.9), Color(1, 1, 1, 0.0)])
 	color_ramp = fade
 	if effect == "mist" or effect == "smoke":
-		# Puffs in whole pixels with a dithered edge, fading in steps, so
+		# Puffs (a 7x6 texture shown at 2x, so 2px cells) with a dithered edge, fading in steps, so
 		# they read as pixel art and don't blur into a soft blob.
 		texture = _puff()
 		fade.interpolation_mode = Gradient.GRADIENT_INTERPOLATE_CONSTANT
@@ -98,14 +98,14 @@ func _ready() -> void:
 		steps.offsets = PackedFloat32Array([0.0, 0.15, 0.35, 0.7, 0.88])
 		steps.colors = PackedColorArray([Color(tint, tint.a * 0.4), Color(tint, tint.a * 0.75), Color(tint, tint.a), Color(tint, tint.a * 0.6), Color(tint, tint.a * 0.3)])
 		color_ramp = steps
-		scale_amount_min = 1.0
-		scale_amount_max = 1.0
+		scale_amount_min = 2.0
+		scale_amount_max = 2.0
 		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	# Fires crackle and waterfalls roar, heard from nearby.
 	if effect == "sparks":
-		add_child(SoundEmitter.make("campfire", 150.0, 0.8))
+		add_child(SoundEmitter.make("campfire", 300.0, 0.8))
 	elif effect == "mist":
-		add_child(SoundEmitter.make("waterfall", 360.0, 1.0))
+		add_child(SoundEmitter.make("waterfall", 720.0, 1.0))
 	if effect == "fireflies":
 		# Fireflies glow: additive, so they show against the night tint.
 		var add := CanvasItemMaterial.new()

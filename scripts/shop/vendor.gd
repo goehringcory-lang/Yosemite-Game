@@ -6,7 +6,7 @@ extends StaticBody2D
 @export var shop: ShopData
 ## Placeholder clothing color until real sprites exist.
 @export var color := Color(0.55, 0.35, 0.25)
-## A 48x96 character sheet (see tools/npcgen). When set, the vendor is drawn
+## A 96x192 character sheet (see tools/npcgen). When set, the vendor is drawn
 ## from it, facing [member facing] (0 down, 1 up, 2 left, 3 right).
 @export var sprite_sheet: Texture2D
 @export_range(0, 3) var facing := 0
@@ -31,14 +31,14 @@ func _draw() -> void:
 	GroundShadow.draw_under(self)
 	if sprite_sheet:
 		# A slow breath so the shopkeeper isn't a statue.
-		var bob := -1.0 if int(Time.get_ticks_msec() / 700) % 2 == 1 else 0.0
-		draw_texture_rect_region(sprite_sheet, Rect2(-8, -24 + bob, 16, 24), Rect2(0, facing * 24, 16, 24))
+		var bob := -2.0 if int(Time.get_ticks_msec() / 700) % 2 == 1 else 0.0
+		draw_texture_rect_region(sprite_sheet, Rect2(-16, -48 + bob, 32, 48), Rect2(0, facing * 48, 32, 48))
 		return
-	draw_rect(Rect2(-4, -14, 8, 11), color)
-	draw_circle(Vector2(0, -17), 3.5, Color(0.8, 0.62, 0.48))
-	draw_rect(Rect2(-5, -21, 10, 2), color.darkened(0.3))
-	draw_rect(Rect2(-4, -3, 3, 3), Color(0.25, 0.22, 0.28))
-	draw_rect(Rect2(1, -3, 3, 3), Color(0.25, 0.22, 0.28))
+	draw_rect(Rect2(-8, -28, 16, 22), color)
+	draw_circle(Vector2(0, -34), 7.0, Color(0.8, 0.62, 0.48))
+	draw_rect(Rect2(-10, -42, 20, 4), color.darkened(0.3))
+	draw_rect(Rect2(-8, -6, 6, 6), Color(0.25, 0.22, 0.28))
+	draw_rect(Rect2(2, -6, 6, 6), Color(0.25, 0.22, 0.28))
 
 
 func get_prompt() -> String:

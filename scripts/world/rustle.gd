@@ -6,8 +6,8 @@ extends Node
 ## whose origin is its base), so a skew bends the top and keeps the roots.
 ## World adds one.
 
-## How near the player's feet must come (pixels, across and up or down).
-const REACH := Vector2(9, 6)
+## How near the player's feet must come (world pixels, across and up or down).
+const REACH := Vector2(18, 12)
 ## Seconds a sway lasts, how far it leans (radians), and how fast it rocks.
 const SWAY_TIME := 0.7
 const LEAN := 0.32
@@ -37,7 +37,7 @@ func _process(delta: float) -> void:
 		_collect()
 	_sound_wait -= delta
 	var feet: Vector2 = world.player.global_position
-	if feet.distance_squared_to(_last_feet) > 0.25:
+	if feet.distance_squared_to(_last_feet) > 1.0:
 		var moving_right := feet.x >= _last_feet.x if _last_feet != Vector2.INF else true
 		_last_feet = feet
 		for sprite in _plants:

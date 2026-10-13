@@ -8,6 +8,6 @@ const COLOR := Color(0.05, 0.04, 0.03, 0.28)
 
 
 static func draw_under(ci: CanvasItem, at := Vector2.ZERO) -> void:
-	ci.draw_rect(Rect2(at + Vector2(-3, -2), Vector2(6, 1)), COLOR)
-	ci.draw_rect(Rect2(at + Vector2(-5, -1), Vector2(10, 2)), COLOR)
-	ci.draw_rect(Rect2(at + Vector2(-3, 1), Vector2(6, 1)), COLOR)
+	ci.draw_rect(Rect2(at + Vector2(-6, -4), Vector2(12, 2)), COLOR)
+	ci.draw_rect(Rect2(at + Vector2(-10, -2), Vector2(20, 4)), COLOR)
+	ci.draw_rect(Rect2(at + Vector2(-6, 2), Vector2(12, 2)), COLOR)

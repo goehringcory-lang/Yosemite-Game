@@ -19,56 +19,56 @@
 [node name="JennieCurry" parent="." instance=ExtResource("1_r")]
 character = ExtResource("2_r")
 spot = "registration_porch"
-offset = Vector2(22, 26)
+offset = Vector2(44, 52)
 
 [node name="VisitorCamper" parent="." instance=ExtResource("1_r")]
 character = ExtResource("3_r")
 spot = "campsite_center"
-offset = Vector2(-10, 20)
-wander_radius = 24.0
+offset = Vector2(-20, 40)
+wander_radius = 48
 
 [node name="VisitorPavilionCook" parent="." instance=ExtResource("1_r")]
 character = ExtResource("4_r")
 spot = "pavilion_door"
-offset = Vector2(20, 2)
+offset = Vector2(40, 4)
 
 [node name="VisitorRanger" parent="." instance=ExtResource("1_r")]
 character = ExtResource("5_r")
 spot = "amphitheater"
-offset = Vector2(-6, -4)
-wander_radius = 20.0
+offset = Vector2(-12, -8)
+wander_radius = 40
 
 [node name="VisitorTourist" parent="." instance=ExtResource("1_r")]
 character = ExtResource("6_r")
 spot = "plaza"
-offset = Vector2(-20, 30)
-wander_radius = 40.0
+offset = Vector2(-40, 60)
+wander_radius = 80
 
 [node name="JulesEichorn" parent="." instance=ExtResource("1_r")]
 character = ExtResource("7_r")
 spot = "apron_trailhead"
-offset = Vector2(-20, 36)
+offset = Vector2(-40, 72)
 
 [node name="BestorRobinson" parent="." instance=ExtResource("1_r")]
 character = ExtResource("8_r")
 spot = "apron_trailhead"
-offset = Vector2(14, 44)
-wander_radius = 12.0
+offset = Vector2(28, 88)
+wander_radius = 24
 
 [node name="WrenAlvarez" parent="." instance=ExtResource("1_r")]
 character = ExtResource("9_r")
 spot = "apron_trailhead"
-offset = Vector2(-84, -32)
+offset = Vector2(-168, -64)
 
 [node name="FirefallSlab" parent="." instance=ExtResource("10_r")]
-position = Vector2(1150, 118)
+position = Vector2(2300, 236)
 route = ExtResource("11_r")
 
 [node name="CurryRentalShoes" parent="." instance=ExtResource("12_r")]
-position = Vector2(820, 330)
+position = Vector2(1640, 660)
 item_id = "rental_shoes"
 found_text = "Somebody's rental shoes from the Mountain Shop, left outside a tent cabin. Marty will want these back."
 
 [node name="Firefall" type="Node2D" parent="."]
-position = Vector2(980, 8)
+position = Vector2(1960, 16)
 script = ExtResource("13_r")

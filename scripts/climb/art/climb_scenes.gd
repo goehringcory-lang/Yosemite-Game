@@ -9,7 +9,7 @@ extends RefCounted
 
 const P := preload("res://scripts/climb/art/climb_paint.gd")
 const L := preload("res://scripts/climb/art/climb_layout.gd")
-const DARK := Color("2a1f1a")
+const DARK := Color("2a1b14")
 ## Right limit of the ground (where the wall picture ends) for the current paint.
 static var _xr := 296
 
@@ -37,7 +37,7 @@ static func _lit(col: Color, pal: Dictionary) -> Color:
 ## A window's glass: sky-blue by day, lamp-yellow in the dark.
 static func _glass(pal: Dictionary, hex := "ffd070") -> Color:
 	var n := ClimbProps.night_amount(pal)
-	return _lit(Color("7a9cc0"), pal).lerp(ClimbProps.glow(hex, pal), clampf(n * 2.2, 0.0, 1.0))
+	return _lit(Color("3a86a8"), pal).lerp(ClimbProps.glow(hex, pal), clampf(n * 2.2, 0.0, 1.0))
 
 
 ## A pool of lamp light on the ground (only visible when it's dark).
@@ -190,7 +190,7 @@ static func _curry(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenerat
 	ClimbProps.pine(im, _xr, y0 + 22, 80, rng, c)
 	ClimbProps.oak(im, 286, y0 + 20, 50, rng, c)
 	# Beaten earth path between the cabins.
-	var dirt: Array[Color] = [_lit(Color("6a4e30"), pal), _lit(Color("8a6a42"), pal), _lit(Color("b08a58"), pal)]
+	var dirt: Array[Color] = [_lit(Color("6b4829"), pal), _lit(Color("92693d"), pal), _lit(Color("b0925f"), pal)]
 	_band(im, 0, _xr, y0 + 38, 11, dirt, rng, 2.0, 60)
 	_tent_cabin(im, 4, y0 + 18, pal, true, "12")
 	_tent_cabin(im, 226, y0 + 37, pal, false, "14")
@@ -204,8 +204,8 @@ static func _curry(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenerat
 	ClimbProps.flowers(im, 214, y0 + 22, rng, pal)
 	ClimbProps.flowers(im, 280, y0 + 28, rng, pal)
 	# Two guests strolling to the dining pavilion.
-	ClimbProps.person(im, 150, y0 + 46, pal, {"shirt": Color("c84a3a"), "hat": Color("e8c040"), "dir": 1})
-	ClimbProps.person(im, 164, y0 + 47, pal, {"shirt": Color("4a78c8"), "pants": Color("6a5a48"), "dir": 1, "hair": Color("c8a050")})
+	ClimbProps.person(im, 150, y0 + 46, pal, {"shirt": Color("b3362b"), "hat": Color("d8a63b"), "dir": 1})
+	ClimbProps.person(im, 164, y0 + 47, pal, {"shirt": Color("6f5aa6"), "pants": Color("5e4a38"), "dir": 1, "hair": Color("d8a63b")})
 	ClimbProps.picnic_table(im, 190, y0 + 30, 20, pal)
 	for i in 3:
 		ClimbProps.fern(im, 40 + i * 70 + rng.randi_range(-6, 6), y0 + 62 + (i % 2) * 6, 7, pal)
@@ -214,9 +214,9 @@ static func _curry(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenerat
 ## A Camp Curry tent cabin: white canvas over a timber frame on a wood deck.
 static func _tent_cabin(im: Image, x: int, y: int, pal: Dictionary, lit_window: bool, number: String) -> void:
 	var t := P.make(54, 40)
-	var canvas := _lit(Color("ece4cc"), pal)
+	var canvas := _lit(Color("e4ddcc"), pal)
 	var shade := canvas.darkened(0.2)
-	var wood := _lit(Color("7a4a24"), pal)
+	var wood := _lit(Color("6b4829"), pal)
 	var wood_d := wood.darkened(0.3)
 	var ox := 4
 	var oy := 38
@@ -250,18 +250,18 @@ static func _tent_cabin(im: Image, x: int, y: int, pal: Dictionary, lit_window: 
 	P.rect(t, ox - 6, oy - 18, 56, 1, wood_d)
 	P.rect(t, ox - 6, oy - 19, 56, 1, canvas.darkened(0.08))
 	# Door with a screen, window with a flap, cabin number.
-	P.rect(t, ox + 18, oy - 15, 9, 13, _lit(Color("3a2a1c"), pal))
-	P.rect(t, ox + 19, oy - 14, 7, 11, _lit(Color("5a4630"), pal))
-	P.rect(t, ox + 20, oy - 13, 5, 9, _glass(pal) if lit_window else _lit(Color("48382a"), pal))
+	P.rect(t, ox + 18, oy - 15, 9, 13, _lit(Color("47301f"), pal))
+	P.rect(t, ox + 19, oy - 14, 7, 11, _lit(Color("5e4a38"), pal))
+	P.rect(t, ox + 20, oy - 13, 5, 9, _glass(pal) if lit_window else _lit(Color("47301f"), pal))
 	P.vline(t, ox + 22, oy - 14, 11, wood_d)
 	P.rect(t, ox + 31, oy - 14, 7, 6, wood_d)
 	P.rect(t, ox + 32, oy - 13, 5, 4, _glass(pal))
 	P.vline(t, ox + 34, oy - 13, 4, wood)
-	P.rect(t, ox + 8, oy - 14, 5, 4, _lit(Color("f6f0dc"), pal))
-	ClimbProps.text(t, ox + 9, oy - 13, number.substr(number.length() - 1), _lit(Color("5a3a1c"), pal))
+	P.rect(t, ox + 8, oy - 14, 5, 4, _lit(Color("f5eee0"), pal))
+	ClimbProps.text(t, ox + 9, oy - 13, number.substr(number.length() - 1), _lit(Color("6b4829"), pal))
 	# Stovepipe.
-	P.rect(t, ox + 33, oy - 38, 2, 8, _lit(Color("4a4a54"), pal))
-	P.rect(t, ox + 32, oy - 38, 4, 1, _lit(Color("6a6a74"), pal))
+	P.rect(t, ox + 33, oy - 38, 2, 8, _lit(Color("47464d"), pal))
+	P.rect(t, ox + 32, oy - 38, 4, 1, _lit(Color("6a6a70"), pal))
 	# Porch step.
 	P.rect(t, ox + 17, oy - 2, 11, 2, wood.lightened(0.15))
 	ClimbProps.shadow(im, x + 28, y + 1, 30, 2.5, 0.3)
@@ -269,14 +269,14 @@ static func _tent_cabin(im: Image, x: int, y: int, pal: Dictionary, lit_window: 
 
 
 static func _woodpile(im: Image, x: int, y: int, pal: Dictionary) -> void:
-	var wood := _lit(Color("9a6a3a"), pal)
+	var wood := _lit(Color("92693d"), pal)
 	ClimbProps.shadow(im, x + 8, y + 1, 11, 1.5, 0.3)
 	P.rect(im, x - 1, y - 8, 18, 9, DARK)
 	for r in 3:
 		for k in 5 - (r % 2):
 			var xx := x + k * 3 + (r % 2) * 2
 			P.rect(im, xx, y - 7 + r * 3, 3, 3, wood if (k + r) % 2 == 0 else wood.darkened(0.15))
-			P.px(im, xx + 1, y - 6 + r * 3, _lit(Color("d8b080"), pal))
+			P.px(im, xx + 1, y - 6 + r * 3, _lit(Color("d6bd88"), pal))
 
 
 static func _lamp_post(im: Image, x: int, y: int, pal: Dictionary) -> void:
@@ -300,12 +300,12 @@ static func _camp4(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenerat
 	_chalk(im, 232, y0 + 22, pal, rng)
 	ClimbProps.boulder(im, 52, y0 + 32, 13, 8, rc, rng, true)
 	P.rect(im, 266, y0 + 36, 16, 6, DARK)
-	P.rect(im, 267, y0 + 37, 14, 4, _lit(Color("d8452e"), pal))
-	P.rect(im, 267, y0 + 37, 14, 1, _lit(Color("f07050"), pal))
-	P.rect(im, 273, y0 + 37, 1, 4, _lit(Color("2a3a6a"), pal))
+	P.rect(im, 267, y0 + 37, 14, 4, _lit(Color("b3362b"), pal))
+	P.rect(im, 267, y0 + 37, 14, 1, _lit(Color("d9772a"), pal))
+	P.rect(im, 273, y0 + 37, 1, 4, _lit(Color("2d3050"), pal))
 	# Tents.
-	ClimbProps.dome_tent(im, 30, y0 + 20, 32, 18, Color("e0803a"), pal)
-	ClimbProps.dome_tent(im, 86, y0 + 28, 28, 15, Color("3a6ab8"), pal)
+	ClimbProps.dome_tent(im, 30, y0 + 20, 32, 18, Color("d9772a"), pal)
+	ClimbProps.dome_tent(im, 86, y0 + 28, 28, 15, Color("6f5aa6"), pal)
 	# A bear box, the camp sign and a picnic table.
 	_bear_box(im, 126, y0 + 24, pal)
 	ClimbProps.board_sign(im, 150, y0 + 26, "CAMP 4", pal, 10)
@@ -313,35 +313,35 @@ static func _camp4(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenerat
 	_fire_ring(im, 216, y0 + 46, pal, rng, rc)
 	for i in 3:
 		ClimbProps.log_pile(im, 150 + i * 4, y0 + 52 + i * 4, 12, pal)
-	ClimbProps.person(im, 112, y0 + 42, pal, {"shirt": Color("5a8a4a"), "hat": Color("b88a3a"), "dir": 1, "pack": Color("c84a3a")})
+	ClimbProps.person(im, 112, y0 + 42, pal, {"shirt": Color("437f45"), "hat": Color("ad7a22"), "dir": 1, "pack": Color("b3362b")})
 	for i in 4:
 		ClimbProps.fern(im, 30 + i * 60, y0 + 64 + (i % 2) * 5, 6, pal)
 	ClimbProps.grass_row(im, 0, _xr, y0 + 4, rng, pal, 5, true, 2)
 
 
 static func _chalk(im: Image, x: int, y: int, pal: Dictionary, rng: RandomNumberGenerator) -> void:
-	var ch := _lit(Color("f4eee0"), pal)
+	var ch := _lit(Color("f5eee0"), pal)
 	for i in 12:
 		P.px(im, x + rng.randi_range(-4, 8), y + rng.randi_range(-4, 5), ch)
 	P.rect(im, x + 4, y - 6, 2, 3, ch)
 
 
 static func _bear_box(im: Image, x: int, y: int, pal: Dictionary) -> void:
-	var m := _lit(Color("7a8490"), pal)
+	var m := _lit(Color("93918f"), pal)
 	ClimbProps.shadow(im, x + 11, y + 1, 14, 2, 0.3)
 	P.rect(im, x - 1, y - 14, 24, 15, DARK)
 	P.rect(im, x, y - 13, 22, 13, m)
 	P.rect(im, x, y - 13, 22, 2, m.lightened(0.25))
 	P.rect(im, x + 18, y - 13, 4, 13, m.darkened(0.2))
 	P.rect(im, x + 2, y - 10, 16, 8, m.darkened(0.12))
-	P.rect(im, x + 14, y - 6, 2, 1, _lit(Color("e8c040"), pal))
-	ClimbProps.text(im, x + 3, y - 8, "BEAR", _lit(Color("e8e0c8"), pal))
+	P.rect(im, x + 14, y - 6, 2, 1, _lit(Color("d8a63b"), pal))
+	ClimbProps.text(im, x + 3, y - 8, "BEAR", _lit(Color("e4ddcc"), pal))
 
 
 static func _fire_ring(im: Image, x: int, y: int, pal: Dictionary, rng: RandomNumberGenerator, rc: Dictionary) -> void:
 	var n := ClimbProps.night_amount(pal)
 	P.ellipse(im, x, y, 11, 4.4, DARK)
-	P.ellipse(im, x, y, 9, 3, _lit(Color("2a2020"), pal))
+	P.ellipse(im, x, y, 9, 3, _lit(Color("2a1b14"), pal))
 	for i in 8:
 		var a := float(i) / 8.0 * TAU
 		var sx := x + cos(a) * 9.0
@@ -349,14 +349,14 @@ static func _fire_ring(im: Image, x: int, y: int, pal: Dictionary, rng: RandomNu
 		P.ellipse(im, sx, sy, 2.4, 1.8, ClimbRock.tone(rc, 2.0))
 		P.px(im, int(sx) - 1, int(sy) - 1, ClimbRock.tone(rc, 3.8))
 	# Embers; a real flame once it is dark.
-	P.rect(im, x - 3, y - 1, 6, 2, _lit(Color("d85a2a"), pal).lerp(Color("ff8a30"), n))
+	P.rect(im, x - 3, y - 1, 6, 2, _lit(Color("d9772a"), pal).lerp(Color("d9772a"), n))
 	if n > 0.3:
 		P.ellipse(im, x, y + 1, 26.0 * n, 7.0 * n, Color(1.0, 0.65, 0.25, 0.1 * n))
 		for k in 7:
 			var fw := 4 - k / 2
-			P.rect(im, x - fw / 2, y - 2 - k, maxi(fw, 1), 1, Color("ffd060") if k < 3 else Color("ff8a30"))
+			P.rect(im, x - fw / 2, y - 2 - k, maxi(fw, 1), 1, Color("f1cf6a") if k < 3 else Color("d9772a"))
 	else:
-		P.rect(im, x - 2, y - 3, 4, 2, _lit(Color("4a3a30"), pal))
+		P.rect(im, x - 2, y - 3, 4, 2, _lit(Color("47301f"), pal))
 
 
 # ------------------------------------------------------------------ forests
@@ -381,10 +381,10 @@ static func _forest(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenera
 		ClimbProps.fern(im, 20 + i * 48 + rng.randi_range(-8, 8), y0 + 30 + rng.randi_range(0, 40), rng.randi_range(5, 8), pal)
 	if half_dome:
 		# The John Muir Trail: a signpost, a backpack and a hiker.
-		var tr: Array[Color] = [_lit(Color("6a5a40"), pal), _lit(Color("8a7656"), pal), _lit(Color("a8946a"), pal)]
+		var tr: Array[Color] = [_lit(Color("5e4a38"), pal), _lit(Color("86694b"), pal), _lit(Color("b0925f"), pal)]
 		_band(im, 0, _xr, y0 + 26, 8, tr, rng, 3.0, 50)
 		ClimbProps.board_sign(im, 102, y0 + 30, "HALF DOME 8", pal, 11)
-		ClimbProps.person(im, 190, y0 + 44, pal, {"shirt": Color("e8c040"), "pants": Color("4a5a3a"), "hat": Color("d8d0b8"), "dir": -1, "pack": Color("3a6ab8")})
+		ClimbProps.person(im, 190, y0 + 44, pal, {"shirt": Color("d8a63b"), "pants": Color("2c5c37"), "hat": Color("e4ddcc"), "dir": -1, "pack": Color("6f5aa6")})
 		for i in 2:
 			ClimbProps.fern(im, 130 + i * 30, y0 + 52, 6, pal)
 	else:
@@ -402,7 +402,7 @@ static func _dapple(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenera
 	for i in 7:
 		var x := rng.randi_range(20, 280)
 		var y := y0 + rng.randi_range(14, 70)
-		P.ellipse(im, x, y, rng.randf_range(5, 11), 1.8, Color(1.0, 0.95, 0.7, 0.16))
+		P.ellipse(im, x, y, rng.randf_range(5, 11), 1.8, Color(1, 0.831, 0.541, 0.16))
 
 
 # ------------------------------------------------------------ Ahwahnee Hotel
@@ -413,7 +413,7 @@ static func _ahwahnee(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGene
 	ClimbProps.oak(im, 284, y0 + 20, 52, rng, c)
 	_hotel(im, 2, y0 + 24, pal, rng)
 	# Gravel path up to the door, with box hedges and lamps.
-	var gravel: Array[Color] = [_lit(Color("a09478"), pal), _lit(Color("c4b898"), pal), _lit(Color("e4dcc0"), pal)]
+	var gravel: Array[Color] = [_lit(Color("93918f"), pal), _lit(Color("bdb8ae"), pal), _lit(Color("e4ddcc"), pal)]
 	for k in 70:
 		var hw := 5 + k / 4
 		var yy := y0 + 25 + k
@@ -424,13 +424,13 @@ static func _ahwahnee(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGene
 			P.px(im, 59 - hw + rng.randi_range(0, hw * 2 - 1), yy, gravel[rng.randi_range(0, 2)])
 	for sx in [-1, 1]:
 		var hx: int = 59 + sx * 15
-		var hedge: Array[Color] = [_lit(Color("1e4a22"), pal), _lit(Color("2e6a30"), pal), _lit(Color("4a8a3e"), pal)]
+		var hedge: Array[Color] = [_lit(Color("2c5c37"), pal), _lit(Color("437f45"), pal), _lit(Color("5c8f3c"), pal)]
 		P.rect(im, hx - 12, y0 + 24, 24, 7, DARK)
 		P.rect(im, hx - 11, y0 + 24, 22, 6, hedge[1])
 		P.rect(im, hx - 11, y0 + 24, 22, 2, hedge[2])
 		P.rect(im, hx - 11, y0 + 29, 22, 1, hedge[0])
 		for i in 3:
-			P.px(im, hx - 8 + i * 8, y0 + 26, _lit(Color("f0e8d0"), pal))
+			P.px(im, hx - 8 + i * 8, y0 + 26, _lit(Color("e4ddcc"), pal))
 	_lamp_post(im, 30, y0 + 44, pal)
 	_lamp_post(im, 92, y0 + 44, pal)
 	# Rose beds and a couple on the lawn.
@@ -438,8 +438,8 @@ static func _ahwahnee(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGene
 		ClimbProps.flowers(im, 8 + i * 5, y0 + 30, rng, pal)
 	for i in 5:
 		ClimbProps.flowers(im, 104 + i * 4, y0 + 30, rng, pal)
-	ClimbProps.person(im, 120, y0 + 56, pal, {"shirt": Color("f4f0e6"), "pants": Color("6a5a48"), "hat": Color("e8d8a0"), "dir": -1})
-	ClimbProps.person(im, 129, y0 + 57, pal, {"shirt": Color("c85a8a"), "pants": Color("5a4a60"), "dir": -1, "hair": Color("c8a050")})
+	ClimbProps.person(im, 120, y0 + 56, pal, {"shirt": Color("f5eee0"), "pants": Color("5e4a38"), "hat": Color("d6bd88"), "dir": -1})
+	ClimbProps.person(im, 129, y0 + 57, pal, {"shirt": Color("d47a9b"), "pants": Color("47464d"), "dir": -1, "hair": Color("d8a63b")})
 	ClimbProps.picnic_table(im, 190, y0 + 46, 22, pal)
 	ClimbProps.shrub(im, 220, y0 + 34, 7, rng, pal, true)
 	ClimbProps.grass_row(im, 0, _xr, y0 + 4, rng, pal, 5, false, 2)
@@ -448,11 +448,11 @@ static func _ahwahnee(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGene
 ## The Ahwahnee: a long granite-and-sugar-pine hall with a green-brown roof,
 ## a taller gabled middle, stone chimneys and rows of lit windows.
 static func _hotel(im: Image, x: int, yb: int, pal: Dictionary, rng: RandomNumberGenerator) -> void:
-	var stone := _lit(Color("a8a088"), pal)
+	var stone := _lit(Color("bdb8ae"), pal)
 	var stone_l := stone.lightened(0.18)
 	var stone_d := stone.darkened(0.28)
-	var timber := _lit(Color("6a4228"), pal)
-	var roof := _lit(Color("4a5a38"), pal)
+	var timber := _lit(Color("6b4829"), pal)
+	var roof := _lit(Color("2c5c37"), pal)
 	var roof_l := roof.lightened(0.2)
 	var roof_d := roof.darkened(0.3)
 	var w := 112
@@ -517,7 +517,7 @@ static func _hotel(im: Image, x: int, yb: int, pal: Dictionary, rng: RandomNumbe
 			var wy := top + 3 + row * 14 if row == 0 else top + 17
 			var on := ClimbProps.night_amount(pal) < 0.2 or rng.randf() < 0.75
 			P.rect(im, wx, wy, 5, 7, DARK)
-			P.rect(im, wx + 1, wy + 1, 3, 5, glass if on else _lit(Color("3a4a62"), pal))
+			P.rect(im, wx + 1, wy + 1, 3, 5, glass if on else _lit(Color("235679"), pal))
 			P.hline(im, wx + 1, wy + 3, 3, timber)
 	# Stone chimneys.
 	for cx in [x + 14, x + 98]:
@@ -543,17 +543,17 @@ static func _meadow(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenera
 	ClimbProps.pine(im, 294, y0 + 20, 74, rng, c)
 	ClimbProps.oak(im, 284, y0 + 16, 44, rng, c)
 	# Northside Drive across the foreground, with a dashed yellow line.
-	var asphalt: Array[Color] = [_lit(Color("2a2a32"), pal), _lit(Color("42424c"), pal), _lit(Color("5a5a66"), pal)]
+	var asphalt: Array[Color] = [_lit(Color("2b2a30"), pal), _lit(Color("47464d"), pal), _lit(Color("6a6a70"), pal)]
 	_band(im, 0, _xr, y0 + 56, 14, asphalt, rng, 0.0, 70)
 	for x in range(6, _xr, 18):
-		P.rect(im, x, y0 + 63, 9, 1, _lit(Color("e8c040"), pal))
-	P.hline(im, 0, y0 + 69, _xr, _lit(Color("b8b8b0"), pal))
+		P.rect(im, x, y0 + 63, 9, 1, _lit(Color("d8a63b"), pal))
+	P.hline(im, 0, y0 + 69, _xr, _lit(Color("bdb8ae"), pal))
 	# Parked cars on the shoulder.
-	ClimbProps.car(im, 74, y0 + 55, Color("c84a3a"), pal, 1, true)
-	ClimbProps.car(im, 230, y0 + 56, Color("3a6ab8"), pal, -1)
-	ClimbProps.car(im, 276, y0 + 57, Color("e8e0c8"), pal, -1, true)
+	ClimbProps.car(im, 74, y0 + 55, Color("b3362b"), pal, 1, true)
+	ClimbProps.car(im, 230, y0 + 56, Color("6f5aa6"), pal, -1)
+	ClimbProps.car(im, 276, y0 + 57, Color("e4ddcc"), pal, -1, true)
 	# A split-rail fence along the meadow edge.
-	var rail := _lit(Color("8a6a40"), pal)
+	var rail := _lit(Color("92693d"), pal)
 	for x in range(2, _xr, 16):
 		P.rect(im, x, y0 + 24, 2, 11, DARK)
 		P.rect(im, x, y0 + 24, 1, 10, rail)
@@ -561,12 +561,12 @@ static func _meadow(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenera
 		P.rect(im, 0, y0 + 27 + k * 4, _xr, 2, DARK)
 		P.rect(im, 0, y0 + 27 + k * 4, _xr, 1, rail.lightened(0.2))
 	# Visitors with binoculars and a spotting scope, all looking up.
-	var shirts: Array[Color] = [Color("c84a3a"), Color("4a78c8"), Color("e8c040"), Color("7ac24a")]
+	var shirts: Array[Color] = [Color("b3362b"), Color("6f5aa6"), Color("d8a63b"), Color("84b04a")]
 	var xs: Array[int] = [112, 134, 166, 188, 208]
 	for i in xs.size():
-		ClimbProps.person(im, xs[i], y0 + 42 + (i % 2) * 3, pal, {"shirt": shirts[i % 4], "bino": i % 2 == 0, "dir": 1, "hat": Color("d8d0b8") if i % 3 == 0 else Color("3a2a1a")})
+		ClimbProps.person(im, xs[i], y0 + 42 + (i % 2) * 3, pal, {"shirt": shirts[i % 4], "bino": i % 2 == 0, "dir": 1, "hat": Color("e4ddcc") if i % 3 == 0 else Color("47301f")})
 	ClimbProps.tripod(im, 150, y0 + 45, pal, 1)
-	ClimbProps.person(im, 154, y0 + 46, pal, {"shirt": Color("f4f0e6"), "dir": 1, "pack": Color("5a3a22"), "hair": Color("c8a050")})
+	ClimbProps.person(im, 154, y0 + 46, pal, {"shirt": Color("f5eee0"), "dir": 1, "pack": Color("6b4829"), "hair": Color("d8a63b")})
 	ClimbProps.board_sign(im, 28, y0 + 32, "EL CAP", pal, 9)
 	# Tall meadow grass and wildflowers.
 	for i in 14:
@@ -598,7 +598,7 @@ static func _tuolumne(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGene
 		P.px(im, sx - 8, sy - 2, rc.lichen_o)
 		P.px(im, sx + 9, sy + 1, rc.lichen_y)
 	# Tuolumne River, a ribbon of blue across the foreground.
-	var water: Array[Color] = [_lit(Color("2a5a8a"), pal), _lit(Color("4a86b8"), pal), _lit(Color("a8d4ec"), pal)]
+	var water: Array[Color] = [_lit(Color("235679"), pal), _lit(Color("3a86a8"), pal), _lit(Color("9fd8d9"), pal)]
 	_band(im, 0, _xr, y0 + 72, 9, water, rng, 4.0, 40)
 	# Lodgepoles and whitebarks; the tall ones are out at the sides.
 	var back: Array[int] = [14, 28, 280, 294]
@@ -610,7 +610,7 @@ static func _tuolumne(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGene
 	ClimbProps.boulder(im, 244, y0 + 56, 11, 6, rc, rng, false)
 	# Trail sign and a hiker reading it.
 	ClimbProps.board_sign(im, 106, y0 + 28, "CATHEDRAL PK", pal, 11)
-	ClimbProps.person(im, 170, y0 + 30, pal, {"shirt": Color("3a8ac8"), "pants": Color("6a5a48"), "hat": Color("e8d8a0"), "dir": -1, "pack": Color("d8452e")})
+	ClimbProps.person(im, 170, y0 + 30, pal, {"shirt": Color("3a86a8"), "pants": Color("5e4a38"), "hat": Color("d6bd88"), "dir": -1, "pack": Color("b3362b")})
 	for i in 9:
 		ClimbProps.flowers(im, rng.randi_range(8, 290), y0 + rng.randi_range(16, 96), rng, pal)
 	ClimbProps.shrub(im, 220, y0 + 34, 5, rng, pal, false)
@@ -620,13 +620,13 @@ static func _tuolumne(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGene
 # --------------------------------------------------------------------- moraine
 
 static func _snow(im: Image, x: int, y: int, rx: float, ry: float, pal: Dictionary) -> void:
-	P.ellipse(im, x, y + 1, rx + 1, ry + 1, _lit(Color("7a88a8"), pal))
-	P.shaded_ellipse(im, x, y, rx, ry, _lit(Color("e8f0fa"), pal), _lit(Color("ffffff"), pal), _lit(Color("a8bad8"), pal))
-	P.ellipse(im, x + rx * 0.3, y + ry * 0.4, rx * 0.35, ry * 0.25, _lit(Color("b4c6e0"), pal))
+	P.ellipse(im, x, y + 1, rx + 1, ry + 1, _lit(Color("3a86a8"), pal))
+	P.shaded_ellipse(im, x, y, rx, ry, _lit(Color("d6f1ee"), pal), _lit(Color("f5eee0"), pal), _lit(Color("63b3c6"), pal))
+	P.ellipse(im, x + rx * 0.3, y + ry * 0.4, rx * 0.35, ry * 0.25, _lit(Color("9fd8d9"), pal))
 
 
 static func _moraine(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenerator, rc: Dictionary) -> void:
-	var gray: Array[Color] = [_lit(Color("4a4a58"), pal), _lit(Color("6a6a7a"), pal), _lit(Color("8a8a9a"), pal), _lit(Color("b0b0c0"), pal)]
+	var gray: Array[Color] = [_lit(Color("47464d"), pal), _lit(Color("6a6a70"), pal), _lit(Color("93918f"), pal), _lit(Color("bdb8ae"), pal)]
 	# Rubble: loose stones with a lit top-left edge.
 	for i in 90:
 		var rx := rng.randi_range(4, 292)
@@ -639,11 +639,11 @@ static func _moraine(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGener
 	# A meltwater tarn with floating ice.
 	var wx := 96
 	var wy := y0 + 60
-	P.ellipse(im, wx, wy + 1, 34, 8.5, _lit(Color("3a4a68"), pal))
-	P.ellipse(im, wx, wy, 33, 7.5, _lit(Color("3a78a8"), pal))
-	P.ellipse(im, wx - 4, wy - 2, 24, 4, _lit(Color("6aa6cc"), pal))
+	P.ellipse(im, wx, wy + 1, 34, 8.5, _lit(Color("235679"), pal))
+	P.ellipse(im, wx, wy, 33, 7.5, _lit(Color("3a86a8"), pal))
+	P.ellipse(im, wx - 4, wy - 2, 24, 4, _lit(Color("63b3c6"), pal))
 	for k in 5:
-		P.rect(im, wx - 20 + k * 9 + rng.randi_range(-2, 2), wy - 3 + rng.randi_range(0, 5), 4, 2, _lit(Color("f0f8ff"), pal))
+		P.rect(im, wx - 20 + k * 9 + rng.randi_range(-2, 2), wy - 3 + rng.randi_range(0, 5), 4, 2, _lit(Color("d6f1ee"), pal))
 	# Snow patches and the climbers' gear stuck in them.
 	_snow(im, 214, y0 + 32, 26, 6, pal)
 	_snow(im, 40, y0 + 36, 20, 5, pal)
@@ -656,15 +656,15 @@ static func _moraine(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGener
 		ClimbProps.boulder(im, rng.randi_range(120, 290), y0 + rng.randi_range(44, 90), rng.randf_range(6, 13), rng.randf_range(4, 8), rc, rng, false)
 	ClimbProps.boulder(im, 8, y0 + 30, 15, 12, rc, rng, false)
 	ClimbProps.boulder(im, 292, y0 + 22, 14, 14, rc, rng, false)
-	ClimbProps.dome_tent(im, 66, y0 + 32, 30, 17, Color("e8b83a"), pal)
+	ClimbProps.dome_tent(im, 66, y0 + 32, 30, 17, Color("d8a63b"), pal)
 	ClimbProps.cairn(im, 264, y0 + 34, rc, 3)
-	var rope := _lit(Color("d8452e"), pal)
+	var rope := _lit(Color("b3362b"), pal)
 	P.ellipse(im, 140, y0 + 40, 6, 3, DARK)
 	P.ellipse(im, 140, y0 + 40, 5, 2.2, rope)
 	P.ellipse(im, 140, y0 + 40, 2.5, 1, DARK)
 	P.px(im, 137, y0 + 39, rope.lightened(0.3))
 	for i in 4:
-		P.rect(im, 20 + i * 70 + rng.randi_range(-10, 10), y0 + rng.randi_range(60, 90), 3, 2, _lit(Color("a0b890"), pal))
+		P.rect(im, 20 + i * 70 + rng.randi_range(-10, 10), y0 + rng.randi_range(60, 90), 3, 2, _lit(Color("bdb8ae"), pal))
 
 
 # ---------------------------------------------------------------------- talus
@@ -693,10 +693,10 @@ static func _talus(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenerat
 		ClimbProps.fern(im, rng.randi_range(10, 290), y0 + rng.randi_range(20, 90), rng.randi_range(5, 8), pal)
 	if wet:
 		# A creek of snowmelt, and spray drifting off the wall.
-		var water: Array[Color] = [_lit(Color("2a5a82"), pal), _lit(Color("4a8ab8"), pal), _lit(Color("b8e0f4"), pal)]
+		var water: Array[Color] = [_lit(Color("235679"), pal), _lit(Color("3a86a8"), pal), _lit(Color("9fd8d9"), pal)]
 		_band(im, 0, _xr, y0 + 78, 8, water, rng, 3.0, 30)
 		for i in 5:
-			P.ellipse(im, rng.randi_range(0, 120) + i * 30, y0 - rng.randi_range(0, 14), rng.randf_range(16, 32), rng.randf_range(5, 9), Color(0.92, 0.96, 1.0, 0.1))
+			P.ellipse(im, rng.randi_range(0, 120) + i * 30, y0 - rng.randi_range(0, 14), rng.randf_range(16, 32), rng.randf_range(5, 9), Color(0.839, 0.945, 0.933, 0.1))
 		ClimbProps.board_sign(im, 98, y0 + 26, "MIST TRAIL", pal, 10)
 		# Stone steps of the trail, edged with a pole rail.
 		for k in 5:
@@ -814,7 +814,7 @@ static func _cut(im: Image, top: PackedInt32Array, c: Dictionary, e: int) -> voi
 	var w := im.get_width()
 	for x in w:
 		if top[x] > 0:
-			im.fill_rect(Rect2i(x, 0, 1, top[x]), Color(0, 0, 0, 0))
+			im.fill_rect(Rect2i(x, 0, 1, top[x]), Color(0.082, 0.078, 0.11, 0))
 	var seam: Color = c.seam
 	var hi := ClimbRock.tone(c, 3.9)
 	var lo := ClimbRock.tone(c, 1.2)
@@ -862,22 +862,22 @@ static func _ytop(top: PackedInt32Array, x: int) -> int:
 static func _rim_turf(im: Image, top: PackedInt32Array, x0: int, x1: int, pal: Dictionary, rng: RandomNumberGenerator, dry := false) -> void:
 	for x in range(x0, x1):
 		var y := _ytop(top, x)
-		var g := _lit(Color("6a9a3e") if not dry else Color("b8a064"), pal)
+		var g := _lit(Color("5c8f3c") if not dry else Color("b0925f"), pal)
 		if rng.randf() < 0.55:
 			P.px(im, x, y - 1, g)
 			if rng.randf() < 0.3:
 				P.px(im, x, y - 2, g.lightened(0.15))
 		if rng.randf() < 0.08:
-			P.px(im, x, y + 2, _lit(Color("d8943a"), pal))
+			P.px(im, x, y + 2, _lit(Color("f7a64a"), pal))
 
 
 # ---- Glacier Point
 
 static func _rim(im: Image, top: PackedInt32Array, y_top: int, pal: Dictionary, rng: RandomNumberGenerator, w: int, e: int) -> void:
-	var stone := _lit(Color("a89878"), pal)
+	var stone := _lit(Color("b0925f"), pal)
 	var stone_l := stone.lightened(0.22)
 	var stone_d := stone.darkened(0.28)
-	var iron := _lit(Color("22222a"), pal)
+	var iron := _lit(Color("2b2a30"), pal)
 	var c := ClimbRock.colors("apron", pal)
 	var ye := _ytop(top, 100)
 	var x0 := 6
@@ -910,25 +910,25 @@ static func _rim(im: Image, top: PackedInt32Array, y_top: int, pal: Dictionary, 
 		P.rect(im, x, wt - 18, 3, 2, stone_l)
 		P.rect(im, x, wt - 19, 3, 1, DARK)
 	# The thin tourist crowd, leaning on the fence and waving down.
-	var shirts: Array[Color] = [Color("c84a3a"), Color("4a78c8"), Color("e8c040"), Color("7ac24a"), Color("f4f0e6"), Color("c85a9a")]
-	var hats: Array[Color] = [Color("e8d8a0"), Color("3a2a1a"), Color("c8402e"), Color("8a5a2a")]
+	var shirts: Array[Color] = [Color("b3362b"), Color("6f5aa6"), Color("d8a63b"), Color("84b04a"), Color("f5eee0"), Color("d47a9b")]
+	var hats: Array[Color] = [Color("d6bd88"), Color("47301f"), Color("b3362b"), Color("7e531c")]
 	var xs: Array[int] = [30, 66, 116, 150, 188, 226]
 	for i in xs.size():
-		var o := {"shirt": shirts[i % shirts.size()], "dir": 1 if i % 2 == 0 else -1, "wave": i % 2 == 0, "pants": Color("4a5068") if i % 3 else Color("7a6a50")}
+		var o := {"shirt": shirts[i % shirts.size()], "dir": 1 if i % 2 == 0 else -1, "wave": i % 2 == 0, "pants": Color("47464d") if i % 3 else Color("86694b")}
 		if i % 2 == 1:
 			o["hat"] = hats[i % hats.size()]
 		ClimbProps.person(im, xs[i], wt + 1, pal, o)
 	# A child on someone's shoulders, and a kid holding a camera.
-	P.rect(im, 119, wt - 20, 3, 3, _lit(Color("e0ac7e"), pal))
-	P.rect(im, 118, wt - 23, 5, 2, _lit(Color("c8402e"), pal))
+	P.rect(im, 119, wt - 20, 3, 3, _lit(Color("d6bd88"), pal))
+	P.rect(im, 118, wt - 23, 5, 2, _lit(Color("b3362b"), pal))
 	_rim_turf(im, top, x0, e, pal, rng)
 
 
 ## A stone-and-timber hut: the Glacier Point trading post.
 static func _hut(im: Image, x: int, y: int, pal: Dictionary) -> void:
-	var stone := _lit(Color("9a8c70"), pal)
-	var roof := _lit(Color("5a4838"), pal)
-	var timber := _lit(Color("6a4228"), pal)
+	var stone := _lit(Color("b0925f"), pal)
+	var roof := _lit(Color("5e4a38"), pal)
+	var timber := _lit(Color("6b4829"), pal)
 	P.rect(im, x - 1, y - 21, 60, 22, DARK)
 	P.rect(im, x, y - 20, 58, 20, stone)
 	for r in range(0, 20, 4):
@@ -957,9 +957,9 @@ static func _tree_ledge(im: Image, top: PackedInt32Array, pal: Dictionary, rng: 
 	# A sling around the biggest tree, the climbers' anchor.
 	var tx := 26
 	var ty := _ytop(top, tx) + 1
-	P.hline(im, tx - 2, ty - 6, 5, _lit(Color("e8c040"), pal))
-	P.px(im, tx - 2, ty - 5, _lit(Color("e8c040"), pal))
-	P.rect(im, tx - 1, ty - 4, 3, 2, _lit(Color("c8ccd4"), pal))
+	P.hline(im, tx - 2, ty - 6, 5, _lit(Color("d8a63b"), pal))
+	P.px(im, tx - 2, ty - 5, _lit(Color("d8a63b"), pal))
+	P.rect(im, tx - 1, ty - 4, 3, 2, _lit(Color("bdb8ae"), pal))
 	for i in 4:
 		ClimbProps.flowers(im, 130 + i * 20, _ytop(top, 130 + i * 20) + 1, rng, pal)
 	_rim_turf(im, top, 0, e, pal, rng)
@@ -971,8 +971,8 @@ static func _anchor(im: Image, top: PackedInt32Array, y_top: int, pal: Dictionar
 	ClimbProps.oak(im, 22, _ytop(top, 22) + 3, 56, rng, c)
 	ClimbProps.pine(im, e - 24, _ytop(top, e - 24) + 3, 60, rng, c)
 	ClimbProps.oak(im, e - 56, _ytop(top, e - 56) + 3, 40, rng, c)
-	var steel := _lit(Color("c8ccd4"), pal)
-	var steel_d := _lit(Color("7a808c"), pal)
+	var steel := _lit(Color("bdb8ae"), pal)
+	var steel_d := _lit(Color("6a6a70"), pal)
 	for i in 2:
 		var bx := 177 + i * 32
 		var by := y_top - 15
@@ -1012,19 +1012,19 @@ static func _terrace(im: Image, top: PackedInt32Array, pal: Dictionary, rng: Ran
 			var gx := 112
 			var gy := _ytop(top, gx) + 2
 			P.rect(im, gx - 1, gy - 9, 10, 10, DARK)
-			P.rect(im, gx, gy - 8, 8, 8, _lit(Color("3a6ab8"), pal))
-			P.rect(im, gx, gy - 8, 8, 2, _lit(Color("5a8ad8"), pal))
+			P.rect(im, gx, gy - 8, 8, 8, _lit(Color("6f5aa6"), pal))
+			P.rect(im, gx, gy - 8, 8, 2, _lit(Color("6f5aa6"), pal))
 			P.rect(im, gx + 11, gy - 7, 9, 8, DARK)
-			P.rect(im, gx + 12, gy - 6, 7, 6, _lit(Color("d8452e"), pal))
+			P.rect(im, gx + 12, gy - 6, 7, 6, _lit(Color("b3362b"), pal))
 			P.ellipse(im, gx + 28, gy - 1, 5, 2.5, DARK)
-			P.ellipse(im, gx + 28, gy - 1, 4, 1.7, _lit(Color("e8c040"), pal))
-			ClimbProps.person(im, 138, _ytop(top, 138) + 1, pal, {"shirt": Color("5a8a4a"), "wave": true, "hat": Color("c8a050"), "dir": -1})
+			P.ellipse(im, gx + 28, gy - 1, 4, 1.7, _lit(Color("d8a63b"), pal))
+			ClimbProps.person(im, 138, _ytop(top, 138) + 1, pal, {"shirt": Color("437f45"), "wave": true, "hat": Color("d8a63b"), "dir": -1})
 		"arches":
 			ClimbProps.board_sign(im, 108, _ytop(top, 108) + 4, "N DOME", pal, 8)
 		"chimney":
 			# The mouth of the chimney: a dark notch the climbers pop out of.
 			var mx := 168
-			P.rect(im, mx - 6, _ytop(top, mx) + 2, 12, 8, _lit(Color("1c1a24"), pal))
+			P.rect(im, mx - 6, _ytop(top, mx) + 2, 12, 8, _lit(Color("15141c"), pal))
 		"roof":
 			pass
 	_rim_turf(im, top, 0, e, pal, rng)
@@ -1040,15 +1040,15 @@ static func _el_cap(im: Image, top: PackedInt32Array, pal: Dictionary, rng: Rand
 	ClimbProps.gnarled(im, e - 64, _ytop(top, e - 64) + 3, 20, rng, c)
 	var hx := 176
 	var hy := _ytop(top, hx) + 2
-	ClimbProps.person(im, hx, hy, pal, {"shirt": Color("d8452e"), "wave": true, "hat": Color("e8c040"), "dir": 1})
-	ClimbProps.person(im, hx + 12, hy, pal, {"shirt": Color("3a8ac8"), "wave": true, "dir": -1, "pants": Color("3a3a4a")})
+	ClimbProps.person(im, hx, hy, pal, {"shirt": Color("b3362b"), "wave": true, "hat": Color("d8a63b"), "dir": 1})
+	ClimbProps.person(im, hx + 12, hy, pal, {"shirt": Color("3a86a8"), "wave": true, "dir": -1, "pants": Color("47464d")})
 	# A fluttering flag on a pole.
 	var fx := 222
 	var fy := _ytop(top, fx) + 2
-	P.rect(im, fx, fy - 26, 1, 26, _lit(Color("5a3a1a"), pal))
-	P.rect(im, fx + 1, fy - 26, 9, 5, _lit(Color("d8452e"), pal))
-	P.rect(im, fx + 1, fy - 26, 9, 1, _lit(Color("f07050"), pal))
-	P.px(im, fx + 10, fy - 24, _lit(Color("d8452e"), pal))
+	P.rect(im, fx, fy - 26, 1, 26, _lit(Color("6b4829"), pal))
+	P.rect(im, fx + 1, fy - 26, 9, 5, _lit(Color("b3362b"), pal))
+	P.rect(im, fx + 1, fy - 26, 9, 1, _lit(Color("d9772a"), pal))
+	P.px(im, fx + 10, fy - 24, _lit(Color("b3362b"), pal))
 	ClimbProps.cairn(im, 130, _ytop(top, 130) + 2, c, 2)
 	for i in 8:
 		var gx := rng.randi_range(8, e - 10)
@@ -1069,18 +1069,18 @@ static func _summit(im: Image, top: PackedInt32Array, y_top: int, cx: int, pal: 
 	var ty := _ytop(top, tx)
 	ClimbProps.cairn(im, tx, ty + 1, c, 2 if peak else 1)
 	# Slings and a rappel anchor on the horn just below.
-	var sling := _lit(Color("e8c040"), pal)
+	var sling := _lit(Color("d8a63b"), pal)
 	var rx := cx - (8 if peak else 6)
 	var ry := _ytop(top, rx) + 5
 	P.rect(im, rx, ry, 4, 2, sling)
 	P.vline(im, rx + 1, ry + 2, 7, sling)
-	P.rect(im, rx, ry + 9, 3, 2, _lit(Color("c8ccd4"), pal))
+	P.rect(im, rx, ry + 9, 3, 2, _lit(Color("bdb8ae"), pal))
 	P.px(im, rx + 4, ry + 3, sling)
 	P.px(im, rx + 5, ry + 4, sling)
 	if peak:
 		# The summit register in an ammo can, and a marmot-sized pine below.
 		P.rect(im, tx + 8, ty - 4, 6, 4, DARK)
-		P.rect(im, tx + 9, ty - 3, 4, 2, _lit(Color("6a7a4a"), pal))
+		P.rect(im, tx + 9, ty - 3, 4, 2, _lit(Color("437f45"), pal))
 		var gx := cx - 36
 		ClimbProps.gnarled(im, gx, _ytop(top, gx) + 4, 14, rng, c)
 	else:
@@ -1101,7 +1101,7 @@ static func _dome(im: Image, top: PackedInt32Array, y_top: int, cx: int, pal: Di
 		var x := 20 + i * 26 + rng.randi_range(-6, 6)
 		if x < cx + 20:
 			ClimbProps.gnarled(im, x, _ytop(top, x) + 3, rng.randi_range(10, 18), rng, c)
-	var iron := _lit(Color("2a2a30"), pal)
+	var iron := _lit(Color("2b2a30"), pal)
 	var x0 := cx + 30
 	var prev_x := x0
 	for x in range(x0, e - 8, 3):
@@ -1114,10 +1114,10 @@ static func _dome(im: Image, top: PackedInt32Array, y_top: int, cx: int, pal: Di
 		P.px(im, x + 1, _ytop(top, x + 1) - 6, iron)
 		P.px(im, x + 1, _ytop(top, x + 1) - 3, iron)
 		prev_x = x
-	var sh: Array[Color] = [Color("e8c040"), Color("c84a3a"), Color("3a8ac8")]
+	var sh: Array[Color] = [Color("d8a63b"), Color("b3362b"), Color("3a86a8")]
 	for i in 3:
 		var hx := cx + 62 + i * 22
-		ClimbProps.person(im, hx, _ytop(top, hx) - 1, pal, {"shirt": sh[i], "hat": Color("d8d0b8"), "dir": 1 if i != 1 else -1, "pack": Color("3a5a3a"), "wave": i == 2})
+		ClimbProps.person(im, hx, _ytop(top, hx) - 1, pal, {"shirt": sh[i], "hat": Color("e4ddcc"), "dir": 1 if i != 1 else -1, "pack": Color("2c5c37"), "wave": i == 2})
 	# Summit gear and a plaque; the Visor of the Diving Board sticks out left.
 	ClimbProps.cairn(im, cx - 40, _ytop(top, cx - 40) + 1, c, 1)
 	var _u := prev_x
@@ -1126,9 +1126,9 @@ static func _dome(im: Image, top: PackedInt32Array, y_top: int, cx: int, pal: Di
 
 static func _ridge(im: Image, top: PackedInt32Array, y_top: int, cx: int, pal: Dictionary, rng: RandomNumberGenerator, c: Dictionary, e: int) -> void:
 	# A snowy ridge: a thick cornice along the crest, rime, and ice axes.
-	var snow := _lit(Color("f4f8ff"), pal)
-	var snow_s := _lit(Color("a8bcdc"), pal)
-	var snow_m := _lit(Color("d4e0f4"), pal)
+	var snow := _lit(Color("d6f1ee"), pal)
+	var snow_s := _lit(Color("63b3c6"), pal)
+	var snow_m := _lit(Color("d6f1ee"), pal)
 	for x in range(0, mini(e + 6, top.size())):
 		var t := top[x]
 		var d := top[mini(x + 1, top.size() - 1)] - top[maxi(x - 1, 0)]
@@ -1153,7 +1153,7 @@ static func _ridge(im: Image, top: PackedInt32Array, y_top: int, cx: int, pal: D
 	var ay := _ytop(top, ax) + 2
 	ClimbProps.ice_axe(im, ax, ay, pal, 1)
 	ClimbProps.ice_axe(im, ax + 10, ay + 1, pal, -1)
-	P.rect(im, ax + 20, ay - 24, 1, 24, _lit(Color("5a3a1a"), pal))
-	P.rect(im, ax + 21, ay - 24, 8, 5, _lit(Color("d8452e"), pal))
-	P.px(im, ax + 29, ay - 22, _lit(Color("d8452e"), pal))
+	P.rect(im, ax + 20, ay - 24, 1, 24, _lit(Color("6b4829"), pal))
+	P.rect(im, ax + 21, ay - 24, 8, 5, _lit(Color("b3362b"), pal))
+	P.px(im, ax + 29, ay - 22, _lit(Color("b3362b"), pal))
 	ClimbProps.cairn(im, 108, _ytop(top, 108) + 2, c, 1)

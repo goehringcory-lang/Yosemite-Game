@@ -9,7 +9,7 @@ func _snap(dir: String, shot_name: String, frames := 8) -> void:
 	for i in frames:
 		await get_tree().process_frame
 	var image := get_viewport().get_texture().get_image()
-	image.resize(image.get_width() * 2, image.get_height() * 2, Image.INTERPOLATE_NEAREST)
+	image.resize(image.get_width(), image.get_height(), Image.INTERPOLATE_NEAREST)
 	image.save_png("%s/polish_%s.png" % [dir, shot_name])
 
 

@@ -17,7 +17,7 @@ signal pressed_plant(id: String)
 const ABILITY := "plant_press"
 const SHEET := "res://assets/sprites/plants.png"
 const SHEET_COLUMNS := 8
-const FRAME := 16
+const FRAME := 32
 const SPRING := 1
 const SUMMER := 2
 const FALL := 4
@@ -243,7 +243,7 @@ func press(id: String, where := "") -> bool:
 	return true
 
 
-## The plant's 16x16 drawing, from the sheet tools/plants/plant_art.gd makes.
+## The plant's 32x32 drawing, from the sheet tools/plants/plant_art.gd makes.
 func icon(id: String) -> Texture2D:
 	if not _by_id.has(id):
 		return null

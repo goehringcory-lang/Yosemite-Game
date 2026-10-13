@@ -3,11 +3,11 @@ extends RefCounted
 ## Little pixel hearts for friendship: full and empty 7x6 pictures for the
 ## Register, and the heart that floats up when someone's fondness grows.
 
-const RED := Color("d83a4a")
-const LIGHT := Color("f8a0a8")
-const DARK := Color("8a1e2a")
-const EMPTY := Color("5a4a40")
-const INK := Color("2a1f1a")
+const RED := Color("b3362b")
+const LIGHT := Color("d47a9b")
+const DARK := Color("b3362b")
+const EMPTY := Color("5e4a38")
+const INK := Color("2a1b14")
 const SHAPE := [
 	".##.##.",
 	"#######",
@@ -64,14 +64,14 @@ static func pop(anchor: Node2D) -> void:
 		var heart := Sprite2D.new()
 		heart.texture = texture(true)
 		heart.z_index = 30
-		heart.scale = Vector2.ONE * (1.0 if i == 0 else 0.6)
+		heart.scale = Vector2.ONE * (2.0 if i == 0 else 1.2)
 		anchor.add_child(heart)
-		var start := Vector2([0, -9, 9][i], -30 if i == 0 else -26)
+		var start := Vector2([0, -18, 18][i], -60 if i == 0 else -52)
 		heart.position = start
 		heart.modulate.a = 0.0
 		var tween := heart.create_tween()
 		tween.tween_interval(i * 0.12)
 		tween.tween_property(heart, "modulate:a", 1.0, 0.1)
-		tween.parallel().tween_property(heart, "position", start + Vector2(0, -14), 0.9).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.parallel().tween_property(heart, "position", start + Vector2(0, -28), 0.9).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(heart, "modulate:a", 0.0, 0.3)
 		tween.tween_callback(heart.queue_free)

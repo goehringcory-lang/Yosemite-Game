@@ -34,7 +34,7 @@ func _ready() -> void:
 	check(north != null and north.target_region == "ahwahnee_trail" and north.target_spawn == "south_entry", "the homestead has a north gate to the Stoneman Meadow trail")
 	check(home.get_spawn("north_gate") != null, "the homestead has a north_gate spot to return to")
 	check(home.get_node_or_null("Exits/ToCurryVillage") != null, "the way west to Curry Village is untouched")
-	var gate_tile := Vector2i(north.position / 16.0)
+	var gate_tile := Vector2i(north.position / 32.0)
 	check(home.get_ground().get_cell_source_id(gate_tile) != -1, "the gate opening has ground under it")
 	world.player.global_position = north.global_position + Vector2(0, 30)
 	Input.action_press("move_up")
@@ -55,12 +55,12 @@ func _ready() -> void:
 	for c in trail.get_ground().get_used_cells():
 		if trail.get_ground().get_cell_source_id(c) == 1 and trail.get_ground().get_cell_atlas_coords(c).y == 18:
 			open[c] = true
-	var reached := _flood(open, Vector2i(trail.get_spawn("south_entry").position / 16.0))
+	var reached := _flood(open, Vector2i(trail.get_spawn("south_entry").position / 32.0))
 	for spawn_name in ["north_entry", "bridge_west", "bridge_east", "meadow", "river_bank"]:
-		check(reached.has(Vector2i(trail.get_spawn(spawn_name).position / 16.0)), "%s is reachable on foot from the trail's south end" % spawn_name)
+		check(reached.has(Vector2i(trail.get_spawn(spawn_name).position / 32.0)), "%s is reachable on foot from the trail's south end" % spawn_name)
 	var north_exit: RegionExit = trail.get_node("Exits/ToAhwahnee")
-	check(reached.has(Vector2i(north_exit.position / 16.0) + Vector2i(0, 2)), "the trail's north exit is reachable on foot")
-	var west_end := Vector2i(trail.get_spawn("bridge_west").position / 16.0)
+	check(reached.has(Vector2i(north_exit.position / 32.0) + Vector2i(0, 2)), "the trail's north exit is reachable on foot")
+	var west_end := Vector2i(trail.get_spawn("bridge_west").position / 32.0)
 	check(not reached.has(Vector2i(west_end.x + 4, west_end.y - 3)), "you can't wade into the river north of the bridge")
 
 	# Walk the whole trail for real, from the south end to the bridge.
@@ -69,7 +69,7 @@ func _ready() -> void:
 	var west_trail := [Vector2(13, 76), Vector2(16, 70), Vector2(21, 64), Vector2(24, 58), Vector2(25, 51), Vector2(23, 45), Vector2(23, 39), Vector2(26, 34.5)]
 	var walked_trail := true
 	for wp: Vector2 in west_trail:
-		walked_trail = walked_trail and await _walk_to(world.player, wp * 16.0 + Vector2(8, 8))
+		walked_trail = walked_trail and await _walk_to(world.player, wp * 32.0 + Vector2(16, 16))
 	walked_trail = walked_trail and await _walk_to(world.player, trail.get_spawn("bridge_west").global_position)
 	check(walked_trail, "the player can walk the trail from the south end up through the meadow to the bridge (ended at %s)" % world.player.global_position)
 
@@ -84,7 +84,7 @@ func _ready() -> void:
 		await get_tree().physics_frame
 	Input.action_release("move_up")
 	check(world.player.global_position.y > deck_y - 30.0, "the north parapet stops you from walking off the bridge (y %.0f, deck %.0f)" % [world.player.global_position.y, deck_y])
-	world.player.global_position = trail.get_spawn("bridge_west").global_position + Vector2(48, 0)
+	world.player.global_position = trail.get_spawn("bridge_west").global_position + Vector2(96, 0)
 	await get_tree().physics_frame
 	Input.action_press("move_down")
 	for i in 60:
@@ -97,11 +97,11 @@ func _ready() -> void:
 	await get_tree().physics_frame
 	var walked_north := true
 	for wp: Vector2 in east_trail:
-		walked_north = walked_north and await _walk_to(world.player, wp * 16.0 + Vector2(8, 8))
+		walked_north = walked_north and await _walk_to(world.player, wp * 32.0 + Vector2(16, 16))
 	check(walked_north, "the player can walk the far bank's trail north from the bridge (ended at %s)" % world.player.global_position)
 
 	# Off the trail's north end and into the grounds.
-	world.player.global_position = north_exit.global_position + Vector2(0, 24)
+	world.player.global_position = north_exit.global_position + Vector2(0, 48)
 	Input.action_press("move_up")
 	for i in 60:
 		await get_tree().physics_frame
@@ -120,9 +120,9 @@ func _ready() -> void:
 	check(cascade != null and cascade.sprite_frames.get_frame_count("default") >= 4 and cascade.is_playing(), "the Royal Arch Cascade is animated")
 	check(grounds.get_node_or_null("HotelGlow") != null, "the hotel has its evening glow")
 	open = _walkable_cells(grounds)
-	reached = _flood(open, Vector2i(grounds.get_spawn("south_entry").position / 16.0))
+	reached = _flood(open, Vector2i(grounds.get_spawn("south_entry").position / 32.0))
 	for spawn_name in ["west_road", "front_door", "entrance_circle", "rose_garden", "tea_lawn", "ahwahnee_meadow", "cascade"]:
-		check(reached.has(Vector2i(grounds.get_spawn(spawn_name).position / 16.0)), "%s is reachable on foot from the trail" % spawn_name)
+		check(reached.has(Vector2i(grounds.get_spawn(spawn_name).position / 32.0)), "%s is reachable on foot from the trail" % spawn_name)
 	var to_bridge: RegionExit = grounds.get_node("Exits/ToStonemanBridge")
 	check(to_bridge.target_region == "ahwahnee_trail" and to_bridge.target_spawn == "north_entry", "the drive's foot leads back to the bridge")
 	var west_exit: RegionExit = grounds.get_node("Exits/NorthsideDriveWest")
@@ -138,21 +138,21 @@ func _ready() -> void:
 	for i in 120:
 		await get_tree().physics_frame
 	Input.action_release("move_up")
-	check(world.player.global_position.y > 34 * 16, "the hotel's front wall stops you (feet at y %.0f, wall base %d)" % [world.player.global_position.y, 34 * 16])
+	check(world.player.global_position.y > 34 * 32, "the hotel's front wall stops you (feet at y %.0f, wall base %d)" % [world.player.global_position.y, 34 * 32])
 	# Around the hotel's back: the cliff stops you too.
-	world.player.global_position = Vector2(grounds.get_spawn("front_door").global_position.x, 15 * 16 + 8)
+	world.player.global_position = Vector2(grounds.get_spawn("front_door").global_position.x, 15 * 32 + 16)
 	await get_tree().physics_frame
 	Input.action_press("move_up")
 	for i in 90:
 		await get_tree().physics_frame
 	Input.action_release("move_up")
-	check(world.player.global_position.y > 12 * 16, "the foot of the cliff stops you (y %.0f)" % world.player.global_position.y)
+	check(world.player.global_position.y > 12 * 32, "the foot of the cliff stops you (y %.0f)" % world.player.global_position.y)
 
 	# Back through the west road and the bridge.
 	world.player.global_position = grounds.get_spawn("south_entry").global_position
 	await get_tree().physics_frame
-	var door_spot: Vector2 = grounds.get_spawn("front_door").global_position + Vector2(0, 20)
-	var around_circle := [Vector2(door_spot.x, 50 * 16), Vector2(door_spot.x + 11 * 16, 46 * 16), Vector2(door_spot.x + 11 * 16, 39 * 16), door_spot]
+	var door_spot: Vector2 = grounds.get_spawn("front_door").global_position + Vector2(0, 40)
+	var around_circle := [Vector2(door_spot.x, 50 * 32), Vector2(door_spot.x + 11 * 32, 46 * 32), Vector2(door_spot.x + 11 * 32, 39 * 32), door_spot]
 	var walked := true
 	for wp: Vector2 in around_circle:
 		walked = walked and await _walk_to(world.player, wp)
@@ -169,24 +169,24 @@ func _ready() -> void:
 func _walk_to(player: Player, target: Vector2, max_frames := 1500) -> bool:
 	for i in max_frames:
 		var d := target - player.global_position
-		if d.length() < 5.0:
+		if d.length() < 10.0:
 			break
 		Input.action_release("move_left")
 		Input.action_release("move_right")
 		Input.action_release("move_up")
 		Input.action_release("move_down")
-		if d.x < -3.0:
+		if d.x < -6.0:
 			Input.action_press("move_left")
-		elif d.x > 3.0:
+		elif d.x > 6.0:
 			Input.action_press("move_right")
-		if d.y < -3.0:
+		if d.y < -6.0:
 			Input.action_press("move_up")
-		elif d.y > 3.0:
+		elif d.y > 6.0:
 			Input.action_press("move_down")
 		await get_tree().physics_frame
 	for a in ["move_left", "move_right", "move_up", "move_down"]:
 		Input.action_release(a)
-	return (target - player.global_position).length() < 8.0
+	return (target - player.global_position).length() < 16.0
 
 
 func _walkable_cells(region: Region) -> Dictionary:
@@ -205,9 +205,9 @@ func _walkable_cells(region: Region) -> Dictionary:
 			if shape and shape.shape is RectangleShape2D and not shape.disabled:
 				var center: Vector2 = (body as Node2D).global_position + shape.position
 				var rect := Rect2(center - shape.shape.size / 2.0, shape.shape.size)
-				for y in range(floori(rect.position.y / 16.0), floori(rect.end.y / 16.0) + 1):
-					for x in range(floori(rect.position.x / 16.0), floori(rect.end.x / 16.0) + 1):
-						if rect.grow(-minf(3.0, minf(rect.size.x, rect.size.y) / 3.0)).intersects(Rect2(x * 16, y * 16, 16, 16)):
+				for y in range(floori(rect.position.y / 32.0), floori(rect.end.y / 32.0) + 1):
+					for x in range(floori(rect.position.x / 32.0), floori(rect.end.x / 32.0) + 1):
+						if rect.grow(-minf(6.0, minf(rect.size.x, rect.size.y) / 3.0)).intersects(Rect2(x * 32, y * 32, 32, 32)):
 							open.erase(Vector2i(x, y))
 	return open
 

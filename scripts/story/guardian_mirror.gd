@@ -34,8 +34,8 @@ const GATHERING := [
 ]
 ## Where the crowd stands: three rows across the cave, with the way to the
 ## mirror left open down the middle.
-const COLUMNS := [60, 100, 140, 180, 300, 340, 380, 420]
-const ROWS := [150, 178, 206]
+const COLUMNS := [120, 200, 280, 360, 600, 680, 760, 840]
+const ROWS := [300, 356, 412]
 
 var _busy := false
 
@@ -59,7 +59,7 @@ func interact(player: Player) -> void:
 	await box.say(narrate(LOOKING.slice(0, LOOKING.size() - 1)))
 	gather()
 	player.facing = Vector2i.DOWN
-	player.interaction_area.position = Vector2(player.facing) * 12.0
+	player.interaction_area.position = Vector2(player.facing) * 24.0
 	await box.say(narrate(LOOKING.slice(LOOKING.size() - 1)))
 	await box.say(gathering_lines())
 	await box.say(QuestLog.find_guardian())
@@ -108,7 +108,7 @@ func gather() -> void:
 		npc.character = cast[i]
 		npc.stands_still = true
 		npc.facing = Vector2i.UP
-		npc.position = entities.to_local(global_position) + Vector2(COLUMNS[i % COLUMNS.size()] - 240, ROWS[(i / COLUMNS.size()) % ROWS.size()] - 96)
+		npc.position = entities.to_local(global_position) + Vector2(COLUMNS[i % COLUMNS.size()] - 480, ROWS[(i / COLUMNS.size()) % ROWS.size()] - 192)
 		npc.add_to_group("guardian_crowd")
 		npc.modulate.a = 0.0
 		entities.add_child(npc)

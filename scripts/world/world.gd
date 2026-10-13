@@ -242,7 +242,7 @@ func sleep(passed_out := false) -> void:
 		await plants.refresh()
 	player.global_position = region.get_spawn(Park.HOME_SPAWN).global_position
 	player.facing = Vector2i.DOWN
-	player.interaction_area.position = Vector2(player.facing) * 12.0
+	player.interaction_area.position = Vector2(player.facing) * 24.0
 	await _unstick_player()
 	_camera().reset_smoothing()
 	SaveManager.save_game()
@@ -378,7 +378,7 @@ func _unstick_player() -> void:
 	if not player.test_move(player.global_transform, Vector2.ZERO):
 		return
 	var origin := player.global_position
-	for radius in range(4, 100, 4):
+	for radius in range(8, 200, 8):
 		for dir in 8:
 			var spot := origin + Vector2.from_angle(dir * TAU / 8.0) * radius
 			if not player.test_move(Transform2D(0.0, spot), Vector2.ZERO):

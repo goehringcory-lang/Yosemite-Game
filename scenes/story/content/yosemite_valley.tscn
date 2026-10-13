@@ -25,92 +25,92 @@
 [node name="YosemiteValleyStory" type="Node2D"]
 
 [node name="Tabuce" parent="." instance=ExtResource("1_r")]
-position = Vector2(2968, 568)
+position = Vector2(5936, 1136)
 character = ExtResource("2_r")
 
 [node name="GlacierPointApron" parent="." instance=ExtResource("3_r")]
-position = Vector2(3336, 1036)
+position = Vector2(6672, 2072)
 route = ExtResource("4_r")
 
 [node name="MariaLebrado" parent="." instance=ExtResource("1_r")]
 character = ExtResource("5_r")
 spot = "the_ahwahnee"
-offset = Vector2(-104, -4)
+offset = Vector2(-208, -8)
 
 [node name="RoyalArches" parent="." instance=ExtResource("3_r")]
-position = Vector2(3448, 568)
+position = Vector2(6896, 1136)
 route = ExtResource("6_r")
 
 [node name="Tenaya" parent="." instance=ExtResource("1_r")]
 character = ExtResource("7_r")
 spot = "mirror_lake"
-offset = Vector2(16, -16)
+offset = Vector2(32, -32)
 
 
 
 [node name="GeorgeAnderson" parent="." instance=ExtResource("1_r")]
 character = ExtResource("10_r")
 spot = "happy_isles"
-offset = Vector2(-38, 0)
+offset = Vector2(-76, 0)
 
 [node name="SnakeDike" parent="." instance=ExtResource("3_r")]
-position = Vector2(3944, 1128)
+position = Vector2(7888, 2256)
 route = ExtResource("11_r")
 
 [node name="WarrenHarding" parent="." instance=ExtResource("1_r")]
 character = ExtResource("12_r")
 spot = "el_capitan_meadow"
-offset = Vector2(-24, -16)
+offset = Vector2(-48, -32)
 
 [node name="BeverlyJohnson" parent="." instance=ExtResource("1_r")]
 character = ExtResource("13_r")
 spot = "el_capitan_meadow"
-offset = Vector2(16, -24)
+offset = Vector2(32, -48)
 
 [node name="TheNose" parent="." instance=ExtResource("3_r")]
-position = Vector2(1416, 1336)
+position = Vector2(2832, 2672)
 route = ExtResource("14_r")
 
 [node name="VisitorAngler" parent="." instance=ExtResource("1_r")]
 character = ExtResource("15_r")
 spot = "yosemite_valley_lodge"
-offset = Vector2(-6, 25)
-wander_radius = 24.0
+offset = Vector2(-12, 50)
+wander_radius = 48
 
 [node name="VisitorCccWorker" parent="." instance=ExtResource("1_r")]
 character = ExtResource("16_r")
 spot = "four_mile_trailhead"
-offset = Vector2(16, 0)
-wander_radius = 32.0
+offset = Vector2(32, 0)
+wander_radius = 64
 
 [node name="CurryVillageDoor" parent="." instance=ExtResource("door_r")]
-position = Vector2(3440, 992)
+position = Vector2(6880, 1984)
 label = "Curry Village"
 target_region = "curry_village"
 target_spawn = "west_road"
 
 [node name="AhwahneeDoor" parent="." instance=ExtResource("door_r")]
-position = Vector2(3352, 632)
+position = Vector2(6704, 1264)
 label = "The Ahwahnee"
 target_region = "the_ahwahnee"
 target_spawn = "west_road"
 
 [node name="HigherCathedralSpire" parent="." instance=ExtResource("3_r")]
-position = Vector2(1512, 1688)
+position = Vector2(3024, 3376)
 route = ExtResource("spire_r")
 
 [node name="Nutcracker" parent="." instance=ExtResource("3_r")]
-position = Vector2(1976, 1256)
+position = Vector2(3952, 2512)
 route = ExtResource("nut_r")
 
 [node name="SteckSalathe" parent="." instance=ExtResource("3_r")]
-position = Vector2(2664, 1240)
+position = Vector2(5328, 2480)
 route = ExtResource("steck_r")
 
 [node name="Astroman" parent="." instance=ExtResource("3_r")]
-position = Vector2(3568, 616)
+position = Vector2(7136, 1232)
 route = ExtResource("astro_r")
 
 [node name="SeparateReality" parent="." instance=ExtResource("3_r")]
-position = Vector2(216, 1640)
+position = Vector2(432, 3280)
 route = ExtResource("sepr_r")

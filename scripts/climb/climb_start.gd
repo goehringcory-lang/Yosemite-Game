@@ -18,26 +18,26 @@ func _draw() -> void:
 	# A trail sign with a grade plate (green easy, red hard, blue for ice) and
 	# a coil of rope at its foot.
 	var yds := Guidebook.yds(route.grade) if route else 0.0
-	var plate := Color("5aa8e0")
+	var plate := Color("3a86a8")
 	if yds > 0.0:
-		plate = Color("7ac24a") if yds < 7.5 else (Color("e8c040") if yds < 10.5 else (Color("e8863a") if yds < 12.5 else Color("d8452e")))
-	var wood := Color("7a4a24")
-	draw_rect(Rect2(-1, -15, 3, 15), Color("2a1f1a"))
+		plate = Color("84b04a") if yds < 7.5 else (Color("d8a63b") if yds < 10.5 else (Color("d9772a") if yds < 12.5 else Color("b3362b")))
+	var wood := Color("6b4829")
+	draw_rect(Rect2(-1, -15, 3, 15), Color("2a1b14"))
 	draw_rect(Rect2(0, -14, 1, 14), wood)
-	draw_rect(Rect2(-7, -16, 15, 8), Color("2a1f1a"))
+	draw_rect(Rect2(-7, -16, 15, 8), Color("2a1b14"))
 	draw_rect(Rect2(-6, -15, 13, 6), plate)
 	draw_rect(Rect2(-6, -15, 13, 1), plate.lightened(0.4))
 	draw_rect(Rect2(-6, -10, 13, 1), plate.darkened(0.3))
 	# the rope: a flat coil in pixels, lit on top, with its tail trailing off
-	var rope := Color(0.85, 0.3, 0.25)
-	draw_rect(Rect2(3, -6, 9, 6), Color("2a1f1a"))
-	draw_rect(Rect2(2, -5, 11, 4), Color("2a1f1a"))
+	var rope := Color(0.702, 0.212, 0.169)
+	draw_rect(Rect2(3, -6, 9, 6), Color("2a1b14"))
+	draw_rect(Rect2(2, -5, 11, 4), Color("2a1b14"))
 	draw_rect(Rect2(3, -5, 9, 4), rope.darkened(0.25))
 	draw_rect(Rect2(4, -5, 7, 1), rope.lightened(0.25))
 	draw_rect(Rect2(3, -3, 9, 1), rope)
-	draw_rect(Rect2(5, -4, 5, 1), Color("2a1f1a"))
+	draw_rect(Rect2(5, -4, 5, 1), Color("2a1b14"))
 	draw_rect(Rect2(12, -2, 3, 1), rope)
-	draw_rect(Rect2(12, -1, 3, 1), Color("2a1f1a"))
+	draw_rect(Rect2(12, -1, 3, 1), Color("2a1b14"))
 
 
 func interact(player: Player) -> void:

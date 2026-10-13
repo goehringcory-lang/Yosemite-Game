@@ -45,7 +45,7 @@ static func palette(hour: float) -> Dictionary:
 			var dusk := clampf(1.0 - absf(hour - 18.9) / 1.5, 0.0, 1.0)
 			var dawn := clampf(1.0 - absf(hour - 6.4) / 1.1, 0.0, 1.0)
 			out["glow"] = maxf(dusk, dawn * 0.7)
-			out["glow_col"] = Color("ff8a52") if dusk >= dawn else Color("b8a4f0")
+			out["glow_col"] = Color("d9772a") if dusk >= dawn else Color("6f5aa6")
 			return out
 	return palette(12.0)
 
@@ -74,7 +74,7 @@ static func sky(pal: Dictionary) -> Image:
 		for i in 90:
 			var p := Vector2i(rng.randi_range(0, SCREEN.x - 1), rng.randi_range(0, 150))
 			im.set_pixelv(p, Color(1, 1, 0.95, rng.randf_range(0.4, 1.0)))
-		_disc(im, Vector2i(410, 46), 7, Color("e8e8f0"), Color("b8bcd0"))
+		_disc(im, Vector2i(410, 46), 7, Color("d6f1ee"), Color("bdb8ae"))
 	else:
 		# The sun climbs out of the east in the morning and drops west at night.
 		var day_t := clampf((hour - 5.5) / 15.0, 0.0, 1.0)

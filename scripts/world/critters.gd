@@ -15,17 +15,17 @@ const MAX_BUTTERFLIES := 4
 ## Seconds between tries at adding one while there are fewer.
 const SPAWN_EVERY := 2.5
 ## How close the player can come before a bird takes off.
-const FLEE_DISTANCE := 30.0
+const FLEE_DISTANCE := 60.0
 ## Birds keep this far from the player when they land.
-const SPAWN_CLEAR := 70.0
-const FLY_SPEED := 90.0
-const HOP := 6.0
+const SPAWN_CLEAR := 140.0
+const FLY_SPEED := 180.0
+const HOP := 12.0
 
-## The sprites (tools/npcgen/critter_art.gd): a row of 12x11 frames per
+## The sprites (tools/npcgen/critter_art.gd): a row of 24x22 frames per
 ## bird (standing, pecking, wings up, wings down), facing right, and a row of
-## 8x8 butterfly pairs (open, closed) under them.
+## 16x16 butterfly pairs (open, closed) under them.
 const SHEET := preload("res://assets/sprites/critters.png")
-const FRAME := Vector2(12, 11)
+const FRAME := Vector2(24, 22)
 ## Each bird: its row on the sheet, and the seasons it's about.
 const BIRDS := {
 	"stellers_jay": {"row": 0, "seasons": [0, 1, 2, 3]},
@@ -114,21 +114,21 @@ func _process(delta: float) -> void:
 		if _spawn_timer <= 0.0:
 			_spawn_timer = SPAWN_EVERY
 			_try_spawn()
-	var view := _view().grow(40.0)
+	var view := _view().grow(80.0)
 	var player := _player_position()
 	if not active:
 		# dusk, rain or indoors: the birds still about fly off, quietly
 		for bird in _birds:
 			if bird.state != "fly":
-				_take_off(bird, bird.pos + Vector2(_rng.randf_range(-4.0, 4.0), 6.0), false)
+				_take_off(bird, bird.pos + Vector2(_rng.randf_range(-8.0, 8.0), 12.0), false)
 	for bird in _birds:
 		_update_bird(bird, delta, player)
 	for fly in _flies:
 		_update_butterfly(fly, delta, active)
 	_birds = _birds.filter(func(b: Dictionary) -> bool: return view.has_point(b.pos) or b.state != "fly")
-	_flies = _flies.filter(func(f: Dictionary) -> bool: return view.grow(40.0).has_point(f.pos))
+	_flies = _flies.filter(func(f: Dictionary) -> bool: return view.grow(80.0).has_point(f.pos))
 	# birds left behind off screen go quietly
-	_birds = _birds.filter(func(b: Dictionary) -> bool: return view.grow(80.0).has_point(b.pos))
+	_birds = _birds.filter(func(b: Dictionary) -> bool: return view.grow(160.0).has_point(b.pos))
 	queue_redraw()
 
 
@@ -143,20 +143,20 @@ func _try_spawn() -> void:
 				kinds.append(kind)
 		var kind: String = kinds[_rng.randi() % kinds.size()]
 		var flock := 3 if kind == "quail" else (2 if kind == "junco" else 1)
-		var at := Vector2(_rng.randf_range(view.position.x + 16, view.end.x - 16), _rng.randf_range(view.position.y + 24, view.end.y - 16))
+		var at := Vector2(_rng.randf_range(view.position.x + 32, view.end.x - 32), _rng.randf_range(view.position.y + 48, view.end.y - 32))
 		if at.distance_to(player) > SPAWN_CLEAR:
 			for i in mini(flock, MAX_BIRDS - _birds.size()):
 				# a flock spreads out a little, never one bird on another
-				var spot := at + Vector2((i - flock / 2.0) * 11.0 + _rng.randf_range(-2, 2), _rng.randf_range(-5, 5))
+				var spot := at + Vector2((i - flock / 2.0) * 22.0 + _rng.randf_range(-4, 4), _rng.randf_range(-10, 10))
 				if _open(spot):
 					_birds.append({"kind": kind, "pos": spot, "vel": Vector2.ZERO, "state": "peck",
 						"time": _rng.randf_range(0.5, 2.0), "facing": 1 if _rng.randf() < 0.5 else -1, "hop": 0.0, "flap": 0.0})
 	var warm := season == GameClock.Season.SPRING or season == GameClock.Season.SUMMER
 	if warm and _flies.size() < MAX_BUTTERFLIES and _rng.randf() < 0.5:
 		var from_left := _rng.randf() < 0.5
-		var y := _rng.randf_range(view.position.y + 20, view.end.y - 20)
-		_flies.append({"pos": Vector2(view.position.x - 8 if from_left else view.end.x + 8, y),
-			"vel": Vector2(_rng.randf_range(8, 16) * (1 if from_left else -1), 0), "time": _rng.randf() * 10.0,
+		var y := _rng.randf_range(view.position.y + 40, view.end.y - 40)
+		_flies.append({"pos": Vector2(view.position.x - 16 if from_left else view.end.x + 16, y),
+			"vel": Vector2(_rng.randf_range(16, 32) * (1 if from_left else -1), 0), "time": _rng.randf() * 10.0,
 			"wings": _rng.randi() % BUTTERFLY_KINDS, "seed": _rng.randf() * TAU})
 
 
@@ -191,7 +191,7 @@ func _update_bird(bird: Dictionary, delta: float, player: Vector2) -> void:
 				bird.pecked = bird.pecked - delta
 		"fly":
 			bird.pos += bird.vel * delta
-			bird.vel.y -= 30.0 * delta
+			bird.vel.y -= 60.0 * delta
 
 
 func _take_off(bird: Dictionary, player: Vector2, loud := true) -> void:
@@ -203,7 +203,7 @@ func _take_off(bird: Dictionary, player: Vector2, loud := true) -> void:
 	bird.facing = 1 if bird.vel.x >= 0.0 else -1
 	# a covey goes up together
 	for other in _birds:
-		if other != bird and other.state != "fly" and other.kind == bird.kind and other.pos.distance_to(bird.pos) < 24.0:
+		if other != bird and other.state != "fly" and other.kind == bird.kind and other.pos.distance_to(bird.pos) < 48.0:
 			other.state = "fly"
 			other.vel = (bird.vel.rotated(_rng.randf_range(-0.4, 0.4))) * _rng.randf_range(0.9, 1.1)
 			other.facing = bird.facing
@@ -213,10 +213,10 @@ func _take_off(bird: Dictionary, player: Vector2, loud := true) -> void:
 
 func _update_butterfly(fly: Dictionary, delta: float, active: bool) -> void:
 	fly.time += delta
-	var wobble := Vector2(0, sin(fly.time * 2.3 + fly.seed) * 14.0 + sin(fly.time * 5.1) * 6.0)
+	var wobble := Vector2(0, sin(fly.time * 2.3 + fly.seed) * 28.0 + sin(fly.time * 5.1) * 12.0)
 	fly.pos += (fly.vel + wobble) * delta
 	if not active:
-		fly.vel.y -= 20.0 * delta # off they go at dusk or in the rain
+		fly.vel.y -= 40.0 * delta # off they go at dusk or in the rain
 
 
 func _draw() -> void:
@@ -226,9 +226,9 @@ func _draw() -> void:
 		var at: Vector2 = fly.pos
 		var open := int(fly.time * 10.0) % 2 == 0
 		# a faint shadow on the ground below
-		draw_rect(Rect2((at + Vector2(-1, 9)).round(), Vector2(3, 1)), Color(0, 0, 0, 0.16))
-		var src := Rect2((int(fly.wings) * 2 + (0 if open else 1)) * 8, BIRDS.size() * FRAME.y + 1, 8, 8)
-		draw_texture_rect_region(SHEET, Rect2((at - Vector2(4, 4)).round(), Vector2(8, 8)), src)
+		draw_rect(Rect2((at + Vector2(-2, 18)).round(), Vector2(6, 2)), Color(0, 0, 0, 0.16))
+		var src := Rect2((int(fly.wings) * 2 + (0 if open else 1)) * 16, BIRDS.size() * FRAME.y + 2, 16, 16)
+		draw_texture_rect_region(SHEET, Rect2((at - Vector2(8, 8)).round(), Vector2(16, 16)), src)
 
 
 func _draw_bird(bird: Dictionary) -> void:
@@ -239,16 +239,16 @@ func _draw_bird(bird: Dictionary) -> void:
 	if flying:
 		frame = 2 + int(bird.flap * 12.0) % 2
 	elif bird.state == "hop":
-		lift = -sin(clampf(bird.hop / 0.18, 0.0, 1.0) * PI) * 3.0
+		lift = -sin(clampf(bird.hop / 0.18, 0.0, 1.0) * PI) * 6.0
 	elif bird.get("pecked", 0.0) > 0.0:
 		frame = 1
 	# a shadow on the ground while it's on the ground
 	if not flying:
-		draw_rect(Rect2((at + Vector2(-3, -1)).round(), Vector2(6, 1)), Color(0, 0, 0, 0.2))
-		draw_rect(Rect2((at + Vector2(-2, 0)).round(), Vector2(4, 1)), Color(0, 0, 0, 0.12))
+		draw_rect(Rect2((at + Vector2(-6, -2)).round(), Vector2(12, 2)), Color(0, 0, 0, 0.2))
+		draw_rect(Rect2((at + Vector2(-4, 0)).round(), Vector2(8, 2)), Color(0, 0, 0, 0.12))
 	var row: int = BIRDS[bird.kind].row
 	var src := Rect2(frame * FRAME.x, row * FRAME.y, FRAME.x, FRAME.y)
 	# feet on [param at]; mirrored when facing left
 	draw_set_transform((at + Vector2(0, lift)).round(), 0.0, Vector2(bird.facing, 1))
-	draw_texture_rect_region(SHEET, Rect2(-FRAME.x / 2.0, -FRAME.y + 1, FRAME.x, FRAME.y), src)
+	draw_texture_rect_region(SHEET, Rect2(-FRAME.x / 2.0, -FRAME.y + 2, FRAME.x, FRAME.y), src)
 	draw_set_transform(Vector2.ZERO)

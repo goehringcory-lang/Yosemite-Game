@@ -19,58 +19,58 @@
 [node name="DickLeonard" parent="." instance=ExtResource("1_r")]
 character = ExtResource("2_r")
 spot = "camp_4"
-offset = Vector2(16, -24)
+offset = Vector2(32, -48)
 
 [node name="SwanSlab" parent="." instance=ExtResource("3_r")]
-position = Vector2(216, 120)
+position = Vector2(432, 240)
 route = ExtResource("4_r")
 
 [node name="JohnSalathe" parent="." instance=ExtResource("1_r")]
 character = ExtResource("8_r")
 spot = "camp_4"
-offset = Vector2(-54, -7)
+offset = Vector2(-108, -14)
 
 [node name="VisitorDirtbag" parent="." instance=ExtResource("1_r")]
 character = ExtResource("9_r")
 spot = "camp_4"
-offset = Vector2(9, 10)
-wander_radius = 32.0
+offset = Vector2(18, 20)
+wander_radius = 64
 
 [node name="BridgetDegnan" parent="." instance=ExtResource("1_r")]
 character = ExtResource("10_r")
 spot = "degnans_bakery"
-offset = Vector2(0, 24)
+offset = Vector2(0, 48)
 
 [node name="AnselAdams" parent="." instance=ExtResource("1_r")]
 character = ExtResource("11_r")
 spot = "bests_studio"
-offset = Vector2(0, 24)
-wander_radius = 16.0
+offset = Vector2(0, 48)
+wander_radius = 32
 
 [node name="LucyTelles" parent="." instance=ExtResource("1_r")]
 character = ExtResource("12_r")
 spot = "yosemite_museum"
-offset = Vector2(0, 24)
+offset = Vector2(0, 48)
 
 [node name="EnidMichaelGarden" parent="." instance=ExtResource("1_r")]
 character = ExtResource("16_r")
 spot = "yosemite_museum"
-offset = Vector2(44, 30)
-wander_radius = 12.0
+offset = Vector2(88, 60)
+wander_radius = 24
 stays = 1
 
 [node name="ClareHodges" parent="." instance=ExtResource("1_r")]
 character = ExtResource("13_r")
 spot = "ranger_station"
-offset = Vector2(0, 24)
-wander_radius = 20.0
+offset = Vector2(0, 48)
+wander_radius = 40
 
 [node name="VisitorMotorist" parent="." instance=ExtResource("1_r")]
 character = ExtResource("14_r")
 spot = "cooks_meadow"
 offset = Vector2(0, 0)
-wander_radius = 48.0
+wander_radius = 96
 
 [node name="Moonbow" type="Node2D" parent="."]
-position = Vector2(704, 120)
+position = Vector2(1408, 240)
 script = ExtResource("15_r")

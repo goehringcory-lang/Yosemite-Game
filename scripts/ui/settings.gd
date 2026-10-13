@@ -18,8 +18,8 @@ const TEXT_SPEED_NAMES := ["Slow", "Normal", "Fast", "Instant"]
 const TEXT_SPEED_CPS := [30.0, 60.0, 120.0, 0.0]
 const PROMPT_NAMES := ["Auto", "Keyboard", "Gamepad"]
 const MIN_SCALE := 1
-const MAX_SCALE := 6
-const BASE_SIZE := Vector2i(480, 270)
+const MAX_SCALE := 3
+const BASE_SIZE := Vector2i(960, 540)
 ## Volumes run from 0 (off) to MAX_VOLUME in whole steps.
 const MAX_VOLUME := 10
 
@@ -27,8 +27,8 @@ const MAX_VOLUME := 10
 static var path := DEFAULT_PATH
 static var text_speed := TextSpeed.NORMAL
 static var fullscreen := false
-## Window size in whole steps of 480x270 (3 = 1440x810, the default window).
-static var window_scale := 3
+## Window size in whole steps of 960x540 (2 = 1920x1080, the default window).
+static var window_scale := 2
 ## Which buttons the on-screen hints name: follow the last device used, or
 ## always the keyboard's or the gamepad's.
 static var prompts := Prompts.AUTO
@@ -141,7 +141,7 @@ static func save() -> Error:
 static func reset_defaults() -> void:
 	text_speed = TextSpeed.NORMAL
 	fullscreen = false
-	window_scale = 3
+	window_scale = 2
 	prompts = Prompts.AUTO
 	master_volume = 8
 	effects_volume = MAX_VOLUME

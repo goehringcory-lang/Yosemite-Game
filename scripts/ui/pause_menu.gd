@@ -35,7 +35,7 @@ const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prom
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill the screen. The picture stays sharp in whole-pixel steps.",
-	"The window's size, in whole steps of 480 x 270.",
+	"The window's size, in whole steps of 960 x 540.",
 	"Which buttons hints name. Auto follows the last device you used.",
 	"Smooth letters are easiest to read; pixel letters match the art.",
 	"How loud the whole game is.",
@@ -46,8 +46,8 @@ const SETTING_HELP := [
 ]
 ## A line that plays at the chosen text speed while Text speed is selected.
 const SPEED_SAMPLE := "Sample: The granite glows gold at dusk."
-const HEADING := Color(1.0, 0.85, 0.5)
-const DIM := Color(1, 1, 1, 0.6)
+const HEADING := Color(1, 0.831, 0.541)
+const DIM := Color(0.961, 0.933, 0.878, 0.6)
 const PANEL_POS := Vector2(30, 16)
 const PANEL_SIZE := Vector2(420, 238)
 ## The width of the card beside the pause menu's choices.
@@ -92,6 +92,7 @@ var _plain_style: StyleBoxEmpty
 
 func _ready() -> void:
 	layer = 28
+	UiScale.layer(self)
 	add_to_group("pause_menu")
 	Settings.ensure_loaded()
 	Settings.apply(get_window())
@@ -176,8 +177,8 @@ func _build_main() -> Control:
 func _build_card() -> Control:
 	var card := PanelContainer.new()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.2)
-	style.border_color = Color(0.78, 0.63, 0.38, 0.55)
+	style.bg_color = Color(0.082, 0.078, 0.11, 0.2)
+	style.border_color = Color(0.69, 0.573, 0.373, 0.55)
 	style.border_width_left = 1
 	style.content_margin_left = 8.0
 	style.content_margin_right = 4.0
@@ -190,8 +191,8 @@ func _build_card() -> Control:
 	card.add_child(column)
 	var frame := PanelContainer.new()
 	var frame_style := StyleBoxFlat.new()
-	frame_style.bg_color = Color("5a4634")
-	frame_style.border_color = Color("c8a060")
+	frame_style.bg_color = Color("5e4a38")
+	frame_style.border_color = Color("b0925f")
 	frame_style.set_border_width_all(1)
 	frame_style.set_content_margin_all(1)
 	frame.add_theme_stylebox_override("panel", frame_style)
@@ -287,8 +288,8 @@ func _build_settings() -> Control:
 func _card_panel() -> PanelContainer:
 	var card := PanelContainer.new()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.2)
-	style.border_color = Color(0.78, 0.63, 0.38, 0.55)
+	style.bg_color = Color(0.082, 0.078, 0.11, 0.2)
+	style.border_color = Color(0.69, 0.573, 0.373, 0.55)
 	style.border_width_left = 1
 	style.content_margin_left = 8.0
 	style.content_margin_right = 4.0
@@ -572,11 +573,11 @@ func _setting_value(which: int) -> String:
 func _draw_slider(bar: Control, which: int) -> void:
 	var level := _volume(which)
 	var chosen := which == _settings_cursor
-	var on := Color(1.0, 0.85, 0.5) if chosen else Color(0.95, 0.9, 0.78)
-	bar.draw_rect(Rect2(0, 0, 52, 8), Color("2a1f1a"))
+	var on := Color(1, 0.831, 0.541) if chosen else Color(0.894, 0.867, 0.8)
+	bar.draw_rect(Rect2(0, 0, 52, 8), Color("2a1b14"))
 	for n in Settings.MAX_VOLUME:
 		var notch := Rect2(1 + n * 5, 1, 4, 6)
-		bar.draw_rect(notch, on if n < level else Color(0.35, 0.28, 0.22))
+		bar.draw_rect(notch, on if n < level else Color(0.369, 0.29, 0.22))
 		if n < level:
 			bar.draw_rect(Rect2(notch.position, Vector2(4, 1)), on.lightened(0.4))
 
