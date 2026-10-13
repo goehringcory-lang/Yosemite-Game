@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hodges_canyon"
+title = "Down the Canyon"
+press_line = true
+giver = "clare_hodges"
+requires = PackedStringArray("hodges_herbarium")
+intro = PackedStringArray("Half the people who come up the canyon road think the park starts at the Valley. It starts at El Portal, two thousand feet lower, and hardly anything that grows there grows here.", "Drive down the Merced and press me three foothill plants. Redbud, buckeye, gray pine, and poppies if they're out.")
+steps = [{"type": "pressed", "hub": "el_portal", "count": 3, "objective": "Press 3 plants at El Portal, down the canyon, for Ranger Hodges", "reminder": "El Portal, down the Merced canyon road. Redbud, buckeye and gray pine all year, and poppies in spring. Three will do.", "done": ["Foothill plants, and not one of them in the Valley. That's a whole shelf of the herbarium."]}]
+outro = PackedStringArray("I read your old labels again last night. No names on them, but they have places: El Portal, the Big Trees, the rim, the Tuolumne. Bottom to top.", "Whoever this Guardian was meant to walk the whole park, not stand at a gate. Mr. Clark knew the Big Trees before anyone. Ask Clark.")
+reward_items = {"trail_mix": 2}

@@ -22,6 +22,11 @@ extends Resource
 ##   "time"       from, to (hours, 0-23): talk to the giver between these
 ##                hours. The range wraps past midnight, so 20 to 2 means
 ##                8 PM until 2 AM (see GameClock.hour_in_range).
+##   "pressed"    plants (plant ids), count, hub: have these plants in the
+##                press book, and at least this many in all (of those that
+##                grow in that hub, if one is named; see Herbarium)
+##   "unlocked"   ability: have this ability (set by something in the world,
+##                like the mirror in the Guardian's cave)
 ## Every step except "talk" is turned in by talking to the quest giver.
 ##
 ## Any step can also hand the player something the moment it's done:
@@ -36,6 +41,9 @@ extends Resource
 ## Part of the main storyline: the quests that follow the guidebook's tick
 ## list. Everything else is a side story.
 @export var main_line := false
+## Part of the press book's storyline, which runs beside the tick list: the
+## naturalists and rangers who ask for plants. The finale needs both.
+@export var press_line := false
 ## Character id of the person who gives the quest.
 @export var giver: String
 ## Quest ids that must be finished before this one is offered.
@@ -47,6 +55,9 @@ extends Resource
 ## the player knows to come back ("Come and see me when the snow flies").
 @export var out_of_season: PackedStringArray
 @export var intro: PackedStringArray
+## Abilities handed over the moment the quest starts, such as the plant
+## press that Enid Michael's first quest is about.
+@export var start_unlocks: PackedStringArray
 @export var steps: Array = []
 @export var outro: PackedStringArray
 

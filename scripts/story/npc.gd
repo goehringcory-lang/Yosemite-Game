@@ -20,6 +20,12 @@ const ROWS := {Vector2i.DOWN: 0, Vector2i.UP: 1, Vector2i.LEFT: 2, Vector2i.RIGH
 ## How far they stroll from where they start. 0 = stays put.
 @export var wander_radius := 0.0
 @export var walk_speed := 16.0
+## For someone who moves house during the story (CharacterData.early_home):
+## which of their two homes this node stands at. They're only here while
+## they live here.
+@export_enum("Always", "Early home", "Later home") var stays := 0
+## Never strolls, whatever the hour (the crowd in the Guardian's cave).
+@export var stands_still := false
 
 var facing := Vector2i.DOWN
 var _home := Vector2.ZERO
@@ -72,9 +78,33 @@ func _ready() -> void:
 		add_child(_sprite)
 	_update_frame(false)
 	queue_redraw()
-	if character and not character.visitor:
+	# The crowd in the Guardian's cave came to see you, not to hand out errands.
+	if character and not character.visitor and not stands_still:
 		quest_marker = QuestMarker.new(character.id)
 		add_child(quest_marker)
+	if stays != 0:
+		QuestLog.changed.connect(_refresh_stay)
+		_refresh_stay()
+
+
+## True while this node is where the person lives (see [member stays]).
+func is_here() -> bool:
+	if stays == 0 or character == null:
+		return true
+	return character.at_early_home(QuestLog.is_completed) == (stays == 1)
+
+
+## Shows or hides them as they move between their two homes. Never in the
+## middle of a conversation: they finish talking first.
+func _refresh_stay() -> void:
+	if _talking:
+		return
+	var here := is_here()
+	visible = here
+	set_deferred("collision_layer", 1 if here else 0)
+	var hitbox := get_node_or_null("Hitbox") as Area2D
+	if hitbox:
+		hitbox.set_deferred("monitorable", here)
 
 
 func _process(delta: float) -> void:
@@ -136,6 +166,8 @@ func _draw() -> void:
 ## How far from their spot they wander now: their own wander radius, or for
 ## people with quests, their time of day (see STROLL).
 func roam_radius() -> float:
+	if stands_still:
+		return 0.0
 	if character == null or character.visitor:
 		return wander_radius
 	var hour := GameClock.minutes / 60.0
@@ -149,7 +181,7 @@ func roam_radius() -> float:
 
 
 func _physics_process(delta: float) -> void:
-	if _talking:
+	if _talking or not visible:
 		return
 	var radius := roam_radius()
 	if radius <= 0.0:
@@ -218,6 +250,8 @@ func interact(player: Player) -> void:
 		if QuestLog.final_entry_pending() and character.id == "galen_clark":
 			await _write_last_page(player)
 	_talking = false
+	if stays != 0:
+		_refresh_stay()
 	if quest_marker:
 		quest_marker.hidden_while_talking = false
 		quest_marker.refresh()

@@ -6601,6 +6601,9 @@ position = Vector2(1416, 680)
 [node name="cascade" type="Marker2D" parent="Markers" unique_id=686639344]
 position = Vector2(184, 296)
 
+[node name="cave_mouth" type="Marker2D" parent="Markers" unique_id=1846203771]
+position = Vector2(1128, 248)
+
 [node name="Places" type="Node2D" parent="." unique_id=1320548063]
 
 [node name="TheAhwahnee" type="Marker2D" parent="Places" unique_id=896061042]

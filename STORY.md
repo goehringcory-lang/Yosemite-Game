@@ -10,6 +10,8 @@ The player camps at the Lamon Homestead and sets out across Yosemite. Everyone t
 
 The Register fills up as the game goes on. It starts as Clark's book, and by the end it holds many voices, some of which disagree with each other. The player comes to understand that no single person was ever the valley's guardian. It was always many people, and many of them were never asked to write in the book.
 
+Beside the Register runs a second book. Early on, **Enid Michael**, the ranger-naturalist who keeps the Museum's wildflower garden, hands the player an old **plant press** that came with a stack of bare sheets, each labeled "Collected for the Guardian of Yosemite." Nobody knows who that Guardian was. Filling the press book, plant by plant, for the park's naturalists and rangers is the game's second storyline, and the mystery of **the lost Guardian** runs through it to the very end, where the player finds out the Guardian is themselves.
+
 ## The timeline: a timeless valley
 
 People from 1851 to the 1970s share a single season. Tenaya, John Muir, Dick Leonard, and Warren Harding are all in the valley at once, each living in their own era: their own clothes, their own tools, their own concerns. The game never explains this. There's no time travel, magic, or ghosts. It's a storytelling convention, like a museum where every exhibit is alive.
@@ -30,6 +32,18 @@ A newcomer with a tent and a pair of approach shoes. They have no destiny and no
 ## The main storyline: the tick list
 
 The player's way through the story is the **climbing guidebook**. Clark's first errand sends them to the Mountain Shop in Curry Village. The clerk, Marty Kessler, has them fetch the new printing from the Registration porch and trade food for a guidebook listing every route, its grade, and the gear it takes. Then Marty fits them with a starter kit (climbing shoes, a chalk bag, a harness, and five quickdraws) in exchange for food and a pair of lost rental shoes, and sends them to Wren Alvarez, a new hire looking for a climbing partner. Wren belays the player up **Firefall Slab**, a bolted route on the Glacier Point Apron, and that's the first tick. A route counts only when the player tops it out and ticks it. Every main-line quest after the shop errands ends on a tick, and the person who gave the quest hands over the next piece of gear when they hear about it. The ticks climb the Yosemite Decimal System one grade at a time, so the player feels themselves getting stronger: Firefall Slab (5.5), Swan Slab (5.6), the Glacier Point Apron (5.7), Nutcracker (5.8), Higher Cathedral Spire (5.9), the Steck-Salathé on Sentinel Rock (5.10b), Astroman on Washington Column (5.11c), Separate Reality (5.12a), and the Nose of El Capitan, climbed free (5.13 on the game's ladder; the real free grade is 5.14a). Then the high country: Cathedral Peak and the Lyell Glacier, where the grade matters less than the altitude. Royal Arches and Snake Dike are side stories, classics off the ladder. The full chain is in [docs/CAST.md](docs/CAST.md#quest-chains). Side stories (the people who aren't on the main line) come alongside it.
+
+## The second storyline: the press book
+
+The **plant press** is the other way through the story, and it runs beside the tick list from the first chapter. Enid Michael gives it to the player at the Museum garden in Yosemite Village (she goes up to Sentinel Dome once the way to Glacier Point is open). With it, the player can press a sprig of any of the park's plants: 26 real species, from redbud and buckeye at El Portal to white heather at Tuolumne. Each grows where and when it really does, in the same spots every day, and a plant not yet in the book glints so it stands out from the scenery.
+
+The rules are Enid's, and they're the park's: collecting takes a permit (the player works under hers), you take one sprig and leave the plant, and some plants you only draw. The snow plant is protected, so the player sketches it.
+
+Naturalists and rangers ask for plants, the way climbers ask for ticks: Enid Michael, Ranger Clare Hodges for her station herbarium, Galen Clark for the big trees, and John Muir for Cassiope. Each quest sends the player to a different life zone, so the press book is also a walk up the mountain: foothills, Valley floor, sequoia grove, rim, and high country. The chain is in [docs/CAST.md](docs/CAST.md#the-press-book).
+
+**The lost Guardian.** The press's old sheets are bare, but each carries the faint outline of a plant, and the player's specimens fit them. Each press-book quest adds a clue (the Journal's Press Book tab keeps them): Hodges's files hold every Guardian the State named from 1866 to 1906, and the sheets belong to none of them; the labels name places from El Portal to the Tuolumne; Clark remembers a tin box in a gap in the talus under the Royal Arches that he never felt was his to open. When the book is full, every outline has been filled by the player's own hand, and one sheet is left with no outline at all.
+
+Nothing in this is magic (see "The timeline" below). The sheets are a list: walk the whole park with a press and these are the plants you'd bring home. Who left them is never said.
 
 ## Story arc
 
@@ -78,11 +92,21 @@ The full cast (who lives where, with sprites) and every quest chain, with the ge
 
 ### 6. Return: the last page (Fall)
 
-The player brings the Register back to Galen Clark. The ending is **not** the player becoming the next Guardian. Instead, the player sees how the book has changed: Clark's single account has become many voices that don't always agree. It includes stories told in full, stories told in part, and blank spaces for the stories people chose not to share.
+The player brings the Register back to Galen Clark and sees how the book has changed: Clark's single account has become many voices that don't always agree. It includes stories told in full, stories told in part, and blank spaces for the stories people chose not to share.
 
 Clark's last talk is personal: he came up into these mountains in 1856 expecting to die of his lungs, lived another fifty years, and spent them thinking he was the one looking after the place. He sends the player to ask Tabuce and Maria Lebrado whether they want anything written, and both ask for blank pages.
 
-The player adds one final entry of their own and can choose what it says: every voice they heard, a thank-you, the tick list, or a blank page like the ones Tabuce and Maria Lebrado asked for. Clark leafs back through the book (how many pages, in how many hands, with Tenaya's still at the front), hands it back ("when you read it, start at the front"), and the season turns. Looking after the valley doesn't end, and it was never one person's job. A closing line tells the player the story is over and that the valley stays open: the tick list isn't finished, and the people they met still have things to say.
+The player adds one final entry of their own and can choose what it says: every voice they heard, a thank-you, the tick list, or a blank page like the ones Tabuce and Maria Lebrado asked for. Clark leafs back through the book (how many pages, in how many hands, with Tenaya's still at the front), hands it back ("when you read it, start at the front"), and the season turns. Looking after the valley doesn't end, and it was never one person's job. The Register is finished, but a closing line says the press's old labels are still unanswered.
+
+### 7. The lost Guardian (the ending)
+
+The finale opens only when **both** storylines are done: the last page is written and Enid Michael has seen the full press. Clark then says what he thinks ("I don't think that Guardian was ever lost. I think nobody had got there yet") and sends the player to the gap in the talus under the Royal Arches, behind the Ahwahnee. Until then the gap is there to look at, and shut.
+
+Inside is a small cave, a tin box, and the last sheet from the press. It has no plant and no outline: where the specimen should be, the sheet is cut away, and behind it hangs a looking-glass. The player leans in to read the collector's name and sees their own face. They turn around, and everyone from the story is standing in the cave behind them. Clark says it: it was you all along. The quests were never a test. They were the work, and the work is what a Guardian is.
+
+How this sits with the rest of the story: the player finds out they are the Guardian by doing what everyone in the book taught them, so the title is something the valley's people hand over, not something an outsider claims. Clark's own lesson stands (nobody guards the valley alone), and the finale's Register note says plainly that the lost Guardian, the cave and the mirror are invented, and that the valley has been looked after by many people before, during and since, the seven associated tribes first among them. What Native characters say in the gathering, and whether they are in it at all, is a placeholder pending tribal review, like the rest of their dialogue.
+
+Afterwards the valley stays open: the tick list and the press book can still be finished, Clark calls the player Guardian, and the people they met still have things to say.
 
 ### Between the chapters: story beats
 
@@ -109,6 +133,7 @@ The game doesn't invent Native characters. Present-day tribal voices come throug
 - **Food** ties the seasons to the plot. Acorns stored in the fall are what get you up El Cap, and fresh forage gets you through day climbs.
 - **Seasons and road closures** are story gates the player can see and understand.
 - **The Register** is the quest log and journal. Entries fill in, get annotated, and get contradicted as you hear more people.
+- **The press book** is the second storyline. Plants grow by habitat, elevation, and season, so finding them teaches the park's life zones, and the naturalists' requests gate the finale alongside the tick list.
 - **Choices** decide who you help first, which accounts you trust, and what you write at the end. Native characters' rights and belonging are never the player's decision.
 
 ## Writing guardrails
@@ -120,6 +145,8 @@ The game doesn't invent Native characters. Present-day tribal voices come throug
 - **No "pristine wilderness saved by one outsider."** People have always lived in, shaped, and looked after this valley.
 
 ## Facts to verify before writing
+
+- The press book: that the Yosemite Museum's herbarium holds specimens Enid Michael collected; the list of State Guardians between 1866 and 1906 (Clark, Hutchings, Dennison, and their successors) and their dates; Clark's sequoia seedlings at his grave in the Yosemite cemetery; Muir's search for Cassiope in 1869 and where he first found it; and each plant's name, range, and season in `Herbarium.PLANTS` against a current Yosemite flora (the Sentinel Dome Jeffrey pine, the snow plant's protected status, the alpine shooting star's current Latin name).
 
 - Galen Clark appointed Guardian (1866), the Yosemite Grant (1864), Clark's Station at Wawona.
 - James Lamon's arrival date and his orchard at what's now Curry Village.

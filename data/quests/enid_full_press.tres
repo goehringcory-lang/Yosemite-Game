@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "enid_full_press"
+title = "The Full Press"
+press_line = true
+giver = "enid_michael"
+requires = PackedStringArray("clark_grove_sprigs", "muir_cassiope")
+intro = PackedStringArray("Cassiope from the Tuolumne, and the Big Tree from the grove. Let me count what's left in that stack.", "Twenty plants would fill every outline. Bring me the book when it holds twenty.")
+steps = [{"type": "pressed", "count": 20, "objective": "Have 20 plants in the press book and show Enid Michael", "reminder": "Twenty, from the canyon to the high country. The empty pages of your book say where each one grows, and when.", "done": ["Twenty. Sit down, this takes a while. Oak on its sheet. Cedar on its sheet. Sequoia. Jeffrey. Cassiope.", "Every outline filled. And every one of them by the same hand, which is yours."]}]
+outro = PackedStringArray("There's one sheet left over. The same label, 'Collected for the Guardian of Yosemite,' and no outline on it at all. I don't know what goes there.", "Mr. Clark knows something he hasn't said. When his Register is finished, ask him about the lost Guardian.")
+reward_items = {"elderberry_sauce": 2}

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "enid_rim"
+title = "Above the Rim"
+press_line = true
+giver = "enid_michael"
+requires = PackedStringArray("hodges_herbarium", "eichorn_apron")
+intro = PackedStringArray("Three thousand feet up, and it's another country. Hardly a plant in your book from the Valley floor grows on this dome.", "There's a Jeffrey pine out on the granite here that every visitor photographs. Press me a sprig of Jeffrey, and three rim plants in all.", "If the snow plant is up, don't pick it. It's as red as a fire engine and rarer than it looks. Draw it.")
+steps = [{"type": "pressed", "plants": ["jeffrey_pine"], "hub": "glacier_point", "count": 3, "objective": "Press Jeffrey pine, and 3 rim plants in all, at Glacier Point for Enid Michael", "reminder": "Jeffrey pine smells of vanilla if you put your nose to the bark. Red fir and pinemat manzanita grow round the dome too. Three rim plants in all.", "done": ["Jeffrey. Smell your fingers. Vanilla. Now watch this.", "I lay it on one of the old sheets, and it fits the outline needle for needle. Whoever traced these knew just which plants a person would bring down from here."]}]
+outro = PackedStringArray("It isn't magic. Walk the whole park with a press and these are the plants you'd come home with. The sheets are a list. Somebody left a job half described.", "The rest of it is in the high country. Mr. Muir is up at Tuolumne, and he'll talk your ear off about a heather.")
+reward_items = {"yerba_buena_tea": 2}

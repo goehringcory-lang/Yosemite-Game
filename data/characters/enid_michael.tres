@@ -14,5 +14,7 @@ idle_lines = PackedStringArray("Know a plant before you pick it, and never take 
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.659, 0.627, 0.471, 1)
 home = "Sentinel Dome"
+early_home = "the Museum garden, Yosemite Village"
+early_until = "eichorn_apron"
 needs_tribal_review = false
 sources = "To verify: Yosemite Nature Notes archive; NPS history of women rangers."

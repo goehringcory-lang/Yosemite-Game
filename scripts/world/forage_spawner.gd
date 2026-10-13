@@ -27,6 +27,9 @@ const MEADOW_TERRAIN := [Terrain.MEADOW, Terrain.WET_MEADOW, Terrain.FOOTHILL]
 const NATURAL_TERRAIN := [Terrain.FOREST, Terrain.MEADOW, Terrain.WET_MEADOW, Terrain.FOOTHILL,
 	Terrain.FIR, Terrain.SUBALPINE, Terrain.SCRUB]
 const WATER_TERRAIN := [Terrain.RIVER, Terrain.LAKE, Terrain.CREEK]
+## Conifer shade, and the lodgepole and granite-sand country above it.
+const FOREST_TERRAIN := [Terrain.FOREST, Terrain.FIR]
+const HIGH_TERRAIN := [Terrain.SUBALPINE]
 ## How many tiles from a black oak's trunk its acorns (and morels) can land.
 ## Only the ground south of the trunk counts, so items aren't hidden behind the canopy.
 const OAK_REACH := 2
@@ -132,6 +135,16 @@ func world_to_cell(world_position: Vector2) -> Vector2i:
 	return ground.local_to_map(ground.to_local(world_position))
 
 
+## Habitat -> Array of open cells, for PlantSpawner, which shares this scan.
+func habitats() -> Dictionary:
+	return _find_habitats()
+
+
+## True if nothing solid stands on [param cell] (see _is_unblocked).
+func is_unblocked(cell: Vector2i) -> bool:
+	return _is_unblocked(cell)
+
+
 ## Habitat -> Array of open cells. A cell can belong to several habitats.
 ## The map doesn't change during play, so this is worked out once per spawner
 ## (it reads every tile of a hub, which takes a noticeable moment) and kept.
@@ -201,6 +214,10 @@ func _scan_habitats() -> Dictionary:
 				_add(result, ItemData.Habitat.CHAPARRAL, cell)
 			if near_water.has(cell):
 				_add(result, ItemData.Habitat.RIVERSIDE, cell)
+			if type in FOREST_TERRAIN:
+				_add(result, ItemData.Habitat.FOREST, cell)
+			if type in HIGH_TERRAIN:
+				_add(result, ItemData.Habitat.HIGH_COUNTRY, cell)
 		elif source == SOURCE_STARTER:
 			var data := ground.get_cell_tile_data(cell)
 			if data == null or not data.get_custom_data("open_ground"):

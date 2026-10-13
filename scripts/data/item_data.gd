@@ -3,7 +3,8 @@ extends Resource
 ## Anything the player can carry: wild forage and prepared food. What food
 ## is worth on a climb (energy, shelf life) lives in FoodDB.
 
-enum Habitat { NONE, MEADOW, OAK_WOODLAND, CHAPARRAL, RIVERSIDE }
+## FOREST and HIGH_COUNTRY are only used by the press book's plants (Herbarium).
+enum Habitat { NONE, MEADOW, OAK_WOODLAND, CHAPARRAL, RIVERSIDE, FOREST, HIGH_COUNTRY }
 
 @export var id: String
 @export var display_name: String

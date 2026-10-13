@@ -36,6 +36,12 @@ extends Resource
 @export var color := Color(0.5, 0.4, 0.3)
 ## Where they spend their days, for the journal: "Degnan's Bakery", "Camp 4".
 @export var home: String
+## Optional: where they spend their days early in the story, until the quest
+## [member early_until] is done. Enid Michael keeps the Museum's garden until
+## the way to Glacier Point opens, then goes up to Sentinel Dome. An NPC node
+## can stand at either home (see NPC.stays).
+@export var early_home := ""
+@export var early_until := ""
 ## An everyday park visitor from one of the park's eras, not a historical figure. Visitors
 ## only chat: they never give quests or appear in the Register.
 @export var visitor := false
@@ -68,3 +74,14 @@ func latest_beat(is_done: Callable) -> Dictionary:
 		if is_done.call(beat.after):
 			return {"key": "%s:%s" % [id, beat.after], "lines": PackedStringArray(beat.lines)}
 	return {}
+
+
+## True while they're still at [member early_home]. [param is_done] reports
+## whether a quest is finished (QuestLog.is_completed).
+func at_early_home(is_done: Callable) -> bool:
+	return early_until != "" and not is_done.call(early_until)
+
+
+## Where to find them now: [member early_home] or [member home].
+func home_now(is_done: Callable) -> String:
+	return early_home if at_early_home(is_done) and early_home != "" else home

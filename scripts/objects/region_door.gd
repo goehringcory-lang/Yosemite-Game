@@ -11,13 +11,23 @@ extends StaticBody2D
 ## A seasonal closure in Park.SEASONAL (like "four_mile_trail") that shuts
 ## this way in winter. Empty if it's always open.
 @export var closure := ""
+## A quest id: the way is only open once that quest is under way or done
+## (the gap in the talus, which Clark sends you to at the very end).
+@export var needs_quest := ""
+## Shown instead of going in while [member needs_quest] hasn't started.
+@export_multiline var locked_text := ""
 
 
 func get_prompt() -> String:
+	if needs_quest != "" and not (QuestLog.active.has(needs_quest) or QuestLog.is_completed(needs_quest)):
+		return "Look at %s" % label
 	return "Go to %s" % label
 
 
 func interact(_player: Player) -> void:
+	if needs_quest != "" and not (QuestLog.active.has(needs_quest) or QuestLog.is_completed(needs_quest)):
+		get_tree().call_group("hud", "show_message", locked_text)
+		return
 	if closure != "" and not Park.is_open(closure):
 		get_tree().call_group("hud", "show_message", Park.SEASONAL[closure].why)
 		return

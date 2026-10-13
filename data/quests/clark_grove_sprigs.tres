@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "clark_grove_sprigs"
+title = "What Grows Under the Giants"
+press_line = true
+giver = "galen_clark"
+requires = PackedStringArray("hodges_canyon")
+intro = PackedStringArray("Ranger Hodges sent you about a Guardian? I've been Guardian twice, and I never knew who those labels meant.", "But I know the grove. Bring me a sprig of the Big Tree itself, and one of the sugar pine that grows beside it. I'd like to see the two on a page together.")
+steps = [{"type": "pressed", "plants": ["giant_sequoia", "sugar_pine"], "objective": "Press giant sequoia and sugar pine in the Mariposa Grove (Wawona) for Galen Clark", "reminder": "Take the Wawona Road south. The sequoias stand in the Mariposa Grove, round the Grizzly Giant, and the sugar pines grow among them.", "done": ["There. The biggest tree there is, and its leaf is no longer than a grain of wheat.", "I've planted seedlings of these by the Valley cemetery. I won't see them tall. That isn't the point of planting."]}]
+outro = PackedStringArray("Now, your Guardian. Years ago, under the Royal Arches, I found a gap in the talus with cold air coming out of it, and inside it a tin box.", "I left it. I can't tell you why, except that it didn't feel like mine to open. I've thought about it since.", "Finish the book first. Mrs. Michael will want the rim, and Muir the high country. Then come and ask me again.")
+reward_items = {"pilot_bread": 2, "lamon_apple": 2}

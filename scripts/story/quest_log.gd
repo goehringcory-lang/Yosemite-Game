@@ -61,6 +61,17 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/hodges_bear_season.tres"),
 	preload("res://data/quests/degnan_snowbound.tres"),
 	preload("res://data/quests/muir_soda_springs.tres"),
+	# The press book (QuestData.press_line): plants for the naturalists and
+	# rangers, beside the tick list. See Herbarium.
+	preload("res://data/quests/enid_press.tres"),
+	preload("res://data/quests/hodges_herbarium.tres"),
+	preload("res://data/quests/hodges_canyon.tres"),
+	preload("res://data/quests/clark_grove_sprigs.tres"),
+	preload("res://data/quests/enid_rim.tres"),
+	preload("res://data/quests/muir_cassiope.tres"),
+	preload("res://data/quests/enid_full_press.tres"),
+	# The finale: it needs the last page written and the press book full.
+	preload("res://data/quests/lost_guardian.tres"),
 ]
 
 const CHARACTERS: Array[CharacterData] = [
@@ -100,6 +111,11 @@ const STAFF: Array[CharacterData] = [
 ## "choice" is the menu option, "entry" what goes in the book, "reply" Clark's
 ## answer.
 const LAST_PAGE_QUEST := "clark_last_page"
+## The finale, which Clark offers once the last page is written and the press
+## book is full (see GuardianMirror for how it ends).
+const FINALE_QUEST := "lost_guardian"
+## Set when the player looks in the mirror in the Guardian's cave.
+const GUARDIAN_FOUND := "guardian_found"
 const FINAL_ENTRIES: Array[Dictionary] = [
 	{"choice": "Write down every voice you heard",
 		"entry": "Many people looked after this valley, and they didn't all agree. I wrote down what they told me.",
@@ -121,10 +137,19 @@ const EPILOGUE := [
 	"Keep the book with you. And when you read it, start at the front.",
 ]
 
+## The line after the last page: the Register is done, the mystery isn't.
+const AFTER_EPILOGUE := "The Guardian's Register is finished, with your page at the back. But the press book's old labels still say \"Collected for the Guardian of Yosemite,\" and nobody has found out who that was."
+
 ## What Galen Clark says once the Register is finished.
 const AFTER_LAST_PAGE := [
 	"The book's yours now. I read it some evenings, the parts that aren't mine especially.",
 	"The valley keeps going. So should you: there's always someone new on the trail with a story.",
+]
+
+## What he says once the lost Guardian is found.
+const AFTER_FINALE := [
+	"Guardian. It suits you better than it ever suited me.",
+	"The valley keeps going. So should you: there's always a plant you haven't pressed, and someone new on the trail with a story.",
 ]
 
 ## Quest id -> index of the current step. Missing = not started.
@@ -230,6 +255,8 @@ func main_objective() -> Dictionary:
 	for quest: QuestData in QUESTS:
 		if not quest.main_line or is_completed(quest.id):
 			continue
+		if quest.id == FINALE_QUEST and final_entry < 0:
+			continue # write the last page first
 		var unmet := Array(quest.requires).filter(func(r: String) -> bool: return not is_completed(r))
 		if not unmet.is_empty() and unmet.all(func(r: String) -> bool: return not get_quest(r).main_line):
 			var titles := PackedStringArray()
@@ -244,18 +271,47 @@ func main_objective() -> Dictionary:
 				titles.append(title)
 			if quest.id == LAST_PAGE_QUEST:
 				return {"quest": quest, "objective": "Before the last page, hear everyone out: %s" % ", ".join(titles)}
+			if quest.id == FINALE_QUEST:
+				return {"quest": quest, "objective": "One Guardian is still missing. Fill the press book: %s" % ", ".join(titles)}
 			var next_giver := get_character(quest.giver)
 			return {"quest": quest, "objective": "Before %s will take you on, finish %s" % [
 				next_giver.display_name if next_giver else quest.giver, ", ".join(titles)]}
 		if unmet.is_empty():
-			var giver := get_character(quest.giver)
-			var where := " (%s)" % giver.home if giver and giver.home != "" else ""
-			var objective := "Talk to %s%s" % [giver.display_name if giver else quest.giver, where]
+			var objective := "Talk to %s" % _who_and_where(quest.giver)
 			# Muir waits up in Tuolumne, and the Tioga Road shuts for winter.
 			if quest.id == "muir_cathedral" and not Park.is_open("tioga_road"):
 				objective += ". The Tioga Road is closed for winter. It reopens in early summer."
 			return {"quest": quest, "objective": objective}
 	return {}
+
+
+## The press book's next step, shown beside the main story: {"quest",
+## "objective"}, or {} before the press and once the book's quests are done.
+func press_objective() -> Dictionary:
+	for quest: QuestData in QUESTS:
+		if quest.press_line and active.has(quest.id):
+			return {"quest": quest, "objective": objective_text(quest)}
+	for quest: QuestData in QUESTS:
+		if not quest.press_line or is_completed(quest.id):
+			continue
+		var unmet := Array(quest.requires).filter(func(r: String) -> bool: return not is_completed(r))
+		if unmet.is_empty():
+			return {"quest": quest, "objective": "Talk to %s" % _who_and_where(quest.giver)}
+		# Waiting on the tick list (a road or a mentor further up the ladder).
+		if unmet.all(func(r: String) -> bool: return not get_quest(r).press_line):
+			var gate := _first_open(get_quest(unmet[0]))
+			return {"quest": quest, "objective": "%s has plants to ask for once you've finished %s" % [
+				_who_and_where(quest.giver), gate.title]}
+	return {}
+
+
+## "Enid Michael (Museum garden)": a person and where they are now.
+func _who_and_where(character_id: String) -> String:
+	var character := get_character(character_id)
+	if character == null:
+		return character_id
+	var home := character.home_now(is_completed)
+	return "%s (%s)" % [character.display_name, home] if home != "" else character.display_name
 
 
 ## The first quest in [param quest]'s chain of requirements that the player
@@ -298,9 +354,25 @@ func write_final_entry(index: int) -> Array[Dictionary]:
 	lines.append({"speaker": "", "text": leafing})
 	_add_lines(lines, clark_name, EPILOGUE)
 	lines.append({"speaker": "", "text": "The season turns. Looking after the valley doesn't end, and it was never one person's job."})
-	lines.append({"speaker": "", "text": "The end of The Guardian's Register. Your tick list holds %d of %d routes, and the valley is still open: the people you met have more to say, and there are always more routes." % [
-		Guidebook.ticked_count(), Guidebook.routes().size()]})
+	lines.append({"speaker": "", "text": AFTER_EPILOGUE})
 	changed.emit()
+	return lines
+
+
+## Called when the player looks in the mirror in the Guardian's cave: marks
+## the Guardian found and finishes the finale there and then, with Clark
+## speaking (he's standing behind you). Returns his lines, the Register page
+## and the reward; [] unless the finale is under way.
+func find_guardian() -> Array[Dictionary]:
+	var lines: Array[Dictionary] = []
+	var quest := get_quest(FINALE_QUEST)
+	if not active.has(FINALE_QUEST) or current_step(quest).get("ability") != GUARDIAN_FOUND:
+		return lines
+	if not is_unlocked(GUARDIAN_FOUND):
+		unlocks.append(GUARDIAN_FOUND)
+	var clark := get_character(quest.giver)
+	_add_lines(lines, clark.display_name if clark else quest.giver, current_step(quest).get("done", []))
+	_advance(quest, lines)
 	return lines
 
 
@@ -309,6 +381,8 @@ func available_from(character_id: String) -> QuestData:
 	for quest: QuestData in QUESTS:
 		if quest.giver != character_id or active.has(quest.id) or is_completed(quest.id):
 			continue
+		if quest.id == FINALE_QUEST and final_entry < 0:
+			continue # Clark hands you the last page to write first
 		if Array(quest.requires).all(is_completed) and quest.is_offered_in(GameClock.season):
 			return quest
 	return null
@@ -367,6 +441,10 @@ func is_step_done(step: Dictionary) -> bool:
 			return true # finished as soon as you talk to the giver again
 		"time":
 			return GameClock.hour_in_range(int(step.from), int(step.to))
+		"pressed":
+			return Herbarium.has_all(step.get("plants", [])) and Herbarium.count(step.get("hub", "")) >= int(step.get("count", 0))
+		"unlocked":
+			return is_unlocked(step.ability)
 	push_error("Unknown quest step type: %s" % step.get("type", ""))
 	return false
 
@@ -376,7 +454,7 @@ func objectives() -> PackedStringArray:
 	var result := PackedStringArray()
 	for quest: QuestData in QUESTS:
 		if active.has(quest.id):
-			result.append("%s%s: %s" % ["* " if quest.main_line else "", quest.title, objective_text(quest)])
+			result.append("%s%s: %s" % ["* " if quest.main_line or quest.press_line else "", quest.title, objective_text(quest)])
 	return result
 
 
@@ -387,7 +465,29 @@ func objective_text(quest: QuestData) -> String:
 	if step.get("type") == "climbed" and is_step_done(step):
 		var giver := get_character(quest.giver)
 		return "Ticked! Tell %s" % (giver.display_name if giver else quest.giver)
+	if step.get("type") == "pressed":
+		return step.get("objective", "") + _pressed_progress(step)
 	return step.get("objective", "")
+
+
+## " (2 of 3 pressed)" for a press-book step, or " Show <giver>" once it's done.
+func _pressed_progress(step: Dictionary) -> String:
+	if is_step_done(step):
+		return " (all pressed)"
+	var parts := PackedStringArray()
+	var plants: Array = step.get("plants", [])
+	if not plants.is_empty():
+		var missing := PackedStringArray()
+		for id: String in plants:
+			if not Herbarium.has(id):
+				missing.append(Herbarium.get_plant(id).get("name", id))
+		if not missing.is_empty():
+			parts.append("still to find: %s" % ", ".join(missing))
+	var need := int(step.get("count", 0))
+	var got := Herbarium.count(step.get("hub", ""))
+	if need > 0 and got < need:
+		parts.append("%d of %d pressed" % [got, need])
+	return " (%s)" % "; ".join(parts) if not parts.is_empty() else ""
 
 
 ## Runs a conversation with [param character_id], updating quests along the
@@ -411,7 +511,9 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 	for quest: QuestData in QUESTS:
 		if quest.giver != character_id or not active.has(quest.id):
 			continue
-		had_own = true
+		# A press-book quest takes days of walking, so it doesn't hold up
+		# the giver's other stories.
+		had_own = had_own or not quest.press_line
 		var progressed := false
 		while active.has(quest.id):
 			var step := current_step(quest)
@@ -432,11 +534,18 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 	# A new quest from this person, next time you talk. A side story in
 	# progress never holds up the main line, but otherwise one at a time.
 	var offer := available_from(character_id)
-	if had_own and (finished_now or not (offer and offer.main_line)):
+	if finished_now or (had_own and not (offer and (offer.main_line or offer.press_line))):
 		return lines
 	if offer:
 		_add_lines(lines, speaker, offer.intro)
 		active[offer.id] = 0
+		for ability: String in offer.start_unlocks:
+			if not is_unlocked(ability):
+				unlocks.append(ability)
+				var got := "Received the %s." % ability.replace("_", " ")
+				if ability == Herbarium.ABILITY:
+					got += " The press book is in your journal (P). Walk up to a plant to press a sprig."
+				lines.append({"speaker": "", "text": got})
 		lines.append({"speaker": "", "text": "New quest: %s. %s" % [offer.title, current_step(offer).get("objective", "")]})
 		quest_started.emit(offer)
 		changed.emit()
@@ -446,7 +555,7 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 	var seasonal: QuestData = waiting_for_season(character_id) if lines.is_empty() else null
 	# After the last page, Clark talks about the book you wrote, not the job.
 	if lines.is_empty() and character_id == "galen_clark" and final_entry >= 0:
-		_add_lines(lines, speaker, AFTER_LAST_PAGE)
+		_add_lines(lines, speaker, AFTER_FINALE if is_completed(FINALE_QUEST) else AFTER_LAST_PAGE)
 	elif seasonal and not seasonal.out_of_season.is_empty():
 		_add_lines(lines, speaker, seasonal.out_of_season)
 	elif lines.is_empty() and character:

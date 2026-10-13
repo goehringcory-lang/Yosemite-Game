@@ -79,6 +79,7 @@ func _ready() -> void:
 		QuestLog.start_new_game()
 		Perks.start_new_game()
 		Friendship.start_new_game()
+		Herbarium.start_new_game()
 		if forage:
 			forage.respawn()
 	hud.bind_player(player)
@@ -235,6 +236,10 @@ func sleep(passed_out := false) -> void:
 	GameClock.start_new_day()
 	if forage:
 		await forage.respawn()
+	# A new season brings up different plants for the press book.
+	var plants := PlantSpawner.attach(region)
+	if plants:
+		await plants.refresh()
 	player.global_position = region.get_spawn(Park.HOME_SPAWN).global_position
 	player.facing = Vector2i.DOWN
 	player.interaction_area.position = Vector2(player.facing) * 12.0
@@ -304,6 +309,9 @@ func _enter_region(id: String, spawn_name := "") -> void:
 	$DayNight.visible = not region.indoors
 	if forage:
 		forage.refresh()
+	var plants := PlantSpawner.attach(region)
+	if plants:
+		plants.refresh()
 	region_changed.emit(region)
 	_update_location()
 	_preload_neighbors()

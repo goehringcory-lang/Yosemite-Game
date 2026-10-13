@@ -353,7 +353,7 @@ func _check_book(world: Node, journal: Journal, player: Player) -> void:
 	bumper.pressed = true
 	Input.parse_input_event(bumper)
 	Input.flush_buffered_events()
-	check(journal.tab() == Journal.Tab.QUESTS, "LB turns back a tab")
+	check(journal.tab() == Journal.Tab.PRESS, "LB turns back a tab")
 	world.hud._input(InputEventKey.new()) # the bumper switched the prompts to the gamepad
 	_press("ui_cancel")
 	check(not journal.is_open() and player.can_act and not GameClock.paused, "Esc closes the book from any tab")
