@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+"""Upgrades freshly generated 16px art to the 32px palette art, in place.
+
+The pixel-art generators under tools/ (npcgen, hubs, mapgen, plants, ui) still
+draw at the original 16px scale and write straight into assets/. Run them
+through tools/art32/regen.sh, or run this afterwards: it finds every PNG under
+assets/ that is now the same size as its 16px original (so, freshly
+generated), and runs it through the same pass `build.py` uses.
+
+    python3 tools/art32/upgrade.py            # every freshly generated image
+    python3 tools/art32/upgrade.py FILE...    # just these
+"""
+from __future__ import annotations
+
+import os
+import sys
+
+import numpy as np
+from PIL import Image
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import build  # noqa: E402
+import passes  # noqa: E402
+import pixel32 as K  # noqa: E402
+
+
+def original_sizes() -> dict[str, tuple[int, int]]:
+    sizes = {}
+    for path in build.base_files():
+        sizes[path] = build.read_base(path).shape[1::-1]
+    return sizes
+
+
+def main() -> None:
+    wanted = [os.path.relpath(os.path.abspath(a), build.ROOT) for a in sys.argv[1:]]
+    sizes = original_sizes()
+    n = 0
+    for path, size in sizes.items():
+        if wanted and path not in wanted:
+            continue
+        cat = build.category_of(path)
+        full = os.path.join(build.ROOT, path)
+        if cat is None or not os.path.exists(full):
+            continue
+        if Image.open(full).size != size:  # already 32px (or resized): leave it
+            continue
+        K.save(passes.run(cat, path, np.array(Image.open(full).convert("RGBA"))), full)
+        n += 1
+    print("upgraded", n, "images")
+
+
+if __name__ == "__main__":
+    main()
