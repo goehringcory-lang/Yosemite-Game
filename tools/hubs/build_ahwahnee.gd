@@ -517,6 +517,8 @@ func _grounds_markers_and_exits() -> void:
 	marker("tea_lawn", 28, 41)
 	marker("ahwahnee_meadow", 88, 42)
 	marker("cascade", int(_land_consts.get("POOL_POS", Vector2i(416, 210)).x / T), 18)
+	# Where you come out of the Guardian's cave (tools/hubs/build_guardian_cave.gd).
+	marker("cave_mouth", 70, 15)
 	place("The Ahwahnee", _cx, 38, 22)
 	place("Entrance Circle", _cx, 42, 8, false)
 	place("Rose Garden", 69, 42, 8)

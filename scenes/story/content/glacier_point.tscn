@@ -18,6 +18,7 @@ character = ExtResource("3_r")
 spot = "sentinel_dome"
 offset = Vector2(16, -8)
 wander_radius = 16.0
+stays = 2
 
 [node name="VisitorPainter" parent="." instance=ExtResource("1_r")]
 character = ExtResource("4_r")

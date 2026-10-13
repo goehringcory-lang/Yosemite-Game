@@ -159,7 +159,7 @@ Possible historical figures:
 | **George Anderson** | Drilled his way up Half Dome in 1875 |
 | **James Lamon** | First non-Native settler to stay year-round. Orchard (apples). |
 | **Clare Marie Hodges** | First woman ranger (1918) |
-| **Enid Michael** | Early naturalist and botanist. A plant-ID / foraging mentor. |
+| **Enid Michael** | Early naturalist and botanist. A plant-ID / foraging mentor, and the one who hands over the plant press (the second storyline: see STORY.md, "The press book"). |
 | **Ansel Adams** | Photography quests, views from the rim |
 
 ### Climbers

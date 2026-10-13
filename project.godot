@@ -31,6 +31,7 @@ QuestLog="*res://scripts/story/quest_log.gd"
 Larder="*res://scripts/story/larder.gd"
 Perks="*res://scripts/story/perks.gd"
 Friendship="*res://scripts/story/friendship.gd"
+Herbarium="*res://scripts/story/herbarium.gd"
 Sound="*res://scripts/autoload/sound.gd"
 
 [display]
@@ -161,6 +162,11 @@ quests={
 backpack={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":66,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+press_book={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":80,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
 pause={

@@ -1,20 +1,23 @@
 class_name Journal
 extends CanvasLayer
-## The player's book, in three tabs:
+## The player's book, in four tabs:
 ##   Journal: the Guardian's Register, the guidebook's tick list, and perks
 ##   Quests: the main story's next step and every open quest
+##   Press Book: the plants you've pressed, and where the rest grow
 ##   Backpack: everything you carry (climbing gear, food, forage) in slots
-## J, Q and B open it on their tab (gamepad Y opens the Journal), Tab (LB/RB)
+## J, Q, P and B open it on their tab (gamepad Y opens the Journal), Tab (LB/RB)
 ## turns to the next tab, and the tab's own key or Esc (B) closes it.
 ##
 ## World adds one of these. It pauses the clock while it's open.
 
-enum Tab { JOURNAL, QUESTS, BACKPACK }
+enum Tab { JOURNAL, QUESTS, PRESS, BACKPACK }
 
-const TAB_NAMES := ["Journal", "Quests", "Backpack"]
+const TAB_NAMES := ["Journal", "Quests", "Press Book", "Backpack"]
 ## The action that opens each tab, and the key it's on.
-const TAB_ACTIONS := ["journal", "quests", "backpack"]
-const TAB_KEYS := ["J", "Q", "B"]
+const TAB_ACTIONS := ["journal", "quests", "press_book", "backpack"]
+const TAB_KEYS := ["J", "Q", "P", "B"]
+## A plant that isn't in the press book yet shows as a shadow of itself.
+const UNFOUND := Color(0.16, 0.11, 0.07, 0.4)
 const HEADING := Color(1.0, 0.85, 0.5)
 const DIM := Color(1, 1, 1, 0.6)
 ## The thin line under each section heading.
@@ -45,8 +48,9 @@ var _scroll: ScrollContainer
 var _fade_below: TextureRect
 var _fade_above: TextureRect
 var _body: VBoxContainer
-## The Backpack's slots in reading order, what each one holds
-## ({"name", "count", "facts", "description"}), and the one under the cursor.
+## The slots of the Backpack or the Press Book in reading order, what each
+## one holds ({"name", "count", "facts", "description"}), and the one under
+## the cursor.
 var _slots: Array[PanelContainer] = []
 var _slot_items: Array[Dictionary] = []
 var _cursor := 0
@@ -159,7 +163,7 @@ func is_open() -> bool:
 	return _panel.visible
 
 
-## The tab showing now (Tab.JOURNAL, QUESTS or BACKPACK).
+## The tab showing now (Tab.JOURNAL, QUESTS, PRESS or BACKPACK).
 func tab() -> Tab:
 	return _tab
 
@@ -212,7 +216,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		show_tab((asked if asked >= 0 else wrapi(_tab + turn, 0, Tab.size())) as Tab)
 		Sound.play("ui_move")
 		get_viewport().set_input_as_handled()
-	elif _tab == Tab.BACKPACK:
+	elif _uses_slots():
 		var step := Vector2i(MenuInput.horizontal(event), MenuInput.vertical(event))
 		if step != Vector2i.ZERO:
 			move_cursor(step)
@@ -256,7 +260,7 @@ func _process(delta: float) -> void:
 	if not is_open():
 		return
 	_refresh_more()
-	if _tab == Tab.BACKPACK:
+	if _uses_slots():
 		return
 	var held := int(Input.is_action_pressed("move_down") or Input.is_action_pressed("ui_down")) \
 			- int(Input.is_action_pressed("move_up") or Input.is_action_pressed("ui_up"))
@@ -285,11 +289,19 @@ func _refresh() -> void:
 			_journal_page()
 		Tab.QUESTS:
 			_quests_page()
+		Tab.PRESS:
+			_press_page()
 		Tab.BACKPACK:
 			_backpack_page()
-	_detail.visible = _tab == Tab.BACKPACK
+	_detail.visible = _uses_slots()
 	_refresh_cursor()
 	_refresh_hints()
+
+
+## True on the tabs laid out as slots with a cursor (the Backpack and the
+## Press Book); the others are pages that scroll.
+func _uses_slots() -> bool:
+	return _tab == Tab.BACKPACK or _tab == Tab.PRESS
 
 
 ## The tab names and the controls hint, in the current device's buttons.
@@ -301,7 +313,7 @@ func _refresh_hints() -> void:
 		label.text = TAB_NAMES[i] if gamepad else "%s  %s" % [TAB_KEYS[i], TAB_NAMES[i]]
 		label.add_theme_color_override("font_color", HEADING if i == _tab else DIM)
 		label.add_theme_stylebox_override("normal", _tab_style if i == _tab else _plain_style)
-	var move := "[%s] Choose" % MenuInput.button(tree, "Arrows", "Stick") if _tab == Tab.BACKPACK \
+	var move := "[%s] Choose" % MenuInput.button(tree, "Arrows", "Stick") if _uses_slots() \
 			else "[%s] Scroll" % MenuInput.button(tree, "Up/Down", "Stick")
 	var close_key := "Y/B" if _tab == Tab.JOURNAL else "B"
 	_footer.text = "%s   [%s] Next tab   [%s] Close" % [move, MenuInput.button(tree, "Tab", "LB/RB"),
@@ -444,14 +456,26 @@ func _quests_page() -> void:
 		_line("Pick up a climbing guidebook at the Mountain Shop in Curry Village.")
 	elif QuestLog.final_entry_pending():
 		_line("The Last Page: talk to Galen Clark and write your entry.")
+	elif QuestLog.is_completed(QuestLog.FINALE_QUEST):
+		_line("You found the lost Guardian. The valley is still open.", DIM)
 	elif QuestLog.final_entry >= 0:
 		_line("You've written your last page. It's in the Journal.", DIM)
 	else:
 		_line("Explore, and talk to people around the valley.", DIM)
 
+	# The press book runs beside the main story, so it gets a card of its own.
+	var press := QuestLog.press_objective()
+	if not press.is_empty():
+		_heading("The press book (%d of %d plants)" % [Herbarium.count(), Herbarium.total()])
+		_quest_card(press.quest, press.objective)
+
+	var shown: Array[QuestData] = []
+	for card: Dictionary in [main, press]:
+		if not card.is_empty():
+			shown.append(card.quest)
 	var open: Array[QuestData] = []
 	for quest: QuestData in QuestLog.QUESTS:
-		if QuestLog.active.has(quest.id) and (main.is_empty() or quest != main.quest):
+		if QuestLog.active.has(quest.id) and not quest in shown:
 			open.append(quest)
 	_heading("Open quests (%d)" % open.size())
 	if open.is_empty():
@@ -463,8 +487,8 @@ func _quests_page() -> void:
 	var asking: Array[CharacterData] = []
 	for character: CharacterData in QuestLog.CHARACTERS:
 		var offer: QuestData = QuestLog.available_from(character.id)
-		# the main story's next step is already shown above
-		if offer != null and (main.is_empty() or offer != main.quest):
+		# the main story's and the press book's next steps are already shown above
+		if offer != null and not offer in shown:
 			asking.append(character)
 	if not asking.is_empty():
 		_heading("Looking for help (%d)" % asking.size())
@@ -477,7 +501,8 @@ func _quests_page() -> void:
 			who.add_theme_constant_override("separation", 4)
 			who.add_child(_face(character.display_name, 24))
 			var name_label := Label.new()
-			name_label.text = character.display_name + ("  · %s" % character.home if character.home != "" else "")
+			var home := character.home_now(QuestLog.is_completed)
+			name_label.text = character.display_name + ("  · %s" % home if home != "" else "")
 			name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			who.add_child(name_label)
 			flow.add_child(who)
@@ -524,6 +549,49 @@ func _face(speaker: String, side: int) -> Control:
 	picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	frame.add_child(picture)
 	return frame
+
+
+# ---------------------------------------------------------------- the Press Book tab
+
+## The press book: every plant as a slot, grouped by where it grows. A plant
+## not yet pressed is a shadow, and says where and when to look for it.
+func _press_page() -> void:
+	if not Herbarium.has_press():
+		_heading("Press book")
+		_line("You don't have a plant press yet. Enid Michael keeps the wildflower garden at the Museum in Yosemite Village.", DIM)
+		return
+	var by_hub := {}
+	for plant: Dictionary in Herbarium.PLANTS:
+		var hub: String = Herbarium.hubs_of(plant)[0]
+		if not by_hub.has(hub):
+			by_hub[hub] = []
+		by_hub[hub].append(plant)
+	for hub: String in by_hub:
+		var pages: Array[Dictionary] = []
+		var found := 0
+		for plant: Dictionary in by_hub[hub]:
+			found += int(Herbarium.has(plant.id))
+			pages.append(_pressed(plant))
+		var place: String = Herbarium.HUB_NAMES.get(hub, hub)
+		_slot_section("%s (%d of %d)" % [place[0].to_upper() + place.substr(1), found, pages.size()], pages, "")
+	_heading("The lost Guardian")
+	var clues := Herbarium.clues()
+	if clues.is_empty():
+		_line("The old sheets in the press are labeled \"Collected for the Guardian of Yosemite.\" Nobody knows who that was.", DIM)
+	for clue in clues:
+		_line(clue)
+
+
+## What a slot shows for [param plant]: its name and drawing, and either its
+## natural history and where you found it, or where and when to look.
+func _pressed(plant: Dictionary) -> Dictionary:
+	if not Herbarium.has(plant.id):
+		return {"name": plant.name, "count": 1, "icon": Herbarium.icon(plant.id), "facts": "not yet pressed",
+			"description": "Look in: " + Herbarium.hint(plant), "dim": true}
+	var entry: Dictionary = Herbarium.pressed[plant.id]
+	var found: String = " Found at %s." % entry.where if str(entry.get("where", "")) != "" else ""
+	return {"name": plant.name, "count": 1, "icon": Herbarium.icon(plant.id), "facts": plant.latin,
+		"description": plant.note + found, "dim": false}
 
 
 # ---------------------------------------------------------------- the Backpack tab
@@ -601,6 +669,8 @@ func _slot(item: Dictionary) -> PanelContainer:
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if item.get("dim", false):
+		icon.modulate = UNFOUND
 	slot.add_child(icon)
 	if item.icon == null:
 		var name_label := Label.new()
@@ -657,6 +727,8 @@ func move_cursor(step: Vector2i) -> void:
 	if target == _cursor:
 		if step.y < 0:
 			_scroll.scroll_vertical = 0 # back up to the first heading
+		elif step.y > 0:
+			scroll_by(SCROLL_STEP * 2) # on to whatever is written under the slots
 		return
 	_cursor = target
 	Sound.play("ui_move")
@@ -669,7 +741,7 @@ func _refresh_cursor() -> void:
 	for i in _slots.size():
 		_slots[i].add_theme_stylebox_override("panel", _slot_chosen_style if i == _cursor else _slot_style)
 	if _slots.is_empty():
-		_detail_name.text = "Your pack is empty."
+		_detail_name.text = "Your pack is empty." if _tab == Tab.BACKPACK else ""
 		_detail_text.text = ""
 		return
 	var item := _slot_items[_cursor]

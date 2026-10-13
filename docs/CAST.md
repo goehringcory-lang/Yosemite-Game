@@ -47,7 +47,7 @@ NPCs go in a hub's story overlay (`scenes/story/content/<hub>.tscn`). Each NPC h
 | **Bestor Robinson** | 1898–1987 | Curry Village, foot of the Apron trail | Cheddar, dried apples (Royal Arches) |
 | **Jennie Curry** | 1861–1948 | Camp Curry | Lamon apples |
 | **James McCauley** | | Glacier Point | Bread, a Firefall entry |
-| **Enid Michael** | 1883–1966 | Sentinel Dome | 4 cooking recipes |
+| **Enid Michael** | 1883–1966 | The Museum garden, then Sentinel Dome | the plant press, 4 cooking recipes |
 | **Clare Marie Hodges** | 1890–1970 | Ranger station | 2 quickdraws, jerky (fall) |
 | **Ansel Adams** | 1902–1984 | Best's Studio | 2 quickdraws |
 | **George Anderson** | d. 1884 | Happy Isles | Anderson's eyebolt |
@@ -103,10 +103,11 @@ Talking to a visitor gets one random line.
 | Happy Isles | yosemite_valley · `happy_isles` | Anderson; Snake Dike |
 | The Ahwahnee / Royal Arches | yosemite_valley · `the_ahwahnee` | Maria Lebrado; Royal Arches |
 | The Ahwahnee grounds (walk north from the homestead: `ahwahnee_trail`, then `the_ahwahnee`) | the_ahwahnee · `front_door`, `rose_garden`, `tea_lawn`, `cascade`, `ahwahnee_meadow` | Royal Robbins and the Royal Arches start behind the hotel. The hotel's doors are still a sign, with no inside. |
+| The gap in the talus (the Guardian's cave) | the_ahwahnee · `cave_mouth`, then `guardian_cave` | Under the Royal Arches, east of the climb's start. Shut until Clark's last quest. Inside: the looking-glass, and at the end, everyone. |
 | Mirror Lake | yosemite_valley · `mirror_lake` | Tenaya |
 | Glacier Point Apron | yosemite_valley · `apron_base` | the Apron climb |
 | Firefall Slab | curry_village · `apron_trailhead` | Wren Alvarez; the Firefall Slab climb. The lost rental shoes lie out front of the upper tent cabins. |
-| Glacier Point | glacier_point | McCauley, Enid Michael, a painter |
+| Glacier Point | glacier_point | McCauley, Enid Michael (at Sentinel Dome, once the Apron is climbed; before that she's in the Museum's garden in Yosemite Village), a painter |
 | Tuolumne Meadows | tuolumne_meadows | Muir, Carrie Bethel, a backpacker; Cathedral Peak, Lyell Glacier |
 | El Portal railyard | el_portal · `railroad` | The Model A axle and Degnan's sack of flour (pickups), a railroad passenger |
 | Wawona Hotel | wawona · `wawona_hotel` | The stagecoach couple |
@@ -118,7 +119,7 @@ Yosemite Village is the hand-made hub you arrive at when you drive to the Valley
 
 ### The main line: the guidebook and its tick list
 
-The main storyline is one chain of quests (marked ★ in the Journal). Each one ends on a **tick**: a route topped out and logged in the climbing guidebook. The giver hands over the reward when you report back, so no main quest finishes without a climb. The only exceptions are the first (fetching the guidebook) and the last (the ending).
+The main storyline is one chain of quests (marked ★ in the Journal). Each one ends on a **tick**: a route topped out and logged in the climbing guidebook. The giver hands over the reward when you report back, so no main quest finishes without a climb. The only exceptions are the first (fetching the guidebook) and the last two (the last page, and the finale in the cave, which also needs the press book: see below).
 
 The main-line climbs climb the **Yosemite Decimal System** one grade at a time, from 5.5 on Firefall Slab to 5.13 on the Nose, climbed free. Marty explains the scale when he sells you the guidebook, Dick Leonard explains the Sierra Club's classes, and Robbins tells how the decimals were worked out at Tahquitz. The tick report and the journal show your hardest grade so far (`Guidebook.yds()` turns a grade into a number). `tests/cast_test.tscn` checks the ladder: one main-line climb per grade, each harder than the last.
 
@@ -145,7 +146,10 @@ Gear arrives in the order the routes need it, and a quest can hand over gear as 
 ★ 11 Living Ice ............ Muir ............................ ice   TICK Lyell Glacier
 ★ 12 The Last Page ......... Clark: after Lucy Telles's and Maria Lebrado's stories → you write the last page
                               (pick one of four entries, or leave it blank; it's saved and shown in the journal)
-                              → Clark leafs back through the book, the season turns, and the game says the story is over
+                              → Clark leafs back through the book, and the season turns
+★ 13 The Lost Guardian ..... Clark: after the last page is written AND The Full Press (the press book, below)
+                              → the gap in the talus under the Royal Arches opens (behind the Ahwahnee)
+                              → the looking-glass, everyone gathered behind you, and the end of the game
 ```
 
 Every main-line quest except the shop errands writes a page in the Register, and its Register note (what's documented, what's dramatized) is read out before the rewards. Between quests, the people you keep passing react to the main line once each (story beats), and after the last page Clark, the climbing mentors, Wren, Lamon, Jennie Curry, Bridget Degnan, and Muir each say goodbye.
@@ -153,6 +157,40 @@ Every main-line quest except the shop errands writes a page in the Register, and
 After the Nose the scale stops mattering: the high country is alpine climbing, where the hard part is altitude, weather, and ice, not the grade. Cathedral Peak is only 5.6.
 
 Geography is part of the progression. You leave the Lamon Homestead: south to Curry Village (guidebook, then the Apron behind it), north to the Ahwahnee (Robbins), then out across the Valley (Nutcracker near El Capitan, the Spire near Bridalveil, Sentinel Rock above the Four Mile Trail, Washington Column past the Royal Arches, the roof crack at the west end, El Capitan Meadow) and finally up the Tioga Road.
+
+### The press book
+
+The second storyline (`QuestData.press_line`), beside the tick list from the first chapter on. Naturalists and rangers ask for plants, and each quest ends when the press book (`Herbarium`, the Journal's Press Book tab, **P**) holds what they asked for. A press-book quest never holds up its giver's other stories, or the other way round, and the Quests tab shows its next step on a card of its own under the main story's. Each one leaves a clue about the lost Guardian. `tests/press_test.tscn` plays the chain and the finale, and checks that every plant comes up where and when the book says.
+
+```
+P1 The Plant Press ......... Enid Michael, Museum garden ....... after Clark's errand. She hands over the PLANT PRESS.
+                              Press 3 Valley-floor plants → dried apples. Clue: the bare sheets "for the Guardian of Yosemite".
+P2 The Station Herbarium ... Ranger Hodges, ranger station ..... incense-cedar + canyon live oak, 6 plants in all → jerky.
+                              Clue: every State Guardian from 1866 to 1906 is on file, and it was none of them.
+P3 Down the Canyon ......... Ranger Hodges ..................... 3 foothill plants from El Portal → trail mix.
+                              Clue: the labels name places from El Portal to the Tuolumne.
+P4 What Grows Under the Giants  Galen Clark .................... giant sequoia + sugar pine from the Mariposa Grove → bread, apples.
+                              Clue: the gap in the talus under the Royal Arches, and a tin box he left alone.
+P5 Above the Rim ........... Enid Michael, Sentinel Dome ....... after P2 and the Apron. Jeffrey pine, 3 rim plants in all → tea.
+                              The snow plant is protected: you sketch it, and the sketch counts.
+P6 Cassiope ................ John Muir, Tuolumne ............... after P5 and Cathedral Peak. White heather, 4 high-country plants → dry crusts.
+P7 The Full Press .......... Enid Michael ...................... after P4 and P6. 20 of the 26 plants → elderberry sauce.
+                              Every outline is filled, by your hand. One sheet is left with no outline. → opens ★ 13.
+```
+
+Enid Michael is the one person with two homes (`CharacterData.early_home`, `NPC.stays`): the Museum garden in Yosemite Village until the Apron is climbed, then Sentinel Dome.
+
+The plants (`Herbarium.PLANTS`), by where they grow:
+
+| Life zone | Plants |
+|---|---|
+| El Portal (foothills) | western redbud, California poppy, California buckeye, gray pine |
+| The Valley floor | California black oak, incense-cedar, ponderosa pine, canyon live oak, greenleaf manzanita, western azalea, showy milkweed, broadleaf lupine, bracken fern, mountain dogwood |
+| Wawona and the Mariposa Grove | giant sequoia, sugar pine, mountain misery (and dogwood) |
+| Glacier Point (the rim) | Jeffrey pine, California red fir, pinemat manzanita, snow plant (sketched), and sugar pine and greenleaf manzanita again |
+| Tuolumne Meadows | lodgepole pine, Sierra juniper, white mountain heather, alpine shooting star, Lemmon's paintbrush |
+
+Evergreens can be pressed all year, so no quest is ever stuck behind a season; the wildflowers are up in spring and summer only. To add a plant, add it to `Herbarium.PLANTS` with a drawing in `tools/plants/plant_art.gd`.
 
 ### Side stories
 

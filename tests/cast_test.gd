@@ -236,8 +236,8 @@ func _check_main_line() -> void:
 	var main: Array[QuestData] = QuestLog.QUESTS.filter(func(q: QuestData) -> bool: return q.main_line)
 	check(main.size() >= 10, "the main line has its quests (%d)" % main.size())
 	for quest in main:
-		if quest.id in ["clark_register", "shop_guidebook", "shop_outfit", "clark_last_page"]:
-			continue # the errands for the guidebook and the first kit, and the ending
+		if quest.id in ["clark_register", "shop_guidebook", "shop_outfit", "clark_last_page", "lost_guardian"]:
+			continue # the errands for the guidebook and the first kit, the last page, and the finale in the cave
 		check(quest.steps.back().type == "climbed", "%s finishes on a tick in the guidebook" % quest.id)
 	for route in Guidebook.routes():
 		var side_climb := QuestLog.QUESTS.any(func(q: QuestData) -> bool:
@@ -494,7 +494,7 @@ func _play_last_page() -> void:
 	var lines := QuestLog.write_final_entry(1)
 	check(QuestLog.final_entry == 1 and not QuestLog.final_entry_pending() and lines.size() == 5 + QuestLog.EPILOGUE.size(), "you write your entry, and the season turns")
 	check(lines.any(func(l: Dictionary) -> bool: return l.text.begins_with("Clark turns back through the book")), "Clark leafs back through the Register")
-	check(lines.back().text.begins_with("The end of The Guardian's Register"), "the game says the story is over (%s)" % lines.back().text)
+	check(lines.back().text == QuestLog.AFTER_EPILOGUE, "the Register is finished, and the lost Guardian is still to find (%s)" % lines.back().text)
 	check(QuestLog.write_final_entry(0).is_empty() and QuestLog.final_entry == 1, "the last page is written once")
 	var after := QuestLog.talk_to("galen_clark")
 	check(after.size() == 2 and after[0].text == QuestLog.AFTER_LAST_PAGE[0], "Clark talks about the finished book")

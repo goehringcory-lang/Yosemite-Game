@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tools/hubs/build_guardian_cave.gd" id="1"]
+
+[node name="BuildGuardianCave" type="Node"]
+script = ExtResource("1")

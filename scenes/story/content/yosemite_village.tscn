@@ -12,6 +12,7 @@
 [ext_resource type="Resource" path="res://data/characters/clare_hodges.tres" id="13_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_motorist.tres" id="14_r"]
 [ext_resource type="Script" path="res://scripts/world/moonbow.gd" id="15_r"]
+[ext_resource type="Resource" path="res://data/characters/enid_michael.tres" id="16_r"]
 
 [node name="YosemiteVillageStory" type="Node2D"]
 
@@ -50,6 +51,13 @@ wander_radius = 16.0
 character = ExtResource("12_r")
 spot = "yosemite_museum"
 offset = Vector2(0, 24)
+
+[node name="EnidMichaelGarden" parent="." instance=ExtResource("1_r")]
+character = ExtResource("16_r")
+spot = "yosemite_museum"
+offset = Vector2(44, 30)
+wander_radius = 12.0
+stays = 1
 
 [node name="ClareHodges" parent="." instance=ExtResource("1_r")]
 character = ExtResource("13_r")

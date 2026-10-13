@@ -90,10 +90,21 @@ const PAGES: Array[Dictionary] = [
 		"text": "Winter: the stage roads close, but the railroad runs. The flour comes up the canyon to El Portal."},
 	{"quest": "muir_soda_springs", "by": "John Muir",
 		"text": "Soda Springs, 1889: a campfire with Robert Underwood Johnson. He asked why this country wasn't a park. In 1890 it was."},
+	# The press book: what the naturalists and rangers added along the way.
+	{"quest": "enid_press", "by": "Enid Michael",
+		"text": "A plant press, and a stack of old sheets labeled 'Collected for the Guardian of Yosemite.' All of them bare. Take one sprig, never the plant."},
+	{"quest": "hodges_herbarium", "by": "Clare Marie Hodges",
+		"text": "A herbarium for the ranger station. The State named Guardians from 1866 to 1906, and the labels belong to none of them."},
+	{"quest": "clark_grove_sprigs", "by": "Galen Clark",
+		"text": "Sequoia and sugar pine on one page. A gap in the talus under the Royal Arches, and a tin box I left where it was."},
+	{"quest": "muir_cassiope", "by": "John Muir",
+		"text": "Cassiope, found at last on the cold rock. A sprig is a letter of introduction. The whole plant is a theft."},
 	{"quest": "clark_last_page", "review": true, "by": "Tabuce (Maggie Howard)",
 		"text": "A blank page, kept at her request. Some things stay with her family."},
 	{"quest": "clark_last_page", "review": true, "by": "Maria Lebrado (Totuya)",
 		"text": "A blank page. The rest belongs to her people."},
+	{"quest": "lost_guardian", "by": "The lost Guardian",
+		"text": "The last sheet from the press. Where the plant should be, a looking-glass."},
 ]
 
 
@@ -133,6 +144,11 @@ const HISTORY := {
 	"hodges_bear_season": "Real: Yosemite's black bears feed hard in fall, and the old orchard by Curry Village still draws them. Bears were fed for crowds in the park from the 1920s until 1940; today every campsite has a bear box. Grizzlies are gone from the park; the last is usually dated to the 1890s. Dramatized: this patrol, and Lamon's bears.",
 	"degnan_snowbound": "Real: the Yosemite Valley Railroad ran from Merced up the Merced River canyon to El Portal from 1907 to 1945, all year, and made winter trips to the valley practical. The Degnans' bakery fed the valley from the 1880s. Dramatized: this sack of flour, the toyon on the loaves, and the pudding.",
 	"muir_soda_springs": "Real: Muir and Johnson camped in Tuolumne Meadows in 1889 and planned a campaign; Johnson's Century Magazine printed Muir's articles, and Congress created Yosemite National Park around the state-held valley in 1890. Muir herded sheep here in 1869 and later called them hoofed locusts. Dramatized: the supper and Muir's words. Those park lines were drawn without asking the Native people whose homeland it was.",
+	"enid_press": "Documented: the Yosemite Museum keeps a herbarium of pressed park plants, and Enid Michael, who tended its wildflower garden, collected for it. Collecting plants in a national park takes a permit. Dramatized: the old press, its bare sheets, and the lost Guardian, all invented for the game.",
+	"hodges_herbarium": "Documented: California appointed Guardians of the Yosemite Grant from 1866 until the Valley was returned to the federal government in 1906. Galen Clark served twice, with James Hutchings and Walter Dennison among those between his terms. Dramatized: the station herbarium and Hodges's files.",
+	"clark_grove_sprigs": "Documented: Galen Clark chose his own grave in the Yosemite Valley cemetery and planted giant sequoia seedlings around it, years before he died in 1910. Dramatized: the tin box under the Royal Arches.",
+	"muir_cassiope": "Documented: Muir wrote of hunting for Cassiope, the white mountain heather, in his first Sierra summer (1869), and of meeting it in bloom on a later trip into the high country. Dramatized: the errand, and his words here.",
+	"lost_guardian": "Invented for the game: there was no lost Guardian, no cave, and no mirror. Documented: the Guardian's office ended in 1906, and this valley has been looked after by a great many people before, during, and since, the seven traditionally associated tribes first among them.",
 }
 
 

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "muir_cassiope"
+title = "Cassiope"
+press_line = true
+giver = "john_muir"
+requires = PackedStringArray("enid_rim", "muir_cathedral")
+intro = PackedStringArray("A plant press! Then you'll understand me. My first summer up here I looked for one plant above all the rest, and didn't find her.", "Cassiope, the white heather. Bells no bigger than a barley grain, ringing on the cold rock where the snow lies latest.", "Find her for me, and have four plants of this high country in your book. Then we'll talk about your Guardian.")
+steps = [{"type": "pressed", "plants": ["white_heather"], "hub": "tuolumne_meadows", "count": 4, "objective": "Press white mountain heather (Cassiope), and 4 high-country plants in all, at Tuolumne Meadows for John Muir", "reminder": "Cassiope keeps to the high granite sand, out toward the Cathedral Lakes trail. Lodgepole and juniper will fill your count, and the meadow flowers in summer.", "done": ["Cassiope! There she is. When I met her at last, on a glacier's doorstep, I felt I'd been presented at court.", "And you left the plants standing. Good. A sprig is a letter of introduction. The whole plant is a theft."]}]
+outro = PackedStringArray("A guardian who gathers and never signs the label. I should like to meet that one. Most of us sign everything.", "I signed a great deal. I've wondered since whether the mountains noticed. Take your book down to Mrs. Michael. It must be near full.")
+reward_items = {"dry_crusts": 3}

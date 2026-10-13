@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hodges_herbarium"
+title = "The Station Herbarium"
+press_line = true
+giver = "clare_hodges"
+requires = PackedStringArray("enid_press")
+intro = PackedStringArray("Mrs. Michael's press! So she found someone to carry it.", "Visitors ask my rangers what a tree is forty times a day, and half the time we guess. I want a herbarium at this station: real specimens with real names.", "Bring me incense-cedar and canyon live oak to start, the two we get wrong most. And have six plants in that book before you come back.")
+steps = [{"type": "pressed", "plants": ["incense_cedar", "canyon_live_oak"], "count": 6, "objective": "Press incense-cedar and canyon live oak, and have 6 plants in the press book, for Ranger Hodges", "reminder": "Incense-cedar grows all through the Valley's woods. Canyon live oak likes the rocks under the cliffs, up by the Ahwahnee. Six plants in the book, all told.", "done": ["Cedar, in flat sprays. Live oak, and look, both kinds of leaf on the one twig. These go on the wall."]}]
+outro = PackedStringArray("You asked about a Guardian. The State appointed Guardians from 1866 until the Valley went back to the federal government in 1906. I have every name: Clark, Hutchings, Dennison, and the rest.", "None of them left those sheets. None of them is lost, either. I can tell you where each one is buried.", "So it's somebody who was never on the State's list. Here, take some rations. I'll have another errand when you're ready.")
+reward_items = {"beef_jerky": 2}
