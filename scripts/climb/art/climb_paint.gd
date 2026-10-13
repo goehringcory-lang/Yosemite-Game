@@ -4,7 +4,7 @@ extends RefCounted
 ## rectangles, lines, ellipses, blobs, 1 px outlines and cheap hashed noise.
 ## All coordinates are whole pixels; everything clips to the image.
 
-const OUTLINE := Color("2a1f1a")
+const OUTLINE := Color("2a1b14")
 const BAYER := [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
 
 

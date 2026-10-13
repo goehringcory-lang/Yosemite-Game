@@ -78,13 +78,13 @@ func _add_fire_effects() -> void:
 ## style (shaded from the upper left, a dark rim): a ring of stones round
 ## burning logs with a flickering flame, a granite slab with mortar holes, or
 ## a sand basin with water.
-const RIM := Color("2a1f1a")
-const STONE := Color("8a8a90")
-const STONE_LIT := Color("b0b0b6")
-const STONE_DARK := Color("5a5a62")
-const LOG := Color("6a4024")
-const LOG_LIT := Color("8a5a34")
-const FLAME := [Color("f8e070"), Color("f8a030"), Color("e05a20")]
+const RIM := Color("2a1b14")
+const STONE := Color("93918f")
+const STONE_LIT := Color("bdb8ae")
+const STONE_DARK := Color("6a6a70")
+const LOG := Color("6b4829")
+const LOG_LIT := Color("92693d")
+const FLAME := [Color("f1cf6a"), Color("f7a64a"), Color("d9772a")]
 
 var _flicker := 0.0
 
@@ -121,10 +121,10 @@ func _draw() -> void:
 		"leaching":
 			# a sand basin by the river with water standing in it
 			_px(-9, -9, 18, 10, RIM)
-			_px(-8, -8, 16, 8, Color("d8c090"))
-			_px(-8, -8, 16, 1, Color("ecd8a8"))
-			_px(-5, -6, 10, 4, Color("4a8ac8"))
-			_px(-5, -6, 10, 1, Color("8ac0e8"))
+			_px(-8, -8, 16, 8, Color("d6bd88"))
+			_px(-8, -8, 16, 1, Color("d6bd88"))
+			_px(-5, -6, 10, 4, Color("3a86a8"))
+			_px(-5, -6, 10, 1, Color("63b3c6"))
 
 
 func _draw_campfire() -> void:
@@ -138,8 +138,8 @@ func _draw_campfire() -> void:
 	_px(-5, -3, 10, 1, LOG)
 	_px(-2, -7, 4, 6, RIM)
 	_px(-1, -6, 2, 4, LOG_LIT)
-	_px(-5, -4, 1, 2, Color("f08030"))
-	_px(4, -4, 1, 2, Color("f08030"))
+	_px(-5, -4, 1, 2, Color("d9772a"))
+	_px(4, -4, 1, 2, Color("d9772a"))
 	# the flame: three layers that lean and flicker
 	var frame := int(_flicker * 8.0) % 4
 	var lean: int = [0, 1, 0, -1][frame]

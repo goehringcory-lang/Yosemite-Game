@@ -36,12 +36,12 @@ const CRUX_GRACE := 0.35
 ## this is off the bottom of the picture, not half hidden behind the tray.
 const TRAY_TOP := 237.0
 
-const ROPE := Color("d8452e")
-const ROPE_LIT := Color("f07a5a")
-const ROPE_DARK := Color("7a2218")
-const STEEL := Color("c8ccd4")
-const STEEL_DARK := Color("6a6e78")
-const OUTLINE := Color("1e1620")
+const ROPE := Color("b3362b")
+const ROPE_LIT := Color("d9772a")
+const ROPE_DARK := Color("b3362b")
+const STEEL := Color("bdb8ae")
+const STEEL_DARK := Color("6a6a70")
+const OUTLINE := Color("15141c")
 
 var state: ClimbState
 var route: RouteData
@@ -124,6 +124,13 @@ func _ready() -> void:
 	_canvas.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_canvas.draw.connect(_draw_screen)
 	add_child(_canvas)
+	# The climbing art is painted in code; this keeps all of it on the palette.
+	var snap := ColorRect.new()
+	UiScale.fit(snap)
+	snap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	snap.material = ShaderMaterial.new()
+	snap.material.shader = load("res://assets/shaders/palette_snap.gdshader")
+	add_child(snap)
 	_start_minutes = GameClock.minutes
 	state.start_minutes = _start_minutes
 	_paint_scenery()
@@ -399,7 +406,7 @@ func _end_night() -> void:
 
 
 func _dust_color() -> Color:
-	return (_pal.get("lit", Color("e8e0d0")) if _pal.has("lit") else Color(0.82, 0.78, 0.7, 0.8))
+	return (_pal.get("lit", Color("e4ddcc")) if _pal.has("lit") else Color(0.741, 0.722, 0.682, 0.8))
 
 
 # ---------------------------------------------------------------- the crux
@@ -677,7 +684,7 @@ func _draw_clouds(height: float) -> void:
 	var tint := Color(1, 1, 1, 0.35 if _pal.night else 0.95)
 	var storm: bool = state.is_stormy()
 	if storm:
-		tint = Color(0.55, 0.57, 0.66, 1.0)
+		tint = Color(0.576, 0.569, 0.561, 1)
 	for i in _clouds.size():
 		var speed := 3.0 + i * 1.7
 		var x := fposmod(140.0 + i * 131.0 + _time * speed, SCREEN.x + 140.0) - 70.0
@@ -698,7 +705,7 @@ func _draw_layers(height: float) -> void:
 		for y in range(int(f.y0) + 2, int(f.y1), 3):
 			var pos := Vector2(f.x + 1 + int(sin(_time * 3.0 + y * 0.3) * 1.2), y + off)
 			if fmod(_time * 7.0 + y * 0.21, 3.0) < 1.0:
-				_canvas.draw_rect(Rect2(pos, Vector2(1, 2)), Color(1, 1, 1, 0.8))
+				_canvas.draw_rect(Rect2(pos, Vector2(1, 2)), Color(0.961, 0.933, 0.878, 0.8))
 
 
 ## Swifts darting past the wall.
@@ -710,7 +717,7 @@ func _draw_birds() -> void:
 		var x := SCREEN.x + 20 - t * (SCREEN.x * 0.62)
 		var y := 60.0 + i * 38.0 + sin(t * 9.0 + i) * 10.0
 		var flap := int(_time * 8.0 + i) % 2
-		var col := Color(0.1, 0.1, 0.14, 0.9)
+		var col := Color(0.082, 0.078, 0.11, 0.9)
 		_canvas.draw_rect(Rect2(x, y, 2, 1), col)
 		_canvas.draw_rect(Rect2(x - 2, y - flap, 2, 1), col)
 		_canvas.draw_rect(Rect2(x + 2, y - flap, 2, 1), col)
@@ -726,7 +733,7 @@ func _draw_wall() -> void:
 	# Below the picture: more wall, or the forest floor at the foot of pitch one.
 	var bottom := top + (0 if _roof else _wall_tex.get_height())
 	if bottom < SCREEN.y and not _roof:
-		var ground: Color = Color("2e3a2a") if state.pitch == 0 else (_pal.rock as Color).darkened(0.2)
+		var ground: Color = Color("1d3f2b") if state.pitch == 0 else (_pal.rock as Color).darkened(0.2)
 		_canvas.draw_rect(Rect2(0, bottom, SCREEN.x, SCREEN.y - bottom), ground)
 	# Fixed pieces glint until they're clipped.
 	for r: int in state.bolts:
@@ -737,24 +744,24 @@ func _draw_wall() -> void:
 		if state.bolt_kinds.get(r, "bolt") == "pin":
 			# An old iron piton, rusty, with a ring.
 			_canvas.draw_rect(Rect2(p + Vector2(-3, -1), Vector2(6, 3)), OUTLINE)
-			_canvas.draw_rect(Rect2(p + Vector2(-2, 0), Vector2(5, 1)), Color("a85a2a"))
-			_canvas.draw_rect(Rect2(p + Vector2(-2, 1), Vector2(5, 1)), Color("6a3a1a"))
-			_canvas.draw_rect(Rect2(p + Vector2(-3, -2), Vector2(2, 2)), Color("8a8e98"))
+			_canvas.draw_rect(Rect2(p + Vector2(-2, 0), Vector2(5, 1)), Color("a84a1c"))
+			_canvas.draw_rect(Rect2(p + Vector2(-2, 1), Vector2(5, 1)), Color("6b4829"))
+			_canvas.draw_rect(Rect2(p + Vector2(-3, -2), Vector2(2, 2)), Color("93918f"))
 		else:
 			_canvas.draw_rect(Rect2(p + Vector2(-2, -2), Vector2(5, 6)), OUTLINE)
 			_canvas.draw_rect(Rect2(p + Vector2(-1, -1), Vector2(3, 4)), STEEL)
 			_canvas.draw_rect(Rect2(p + Vector2(0, 0), Vector2(1, 2)), STEEL_DARK)
 		if fmod(_time * 1.3 + r * 0.37, 2.0) < 0.25:
-			_canvas.draw_rect(Rect2(p + Vector2(-2, -1), Vector2(5, 1)), Color(1, 1, 1, 0.9))
-			_canvas.draw_rect(Rect2(p + Vector2(0, -3), Vector2(1, 5)), Color(1, 1, 1, 0.9))
+			_canvas.draw_rect(Rect2(p + Vector2(-2, -1), Vector2(5, 1)), Color(0.961, 0.933, 0.878, 0.9))
+			_canvas.draw_rect(Rect2(p + Vector2(0, -3), Vector2(1, 5)), Color(0.961, 0.933, 0.878, 0.9))
 	# Fixed ropes hang beside the line where there are some.
 	for r in range(1, state.top_row):
 		for c: int in state.holds.get(r, {}):
 			if state.holds[r][c].get("fixed", false):
 				var p := _screen(r, c) + Vector2(-12, 0)
-				_canvas.draw_rect(Rect2(p, Vector2(2, L.ROW_H)), Color("e8c040"))
-				_canvas.draw_rect(Rect2(p, Vector2(1, L.ROW_H)), Color("f8e888"))
-				_canvas.draw_rect(Rect2(p + Vector2(0, 0), Vector2(2, 1)), Color("8a6a1a"))
+				_canvas.draw_rect(Rect2(p, Vector2(2, L.ROW_H)), Color("d8a63b"))
+				_canvas.draw_rect(Rect2(p, Vector2(1, L.ROW_H)), Color("f1cf6a"))
+				_canvas.draw_rect(Rect2(p + Vector2(0, 0), Vector2(2, 1)), Color("ad7a22"))
 
 
 func _bolt_pos(cell: Vector2i) -> Vector2:
@@ -858,7 +865,7 @@ func _draw_belayer() -> void:
 	var sz := tex.get_size()
 	var pos := Vector2(p.x - sz.x * 0.5, p.y - sz.y + 4 + (2 if mode == "anchor" else 0))
 	# A soft shadow on the ledge.
-	_canvas.draw_rect(Rect2(p + Vector2(-9, 0), Vector2(18, 2)), Color(0, 0, 0, 0.25))
+	_canvas.draw_rect(Rect2(p + Vector2(-9, 0), Vector2(18, 2)), Color(0.082, 0.078, 0.11, 0.25))
 	_canvas.draw_texture(tex, pos.round())
 	ClimbHud.speech(_canvas, p + Vector2(0, -26), _speech_text, belayer_look.get("name", ""), _speech_age)
 
@@ -883,7 +890,7 @@ func _draw_climber() -> void:
 	# Headlamp glow after dark.
 	if _pal.night:
 		for i in 6:
-			_canvas.draw_circle(torso + Vector2(0, -14), 52.0 - i * 8.0, Color(1.0, 0.92, 0.7, 0.045))
+			_canvas.draw_circle(torso + Vector2(0, -14), 52.0 - i * 8.0, Color(1, 0.831, 0.541, 0.045))
 
 
 ## The pose to draw now: a stance that eases into the next one while a move
@@ -1064,7 +1071,7 @@ func _cost_color(cost: int) -> Color:
 func _weather(delta: float) -> void:
 	if state.is_stormy() and _phase in [Phase.CLIMB, Phase.CRUX]:
 		for i in 5:
-			_fx.spawn(Vector2(randf_range(0, SCREEN.x + 60), -4), Vector2(-50, 240), 1.2, Color(0.8, 0.88, 1.0, 0.85), 1, 0.0, true)
+			_fx.spawn(Vector2(randf_range(0, SCREEN.x + 60), -4), Vector2(-50, 240), 1.2, Color(0.839, 0.945, 0.933, 0.85), 1, 0.0, true)
 		_next_lightning -= delta
 		if _next_lightning <= 0.0:
 			_lightning = 1.0
@@ -1073,11 +1080,11 @@ func _weather(delta: float) -> void:
 
 func _draw_atmosphere() -> void:
 	if state.is_stormy():
-		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.08, 0.1, 0.18, 0.36))
+		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.082, 0.078, 0.11, 0.36))
 	if _lightning > 0.0:
 		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(1, 1, 1, 0.5 * _lightning))
 	if _pal.night:
-		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.02, 0.03, 0.1, 0.18))
+		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.082, 0.078, 0.11, 0.18))
 
 
 func _draw_hud(height: float) -> void:

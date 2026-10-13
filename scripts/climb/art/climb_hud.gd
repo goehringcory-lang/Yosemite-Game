@@ -26,7 +26,7 @@ static func route_plate(ci: CanvasItem, state: ClimbState, feet: int) -> void:
 static func topo_bar(ci: CanvasItem, state: ClimbState, progress: float) -> void:
 	var bar := Rect2(SCREEN.x - 10, 28, 4, 126)
 	UI.glass(ci, Rect2(bar.position + Vector2(-3, -6), bar.size + Vector2(6, 12)), 0.5)
-	ci.draw_rect(bar, Color(0.12, 0.1, 0.14, 0.9))
+	ci.draw_rect(bar, Color(0.082, 0.078, 0.11, 0.9))
 	# a little summit on top, so it reads as the way to the top and not a
 	# second energy bar
 	var peak := Vector2(bar.position.x + bar.size.x / 2.0, bar.position.y - 13)
@@ -40,7 +40,7 @@ static func topo_bar(ci: CanvasItem, state: ClimbState, progress: float) -> void
 	var fill := bar.size.y * progress
 	ci.draw_rect(Rect2(bar.position.x, bar.end.y - fill, bar.size.x, fill), UI.GOLD)
 	ci.draw_rect(Rect2(bar.position.x - 3, bar.end.y - fill - 2, 10, 4), UI.WARN)
-	ci.draw_rect(Rect2(bar.position.x - 2, bar.end.y - fill - 1, 8, 2), Color("ffb090"))
+	ci.draw_rect(Rect2(bar.position.x - 2, bar.end.y - fill - 1, 8, 2), Color("d6bd88"))
 
 
 static func stamina(ci: CanvasItem, state: ClimbState, flash: float, shake: float) -> void:
@@ -180,7 +180,7 @@ static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, t
 			UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 54), "E: eat %s (+%d), then try again" % [data.food, data.energy], UI.GOOD_DARK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 		"timing":
 			ci.draw_rect(bar.grow(1), UI.WOOD_DARK)
-			ci.draw_rect(bar, Color("5a4a3a"))
+			ci.draw_rect(bar, Color("5e4a38"))
 			var win: float = data.window
 			var center: float = data.center
 			# The green is the move; its bright middle is a perfect one.
@@ -203,7 +203,7 @@ static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, t
 				var filled := i < done
 				var cell := Rect2(x, bar.position.y, (bar.size.x - 4) / need - 2, bar.size.y)
 				ci.draw_rect(cell.grow(1), UI.WOOD_DARK)
-				ci.draw_rect(cell, UI.GOOD if filled else Color("5a4a3a"))
+				ci.draw_rect(cell, UI.GOOD if filled else Color("5e4a38"))
 			var tleft: float = data.time_left
 			ci.draw_rect(Rect2(bar.position.x, bar.end.y + 4, bar.size.x * clampf(tleft / float(data.time_total), 0.0, 1.0), 2), UI.GOLD)
 			var prompt := "Tap Up quickly!" if kind == "mash" else ("Left!" if left_next else "Right!")
@@ -296,8 +296,8 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 		for layer: Dictionary in view.get("layers", []):
 			ci.draw_texture_rect_region(layer.tex, card, Rect2(0, layer.pad, 480, 270))
 	else:
-		ci.draw_rect(card, Color("5aa8e0"))
-	ci.draw_rect(Rect2(card.position, Vector2(card.size.x, 1)), Color(1, 1, 1, 0.3))
+		ci.draw_rect(card, Color("3a86a8"))
+	ci.draw_rect(Rect2(card.position, Vector2(card.size.x, 1)), Color(0.961, 0.933, 0.878, 0.3))
 	var sx := x + 124
 	for i in facts.size():
 		UI.ink(ci, Vector2(sx, band + 11 + i * 11), facts[i][0], facts[i][1], 10, fact_w + 8)
@@ -308,7 +308,7 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 	for i in n:
 		var yy := band + 19 + (n - 1 - i) * row_h
 		var diff := route.pitches[i]
-		ci.draw_rect(Rect2(tx, yy - 6, 6, 6), [Color("7ac24a"), Color("a8c24a"), Color("e8c040"), Color("e8863a"), Color("d8452e")][clampi(diff - 1, 0, 4)])
+		ci.draw_rect(Rect2(tx, yy - 6, 6, 6), [Color("84b04a"), Color("aecb62"), Color("d8a63b"), Color("d9772a"), Color("b3362b")][clampi(diff - 1, 0, 4)])
 		var nm: String = specs[i].get("name", "Pitch %d" % (i + 1)) if i < specs.size() else "Pitch %d" % (i + 1)
 		# One star for each crux point on the pitch.
 		var mark := ""
@@ -393,7 +393,7 @@ static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, 
 		elif state.falls > 1:
 			stars = 2
 		for i in 3:
-			UI.icon(ci, "star", Vector2(r.end.x - 70 + i * 16, y + 28), Color.WHITE if i < stars else Color(1, 1, 1, 0.22))
+			UI.icon(ci, "star", Vector2(r.end.x - 70 + i * 16, y + 28), Color.WHITE if i < stars else Color(0.961, 0.933, 0.878, 0.22))
 	var ly := y + 36 + rows.size() * 12 + 2.0
 	for i in quote.size():
 		UI.ink(ci, Vector2(x, ly + 6 + i * 11), quote[i], UI.WARN_DARK, 10)
@@ -405,7 +405,7 @@ static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, 
 
 
 static func pause_card(ci: CanvasItem, state: ClimbState) -> void:
-	ci.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.03, 0.03, 0.06, 0.5))
+	ci.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.082, 0.078, 0.11, 0.5))
 	var r := Rect2(SCREEN.x * 0.5 - 100, 90, 200, 74)
 	UI.panel(ci, r)
 	var verb := "Rappel down?" if state.has_device and state.pitch > 0 else "Lower off?"

@@ -52,8 +52,8 @@ const CREDITS := [
 ]
 const FONT_LICENSE := "res://assets/fonts/NotoSans-OFL.txt"
 const PIXEL_FONT_LICENSE := "res://assets/fonts/DotGothic16-OFL.txt"
-const HEADING := Color(1.0, 0.85, 0.5)
-const DIM := Color(1, 1, 1, 0.6)
+const HEADING := Color(1, 0.831, 0.541)
+const DIM := Color(0.961, 0.933, 0.878, 0.6)
 const PANEL_POS := Vector2(30, 16)
 const PANEL_SIZE := Vector2(420, 238)
 ## Pixels a second the Credits page drifts up by itself, and how fast Up/Down

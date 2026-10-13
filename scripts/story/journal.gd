@@ -17,11 +17,11 @@ const TAB_NAMES := ["Journal", "Quests", "Press Book", "Backpack"]
 const TAB_ACTIONS := ["journal", "quests", "press_book", "backpack"]
 const TAB_KEYS := ["J", "Q", "P", "B"]
 ## A plant that isn't in the press book yet shows as a shadow of itself.
-const UNFOUND := Color(0.16, 0.11, 0.07, 0.4)
-const HEADING := Color(1.0, 0.85, 0.5)
-const DIM := Color(1, 1, 1, 0.6)
+const UNFOUND := Color(0.165, 0.106, 0.078, 0.4)
+const HEADING := Color(1, 0.831, 0.541)
+const DIM := Color(0.961, 0.933, 0.878, 0.6)
 ## The thin line under each section heading.
-const RULE := Color(0.85, 0.7, 0.37, 0.45)
+const RULE := Color(0.945, 0.812, 0.416, 0.45)
 const PANEL_POS := Vector2(30, 16)
 const PANEL_SIZE := Vector2(420, 238)
 ## How wide a line of text on the page is, leaving room for the scroll bar.
@@ -34,10 +34,10 @@ const REPEAT_EVERY := 0.06
 ## A backpack slot: the icon's size on screen, and the slot's wood and its
 ## brighter look under the cursor (the same colors as the climbing toolbar).
 const ICON_SIZE := Vector2(32, 32)
-const SLOT_FILL := Color("c9a06a")
-const SLOT_EDGE := Color("3a2414")
-const SLOT_FILL_CHOSEN := Color("e2c08a")
-const SLOT_EDGE_CHOSEN := Color("fff4d6")
+const SLOT_FILL := Color("b0925f")
+const SLOT_EDGE := Color("47301f")
+const SLOT_FILL_CHOSEN := Color("d6bd88")
+const SLOT_EDGE_CHOSEN := Color("f5eee0")
 ## Lines of description the Backpack shows under the slots.
 const DETAIL_LINES := 2
 
@@ -423,7 +423,7 @@ func _guidebook() -> void:
 			chapter = route.guide_chapter
 			_line(chapter.to_upper(), DIM)
 		var star := " *" if entry.main else ""
-		_check_line(entry.ticked, "%s%s  %s" % [route.display_name, star, route.grade], Color(0.7, 1.0, 0.7) if entry.ticked else Color.WHITE)
+		_check_line(entry.ticked, "%s%s  %s" % [route.display_name, star, route.grade], Color(0.827, 0.894, 0.541) if entry.ticked else Color.WHITE)
 		if not entry.ticked:
 			var need: String = Guidebook.gear_text(route)
 			if entry.ready:
@@ -438,7 +438,7 @@ func _perks() -> void:
 	_heading("Perks: what the valley taught you (%d of %d)" % [Perks.earned.size(), Perks.PERKS.size()])
 	for perk: Dictionary in Perks.PERKS:
 		if Perks.has(perk.id):
-			_line("%s: %s" % [perk.name, perk.effect], Color(0.7, 1.0, 0.7))
+			_line("%s: %s" % [perk.name, perk.effect], Color(0.827, 0.894, 0.541))
 			_line("     " + perk.flavor + (" (Placeholder pending tribal review.)" if perk.get("review", false) else ""), DIM)
 		else:
 			var p := Perks.progress(perk)
@@ -522,7 +522,7 @@ func _quest_card(quest: QuestData, objective: String) -> void:
 	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var title := Label.new()
 	title.text = quest.title + ("  · from %s" % giver.display_name if giver else "")
-	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.5))
+	title.add_theme_color_override("font_color", Color(1, 0.831, 0.541))
 	words.add_child(title)
 	var step := Label.new()
 	step.text = objective
@@ -537,8 +537,8 @@ func _quest_card(quest: QuestData, objective: String) -> void:
 func _face(speaker: String, side: int) -> Control:
 	var frame := PanelContainer.new()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color("5a4634")
-	style.border_color = Color("c8a060")
+	style.bg_color = Color("5e4a38")
+	style.border_color = Color("b0925f")
 	style.set_border_width_all(1)
 	frame.add_theme_stylebox_override("panel", style)
 	frame.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
@@ -691,7 +691,7 @@ func _slot(item: Dictionary) -> PanelContainer:
 		count.size_flags_horizontal = Control.SIZE_SHRINK_END
 		count.size_flags_vertical = Control.SIZE_SHRINK_END
 		count.add_theme_font_size_override("font_size", 8)
-		count.add_theme_color_override("font_outline_color", Color("2a1f1a"))
+		count.add_theme_color_override("font_outline_color", Color("2a1b14"))
 		count.add_theme_constant_override("outline_size", 4)
 		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		slot.add_child(count)

@@ -7,26 +7,26 @@ extends RefCounted
 const FONT_PATH := "res://assets/fonts/NotoSans-Regular.ttf"
 
 # Wood frame, parchment, ink.
-const WOOD_DARK := Color("3a2414")
-const WOOD := Color("7a4a24")
-const WOOD_LIGHT := Color("b07a3a")
-const WOOD_HI := Color("d8a458")
+const WOOD_DARK := Color("47301f")
+const WOOD := Color("6b4829")
+const WOOD_LIGHT := Color("ad7a22")
+const WOOD_HI := Color("d8a63b")
 # The "paper" is the dark board of the game's panels, and "ink" is cream.
-const PAPER := Color("3a2a1e")
-const PAPER_SHADE := Color("4a3626")
-const PAPER_DARK := Color("24180f")
-const GILT := Color("c8a060")
-const INK := Color("f2e6c8")
-const INK_SOFT := Color("c8b090")
-const CREAM := Color("fff4d6")
-const SHADOW := Color(0.07, 0.04, 0.03, 0.9)
+const PAPER := Color("47301f")
+const PAPER_SHADE := Color("47301f")
+const PAPER_DARK := Color("2a1b14")
+const GILT := Color("b0925f")
+const INK := Color("e4ddcc")
+const INK_SOFT := Color("d6bd88")
+const CREAM := Color("f5eee0")
+const SHADOW := Color(0.082, 0.078, 0.11, 0.9)
 
-const GOOD := Color("7ac24a")
-const GOOD_DARK := Color("9ad06a")
-const WARN := Color("e8663a")
-const WARN_DARK := Color("f09060")
-const GOLD := Color("f6c040")
-const SKY_BLUE := Color("5aa8e0")
+const GOOD := Color("84b04a")
+const GOOD_DARK := Color("aecb62")
+const WARN := Color("d9772a")
+const WARN_DARK := Color("d9772a")
+const GOLD := Color("d8a63b")
+const SKY_BLUE := Color("3a86a8")
 
 static var _font: Font
 
@@ -120,7 +120,7 @@ static func text_width(s: String, size := 10) -> float:
 ## A wooden-framed parchment panel with a 1 px highlight and a drop shadow.
 static func panel(ci: CanvasItem, r: Rect2, paper := PAPER, frame := true) -> void:
 	r = Rect2(r.position.round(), r.size.round())
-	ci.draw_rect(Rect2(r.position + Vector2(2, 3), r.size), Color(0, 0, 0, 0.28))
+	ci.draw_rect(Rect2(r.position + Vector2(2, 3), r.size), Color(0.082, 0.078, 0.11, 0.28))
 	if frame:
 		ci.draw_rect(r, WOOD_DARK)
 		ci.draw_rect(r.grow(-1), WOOD)
@@ -156,12 +156,12 @@ static func panel(ci: CanvasItem, r: Rect2, paper := PAPER, frame := true) -> vo
 static func glass(ci: CanvasItem, r: Rect2, alpha := 0.62) -> void:
 	r = Rect2(r.position.round(), r.size.round())
 	ci.draw_rect(r, Color(0.07, 0.05, 0.1, alpha))
-	ci.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), Color(1, 1, 1, 0.2))
-	ci.draw_rect(Rect2(r.position + Vector2(0, r.size.y - 1), Vector2(r.size.x, 1)), Color(0, 0, 0, 0.35))
+	ci.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), Color(0.961, 0.933, 0.878, 0.2))
+	ci.draw_rect(Rect2(r.position + Vector2(0, r.size.y - 1), Vector2(r.size.x, 1)), Color(0.082, 0.078, 0.11, 0.35))
 
 
 ## A framed bar: [param frac] filled.
-static func bar(ci: CanvasItem, r: Rect2, frac: float, fill: Color, dark: Color, back := Color("2a1c14")) -> void:
+static func bar(ci: CanvasItem, r: Rect2, frac: float, fill: Color, dark: Color, back := Color("2a1b14")) -> void:
 	frac = clampf(frac, 0.0, 1.0)
 	ci.draw_rect(r.grow(1), WOOD_DARK)
 	ci.draw_rect(r, back)
@@ -176,7 +176,7 @@ static func bar(ci: CanvasItem, r: Rect2, frac: float, fill: Color, dark: Color,
 static func energy_bar(ci: CanvasItem, r: Rect2, frac: float, low: bool, flash: float) -> void:
 	frac = clampf(frac, 0.0, 1.0)
 	panel(ci, r.grow(3))
-	ci.draw_rect(r, Color("2a1c14"))
+	ci.draw_rect(r, Color("2a1b14"))
 	var h := roundf(r.size.y * frac)
 	var top := r.position.y + r.size.y - h
 	var col := WARN if low else GOOD
@@ -190,21 +190,21 @@ static func energy_bar(ci: CanvasItem, r: Rect2, frac: float, low: bool, flash: 
 		ci.draw_rect(Rect2(r.position.x + r.size.x - 2, top, 2, h), dark)
 	# Tick marks every quarter.
 	for i in range(1, 4):
-		ci.draw_rect(Rect2(r.position.x, r.position.y + r.size.y * i / 4.0, r.size.x, 1), Color(0, 0, 0, 0.35))
+		ci.draw_rect(Rect2(r.position.x, r.position.y + r.size.y * i / 4.0, r.size.x, 1), Color(0.082, 0.078, 0.11, 0.35))
 
 
 # ---------------------------------------------------------------- icons
 
 ## 12 x 12 gear icons. Letters index into ICON_COLORS.
 const ICON_COLORS := {
-	"k": Color("2a1f1a"), "w": Color("f4f0e6"), "g": Color("c4c8d2"), "G": Color("7a808e"),
-	"r": Color("d8452e"), "R": Color("8a2a1c"), "b": Color("3a78c8"), "B": Color("24488a"),
-	"y": Color("f0c040"), "Y": Color("b08420"), "o": Color("e88a30"), "n": Color("9a6a3a"),
-	"N": Color("5a3a1e"), "p": Color("8a5ab0"), "c": Color("6ad0e0"), "e": Color("6ab04a"),
-	"E": Color("3a7a2c"), "s": Color("f0c088"), "t": Color("d8d0b8"), "T": Color("a8a088"),
-	"m": Color("e060a0"), "d": Color("505868"),
-	"h": Color("fafcff"), "H": Color("f8a070"), "O": Color("a85a1c"), "l": Color("8ac0f0"),
-	"u": Color("f8e078"), "a": Color("f4c8a0"), "P": Color("5a3a80"), "q": Color("e8e0c8"),
+	"k": Color("2a1b14"), "w": Color("f5eee0"), "g": Color("bdb8ae"), "G": Color("6a6a70"),
+	"r": Color("b3362b"), "R": Color("b3362b"), "b": Color("6f5aa6"), "B": Color("6f5aa6"),
+	"y": Color("d8a63b"), "Y": Color("ad7a22"), "o": Color("d9772a"), "n": Color("92693d"),
+	"N": Color("6b4829"), "p": Color("6f5aa6"), "c": Color("63b3c6"), "e": Color("84b04a"),
+	"E": Color("5c8f3c"), "s": Color("d6bd88"), "t": Color("e4ddcc"), "T": Color("bdb8ae"),
+	"m": Color("d47a9b"), "d": Color("47464d"),
+	"h": Color("f5eee0"), "H": Color("f7a64a"), "O": Color("a84a1c"), "l": Color("63b3c6"),
+	"u": Color("f1cf6a"), "a": Color("d6bd88"), "P": Color("6f5aa6"), "q": Color("e4ddcc"),
 }
 
 ## Light from the upper left: highlights (w, h, l, u) top-left, shade (R, B, Y, O) bottom-right.
@@ -507,23 +507,23 @@ static func icon(ci: CanvasItem, id: String, pos: Vector2, tint := Color.WHITE) 
 ## An inventory slot (like Stardew's toolbar): framed square, icon, count.
 static func slot(ci: CanvasItem, pos: Vector2, id: String, count := -1, dim := false, selected := false) -> void:
 	var r := Rect2(pos.round(), Vector2(18, 18))
-	ci.draw_rect(r.grow(1), WOOD_DARK if not selected else Color("8a5a14"))
-	ci.draw_rect(r, Color("c9a06a") if not selected else Color("f2d27a"))
+	ci.draw_rect(r.grow(1), WOOD_DARK if not selected else Color("7e531c"))
+	ci.draw_rect(r, Color("b0925f") if not selected else Color("f1cf6a"))
 	# Inset: shadowed top and left, lit bottom and right.
-	var shade := Color("a5804a") if not selected else Color("d8aa48")
-	var lit := Color("e2c08a") if not selected else Color("fbe8a0")
+	var shade := Color("b0925f") if not selected else Color("d8a63b")
+	var lit := Color("d6bd88") if not selected else Color("ffd48a")
 	ci.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), shade)
 	ci.draw_rect(Rect2(r.position, Vector2(1, r.size.y)), shade)
 	ci.draw_rect(Rect2(r.position + Vector2(1, r.size.y - 1), Vector2(r.size.x - 1, 1)), lit)
 	ci.draw_rect(Rect2(r.position + Vector2(r.size.x - 1, 1), Vector2(1, r.size.y - 1)), lit)
 	# A soft shadow under the icon, then the icon.
 	if not dim and icon_texture(id) != null:
-		ci.draw_texture(icon_texture(id), pos.round() + Vector2(4, 4), Color(0.2, 0.1, 0.0, 0.25))
-	icon(ci, id, pos + Vector2(3, 3), Color(1, 1, 1, 0.35) if dim else Color.WHITE)
+		ci.draw_texture(icon_texture(id), pos.round() + Vector2(4, 4), Color(0.165, 0.106, 0.078, 0.25))
+	icon(ci, id, pos + Vector2(3, 3), Color(0.961, 0.933, 0.878, 0.35) if dim else Color.WHITE)
 	if count >= 0:
 		# the count on a small dark badge in the corner, inside the slot
 		var s := str(count)
 		var w := text_width(s, 8)
 		var badge := Rect2((pos + Vector2(18 - w - 2, 11)).round(), Vector2(w + 2, 8))
-		ci.draw_rect(badge, Color(0.1, 0.07, 0.05, 0.8))
+		ci.draw_rect(badge, Color(0.165, 0.106, 0.078, 0.8))
 		text(ci, pos + Vector2(17 - w, 18), s, CREAM if not dim else Color(CREAM, 0.5), 8)

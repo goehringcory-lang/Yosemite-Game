@@ -7,8 +7,8 @@ extends RefCounted
 const P := preload("res://scripts/climb/art/climb_paint.gd")
 const L := preload("res://scripts/climb/art/climb_layout.gd")
 
-const BARK := Color("5a3a24")
-const BARK_LIT := Color("8a5e3a")
+const BARK := Color("47301f")
+const BARK_LIT := Color("92693d")
 const PINE := ["1f4a2c", "2e6a3a", "428a48", "6aae5a"]
 const OAK := ["2a4a24", "3e6a2e", "5a8a3a", "84b04e"]
 const MANZ := ["3a5a30", "567a3e", "78a050", "a0c870"]
@@ -46,7 +46,7 @@ static func pine(im: Image, x: int, y: int, h: int, rng: RandomNumberGenerator, 
 			P.px(im, x - rw + 1, yy, g[2])
 			P.px(im, x + rw, yy, g[0])
 		if snowy:
-			P.rect(im, x - tw + 1, ty - 4, tw * 2 - 1, 1, Color("eef4fa"))
+			P.rect(im, x - tw + 1, ty - 4, tw * 2 - 1, 1, Color("d6f1ee"))
 	P.px(im, x, y - h, g[3])
 	P.px(im, x, y - h + 1, g[2])
 
@@ -99,13 +99,13 @@ static func shrub(im: Image, x: int, y: int, r: int, rng: RandomNumberGenerator,
 	P.px(im, x - r / 2, y - r, g[3])
 	if berries:
 		for i in 4:
-			P.px(im, x + rng.randi_range(-r, r), y - rng.randi_range(r / 2, r), _lit(Color("c8402e"), c))
+			P.px(im, x + rng.randi_range(-r, r), y - rng.randi_range(r / 2, r), _lit(Color("b3362b"), c))
 
 
 static func tuft(im: Image, x: int, y: int, rng: RandomNumberGenerator, c: Dictionary, dry := false) -> void:
-	var cols := [_lit(Color("4a7a3a"), c), _lit(Color("6a9a48"), c), _lit(Color("365a2c"), c)]
+	var cols := [_lit(Color("437f45"), c), _lit(Color("5c8f3c"), c), _lit(Color("2c5c37"), c)]
 	if dry:
-		cols = [_lit(Color("b8a060"), c), _lit(Color("d8c07a"), c), _lit(Color("8a7440"), c)]
+		cols = [_lit(Color("b0925f"), c), _lit(Color("d6bd88"), c), _lit(Color("92693d"), c)]
 	for i in rng.randi_range(5, 9):
 		var q := Vector2i(x + rng.randi_range(-3, 3), y - rng.randi_range(0, 3))
 		P.px(im, q.x, q.y, cols[rng.randi() % cols.size()])
@@ -115,7 +115,7 @@ static func tuft(im: Image, x: int, y: int, rng: RandomNumberGenerator, c: Dicti
 
 static func flowers(im: Image, x: int, y: int, rng: RandomNumberGenerator, c: Dictionary) -> void:
 	tuft(im, x, y, rng, c)
-	var cols := [Color("f06a4a"), Color("f0c040"), Color("c870d8"), Color("f4f0e6")]
+	var cols := [Color("d9772a"), Color("d8a63b"), Color("6f5aa6"), Color("f5eee0")]
 	for i in 4:
 		P.px(im, x + rng.randi_range(-3, 3), y - rng.randi_range(1, 4), _lit(cols[rng.randi() % cols.size()], c))
 
@@ -142,7 +142,7 @@ static func ledge_plant(im: Image, x: int, y: int, deco: Array, rng: RandomNumbe
 # people, boulders, tents, tables, cars, tripods, cairns. All of them take the
 # lighting dictionary [param c] (ClimbSky.palette or ClimbRock.colors).
 
-const DARK := Color("2a1f1a")
+const DARK := Color("2a1b14")
 const FONT := {
 	"A": "111101111101101", "B": "110101110101110", "C": "111100100100111", "D": "110101101101110",
 	"E": "111100110100111", "F": "111100110100100", "G": "111100101101111", "H": "101101111101101",
@@ -195,29 +195,29 @@ static func shadow(im: Image, x: float, y: float, rx: float, ry := 2.0, alpha :=
 ## A wooden board sign on two posts, with [param s] painted on it. The posts
 ## end at [param y].
 static func board_sign(im: Image, x: int, y: int, s: String, c: Dictionary, post := 12) -> void:
-	var wood := _lit(Color("8a5a2e"), c)
+	var wood := _lit(Color("7e531c"), c)
 	var w := text_width(s) + 6
 	var top := y - post - 9
-	P.rect(im, x + 2, y - post, 2, post, _lit(Color("5a3a1c"), c))
-	P.rect(im, x + w - 4, y - post, 2, post, _lit(Color("5a3a1c"), c))
+	P.rect(im, x + 2, y - post, 2, post, _lit(Color("6b4829"), c))
+	P.rect(im, x + w - 4, y - post, 2, post, _lit(Color("6b4829"), c))
 	P.rect(im, x - 1, top - 1, w + 2, 11, DARK)
 	P.rect(im, x, top, w, 9, wood)
 	P.rect(im, x, top, w, 1, wood.lightened(0.25))
 	P.rect(im, x, top + 8, w, 1, wood.darkened(0.3))
 	P.px(im, x + 1, top + 1, DARK)
 	P.px(im, x + w - 2, top + 1, DARK)
-	text(im, x + 3, top + 2, s, _lit(Color("f6e4b0"), c))
+	text(im, x + 3, top + 2, s, _lit(Color("d6bd88"), c))
 
 
 ## A little person, about 16 px tall, feet at ([param x], [param y]). Options:
 ## shirt, pants, hat (Color), skin, hair, dir (1 or -1), bino, wave, pack.
 static func person(im: Image, x: int, y: int, c: Dictionary, o := {}) -> void:
 	var t := P.make(16, 20)
-	var shirt := _lit(o.get("shirt", Color("c84a3a")), c)
-	var pants := _lit(o.get("pants", Color("4a5068")), c)
-	var skin := _lit(o.get("skin", Color("e0ac7e")), c)
-	var hair := _lit(o.get("hair", Color("4a3020")), c)
-	var boot := _lit(Color("3a2a22"), c)
+	var shirt := _lit(o.get("shirt", Color("b3362b")), c)
+	var pants := _lit(o.get("pants", Color("47464d")), c)
+	var skin := _lit(o.get("skin", Color("d6bd88")), c)
+	var hair := _lit(o.get("hair", Color("47301f")), c)
+	var boot := _lit(Color("2a1b14"), c)
 	P.rect(t, 6, 13, 2, 5, pants)
 	P.rect(t, 8, 13, 2, 5, pants.darkened(0.2))
 	P.rect(t, 6, 17, 2, 1, boot)
@@ -229,7 +229,7 @@ static func person(im: Image, x: int, y: int, c: Dictionary, o := {}) -> void:
 	P.rect(t, 6, 8, 4, 6, shirt)
 	P.rect(t, 6, 8, 1, 6, shirt.lightened(0.18))
 	P.rect(t, 9, 8, 1, 6, shirt.darkened(0.2))
-	P.rect(t, 6, 13, 4, 1, _lit(Color("5a3a22"), c))
+	P.rect(t, 6, 13, 4, 1, _lit(Color("6b4829"), c))
 	if o.get("wave", false):
 		P.rect(t, 10, 4, 1, 5, shirt.darkened(0.1))
 		P.rect(t, 10, 2, 1, 2, skin)
@@ -275,9 +275,9 @@ static func boulder(im: Image, x: int, y: int, rx: float, ry: float, rc: Diction
 
 ## Grass blades along a line, a few pixels tall.
 static func grass_row(im: Image, x0: int, x1: int, y: int, rng: RandomNumberGenerator, c: Dictionary, step := 3, dry := false, tall := 3) -> void:
-	var cols := [_lit(Color("3a6a30"), c), _lit(Color("5a8a3e"), c), _lit(Color("84b04e"), c)]
+	var cols := [_lit(Color("437f45"), c), _lit(Color("5c8f3c"), c), _lit(Color("84b04a"), c)]
 	if dry:
-		cols = [_lit(Color("8a7440"), c), _lit(Color("b8a060"), c), _lit(Color("e0cc82"), c)]
+		cols = [_lit(Color("92693d"), c), _lit(Color("b0925f"), c), _lit(Color("ffd48a"), c)]
 	for x in range(x0, x1, step):
 		var xx := x + rng.randi_range(0, step - 1)
 		var hh := rng.randi_range(1, tall)
@@ -306,7 +306,7 @@ static func fern(im: Image, x: int, y: int, r: int, c: Dictionary) -> void:
 ## A lodgepole pine: straight pale trunk, narrow ragged crown on the top half.
 static func lodgepole(im: Image, x: int, y: int, h: int, rng: RandomNumberGenerator, c: Dictionary) -> void:
 	var g := _ramp(PINE, c)
-	var bark := _lit(Color("a07a52"), c)
+	var bark := _lit(Color("92693d"), c)
 	P.rect(im, x - 1, y - h, 3, h, DARK)
 	P.rect(im, x - 1 + 1, y - h + 1, 1, h - 1, bark)
 	P.vline(im, x, y - h + 1, h - 1, bark)
@@ -330,7 +330,7 @@ static func lodgepole(im: Image, x: int, y: int, h: int, rng: RandomNumberGenera
 ## A wind-twisted whitebark pine or juniper: leaning trunk, flat tufted crown.
 static func gnarled(im: Image, x: int, y: int, h: int, rng: RandomNumberGenerator, c: Dictionary) -> void:
 	var g := _ramp(PINE, c)
-	var bark := _lit(Color("6a5240"), c)
+	var bark := _lit(Color("5e4a38"), c)
 	var lean := 1 if rng.randf() < 0.5 else -1
 	for k in h:
 		var xx := x + int(sin(k * 0.45) * 2.0) + lean * k / 6
@@ -348,7 +348,7 @@ static func gnarled(im: Image, x: int, y: int, h: int, rng: RandomNumberGenerato
 
 ## A fallen log.
 static func log_pile(im: Image, x: int, y: int, length: int, c: Dictionary) -> void:
-	var bark := _lit(Color("6a4428"), c)
+	var bark := _lit(Color("6b4829"), c)
 	shadow(im, x + length / 2.0, y + 1, length / 2.0 + 1, 1.5, 0.3)
 	P.rect(im, x - 1, y - 5, length + 2, 7, DARK)
 	P.rect(im, x, y - 4, length, 5, bark)
@@ -356,7 +356,7 @@ static func log_pile(im: Image, x: int, y: int, length: int, c: Dictionary) -> v
 	P.rect(im, x, y, length, 1, bark.darkened(0.3))
 	for k in range(3, length - 2, 5):
 		P.px(im, x + k, y - 2, bark.darkened(0.25))
-	P.ellipse(im, x, y - 2, 2.5, 3, _lit(Color("d8b080"), c))
+	P.ellipse(im, x, y - 2, 2.5, 3, _lit(Color("d6bd88"), c))
 	P.px(im, x, y - 2, bark)
 
 
@@ -375,8 +375,8 @@ static func cairn(im: Image, x: int, y: int, rc: Dictionary, h := 3) -> void:
 
 ## An ice axe stuck in the snow at ([param x], [param y]).
 static func ice_axe(im: Image, x: int, y: int, c: Dictionary, lean := 1) -> void:
-	var shaft := _lit(Color("d8452e"), c)
-	var steel := _lit(Color("d0d8e4"), c)
+	var shaft := _lit(Color("b3362b"), c)
+	var steel := _lit(Color("d6f1ee"), c)
 	for k in 17:
 		var sx := x + lean * k / 6
 		P.px(im, sx, y - k, DARK if k > 14 else shaft)
@@ -409,7 +409,7 @@ static func dome_tent(im: Image, x: int, y: int, w: int, h: int, color: Color, c
 		P.rect(im, x - half, yy, half * 2 + 1, 1, col)
 		P.rect(im, x - half, yy, mini(half, 3), 1, lit)
 		P.rect(im, x + half - 2, yy, 3, 1, dark)
-	var door := _lit(Color("2a2430"), c).lerp(Color("f0a850"), night_amount(c) * 0.9)
+	var door := _lit(Color("2b2a30"), c).lerp(Color("f7a64a"), night_amount(c) * 0.9)
 	P.rect(im, x - 3, y - h / 2, 7, h / 2 + 1, door)
 	P.rect(im, x - 3, y - h / 2, 7, 1, dark)
 	P.vline(im, x, y - h / 2, h / 2 + 1, dark)
@@ -431,13 +431,13 @@ static func ridge_tent(im: Image, x: int, y: int, w: int, h: int, color: Color, 
 		P.rect(im, x - half, yy, half * 2 + 1, 1, col)
 		P.px(im, x - half, yy, col.lightened(0.3))
 		P.rect(im, x + 1, yy, half, 1, dark)
-	P.rect(im, x - 2, y - h / 2, 5, h / 2 + 1, _lit(Color("2a2430"), c).lerp(Color("f0a850"), night_amount(c) * 0.9))
-	P.vline(im, x, y - h - 1, 2, _lit(Color("a07a4a"), c))
+	P.rect(im, x - 2, y - h / 2, 5, h / 2 + 1, _lit(Color("2b2a30"), c).lerp(Color("f7a64a"), night_amount(c) * 0.9))
+	P.vline(im, x, y - h - 1, 2, _lit(Color("92693d"), c))
 
 
 ## A picnic table with benches, [param w] wide.
 static func picnic_table(im: Image, x: int, y: int, w: int, c: Dictionary) -> void:
-	var wood := _lit(Color("9a6a38"), c)
+	var wood := _lit(Color("92693d"), c)
 	shadow(im, x + w / 2.0 + 2, y + 1, w / 2.0 + 3, 2.0, 0.3)
 	P.line(im, Vector2(x + 3, y), Vector2(x + 6, y - 7), DARK)
 	P.line(im, Vector2(x + 9, y), Vector2(x + 6, y - 7), DARK)
@@ -457,8 +457,8 @@ static func picnic_table(im: Image, x: int, y: int, w: int, c: Dictionary) -> vo
 static func car(im: Image, x: int, y: int, body: Color, c: Dictionary, dir := 1, wagon := false) -> void:
 	var t := P.make(40, 20)
 	var col := _lit(body, c)
-	var glass := _lit(Color("a8c8e0"), c)
-	var tire := _lit(Color("1c1a20"), c)
+	var glass := _lit(Color("9fd8d9"), c)
+	var tire := _lit(Color("15141c"), c)
 	P.rect(t, 2, 8, 34, 6, col)
 	P.rect(t, 2, 8, 34, 1, col.lightened(0.3))
 	P.rect(t, 2, 13, 34, 1, col.darkened(0.3))
@@ -473,12 +473,12 @@ static func car(im: Image, x: int, y: int, body: Color, c: Dictionary, dir := 1,
 		P.rect(t, 9, 3, 17, 1, col.lightened(0.3))
 		P.rect(t, 11, 4, 6, 4, glass)
 		P.rect(t, 18, 4, 6, 4, glass)
-	P.px(t, 35, 9, _lit(Color("fff0b0"), c))
-	P.px(t, 2, 9, _lit(Color("c83020"), c))
+	P.px(t, 35, 9, _lit(Color("ffd48a"), c))
+	P.px(t, 2, 9, _lit(Color("b3362b"), c))
 	P.rect(t, 6, 12, 7, 6, tire)
 	P.rect(t, 25, 12, 7, 6, tire)
-	P.rect(t, 8, 14, 3, 3, _lit(Color("a0a4b0"), c))
-	P.rect(t, 27, 14, 3, 3, _lit(Color("a0a4b0"), c))
+	P.rect(t, 8, 14, 3, 3, _lit(Color("93918f"), c))
+	P.rect(t, 27, 14, 3, 3, _lit(Color("93918f"), c))
 	P.outline(t, DARK)
 	if dir < 0:
 		t.flip_x()
@@ -488,17 +488,17 @@ static func car(im: Image, x: int, y: int, body: Color, c: Dictionary, dir := 1,
 
 ## A tripod with a spotting scope, [param dir] 1 aims up and to the right.
 static func tripod(im: Image, x: int, y: int, c: Dictionary, dir := 1) -> void:
-	var leg := _lit(Color("2a2a30"), c)
+	var leg := _lit(Color("2b2a30"), c)
 	P.line(im, Vector2(x, y - 8), Vector2(x - 3, y), leg)
 	P.line(im, Vector2(x, y - 8), Vector2(x + 3, y), leg)
 	P.line(im, Vector2(x, y - 8), Vector2(x, y), leg)
-	P.line(im, Vector2(x, y - 9), Vector2(x + 5 * dir, y - 14), _lit(Color("6a7080"), c), 2)
-	P.px(im, x + 5 * dir, y - 15, _lit(Color("c8d0dc"), c))
+	P.line(im, Vector2(x, y - 9), Vector2(x + 5 * dir, y - 14), _lit(Color("6a6a70"), c), 2)
+	P.px(im, x + 5 * dir, y - 15, _lit(Color("d6f1ee"), c))
 
 
 ## A string of bright pennants hung between two points.
 static func bunting(im: Image, a: Vector2, b: Vector2, c: Dictionary) -> void:
-	var cols := [Color("d8452e"), Color("e8c040"), Color("4a78c8"), Color("7ac24a")]
+	var cols := [Color("b3362b"), Color("d8a63b"), Color("6f5aa6"), Color("84b04a")]
 	var n := int(absf(b.x - a.x) / 5.0)
 	for i in n + 1:
 		var t := float(i) / maxf(n, 1)

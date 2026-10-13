@@ -75,6 +75,13 @@ CATEGORIES: dict[str, list[str]] = {
         "assets/sprites/portraits/*.png",
         "assets/sprites/gear/*.png",
     ],
+    # The park and area maps are looked at on the map screens; the relief
+    # map is data (heights in the red channel), so it is left as it is.
+    "maps": [
+        "assets/map/park_map.png",
+        "assets/map/areas/[!y]*.png",
+        "assets/map/areas/yosemite_valley.png",
+    ],
 }
 SKIP_SUFFIX = (".import",)
 

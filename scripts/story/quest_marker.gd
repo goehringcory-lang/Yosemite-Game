@@ -10,9 +10,9 @@ const CHECK := 0.5
 ## The bubble's height over their feet, and its bob.
 const HEIGHT := -68.0
 const BOB := 3.0
-const INK := Color("2a1f1a")
-const NEW := Color("e8a020")
-const DONE := Color("4a8ad0")
+const INK := Color("2a1b14")
+const NEW := Color("f7a64a")
+const DONE := Color("3a86a8")
 ## 3x5 glyphs (each cell drawn 2x2 px) for the bubble.
 const GLYPHS := {
 	"!": ["010", "010", "010", "000", "010"],

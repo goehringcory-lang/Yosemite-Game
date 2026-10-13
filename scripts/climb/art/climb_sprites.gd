@@ -28,19 +28,19 @@ const SIZE := Vector2i(56, 64)
 const ORIGIN := Vector2(28, 38)
 const BSIZE := Vector2i(48, 56)
 
-const SKIN := Color("f0c088")
-const SKIN_LIT := Color("f8d8a8")
-const SKIN_SHADE := Color("cf9660")
-const HAT := Color("8a5a2a")
-const SHIRT := Color("6a8a4a")
-const PANTS := Color("3a4466")
-const HARNESS := Color("f0b030")
-const CAM_COLORS := [Color("d8452e"), Color("e8a030"), Color("3a78c8"), Color("7a4ab0"), Color("3a9a58")]
-const STEEL := Color("c8ccd4")
-const STEEL_LIT := Color("f4f6fa")
-const STEEL_DARK := Color("6a7080")
-const ROPE_C := Color("d8452e")
-const ROPE_D := Color("8a2a1c")
+const SKIN := Color("d6bd88")
+const SKIN_LIT := Color("d6bd88")
+const SKIN_SHADE := Color("b0925f")
+const HAT := Color("7e531c")
+const SHIRT := Color("5c8f3c")
+const PANTS := Color("2d3050")
+const HARNESS := Color("d8a63b")
+const CAM_COLORS := [Color("b3362b"), Color("f7a64a"), Color("6f5aa6"), Color("6f5aa6"), Color("437f45")]
+const STEEL := Color("bdb8ae")
+const STEEL_LIT := Color("f5eee0")
+const STEEL_DARK := Color("6a6a70")
+const ROPE_C := Color("b3362b")
+const ROPE_D := Color("b3362b")
 
 static var _cache: Dictionary = {}
 
@@ -200,7 +200,7 @@ static func _outline(im: Image) -> void:
 				continue
 			# The opaque neighbor this pixel borders, if any (right and below
 			# count as lit-side neighbors: the outline is on our upper left).
-			var src := Color(0, 0, 0, 0)
+			var src := Color(0.082, 0.078, 0.11, 0)
 			var lit_side := false
 			for d in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
 				var n: Vector2i = Vector2i(x, y) + d
@@ -258,9 +258,9 @@ static func _paint_climber(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 	var lean: float = pose.get("lean", 0)
 	var torso := o + Vector2(lean, 0)
 	var shoes_red := int(kit.get("climbing_shoes", 0)) > 0
-	var shoe_col := Color("d8502e") if shoes_red else Color("8a5a32")
-	var shoe_dark := Color("8a2a1c") if shoes_red else Color("5a3a1e")
-	var sole := Color("2a2a30") if shoes_red else Color("3a2a1e")
+	var shoe_col := Color("b3362b") if shoes_red else Color("92693d")
+	var shoe_dark := Color("b3362b") if shoes_red else Color("6b4829")
+	var sole := Color("2b2a30") if shoes_red else Color("47301f")
 	var snow: bool = flags.get("snow", false)
 	var crampons: bool = int(kit.get("crampons", 0)) > 0 and snow
 	var axe: bool = int(kit.get("ice_axe", 0)) > 0 and snow
@@ -320,15 +320,15 @@ static func _paint_climber(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 
 static func _portaledge_roll(im: Image, tx: int, ty: int) -> void:
 	# A rolled portaledge strapped across the upper back, tubes poking out.
-	P.rect(im, tx - 7, ty - 8, 14, 6, Color("a85a1c"))
-	P.rect(im, tx - 7, ty - 8, 14, 4, Color("e88a30"))
-	P.hline(im, tx - 7, ty - 8, 14, Color("f8b868"))
-	P.rect(im, tx + 4, ty - 4, 3, 3, Color("8a4814"))
+	P.rect(im, tx - 7, ty - 8, 14, 6, Color("a84a1c"))
+	P.rect(im, tx - 7, ty - 8, 14, 4, Color("d9772a"))
+	P.hline(im, tx - 7, ty - 8, 14, Color("f7a64a"))
+	P.rect(im, tx + 4, ty - 4, 3, 3, Color("7e531c"))
 	P.rect(im, tx - 9, ty - 5, 2, 3, STEEL)
 	P.px(im, tx - 9, ty - 5, STEEL_LIT)
 	P.rect(im, tx + 7, ty - 5, 2, 3, STEEL_DARK)
-	P.vline(im, tx - 3, ty - 6, 5, Color("3a2a1e"))
-	P.vline(im, tx + 2, ty - 6, 5, Color("3a2a1e"))
+	P.vline(im, tx - 3, ty - 6, 5, Color("47301f"))
+	P.vline(im, tx + 2, ty - 6, 5, Color("47301f"))
 
 
 static func _torso(im: Image, tx: int, ty: int, harness_on: bool) -> void:
@@ -351,7 +351,7 @@ static func _torso(im: Image, tx: int, ty: int, harness_on: bool) -> void:
 	P.rect(im, tx + 3, ty + 6, 2, 3, PANTS.darkened(0.2))
 	P.vline(im, tx, ty + 6, 3, PANTS.darkened(0.25))
 	# Waist belt.
-	var belt := HARNESS if harness_on else Color("7a5a3a")
+	var belt := HARNESS if harness_on else Color("86694b")
 	P.rect(im, tx - 6, ty + 3, 12, 3, belt)
 	P.hline(im, tx - 6, ty + 3, 12, belt.lightened(0.35))
 	P.hline(im, tx - 6, ty + 5, 12, belt.darkened(0.3))
@@ -364,22 +364,22 @@ static func _torso(im: Image, tx: int, ty: int, harness_on: bool) -> void:
 		P.vline(im, tx + 3, ty + 6, 4, HARNESS.darkened(0.3))
 		# Gear loops.
 		for gx in [-6, -4, 3, 5]:
-			P.px(im, tx + gx, ty + 6, Color("3a3a40"))
+			P.px(im, tx + gx, ty + 6, Color("47464d"))
 	else:
-		P.px(im, tx, ty + 4, Color("c8a050"))
+		P.px(im, tx, ty + 4, Color("d8a63b"))
 
 
 static func _chalk_bag(im: Image, tx: int, ty: int) -> void:
-	var blue := Color("2f6ab8")
+	var blue := Color("6f5aa6")
 	P.rect(im, tx - 2, ty - 1, 5, 6, blue)
-	P.rect(im, tx - 2, ty - 1, 2, 6, Color("4a8ae0"))
-	P.rect(im, tx + 2, ty + 1, 1, 4, Color("1f4a88"))
-	P.hline(im, tx - 2, ty + 4, 5, Color("1f4a88"))
+	P.rect(im, tx - 2, ty - 1, 2, 6, Color("6f5aa6"))
+	P.rect(im, tx + 2, ty + 1, 1, 4, Color("235679"))
+	P.hline(im, tx - 2, ty + 4, 5, Color("235679"))
 	# Rolled white rim, drawstring and a dab of chalk.
-	P.rect(im, tx - 3, ty - 2, 7, 2, Color("f4f0e6"))
-	P.hline(im, tx - 3, ty - 1, 7, Color("c8c0b0"))
-	P.px(im, tx - 1, ty + 1, Color("f4f0e6"))
-	P.px(im, tx, ty + 2, Color("f4f0e6"))
+	P.rect(im, tx - 3, ty - 2, 7, 2, Color("f5eee0"))
+	P.hline(im, tx - 3, ty - 1, 7, Color("bdb8ae"))
+	P.px(im, tx - 1, ty + 1, Color("f5eee0"))
+	P.px(im, tx, ty + 2, Color("f5eee0"))
 
 
 static func _rack(im: Image, tx: int, ty: int, cams: int, draws: int) -> void:
@@ -398,7 +398,7 @@ static func _rack(im: Image, tx: int, ty: int, cams: int, draws: int) -> void:
 		var y := ty + 4 + (i / 2) * 3
 		P.rect(im, x, y, 1, 3, STEEL)
 		P.px(im, x, y, STEEL_LIT)
-		P.rect(im, x + 1, y + 1, 1, 3, Color("3a78c8") if i % 2 == 0 else Color("e8a030"))
+		P.rect(im, x + 1, y + 1, 1, 3, Color("6f5aa6") if i % 2 == 0 else Color("f7a64a"))
 		P.px(im, x, y + 3, STEEL_DARK)
 
 
@@ -406,10 +406,10 @@ static func _aiders(im: Image, tx: int, ty: int) -> void:
 	# Two aider ladders (blue webbing, cream steps) hanging from the belt.
 	for i in 2:
 		var x := tx + 5 + i * 2
-		P.rect(im, x, ty + 5, 1, 12 + i * 3, Color("3a78c8"))
-		P.vline(im, x, ty + 5, 12 + i * 3, Color("3a78c8"))
+		P.rect(im, x, ty + 5, 1, 12 + i * 3, Color("6f5aa6"))
+		P.vline(im, x, ty + 5, 12 + i * 3, Color("6f5aa6"))
 		for k in 4:
-			P.hline(im, x - 1, ty + 8 + k * 3, 3, Color("f4f0e6"))
+			P.hline(im, x - 1, ty + 8 + k * 3, 3, Color("f5eee0"))
 		P.px(im, x, ty + 5, STEEL)
 
 
@@ -435,7 +435,7 @@ static func _draw_leg(im: Image, hip: Vector2, joints: Array[Vector2], shoe: Col
 	P.rect(im, fx + 2, fy, 1, 3, shoe_dark)
 	P.rect(im, fx - 3, fy + 2, 6, 1, shoe_dark)
 	P.rect(im, fx - 3, fy + 3, 6, 1, sole)
-	P.px(im, fx - 1, fy + 1, Color("f4f0e6"))
+	P.px(im, fx - 1, fy + 1, Color("f5eee0"))
 	if crampons:
 		for i in 3:
 			P.px(im, fx - 3 + i * 2, fy + 4, STEEL)
@@ -470,28 +470,28 @@ static func _draw_arm(im: Image, shoulder: Vector2, joints: Array[Vector2], chal
 	P.px(im, hx + 1, hy - 1, SKIN_SHADE)
 	P.px(im, hx + 1, hy - 3, SKIN_SHADE)
 	if chalk:
-		P.rect(im, hx - 2, hy - 3, 4, 2, Color("f4f0e6"))
-		P.px(im, hx + 1, hy - 3, Color("d8d0c0"))
-		P.px(im, hx - 3, hy - 2, Color("f4f0e6"))
+		P.rect(im, hx - 2, hy - 3, 4, 2, Color("f5eee0"))
+		P.px(im, hx + 1, hy - 3, Color("e4ddcc"))
+		P.px(im, hx - 3, hy - 2, Color("f5eee0"))
 
 
 static func _draw_axe(im: Image, hand: Vector2) -> void:
 	var hx := roundi(hand.x)
 	var hy := roundi(hand.y)
-	P.vline(im, hx, hy - 6, 15, Color("9a6a3a"))
-	P.vline(im, hx + 1, hy - 6, 15, Color("6a4a2a"))
+	P.vline(im, hx, hy - 6, 15, Color("92693d"))
+	P.vline(im, hx + 1, hy - 6, 15, Color("6b4829"))
 	P.rect(im, hx - 4, hy - 8, 10, 2, STEEL)
 	P.hline(im, hx - 4, hy - 8, 10, STEEL_LIT)
 	P.rect(im, hx - 5, hy - 7, 2, 3, STEEL_DARK)
 	P.rect(im, hx + 5, hy - 7, 2, 2, STEEL_DARK)
 	P.rect(im, hx, hy + 8, 2, 2, STEEL)
 	# Wrist leash.
-	P.px(im, hx - 1, hy + 1, Color("e8a030"))
+	P.px(im, hx - 1, hy + 1, Color("f7a64a"))
 
 
 ## The head, from behind: hair, ears and a broad-brimmed hat with a band.
 static func _head(im: Image, hx: int, hy: int, tilt: float) -> void:
-	var hair := Color("6a4428")
+	var hair := Color("6b4829")
 	# Neck.
 	P.rect(im, hx - 2, hy + 4, 4, 3, SKIN_SHADE)
 	P.px(im, hx - 2, hy + 4, SKIN)
@@ -510,8 +510,8 @@ static func _head(im: Image, hx: int, hy: int, tilt: float) -> void:
 	P.ellipse(im, hx - 0.5, hy - 3, 5.8, 1.8, HAT)
 	P.hline(im, hx - 5, hy - 3, 4, HAT.lightened(0.18))
 	P.shaded_ellipse(im, hx, hy - 4, 3.8, 3.2, HAT, HAT.lightened(0.3), HAT.darkened(0.22))
-	P.hline(im, hx - 4, hy - 3, 8, Color("c8a050"))
-	P.hline(im, hx + 1, hy - 3, 3, Color("a07830"))
+	P.hline(im, hx - 4, hy - 3, 8, Color("d8a63b"))
+	P.hline(im, hx + 1, hy - 3, 3, Color("ad7a22"))
 	P.hline(im, hx - 3, hy - 2, 7, HAT.darkened(0.45))
 
 
@@ -524,8 +524,8 @@ static func _paint_chimney(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 	var im := P.make(SIZE.x, SIZE.y)
 	var o := ORIGIN
 	var shoes_red := int(kit.get("climbing_shoes", 0)) > 0
-	var shoe_col := Color("d8502e") if shoes_red else Color("8a5a32")
-	var shoe_dark := Color("8a2a1c") if shoes_red else Color("5a3a1e")
+	var shoe_col := Color("b3362b") if shoes_red else Color("92693d")
+	var shoe_dark := Color("b3362b") if shoes_red else Color("6b4829")
 	var harness_on: bool = int(kit.get("harness", 0)) > 0 or flags.get("always_harness", false)
 	var fr: Vector2 = pose.get("fr", Vector2(18, 10))
 	var fl: Vector2 = pose.get("fl", Vector2(18, 18))
@@ -546,7 +546,7 @@ static func _paint_chimney(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 		# Sole flat against the far wall: toe up, heel down.
 		P.rect(im, fx - 3, fy - 3, 4, 6, shoe_col)
 		P.rect(im, fx - 3, fy - 3, 4, 1, shoe_col.lightened(0.3))
-		P.rect(im, fx, fy - 3, 1, 6, Color("2a2a30"))
+		P.rect(im, fx, fy - 3, 1, 6, Color("2b2a30"))
 		P.rect(im, fx - 3, fy + 2, 3, 1, shoe_dark)
 	# Torso, upright against the wall, shirt lit from the left.
 	var s := SHIRT
@@ -555,9 +555,9 @@ static func _paint_chimney(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 	P.rect(im, bx + 2, ty - 8, 2, 14, s.lightened(0.15))
 	P.rect(im, bx + 6, ty - 6, 3, 13, s.darkened(0.18))
 	P.hline(im, bx, ty - 8, 9, s.lightened(0.3))
-	P.rect(im, bx, ty + 2, 9, 3, HARNESS if harness_on else Color("7a5a3a"))
-	P.hline(im, bx, ty + 2, 9, HARNESS.lightened(0.3) if harness_on else Color("a07a50"))
-	P.rect(im, bx + 4, ty + 2, 3, 3, STEEL if harness_on else Color("c8a050"))
+	P.rect(im, bx, ty + 2, 9, 3, HARNESS if harness_on else Color("86694b"))
+	P.hline(im, bx, ty + 2, 9, HARNESS.lightened(0.3) if harness_on else Color("92693d"))
+	P.rect(im, bx + 4, ty + 2, 3, 3, STEEL if harness_on else Color("d8a63b"))
 	P.rect(im, bx, ty + 5, 9, 3, PANTS)
 	# Rack on the belt in front.
 	var cams := mini(int(kit.get("cam", 0)), 4)
@@ -566,8 +566,8 @@ static func _paint_chimney(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 		P.rect(im, bx + 9, ty + 2 + i * 2, 2, 2, c)
 		P.px(im, bx + 9, ty + 2 + i * 2, c.lightened(0.45))
 	if int(kit.get("chalk_bag", 0)) > 0:
-		P.rect(im, bx - 3, ty + 1, 3, 5, Color("2f6ab8"))
-		P.rect(im, bx - 3, ty, 3, 1, Color("f4f0e6"))
+		P.rect(im, bx - 3, ty + 1, 3, 5, Color("6f5aa6"))
+		P.rect(im, bx - 3, ty, 3, 1, Color("f5eee0"))
 	# Arms: both hands pressed flat on the near wall beside the hips.
 	for k in 2:
 		var sh := Vector2(bx + 3 + k, ty - 5)
@@ -580,13 +580,13 @@ static func _paint_chimney(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 	P.rect(im, hx - 1, hy + 4, 4, 3, SKIN_SHADE)
 	P.shaded_ellipse(im, hx + 1, hy, 4.8, 4.8, SKIN, SKIN_LIT, SKIN_SHADE)
 	P.rect(im, hx + 5, hy + 1, 1, 2, SKIN)
-	P.px(im, hx + 3, hy, Color("2a1f1a"))
-	P.rect(im, hx - 3, hy - 2, 5, 7, Color("6a4428"))
-	P.rect(im, hx - 3, hy - 2, 2, 7, Color("8a5e3a"))
+	P.px(im, hx + 3, hy, Color("2a1b14"))
+	P.rect(im, hx - 3, hy - 2, 5, 7, Color("6b4829"))
+	P.rect(im, hx - 3, hy - 2, 2, 7, Color("92693d"))
 	P.ellipse(im, hx + 1, hy - 3, 6.8, 2.2, HAT.darkened(0.2))
 	P.ellipse(im, hx + 1, hy - 4, 6.0, 1.7, HAT)
 	P.shaded_ellipse(im, hx + 1, hy - 5, 3.6, 3.0, HAT, HAT.lightened(0.3), HAT.darkened(0.22))
-	P.hline(im, hx - 2, hy - 3, 7, Color("c8a050"))
+	P.hline(im, hx - 2, hy - 3, 7, Color("d8a63b"))
 	_outline(im)
 	if int(pose.get("side", -1)) > 0:
 		im.flip_x()
@@ -628,10 +628,10 @@ static func _paint_belayer(look: Dictionary, mode: String, frame: int) -> Image:
 		hop = 3
 	var bob := 1 if (mode == "belay" or mode == "look_up") and frame == 2 else 0
 	var knickers := id in ["dick_leonard", "jules_eichorn"]
-	var boot := Color("5a3a24")
-	var boot_dark := Color("3a2616")
+	var boot := Color("47301f")
+	var boot_dark := Color("47301f")
 	if id == "john_muir":
-		boot = Color("4a3020")
+		boot = Color("47301f")
 	var sock := Color(look.get("socks", "8a6a4a"))
 	# ---- legs
 	if seated:
@@ -643,10 +643,10 @@ static func _paint_belayer(look: Dictionary, mode: String, frame: int) -> Image:
 		P.rect(im, cx - 14, base - 5, 5, 4, sock if knickers else lc)
 		P.rect(im, cx - 18, base - 7, 5, 7, boot)
 		P.rect(im, cx - 18, base - 7, 5, 1, boot.lightened(0.25))
-		P.rect(im, cx - 18, base - 1, 6, 2, Color("2a2a30"))
+		P.rect(im, cx - 18, base - 1, 6, 2, Color("2b2a30"))
 		if knickers:
-			P.px(im, cx - 16, base - 3, Color("8a8e98"))
-			P.px(im, cx - 14, base - 1, Color("8a8e98"))
+			P.px(im, cx - 16, base - 3, Color("93918f"))
+			P.px(im, cx - 14, base - 1, Color("93918f"))
 	else:
 		var spread := 6
 		var lt := base - 14 - hop
@@ -669,11 +669,11 @@ static func _paint_belayer(look: Dictionary, mode: String, frame: int) -> Image:
 			var by := base - 3 - hop
 			P.rect(im, lx - 1, by, lw + 2, 4, boot if k == 0 else boot.darkened(0.12))
 			P.hline(im, lx - 1, by, lw + 2, boot.lightened(0.28))
-			P.rect(im, lx - 1, by + 3, lw + 2, 1, Color("2a2a30"))
+			P.rect(im, lx - 1, by + 3, lw + 2, 1, Color("2b2a30"))
 			if knickers:
-				P.px(im, lx, by + 3, Color("9a9ea8"))
-				P.px(im, lx + 2, by + 3, Color("9a9ea8"))
-				P.px(im, lx + 4, by + 3, Color("9a9ea8"))
+				P.px(im, lx, by + 3, Color("93918f"))
+				P.px(im, lx + 2, by + 3, Color("93918f"))
+				P.px(im, lx + 4, by + 3, Color("93918f"))
 	# ---- torso
 	var tw := 12
 	var tx := cx - 6
@@ -706,8 +706,8 @@ static func _paint_belayer(look: Dictionary, mode: String, frame: int) -> Image:
 	var by2 := ty + th - 4
 	if coat:
 		by2 = ty + th - 5
-		P.rect(im, tx - 1, by2, tw + 2, 2, Color("b08a50"))
-		P.hline(im, tx - 1, by2, tw + 2, Color("d8b070"))
+		P.rect(im, tx - 1, by2, tw + 2, 2, Color("b0925f"))
+		P.hline(im, tx - 1, by2, tw + 2, Color("d6bd88"))
 		P.rect(im, tx + tw / 2 - 2, by2 + 1, 4, 3, ROPE_C)
 		P.rect(im, tx + tw / 2 - 2, by2 + 3, 4, 1, ROPE_D)
 	else:
@@ -719,11 +719,11 @@ static func _paint_belayer(look: Dictionary, mode: String, frame: int) -> Image:
 		# Gear loops with a couple of carabiners / a hammer for the drillers.
 		P.px(im, tx + tw - 5, by2 + 3, STEEL)
 		P.px(im, tx + tw - 5, by2 + 4, STEEL_DARK)
-		P.px(im, tx + 3, by2 + 3, Color("d8452e") if id == "royal_robbins" else STEEL)
+		P.px(im, tx + 3, by2 + 3, Color("b3362b") if id == "royal_robbins" else STEEL)
 		P.px(im, tx + 3, by2 + 4, STEEL_DARK)
 	if id == "george_anderson":
 		# Drill hammer and a bit holder hanging at the hip.
-		P.vline(im, tx + tw + 1, by2 + 1, 8, Color("7a5a30"))
+		P.vline(im, tx + tw + 1, by2 + 1, 8, Color("92693d"))
 		P.rect(im, tx + tw - 1, by2 + 8, 5, 3, STEEL_DARK)
 		P.rect(im, tx + tw - 1, by2 + 8, 5, 1, STEEL)
 	if id == "john_salathe" and not seated:
@@ -733,22 +733,22 @@ static func _paint_belayer(look: Dictionary, mode: String, frame: int) -> Image:
 		P.rect(im, tx + tw - 4, by2 + 3, 3, 10, ap.darkened(0.2))
 		P.hline(im, tx + 1, by2 + 12, tw - 2, ap.darkened(0.35))
 	if id == "john_salathe":
-		P.vline(im, tx + tw + 1, by2 + 1, 6, Color("5a3a22"))
-		P.rect(im, tx + tw - 1, by2 + 6, 5, 3, Color("4a4a50"))
-		P.rect(im, tx + tw - 1, by2 + 6, 5, 1, Color("8a8e98"))
+		P.vline(im, tx + tw + 1, by2 + 1, 6, Color("6b4829"))
+		P.rect(im, tx + tw - 1, by2 + 6, 5, 3, Color("47464d"))
+		P.rect(im, tx + tw - 1, by2 + 6, 5, 1, Color("93918f"))
 	if id == "warren_harding":
 		# A jug of wine on the back of the belt.
-		P.rect(im, tx - 4, by2 + 1, 4, 6, Color("2a4a2a"))
-		P.rect(im, tx - 4, by2 + 1, 1, 6, Color("4a7a4a"))
-		P.rect(im, tx - 3, by2 - 1, 2, 2, Color("2a4a2a"))
-		P.px(im, tx - 3, by2 - 1, Color("c8a050"))
+		P.rect(im, tx - 4, by2 + 1, 4, 6, Color("1d3f2b"))
+		P.rect(im, tx - 4, by2 + 1, 1, 6, Color("437f45"))
+		P.rect(im, tx - 3, by2 - 1, 2, 2, Color("1d3f2b"))
+		P.px(im, tx - 3, by2 - 1, Color("d8a63b"))
 	# ---- anchor: a sling from the belt to a bolt hanger on the wall above
 	if mode == "anchor":
 		var bx := tx + tw + 5
 		var top_y := ty - 9
-		P.line(im, Vector2(tx + tw - 2, by2 + 1), Vector2(bx, top_y + 3), Color("1f4a88"), 3)
-		P.line(im, Vector2(tx + tw - 2, by2 + 1), Vector2(bx, top_y + 3), Color("3a78c8"), 2)
-		P.px(im, bx, top_y + 4, Color("8ac0f0"))
+		P.line(im, Vector2(tx + tw - 2, by2 + 1), Vector2(bx, top_y + 3), Color("235679"), 3)
+		P.line(im, Vector2(tx + tw - 2, by2 + 1), Vector2(bx, top_y + 3), Color("6f5aa6"), 2)
+		P.px(im, bx, top_y + 4, Color("63b3c6"))
 		P.rect(im, bx - 2, top_y - 2, 5, 4, STEEL)
 		P.hline(im, bx - 2, top_y - 2, 5, STEEL_LIT)
 		P.px(im, bx, top_y - 1, STEEL_DARK)
@@ -773,7 +773,7 @@ static func _outfit(im: Image, id: String, look: Dictionary, tx: int, ty: int, t
 		"dick_leonard", "jules_eichorn":
 			# A wool sweater: ribbed hem and cuffs, a band of pattern across the chest,
 			# a rolled turtleneck.
-			var pat := Color("e8dcc0") if id == "dick_leonard" else Color("5a4a3a")
+			var pat := Color("e4ddcc") if id == "dick_leonard" else Color("5e4a38")
 			P.hline(im, tx, ty + 4, tw, pat)
 			P.hline(im, tx, ty + 6, tw, pat)
 			for x in range(tx + 1, tx + tw - 1, 2):
@@ -788,11 +788,11 @@ static func _outfit(im: Image, id: String, look: Dictionary, tx: int, ty: int, t
 			P.rect(im, tx + tw - 5, ty + 3, 3, th - 3, ap.darkened(0.2))
 			P.vline(im, tx + 3, ty, 4, ap.darkened(0.1))
 			P.vline(im, tx + tw - 4, ty, 4, ap.darkened(0.2))
-			P.px(im, tx + 5, ty + 6, Color("2a1f1a"))
+			P.px(im, tx + 5, ty + 6, Color("2a1b14"))
 			P.hline(im, tx + 2, ty + 3, tw - 4, ap.darkened(0.3))
 		"warren_harding":
 			# Red-and-black plaid shirt.
-			var dk := Color("2a1a18")
+			var dk := Color("2a1b14")
 			for x in range(tx + 1, tx + tw, 3):
 				P.vline(im, x, ty + 1, th - 3, dk)
 			for y in range(ty + 2, ty + th - 2, 4):
@@ -807,7 +807,7 @@ static func _outfit(im: Image, id: String, look: Dictionary, tx: int, ty: int, t
 			# A long wool coat: lapel line, big buttons, a darker hem.
 			P.vline(im, tx + tw / 2 - 1, ty + 1, th - 3, top.darkened(0.35))
 			for k in 3:
-				P.px(im, tx + tw / 2 + 1, ty + 4 + k * 4, Color("2a1f1a"))
+				P.px(im, tx + tw / 2 + 1, ty + 4 + k * 4, Color("2a1b14"))
 			P.hline(im, tx, ty + th - 3, tw, top.darkened(0.15))
 			P.rect(im, tx + tw - 4, ty + 9, 3, 3, top.darkened(0.25))
 			P.hline(im, tx + 1, ty + 1, tw - 2, top.lightened(0.18))
@@ -829,7 +829,7 @@ static func _outfit(im: Image, id: String, look: Dictionary, tx: int, ty: int, t
 static func _belayer_head(im: Image, id: String, look: Dictionary, hx: int, hy: int, look_up: bool, skin: Color, skin_lit: Color, skin_shade: Color) -> void:
 	var hair := Color(look.get("hair", "5a3a22"))
 	if id == "john_muir":
-		hair = Color("9a8a78")
+		hair = Color("93918f")
 	var hair_lit := hair.lightened(0.2)
 	var hair_dark := hair.darkened(0.22)
 	var up := 1 if look_up else 0
@@ -867,20 +867,20 @@ static func _belayer_head(im: Image, id: String, look: Dictionary, hx: int, hy: 
 			P.hline(im, hx - 3, hy2 - 4, 3, hair_lit)
 			P.px(im, hx - 4, hy2 - 2, hair)
 	# Face: eye, brow, cheek.
-	var eye := Color("2a1f1a")
+	var eye := Color("2a1b14")
 	P.px(im, hx - 3, hy2, eye)
 	if id in ["john_salathe", "john_muir", "warren_harding", "george_anderson", "royal_robbins"]:
-		P.hline(im, hx - 4, hy2 - 1, 3, hair_dark if id != "john_salathe" else Color("8a8a8a"))
-	P.px(im, hx - 4, hy2 + 2, skin.lerp(Color("e08a7a"), 0.35))
+		P.hline(im, hx - 4, hy2 - 1, 3, hair_dark if id != "john_salathe" else Color("93918f"))
+	P.px(im, hx - 4, hy2 + 2, skin.lerp(Color("d47a9b"), 0.35))
 	if look.get("glasses", false):
-		P.hline(im, hx - 4, hy2, 3, Color("2a1f1a"))
-		P.px(im, hx - 4, hy2 + 1, Color("2a1f1a"))
-		P.px(im, hx - 2, hy2 + 1, Color("2a1f1a"))
-		P.px(im, hx - 3, hy2 + 1, Color("a8d8f0"))
+		P.hline(im, hx - 4, hy2, 3, Color("2a1b14"))
+		P.px(im, hx - 4, hy2 + 1, Color("2a1b14"))
+		P.px(im, hx - 2, hy2 + 1, Color("2a1b14"))
+		P.px(im, hx - 3, hy2 + 1, Color("9fd8d9"))
 	if look.has("beard"):
 		var bc := Color(look.beard)
 		if id == "john_muir":
-			bc = Color("c8baa4")
+			bc = Color("bdb8ae")
 		if bool(look.get("long_beard", false)):
 			# Muir's great beard, falling over the coat.
 			P.rect(im, hx - 5, hy2 + 1, 6, 6, bc)
@@ -925,16 +925,16 @@ static func _belayer_hat(im: Image, id: String, look: Dictionary, hx: int, hy: i
 			P.rect(im, hx + 5, hy - 2, 3, 3, hc.darkened(0.1))
 			P.px(im, hx + 6, hy + 1, hc.darkened(0.2))
 			for x in range(hx - 4, hx + 5, 3):
-				P.px(im, x, hy - 3, Color("f4f0e6"))
+				P.px(im, x, hy - 3, Color("f5eee0"))
 		"fedora":
 			P.ellipse(im, hx, hy - 3, 8.2, 2.4, hc.darkened(0.15))
 			P.hline(im, hx - 7, hy - 3, 5, hc.lightened(0.1))
 			P.shaded_ellipse(im, hx, hy - 5, 4.6, 3.8, hc, hc.lightened(0.22), hc.darkened(0.22))
-			P.hline(im, hx - 4, hy - 3, 9, Color("2a2a30"))
+			P.hline(im, hx - 4, hy - 3, 9, Color("2b2a30"))
 			P.px(im, hx - 2, hy - 7, hc.darkened(0.25))
 		"painter":
 			# A white painter's cap: soft flat crown, short bill to the left.
-			P.shaded_ellipse(im, hx + 1, hy - 3, 5.8, 3.6, hc, Color("ffffff"), hc.darkened(0.2))
+			P.shaded_ellipse(im, hx + 1, hy - 3, 5.8, 3.6, hc, Color("f5eee0"), hc.darkened(0.2))
 			P.rect(im, hx - 8, hy - 2, 5, 2, hc.darkened(0.12))
 			P.hline(im, hx - 8, hy - 1, 5, hc.darkened(0.3))
 			P.hline(im, hx - 4, hy - 2, 9, hc.darkened(0.15))
@@ -980,7 +980,7 @@ static func _belayer_arms(im: Image, id: String, look: Dictionary, mode: String,
 		P.rect(im, roundi(dev.x) - 2, roundi(dev.y), 4, 3, STEEL)
 		P.hline(im, roundi(dev.x) - 2, roundi(dev.y), 4, STEEL_LIT)
 		P.px(im, roundi(dev.x), roundi(dev.y) + 1, STEEL_DARK)
-		P.px(im, roundi(dev.x) - 1, roundi(dev.y) - 1, Color("d8452e"))
+		P.px(im, roundi(dev.x) - 1, roundi(dev.y) - 1, Color("b3362b"))
 		P.px(im, roundi(dev.x), roundi(dev.y) - 1, STEEL)
 		P.line(im, dev + Vector2(1, 2), brake + Vector2(-1, 1), rc, 1)
 		var slack := 5 + (3 if frame == 1 else 0)
@@ -1012,10 +1012,10 @@ static func _belayer_arms(im: Image, id: String, look: Dictionary, mode: String,
 	if id == "john_muir" and mode != "cheer":
 		# A walking stick planted beside him.
 		var sx := tx + tw + 3
-		P.vline(im, sx, ty - 8, th + 14, Color("8a6a3a"))
-		P.vline(im, sx + 1, ty - 8, th + 14, Color("5a3a1e"))
-		P.px(im, sx, ty - 9, Color("a88a58"))
-		P.px(im, sx, ty + th + 5, Color("2a2a30"))
+		P.vline(im, sx, ty - 8, th + 14, Color("92693d"))
+		P.vline(im, sx + 1, ty - 8, th + 14, Color("6b4829"))
+		P.px(im, sx, ty - 9, Color("b0925f"))
+		P.px(im, sx, ty + th + 5, Color("2b2a30"))
 
 
 # ---------------------------------------------------------------- hardware
@@ -1060,10 +1060,10 @@ static func _hw_cam(im: Image, c: Color) -> void:
 	P.rect(im, 4, 9, 4, 2, c.darkened(0.15))
 	P.hline(im, 4, 9, 4, c.lightened(0.2))
 	# Sling and a locker.
-	P.rect(im, 5, 11, 2, 3, Color("d89a24"))
-	P.px(im, 5, 11, Color("f0c050"))
+	P.rect(im, 5, 11, 2, 3, Color("d8a63b"))
+	P.px(im, 5, 11, Color("f1cf6a"))
 	P.rect(im, 4, 14, 4, 4, STEEL)
-	P.rect(im, 5, 15, 2, 2, Color(0, 0, 0, 0))
+	P.rect(im, 5, 15, 2, 2, Color(0.082, 0.078, 0.11, 0))
 	P.px(im, 5, 15, STEEL_DARK)
 	P.px(im, 6, 15, STEEL_DARK)
 	P.hline(im, 4, 14, 4, STEEL_LIT)
@@ -1072,10 +1072,10 @@ static func _hw_cam(im: Image, c: Color) -> void:
 static func _hw_draw(im: Image, pin: bool) -> void:
 	if pin:
 		# An old piton: a blade driven into the crack with an eye, rusty.
-		P.rect(im, 1, 0, 8, 3, Color("6a3a1a"))
-		P.rect(im, 2, 0, 6, 1, Color("c47a3a"))
-		P.rect(im, 4, 1, 2, 1, Color("2a1f1a"))
-		P.px(im, 8, 1, Color("8a5a2a"))
+		P.rect(im, 1, 0, 8, 3, Color("6b4829"))
+		P.rect(im, 2, 0, 6, 1, Color("ad7a22"))
+		P.rect(im, 4, 1, 2, 1, Color("2a1b14"))
+		P.px(im, 8, 1, Color("7e531c"))
 	else:
 		# A bolt hanger.
 		P.rect(im, 3, 0, 6, 3, STEEL)
@@ -1084,12 +1084,12 @@ static func _hw_draw(im: Image, pin: bool) -> void:
 	# Top carabiner, sewn dyneema (blue with stitching), bottom carabiner.
 	P.rect(im, 4, 3, 4, 3, STEEL)
 	P.rect(im, 5, 4, 2, 1, STEEL_DARK)
-	P.rect(im, 4, 6, 4, 6, Color("3a78c8"))
-	P.rect(im, 4, 6, 1, 6, Color("5a98e8"))
-	P.rect(im, 7, 6, 1, 6, Color("24488a"))
-	P.px(im, 5, 8, Color("f4f0e6"))
-	P.px(im, 6, 10, Color("f4f0e6"))
+	P.rect(im, 4, 6, 4, 6, Color("6f5aa6"))
+	P.rect(im, 4, 6, 1, 6, Color("3a86a8"))
+	P.rect(im, 7, 6, 1, 6, Color("6f5aa6"))
+	P.px(im, 5, 8, Color("f5eee0"))
+	P.px(im, 6, 10, Color("f5eee0"))
 	P.rect(im, 3, 12, 6, 5, STEEL)
 	P.hline(im, 3, 12, 6, STEEL_LIT)
 	P.rect(im, 5, 13, 2, 3, STEEL_DARK)
-	P.px(im, 8, 14, Color("e8a030"))
+	P.px(im, 8, 14, Color("f7a64a"))

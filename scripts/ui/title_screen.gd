@@ -20,8 +20,8 @@ const FALL_HALF_WIDTH := Vector2(2.5, 4.0)
 enum Option { CONTINUE, NEW_GAME, SETTINGS, CREDITS, QUIT }
 const OPTION_NAMES := ["Continue", "New Game", "Settings", "Credits", "Quit"]
 const NEW_GAME_CONFIRM := "Start over? Press again. (Your saved game is replaced when you first sleep.)"
-const HEADING := Color(1.0, 0.85, 0.5)
-const DIM := Color(1, 1, 1, 0.6)
+const HEADING := Color(1, 0.831, 0.541)
+const DIM := Color(0.961, 0.933, 0.878, 0.6)
 const MENU_POS := Vector2(176, 128)
 const MENU_WIDTH := 128.0
 
@@ -89,10 +89,10 @@ func _build_background() -> void:
 ## the sun, and a small pixel divider above the tagline.
 const LOGO_TOP := 22.0
 const LOGO_SIZE := 38
-const GOLD_LIGHT := Color("ffe9a8")
-const GOLD_DEEP := Color("e0a238")
-const LOGO_INK := Color("2a1608")
-const LOGO_EXTRUDE := Color("5a3418")
+const GOLD_LIGHT := Color("ffd48a")
+const GOLD_DEEP := Color("d8a63b")
+const LOGO_INK := Color("2a1b14")
+const LOGO_EXTRUDE := Color("6b4829")
 
 
 func _logo_label(text: String, color: Color, outline: int, at: Vector2) -> Label:
@@ -146,13 +146,13 @@ func _build_title() -> void:
 func _on_band(label: Label, y: float) -> PanelContainer:
 	var band := PanelContainer.new()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.1, 0.07, 0.05, 0.62)
+	style.bg_color = Color(0.165, 0.106, 0.078, 0.62)
 	style.content_margin_left = 8.0
 	style.content_margin_right = 8.0
 	style.content_margin_top = 0.0
 	style.content_margin_bottom = 1.0
 	band.add_theme_stylebox_override("panel", style)
-	label.add_theme_color_override("font_outline_color", Color(0.12, 0.08, 0.06))
+	label.add_theme_color_override("font_outline_color", Color(0.165, 0.106, 0.078))
 	label.add_theme_constant_override("outline_size", 2)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	band.add_child(label)
@@ -196,7 +196,7 @@ func _build_menu() -> void:
 		_labels.append(label)
 	_hint = Label.new()
 	_hint.add_theme_color_override("font_color", HEADING)
-	_hint.add_theme_color_override("font_outline_color", Color(0.12, 0.08, 0.06))
+	_hint.add_theme_color_override("font_outline_color", Color(0.165, 0.106, 0.078))
 	_hint.add_theme_constant_override("outline_size", 2)
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -204,7 +204,7 @@ func _build_menu() -> void:
 	_hint.size = Vector2(SCREEN.x - 80, 16)
 	add_child(_hint)
 	_footer = Label.new()
-	_footer.add_theme_color_override("font_color", Color(1, 1, 1, 0.8))
+	_footer.add_theme_color_override("font_color", Color(0.961, 0.933, 0.878, 0.8))
 	_footer_band = _on_band(_footer, SCREEN.y - 17)
 
 
@@ -234,7 +234,7 @@ func _draw_shimmer() -> void:
 			if fmod(phase, 3.0) >= 1.0:
 				continue
 			var x := mid + (stream - 1) * half * 0.7 + sin(_time * 3.0 + y * 0.3 + stream) * 1.2
-			_shimmer.draw_rect(Rect2(Vector2(roundf(x), y), Vector2(1, 2)), Color(1, 1, 1, 0.8))
+			_shimmer.draw_rect(Rect2(Vector2(roundf(x), y), Vector2(1, 2)), Color(0.961, 0.933, 0.878, 0.8))
 
 
 func _unhandled_input(event: InputEvent) -> void:

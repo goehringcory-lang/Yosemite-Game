@@ -85,9 +85,9 @@ static func cursor_texture() -> Texture2D:
 		for x in 5:
 			match CURSOR_SHAPE[y][x]:
 				"#":
-					im.set_pixel(x, y, Color("2a1f1a"))
+					im.set_pixel(x, y, Color("2a1b14"))
 				"=":
-					im.set_pixel(x, y, Color("ffe08a") if y < 4 else Color("e0a040"))
+					im.set_pixel(x, y, Color("ffd48a") if y < 4 else Color("d8a63b"))
 	_cursor = ImageTexture.create_from_image(im)
 	return _cursor
 
@@ -121,14 +121,14 @@ static func checkbox_texture(ticked: bool) -> Texture2D:
 	if _boxes.has(ticked):
 		return _boxes[ticked]
 	var im := Image.create_empty(8, 8, false, Image.FORMAT_RGBA8)
-	var rim := Color("2a1f1a")
+	var rim := Color("2a1b14")
 	for y in range(0, 8):
 		for x in range(0, 8):
 			var edge := x == 0 or y == 0 or x == 7 or y == 7
-			im.set_pixel(x, y, rim if edge else Color("e8dcc0") if ticked else Color("5a4a3c"))
+			im.set_pixel(x, y, rim if edge else Color("e4ddcc") if ticked else Color("5e4a38"))
 	if ticked:
 		for p in [Vector2i(2, 4), Vector2i(3, 5), Vector2i(4, 4), Vector2i(5, 3), Vector2i(6, 2), Vector2i(2, 3), Vector2i(3, 4)]:
-			im.set_pixelv(p, Color("3a8a3a"))
+			im.set_pixelv(p, Color("5c8f3c"))
 	_boxes[ticked] = ImageTexture.create_from_image(im)
 	return _boxes[ticked]
 

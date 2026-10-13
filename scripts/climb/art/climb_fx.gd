@@ -41,7 +41,7 @@ func spawn(pos: Vector2, vel: Vector2, life: float, color: Color, size := 1, gra
 func chalk(pos: Vector2, n := 14) -> void:
 	for i in n:
 		spawn(pos + Vector2(_rng.randf_range(-3, 3), _rng.randf_range(-3, 3)), Vector2(_rng.randf_range(-22, 22), _rng.randf_range(-30, -4)),
-			_rng.randf_range(0.5, 1.1), Color(0.97, 0.95, 0.9, 0.9), 1 + int(i % 3 == 0), 14.0)
+			_rng.randf_range(0.5, 1.1), Color(0.961, 0.933, 0.878, 0.9), 1 + int(i % 3 == 0), 14.0)
 
 
 func dust(pos: Vector2, color: Color, n := 6) -> void:
@@ -53,15 +53,15 @@ func dust(pos: Vector2, color: Color, n := 6) -> void:
 func sparks(pos: Vector2, n := 8) -> void:
 	for i in n:
 		var a := _rng.randf() * TAU
-		spawn(pos, Vector2(cos(a), sin(a)) * _rng.randf_range(20, 55), _rng.randf_range(0.2, 0.45), Color(1.0, 0.9, 0.5, 1.0), 1, 90.0)
+		spawn(pos, Vector2(cos(a), sin(a)) * _rng.randf_range(20, 55), _rng.randf_range(0.2, 0.45), Color(0.945, 0.812, 0.416, 1), 1, 90.0)
 
 
 func sweat(pos: Vector2) -> void:
-	spawn(pos, Vector2(_rng.randf_range(-6, 6), -10), 0.6, Color(0.7, 0.88, 1.0, 0.95), 1, 80.0)
+	spawn(pos, Vector2(_rng.randf_range(-6, 6), -10), 0.6, Color(0.624, 0.847, 0.851, 0.95), 1, 80.0)
 
 
 func confetti(pos: Vector2, n := 40) -> void:
-	var cols := [Color("f6c040"), Color("e8663a"), Color("7ac24a"), Color("5aa8e0"), Color("f4f0e6")]
+	var cols := [Color("d8a63b"), Color("d9772a"), Color("84b04a"), Color("3a86a8"), Color("f5eee0")]
 	for i in n:
 		spawn(pos, Vector2(_rng.randf_range(-70, 70), _rng.randf_range(-130, -40)), _rng.randf_range(0.9, 1.8), cols[i % cols.size()], 2, 120.0)
 

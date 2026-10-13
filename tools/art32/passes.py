@@ -64,6 +64,10 @@ def ui(path: str, a: np.ndarray) -> np.ndarray:
     return K.remap(a)
 
 
+def maps(path: str, a: np.ndarray) -> np.ndarray:
+    return K.remap(a, dither=8)
+
+
 def hash_seed(path: str) -> int:
     return sum(ord(c) * (i + 1) for i, c in enumerate(path)) % 100003
 

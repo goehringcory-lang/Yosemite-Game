@@ -12,8 +12,8 @@ extends CanvasLayer
 signal closed
 
 const PANEL_SIZE := Vector2(320, 0)
-const HEADING := Color(1.0, 0.85, 0.5)
-const DIM := Color(1, 1, 1, 0.6)
+const HEADING := Color(1, 0.831, 0.541)
+const DIM := Color(0.961, 0.933, 0.878, 0.6)
 ## Seconds between each thing counted out.
 const STEP := 0.09
 const ICON := Vector2(16, 16)
@@ -59,7 +59,7 @@ func _build(log: DayLog) -> void:
 	add_child(root)
 	# the world dims behind the page
 	var dim := ColorRect.new()
-	dim.color = Color(0.03, 0.02, 0.05, 0.6)
+	dim.color = Color(0.082, 0.078, 0.11, 0.6)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(dim)

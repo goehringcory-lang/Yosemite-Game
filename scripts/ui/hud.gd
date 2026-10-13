@@ -61,7 +61,7 @@ func _ready() -> void:
 	GameClock.day_started.connect(_refresh_clock.unbind(3))
 	device_changed.connect(_refresh_status)
 	_dim = ColorRect.new()
-	_dim.color = Color(0.03, 0.02, 0.06, 0.0)
+	_dim.color = Color(0.082, 0.078, 0.11, 0)
 	_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_screen.add_child(_dim)
@@ -69,8 +69,8 @@ func _ready() -> void:
 	# Messages ("You fell asleep at...", what a find is) sit on a dark card
 	# rather than floating over the world.
 	var card := StyleBoxFlat.new()
-	card.bg_color = Color(0.1, 0.07, 0.05, 0.72)
-	card.border_color = Color(0.55, 0.4, 0.22, 0.9)
+	card.bg_color = Color(0.165, 0.106, 0.078, 0.72)
+	card.border_color = Color(0.573, 0.412, 0.239, 0.9)
 	card.set_border_width_all(1)
 	card.set_content_margin_all(3)
 	card.content_margin_left = 5
@@ -122,7 +122,7 @@ func _ready() -> void:
 	apple.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	purse.add_child(apple)
 	food_label = Label.new()
-	food_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.5))
+	food_label.add_theme_color_override("font_color", Color(1, 0.831, 0.541))
 	food_label.tooltip_text = "Food energy you carry (what you trade with)"
 	purse.add_child(food_label)
 	right.add_child(purse)
@@ -132,8 +132,8 @@ func _ready() -> void:
 	# The use prompt is a slim bubble, not a full frame, so it doesn't cover
 	# the person or the sign you're facing.
 	var bubble := StyleBoxFlat.new()
-	bubble.bg_color = Color(0.11, 0.08, 0.06, 0.82)
-	bubble.border_color = Color(0.78, 0.63, 0.38, 0.9)
+	bubble.bg_color = Color(0.165, 0.106, 0.078, 0.82)
+	bubble.border_color = Color(0.69, 0.573, 0.373, 0.9)
 	bubble.set_border_width_all(1)
 	bubble.set_corner_radius_all(2)
 	bubble.content_margin_left = 4.0

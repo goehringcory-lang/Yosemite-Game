@@ -10,18 +10,18 @@ const H := 22
 ## The sun crosses from 6 AM to 8 PM; the moon from 8 PM to 6 AM.
 const SUN_RISE := 6.0
 const SUN_SET := 20.0
-const FRAME := Color("2a1f1a")
-const NIGHT := Color("1c2448")
-const DAWN := Color("e8a070")
-const DAY := Color("7ab4e0")
-const GOLDEN := Color("f0c070")
-const DUSK := Color("d87850")
-const GRANITE := Color("4a4a58")
-const GRANITE_LIT := Color("6a6a78")
-const PINES := Color("2a4a34")
-const SUN := Color("f8d860")
-const SUN_CORE := Color("fff4c0")
-const MOON := Color("e8e8f0")
+const FRAME := Color("2a1b14")
+const NIGHT := Color("2d3050")
+const DAWN := Color("b0925f")
+const DAY := Color("63b3c6")
+const GOLDEN := Color("ffd48a")
+const DUSK := Color("d9772a")
+const GRANITE := Color("47464d")
+const GRANITE_LIT := Color("6a6a70")
+const PINES := Color("1d3f2b")
+const SUN := Color("f1cf6a")
+const SUN_CORE := Color("f5eee0")
+const MOON := Color("d6f1ee")
 const STARS := [Vector2i(5, 4), Vector2i(11, 7), Vector2i(17, 3), Vector2i(24, 6), Vector2i(29, 3), Vector2i(8, 10), Vector2i(27, 10)]
 ## Half Dome's skyline from the Valley floor, one height a column.
 ## The sheer face is on the left, the rounded back falls away to the right.
@@ -97,7 +97,7 @@ func _draw() -> void:
 	var weather := Weather.today()
 	var clouds: float = weather.get("clouds", 0.0)
 	if clouds >= 1.0:
-		sky = sky.lerp(Color("8a8c96") if not night else Color("2a2e3e"), 0.55)
+		sky = sky.lerp(Color("93918f") if not night else Color("2b2a30"), 0.55)
 	# the frame and the sky, a band of glow low down
 	draw_rect(Rect2(0, 0, W, H), FRAME)
 	draw_rect(Rect2(1, 1, W - 2, H - 2), sky)
@@ -107,7 +107,7 @@ func _draw() -> void:
 			var star: Vector2i = STARS[i]
 			var twinkle := sin(_time * 2.0 + i * 1.7) > -0.3
 			if twinkle:
-				_px(star.x, star.y, Color(1, 1, 0.9, 0.85))
+				_px(star.x, star.y, Color(0.961, 0.933, 0.878, 0.85))
 	# the sun or the moon on its arc
 	var body := body_position(hour)
 	if night:
@@ -143,14 +143,14 @@ func _draw() -> void:
 			var x := 3 + (i * 11) % (W - 6)
 			var y := 3 + (i * 5 + fall) % (H - 6)
 			if rain > 0.0:
-				_px(x, y, Color("9ac0e8"))
-				_px(x, y + 1, Color("9ac0e8"))
+				_px(x, y, Color("63b3c6"))
+				_px(x, y + 1, Color("63b3c6"))
 			else:
 				_px(x, y, Color.WHITE)
 
 
 func _cloud(at: Vector2, night: bool) -> void:
-	var color := Color("f0f0f4") if not night else Color("5a5e70")
+	var color := Color("f5eee0") if not night else Color("6a6a70")
 	_disc(at, 2.4, color)
 	_disc(at + Vector2(3, 0.6), 2.0, color)
 	_disc(at + Vector2(-3, 0.8), 1.8, color)

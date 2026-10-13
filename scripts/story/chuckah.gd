@@ -51,15 +51,15 @@ func _refresh_art() -> void:
 func _draw() -> void:
 	if _art:
 		return
-	var pole := Color(0.45, 0.32, 0.2)
+	var pole := Color(0.42, 0.282, 0.161)
 	if Granary.chuckahs_built == 0:
 		draw_line(Vector2(-12, 0), Vector2(0, -36), pole, 2.0)
 		draw_line(Vector2(12, 0), Vector2(0, -36), pole, 2.0)
 		return
 	draw_line(Vector2(-14, 0), Vector2(-10, -16), pole, 4.0)
 	draw_line(Vector2(14, 0), Vector2(10, -16), pole, 4.0)
-	draw_colored_polygon(PackedVector2Array([Vector2(-14, -16), Vector2(14, -16), Vector2(10, -48), Vector2(-10, -48)]), Color(0.7, 0.58, 0.35))
-	draw_colored_polygon(PackedVector2Array([Vector2(-14, -48), Vector2(14, -48), Vector2(0, -60)]), Color(0.45, 0.55, 0.3))
+	draw_colored_polygon(PackedVector2Array([Vector2(-14, -16), Vector2(14, -16), Vector2(10, -48), Vector2(-10, -48)]), Color(0.69, 0.573, 0.373))
+	draw_colored_polygon(PackedVector2Array([Vector2(-14, -48), Vector2(14, -48), Vector2(0, -60)]), Color(0.361, 0.561, 0.235))
 
 
 func interact(player: Player) -> void:

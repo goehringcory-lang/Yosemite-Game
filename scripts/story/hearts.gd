@@ -3,11 +3,11 @@ extends RefCounted
 ## Little pixel hearts for friendship: full and empty 7x6 pictures for the
 ## Register, and the heart that floats up when someone's fondness grows.
 
-const RED := Color("d83a4a")
-const LIGHT := Color("f8a0a8")
-const DARK := Color("8a1e2a")
-const EMPTY := Color("5a4a40")
-const INK := Color("2a1f1a")
+const RED := Color("b3362b")
+const LIGHT := Color("d47a9b")
+const DARK := Color("b3362b")
+const EMPTY := Color("5e4a38")
+const INK := Color("2a1b14")
 const SHAPE := [
 	".##.##.",
 	"#######",
