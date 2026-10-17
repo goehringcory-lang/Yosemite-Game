@@ -112,6 +112,10 @@ func _ready() -> void:
 	_detail.add_child(_rule())
 	_detail_name = Label.new()
 	_detail_name.add_theme_color_override("font_color", HEADING)
+	# A long name with its facts (a plant's Latin name and rarity) trails off
+	# rather than widening the page.
+	_detail_name.custom_minimum_size.x = LINE_WIDTH
+	_detail_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_detail.add_child(_detail_name)
 	_detail_text = Label.new()
 	_detail_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -575,6 +579,9 @@ func _press_page() -> void:
 			pages.append(_pressed(plant))
 		var place: String = Herbarium.HUB_NAMES.get(hub, hub)
 		_slot_section("%s (%d of %d)" % [place[0].to_upper() + place.substr(1), found, pages.size()], pages, "")
+	var rare := Herbarium.rare_count(Herbarium.RARE)
+	var very_rare := Herbarium.rare_count(Herbarium.VERY_RARE)
+	_line("Rare finds: %d of %d, %d of %d of them very rare. Rare plants glint gold." % [rare[0], rare[1], very_rare[0], very_rare[1]], DIM)
 	_heading("The lost Guardian")
 	var clues := Herbarium.clues()
 	if clues.is_empty():
@@ -587,11 +594,11 @@ func _press_page() -> void:
 ## natural history and where you found it, or where and when to look.
 func _pressed(plant: Dictionary) -> Dictionary:
 	if not Herbarium.has(plant.id):
-		return {"name": plant.name, "count": 1, "icon": Herbarium.icon(plant.id), "facts": "not yet pressed",
+		return {"name": plant.name, "count": 1, "icon": Herbarium.icon(plant.id), "facts": "%s · not yet pressed" % Herbarium.rarity_name(plant),
 			"description": "Look in: " + Herbarium.hint(plant), "dim": true}
 	var entry: Dictionary = Herbarium.pressed[plant.id]
 	var found: String = " Found at %s." % entry.where if str(entry.get("where", "")) != "" else ""
-	return {"name": plant.name, "count": 1, "icon": Herbarium.icon(plant.id), "facts": plant.latin,
+	return {"name": plant.name, "count": 1, "icon": Herbarium.icon(plant.id), "facts": "%s · %s" % [plant.latin, Herbarium.rarity_name(plant)],
 		"description": plant.note + found, "dim": false}
 
 
