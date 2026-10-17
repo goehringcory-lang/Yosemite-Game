@@ -62,6 +62,16 @@ static func stamina(ci: CanvasItem, state: ClimbState, flash: float, shake: floa
 	UI.outlined(ci, Vector2(r.position.x + r.size.x / 2.0, r.end.y + 10), "%d" % maxi(state.stamina, 0), UI.WARN if state.stamina <= 25 else UI.CREAM, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 
 
+## The effects of meals from the cooking pot, stacked above the stamina bar:
+## "Steady 8" for each, with the moves it has left.
+static func boosts(ci: CanvasItem, state: ClimbState) -> void:
+	var y := SCREEN.y - 116
+	for effect: String in state.boosts:
+		var text := "%s %d" % [Cooking.EFFECTS[effect].name, int(state.boosts[effect])]
+		UI.outlined(ci, Vector2(SCREEN.x - 16, y), text, UI.GOLD, 10, -1.0, HORIZONTAL_ALIGNMENT_RIGHT)
+		y -= 11
+
+
 ## The pump meter beside the stamina bar: a cell for each point of pump, and
 ## what it adds to every move under it.
 static func pump(ci: CanvasItem, state: ClimbState, time: float) -> void:

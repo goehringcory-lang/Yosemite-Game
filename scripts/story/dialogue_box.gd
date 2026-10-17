@@ -7,6 +7,7 @@ extends CanvasLayer
 ##   await box.say(lines)             # lines: [{"speaker": "...", "text": "..."}]
 ##   var i := await box.choose("Build it?", ["Yes", "No"])   # -1 if cancelled
 ##   var i := await box.choose("Buy?", names, "Clerk", icons)  # a picture per option (or null)
+##   var i := await box.choose("Add?", names, "", icons, cards, 3)  # start on the fourth option
 ##   box.close()
 ##
 ## Or, for a one-off conversation: DialogueBox.say_to(player, lines)
@@ -262,8 +263,8 @@ static func pages(text: String) -> PackedStringArray:
 ## the one under the cursor: {"title": String, "rows": [[icon or null, text,
 ## short (true draws it in red)], ...], "facts": String, "note": String}. Options without one
 ## (Leave) show an empty card.
-func choose(prompt: String, options: Array, speaker := "", icons := [], details := []) -> int:
-	_cursor = 0
+func choose(prompt: String, options: Array, speaker := "", icons := [], details := [], cursor := 0) -> int:
+	_cursor = clampi(cursor, 0, maxi(options.size() - 1, 0))
 	_icons = icons
 	_details = details
 	_show(speaker, prompt, options)

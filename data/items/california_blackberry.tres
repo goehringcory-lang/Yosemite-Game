@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/wild_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(0, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "california_blackberry"
+display_name = "California Blackberry"
+description = "A native trailing blackberry from the riverbanks. Sweeter and smaller than the invasive Himalayan kind the Park pulls out."
+icon = SubResource("icon")
+forage_seasons = 2
+habitat = 4
+forage_per_day = 2

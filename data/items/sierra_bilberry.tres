@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/wild_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(128, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "sierra_bilberry"
+display_name = "Sierra Bilberry"
+description = "Tiny dusty-blue berries on low shrubs by the high meadows."
+icon = SubResource("icon")
+forage_seasons = 6
+habitat = 6
+forage_per_day = 3

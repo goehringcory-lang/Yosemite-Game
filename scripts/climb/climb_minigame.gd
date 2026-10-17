@@ -1113,6 +1113,7 @@ func _draw_hud(height: float) -> void:
 	ClimbHud.topo_bar(_canvas, state, height)
 	ClimbHud.stamina(_canvas, state, _stamina_flash, 0.0)
 	ClimbHud.pump(_canvas, state, _time)
+	ClimbHud.boosts(_canvas, state)
 	if _phase == Phase.CLIMB or _phase == Phase.PAUSE:
 		var toolbar_end := ClimbHud.toolbar(_canvas, state, _time, _usable())
 		ClimbHud.hints(_canvas, _hint(), toolbar_end + 6.0)

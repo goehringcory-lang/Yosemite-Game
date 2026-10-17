@@ -32,6 +32,8 @@ _CELLS = {
     "assets/sprites/plants.png": (32, 32),
     "assets/sprites/items.png": (32, 32),
     "assets/sprites/food_items.png": (32, 32),
+    "assets/sprites/wild_items.png": (32, 32),
+    "assets/sprites/meal_items.png": (32, 32),
     "assets/sprites/store_items.png": (32, 32),
     "assets/sprites/story_items.png": (32, 32),
     "assets/sprites/side_quest_items.png": (32, 32),

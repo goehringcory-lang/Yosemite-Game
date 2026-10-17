@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/wild_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(160, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "wood_rose_hips"
+display_name = "Wood Rose Hips"
+description = "The fruit of the wild rose, sweetest after a frost. Full of vitamin C, and they hang on all winter."
+icon = SubResource("icon")
+forage_seasons = 12
+habitat = 1
+forage_per_day = 2
