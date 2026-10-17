@@ -30,6 +30,7 @@ godot project.godot         # opens the editor; press F5 to play
 | Climbing: climb up, up-left, up-right | W / A / D (or arrows) | Stick up / left / right |
 | Climbing: place a cam or clip / eat at a ledge, or chalk up / retreat | Space or C / E / Esc | X / A / B |
 | Climbing: aid a hard move, or jug a fixed rope | Shift + arrow | Y + stick |
+| Slackline: lean back (hold the side away from the tip) | Left / Right | Stick left / right |
 | *Debug:* skip 1 hour / sleep now | F2 / F3 | |
 
 A prompt above the player's head shows what the interact button will do ("E  Read: Camp 4"), and it switches to gamepad button names when you use a gamepad. Every menu's hint line (pause menu, journal, conversations, maps) follows the same switch.
@@ -125,7 +126,7 @@ Labels and their hand-placed positions are in `tools/mapgen/oblique/points.js`. 
 
 Driving to Yosemite Valley brings you to **Yosemite Village**, a walking-scale central hub. It fits the real layout of the Valley between Camp 4 and the Village into one map, from the granite north wall down to the Merced River:
 
-- **Camp 4**: the climbers' walk-in campground, laid out as real sites under the pines. Each has its tents, a Park Service picnic table, a bear box and a steel fire ring, and they sit around a shared fire where you cook. The tents span the camp's history: 1950s canvas wall tents, a 1970s climber's tarp shelter, and modern domes. **Columbia Boulder** stands at the back by the talus, with **Midnight Lightning** (Ron Kauk, 1978) chalked up its overhanging face, the lightning bolt beside the start and a crash pad below. There's also a slackline between two pines (slacklining started here around 1980), the bulletin board where the walk-in path arrives, the Park Service sign, the two gear traders, and a 1970s van in the lot. After dark the fires burn and throw sparks, and lanterns glow in the tents and on the cook tables.
+- **Camp 4**: the climbers' walk-in campground, laid out as real sites under the pines. Each has its tents, a Park Service picnic table, a bear box and a steel fire ring, and they sit around a shared fire where you cook. The tents span the camp's history: 1950s canvas wall tents, a 1970s climber's tarp shelter, and modern domes. **Columbia Boulder** stands at the back by the talus, with **Midnight Lightning** (Ron Kauk, 1978) chalked up its overhanging face, the lightning bolt beside the start and a crash pad below. There's also a slackline between two pines (slacklining started here around 1980), which you can walk: keep your balance with Left/Right all the way across and the six-pack of King Cobra on the far stump is yours; the bulletin board where the walk-in path arrives, the Park Service sign, the two gear traders, and a 1970s van in the lot. After dark the fires burn and throw sparks, and lanterns glow in the tents and on the cook tables.
 - **Lower Yosemite Fall** and **Yosemite Creek**, crossed by a footbridge and the Northside Drive bridge.
 - **The Village**: the Village Store, Welcome Center, Yosemite Museum, Best's Studio, Degnan's, and the Wilderness Center.
 - **The Indian Village** behind the museum: umachas (bark homes), a chuckah (acorn granary), and a grinding rock you can use. Its text is a placeholder until tribal review.

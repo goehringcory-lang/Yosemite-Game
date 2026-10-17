@@ -3,8 +3,8 @@ extends RefCounted
 ## Small hidden touches added to regions when they first load. They need no
 ## edits to the generated hub scenes, so a map rebuild keeps them. The moving
 ## ones (the Firefall and the moonbow) are placed by the story overlays; this
-## class handles the conditional sign text, the readable bear boxes, and the
-## Camp 4 headlamp. Described for developers in docs/DESIGN.md ("Easter eggs").
+## class handles the conditional sign text, the readable bear boxes, the
+## Camp 4 headlamp, and the walkable Camp 4 slackline. Described for developers in docs/DESIGN.md ("Easter eggs").
 
 const BEAR_BOX_TEXT := "Bear box. Food, coolers, and anything with a smell go in here, day and night. Black bears in Yosemite learned to open cars for food."
 const FIREFALL_TEXT := "The call is going up from the rim: 'Let the fire fall!' High above the wall, the bonfire's glow sits on Glacier Point, and a ribbon of embers begins to run down the granite."
@@ -39,11 +39,25 @@ static func dress(region: Region) -> void:
 				lamp.name = "Headlamp"
 				lamp.position = Vector2(12, -52)
 				boulder.add_child(lamp)
+			_slackline(region)
 		"wawona":
 			var clark := _sign(region, "Sign_Clarks_Station")
 			if clark:
 				clark.extra_text = CLARK_NOTE_TEXT
 				clark.extra_after_quest = "tenaya_ahwahnee"
+
+
+## Lets the player walk the Camp 4 slackline from its sign (SlacklineSpot).
+## Swapping the script clears its fields, so they're carried across.
+static func _slackline(region: Region) -> void:
+	var info := _sign(region, "SlacklineInfo")
+	if info == null or info is SlacklineSpot:
+		return
+	var title := info.title
+	var text := info.text
+	info.set_script(preload("res://scripts/objects/slackline_spot.gd"))
+	info.set("title", title)
+	info.set("text", text)
 
 
 ## Finds an InfoSign by name anywhere in the region (generated maps nest theirs).
