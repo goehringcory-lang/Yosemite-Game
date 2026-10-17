@@ -148,6 +148,8 @@ const ALPINE_START_BEFORE := 10
 ## for each grade (shaking out, and the falls a hard pitch brings).
 const ESTIMATE_PER_PITCH := 20
 const ESTIMATE_PER_GRADE := 6
+## A Keen meal (see Cooking) widens the crux meter's green this much.
+const KEEN_WINDOW := 0.06
 
 var route: RouteData
 var status := Status.CLIMBING
@@ -175,6 +177,9 @@ var protection: Array[Dictionary] = []
 var bolts: Dictionary = {}
 ## Row -> "bolt" or "pin", for the fixed pieces in [member bolts].
 var bolt_kinds: Dictionary = {}
+## What meals cooked in the pot are doing for you: effect ("steady", "keen",
+## "warming", "nimble") -> moves left. See Cooking.EFFECTS.
+var boosts: Dictionary = {}
 var has_shoes := false
 var has_chalk := false
 var has_device := false
@@ -339,12 +344,15 @@ func move_cost(r: int, c: int) -> int:
 			cost -= CHIMNEY_BONUS
 		elif dx == last_dx and dx != 0:
 			cost += CHIMNEY_PENALTY
-	if is_stormy():
+	var warm := boosts.has("warming")
+	if is_stormy() and not warm:
 		cost += STORM_PENALTY
 	cost += pump_cost()
 	# Slush and storms don't stack: a storm already makes the snow wet.
-	if is_snow() and not is_stormy() and hour() >= SLUSH_HOUR and hour() < 20.0:
+	if is_snow() and not is_stormy() and hour() >= SLUSH_HOUR and hour() < 20.0 and not warm:
 		cost += 1
+	if boosts.has("nimble"):
+		cost -= 1
 	return maxi(cost, 1)
 
 
@@ -377,6 +385,8 @@ func pump_change(hold: Dictionary) -> int:
 			change = PUMP_CRIMP
 	if hold.get("crux", false):
 		change += PUMP_CRUX
+	if boosts.has("steady") and change > 0:
+		change -= 1
 	return change
 
 
@@ -484,6 +494,30 @@ func jug(dx: int) -> bool:
 	return true
 
 
+## A move's worth of every meal's effect wears off.
+func _wear_off_boosts() -> void:
+	for effect: String in boosts.keys():
+		boosts[effect] = int(boosts[effect]) - 1
+		if boosts[effect] <= 0:
+			boosts.erase(effect)
+
+
+## Starts the effect of meal [param item_id], if it has one, and returns a
+## line about it for the message ("" if none). A Hearty meal fills you up.
+func _take_effect(item_id: String) -> String:
+	if not Cooking.is_meal(item_id):
+		return ""
+	var meal: Dictionary = Cooking.meal_effect(item_id)
+	if meal.effect == "":
+		return ""
+	if meal.effect == "hearty":
+		stamina = MAX_STAMINA
+		pump = 0
+		return "Hearty: you're full of energy."
+	boosts[meal.effect] = maxi(int(boosts.get(meal.effect, 0)), int(meal.moves))
+	return "%s for %d moves." % [Cooking.EFFECTS[meal.effect].name, boosts[meal.effect]]
+
+
 ## Shared by moves, aid steps and jugs.
 func _step(dx: int, cost: int, mins: int, safe := false) -> void:
 	var hold := hold_at(row + 1, col + dx)
@@ -496,6 +530,7 @@ func _step(dx: int, cost: int, mins: int, safe := false) -> void:
 	var pump_before := pump
 	if not safe:
 		pump = clampi(pump + pump_change(hold), 0, PUMP_MAX)
+	_wear_off_boosts()
 	message = ""
 	if pump >= PUMP_WARN and pump_before < PUMP_WARN:
 		message = "Your forearms are pumping (+%d a move). Shake out on a jug." % pump_cost()
@@ -546,6 +581,8 @@ func crux_window() -> float:
 	if route.top_rope:
 		window += 0.12
 	window += Perks.bonus("steady_breath")
+	if boosts.has("keen"):
+		window += KEEN_WINDOW
 	window += CRUX_MERCY_WINDOW * _crux_mercy()
 	window -= PUMP_WINDOW * pump
 	return clampf(window, 0.1, 0.5)
@@ -739,9 +776,9 @@ func is_reserved_meal(item_id: String) -> bool:
 
 
 ## What to eat at a belay: smaller foods first, saving the real meals for the
-## nights, and whatever spoils soonest among them. Empty if the pack has no
-## food. If only reserved meals are left, it's one of those (and [method eat]
-## will say to save it).
+## nights, then a cooked meal whose effect you don't have going, and whatever
+## spoils soonest among them. Empty if the pack has no food. If only reserved
+## meals are left, it's one of those (and [method eat] will say to save it).
 func next_food() -> String:
 	var foods := FoodDB.edible_in_inventory()
 	if foods.is_empty():
@@ -751,8 +788,20 @@ func next_food() -> String:
 		var meal_b := FoodDB.energy(b) >= BIVY_MEAL_ENERGY
 		if meal_a != meal_b:
 			return meal_b
+		var lift_a := _would_boost(a)
+		var lift_b := _would_boost(b)
+		if lift_a != lift_b:
+			return lift_a
 		return _freshness(a) < _freshness(b))
 	return foods[0]
+
+
+## True if [param item_id] is a cooked meal whose effect isn't already going.
+func _would_boost(item_id: String) -> bool:
+	if not Cooking.is_meal(item_id):
+		return false
+	var effect: String = Cooking.meal_effect(item_id).effect
+	return effect != "" and not boosts.has(effect)
 
 
 ## Days left before [param item_id] spoils, with food that never spoils last.
@@ -802,6 +851,9 @@ func eat(item_id: String) -> bool:
 	minutes += MINUTES_TO_EAT
 	var item := ItemDB.get_item(item_id)
 	message = "Ate %s (+%d)." % [item.display_name if item else item_id, energy]
+	var effect := _take_effect(item_id)
+	if effect != "":
+		message += " " + effect
 	if pumped:
 		pending.pumped = false
 		pending.window = crux_window()
@@ -917,23 +969,36 @@ func _night_after(finished_spec: Dictionary) -> bool:
 ## wakes at [constant WAKE_MINUTES] the next morning. Returns false if there's
 ## no real meal to eat.
 func _bivy(place: String) -> bool:
+	var cold := not has_portaledge and place != "ledge"
 	var meal_id := ""
 	for id in FoodDB.edible_in_inventory():
 		var energy := FoodDB.energy(id)
-		if energy >= BIVY_MEAL_ENERGY and (meal_id == "" or energy < FoodDB.energy(meal_id)):
+		if energy < BIVY_MEAL_ENERGY:
+			continue
+		# On a cold night, a Warming meal beats a smaller one.
+		var warm := cold and _warms(id)
+		var best_warm := cold and meal_id != "" and _warms(meal_id)
+		if meal_id == "" or (warm and not best_warm) or (warm == best_warm and energy < FoodDB.energy(meal_id)):
 			meal_id = id
 	if meal_id == "":
 		retreat("Night is falling and you have no real meal for the wall. You rappel down hungry.")
 		return false
+	var warmed := _warms(meal_id) or boosts.has("warming")
 	Inventory.remove(meal_id)
 	nights_spent += 1
-	stamina = MAX_STAMINA if (has_portaledge or place == "ledge") else COLD_NIGHT_STAMINA
+	stamina = MAX_STAMINA if (not cold or warmed) else COLD_NIGHT_STAMINA
+	_take_effect(meal_id)
 	minutes += minutes_until_morning()
 	var item := ItemDB.get_item(meal_id)
 	var meal := item.display_name if item else meal_id
 	message = "You spend the night on the wall and eat %s. You wake up rested." % meal
 	events.append({"type": "bivy", "night": nights_spent, "place": place, "meal": meal})
 	return true
+
+
+## True if [param item_id] is a meal that keeps you warm (see Cooking).
+func _warms(item_id: String) -> bool:
+	return Cooking.is_meal(item_id) and Cooking.meal_effect(item_id).effect == "warming"
 
 
 ## Game minutes from now until 6:30 the next morning (or this morning, if it's

@@ -76,6 +76,7 @@ func _ready() -> void:
 		Gear.start_new_game()
 		Granary.start_new_game()
 		Recipes.start_new_game()
+		Cooking.start_new_game()
 		QuestLog.start_new_game()
 		Perks.start_new_game()
 		Friendship.start_new_game()

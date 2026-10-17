@@ -3,7 +3,8 @@ extends Resource
 ## Anything the player can carry: wild forage and prepared food. What food
 ## is worth on a climb (energy, shelf life) lives in FoodDB.
 
-## FOREST and HIGH_COUNTRY are only used by the press book's plants (Herbarium).
+## FOREST (conifer shade) and HIGH_COUNTRY (lodgepole and granite sand) only
+## exist on the generated hubs, not the hand-painted homestead.
 enum Habitat { NONE, MEADOW, OAK_WOODLAND, CHAPARRAL, RIVERSIDE, FOREST, HIGH_COUNTRY }
 
 @export var id: String
@@ -15,7 +16,8 @@ enum Habitat { NONE, MEADOW, OAK_WOODLAND, CHAPARRAL, RIVERSIDE, FOREST, HIGH_CO
 @export_group("Foraging")
 ## Seasons when this item appears on the map. Leave empty for items you can only make.
 @export_flags("Spring", "Summer", "Fall", "Winter") var forage_seasons := 0
-## Where it spawns: meadow grass, under black oaks, beside manzanita, or along the river.
+## Where it spawns: meadow grass, under black oaks, beside manzanita, along
+## the river, in the conifer forest, or up in the high country.
 @export var habitat := Habitat.NONE
 ## How many appear each morning while in season.
 @export var forage_per_day := 0

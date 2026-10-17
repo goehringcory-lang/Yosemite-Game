@@ -5,6 +5,7 @@ extends Node
 ## example, raw acorns are too bitter until leached).
 ## shelf_life: days it keeps in your pack before spoiling (0 = never).
 ## Acorns keep for good once they're stored in a chuckah (see Granary).
+## Meals cooked in the pot aren't listed: Cooking reads theirs from the id.
 
 const FOODS := {
 	# Fresh forage: quick energy that spoils fast
@@ -17,6 +18,15 @@ const FOODS := {
 	"morel_mushroom": {"energy": 0, "shelf_life": 3}, # must be cooked
 	"blue_elderberries": {"energy": 0, "shelf_life": 2}, # must be cooked
 	"toyon_berries": {"energy": 0, "shelf_life": 5}, # must be toasted
+	"california_blackberry": {"energy": 12, "shelf_life": 2},
+	"whitebark_raspberry": {"energy": 11, "shelf_life": 2},
+	"thimbleberry": {"energy": 9, "shelf_life": 1}, # too soft to carry far
+	"sierra_gooseberry": {"energy": 7, "shelf_life": 4},
+	"sierra_bilberry": {"energy": 10, "shelf_life": 3},
+	"wood_rose_hips": {"energy": 5, "shelf_life": 12}, # they keep on the bush all winter
+	"chanterelle": {"energy": 0, "shelf_life": 3}, # cook first
+	"king_bolete": {"energy": 0, "shelf_life": 3}, # cook first
+	"coyote_mint": {"energy": 2, "shelf_life": 3},
 	# The acorn chain
 	"black_oak_acorn": {"energy": 0, "shelf_life": 14},
 	"acorn_flour": {"energy": 0, "shelf_life": 5},
@@ -50,15 +60,17 @@ const FOODS := {
 
 
 func is_food(id: String) -> bool:
-	return FOODS.has(id)
+	return FOODS.has(id) or Cooking.is_meal(id)
 
 
 func energy(id: String) -> int:
+	if id.begins_with(Cooking.PREFIX):
+		return Cooking.meal_energy(id)
 	return FOODS.get(id, {}).get("energy", 0)
 
 
 func shelf_life(id: String) -> int:
-	var days: int = FOODS.get(id, {}).get("shelf_life", 0)
+	var days: int = Cooking.meal_shelf_life(id) if id.begins_with(Cooking.PREFIX) else FOODS.get(id, {}).get("shelf_life", 0)
 	# Lamon's Cellar (a perk): food keeps a day longer. 0 still means never spoils.
 	return days + int(Perks.bonus("lamons_cellar")) if days > 0 else days
 

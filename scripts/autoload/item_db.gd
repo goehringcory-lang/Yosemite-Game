@@ -17,6 +17,15 @@ const ITEMS := [
 	preload("res://data/items/blue_elderberries.tres"),
 	preload("res://data/items/yerba_buena.tres"),
 	preload("res://data/items/toyon_berries.tres"),
+	preload("res://data/items/california_blackberry.tres"),
+	preload("res://data/items/whitebark_raspberry.tres"),
+	preload("res://data/items/thimbleberry.tres"),
+	preload("res://data/items/sierra_gooseberry.tres"),
+	preload("res://data/items/sierra_bilberry.tres"),
+	preload("res://data/items/wood_rose_hips.tres"),
+	preload("res://data/items/chanterelle.tres"),
+	preload("res://data/items/king_bolete.tres"),
+	preload("res://data/items/coyote_mint.tres"),
 	# Prepared food (see Recipes)
 	preload("res://data/food/acorn_flour.tres"),
 	preload("res://data/food/leached_acorn_meal.tres"),
@@ -60,13 +69,17 @@ func _ready() -> void:
 		_by_id[item.id] = item
 
 
-## Returns null if [param id] isn't a registered item.
+## Returns null if [param id] isn't a registered item. Meals cooked in the
+## pot aren't in ITEMS: Cooking makes their ItemData from the id.
 func get_item(id: String) -> ItemData:
-	return _by_id.get(id)
+	var item: ItemData = _by_id.get(id)
+	if item == null and id.begins_with(Cooking.PREFIX):
+		return Cooking.meal_item(id)
+	return item
 
 
 ## Words that don't take an "s": "3 Trail Mix", "2 Pilot Bread".
-const MASS_NOUNS := ["Mix", "Jerky", "Tea", "Mush", "Flour", "Meal", "Cider", "Sauce", "Lettuce", "Yampah", "Buena", "Toyon", "Pilot Bread"]
+const MASS_NOUNS := ["Mix", "Jerky", "Tea", "Mush", "Flour", "Meal", "Cider", "Sauce", "Lettuce", "Yampah", "Buena", "Toyon", "Pilot Bread", "Mint", "Fruit"]
 ## Names with their own plural.
 const PLURALS := {"Degnan's Bread": "loaves of Degnan's Bread"}
 

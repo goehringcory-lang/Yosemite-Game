@@ -618,9 +618,25 @@ func _backpack_page() -> void:
 		rest.append(_carried(id))
 	_slot_section("Forage and other things", rest, "Nothing yet.")
 
+	var dishes: Array[Dictionary] = []
+	for dish: String in Cooking.DISHES:
+		if Cooking.knows_dish(dish):
+			dishes.append(_cookbook_entry(dish))
+	_slot_section("Cookbook (%d of %d dishes)" % [dishes.size(), Cooking.DISHES.size()], dishes,
+		"Nothing yet. Put what you've gathered in the pot at a campfire and see what it makes.")
+
 	if Granary.chuckahs_built > 0:
 		_heading("Chuckah")
 		_line("%d of %d acorns stored. They won't spoil." % [Granary.acorns, Granary.capacity])
+
+
+## A Cookbook slot: a dish the pot has made, with the best you've cooked of it.
+func _cookbook_entry(dish: String) -> Dictionary:
+	var info: Dictionary = Cooking.DISHES[dish]
+	var entry: Dictionary = Cooking.discovered[dish]
+	return {"name": info.name, "count": 1, "icon": Cooking.dish_icon(dish),
+		"facts": "best %d energy, keeps %d days, cooked %d time%s" % [entry.best, info.keeps, entry.made, "" if entry.made == 1 else "s"],
+		"description": info.note}
 
 
 ## What a slot shows for carried item [param id]: its count, what it's worth

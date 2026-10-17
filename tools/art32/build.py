@@ -51,6 +51,8 @@ CATEGORIES: dict[str, list[str]] = {
         "assets/sprites/blocker.png",
         "assets/sprites/items.png",
         "assets/sprites/food_items.png",
+        "assets/sprites/wild_items.png",
+        "assets/sprites/meal_items.png",
         "assets/sprites/store_items.png",
         "assets/sprites/story_items.png",
         "assets/sprites/side_quest_items.png",

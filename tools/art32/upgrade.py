@@ -9,6 +9,9 @@ generated), and runs it through the same pass `build.py` uses.
 
     python3 tools/art32/upgrade.py            # every freshly generated image
     python3 tools/art32/upgrade.py FILE...    # just these
+
+A sheet added after the 32px upgrade has no 16px original. Name it on the
+command line and it is upgraded while it is still a 16px-high row of icons.
 """
 from __future__ import annotations
 
@@ -35,6 +38,12 @@ def original_sizes() -> dict[str, tuple[int, int]]:
 def main() -> None:
     wanted = [os.path.relpath(os.path.abspath(a), build.ROOT) for a in sys.argv[1:]]
     sizes = original_sizes()
+    for path in wanted:
+        full = os.path.join(build.ROOT, path)
+        if path not in sizes and build.category_of(path) and os.path.exists(full):
+            w, h = Image.open(full).size
+            if h == 16:
+                sizes[path] = (w, h)
     n = 0
     for path, size in sizes.items():
         if wanted and path not in wanted:
