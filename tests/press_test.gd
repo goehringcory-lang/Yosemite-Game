@@ -55,10 +55,10 @@ func talk_until(character_id: String, quest_id: String) -> void:
 			QuestLog.talk_to(character_id)
 
 
-## Presses the first [param n] plants that grow in [param hub] and aren't in the book.
+## Presses the first [param n] plants that grow only in [param hub] and aren't in the book.
 func press_from(hub: String, n: int) -> void:
 	for plant: Dictionary in Herbarium.PLANTS:
-		if n > 0 and hub in Herbarium.hubs_of(plant) and Herbarium.press(plant.id, hub):
+		if n > 0 and Herbarium.hubs_of(plant) == [hub] and Herbarium.press(plant.id, hub):
 			n -= 1
 
 
@@ -96,7 +96,20 @@ func _check_plants() -> void:
 		if not drawn:
 			problems.append("%s has no drawing" % plant.id)
 	check(problems.is_empty(), "every plant has a name, a note, a drawing and a place to grow %s" % [problems])
-	check(Herbarium.PLANTS.size() >= 24, "the press book has its plants (%d)" % Herbarium.PLANTS.size())
+	check(Herbarium.PLANTS.size() >= 100, "the press book has at least a hundred plants (%d)" % Herbarium.PLANTS.size())
+	var tiers := [0, 0, 0, 0]
+	for plant: Dictionary in Herbarium.PLANTS:
+		tiers[Herbarium.rarity(plant)] += 1
+	check(tiers.all(func(n: int) -> bool: return n > 0) and tiers[0] > tiers[1] and tiers[1] > tiers[2] and tiers[2] > tiers[3],
+		"plants come in every rarity, fewer the rarer (%s)" % [tiers])
+	check(Herbarium.PATCHES[Herbarium.COMMON] > Herbarium.PATCHES[Herbarium.UNCOMMON] and Herbarium.PATCHES[Herbarium.UNCOMMON] > Herbarium.PATCHES[Herbarium.RARE],
+		"rarer plants grow in fewer patches")
+	check(Herbarium.rarity_name(Herbarium.get_plant("incense_cedar")) == "Common" and Herbarium.rarity_name(Herbarium.get_plant("snow_plant")) == "Rare",
+		"a plant with no rarity is common")
+	check(Herbarium.PLANTS.all(func(p: Dictionary) -> bool: return Herbarium.rarity(p) < Herbarium.VERY_RARE or p.get("protected", false)),
+		"every very rare plant is sketched, not picked")
+	check("rather not touch" in Herbarium.sketch_reason(Herbarium.get_plant("poison_oak")) and "Too rare" in Herbarium.sketch_reason(Herbarium.get_plant("snow_plant")),
+		"a sketched plant says why")
 	for hub: String in Herbarium.HUB_NAMES:
 		check(Herbarium.total(hub) >= 4, "%s has at least four plants (%d)" % [hub, Herbarium.total(hub)])
 	check(Herbarium.PLANTS.any(func(p: Dictionary) -> bool: return p.get("protected", false)), "at least one plant is sketched, not picked")
@@ -302,10 +315,15 @@ func _check_world() -> void:
 		"the Press Book shows a slot for every plant (%d)" % journal._slots.size())
 	var texts: Array = journal._body.get_children().filter(func(n: Node) -> bool: return n is Label).map(func(n: Label) -> String: return n.text)
 	check(texts.has("The Valley floor (1 of %d)" % Herbarium.total("yosemite_valley")) and texts.has("The lost Guardian"),
-		"grouped by where they grow, with the lost Guardian's clues below")
+		"grouped by where they grow, with the lost Guardian's clues below %s" % [texts])
 	var fern_slot := journal._slot_items.find_custom(func(item: Dictionary) -> bool: return item.name == "Western Bracken Fern")
 	check(fern_slot >= 0 and not journal._slot_items[fern_slot].dim and "Found at" in journal._slot_items[fern_slot].description, "a pressed plant shows where you found it")
 	check(journal._slot_items[0].dim and journal._slot_items[0].description.begins_with("Look in: "), "an empty page says where to look (%s)" % journal._slot_items[0].description)
+	check(journal._slot_items[fern_slot].facts.ends_with("Common") and journal._slot_items[0].facts.begins_with("Common"), "each slot says how rare the plant is")
+	check(texts.any(func(t: String) -> bool: return t.begins_with("Rare finds: 0 of %d" % Herbarium.rare_count()[1])), "and the page counts the rare finds")
+	journal._cursor = fern_slot
+	journal._refresh_cursor()
+	check(journal._detail_name.get_minimum_size().x <= Journal.LINE_WIDTH + 1, "a long plant name and its facts fit on the line")
 	journal.show_tab(Journal.Tab.QUESTS)
 	texts = journal._body.get_children().filter(func(n: Node) -> bool: return n is Label).map(func(n: Label) -> String: return n.text)
 	check(texts[0] == "Main story" and texts.any(func(t: String) -> bool: return t.begins_with("The press book (1 of")), "the Quests tab carries the press book beside the main story")
@@ -346,6 +364,7 @@ func _check_world() -> void:
 ## Every plant comes up in every region it's said to grow in, in each of its seasons.
 func _check_growth() -> void:
 	var missing: Array[String] = []
+	var too_many: Array[String] = []
 	for region_id: String in REGIONS:
 		var region: Region = load("res://scenes/regions/%s.tscn" % region_id).instantiate()
 		add_child(region)
@@ -364,6 +383,9 @@ func _check_growth() -> void:
 				var should: bool = plant.grows.has(region_id) and Herbarium.in_season(plant, season)
 				if should != growing.has(plant.id):
 					missing.append("%s in %s, season %d" % [plant.id, region_id, season])
+				if int(growing.get(plant.id, 0)) > Herbarium.patches(plant):
+					too_many.append("%s in %s" % [plant.id, region_id])
 		region.free()
 	GameClock.season = GameClock.Season.SPRING
 	check(missing.is_empty(), "every plant grows where and when the press book says %s" % [missing])
+	check(too_many.is_empty(), "rare plants grow in fewer patches %s" % [too_many])

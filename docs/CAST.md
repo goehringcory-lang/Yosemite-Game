@@ -174,7 +174,7 @@ P4 What Grows Under the Giants  Galen Clark .................... giant sequoia +
 P5 Above the Rim ........... Enid Michael, Sentinel Dome ....... after P2 and the Apron. Jeffrey pine, 3 rim plants in all → tea.
                               The snow plant is protected: you sketch it, and the sketch counts.
 P6 Cassiope ................ John Muir, Tuolumne ............... after P5 and Cathedral Peak. White heather, 4 high-country plants → dry crusts.
-P7 The Full Press .......... Enid Michael ...................... after P4 and P6. 20 of the 26 plants → elderberry sauce.
+P7 The Full Press .......... Enid Michael ...................... after P4 and P6. 20 of the 124 plants → elderberry sauce.
                               Every outline is filled, by your hand. One sheet is left with no outline. → opens ★ 13.
 ```
 

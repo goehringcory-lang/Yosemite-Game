@@ -52,7 +52,11 @@ def main() -> None:
         full = os.path.join(build.ROOT, path)
         if cat is None or not os.path.exists(full):
             continue
-        if Image.open(full).size != size:  # already 32px (or resized): leave it
+        now = Image.open(full).size
+        # The press book's sheet grows a row at a time as plants are added,
+        # so for it the width alone says whether it's freshly drawn.
+        fresh = now[0] == size[0] if path == "assets/sprites/plants.png" else now == size
+        if not fresh:  # already 32px (or resized): leave it
             continue
         K.save(passes.run(cat, path, np.array(Image.open(full).convert("RGBA"))), full)
         n += 1

@@ -9,9 +9,10 @@ var plant_id := ""
 var cell: Vector2i
 
 ## The glint over a plant that's still wanted for the book: how often it
-## twinkles (seconds), and its color.
+## twinkles (seconds), and its color. A rare plant glints gold.
 const GLINT_EVERY := 2.4
 const GLINT := Color(1.0, 0.97, 0.8)
+const RARE_GLINT := Color(1.0, 0.8, 0.3)
 
 var _time := 0.0
 var _glint := 0.0
@@ -53,7 +54,8 @@ func _draw() -> void:
 	if not is_wanted() or _glint <= 0.0:
 		return
 	var at := Vector2(8, -26)
-	var color := Color(GLINT, _glint)
+	var rare := Herbarium.rarity(Herbarium.get_plant(plant_id)) >= Herbarium.RARE
+	var color := Color(RARE_GLINT if rare else GLINT, _glint)
 	var arm := 2 + 2 * int(_glint * 2.0)
 	draw_rect(Rect2(at.x - arm, at.y, arm * 2 + 2, 2), color)
 	draw_rect(Rect2(at.x, at.y - arm, 2, arm * 2 + 2), color)
@@ -83,9 +85,9 @@ func interact(player: Player) -> void:
 	PickupPop.spawn(sprite, player)
 	Sound.play("item_get")
 	var title := "Sketched: %s" if plant.get("protected", false) else "Pressed: %s"
-	var text := "%s\n\n%s" % [plant.latin, plant.note]
+	var text := "%s · %s\n\n%s" % [plant.latin, Herbarium.rarity_name(plant), plant.note]
 	if plant.get("protected", false):
-		text += "\n\nToo rare to pick. You draw it in the press book and leave it standing."
+		text += "\n\n" + Herbarium.sketch_reason(plant)
 	hud.show_info(title % plant.name, "%s\n\nPress book: %d of %d." % [text, Herbarium.count(), Herbarium.total()])
 
 

@@ -35,7 +35,7 @@ The player's way through the story is the **climbing guidebook**. Clark's first 
 
 ## The second storyline: the press book
 
-The **plant press** is the other way through the story, and it runs beside the tick list from the first chapter. Enid Michael gives it to the player at the Museum garden in Yosemite Village (she goes up to Sentinel Dome once the way to Glacier Point is open). With it, the player can press a sprig of any of the park's plants: 26 real species, from redbud and buckeye at El Portal to white heather at Tuolumne. Each grows where and when it really does, in the same spots every day, and a plant not yet in the book glints so it stands out from the scenery.
+The **plant press** is the other way through the story, and it runs beside the tick list from the first chapter. Enid Michael gives it to the player at the Museum garden in Yosemite Village (she goes up to Sentinel Dome once the way to Glacier Point is open). With it, the player can press a sprig of any of the park's plants: 124 real species, from redbud and buckeye at El Portal to white heather at Tuolumne, each common, uncommon, rare or very rare. The rarest (orchids, the snow plant, and plants that grow in Yosemite and almost nowhere else) grow in a single patch, and the player sketches them rather than picking. Each grows where and when it really does, in the same spots every day, and a plant not yet in the book glints so it stands out from the scenery.
 
 The rules are Enid's, and they're the park's: collecting takes a permit (the player works under hers), you take one sprig and leave the plant, and some plants you only draw. The snow plant is protected, so the player sketches it.
 

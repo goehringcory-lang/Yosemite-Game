@@ -43,9 +43,10 @@ _CELLS = {
 def _lit(path: str, big: np.ndarray) -> np.ndarray:
     """The one-light pass: glows are light themselves, and scene-sized
     overlays are lit by their own painting, so both are left alone."""
-    if "glow" in path or max(big.shape[:2]) > 400:
-        return big
     cell = _CELLS.get(path)
+    # the press book's sheet grows past 400px as plants are added: still lit
+    if "glow" in path or (max(big.shape[:2]) > 400 and path != "assets/sprites/plants.png"):
+        return big
     if cell:
         return K.per_cell(big, cell[0], cell[1], lambda c: K.form_light(c, _RIMS))
     return K.form_light(big, _RIMS)

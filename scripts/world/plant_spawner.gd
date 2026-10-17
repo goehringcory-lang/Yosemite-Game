@@ -3,15 +3,13 @@ extends Node2D
 ## Grows the press book's plants in a region (see Herbarium.PLANTS). Unlike
 ## forage they come up in the same places every day, so a plant you passed in
 ## spring is where you left it when you come back with the press: each kind
-## has a few spots near the place named in its "grows" entry, chosen once from
+## has a few spots (fewer if it's rare) near the place named in its "grows" entry, chosen once from
 ## the ground its habitat allows. What shows follows the season.
 ##
 ## World adds one to each region that has a ForageSpawner, whose scan of the
 ## map's habitats it shares.
 
 const SPECIMEN := preload("res://scenes/objects/plant_specimen.tscn")
-## How many of each plant grow in a region.
-const PER_PLANT := 3
 ## Tiles from the named spot to look for ground, widened until enough is found.
 const NEAR_TILES := [10, 18, 30]
 const PLACE_TRIES := 40
@@ -70,18 +68,19 @@ func grow() -> void:
 		if cells.is_empty():
 			push_warning("%s: no %s ground for %s" % [region.region_id, ItemData.Habitat.keys()[plant.habitat], plant.id])
 			continue
-		for cell in _pick_cells(plant.id, cells, str(grows[region.region_id]), taken):
+		for cell in _pick_cells(plant.id, Herbarium.patches(plant), cells, str(grows[region.region_id]), taken):
 			_add(plant.id, cell)
 
 
-## Up to PER_PLANT open cells for a plant, the same ones every time.
-func _pick_cells(plant_id: String, cells: Array, near: String, taken: Dictionary) -> Array[Vector2i]:
+## Up to [param wanted] open cells for a plant (fewer for rarer plants; see
+## Herbarium.PATCHES), the same ones every time.
+func _pick_cells(plant_id: String, wanted: int, cells: Array, near: String, taken: Dictionary) -> Array[Vector2i]:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("%s@%s" % [plant_id, region.region_id])
-	var pool := _near(cells, near)
+	var pool := _near(cells, near, wanted)
 	var picked: Array[Vector2i] = []
 	for attempt in PLACE_TRIES:
-		if picked.size() >= PER_PLANT or pool.is_empty():
+		if picked.size() >= wanted or pool.is_empty():
 			break
 		var cell: Vector2i = pool[rng.randi_range(0, pool.size() - 1)]
 		# Keep a plant's spots a few steps apart, so three don't sit in a row.
@@ -94,15 +93,16 @@ func _pick_cells(plant_id: String, cells: Array, near: String, taken: Dictionary
 
 
 ## The cells of [param cells] close to the spot named [param near]: within
-## the first of NEAR_TILES that holds enough ground, or all of them.
-func _near(cells: Array, near: String) -> Array:
+## the first of NEAR_TILES that holds enough ground for [param wanted]
+## patches, or all of them.
+func _near(cells: Array, near: String, wanted: int) -> Array:
 	var spot := _spot(near)
 	if spot == null:
 		return cells
 	var center := forage.world_to_cell(spot.global_position)
 	for reach: int in NEAR_TILES:
 		var close := cells.filter(func(cell: Vector2i) -> bool: return (cell - center).length() <= reach)
-		if close.size() >= PER_PLANT * 4:
+		if close.size() >= wanted * 4:
 			return close
 	return cells
 
