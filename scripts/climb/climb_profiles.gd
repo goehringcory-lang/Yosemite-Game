@@ -290,7 +290,7 @@ const PROFILES := {
 			"In 1986 Wolfgang Güllich free-soloed it, a first.",
 		],
 		"pitches": [
-			{"name": "The Roof", "style": "roof", "rows": 11, "cracks": 0.9, "crux": 9, "crux_name": "The lip", "deco": ["roof"], "beta": "Hang under the roof and jam out. Don't look down until you've turned the lip."},
+			{"name": "The Roof", "style": "roof", "rows": 9, "cracks": 0.9, "crux": 7, "crux_name": "The lip", "deco": ["roof"], "beta": "Hang under the roof and jam out. Don't look down until you've turned the lip."},
 		],
 	},
 	"the_nose": {

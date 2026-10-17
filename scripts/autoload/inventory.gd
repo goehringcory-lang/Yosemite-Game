@@ -24,6 +24,8 @@ func add(id: String, amount := 1) -> void:
 
 
 func remove(id: String, amount := 1) -> bool:
+	if amount <= 0:
+		return true
 	if count(id) < amount:
 		return false
 	items[id] -= amount

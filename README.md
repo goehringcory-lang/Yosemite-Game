@@ -28,7 +28,7 @@ godot project.godot         # opens the editor; press F5 to play
 | Settings: change a value | Left/Right (or E) | Stick or D-pad left/right (or A) |
 | Dialogue: show the whole page / next | E (first press / second press) | A |
 | Climbing: climb up, up-left, up-right | W / A / D (or arrows) | Stick up / left / right |
-| Climbing: place a cam or clip / eat at a ledge, or chalk up / retreat | Space or C / E / Esc | X / A / B |
+| Climbing: place a cam or clip / eat at a ledge, shake out on a jug, or chalk up / retreat | Space or C / E / Esc | X / A / B |
 | Climbing: aid a hard move, or jug a fixed rope | Shift + arrow | Y + stick |
 | *Debug:* skip 1 hour / sleep now | F2 / F3 | |
 
@@ -239,7 +239,9 @@ Each of the 13 routes is its own little game, set where the real climb is. Befor
 
 Your climber works up the face on a rope that runs through every quickdraw, cam or old piton to your belayer, who is the person from the story who sent you (Wren, Dick Leonard, Jules Eichorn, Royal Robbins, John Salathé, Beverly Johnson, Warren Harding, George Anderson, John Muir...). The climber shows what you own: red climbing shoes, a chalk bag, a harness with your cams (colored by size) and quickdraws, a belay device, aiders, a portaledge roll, an ice axe and crampons.
 
-**Controls:** arrows climb (up, up-left, up-right); **Space** clips a bolt or places a cam; **E** eats at a belay ledge (not when you're full) or chalks up on rock; **Shift + an arrow** aids a hard move (aiders) or jugs a fixed rope (ascenders); **Esc** asks if you want to retreat (**E** says yes, **Esc** again keeps climbing). Rings mark the holds you can reach, with what each costs after your shoes and chalk; the toolbar at the bottom is your rack, and lights up what you can do right now.
+**Controls:** arrows climb (up, up-left, up-right); **Space** clips a bolt or places a cam; **E** eats at a belay ledge (not when you're full), shakes out on a jug when you're pumped, or chalks up on rock; **Shift + an arrow** aids a hard move (aiders) or jugs a fixed rope (ascenders); **Esc** asks if you want to retreat (**E** says yes, **Esc** again keeps climbing). Rings mark the holds you can reach, with what each costs after your shoes and chalk; the toolbar at the bottom is your rack, and lights up what you can do right now.
+
+**Reading the line.** Every hold is a jug (big, cheap), an edge, or a crimp (small, costly). Crimps and cruxes **pump** your forearms, and every point of pump (the meter beside your stamina) adds 1 to every move and narrows the crux meter. A jug lets you recover a little; shaking out on one (**E**, once a hold, 3 minutes) drains most of the pump, and a stance or a belay clears it. Placing gear is cheap from a jug (-1) and strenuous off a crimp (-5), and a fall more than three moves above your last piece ends the climb. So on the harder routes the cheapest-looking hold isn't always the right one: plan a line that strings jugs between the crimps, protect from good holds, and eat at the belay for the pitch you can see ahead. The first slabs stay forgiving: on easy pitches edges don't pump you, and the hold beside every bolt is good enough to clip from.
 
 **What each piece of gear does** (so the gear you earn in the story changes how you climb):
 
@@ -258,7 +260,7 @@ Your climber works up the face on a rope that runs through every quickdraw, cam 
 
 **Pitch styles** change the rules as well as the art: friction **slab** (Firefall Slab, Swan Slab), **crack** and **flake** (the Grack, Nutcracker, Astroman), **chimney** (Steck-Salathé's Chockstone Chimney and Narrows, Astroman's Harding Slot: alternate Left and Right), **roof** (Separate Reality, the Great Roof: the picture runs sideways), **dike** (Snake Dike: stay on the ribbon, bolts are far apart), **knobs** (Cathedral Peak), **snow** and **ice** (Lyell Glacier: crevasses, and slush after noon).
 
-**Crux moves** ask for a short skill check: stop a marker in the green zone (Firefall Slab's bulge, Separate Reality's lip), tap Up for a mantel (Nutcracker), or alternate Left and Right to the beat (the Narrows, the King Swing, the Pendulum). Hit the middle of the green for stamina back. Miss the green and you're pumped: you eat something from your pack right there (`E`) before you can try the move again, and with nothing to eat you come off onto the rope. Each harder climb has more crux points (the route card shows a `*` for each one on a pitch) and a faster marker, but it never crosses the green in less than about an eighth of a second, and every miss makes the next try a little wider and slower. Nothing is timed against you otherwise.
+**Crux moves** ask for a short skill check: stop a marker in the green zone (Firefall Slab's bulge, Separate Reality's lip), tap Up for a mantel (Nutcracker), or alternate Left and Right to the beat (the Narrows, the King Swing, the Pendulum). Hit the middle of the green for stamina back (and a little pump off). Arrive pumped and the green is narrower. Miss the green and you're spent: you eat something from your pack right there (`E`) before you can try the move again, and with nothing to eat you come off onto the rope. Each harder climb has more crux points (the route card shows a `*` for each one on a pitch) and a faster marker, but it never crosses the green in less than a tenth of a second, and every miss makes the next try a little wider and slower. Nothing is timed against you otherwise.
 
 **Style** is rated on the result card: an *onsight* (no falls), *hard-won* (falls but free), or *aided*. The Nose can be done free, as the story asks, or with aid.
 

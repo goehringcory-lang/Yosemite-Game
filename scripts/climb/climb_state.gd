@@ -25,6 +25,14 @@ extends RefCounted
 ## the check and you're pumped: you eat something from the pack before you can
 ## try the move again, and with nothing to eat you come off. Harder pitches
 ## have more crux points and a faster meter.
+##
+## Holds have a grip: a jug, an edge or a crimp. Crimps (and cruxes) pump your
+## forearms, and every couple of points of [member pump] adds to what each
+## move costs and narrows the crux meter. A jug lets your arms recover a
+## little, shaking out on one (or reaching a stance) recovers a lot, and
+## placing gear is cheap from a jug and strenuous from a crimp. So the line
+## matters: string the crimps together and you'll be paying double by the
+## crux; break them up with jugs and place your gear from good holds.
 
 enum Status { CLIMBING, TOPPED_OUT, RETREATED }
 
@@ -69,8 +77,39 @@ const CHALK_BONUS := 3
 const CHALK_MOVES := 2
 ## A good stance (a rest hold) gives this much stamina back.
 const REST_STANCE := 6
+## Pump: what moving onto each grip does to your forearms (see [member pump]).
+const PUMP_MAX := 6
+const PUMP_JUG := -1
+const PUMP_EDGE := 1
+const PUMP_CRIMP := 3
+## Pitches this grade or under are gentle on the arms (see [method pump_change]).
+const EASY_GRADE := 2
+## A crux hold pumps you this much on top of its grip.
+const PUMP_CRUX := 1
+## The screen warns you when pump reaches this.
+const PUMP_WARN := 3
+## Every this many points of pump add 1 to each move.
+const PUMP_PER_COST := 1
+## Each point of pump takes this much off the crux meter's green.
+const PUMP_WINDOW := 0.02
+## Shaking out on a jug or a stance takes this much pump off, once a hold.
+const SHAKE_PUMP := 5
+const MINUTES_TO_SHAKE := 3
+## Stamina it takes to place a cam or clip a draw, by the hold you're on.
+const PROTECT_COST := {"jug": 1, "edge": 2, "crimp": 5}
+## How often each grip comes up, by pitch style: [jug, edge] (the rest are
+## crimps). The guaranteed line is drawn from the same mix.
+const GRIPS := {
+	"slab": [0.15, 0.5],
+	"crack": [0.25, 0.45],
+	"flake": [0.3, 0.45],
+	"chimney": [0.3, 0.55],
+	"roof": [0.15, 0.4],
+	"knobs": [0.45, 0.35],
+	"dike": [0.25, 0.45],
+}
 ## Each step up the grades adds this much to what a hold costs.
-const COST_PER_GRADE := 1.2
+const COST_PER_GRADE := 1.0
 ## A crux point that isn't the pitch's named crux adds this much to its holds.
 const CRUX_POINT_COST := 2
 ## Missing a crux costs this much stamina, plus PUMP_PER_GRADE a grade.
@@ -82,7 +121,7 @@ const CRUX_SPEED := 0.85
 const CRUX_SPEED_PER_GRADE := 0.12
 const CRUX_SPEED_PER_ROUTE_GRADE := 0.06
 ## ...but never so fast that it crosses the green in less than this.
-const CRUX_MIN_GREEN_SECONDS := 0.13
+const CRUX_MIN_GREEN_SECONDS := 0.1
 ## Each miss on a crux makes the next try a little easier: a wider green and
 ## a slower marker, up to CRUX_MERCY_TRIES misses.
 const CRUX_MERCY_WINDOW := 0.03
@@ -105,8 +144,10 @@ const SLUSH_HOUR := 12.0
 ## The route card tells you to start high-country routes before this hour.
 const ALPINE_START_BEFORE := 10
 ## For the route card's late-start warning: extra minutes a pitch takes beyond
-## its moves (the belay, a clip or two, and a fall now and then).
-const ESTIMATE_PER_PITCH := 16
+## its moves (the belay, a clip or two, and a fall now and then), and more
+## for each grade (shaking out, and the falls a hard pitch brings).
+const ESTIMATE_PER_PITCH := 20
+const ESTIMATE_PER_GRADE := 6
 
 var route: RouteData
 var status := Status.CLIMBING
@@ -114,6 +155,9 @@ var pitch := 0
 var row := 0
 var col := COLUMNS / 2
 var stamina := MAX_STAMINA
+## How pumped your forearms are, 0 to [constant PUMP_MAX]. Cleared at a belay,
+## a stance and after a fall; shaking out on a jug takes most of it off.
+var pump := 0
 var cams_per_pitch := 0
 var cams_left := 0
 var quickdraws_per_pitch := 0
@@ -176,6 +220,7 @@ var last_dx := 0
 
 var _rng := RandomNumberGenerator.new()
 var _rested_rows := {}
+var _shaken_rows := {}
 ## 1 once [method route_has_fixed_pieces] has found some, 0 if none, -1 unasked.
 var _has_fixed := -1
 
@@ -296,10 +341,80 @@ func move_cost(r: int, c: int) -> int:
 			cost += CHIMNEY_PENALTY
 	if is_stormy():
 		cost += STORM_PENALTY
+	cost += pump_cost()
 	# Slush and storms don't stack: a storm already makes the snow wet.
 	if is_snow() and not is_stormy() and hour() >= SLUSH_HOUR and hour() < 20.0:
 		cost += 1
 	return maxi(cost, 1)
+
+
+## What pump adds to every move right now.
+func pump_cost() -> int:
+	return pump / PUMP_PER_COST
+
+
+## The grip of the hold at ([param r], [param c]): "jug", "edge", "crimp",
+## or "step" (snow, and the ledges).
+func grip_at(r: int, c: int) -> String:
+	return hold_at(r, c).get("grip", "step")
+
+
+## The grip you're hanging on now.
+func grip() -> String:
+	return grip_at(row, col)
+
+
+## What moving onto [param hold] does to your pump. Edges on an easy pitch
+## (grade 2 or under) don't pump you.
+func pump_change(hold: Dictionary) -> int:
+	var change := 0
+	match hold.get("grip", "step"):
+		"jug":
+			change = PUMP_JUG
+		"edge":
+			change = PUMP_EDGE if int(spec.get("diff", 2)) > EASY_GRADE else 0
+		"crimp":
+			change = PUMP_CRIMP
+	if hold.get("crux", false):
+		change += PUMP_CRUX
+	return change
+
+
+## Stamina it takes to place a piece from where you hang.
+func protect_cost() -> int:
+	if hold_at(row, col).get("rest", false):
+		return 1
+	return int(PROTECT_COST.get(grip(), 2))
+
+
+## True on a jug or a stance you haven't shaken out on yet, with pump to lose.
+func can_shake() -> bool:
+	if status != Status.CLIMBING or not pending.is_empty() or is_at_belay() or pump <= 0:
+		return false
+	var hold := hold_at(row, col)
+	return (hold.get("grip", "") == "jug" or hold.get("rest", false)) and not _shaken_rows.has(row)
+
+
+## Hangs off a straight arm and shakes the other one out: most of the pump
+## goes, once a hold.
+func shake_out() -> bool:
+	if not can_shake():
+		if status != Status.CLIMBING or not pending.is_empty():
+			return false
+		if pump <= 0:
+			message = "Your arms feel fine."
+		elif _shaken_rows.has(row):
+			message = "You've shaken out here already. Move on before it saps you."
+		else:
+			message = "You can't let go here. Shake out on a jug."
+		return false
+	_shaken_rows[row] = true
+	var before := pump
+	pump = maxi(pump - SHAKE_PUMP, 0)
+	minutes += MINUTES_TO_SHAKE
+	message = "You shake out on the jug. The pump drains away (%d to %d)." % [before, pump]
+	events.append({"type": "shake"})
+	return true
 
 
 ## Fixed pieces per pitch: how many quickdraws it takes to clip them all.
@@ -341,6 +456,7 @@ func aid_step(dx: int) -> bool:
 	placed_cams.append(cell)
 	protection.append({"cell": cell, "kind": "cam", "hw": "cam", "aid": true})
 	_step(dx, AID_STAMINA, MINUTES_PER_AID, true)
+	pump = maxi(pump - 1, 0)
 	aid_moves += 1
 	if status == Status.CLIMBING:
 		message = "You place a cam and stand in your aiders. Pulled through (+1 aid move)."
@@ -362,6 +478,7 @@ func jug(dx: int) -> bool:
 		return false
 	# You can't fall off a fixed rope, so jugging never takes the last stamina.
 	_step(dx, maxi(mini(JUG_STAMINA, stamina - 1), 0), MINUTES_PER_JUG, true)
+	pump = maxi(pump - 1, 0)
 	jug_moves += 1
 	events.append({"type": "jug"})
 	return true
@@ -376,10 +493,17 @@ func _step(dx: int, cost: int, mins: int, safe := false) -> void:
 	stamina -= cost
 	minutes += mins
 	chalk_moves = maxi(chalk_moves - 1, 0)
+	var pump_before := pump
+	if not safe:
+		pump = clampi(pump + pump_change(hold), 0, PUMP_MAX)
 	message = ""
+	if pump >= PUMP_WARN and pump_before < PUMP_WARN:
+		message = "Your forearms are pumping (+%d a move). Shake out on a jug." % pump_cost()
+		events.append({"type": "pumped"})
 	if hold.get("rest", false) and row < top_row and not _rested_rows.has(row):
 		_rested_rows[row] = true
 		stamina = mini(stamina + REST_STANCE, MAX_STAMINA)
+		pump = 0
 		message = "A good stance. You shake out (+%d)." % REST_STANCE
 		events.append({"type": "rest"})
 	if hold.get("crux", false) and row < top_row and not safe:
@@ -411,7 +535,8 @@ func _settle() -> void:
 
 ## How wide the green zone of the crux meter is, 0..1 of the bar. The
 ## better your kit and your hands, the more forgiving the move, and every
-## miss on a crux widens it a little for the next try.
+## miss on a crux widens it a little for the next try. Pumped forearms
+## narrow it.
 func crux_window() -> float:
 	var window := 0.30 - 0.025 * int(spec.get("diff", 2))
 	if has_shoes:
@@ -422,7 +547,8 @@ func crux_window() -> float:
 		window += 0.12
 	window += Perks.bonus("steady_breath")
 	window += CRUX_MERCY_WINDOW * _crux_mercy()
-	return clampf(window, 0.12, 0.5)
+	window -= PUMP_WINDOW * pump
+	return clampf(window, 0.1, 0.5)
 
 
 ## How fast the crux meter's marker moves, in bar lengths a second: faster on
@@ -465,19 +591,20 @@ func resolve_crux(result: String) -> void:
 		if stamina > 0 and _has_spare_food():
 			pending.tries = int(pending.get("tries", 0)) + 1
 			pending.pumped = true
-			message = "You miss %s and you're pumped (-%d). Eat something, then try again." % [name.to_lower(), cost]
+			message = "You miss %s and you're spent (-%d). Eat something, then try again." % [name.to_lower(), cost]
 			return
 		pending = {}
 		if stamina > 0:
 			_fall()
 			if status == Status.CLIMBING:
-				message = "Pumped on %s with nothing to eat, you come off. " % name.to_lower() + message
+				message = "Spent on %s with nothing to eat, you come off. " % name.to_lower() + message
 		else:
 			_settle()
 		return
 	pending = {}
 	if result == "perfect":
 		stamina = mini(stamina + 3 + diff, MAX_STAMINA)
+		pump = maxi(pump - 2, 0)
 		perfect_cruxes += 1
 		message = "Sent! Perfect through %s (+%d)." % [name.to_lower(), 3 + diff]
 	else:
@@ -498,9 +625,9 @@ func place_cam() -> bool:
 	protection_row = row
 	placed_cams.append(Vector2i(col, row))
 	protection.append({"cell": Vector2i(col, row), "kind": "cam", "hw": "cam"})
-	stamina -= 1
+	_protect_effort()
 	minutes += MINUTES_PER_CAM
-	message = "Cam placed."
+	message = _protect_message("Cam placed.")
 	events.append({"type": "cam"})
 	return true
 
@@ -529,11 +656,26 @@ func clip_bolt() -> bool:
 	protection_row = row
 	clipped_bolts.append(bolt)
 	protection.append({"cell": bolt, "kind": "draw", "hw": hw})
-	stamina -= 1
+	_protect_effort()
 	minutes += MINUTES_PER_CLIP
-	message = "Clipped the old piton." if hw == "pin" else "Clipped. The rope runs through the quickdraw."
+	message = _protect_message("Clipped the old piton." if hw == "pin" else "Clipped. The rope runs through the quickdraw.")
 	events.append({"type": "clip", "hw": hw})
 	return true
+
+
+## Placing a piece: cheap from a jug, strenuous off a crimp. It never takes
+## the last of your stamina: you'd rather hang on than finish the placement.
+func _protect_effort() -> void:
+	var effort := protect_cost()
+	stamina = maxi(stamina - effort, 1) if stamina > 0 else stamina
+	if grip() == "crimp" and not hold_at(row, col).get("rest", false):
+		pump = mini(pump + 1, PUMP_MAX)
+
+
+func _protect_message(done: String) -> String:
+	if grip() == "crimp" and not hold_at(row, col).get("rest", false):
+		return done + " Fiddly off a crimp (-%d)." % protect_cost()
+	return done
 
 
 ## The protect button: clips a bolt within reach, or places a cam in a crack.
@@ -699,6 +841,7 @@ func _fall() -> void:
 	falls += 1
 	falls_this_pitch += 1
 	minutes += MINUTES_PER_FALL
+	pump = 0
 	events.append({"type": "fall"})
 	if falls_this_pitch >= MAX_FALLS_PER_PITCH:
 		retreat("That's %d falls on this pitch. Your arms are done, so you lower off and head down." % falls_this_pitch)
@@ -801,11 +944,13 @@ func minutes_until_morning() -> int:
 
 
 ## About how long a route takes in game minutes, without any nights on the
-## wall: every move, plus the belay and the odd fall on each pitch.
+## wall: every move, plus the belay, the shake-outs and the odd fall on each
+## pitch.
 static func estimate_minutes(r: RouteData) -> int:
 	var total := 0
 	for i in r.pitches.size():
-		total += int(ClimbProfiles.pitch_spec(r, i).rows) * MINUTES_PER_MOVE + ESTIMATE_PER_PITCH
+		var pitch_spec := ClimbProfiles.pitch_spec(r, i)
+		total += int(pitch_spec.rows) * MINUTES_PER_MOVE + ESTIMATE_PER_PITCH + ESTIMATE_PER_GRADE * int(pitch_spec.diff)
 	return total
 
 
@@ -841,6 +986,8 @@ func _start_pitch() -> void:
 	chalked_this_pitch = false
 	pending = {}
 	_rested_rows = {}
+	_shaken_rows = {}
+	pump = 0
 	spec = ClimbProfiles.pitch_spec(route, pitch)
 	top_row = int(spec.rows)
 	_generate_holds()
@@ -881,7 +1028,8 @@ func _generate_holds() -> void:
 			# The dike snakes across the face; the line follows it.
 			var sign := -1.0 if pitch % 2 == 1 else 1.0
 			var target := 2.0 + sign * 1.7 * sin(r * 0.55) * minf(r / 2.0, 1.0)
-			path_col = clampi(roundi(target), cols.min(), cols.max())
+			# ...one column at a time, so it stays within reach.
+			path_col = clampi(clampi(roundi(target), path_col - 1, path_col + 1), cols.min(), cols.max())
 		else:
 			# A guaranteed line: each row has a hold within reach of the one below.
 			path_col = clampi(path_col + _rng.randi_range(-1, 1), cols.min(), cols.max())
@@ -912,8 +1060,16 @@ func _generate_holds() -> void:
 		if r > 0 and r < top_row and path.has(r):
 			bolts[r] = path[r]
 			bolt_kinds[r] = spec.get("pin_kind", "pin")
+	# Bolts and pitons were placed where you can let go and clip: the hold
+	# beside each one is never a crimp.
+	for r: int in bolts:
+		var hold: Dictionary = holds[r][path[r]]
+		if hold.get("grip", "step") == "crimp" and not hold.get("crux", false):
+			hold.grip = "edge"
+			hold.cost = _grip_cost(difficulty, "edge")
+			hold.erase("hard")
 	if _crack_chance() > 0.0 and not is_snow():
-		_ensure_cracks()
+		_ensure_cracks(path)
 
 
 ## Gives every hold at least one hold within reach above it, so the player
@@ -929,10 +1085,33 @@ func _remove_dead_ends(difficulty: int, cols: Array) -> void:
 				holds[r + 1][nc] = _make_hold(difficulty, false)
 
 
+## A grip for a new hold on this pitch's style (see [constant GRIPS]).
+func _roll_grip(on_line: bool) -> String:
+	if style() == "dike" and not on_line:
+		return "crimp"
+	var mix: Array = GRIPS.get(style(), GRIPS.crack)
+	var roll := _rng.randf()
+	if roll < float(mix[0]):
+		return "jug"
+	return "edge" if roll < float(mix[0]) + float(mix[1]) else "crimp"
+
+
+## What a hold of [param grip] costs on a pitch of [param difficulty].
+func _grip_cost(difficulty: int, grip_name: String) -> int:
+	var base := 2 + roundi(difficulty * COST_PER_GRADE)
+	match grip_name:
+		"jug":
+			return maxi(base - 2, 2) + _rng.randi_range(0, 1)
+		"crimp":
+			return base + 1 + _rng.randi_range(0, 1)
+	return base - 1 + _rng.randi_range(0, 1)
+
+
 func _make_hold(difficulty: int, on_line: bool) -> Dictionary:
-	var cost := 2 + roundi(difficulty * COST_PER_GRADE) + _rng.randi_range(0, 2)
+	var grip_name := _roll_grip(on_line)
+	var cost := _grip_cost(difficulty, grip_name)
 	var crack := _rng.randf() < _crack_chance()
-	var hold := {"cost": cost, "crack": crack}
+	var hold := {"cost": cost, "crack": crack, "grip": grip_name}
 	match style():
 		"knobs":
 			hold.cost = maxi(cost - 1, 2)
@@ -940,21 +1119,23 @@ func _make_hold(difficulty: int, on_line: bool) -> Dictionary:
 			hold.cost = 1 + difficulty + _rng.randi_range(0, 2)
 			hold.crack = false
 			hold["kind"] = "snow"
+			hold.grip = "step"
 		"ice":
+			# Swinging tools is hard on the arms: every hold is an edge.
 			hold.cost = 2 + difficulty + _rng.randi_range(0, 3)
 			hold.crack = false
 			hold["kind"] = "ice"
+			hold.grip = "edge"
 		"chimney":
 			hold.cost = maxi(cost - 1, 3)
 		"dike":
 			# On the dike it's easy; off it, it's blank slab.
-			hold.cost = maxi(cost - 2, 2) if on_line else cost + 3
+			hold.cost = maxi(cost - 2, 2) if on_line else cost + 2
 			hold["dike"] = on_line
 			hold.crack = hold.crack and not on_line
 		"roof":
 			hold.cost = cost
-	var base := 2 + difficulty + 1
-	if hold.cost >= base + 3:
+	if hold.grip == "crimp":
 		hold["hard"] = true
 	return hold
 
@@ -970,30 +1151,35 @@ func _apply_features(path: Dictionary, difficulty: int) -> void:
 			hold.cost = int(hold.cost) + extra
 			hold["crux"] = true
 			hold["hard"] = true
+			if hold.get("grip", "step") == "jug":
+				hold.grip = "edge"
 	for r: int in spec.get("rest", []):
 		if r > 0 and r < top_row:
 			for c: int in holds[r]:
 				holds[r][c].cost = 2
 				holds[r][c]["rest"] = true
 				holds[r][c].erase("hard")
+				if holds[r][c].get("grip", "step") != "step":
+					holds[r][c].grip = "jug"
 	for r: int in spec.get("fixed", []):
 		if r > 0 and r < top_row and path.has(r):
 			holds[r][path[r]]["fixed"] = true
 
 
 ## Makes sure a careful climber can protect every stretch of DANGEROUS_RUNOUT
-## moves, so no pitch is impossible to climb safely. Fixed pieces count.
-func _ensure_cracks() -> void:
-	for start in range(1, top_row, DANGEROUS_RUNOUT - 1):
-		var has_crack := false
-		for r in range(start, mini(start + DANGEROUS_RUNOUT - 1, top_row)):
-			has_crack = has_crack or bolts.has(r)
-			for c: int in holds[r]:
-				has_crack = has_crack or holds[r][c].crack
-		if not has_crack:
-			var r := mini(start + 1, top_row - 1)
-			var c: int = holds[r].keys()[0]
+## moves, so no pitch is impossible to climb safely: the guaranteed line has a
+## crack (or a fixed piece) at least every DANGEROUS_RUNOUT - 1 moves.
+func _ensure_cracks(path: Dictionary) -> void:
+	var since := 0
+	for r in range(1, top_row):
+		since += 1
+		var c: int = path[r]
+		var protectable: bool = holds[r][c].crack or (bolts.has(r) and absi(int(bolts[r]) - c) <= 1)
+		if not protectable and since >= DANGEROUS_RUNOUT - 1:
 			holds[r][c].crack = true
+			protectable = true
+		if protectable:
+			since = 0
 
 
 func _nearest_hold_column(r: int, from_col: int) -> int:
