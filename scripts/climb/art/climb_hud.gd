@@ -62,6 +62,31 @@ static func stamina(ci: CanvasItem, state: ClimbState, flash: float, shake: floa
 	UI.outlined(ci, Vector2(r.position.x + r.size.x / 2.0, r.end.y + 10), "%d" % maxi(state.stamina, 0), UI.WARN if state.stamina <= 25 else UI.CREAM, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 
 
+## The pump meter beside the stamina bar: a cell for each point of pump, and
+## what it adds to every move under it.
+static func pump(ci: CanvasItem, state: ClimbState, time: float) -> void:
+	var cells := ClimbState.PUMP_MAX
+	var r := Rect2(SCREEN.x - 44, SCREEN.y - 100, 6, 76)
+	UI.panel(ci, r.grow(3))
+	ci.draw_rect(r, Color("2a1b14"))
+	var gap := 2.0
+	var h := (r.size.y - gap * (cells - 1)) / cells
+	var hot := state.pump >= cells - 1 and fmod(time, 0.5) < 0.25
+	for i in cells:
+		var y := r.end.y - (i + 1) * h - i * gap
+		if i < state.pump:
+			var col: Color = UI.GOLD if i < 2 else UI.WARN
+			if hot:
+				col = col.lightened(0.4)
+			ci.draw_rect(Rect2(r.position.x, y, r.size.x, h), col)
+			ci.draw_rect(Rect2(r.position.x, y, r.size.x, 1), col.lightened(0.35))
+		else:
+			ci.draw_rect(Rect2(r.position.x, y, r.size.x, h), Color(1, 1, 1, 0.06))
+	UI.outlined(ci, Vector2(r.position.x + r.size.x / 2.0, r.position.y - 9), "pump", UI.CREAM, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+	var extra := state.pump_cost()
+	UI.outlined(ci, Vector2(r.position.x + r.size.x / 2.0, r.end.y + 10), "+%d" % extra if extra > 0 else "0", UI.WARN if extra >= 3 else UI.CREAM, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+
+
 ## The rack as a Stardew-style toolbar. Slots light up when what they do is
 ## possible right now. Returns the x where the toolbar ends.
 static func toolbar(ci: CanvasItem, state: ClimbState, time: float, usable: Dictionary) -> float:
@@ -172,7 +197,7 @@ static func pitch_banner(ci: CanvasItem, state: ClimbState, age: float) -> void:
 static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, time: float) -> void:
 	var r := Rect2(SCREEN.x * 0.5 - 110, 60, 220, 66)
 	UI.panel(ci, r)
-	UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 17), ("PUMPED: " if kind == "pumped" else "CRUX: ") + name.to_upper(), UI.WARN_DARK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 17), ("SPENT: " if kind == "pumped" else "CRUX: ") + name.to_upper(), UI.WARN_DARK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 	var bar := Rect2(r.position.x + 16, r.position.y + 28, 188, 12)
 	match kind:
 		"pumped":

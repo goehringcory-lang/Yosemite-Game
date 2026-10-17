@@ -14,8 +14,8 @@ extends CanvasLayer
 ## are spent on a ledge or a portaledge.
 ##
 ## Controls: arrows climb (up = straight up, left/right = up-left/up-right);
-## use tool = clip a bolt or place a cam; interact = eat (at a belay ledge) or
-## chalk up (on the wall); Shift + an arrow = aid a hard move or jug a fixed
+## use tool = clip a bolt or place a cam; interact = eat (at a belay ledge),
+## shake out (on a jug, when pumped) or chalk up (on the wall); Shift + an arrow = aid a hard move or jug a fixed
 ## rope (when you have the gear); cancel = retreat (asks first).
 
 ## Emitted when the player leaves the screen after topping out or retreating.
@@ -266,6 +266,8 @@ func _climb_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("interact"):
 		if state.is_at_belay():
 			eat_next()
+		elif state.can_shake():
+			state.shake_out()
 		else:
 			state.chalk_up()
 	elif event.is_action_pressed("ui_cancel"):
@@ -366,6 +368,12 @@ func _events() -> void:
 			"rest":
 				_stamina_flash = 0.7
 				if randf() < 0.5:
+					_speak("rest")
+			"shake":
+				Sound.play("climb_chalk", -6.0)
+				_act_t = -0.6 # held a little longer than the other actions
+				_act_kind = "shake"
+				if randf() < 0.4:
 					_speak("rest")
 			"fall":
 				Sound.play("climb_fall", 0.0, 0.03)
@@ -951,6 +959,9 @@ func _pose() -> Dictionary:
 				a = ClimbSprites.protect_pose(step)
 			"eat":
 				a = ClimbSprites.eat_pose()
+			"shake":
+				a = ClimbSprites.rest_pose()
+				a["hl"] += Vector2(sin(_time * 40.0) * 1.5, 0)
 	if state.chalk_moves > 0:
 		a["chalk"] = true
 	return a
@@ -969,6 +980,8 @@ func _hint() -> String:
 	if state.is_at_belay():
 		if state.can_eat():
 			parts.append("E: eat")
+	elif state.can_shake():
+		parts.append("E: shake out")
 	elif state.can_chalk():
 		parts.append("E: chalk up")
 	for dx in [-1, 0, 1]:
@@ -991,7 +1004,7 @@ func _usable() -> Dictionary:
 		return out
 	out["cam"] = state.can_place_cam() and not state.can_clip()
 	out["clip"] = state.can_clip()
-	out["chalk"] = state.can_chalk()
+	out["chalk"] = state.can_chalk() and not state.can_shake()
 	out["eat"] = state.can_eat()
 	for dx in [-1, 0, 1]:
 		out["jug"] = out.get("jug", false) or state.can_jug(dx)
@@ -1030,6 +1043,10 @@ func _draw_reachable() -> void:
 			label += " rest"
 		elif hold.get("fixed", false):
 			label += " fixed"
+		elif hold.get("grip", "") == "jug":
+			label += " jug"
+		elif hold.get("grip", "") == "crimp":
+			label += " crimp"
 		# the number in cream (the ring's colour says how hard; a green "-1"
 		# read as a gain), unless it's a rest or crux, which keep their colour
 		var ink: Color = color if hold.get("rest", false) or hold.get("crux", false) else UI.CREAM
@@ -1095,6 +1112,7 @@ func _draw_hud(height: float) -> void:
 	ClimbHud.route_plate(_canvas, state, feet)
 	ClimbHud.topo_bar(_canvas, state, height)
 	ClimbHud.stamina(_canvas, state, _stamina_flash, 0.0)
+	ClimbHud.pump(_canvas, state, _time)
 	if _phase == Phase.CLIMB or _phase == Phase.PAUSE:
 		var toolbar_end := ClimbHud.toolbar(_canvas, state, _time, _usable())
 		ClimbHud.hints(_canvas, _hint(), toolbar_end + 6.0)

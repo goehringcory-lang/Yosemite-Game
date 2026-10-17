@@ -211,16 +211,4 @@ func press(game: ClimbMinigame, action: String) -> void:
 
 ## One decision, using the rules directly (like the bot in climb_bot.gd).
 func bot_step(game: ClimbMinigame, bot: ClimbBot) -> void:
-	var s := game.state
-	if s.is_at_belay():
-		bot._eat(s)
-	bot._protect(s)
-	bot._chalk(s)
-	var choice := bot._choose(s)
-	var dx: int = choice.dx
-	if choice.mode == "jug":
-		s.jug(dx)
-	elif choice.mode == "aid":
-		s.aid_step(dx)
-	else:
-		s.move(dx)
+	bot.step(game.state)

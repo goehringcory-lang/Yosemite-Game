@@ -914,7 +914,8 @@ static func _ledge(im: Image, c: Dictionary, rng: RandomNumberGenerator, y: int,
 static func _hold(im: Image, c: Dictionary, rng: RandomNumberGenerator, p: Vector2i, hold: Dictionary, base: int, style: String) -> void:
 	var cost: int = hold.cost
 	var hard: bool = hold.get("hard", false)
-	var easy := cost <= base
+	# Jugs are drawn big and crimps small, so you can read the line from below.
+	var easy: bool = hold.get("grip", "") == "jug" if hold.has("grip") else cost <= base
 	if style == "snow" or style == "ice":
 		# A kicked step in the snow, or a chipped hold in the ice.
 		var col := tone(c, 1.6)

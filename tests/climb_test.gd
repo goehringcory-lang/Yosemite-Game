@@ -44,6 +44,8 @@ func _ready() -> void:
 	test_pitch_generation()
 	test_every_route_is_climbable()
 	test_gear_verbs()
+	test_pump()
+	test_safe_lines()
 	test_crux()
 	test_weather_and_snow()
 	test_nights()
@@ -118,6 +120,9 @@ func test_every_route_is_climbable() -> void:
 	var stats := OS.get_environment("CLIMB_STATS") != ""
 	if stats:
 		print_food_sweep()
+	var hard_careful := 0.0
+	var hard_greedy := 0.0
+	var hard_count := 0
 	for r in Guidebook.routes():
 		var tops := 0
 		var falls := 0
@@ -135,9 +140,36 @@ func test_every_route_is_climbable() -> void:
 				aided += 1 if state.aid_moves > 0 else 0
 		Inventory.items.clear()
 		var rate := tops / float(runs)
+		var greedy_rate := greedy_rate(r, runs)
 		if stats:
-			print("STATS %-24s %-12s tops %2d/%d  falls/top %.1f  hours %.1f  aided %d" % [r.id, r.grade.substr(0, 12), tops, runs, falls / float(maxi(tops, 1)), minutes / 60.0 / maxi(tops, 1), aided])
+			print("STATS %-24s %-12s tops %2d/%d  greedy %3d%%  falls/top %.1f  hours %.1f  aided %d" % [r.id, r.grade.substr(0, 12), tops, runs, roundi(greedy_rate * 100), falls / float(maxi(tops, 1)), minutes / 60.0 / maxi(tops, 1), aided])
 		check(rate >= 0.85, "a careful climber with the recommended food tops out %s (%d of %d)" % [r.id, tops, runs])
+		if r.pitches.max() <= ClimbState.EASY_GRADE:
+			check(greedy_rate >= 0.85, "%s forgives a beginner who just takes the cheapest hold (%d%%)" % [r.id, roundi(greedy_rate * 100)])
+		elif r.pitches.max() >= 4:
+			hard_careful += rate
+			hard_greedy += greedy_rate
+			hard_count += 1
+	# The hard routes reward reading the line: shaking out, protecting from
+	# good holds, eating for the pitch ahead.
+	hard_careful /= hard_count
+	hard_greedy /= hard_count
+	check(hard_careful - hard_greedy >= 0.15, "on the hard routes, planning tops out clearly more often than taking the cheapest hold (%d%% vs %d%%)" % [roundi(hard_careful * 100), roundi(hard_greedy * 100)])
+
+
+## How often a climber who only reads the rings (the cheapest hold, gear
+## whenever it fits, no shaking out) tops out with the recommended food.
+func greedy_rate(r: RouteData, runs: int) -> float:
+	var tops := 0
+	for seed in runs:
+		food_for(r)
+		var state := ClimbState.new(r, int(kit_for(r).get("cam", 0)), seed, kit_for(r))
+		var bot := ClimbBot.new()
+		bot.greedy = true
+		bot.play(state)
+		tops += 1 if state.status == ClimbState.Status.TOPPED_OUT else 0
+	Inventory.items.clear()
+	return tops / float(runs)
 
 
 func test_gear_verbs() -> void:
@@ -215,6 +247,75 @@ func test_gear_verbs() -> void:
 	var base_l := int(steck.hold_at(1, 1).cost)
 	var base_r := int(steck.hold_at(1, 3).cost)
 	check(left <= maxi(base_l - 1 - 1, 1) + 0 and right >= base_r - 1, "alternating sides in a chimney is cheaper than repeating (%d vs %d)" % [left, right])
+
+
+## A pitch of hand-made holds on Astroman's second pitch (grade 4): row 1 a
+## crimp in a crack, row 2 a jug in a crack, row 3 a crimp.
+func _pump_wall() -> ClimbState:
+	var s := ClimbState.new(route("astroman"), 4, 1, kit_for(route("astroman")))
+	s.pitch = 1
+	s._start_pitch()
+	s.spec.erase("cruxes")
+	for r in range(1, s.top_row):
+		s.holds[r] = {2: {"cost": 6, "crack": false, "grip": "edge"}}
+	s.holds[1] = {2: {"cost": 7, "crack": true, "grip": "crimp", "hard": true}}
+	s.holds[2] = {2: {"cost": 4, "crack": true, "grip": "jug"}}
+	s.holds[3] = {2: {"cost": 7, "crack": false, "grip": "crimp", "hard": true}}
+	s.bolts = {}
+	s.col = 2
+	return s
+
+
+func test_pump() -> void:
+	var s := _pump_wall()
+	s.move(0)
+	check(s.pump == ClimbState.PUMP_CRIMP, "a crimp pumps your forearms (%d)" % s.pump)
+	var crimp_cam := s.stamina
+	check(s.place_cam() and crimp_cam - s.stamina == ClimbState.PROTECT_COST.crimp, "a cam placed off a crimp is strenuous (-%d)" % (crimp_cam - s.stamina))
+	check(not s.can_shake(), "you can't shake out on a crimp")
+	var pumped_cost := s.move_cost(2, 2)
+	check(pumped_cost == int(s.hold_at(2, 2).cost) - ClimbState.SHOE_BONUS + s.pump, "pump adds to every move (%d)" % pumped_cost)
+	s.move(0)
+	var jug_cam := s.stamina
+	check(s.place_cam() and jug_cam - s.stamina == ClimbState.PROTECT_COST.jug, "a cam placed from a jug is cheap (-%d)" % (jug_cam - s.stamina))
+	s.pump = 5
+	var narrow := s.crux_window()
+	var minutes := s.minutes
+	check(s.can_shake() and s.shake_out() and s.pump == 5 - ClimbState.SHAKE_PUMP and s.minutes == minutes + ClimbState.MINUTES_TO_SHAKE, "shaking out on a jug drains the pump, and takes a few minutes")
+	check(s.crux_window() > narrow, "a pumped climber gets a narrower crux window (%.2f vs %.2f)" % [narrow, s.crux_window()])
+	s.pump = 3
+	check(not s.can_shake() and not s.shake_out(), "...once a hold")
+	s.move(0)
+	s.stamina = 1
+	s.move(0)
+	check(s.falls == 1 and s.pump == 0, "a fall clears the pump: you hang on the rope")
+	var easy := ClimbState.new(route("firefall_slab"), 0, 1, kit_for(route("firefall_slab")))
+	check(easy.pump_change({"grip": "edge"}) == 0 and s.pump_change({"grip": "edge"}) == ClimbState.PUMP_EDGE, "edges only pump you on the harder pitches")
+	var belay := _pump_wall()
+	belay.pump = 4
+	belay._finish_pitch()
+	check(belay.pump == 0, "a belay ledge clears the pump")
+
+
+## Every pitch has a line that never runs out far enough for a fall to end the
+## climb (the guaranteed line has a crack or a fixed piece at least every few
+## moves).
+func test_safe_lines() -> void:
+	var bad := []
+	for r in Guidebook.routes():
+		if r.top_rope:
+			continue
+		for seed in 10:
+			var state := ClimbState.new(r, int(kit_for(r).get("cam", 0)), seed, kit_for(r))
+			for p in r.pitches.size():
+				state.pitch = p
+				state._start_pitch()
+				if state.is_snow():
+					continue
+				var bot := ClimbBot.new()
+				if float(bot._best(state, 0, state.col, 0, 0, bot._cams(state)).cost) >= 1.0e5:
+					bad.append("%s p%d s%d" % [r.id, p + 1, seed])
+	check(bad.is_empty(), "every pitch has a line you can protect all the way (%s)" % ", ".join(bad))
 
 
 func _up(s: ClimbState) -> int:
