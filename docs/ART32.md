@@ -58,5 +58,9 @@ and station code.
 - The pixel-art generators under `tools/` (npcgen, hubs, mapgen, plants, ui)
   still draw at the old 16px scale. Their output goes through `build.py`'s
   passes, not straight into the game.
+  A hub builder also lays its scene out in 16px pixels:
+  `tools/hubs/rebuild_village.sh` shows the whole round trip for Yosemite
+  Village (build, `upgrade.py --fresh` on what it drew, then
+  `migrate_built.py` on the scene it wrote).
 - Detail is derived from the 16px drawings (smoothed, re-colored, shaded), not
   redrawn by hand, so shapes are the originals' shapes.

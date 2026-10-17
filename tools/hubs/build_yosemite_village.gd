@@ -18,7 +18,16 @@ extends AhwahneeStyle
 ##
 ## The layout is not to scale: it squeezes the 1.5 km from Camp 4 to the
 ## Village into one walkable map, keeping the real order of things west to
-## east and north (the Valley wall) to south (the Merced).
+## east and north (the Valley wall) to south (the Merced). The Village itself
+## follows the real one: the Welcome Center, Museum, Best's Studio (now the
+## Ansel Adams Gallery), Wilderness Center and Post Office along the north side
+## of the pedestrian mall, the Indian Village behind the Museum, the cemetery
+## across from it, Degnan's and the Village Store round a plaza at the east
+## end with the store's lot beside it; the Lodge south of Northside Drive and
+## west of Yosemite Creek; Cook's Meadow between the creek and Sentinel Drive,
+## the Camp 6 day-use lot east of it, and the Chapel on Southside Drive.
+##
+## Rebuild onto the game's 32px grid with tools/hubs/rebuild_village.sh.
 
 const HubArt = preload("res://tools/hubs/hub_art.gd")
 const ValleyArt = preload("res://tools/hubs/valley_art.gd")
@@ -26,8 +35,8 @@ const Camp4Art = preload("res://tools/hubs/camp4_art.gd")
 const ValleyLandArt = preload("res://tools/hubs/valley_land_art.gd")
 const HotelArt = preload("res://tools/hubs/ahwahnee_hotel_art.gd")
 
-const W := 100
-const H := 60
+const W := 120
+const H := 64
 const SCENE := "res://scenes/regions/yosemite_village.tscn"
 const SHUTTLE_SCENE := "res://scenes/objects/shuttle_stop.tscn"
 const B := "res://assets/sprites/buildings/"
@@ -182,47 +191,60 @@ func _layout() -> void:
 	# Keep the shared fire and Columbia Boulder in the open.
 	_clear_trees(13, 17, 22, 26)
 	_clear_trees(4, 9, 15, 16)
-	# Yosemite Valley Lodge, between Camp 4 and the creek.
-	_rect(34, 26, 42, 35, Terrain.PAVED)
+	# Yosemite Valley Lodge: south of Northside Drive, west of the creek.
+	_rect(32, 40, 43, 46, Terrain.PAVED)
+	_rect(25, 40, 31, 44, Terrain.PARKING)
 	# The Indian Village behind the museum, in the oaks.
-	_rect(50, 9, 66, 17, Terrain.FOREST)
-	_clear_trees(50, 10, 66, 17)
-	# The Village: a pedestrian mall, the plaza by the store, the parking lot.
-	_rect(48, 19, 95, 21, Terrain.PAVED)
-	_rect(62, 22, 82, 31, Terrain.PAVED)
-	_rect(88, 22, 89, 30, Terrain.PAVED)
-	_rect(82, 31, 96, 36, Terrain.PARKING)
-	_rect(62, 32, 63, 37, Terrain.PAVED)
-	# A paved walk from each door down to the mall or the lot, so no door
-	# opens onto grass.
-	for door_x in [69, 79, 86, 93]:
-		_rect(door_x - 1, 18, door_x + 1, 18, Terrain.PAVED)
-	_rect(85, 30, 87, 30, Terrain.PAVED)
-	# Cook's Meadow between the road and the river.
-	_rect(46, 39, 97, 47, Terrain.MEADOW)
-	_rect(52, 43, 58, 45, Terrain.WET_MEADOW)
-	_rect(84, 42, 90, 44, Terrain.WET_MEADOW)
-	_rect(8, 47, 18, 47, Terrain.SAND)
-	_rect(76, 47, 86, 47, Terrain.SAND)
+	_rect(50, 9, 68, 18, Terrain.FOREST)
+	_clear_trees(50, 10, 68, 18)
+	# The Village: the pedestrian mall with its buildings along the north side,
+	# a plaza at the east end in front of Degnan's and the Village Store, and
+	# the store's parking lot east of it.
+	_rect(50, 23, 92, 25, Terrain.PAVED)
+	_rect(66, 26, 68, 31, Terrain.PAVED)
+	_rect(95, 26, 97, 32, Terrain.PAVED)
+	_rect(66, 32, 98, 36, Terrain.PAVED)
+	_rect(100, 24, 116, 36, Terrain.PARKING)
+	# A paved walk from each door down to the mall, so no door opens onto grass.
+	for door_x in [56, 64, 72, 79, 86]:
+		_rect(door_x - 1, 22, door_x + 1, 22, Terrain.PAVED)
+	# Yosemite Cemetery, across the mall from the museum, under the trees.
+	_rect(53, 27, 63, 35, Terrain.FOREST)
+	_clear_trees(53, 26, 63, 35)
+	# Cook's Meadow, between Yosemite Creek and Sentinel Drive.
+	_rect(47, 40, 81, 49, Terrain.MEADOW)
+	_rect(51, 43, 56, 45, Terrain.WET_MEADOW)
+	_rect(69, 42, 75, 44, Terrain.WET_MEADOW)
+	# Camp 6, the Village's day-use lot, east of Sentinel Drive.
+	_rect(88, 40, 112, 46, Terrain.PARKING)
+	# The Chapel's forecourt on Southside Drive.
+	_rect(74, 59, 78, 59, Terrain.PAVED)
+	_rect(8, 49, 18, 49, Terrain.SAND)
+	_rect(62, 49, 72, 49, Terrain.SAND)
 
 	# Roads and trails (remembered so crossings with water become bridges).
 	var paths := [
 		[Terrain.ROAD, 0, 38, W - 1, 38], # Northside Drive
-		[Terrain.ROAD, 0, 56, W - 1, 56], # Southside Drive
-		[Terrain.ROAD, 71, 38, 71, H - 1], # Sentinel Drive and Sentinel Bridge
+		[Terrain.ROAD, 0, 60, W - 1, 60], # Southside Drive
+		[Terrain.ROAD, 84, 39, 84, H - 1], # Sentinel Drive and Sentinel Bridge
 		[Terrain.ROAD, 26, 37, 27, 37], # Camp 4 parking
-		[Terrain.ROAD, 89, 37, 90, 37], # Village parking
-		[Terrain.PAVED, 38, 36, 38, 37], # Lodge walk
+		[Terrain.ROAD, 28, 39, 29, 39], # Lodge parking
+		[Terrain.ROAD, 51, 26, 52, 37], # Village Drive to the Welcome Center stop
+		[Terrain.ROAD, 108, 37, 109, 37], # Village Store parking
+		[Terrain.ROAD, 100, 39, 101, 39], # Camp 6 parking
+		[Terrain.PAVED, 37, 39, 38, 39], # Lodge walk
 		[Terrain.TRAIL, 15, 31, 15, 37], # Camp 4 walk-in path
-		[Terrain.TRAIL, 33, 20, 49, 20], # Camp 4 to the Village, over the creek
-		[Terrain.TRAIL, 47, 10, 47, 19], # to the base of Lower Yosemite Fall
+		[Terrain.TRAIL, 33, 20, 47, 20], # Camp 4 to the fall trail, over the creek
+		[Terrain.TRAIL, 47, 10, 47, 37], # Lower Yosemite Fall trail
 		[Terrain.TRAIL, 46, 10, 48, 10],
-		[Terrain.TRAIL, 51, 14, 65, 14], # Indian Village loop
-		[Terrain.TRAIL, 58, 15, 58, 18],
-		[Terrain.BRIDGE, 60, 39, 60, 47], # Cook's Meadow boardwalk
-		[Terrain.TRAIL, 60, 48, 60, 52], # boardwalk down to the river and across
-		[Terrain.TRAIL, 61, 47, 70, 47],
-		[Terrain.TRAIL, 22, 39, 22, 55], # Swinging Bridge trail
+		[Terrain.TRAIL, 48, 24, 49, 24], # fall trail to the mall
+		[Terrain.TRAIL, 51, 14, 66, 14], # Indian Village loop
+		[Terrain.TRAIL, 60, 15, 60, 22],
+		[Terrain.TRAIL, 58, 26, 58, 27], # into the cemetery
+		[Terrain.BRIDGE, 57, 39, 57, 46], # Cook's Meadow boardwalk
+		[Terrain.TRAIL, 57, 47, 83, 47], # boardwalk on to Sentinel Bridge
+		[Terrain.TRAIL, 22, 39, 22, 59], # Swinging Bridge trail
+		[Terrain.TRAIL, 23, 47, 31, 47], # Lodge to the Swinging Bridge trail
 	]
 	for p: Array in paths:
 		_rect(p[1], p[2], p[3], p[4], p[0])
@@ -240,13 +262,13 @@ func _layout() -> void:
 		for x in range(42, 47):
 			water[y * W + x] = 1
 	var prev_x := 44
-	for y in range(10, 49):
+	for y in range(10, 51):
 		var x := 44 if y < 17 or (y >= 28 and y < 37) else 45
 		water[y * W + x] = 1
 		water[y * W + prev_x] = 1
 		prev_x = x
 	for x in W:
-		var bank := 48 + int(noise.get_noise_1d(x * 2.0 + 40.0) * 1.5)
+		var bank := 50 + int(noise.get_noise_1d(x * 2.0 + 40.0) * 1.5)
 		for y in range(bank, bank + 3):
 			water[y * W + x] = 1
 	for k in W * H:
@@ -261,8 +283,10 @@ func _layout() -> void:
 	for k in W * H:
 		if path[k] or water[k] or kind[k] in [Terrain.PARKING, Terrain.PAVED]:
 			no_trees[k] = 1
-	_clear_trees(34, 24, 42, 36)
-	_clear_trees(62, 10, 96, 31)
+	_clear_trees(25, 39, 44, 47)
+	_clear_trees(64, 19, 99, 37)
+	_clear_trees(50, 19, 53, 37)
+	_clear_trees(72, 54, 80, 59)
 
 
 # ---------------------------------------------------------------- scene
@@ -364,20 +388,56 @@ func _instance(path: String, at: Vector2, node_name: String) -> Node2D:
 
 
 func _place_buildings() -> void:
-	_building("VillageStore", "village_store", 72, 30, "Village Store",
-		"The Valley's general store: groceries, supplies, and gifts. Trade fresh forage here for trail food that keeps.")
-	_building("WelcomeCenter", "welcome_center", 79, 18, "Yosemite Valley Welcome Center",
-		"Maps, trail conditions, road closures, and Junior Ranger booklets.")
-	_building("YosemiteMuseum", "museum", 69, 18, "Yosemite Museum",
-		"The museum opened in 1926 and shows the Valley's art and cultural history. The Indian Village stands behind it.")
-	_building("BestsStudio", "bests_studio", 86, 18, "Best's Studio",
+	# The north side of the mall, west to east.
+	_building("WelcomeCenter", "welcome_center", 56, 22, "Yosemite Valley Welcome Center",
+		"Maps, trail conditions, road closures, and Junior Ranger booklets. The Lower Yosemite Fall trail and the Cook's Meadow boardwalk both start close by.")
+	_building("YosemiteMuseum", "museum", 64, 22, "Yosemite Museum",
+		"The museum opened in 1926 and shows the Valley's art and cultural history. Its ground floor is laid up from Valley granite. The Indian Village stands behind it.")
+	_building("BestsStudio", "bests_studio", 72, 22, "Best's Studio",
 		"Harry Best opened a painting studio in the Valley in 1902. His daughter Virginia married Ansel Adams, and the studio became The Ansel Adams Gallery.")
-	_building("Degnans", "degnans", 86, 30, "Degnan's",
-		"John and Bridget Degnan came to the Valley in 1884. Bridget sold bread from her porch before they opened a bakery and store, and her bread was famous with visitors.")
-	_building("WildernessCenter", "wilderness_center", 93, 18, "Wilderness Center",
+	_building("WildernessCenter", "wilderness_center", 79, 22, "Wilderness Center",
 		"Rangers issue wilderness permits and check the trail conditions here.")
-	_building("ValleyLodge", "valley_lodge", 38, 32, "Yosemite Valley Lodge",
-		"The lodge stands near the foot of Yosemite Falls, a short walk from Camp 4.")
+	_building("PostOffice", "post_office", 86, 22, "Yosemite Valley Post Office",
+		"The Valley's post office. Mail sent from here is postmarked Yosemite National Park.")
+	# Degnan's and the Village Store round the plaza at the east end.
+	_building("Degnans", "degnans", 73, 32, "Degnan's",
+		"John and Bridget Degnan came to the Valley in 1884. Bridget sold bread from her porch before they opened a bakery and store, and her bread was famous with visitors.")
+	_building("VillageStore", "village_store", 90, 33, "Village Store",
+		"The Valley's general store: groceries, supplies, and gifts. Trade fresh forage here for trail food that keeps.")
+	# South of Northside Drive and the river.
+	_building("ValleyLodge", "valley_lodge", 38, 45, "Yosemite Valley Lodge",
+		"The lodge stands near the foot of Yosemite Falls, across Northside Drive from the Lower Yosemite Fall trail and a short walk from Camp 4.")
+	_building("YosemiteChapel", "chapel", 76, 59, "Yosemite Chapel",
+		"Yosemite Chapel was built in 1879 near the old village, and moved here, across the river from Cook's Meadow, in 1901. It is the oldest building in Yosemite Valley still in use.")
+	# Flags at the Welcome Center and the Post Office.
+	var CS_ := "res://assets/sprites/curry/"
+	animate(decor("WelcomeFlagpole", CS_ + "flagpole.png", foot(52, 21), Vector2(6, 4)), 3, 2.5)
+	animate(decor("PostOfficeFlagpole", CS_ + "flagpole.png", foot(90, 21), Vector2(6, 4)), 3, 2.5)
+
+
+## Yosemite Cemetery: a low picket fence round the plot with its gate toward
+## the mall, granite and wooden headstones under the oaks, and Galen Clark's
+## grave with the giant sequoias he planted round it.
+func _place_cemetery() -> void:
+	var CS_ := "res://assets/sprites/curry/"
+	for x in range(53, 64):
+		if x < 57 or x > 59:
+			decor("CemeteryFenceN%d" % x, CS_ + "fence_h.png", foot(x, 27), Vector2(16, 4))
+		decor("CemeteryFenceS%d" % x, CS_ + "fence_h.png", foot(x, 35), Vector2(16, 4))
+	for y in range(28, 36):
+		decor("CemeteryFenceW%d" % y, CS_ + "fence_v.png", foot(52.8, y), Vector2(6, 16))
+		decor("CemeteryFenceE%d" % y, CS_ + "fence_v.png", foot(63.2, y), Vector2(6, 16))
+	_sign_prop("CemeterySign", "res://assets/sprites/info_sign.png", foot(56, 27) + Vector2(0, -4), Vector2(12, 4), "Yosemite Cemetery",
+		"People of the Valley have been buried here since the 1870s: Native families who lived here, early settlers, and park workers. Some graves are marked with granite, some with wood, and some not at all.")
+	var stones := [[54, 29, 0], [54, 31.5, 1], [54, 34, 2], [56.5, 34, 0], [58.5, 34, 1], [61, 34, 2], [62.5, 34, 0]]
+	for st: Array in stones:
+		decor("Headstone%d_%d" % [roundi(st[0] * 10), roundi(st[1] * 10)], B + "headstone_%d.png" % st[2], foot(st[0], st[1]), Vector2(10, 4))
+	# Galen Clark's grave, ringed by his sequoias.
+	_sign_prop("ClarkGrave", B + "headstone_clark.png", foot(59, 31), Vector2(16, 4), "Galen Clark",
+		"Galen Clark, 1814 to 1910, the first Guardian of Yosemite. He chose this plot himself and planted the giant sequoia seedlings around it years before he died.")
+	for at_pos in [foot(56.5, 31), foot(61.5, 31), foot(59, 29)]:
+		decor("Sequoia%d" % _entities.get_child_count(), B + "tree_sequoia.png", at_pos, Vector2(10, 6))
+	_prop("tree_dogwood_bloom_a", foot(62.5, 32))
 
 
 ## Camp 4 as it is laid out on the ground: walk-in sites under the pines,
@@ -544,12 +604,12 @@ func _place_village_life() -> void:
 	# The Indian Village: umachas, an acorn granary, and a grinding rock.
 	# TRIBAL REVIEW NEEDED: these descriptions are placeholders until the
 	# associated tribes have reviewed them (docs/DESIGN.md).
-	var homes := [[53, 12], [57, 11], [62, 12], [55, 16], [64, 16]]
+	var homes := [[53, 12], [57, 11], [63, 11], [55, 16], [66, 15]]
 	for i in homes.size():
 		var h: Array = homes[i]
 		_sign_prop("Umacha%d" % i, B + "umacha.png", _tile_pos(h[0], h[1]) + Vector2(0, 6), Vector2(24, 8), "Umacha",
 			"A cone-shaped home of incense-cedar bark slabs laid over a frame of poles. Families in Yosemite Valley lived in umachas like this one.")
-	_sign_prop("Chuckah", B + "chuckah.png", _tile_pos(60, 16) + Vector2(0, 6), Vector2(12, 6), "Chuckah",
+	_sign_prop("Chuckah", B + "chuckah.png", _tile_pos(62, 16) + Vector2(0, 6), Vector2(12, 6), "Chuckah",
 		"An acorn granary: a tall woven store on poles under a thatched cap. It keeps a family's acorns dry and away from animals through the year.")
 	var mortar := _instance("res://scenes/story/station.tscn", _tile_pos(52, 17) + Vector2(0, 4), "GrindingRock")
 	mortar.set("station", "mortar")
@@ -558,17 +618,22 @@ func _place_village_life() -> void:
 	mortar.set("ground_inset", 5)
 	mortar.set("body_size", Vector2(50, 10))
 	mortar.set("reach_size", Vector2(60, 26))
-	_sign_prop("IndianVillageSign", "res://assets/sprites/info_sign.png", _tile_pos(58, 18) + Vector2(0, 4), Vector2(12, 4), "Indian Village",
+	_sign_prop("IndianVillageSign", "res://assets/sprites/info_sign.png", _tile_pos(61, 18) + Vector2(0, 4), Vector2(12, 4), "Indian Village",
 		"This village behind the Yosemite Museum shows how Native families lived in the Valley: bark homes, acorn granaries, and grinding rocks worn into the granite. The Southern Sierra Miwuk and neighboring peoples still live and work in and around Yosemite today. [Placeholder pending tribal review.]")
+	_place_cemetery()
 	# The Village Store clerk trades trail food for forage.
-	_vendor("StoreClerk", "res://data/shops/village_store.tres", _tile_pos(72, 31) + Vector2(0, 2), Color(0.3, 0.5, 0.35))
-	_instance("res://scenes/objects/travel_point.tscn", _tile_pos(92, 33) + Vector2(0, 4), "Travel_YosemiteVillageParking").set("label", "Yosemite Village Parking")
-	_shuttle("ShuttleVillage", "Yosemite Village", _tile_pos(64, 37) + Vector2(0, 4))
+	_vendor("StoreClerk", "res://data/shops/village_store.tres", _tile_pos(90, 34) + Vector2(0, 2), Color(0.3, 0.5, 0.35))
+	_instance("res://scenes/objects/travel_point.tscn", _tile_pos(98, 41) + Vector2(0, 4), "Travel_YosemiteVillageParking").set("label", "Yosemite Village Parking")
+	_shuttle("ShuttleVillage", "Yosemite Village", _tile_pos(50, 26) + Vector2(0, 4))
 	_sign_prop("LowerFallSign", "res://assets/sprites/info_sign.png", _tile_pos(49, 11) + Vector2(0, 4), Vector2(12, 4), "Lower Yosemite Fall",
 		"Lower Yosemite Fall drops 320 feet. It roars with snowmelt in late spring and can dry to a trickle by late summer.")
-	_sign_prop("CooksMeadowSign", "res://assets/sprites/info_sign.png", _tile_pos(61, 40) + Vector2(0, 4), Vector2(12, 4), "Cook's Meadow",
+	_sign_prop("LowerFallTrailhead", "res://assets/sprites/info_sign.png", _tile_pos(48, 36) + Vector2(0, 4), Vector2(12, 4), "Lower Yosemite Fall Trail",
+		"A short walk north to the foot of Lower Yosemite Fall, with the creek alongside. In spring the spray reaches the bridge.")
+	_sign_prop("CooksMeadowSign", "res://assets/sprites/info_sign.png", _tile_pos(58, 40) + Vector2(0, 4), Vector2(12, 4), "Cook's Meadow",
 		"From the boardwalk you can see Yosemite Falls to the north and Half Dome to the east. Stay on the boardwalk: meadows here are easily trampled.")
-	_sign_prop("SwingingBridgeSign", "res://assets/sprites/info_sign.png", _tile_pos(23, 45) + Vector2(0, 4), Vector2(12, 4), "Swinging Bridge",
+	_sign_prop("SentinelBridgeSign", "res://assets/sprites/info_sign.png", _tile_pos(82, 45) + Vector2(0, 4), Vector2(12, 4), "Sentinel Bridge",
+		"Look upriver: Half Dome stands over the Merced, and on a still morning it is mirrored in the water. It is one of the most photographed views in the park.")
+	_sign_prop("SwingingBridgeSign", "res://assets/sprites/info_sign.png", _tile_pos(23, 47) + Vector2(0, 4), Vector2(12, 4), "Swinging Bridge",
 		"This footbridge crosses the Merced to the south side of the Valley, near the Four Mile Trailhead.")
 
 
@@ -592,36 +657,42 @@ func _place(place_name: String, x: float, y: float, radius_tiles: float, label :
 
 func _place_markers_and_places() -> void:
 	# Spawn points and spots for story NPCs (found with Region.get_spawn).
-	_marker("arrival", 90, 34)
+	_marker("arrival", 99, 43)
 	_marker("camp_4", 20, 20)
 	_marker("camp_4_fire", 18, 22)
 	_marker("shuttle_camp_4", 24, 36)
-	_marker("shuttle_village", 64, 36)
+	_marker("shuttle_village", 50, 25)
 	_marker("lower_yosemite_fall", 47, 12)
-	_marker("cooks_meadow", 62, 42)
-	_marker("indian_village", 58, 15)
-	_marker("village_store", 72, 31)
-	_marker("degnans_bakery", 86, 31)
-	_marker("bests_studio", 86, 19)
-	_marker("yosemite_museum", 69, 19)
-	_marker("ranger_station", 93, 19)
-	_marker("welcome_center", 79, 19)
-	_marker("valley_lodge", 38, 33)
+	_marker("cooks_meadow", 59, 42)
+	_marker("indian_village", 60, 15)
+	_marker("village_store", 90, 34)
+	_marker("degnans_bakery", 73, 33)
+	_marker("bests_studio", 72, 23)
+	_marker("yosemite_museum", 64, 23)
+	_marker("ranger_station", 79, 23)
+	_marker("welcome_center", 56, 23)
+	_marker("post_office", 86, 23)
+	_marker("cemetery", 58, 30)
+	_marker("chapel", 76, 60)
+	_marker("valley_lodge", 38, 46)
 	_marker("west_road", 2, 38)
-	_marker("east_road", 97, 38)
-	_marker("south_road", 71, 57)
-	_marker("southside_west", 2, 56)
-	_marker("southside_east", 97, 56)
+	_marker("east_road", W - 3, 38)
+	_marker("south_road", 84, H - 2)
+	_marker("southside_west", 2, 60)
+	_marker("southside_east", W - 3, 60)
 	_place("Camp 4", 18, 20, 16)
-	_place("Yosemite Valley Lodge", 38, 30, 7)
+	_place("Yosemite Valley Lodge", 38, 43, 6)
 	_place("Lower Yosemite Fall", 46, 9, 5)
-	_place("Indian Village", 58, 13, 8)
-	_place("Yosemite Village", 80, 25, 16)
-	_place("Village Store", 72, 29, 4, false)
-	_place("Cook's Meadow", 70, 43, 14)
-	_place("Merced River", 50, 49, 3, false)
-	_place("Sentinel Bridge", 71, 49, 3)
-	_place("Swinging Bridge", 22, 49, 3)
+	_place("Indian Village", 59, 13, 7)
+	_place("Yosemite Village", 76, 26, 16)
+	_place("Village Store", 90, 31, 4, false)
+	_place("Yosemite Cemetery", 58, 31, 4)
+	_place("Cook's Meadow", 64, 44, 13)
+	_place("Camp 6 parking", 100, 43, 7, false)
+	_place("Merced River", 50, 51, 3, false)
+	_place("Sentinel Bridge", 84, 51, 3)
+	_place("Swinging Bridge", 22, 51, 3)
+	_place("Yosemite Chapel", 76, 56, 3)
 
 
 ## Roads out of the hub lead back onto the full Valley map.
@@ -687,7 +758,7 @@ func _dress_village() -> void:
 	_fringe_trees([Terrain.TALUS], 4, 0.4, [["tree_incense_cedar", 2.0], ["tree_snag", 0.6], ["tree_white_fir", 1.0]], 0, 30.0)
 	_fringe_trees([Terrain.MEADOW], 8, 0.3, [["tree_black_oak", 3.0], ["tree_dogwood", 1.0]], 2, 70.0)
 	# Cook's Meadow: wildflowers, tall grass and lupine in drifts.
-	var meadow := Rect2i(46, 39, 52, 9)
+	var meadow := Rect2i(47, 40, 35, 10)
 	_scatter_decor("plant_wildflowers", [Terrain.MEADOW], 60, meadow, 1)
 	_scatter_decor("plant_lupine", [Terrain.MEADOW], 18, meadow, 1)
 	_scatter_decor("plant_paintbrush", [Terrain.MEADOW], 10, meadow, 1)
@@ -710,30 +781,43 @@ func _dress_village() -> void:
 		_prop(_pick("rock_granite" if i % 2 == 0 else "rock_mossy"), Vector2(FALL_CX + rng.randf_range(-60.0, 60.0), FALL_ROWS * T + rng.randf_range(8.0, 40.0)))
 	for i in 10:
 		_prop(_pick("plant_fern"), Vector2(FALL_CX + rng.randf_range(-72.0, 72.0), FALL_ROWS * T + rng.randf_range(0.0, 44.0)))
-	# Wrought-iron lamps along the Village mall, the plaza and the lodge walk,
-	# and benches where people sit.
-	var lamps := [[52, 22], [60, 22], [68, 22], [76, 22], [84, 22], [92, 22], [64, 32], [76, 32], [38, 37], [34, 22], [42, 22]]
+	# Wrought-iron lamps along the mall, round the plaza, at the lodge and the
+	# Welcome Center stop, and benches where people sit.
+	var lamps := [[53, 26], [61, 26], [69, 26], [77, 26], [85, 26], [92, 26], [65, 36], [78, 37], [93, 37],
+		[34, 22], [42, 22], [33, 47], [43, 47], [50, 31], [99, 37]]
 	for l: Array in lamps:
 		if _has("lamp_wrought"):
 			decor("Lamp%d_%d" % [l[0], l[1]], S + "lamp_wrought.png", foot(l[0], l[1]), Vector2(6, 4))
 			_glow("lamp_wrought_glow", foot(l[0], l[1]) - Vector2(5, texture(S + "lamp_wrought.png").get_height()))
-	for p in [[56, 22], [72, 22], [88, 22], [66, 31], [78, 31], [58, 41], [62, 45], [36, 28], [41, 33]]:
+	for p in [[73, 26], [81, 26], [89, 26], [80, 36], [86, 37], [36, 47], [40, 47], [55, 41], [62, 48]]:
 		_prop("garden_bench", foot(p[0], p[1]) + Vector2(0, 2))
-	for p in [[50, 22], [94, 22], [63, 23], [81, 23]]:
+	for p in [[50, 22], [91, 23], [65, 27], [69, 27]]:
 		_prop(_pick("garden_urn"), foot(p[0], p[1]) + Vector2(0, -2))
-	# Flower barrels either side of each door, a bike rack by the store, and
-	# a fountain in the plaza, so the Village looks lived in.
+	# Flower barrels either side of each door, umbrella tables on Degnan's
+	# patio, and a bike rack by the store, so the Village looks lived in.
 	var CS_ := "res://assets/sprites/curry/"
-	for door: Array in [[69, 17], [79, 17], [86, 17], [93, 17], [72, 29], [86, 29]]:
+	for door: Array in [[56, 21], [64, 21], [72, 21], [79, 21], [86, 21], [73, 31], [90, 32]]:
 		for side in [-2, 2]:
 			# each door's pair matches, and the doors differ
 			decor("Planter%d_%d_%d" % [door[0], door[1], side], CS_ + "planter_%d.png" % ((door[0] + door[1]) % 4), foot(door[0] + side, door[1] + 1) + Vector2(0, -2), Vector2(12, 6))
-	decor("BikeRack", CS_ + "bike_rack.png", foot(77, 30), Vector2(30, 6))
-	decor("PlazaFountain", S + "garden_fountain.png", foot(65, 27), Vector2(60, 20))
-	# Cars parked nose-in along the edges of the Village lot, leaving the
-	# walk from Degnan's door to the road and the shuttle kiosk clear.
-	var cars := [[82, 32, 0], [82, 35, 3], [95, 32, 7], [95, 35, 1]]
-	for car: Array in cars:
-		decor("Car%d_%d" % [car[0], car[1]], "res://assets/sprites/curry/car_%d.png" % car[2], foot(car[0], car[1]), Vector2(24, 12))
-	_ambient("MeadowFireflies", "fireflies", Vector2(72, 43) * T, Vector2(24, 4) * T)
-	_ambient("CreekFireflies", "fireflies", Vector2(46, 28) * T, Vector2(3, 14) * T)
+	for t in [[69, 34], [77, 34]]:
+		decor("PatioTable%d" % t[0], CS_ + "patio_table.png", foot(t[0], t[1]), Vector2(20, 8))
+	decor("BikeRack", CS_ + "bike_rack.png", foot(96, 34), Vector2(30, 6))
+	# Shade trees left standing round the plaza and through Camp 6, as in the
+	# real Village.
+	for at_pos in [foot(83, 35), foot(70, 28) + Vector2(8, 0)]:
+		_prop("tree_black_oak_a", at_pos)
+	_prop("tree_dogwood_bloom_b", foot(78, 29))
+	_prop("tree_incense_cedar_a", foot(81, 29))
+	for x in [93, 101, 107]:
+		_prop(_pick("tree_ponderosa"), foot(x, 44) + Vector2(8, 0))
+	_prop("tree_black_oak_b", foot(106, 30) + Vector2(8, 0))
+	# Cars parked nose-in in rows: the Village Store lot and Camp 6.
+	var cars := [[101, 27], [103, 27], [107, 27], [111, 27], [113, 27], [102, 32], [104, 32], [110, 32], [114, 32],
+		[89, 42], [91, 42], [95, 42], [103, 42], [105, 42], [109, 42], [92, 46], [96, 46], [104, 46], [106, 46], [110, 46],
+		[26, 43], [30, 43]]
+	for i in cars.size():
+		var car: Array = cars[i]
+		decor("Car%d_%d" % [car[0], car[1]], CS_ + "car_%d.png" % ((i * 5 + car[0]) % 12), foot(car[0], car[1]), Vector2(24, 12))
+	_ambient("MeadowFireflies", "fireflies", Vector2(64, 44) * T, Vector2(16, 4) * T)
+	_ambient("CreekFireflies", "fireflies", Vector2(46, 30) * T, Vector2(3, 14) * T)

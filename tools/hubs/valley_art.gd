@@ -18,20 +18,27 @@ const OUT := "res://assets/sprites/buildings/"
 ## three or four people tall, as in Stardew Valley, with a door a person fits.
 const VILLAGE_SCALE := 1.45
 
+## The looks follow the real buildings: the Village Store a long, dark log
+## store with two cross gables over a deep porch; the Welcome Center brown
+## board-and-batten under a broad entry gable; the Museum (1926) a granite
+## ground story under dark timber; Best's Studio and the Wilderness Center
+## small brown frame buildings with porches; Degnan's a steep chalet roof;
+## the Post Office granite with a green roof.
 const BUILDINGS := {
-	"village_store": {"goods": true, "size": Vector2i(80, 56), "wall": "timber", "label": "VILLAGE STORE", "seed": 11, "roof": ["2a2a22", "3a3c2c", "4d5238", "62684a", "7b815b", "989d76"], "windows": [14, 66], "gable": 20, "chimney": 60, "awning": true, "scale": VILLAGE_SCALE},
-	"welcome_center": {"flag": true, "size": Vector2i(64, 46), "wall": "stone", "label": "WELCOME", "seed": 23, "roof": ["24262a", "34383e", "484e56", "5e666e", "7a828a", "9aa2a8"], "windows": [11, 53], "gable": 32, "chimney": 46, "scale": VILLAGE_SCALE},
-	"museum": {"portico": true, "size": Vector2i(56, 46), "wall": "stone", "label": "MUSEUM", "seed": 37, "roof": ["2c2822", "443c32", "5e5242", "786a54", "948468", "b0a07e"], "windows": [9, 19, 37, 47], "chimney": 8, "low": true, "scale": VILLAGE_SCALE},
-	"bests_studio": {"size": Vector2i(44, 38), "wall": "board", "label": "BEST'S", "seed": 41, "roof": ["2e2218", "4a3422", "644630", "7e5c3e", "9a7650", "b89468"], "windows": [9, 35], "gable": 22, "tone": 3, "scale": VILLAGE_SCALE},
-	"degnans": {"size": Vector2i(48, 40), "wall": "stucco", "label": "DEGNAN'S", "seed": 53, "roof": ["34201a", "55301f", "74402a", "92583a", "ae7248", "c98c5c"], "windows": [9, 39], "chimney": 36, "awning": true, "awning_a": "9a3a2a", "awning_b": "e8d8b0", "scale": VILLAGE_SCALE},
-	"wilderness_center": {"size": Vector2i(40, 36), "wall": "board", "label": "PERMITS", "seed": 67, "roof": ["1c2a22", "2a4030", "3a5640", "4d6e50", "658a64", "84a67c"], "windows": [8, 32], "tone": 2, "green": true, "scale": VILLAGE_SCALE},
-	"valley_lodge": {"size": Vector2i(72, 44), "wall": "timber", "label": "LODGE", "seed": 79, "windows": [10, 22, 50, 62], "gable": 36, "chimney": 56, "pitch": 12, "scale": VILLAGE_SCALE},
+	"village_store": {"goods": true, "size": Vector2i(110, 58), "wall": "timber", "label": "VILLAGE STORE", "seed": 11, "roof": ["2a2a22", "3a3c2c", "4d5238", "62684a", "7b815b", "989d76"], "windows": [12, 30, 80, 98], "gables": [22, 88], "chimney": 60, "porch": true, "scale": VILLAGE_SCALE},
+	"welcome_center": {"flag": true, "size": Vector2i(66, 46), "wall": "board", "tone": 2, "label": "WELCOME CENTER", "seed": 23, "roof": ["24262a", "34383e", "484e56", "5e666e", "7a828a", "9aa2a8"], "windows": [10, 20, 46, 56], "gable": 33, "chimney": 52, "scale": VILLAGE_SCALE},
+	"museum": {"portico": true, "size": Vector2i(58, 46), "wall": "stone_timber", "label": "YOSEMITE MUSEUM", "seed": 37, "roof": ["2c2822", "443c32", "5e5242", "786a54", "948468", "b0a07e"], "windows": [9, 19, 39, 49], "chimney": 8, "low": true, "scale": VILLAGE_SCALE},
+	"bests_studio": {"size": Vector2i(46, 40), "wall": "board", "label": "BEST'S STUDIO", "seed": 41, "roof": ["2e2218", "4a3422", "644630", "7e5c3e", "9a7650", "b89468"], "windows": [8, 38], "gable": 23, "tone": 3, "porch": true, "scale": VILLAGE_SCALE},
+	"degnans": {"size": Vector2i(52, 46), "wall": "stucco", "label": "DEGNAN'S", "seed": 53, "roof": ["34201a", "55301f", "74402a", "92583a", "ae7248", "c98c5c"], "windows": [8, 44], "chalet": true, "chimney": 40, "awning": true, "awning_a": "9a3a2a", "awning_b": "e8d8b0", "scale": VILLAGE_SCALE},
+	"wilderness_center": {"size": Vector2i(42, 36), "wall": "board", "label": "WILDERNESS", "seed": 67, "roof": ["1c2a22", "2a4030", "3a5640", "4d6e50", "658a64", "84a67c"], "windows": [8, 34], "tone": 2, "green": true, "porch": true, "scale": VILLAGE_SCALE},
+	"post_office": {"size": Vector2i(56, 40), "wall": "stone", "label": "POST OFFICE", "seed": 89, "roof": ["1c2a22", "2a4030", "3a5640", "4d6e50", "658a64", "84a67c"], "windows": [10, 46], "gable": 28, "scale": VILLAGE_SCALE},
+	"valley_lodge": {"size": Vector2i(80, 44), "wall": "timber", "label": "YOSEMITE LODGE", "seed": 79, "windows": [10, 22, 58, 70], "gable": 40, "chimney": 64, "pitch": 12, "porch": true, "scale": VILLAGE_SCALE},
 }
 
 const PROPS := ["umacha", "chuckah", "bear_box", "shuttle_stop"]
-const FILES := ["village_store", "welcome_center", "museum", "bests_studio", "degnans", "wilderness_center", "valley_lodge",
-	"umacha", "chuckah", "bear_box", "shuttle_stop",
-	"village_store_glow", "welcome_center_glow", "museum_glow", "bests_studio_glow", "degnans_glow", "wilderness_center_glow", "valley_lodge_glow"]
+const FILES := ["village_store", "welcome_center", "museum", "bests_studio", "degnans", "wilderness_center", "post_office", "valley_lodge",
+	"chapel", "umacha", "chuckah", "bear_box", "shuttle_stop", "headstone_0", "headstone_1", "headstone_2", "headstone_clark", "tree_sequoia",
+	"village_store_glow", "welcome_center_glow", "museum_glow", "bests_studio_glow", "degnans_glow", "wilderness_center_glow", "post_office_glow", "valley_lodge_glow", "chapel_glow"]
 
 
 func save_all() -> void:
@@ -40,6 +47,13 @@ func save_all() -> void:
 		var built := building(sprite_name)
 		_write(built[0], sprite_name)
 		_write(built[1], sprite_name + "_glow")
+	var church := chapel()
+	_write(church[0], "chapel")
+	_write(church[1], "chapel_glow")
+	for v in 3:
+		_write(headstone(v), "headstone_%d" % v)
+	_write(headstone(3), "headstone_clark")
+	_write(sequoia(), "tree_sequoia")
 	_write(umacha(), "umacha")
 	_write(chuckah(), "chuckah")
 	_write(bear_box(), "bear_box")
@@ -105,6 +119,12 @@ func _wall(im: Image, style: String, x: int, y: int, w: int, h: int, sd: int, o:
 			stucco_wall(im, x, y, w, h, sd)
 		"timber":
 			_vb_logs(im, x, y, w, h, sd)
+		"stone_timber":
+			# a granite ground story under stained timber, like the Museum
+			var split := h * 9 / 20
+			board_wall(im, x, y, w, split + 1, sd, 2)
+			stone_wall(im, x, y + split, w, h - split, sd + 7, 0.6, 4, 3, false)
+			beam(im, x, y + split - 1, w, sd + 5, 2)
 		_:
 			timber_wall(im, x, y, w, h, sd, int(o.get("pitch", 16)), 40)
 
@@ -374,6 +394,8 @@ func building(sprite_name: String, options := {}) -> Array:
 		for key in ["gable", "chimney"]:
 			if o.has(key):
 				o[key] = roundi(int(o[key]) * k)
+		if o.has("gables"):
+			o["gables"] = (o["gables"] as Array).map(func(x: int) -> int: return roundi(x * k))
 	var size: Vector2i = o["size"]
 	var w := size.x
 	var h := size.y
@@ -398,10 +420,15 @@ func building(sprite_name: String, options := {}) -> Array:
 	# Roof, then a cross gable and chimney rising from it.
 	var taper := 0.22 if o.get("low", false) else 0.28
 	_vb_roof(im, 0, 2, w, wall_top - 3, sd + 200, taper)
+	var gables: Array = o.get("gables", [])
 	if o.has("gable"):
-		var gx: int = o["gable"]
+		gables = [o["gable"]]
+	for gx: int in gables:
 		var apex := mini(wall_top - 8, 15)
-		gable(im, gx, wall_top - 1, mini(15, w / 4 + 2), apex, 3, sd + 300, true, 6)
+		gable(im, gx, wall_top - 1, mini(15, w / 4 + 2), apex, 3, sd + 300 + gx, true, 6)
+	if o.get("chalet", false):
+		# one steep gable over most of the front, its peak near the ridge
+		gable(im, w / 2, wall_top - 1, w * 3 / 8, wall_top - 7, 3, sd + 300, true, 8)
 	if o.has("chimney"):
 		var cx: int = o["chimney"]
 		chimney(im, cx, 8, maxi(6, wall_top - 14), sd + 400)
@@ -420,6 +447,8 @@ func building(sprite_name: String, options := {}) -> Array:
 	if o.get("awning", false):
 		var aw := mini(w - 18, roundi(38 * k))
 		awning(im, door_cx - aw / 2, wall_top + 1, aw, 5, Color(o.get("awning_a", "3f6b4a")), Color(o.get("awning_b", "e6d8b0")))
+	if o.get("porch", false):
+		_porch(im, wall_top, found_h, door_cx, sd)
 	if o.has("label"):
 		sign_board(im, door_cx, wall_top - 8 if not o.get("awning", false) else wall_top - 9, o["label"])
 
@@ -571,6 +600,276 @@ func _glow_image(final: Image, w: int, h: int) -> Image:
 			for xx in range(r.position.x, r.end.x):
 				var t := float(yy - r.position.y) / maxi(1, r.size.y - 1)
 				K.px(im, xx, yy, Color(1.0, 0.8 - t * 0.12, 0.38, (0.62 - t * 0.2) * strength))
+	return im
+
+
+## A deep porch along the front: log posts from the eave down to a plank
+## deck on the foundation, with a rail and balusters between the posts and a
+## gap at the door.
+func _porch(im: Image, wall_top: int, found_h: int, door_cx: int, sd: int) -> void:
+	var w := im.get_width()
+	var h := im.get_height()
+	var deck_y := h - found_h - 3
+	# the deck: three rows of planks, lit on the front edge, seams every board
+	for xx in range(2, w - 2):
+		for yy in 3:
+			var idx := 3 if yy == 0 else (4 if yy == 1 else 1)
+			if (xx + yy * 3) % 7 == 0:
+				idx -= 1
+			K.px(im, xx, deck_y + yy, timber[clampi(idx, 0, 5)])
+	K.hline(im, 2, deck_y + 3, w - 4, timber[0])
+	var posts := [2, w - 5, door_cx - 12, door_cx + 9]
+	for span: Array in [[2, door_cx - 12], [door_cx + 9, w - 5]]:
+		var n := int((span[1] - span[0]) / 22)
+		for k in range(1, n + 1):
+			posts.append(span[0] + (span[1] - span[0]) * k / (n + 1))
+	# the rail between posts, kept clear of the door
+	var rail_y := deck_y - 6
+	for xx in range(3, w - 3):
+		if xx > door_cx - 11 and xx < door_cx + 9:
+			continue
+		K.px(im, xx, rail_y, timber[4])
+		K.px(im, xx, rail_y + 1, timber[1])
+		if xx % 3 == 0:
+			K.vline(im, xx, rail_y + 2, deck_y - rail_y - 2, timber[2])
+	for px_: int in posts:
+		post(im, px_, wall_top - 1, deck_y - wall_top + 1, sd + px_, 3)
+		K.px(im, px_, deck_y + 1, timber[0])
+	# the porch roof's shade on the wall behind
+	shade(im, 2, wall_top, w - 4, 5, Color("1e1834"), 0.6, 0.0, 0.35)
+
+
+## Yosemite Chapel (1879): a brown board-and-batten nave under a steep
+## shingled gable, a square bell tower over the door with louvered belfry
+## openings and a tall spire, pointed lancet windows that glow at dusk, and
+## granite steps. Returns [sprite, glow].
+func chapel() -> Array:
+	var w := 64
+	var h := 114
+	var sd := 1879
+	windows.clear()
+	glass_snap = null
+	var im := K.make(w, h)
+	var base_roof := roof
+	roof = _ramp(["2a2420", "3e342c", "54463a", "6c5a48", "86725a", "a48c6e"])
+	var cx := 32
+	K.shadow(im, cx, h - 2.5, 30.0, 3.0, 0.3)
+	# the nave: its long roof runs back from the gable, so both slopes show
+	var hw := 28
+	var base := 76
+	var apex := 26
+	var depth := 15
+	for x in range(cx - hw, cx + hw + 1):
+		var edge := base - apex + int(absf(x - cx) * apex / float(hw))
+		var left := x < cx
+		for y in range(edge - depth, edge):
+			var col := shingle_col(x + 200, y - (edge - depth), sd, 0.14 if left else -0.18)
+			if y == edge - depth:
+				col = col.lightened(0.25) if left else col.darkened(0.2)
+			if vnoise(x * 0.2, y * 0.25, sd + 2) > 0.74 and left:
+				col = moss[1]
+			K.px(im, x, y, col)
+		# the gable face, board-and-batten
+		for y in range(edge, base):
+			var board := (x - cx + 100) % 4
+			var t := 0.5 + (K.hash2(x / 4, y / 3, sd) - 0.5) * 0.14 - float(x - cx + hw) / (hw * 2) * 0.16
+			var idx := clampi(roundi(t * 5.0), 0, 5)
+			if board == 0:
+				idx = clampi(idx + 1, 0, 5)
+			elif board == 3:
+				idx = clampi(idx - 1, 0, 5)
+			K.px(im, x, y, timber[idx])
+		# bargeboards in pale trim
+		K.px(im, x, edge, stucco[4] if left else stucco[2])
+		K.px(im, x, edge + 1, stucco[2] if left else stucco[1])
+	# the nave wall under the gable, and the foundation
+	board_wall(im, cx - hw, base, hw * 2 + 1, h - 6 - base, sd, 3)
+	K.hline(im, cx - hw, base, hw * 2 + 1, stucco[3])
+	stone_wall(im, cx - hw, h - 7, hw * 2 + 1, 5, sd + 100, 0.5, 3, 2, true)
+	K.hline(im, cx - hw, h - 7, hw * 2 + 1, granite[5])
+	# lancet windows either side of the tower
+	for wx in [cx - 21, cx + 16]:
+		_lancet(im, wx, base + 5, 5, 18, sd + wx)
+	# the tower: lighter boards, a cornice, the belfry, and the spire
+	var tw := 18
+	var tx := cx - tw / 2
+	var t_top := 34
+	for yy in range(t_top, h - 7):
+		for xx in tw:
+			var t := 0.66 + (K.hash2(tx + xx, yy / 3, sd + 9) - 0.5) * 0.1 - float(xx) / tw * 0.3
+			var idx := clampi(roundi(t * 5.0), 0, 5)
+			if xx % 4 == 0:
+				idx = clampi(idx + 1, 0, 5)
+			K.px(im, tx + xx, yy, timber[idx])
+	K.vline(im, tx, t_top, h - 7 - t_top, stucco[3])
+	K.vline(im, tx + tw - 1, t_top, h - 7 - t_top, timber[0])
+	# belfry: two louvered arched openings, and a cornice above and below
+	for bx in [tx + 3, tx + 10]:
+		K.rect(im, bx, t_top + 5, 5, 11, Color("140c08"))
+		K.hline(im, bx + 1, t_top + 4, 3, Color("140c08"))
+		for ly in range(t_top + 6, t_top + 16, 2):
+			K.hline(im, bx, ly, 5, timber[2])
+	K.rect(im, tx - 1, t_top + 17, tw + 2, 2, stucco[3])
+	K.hline(im, tx - 1, t_top + 18, tw + 2, timber[1])
+	K.rect(im, tx - 1, t_top - 1, tw + 2, 2, stucco[4])
+	K.hline(im, tx - 1, t_top, tw + 2, timber[1])
+	# a small round window over the door
+	K.ellipse(im, cx, t_top + 28, 3.4, 3.4, timber[0])
+	K.ellipse(im, cx, t_top + 28, 2.2, 2.2, warm[3])
+	_register(im, Rect2i(cx - 1, t_top + 27, 2, 2), 0.8)
+	# the spire, shingled, lit on the left, with an iron finial
+	var s_top := 2
+	for yy in range(s_top, t_top - 1):
+		var half := int(float(yy - s_top) / (t_top - 1 - s_top) * (tw / 2 + 1))
+		for xx in range(cx - half, cx + half + 1):
+			var col := shingle_col(xx + 90, yy, sd + 3, 0.18 if xx < cx else -0.2)
+			if xx == cx - half:
+				col = col.lightened(0.2)
+			K.px(im, xx, yy, col)
+	K.vline(im, cx, 0, 3, iron[2])
+	K.hline(im, cx - 1, 1, 3, iron[2])
+	# the door: a pointed arch of pale trim over double plank doors
+	var dw := 12
+	var dtop := h - 27
+	for yy in range(dtop, h - 7):
+		for xx in dw:
+			var arch := yy - dtop < 3 and absf(xx - (dw - 1) / 2.0) > (yy - dtop) + 1.0
+			if arch:
+				continue
+			var col := timber[2 + int(K.hash2(xx / 2, 0, sd) * 2.0)]
+			if xx == dw / 2:
+				col = timber[0]
+			K.px(im, cx - dw / 2 + xx, yy, col)
+	for k in 6:
+		K.px(im, cx - 7 + k, dtop + 3 - k / 2, stucco[4])
+		K.px(im, cx + 6 - k, dtop + 3 - k / 2, stucco[2])
+	K.px(im, cx - 2, h - 17, warm[5])
+	K.px(im, cx + 1, h - 17, warm[5])
+	# granite steps
+	K.rect(im, cx - 9, h - 7, 18, 2, granite[5])
+	K.hline(im, cx - 9, h - 7, 18, granite[6])
+	K.rect(im, cx - 11, h - 5, 22, 2, granite[3])
+	K.hline(im, cx - 11, h - 5, 22, granite[5])
+	shade(im, cx + hw - 6, base, 6, h - 7 - base, timber[0], 0.0, 0.8, 0.3, false)
+	K.outline(im, Color("231a16"))
+	var glow := _glow_image(im, w, h)
+	roof = base_roof
+	return [im, glow]
+
+
+## A pointed lancet window of small diamond panes: deep blue by day, warm
+## when lit, under a pale pointed hood.
+func _lancet(im: Image, x: int, y: int, w: int, h: int, sd: int) -> void:
+	K.rect(im, x - 1, y - 1, w + 2, h + 2, timber[0])
+	for gy in h:
+		for gx in w:
+			if gy < 2 and (gx < 1 - gy or gx > w - 2 + gy):
+				continue
+			var col := sky[1].lerp(Color("3a4a7a"), 0.5)
+			if (gx + gy) % 3 == 0:
+				col = col.lightened(0.18)
+			if gx == w / 2 or gy == h / 2:
+				col = timber[1]
+			K.px(im, x + gx, y + gy, col)
+	K.px(im, x + 1, y + 1, sky[4])
+	K.hline(im, x - 1, y - 2, w + 2, stucco[3])
+	K.px(im, x + w / 2 - 1, y - 3, stucco[4])
+	K.px(im, x + w / 2, y - 3, stucco[3])
+	K.rect(im, x - 2, y + h + 1, w + 4, 1, granite[5])
+	_register(im, Rect2i(x, y + 2, w, h - 2), 0.9)
+
+
+## A grave marker: 0 a round-topped granite tablet, 1 a peaked slab with
+## lichen, 2 a weathered wooden board, 3 Galen Clark's rough granite block.
+func headstone(variant: int) -> Image:
+	var w := 24 if variant == 3 else 10
+	var h := 16 if variant == 3 else 14
+	var im := K.make(w, h)
+	var sd := 600 + variant * 7
+	K.shadow(im, w / 2.0, h - 2.0, w / 2.0 - 1.0, 1.4, 0.28)
+	if variant == 3:
+		for yy in range(2, h - 2):
+			for xx in range(1, w - 1):
+				var e := pow((xx - w / 2.0 + 0.5) / (w / 2.0 - 1.0), 2.0) + pow((yy - h + 3.0) / (h - 4.0), 2.0) * 0.6
+				if e > 1.0 + (K.hash2(xx, yy, sd) - 0.5) * 0.2:
+					continue
+				var t := 0.82 - float(xx) / w * 0.36 - float(yy) / h * 0.1 + (K.hash2(xx / 2, yy / 2, sd) - 0.5) * 0.14
+				K.px(im, xx, yy, granite[clampi(roundi(t * 6.0), 0, 6)])
+		K.text(im, 2, 6, "CLARK", granite[0])
+		for xx in range(2, w - 2, 3):
+			K.px(im, xx, h - 3, moss[1])
+	elif variant == 2:
+		K.rect(im, 3, 3, 4, 9, Color("8a7a66"))
+		K.vline(im, 3, 3, 9, Color("a89a84"))
+		K.vline(im, 6, 3, 9, Color("6a5c4c"))
+		K.px(im, 4, 2, Color("9a8a74"))
+		K.px(im, 5, 2, Color("7a6a58"))
+		K.hline(im, 4, 6, 2, Color("5a4c3e"))
+		K.px(im, 4, 9, Color("6a5c4c"))
+	else:
+		for yy in range(2, h - 2):
+			for xx in range(2, w - 2):
+				var top := 2 + (absi(xx - 4) if variant == 1 else (1 if xx == 2 or xx == w - 3 else 0))
+				if yy < top:
+					continue
+				var t := 0.66 - float(xx - 2) / (w - 4) * 0.4 + (K.hash2(xx, yy, sd) - 0.5) * 0.12
+				K.px(im, xx, yy, granite[clampi(roundi(t * 6.0), 0, 6)])
+		K.hline(im, 3, 6, 4, granite[2])
+		K.hline(im, 3, 8, 3, granite[2])
+		if variant == 1:
+			K.px(im, 6, 5, Color("b8b070"))
+			K.px(im, 3, 10, Color("a8a060"))
+	# grass at the foot
+	for xx in range(1, w - 1):
+		if K.hash2(xx, 0, sd + 1) > 0.45:
+			K.px(im, xx, h - 3, leaf[3])
+			if K.hash2(xx, 1, sd + 1) > 0.6:
+				K.px(im, xx, h - 4, leaf[4])
+	K.outline(im, Color("231a16"))
+	return im
+
+
+## A young giant sequoia, like the ones Galen Clark planted round his grave:
+## a tall, dense blue-green cone of clumped foliage over a flared, furrowed
+## cinnamon trunk.
+func sequoia() -> Image:
+	var w := 34
+	var h := 78
+	var sd := 1910
+	var im := K.make(w, h)
+	var cx := w / 2.0
+	var green: Array[Color] = _ramp(["1a332c", "24463a", "325a44", "44704e", "5c865c", "7a9e6c"])
+	var bark: Array[Color] = _ramp(["3c1c12", "5a2a18", "7a3a20", "984c2a", "b4643a", "cc8250"])
+	K.shadow(im, cx, h - 2.5, 12.0, 2.4, 0.3)
+	# the trunk, flared at the foot, lit on the left, with deep furrows
+	for yy in range(40, h - 2):
+		var half := 2.6 + pow(maxf(0.0, float(yy - (h - 12)) / 10.0), 2.0) * 3.2
+		for xx in range(floori(cx - half), ceili(cx + half)):
+			var u := (xx - (cx - half)) / (half * 2.0)
+			var t := 0.75 - u * 0.6 + (K.hash2(xx, yy / 3, sd) - 0.5) * 0.14
+			if (xx + yy / 6) % 3 == 0:
+				t -= 0.18
+			K.px(im, xx, yy, bark[clampi(roundi(t * 5.0), 0, 5)])
+	# the crown: widening toward a rounded skirt, built from clumps
+	for yy in range(2, 62):
+		var f := float(yy - 2) / 60.0
+		var half := 2.0 + f * 13.0
+		if f > 0.85:
+			half *= 1.0 - (f - 0.85) * 2.4
+		for xx in range(0, w):
+			var dx := xx + 0.5 - cx
+			var v := vnoise(xx * 0.32, yy * 0.36, sd)
+			if absf(dx) > half + (v - 0.5) * 4.0:
+				continue
+			if yy > 50 and v < 0.28:
+				continue
+			var t := 0.42 + (v - 0.5) * 0.9 - dx / (half + 1.0) * 0.28 + (0.5 - f) * 0.12
+			var c := vnoise(xx * 0.32 + 0.6, yy * 0.36 + 0.5, sd)
+			if c < v - 0.12:
+				t += 0.16
+			K.px(im, xx, yy, green[clampi(roundi(t * 5.0), 0, 5)])
+	K.px(im, int(cx), 1, green[3])
+	K.outline(im, Color("1e1a16"))
 	return im
 
 
