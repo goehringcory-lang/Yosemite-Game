@@ -12,7 +12,7 @@ func _ready() -> void:
 	var out := OS.get_environment("SHOT_OUT") if OS.get_environment("SHOT_OUT") != "" else "user://overview.png"
 	var div := int(OS.get_environment("SHOT_SCALE")) if OS.get_environment("SHOT_SCALE") != "" else 1
 	var region: Region = load("res://scenes/regions/%s.tscn" % id).instantiate()
-	var size := Vector2i(region.get_ground().get_used_rect().size * 16) if region.get_ground() else Vector2i(1024, 1024)
+	var size := Vector2i(region.get_ground().get_used_rect().size * region.get_ground().tile_set.tile_size) if region.get_ground() else Vector2i(1024, 1024)
 	var viewport := SubViewport.new()
 	viewport.size = size
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
