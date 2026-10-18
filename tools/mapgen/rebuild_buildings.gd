@@ -16,7 +16,7 @@ const Buildings = preload("res://tools/mapgen/hub_buildings.gd")
 const BuildingArt = preload("res://tools/mapgen/hub_building_art.gd")
 const Art = preload("res://tools/mapgen/art.gd")
 const Terrain = preload("res://tools/mapgen/terrain.gd")
-const HUBS := ["el_portal", "wawona", "glacier_point", "tuolumne_meadows", "yosemite_valley"]
+const HUBS := ["el_portal", "wawona", "tuolumne_meadows", "yosemite_valley"]
 ## The spawn marker the hotel is built around, per hub.
 const HOTEL_MARKERS := {"wawona": "wawona_hotel"}
 

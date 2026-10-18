@@ -173,9 +173,26 @@ The Ahwahnee's art is the reference for the whole Valley: ramp-shaded, ordered-d
 Rebuilding rewrites each area's scene, so story NPCs stay in `scenes/story/content/`. To look at the village art on its own: `godot --headless --path . -s res://tools/hubs/preview_valley_art.gd` writes `docs/valley_art_preview.png`, and `preview_camp4_art.gd` writes `docs/camp4_art_preview.png`.
 
 
+### Glacier Point: the overlook
+
+Top out the Apron (or drive up Glacier Point Road once it's open) and you're on **Glacier Point**, a hand-made hub laid out like the real one and squeezed so it can be walked. To the north and east the map drops away 3,200 feet: the Valley floor lies far below in blue haze, with the Merced winding through it and Curry Village's roofs under the point, and across the canyon stand Half Dome, Mount Broderick and Liberty Cap, with Nevada, Vernal and Illilouette falls running.
+
+- **The overlook** on its granite point, railed in with a granite parapet and pipe railing, with coin viewers, signs for Half Dome and the Firefall, and **Overhanging Rock** jutting off its west side (closed, so you look at it from behind the rail). Its view frames Half Dome's face across the canyon. The Apron climb tops out here.
+- **The walk** south from the point past the **Geology Hut** (1924) on its knob, the footings of the **Glacier Point Hotel** and McCauley's **Mountain House** (both burned in 1969), and the stone **amphitheater**, to the plaza with the **snack stand**, the restrooms and picnic tables, and the parking lot with its map kiosk at the end of Glacier Point Road.
+- **Washburn Point**, a railed pullout on the east rim where the road comes in, framing Nevada Fall under Liberty Cap, Vernal Fall below it and Illilouette Fall to the right.
+- **Sentinel Dome**, a bare granite dome to the southwest, with the fallen Jeffrey pine Ansel Adams photographed still lying on its summit, and its trailhead pullout on the road.
+- **Trails**: the **Four Mile Trail** west along the north rim (crossing Sentinel Creek above Sentinel Fall) down to the Valley, the **Panorama Trail** off the east rim down to Happy Isles, and the **Pohono Trail** to Sentinel Dome and on toward Taft Point. Both trails down are always open from the top, so a climber who tops out before the road opens can walk home.
+- **The rim forest**: red fir and Jeffrey pine with lodgepole and silver snags on a floor of needle duff, Jeffrey pines in the granite, and manzanita and huckleberry oak on the rocky rims. The granite is drawn as smooth slabs peeling in sheets.
+
+Rebuild it with `tools/hubs/rebuild_glacier_point.sh` (its Python steps need Pillow and numpy; set `PYTHON=` to pick an interpreter). It runs the 16px builder (`res://tools/hubs/build_glacier_point.tscn`), upgrades the pictures it drew to the 32px art and moves the scene onto the 32px grid, like the Village's. The layout is in `tools/hubs/build_glacier_point.gd`, and the art (the buildings, the railing, the rim trees, and the view over the edge) is in `tools/hubs/glacier_art.gd`, written to `assets/sprites/glacier/`. The view is painted in the palette's own colors, with the haze as an ordered dither, so the 32px upgrade keeps it. Story NPCs go in `scenes/story/content/glacier_point.tscn`, placed by marker name. The map generator skips Glacier Point now (`"hand_made"` in `tools/mapgen/hub_content.gd`).
+
+![Glacier Point overlook, with Half Dome across the canyon](docs/glacier_point_overlook.png)
+![Washburn Point: Liberty Cap, Nevada and Vernal falls](docs/glacier_point_washburn.png)
+![Glacier Point, the whole map](docs/glacier_point_overview.png)
+
 ### Graphics pipeline for the generated hubs, UI and people
 
-The four generated hubs (El Portal, Wawona, Glacier Point, Tuolumne Meadows) and the Valley map used to show flat tile ground and simple placeholder trees and huts. They now share the Ahwahnee look:
+The generated hubs (El Portal, Wawona, Tuolumne Meadows, and Glacier Point before it was built by hand) and the Valley map used to show flat tile ground and simple placeholder trees and huts. They now share the Ahwahnee look:
 
 - **Painted ground.** `tools/mapgen/ground_upgrade.gd` reads each map's terrain tiles and hillshade, paints one detailed picture with `tools/hubs/ahwahnee_ground.gd` (golden foothill grass, chaparral, red-fir needles, granite grit, shaded slopes, rivers with foam, road edges), and adds it to the map scene as `GroundArt`. The tile layer stays underneath, hidden, for collision and foraging. Run `godot --headless --path . res://tools/mapgen/upgrade_hubs.tscn -- paint`, then `godot --headless --path . --import`, then `... upgrade_hubs.tscn -- attach`. Re-run it after regenerating a map. The pictures are in `assets/map/ground/`.
 - **Flora atlas.** `tools/mapgen/flora_hd.gd` draws every tree, shrub, boulder, tent and cabin in `assets/sprites/flora.png` (and their lit windows in `flora_glow.png`) with the Ahwahnee ramps and dithering, in the same 32x48 frames, so no scene changed. Run `godot --headless --path . res://tools/mapgen/paint_flora.tscn` (it also writes the info sign, trailhead and map kiosk, and `docs/generated_flora_preview.png`).
@@ -199,10 +216,9 @@ A later pass brought every generator closer to Stardew Valley's finish: hue-shif
 - **UI and maps.** Panels are a beveled wooden frame with brass studs and a drop shadow. A speaker's name sits on a tab above the dialogue box, a bobbing arrow marks "Next", and a highlight bar marks the chosen menu row (`ui_art.gd` writes `panel.png`, `plaque.png`, `tag.png`, `select.png` and `next.png`). The map screens have a wooden frame, parchment labels, a bobbing "you are here" pin, and outlined icons, and they redraw only when something changes (`park_map.gd`).
 - **Climbing** (`scripts/climb/art/`). Skies have more bands and shaded clouds, distant walls haze toward blue, figures have colored outlines, and holds have a lit top and a dark underside.
 
-To rebuild everything after changing a generator, run these in order: `ui_art.tscn`, `npcgen.gd`, `gear_icons.gd`, `paint_flora.tscn`, `rebuild_buildings.tscn -- paint`, `--import`, `build_ahwahnee.tscn`, `build_seasonal_art.gd`, `build_homestead.tscn`, `build_curry.tscn`, `build_hubs.tscn`, `repaint_village_art.tscn`, `repaint_interiors.tscn`, `repaint_ground.tscn`, `upgrade_hubs.tscn -- paint`, `--import`, `upgrade_hubs.tscn -- attach`, `--import`. The hub builders also rewrite the region scenes, plus `scenes/objects/shuttle_stop.tscn` and the shop and food data in `data/`. Only the node IDs differ in the scenes, but the data can lose hand edits, such as the Camp 4 trader's offers. So keep only the art: `git restore -- scenes/ data/`.
+To rebuild everything after changing a generator, run these in order: `ui_art.tscn`, `npcgen.gd`, `gear_icons.gd`, `paint_flora.tscn`, `rebuild_buildings.tscn -- paint`, `--import`, `build_ahwahnee.tscn`, `build_seasonal_art.gd`, `build_homestead.tscn`, `build_curry.tscn`, `build_hubs.tscn`, `rebuild_glacier_point.sh`, `repaint_village_art.tscn`, `repaint_interiors.tscn`, `repaint_ground.tscn`, `upgrade_hubs.tscn -- paint`, `--import`, `upgrade_hubs.tscn -- attach`, `--import`. The hub builders also rewrite the region scenes, plus `scenes/objects/shuttle_stop.tscn` and the shop and food data in `data/`. Only the node IDs differ in the scenes, but the data can lose hand edits, such as the Camp 4 trader's offers. So keep only the art: `git restore -- scenes/ data/`.
 
 ![El Portal](docs/el_portal_painted.png)
-![Glacier Point](docs/glacier_point_painted.png)
 ![Pause menu](docs/ui_pause_menu.png)
 ![Settings](docs/ui_pause_settings.png)
 ![The HUD](docs/ui_hud.png)

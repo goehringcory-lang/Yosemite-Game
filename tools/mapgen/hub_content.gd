@@ -172,6 +172,9 @@ const CONTENT := {
 		},
 	},
 	"glacier_point": {
+		# Glacier Point's region is built by hand now, laid out like the real
+		# overlook, and mapgen skips it. Its places here are the old reference.
+		"hand_made": "tools/hubs/build_glacier_point.gd",
 		"places": [
 			{"name": "Glacier Point", "osm": "Glacier Point", "radius": 170, "label": true},
 			{"name": "Geology Hut", "osm": "Geology Hut", "radius": 60},

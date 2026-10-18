@@ -98,6 +98,9 @@ func build_regions(only: PackedStringArray) -> void:
 		if not HubContent.CONTENT.has(hub.id):
 			push_warning("No content for %s in hub_content.gd" % hub.id)
 			continue
+		if HubContent.CONTENT[hub.id].get("hand_made", false):
+			print("    %s is built by hand (%s); skipped" % [hub.id, HubContent.CONTENT[hub.id].hand_made])
+			continue
 		var builder := RegionBuilder.new(hub, HubContent.CONTENT[hub.id], dem, _hub_osm(hub))
 		var report := builder.build()
 		print("    walkable %d tiles, %d reachable from the arrival point" % [report.walkable, report.reachable])

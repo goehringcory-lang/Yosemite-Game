@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpetvxrbiakpm"
-path="res://.godot/imported/glacier_point_ground.png-ea2be9ef48d9a21f628f7ff2825eb3e3.ctex"
+uid="uid://dys8kwk27fwn5"
+path="res://.godot/imported/gp_nevada_1.png-e58677a83a588630336f580ab77d4bbb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/map/ground/glacier_point_ground.png"
-dest_files=["res://.godot/imported/glacier_point_ground.png-ea2be9ef48d9a21f628f7ff2825eb3e3.ctex"]
+source_file="res://assets/sprites/glacier/gp_nevada_1.png"
+dest_files=["res://.godot/imported/gp_nevada_1.png-e58677a83a588630336f580ab77d4bbb.ctex"]
 
 [params]
 
