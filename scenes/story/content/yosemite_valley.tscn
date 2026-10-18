@@ -84,7 +84,7 @@ offset = Vector2(32, 0)
 wander_radius = 64
 
 [node name="CurryVillageDoor" parent="." instance=ExtResource("door_r")]
-position = Vector2(6880, 1984)
+position = Vector2(6848, 2096)
 label = "Curry Village"
 target_region = "curry_village"
 target_spawn = "west_road"

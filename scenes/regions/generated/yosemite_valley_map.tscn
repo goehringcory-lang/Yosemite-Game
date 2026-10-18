@@ -2061,7 +2061,7 @@ title = "Curry Village"
 text = "David and Jennie Curry opened Camp Curry here in 1899 with just seven tents."
 
 [node name="Sign_Glacier_Point_Apron" parent="Objects" unique_id=1870925923 instance=ExtResource("4_plp7l")]
-position = Vector2(6704, 2072)
+position = Vector2(6736, 2032)
 title = "Glacier Point Apron"
 text = "Smooth, low-angle granite slabs sweep up from here toward Glacier Point. The rim is 3,200 feet above you."
 
@@ -2383,7 +2383,7 @@ position = Vector2(6096, 1392)
 position = Vector2(7120, 2064)
 
 [node name="apron_base" type="Marker2D" parent="Spawns" unique_id=71639304]
-position = Vector2(6704, 2096)
+position = Vector2(6800, 2064)
 
 [node name="camp_4" type="Marker2D" parent="Spawns" unique_id=810185271]
 position = Vector2(4976, 1552)
