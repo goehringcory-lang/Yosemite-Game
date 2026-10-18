@@ -73,7 +73,7 @@ const CONTENT := {
 				"text": "Climbers have camped here since the 1950s, the golden age of big-wall climbing. Camp 4 was added to the National Register of Historic Places in 2003."},
 			{"title": "Curry Village", "osm": "Curry Village Front Office",
 				"text": "David and Jennie Curry opened Camp Curry here in 1899 with just seven tents."},
-			{"title": "Glacier Point Apron", "at": Vector2(-119.5752, 37.7352),
+			{"title": "Glacier Point Apron", "at": Vector2(-119.5745, 37.7363),
 				"text": "Smooth, low-angle granite slabs sweep up from here toward Glacier Point. The rim is 3,200 feet above you."},
 			{"title": "Happy Isles", "osm": "Happy Isles Trailhead",
 				"text": "The John Muir Trail starts here and runs about 211 miles to the summit of Mount Whitney."},
@@ -93,7 +93,7 @@ const CONTENT := {
 		"spawns": {
 			"arrival": {"osm": "Day Use Parking"},
 			"lamon_homestead": {"at": Vector2(-119.5683, 37.7360)},
-			"apron_base": {"at": Vector2(-119.5752, 37.7352)},
+			"apron_base": {"at": Vector2(-119.5735, 37.7359)},
 			"camp_4": {"osm": "Camp 4"},
 			"cooks_meadow": {"osm": "Yosemite Falls View"},
 			"curry_village": {"osm": "Curry Village Front Office"},
