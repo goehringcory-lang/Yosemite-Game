@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dss1v2nlshorm"
-path="res://.godot/imported/glacier_point_painted.png-12fe2450aac18229a93ccc90b71c5689.ctex"
+uid="uid://dlb5fn54ioioe"
+path="res://.godot/imported/amphi_bench.png-8c41d03b33b7e3364d337004e5234744.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/glacier_point_painted.png"
-dest_files=["res://.godot/imported/glacier_point_painted.png-12fe2450aac18229a93ccc90b71c5689.ctex"]
+source_file="res://assets/sprites/glacier/amphi_bench.png"
+dest_files=["res://.godot/imported/amphi_bench.png-8c41d03b33b7e3364d337004e5234744.ctex"]
 
 [params]
 

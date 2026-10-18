@@ -40,6 +40,11 @@ var road_shoulders := false
 ## dark edge line, a lit inner line, and a thin contact shadow on the ground
 ## outside. Reads as a curb instead of a hard-cut rectangle.
 var edge_trim := true
+## Glacier Point's ground: granite as smooth domed slabs peeling in sheets
+## (not faceted blocks), and the red fir forest's floor as brown needle duff
+## with moss only in the hollows.
+var smooth_granite := false
+var fir_duff := false
 
 var _na := PackedByteArray() # large scale
 var _nb := PackedByteArray() # medium scale
@@ -480,6 +485,8 @@ func _color(k: int, x: int, y: int, i: int, tx: int, ty: int) -> Color:
 		Terrain.FOREST:
 			return _forest(x, y, a, b, n, r)
 		Terrain.FIR:
+			if fir_duff:
+				return _fir_duff(x, y, a, b, n, r)
 			return _forest(x, y, a, b, n, r).lerp(c("2f4a3a"), 0.28)
 		Terrain.SUBALPINE:
 			return _granite_sand(x, y, a, b, n, r)
@@ -515,7 +522,11 @@ func _color(k: int, x: int, y: int, i: int, tx: int, ty: int) -> Color:
 			return _gravel(x, y, a, b, n, r).darkened(0.08)
 		Terrain.TALUS, Terrain.SCREE:
 			return _talus(x, y, a, b, n, r)
-		Terrain.CLIFF, Terrain.GRANITE:
+		Terrain.GRANITE:
+			if smooth_granite:
+				return _slab(x, y, a, b, n, r)
+			return _rock(x, y, a, b, n, r)
+		Terrain.CLIFF:
 			return _rock(x, y, a, b, n, r)
 	return c("6f9a44")
 
@@ -843,6 +854,44 @@ func _talus(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
 				tone = c("4e5260")
 			base = tone
 	return base
+
+
+## Bare granite slab: smooth, pale and warm in the sun, in broad tones; the
+## edges of the exfoliating sheets as soft darker lines; a few cracks, grit,
+## and lichen in green and rust.
+func _slab(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
+	var lvl := _nat_tone(a * 0.7 + b * 0.3, x, y)
+	var col: Color = [c("8f8b84"), c("a39e94"), c("b5afa2"), c("c6bfae")][lvl]
+	# sheet edges: thin lines where the medium field crosses a step
+	var sheet := fmod(b * 5.0 + a * 1.5, 1.0)
+	if sheet < 0.035:
+		col = c("7c7974")
+	elif sheet < 0.07:
+		col = col.darkened(0.06)
+	var crack := _nat_pair(x, y, 13, 611, 0.03)
+	if crack != 0:
+		col = c("66646a")
+	var grit := _nat_pebble(x, y, 7, 621, 0.08)
+	if grit == 1:
+		col = c("d8d0bc")
+	elif grit == 2:
+		col = c("7a766e")
+	var lichen := _nat_pair(x, y, 17, 631, 0.04)
+	if lichen == 1:
+		col = c("a9a262")
+	elif lichen == 2 and r < 0.4:
+		col = c("b07a42")
+	return col
+
+
+## The red fir forest floor: a deep brown mat of needles and cone scales,
+## twigs, and moss only where the low field dips.
+func _fir_duff(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
+	var col := _duff(x, y, a, b, n, r)
+	col = col.lerp(c("4a3a2a"), 0.22)
+	if _nat_tone(clampf(1.2 - a * 2.0, 0.0, 1.0), x, y) == 3:
+		col = _forest(x, y, a, b, n, r)
+	return col
 
 
 func _rock(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:

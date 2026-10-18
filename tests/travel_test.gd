@@ -613,10 +613,12 @@ func _check_hub_maps() -> void:
 	for hub in ParkAtlas.HUBS:
 		var region: Region = (load(hub.scene_path()) as PackedScene).instantiate()
 		add_child(region)
-		var blocker: TileMapLayer = region.get_node("Map/Blocker")
+		# A generated hub keeps its terrain in Map; a hand-built one (Glacier
+		# Point) has it at the top, with its spawns in Markers.
+		var blocker: TileMapLayer = region.get_node("Map/Blocker") if region.map else region.get_node("Blocker")
 		var ground := region.get_ground()
 		check(ground.get_used_rect().size.x > 100, "%s map loads (%s tiles)" % [hub.id, ground.get_used_rect().size])
-		var spawns := region.get_node("Map/Spawns").get_children()
+		var spawns := region.get_node("Map/Spawns" if region.map else "Markers").get_children()
 		var blocked := spawns.filter(func(m: Node2D) -> bool: return blocker.get_cell_source_id(blocker.local_to_map(m.position)) != -1)
 		check(region.get_spawn("arrival") != null and blocked.is_empty(), "%s spawn points are walkable (%d spawns)" % [hub.id, spawns.size()])
 		check(region.find_children("*", "TravelPoint", true, false).size() > 0, "%s has a map kiosk" % hub.id)

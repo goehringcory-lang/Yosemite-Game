@@ -69,6 +69,7 @@ CATEGORIES: dict[str, list[str]] = {
         "assets/sprites/ahwahnee/seasons/*.png",
         "assets/sprites/cave/*.png",
         "assets/sprites/lamon/*.png",
+        "assets/sprites/glacier/*.png",
     ],
     # Menus keep their layout, so the pictures keep their size and only
     # take on the palette; the title painting is drawn at the 32px grade.
