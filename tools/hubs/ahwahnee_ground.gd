@@ -45,6 +45,11 @@ var edge_trim := true
 ## with moss only in the hollows.
 var smooth_granite := false
 var fir_duff := false
+## Optional per-tile mask (1 = slab): granite and cliff tiles marked here are
+## painted as smooth slabs whatever [member smooth_granite] says. The Valley
+## map uses it for the Glacier Point Apron (see tools/mapgen/land_patches.gd).
+var slab_tiles := PackedByteArray()
+var _slab_f := PackedFloat32Array()
 
 var _na := PackedByteArray() # large scale
 var _nb := PackedByteArray() # medium scale
@@ -129,6 +134,13 @@ func paint(grid: PackedInt32Array, width: int, height: int, seed_v: int) -> Imag
 		bed.resize(w * h)
 	_path_index()
 	_path_groups()
+	_slab_f.clear()
+	if slab_tiles.size() == w * h:
+		var f := PackedFloat32Array()
+		f.resize(w * h)
+		for t in w * h:
+			f[t] = float(slab_tiles[t])
+		_slab_f = _path_blur(_path_blur(f))
 	var out := PackedByteArray()
 	out.resize(_pw * _ph * 4)
 	_pk.resize(_pw * _ph)
@@ -179,6 +191,11 @@ func paint(grid: PackedInt32Array, width: int, height: int, seed_v: int) -> Imag
 				col = _shapes(col, k, x, y, i)
 			if tint.size() == w * h and k not in FORMAL and not _is_water(k):
 				var tn := _tint_at(x, y)
+				# The slabs are too plain to hide the hillshade's tile-sized
+				# steps once the 32px pass puts it on the palette, so they take
+				# only a little of it.
+				if k in [Terrain.GRANITE, Terrain.CLIFF] and _is_slab(x, y, i):
+					tn = lerpf(1.0, tn, 0.25)
 				col = Color(col.r * tn, col.g * tn, col.b * tn * (1.0 + (1.0 - tn) * 0.15))
 			var o := i * 4
 			out[o] = int(clampf(col.r, 0, 1) * 255.0)
@@ -523,12 +540,22 @@ func _color(k: int, x: int, y: int, i: int, tx: int, ty: int) -> Color:
 		Terrain.TALUS, Terrain.SCREE:
 			return _talus(x, y, a, b, n, r)
 		Terrain.GRANITE:
-			if smooth_granite:
+			if smooth_granite or _is_slab(x, y, i):
 				return _slab(x, y, a, b, n, r)
 			return _rock(x, y, a, b, n, r)
 		Terrain.CLIFF:
+			if _is_slab(x, y, i):
+				return _slab(x, y, a, b, n, r)
 			return _rock(x, y, a, b, n, r)
 	return c("6f9a44")
+
+
+## In the slab mask, with its edge blurred and wobbled on the noise so the
+## slabs meet the faceted rock along a ragged line, not tile steps.
+func _is_slab(x: int, y: int, i: int) -> bool:
+	if _slab_f.is_empty():
+		return false
+	return _path_sample(_slab_f, x, y) > 0.5 + (float(_nb[i]) / 255.0 - 0.5) * 0.6
 
 
 func _forest(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:

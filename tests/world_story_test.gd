@@ -27,6 +27,12 @@ func _ready() -> void:
 	world._enter_region("yosemite_valley", "apron_base")
 	await get_tree().process_frame
 	check(find_named(world.region, "GlacierPointApron") != null, "Apron climb start is placed")
+	# Curry Village is its own hub, so the Valley map's foot of the Apron is
+	# forest and slab, with none of its cabins (tools/mapgen/land_patches.gd).
+	var apron_base: Vector2 = world.region.get_spawn("apron_base").position
+	var cabins: Array = world.region.get_node("Map/Buildings").get_children().filter(func(b: Node) -> bool:
+		return b is Sprite2D and (b as Sprite2D).position.distance_to(apron_base) < 12 * 32.0)
+	check(cabins.is_empty(), "no cabins at the foot of the Apron (%d)" % cabins.size())
 	world._enter_region("curry_village", "apron_trailhead")
 	await get_tree().process_frame
 	check(find_named(world.region, "FirefallSlab") != null and find_named(world.region, "WrenAlvarez") != null,
