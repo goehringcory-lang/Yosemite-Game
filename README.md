@@ -80,7 +80,7 @@ The small touches that make the Valley feel alive, in the spirit of Stardew Vall
 
 ## The map of Yosemite
 
-The park is built from real data. Elevation comes from the USGS 3D Elevation Program, and rivers, roads, trails, meadows, buildings, and place names come from OpenStreetMap. Cliffs, talus, and valley floors follow the real terrain, and trees change with elevation: oaks and gray pine at El Portal, ponderosa and incense cedar in the Valley, red fir at Glacier Point, lodgepole in Tuolumne, and giant sequoias in the Mariposa Grove.
+The park map is built from real data: elevation comes from the USGS 3D Elevation Program, and rivers, roads, trails, meadows, buildings, and place names come from OpenStreetMap. The places you walk are hand-made, laid out like the real ones, and trees change with elevation: oaks and gray pine at El Portal, ponderosa and incense cedar in the Valley, red fir at Glacier Point, lodgepole in Tuolumne, and giant sequoias in the Mariposa Grove.
 
 The game has five **hubs**, each its own map:
 
@@ -218,9 +218,9 @@ Rebuild it with `tools/hubs/rebuild_glacier_point.sh` (its Python steps need Pil
 ![Washburn Point: Liberty Cap, Nevada and Vernal falls](docs/glacier_point_washburn.png)
 ![Glacier Point, the whole map](docs/glacier_point_overview.png)
 
-### El Portal and Wawona
+### El Portal, Wawona and Tuolumne Meadows
 
-The two hubs down the roads out of the Valley are hand-made too, in the same Ahwahnee look, laid out like the real places and squeezed so they can be walked. Both are reached by driving (the park map); their roads out open it again.
+The hubs down the roads out of the Valley are hand-made too, in the same Ahwahnee look, laid out like the real places and squeezed so they can be walked. Both are reached by driving (the park map); their roads out open it again.
 
 **El Portal** (`tools/hubs/build_el_portal.gd`) lies along the Merced River canyon, 2,000 feet below the Valley, with the canyon's north wall at the top as in the Valley scenes:
 
@@ -240,17 +240,30 @@ The two hubs down the roads out of the Valley are hand-made too, in the same Ahw
 - **The Mariposa Grove** down the road: the welcome plaza with its shuttle and kiosk, then the trail up through the giant sequoias past the Fallen Monarch, the Bachelor and Three Graces, the Grizzly Giant (where the sequoia cone lies) and the California Tunnel Tree (you can walk through it) to the grove museum cabin.
 - **Mixed conifer forest**: ponderosa and sugar pine, incense cedar, white fir and black oak, with dogwood, and willows and alders along the river.
 
-Rebuild them with `tools/hubs/rebuild_el_portal.sh` and `tools/hubs/rebuild_wawona.sh` (Pillow and numpy; set `PYTHON=` to pick an interpreter), which work like Glacier Point's. Both builders extend `tools/hubs/build_outer_hub.gd`, which borrows the Valley floor builder's helpers. The buildings and props are in `tools/hubs/el_portal_art.gd` and `tools/hubs/wawona_art.gd` (written to `assets/sprites/el_portal/` and `assets/sprites/wawona/`). The new trees and shrubs (live oak, blue oak, gray pine, buckeye, redbud, white alder, chamise, toyon, sugar pine, the mature giant sequoias, the Grizzly Giant, the Tunnel Tree and the Fallen Monarch) are in `tools/hubs/foothill_flora_art.gd`, written beside the Valley's trees in `assets/sprites/ahwahnee/`, so any builder can scatter them. The deciduous ones follow the seasons through `SeasonalDressing`: the blue oaks and alders go gold and then bare, the buckeye blooms in spring, browns by summer and stands bare with its seeds hanging, and the redbud blooms magenta in spring. Oaks join the `black_oak` group, so the ground under them counts as oak woodland for foraging and the press book. Story NPCs and items go in `scenes/story/content/el_portal.tscn` and `wawona.tscn`. The map generator skips both hubs now (`"hand_made"` in `tools/mapgen/hub_content.gd`).
+**Tuolumne Meadows** (`tools/hubs/build_tuolumne.gd`), north at the top, at 8,600 feet:
+
+- **The meadow**, one of the largest in the Sierra, with the Tuolumne River meandering west through it, the Dana Fork coming in from the east, wet patches with low willows and corn lilies, and glacial erratics lying in the grass.
+- **The domes**: Lembert Dome over its parking lot (the glacier rounded its east side and plucked its west face), with the trail to Dog Lake behind it, and Pothole Dome at the meadow's west end.
+- **Soda Springs** in its log enclosure, **Parsons Memorial Lodge** of local granite and the **McCauley Cabin**, on the rise north of the river, reached by the old road from the Lembert lot or the footbridge across the meadow.
+- **Along the Tioga Road**: the visitor center (the arrival and its kiosk) and the Cathedral Lakes trailhead (John Muir), the store and grill under a canvas roof, the campground's loops, and the canvas cabins and dining tent of the **Tuolumne Meadows Lodge**, where the Lyell Canyon trail (the Lyell Glacier climb) starts. The road west opens the park map; east, it goes over Tioga Pass.
+- **South of the road**: Fairview Dome, and **Cathedral Peak** at the end of its trail, where the Cathedral Peak climb starts at the foot of the rock.
+- **Lodgepole forest** on granite sand under a litter of needles, whitebark pines on the granite, polished slabs. The domes and the peak are solid (CLIFF tiles under their pictures).
+
+Rebuild them with `tools/hubs/rebuild_el_portal.sh`, `tools/hubs/rebuild_wawona.sh` and `tools/hubs/rebuild_tuolumne.sh` (Pillow and numpy; set `PYTHON=` to pick an interpreter), which work like Glacier Point's. All three builders extend `tools/hubs/build_outer_hub.gd`, which borrows the Valley floor builder's helpers. The buildings, props, domes and peak are in `tools/hubs/el_portal_art.gd`, `tools/hubs/wawona_art.gd` and `tools/hubs/tuolumne_art.gd` (written to `assets/sprites/el_portal/`, `assets/sprites/wawona/` and `assets/sprites/tuolumne/`). The new trees and shrubs (live oak, blue oak, gray pine, buckeye, redbud, white alder, chamise, toyon, sugar pine, the mature giant sequoias, the Grizzly Giant, the Tunnel Tree and the Fallen Monarch, lodgepole and whitebark pine, and the meadow willows) are in `tools/hubs/foothill_flora_art.gd`, written beside the Valley's trees in `assets/sprites/ahwahnee/`, so any builder can scatter them. The deciduous ones follow the seasons through `SeasonalDressing`: the blue oaks and alders go gold and then bare, the buckeye blooms in spring, browns by summer and stands bare with its seeds hanging, and the redbud blooms magenta in spring. Oaks join the `black_oak` group, so the ground under them counts as oak woodland for foraging and the press book. Story NPCs, items and climbs go in `scenes/story/content/el_portal.tscn`, `wawona.tscn` and `tuolumne_meadows.tscn`. The map generator skips all three hubs now (`"hand_made"` in `tools/mapgen/hub_content.gd`).
 
 ![El Portal: the market, the post office and the railroad yard](docs/el_portal_town.png)
 ![Arch Rock and its entrance station](docs/el_portal_arch_rock.png)
 ![The Wawona Hotel and its lawn](docs/wawona_hotel.png)
 ![The Wawona Store, the covered bridge and the History Center](docs/wawona_history_center.png)
 ![The Mariposa Grove](docs/wawona_grove.png)
+![Tuolumne Meadows: Soda Springs and Parsons Lodge above the river](docs/tuolumne_soda_springs.png)
+![Lembert Dome and Dog Lake](docs/tuolumne_lembert_dome.png)
+![Cathedral Peak and Fairview Dome](docs/tuolumne_cathedral_peak.png)
+![The campground and the lodge](docs/tuolumne_lodge.png)
 
 ### Graphics pipeline for the generated hubs, UI and people
 
-The generated hubs (Tuolumne Meadows, and El Portal, Wawona and Glacier Point before they were built by hand) and the Valley map used to show flat tile ground and simple placeholder trees and huts. They now share the Ahwahnee look:
+The generated hubs (El Portal, Wawona, Tuolumne Meadows and Glacier Point, before they were built by hand) and the Valley map used to show flat tile ground and simple placeholder trees and huts. They now share the Ahwahnee look:
 
 - **Painted ground.** `tools/mapgen/ground_upgrade.gd` reads each map's terrain tiles and hillshade, paints one detailed picture with `tools/hubs/ahwahnee_ground.gd` (golden foothill grass, chaparral, red-fir needles, granite grit, shaded slopes, rivers with foam, road edges), and adds it to the map scene as `GroundArt`. The tile layer stays underneath, hidden, for collision and foraging. Run `godot --headless --path . res://tools/mapgen/upgrade_hubs.tscn -- paint`, then `godot --headless --path . --import`, then `... upgrade_hubs.tscn -- attach`. Re-run it after regenerating a map. The pictures are in `assets/map/ground/`.
 - **Flora atlas.** `tools/mapgen/flora_hd.gd` draws every tree, shrub, boulder, tent and cabin in `assets/sprites/flora.png` (and their lit windows in `flora_glow.png`) with the Ahwahnee ramps and dithering, in the same 32x48 frames, so no scene changed. Run `godot --headless --path . res://tools/mapgen/paint_flora.tscn` (it also writes the info sign, trailhead and map kiosk, and `docs/generated_flora_preview.png`).
@@ -274,7 +287,7 @@ A later pass brought every generator closer to Stardew Valley's finish: hue-shif
 - **UI and maps.** Panels are a beveled wooden frame with brass studs and a drop shadow. A speaker's name sits on a tab above the dialogue box, a bobbing arrow marks "Next", and a highlight bar marks the chosen menu row (`ui_art.gd` writes `panel.png`, `plaque.png`, `tag.png`, `select.png` and `next.png`). The map screens have a wooden frame, parchment labels, a bobbing "you are here" pin, and outlined icons, and they redraw only when something changes (`park_map.gd`).
 - **Climbing** (`scripts/climb/art/`). Skies have more bands and shaded clouds, distant walls haze toward blue, figures have colored outlines, and holds have a lit top and a dark underside.
 
-To rebuild everything after changing a generator, run these in order: `ui_art.tscn`, `npcgen.gd`, `gear_icons.gd`, `paint_flora.tscn`, `rebuild_buildings.tscn -- paint`, `--import`, `build_ahwahnee.tscn`, `build_seasonal_art.gd`, `build_homestead.tscn`, `build_curry.tscn`, `build_hubs.tscn`, `rebuild_glacier_point.sh`, `rebuild_el_portal.sh`, `rebuild_wawona.sh`, `repaint_village_art.tscn`, `repaint_interiors.tscn`, `repaint_ground.tscn`, `upgrade_hubs.tscn -- paint`, `--import`, `upgrade_hubs.tscn -- attach`, `--import`. The hub builders also rewrite the region scenes, plus `scenes/objects/shuttle_stop.tscn` and the shop and food data in `data/`. Only the node IDs differ in the scenes, but the data can lose hand edits, such as the Camp 4 trader's offers. So keep only the art: `git restore -- scenes/ data/`.
+To rebuild everything after changing a generator, run these in order: `ui_art.tscn`, `npcgen.gd`, `gear_icons.gd`, `paint_flora.tscn`, `rebuild_buildings.tscn -- paint`, `--import`, `build_ahwahnee.tscn`, `build_seasonal_art.gd`, `build_homestead.tscn`, `build_curry.tscn`, `build_hubs.tscn`, `rebuild_glacier_point.sh`, `rebuild_el_portal.sh`, `rebuild_wawona.sh`, `rebuild_tuolumne.sh`, `repaint_village_art.tscn`, `repaint_interiors.tscn`, `repaint_ground.tscn`, `upgrade_hubs.tscn -- paint`, `--import`, `upgrade_hubs.tscn -- attach`, `--import`. The hub builders also rewrite the region scenes, plus `scenes/objects/shuttle_stop.tscn` and the shop and food data in `data/`. Only the node IDs differ in the scenes, but the data can lose hand edits, such as the Camp 4 trader's offers. So keep only the art: `git restore -- scenes/ data/`.
 
 ![Pause menu](docs/ui_pause_menu.png)
 ![Settings](docs/ui_pause_settings.png)

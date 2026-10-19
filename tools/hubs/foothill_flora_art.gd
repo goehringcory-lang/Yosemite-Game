@@ -5,7 +5,8 @@ extends RefCounted
 ## gray pine, California buckeye, western redbud, white alder by the river,
 ## chamise and toyon), and the Big Trees of Wawona's Mariposa Grove (mature
 ## giant sequoias, the Grizzly Giant, the California Tunnel Tree, the Fallen
-## Monarch, and sugar pines).
+## Monarch, and sugar pines), and the high country of Tuolumne Meadows
+## (lodgepole and whitebark pines, and the low willows of the wet meadows).
 ##
 ## Written to assets/sprites/ahwahnee/ beside the Valley's trees, at the same
 ## 16px scale, so the hub builders scatter them with the same helpers. The
@@ -34,6 +35,8 @@ const TRUNKS := {
 	"tree_sequoia_giant_c": Vector2(22, 8),
 	"tree_grizzly_giant": Vector2(38, 12),
 	"tree_fallen_monarch": Vector2(132, 12),
+	"tree_lodgepole_a": Vector2(5, 4), "tree_lodgepole_b": Vector2(5, 4), "tree_lodgepole_c": Vector2(4, 3),
+	"tree_whitebark": Vector2(8, 5),
 }
 ## The Tunnel Tree is solid either side of its tunnel, open in the middle.
 const EXTRA_FOOTPRINTS := {
@@ -44,6 +47,7 @@ const FILES: Array[String] = [
 	"tree_buckeye", "tree_redbud", "tree_alder_a", "tree_alder_b", "tree_sugar_pine_a", "tree_sugar_pine_b",
 	"tree_sequoia_giant_a", "tree_sequoia_giant_b", "tree_sequoia_giant_c", "tree_grizzly_giant", "tree_tunnel",
 	"tree_fallen_monarch", "plant_chamise_a", "plant_chamise_b", "plant_toyon",
+	"tree_lodgepole_a", "tree_lodgepole_b", "tree_lodgepole_c", "tree_whitebark", "plant_willow_low_a", "plant_willow_low_b",
 ]
 const SEASON_NAMES := ["spring", "summer", "fall", "winter"]
 
@@ -67,6 +71,11 @@ const CHAR := ["120e0e", "1e1818", "2e2422", "40322c"]
 const SILVER := ["3a3634", "57514c", "7a736a", "9e968a", "c2baac", "e0d8c8"]
 const SUGAR_NEEDLE := ["17302a", "1f3e34", "2b503e", "3a6448", "4c7a54", "64905f", "82a872"]
 const CHAMISE := ["1e2a1c", "2a3a24", "3a4c2c", "4c5e34", "62723e", "7c884c"]
+const LODGEPOLE_NEEDLE := ["152a20", "1e3a28", "2a4c30", "3a6038", "4e7642", "668c4e", "82a45e"]
+const BARK_LODGEPOLE := ["2e2420", "4a3a2e", "66523e", "846c50", "a08864", "bca47e"]
+const WHITEBARK_NEEDLE := ["18302a", "223e34", "30503e", "426448", "587a56", "729266"]
+const WILLOW_LOW := ["1e3420", "2a4a2a", "3a6234", "4e7a3e", "66924a", "84aa5a"]
+const WILLOW_LOW_FALL := ["3a2e14", "5a4818", "7e6620", "a2862c", "c4a83c", "dcc456"]
 const TOYON := ["12261a", "1a3422", "24462a", "305834", "406c3e", "56844a"]
 
 
@@ -83,6 +92,8 @@ func save_all() -> void:
 		"tree_sequoia_giant_c": sequoia_giant(2), "tree_grizzly_giant": grizzly_giant(),
 		"tree_tunnel": tunnel_tree(), "tree_fallen_monarch": fallen_monarch(),
 		"plant_chamise_a": chamise(0), "plant_chamise_b": chamise(1), "plant_toyon": toyon(),
+		"tree_lodgepole_a": lodgepole(0), "tree_lodgepole_b": lodgepole(1), "tree_lodgepole_c": lodgepole(2),
+		"tree_whitebark": whitebark(), "plant_willow_low_a": willow_low(0), "plant_willow_low_b": willow_low(1),
 	}
 	for sprite_name: String in base:
 		_save(DIR + sprite_name, base[sprite_name])
@@ -98,6 +109,9 @@ func save_all() -> void:
 		_save(SEASON_DIR + "tree_buckeye_" + SEASON_NAMES[s], buckeye(s))
 	for s in [0, 2, 3]:
 		_save(SEASON_DIR + "tree_redbud_" + SEASON_NAMES[s], redbud(s))
+	for v in 2:
+		_save(SEASON_DIR + "plant_willow_low_%s_fall" % "ab"[v], willow_low(v, 2))
+		_save(SEASON_DIR + "plant_willow_low_%s_winter" % "ab"[v], willow_low(v, 3))
 
 
 func _save(path: String, im: Image) -> void:
@@ -640,5 +654,91 @@ func fallen_monarch() -> Image:
 		var a := float(i) / 7.0 * TAU
 		var p := Vector2(17.0, 26.0) + Vector2(cos(a) * 15.0, sin(a) * 22.0)
 		F.limb(im, p.x, p.y, p.x + cos(a) * 5.0, p.y + sin(a) * 5.0, 2.0, 0.8, soil, sd + i, 1.0)
+	F.rim(im, 0.5)
+	return im
+
+
+# ---------------------------------------------------------------- the high country
+
+## A lodgepole pine: a straight, slender trunk of thin scaly bark and a
+## narrow crown of short, dense tufts, the tree that rings Tuolumne Meadows.
+func lodgepole(v: int) -> Image:
+	var w := [30, 28, 24][v] as int
+	var h := [108, 96, 78][v] as int
+	var im := K.make(w, h)
+	var sd := 4400 + v * 17
+	var cx := w / 2.0 + (0.5 if v == 1 else -0.5)
+	var base := h - 4
+	var bark := F.ramp(BARK_LODGEPOLE)
+	var needles := F.ramp(LODGEPOLE_NEEDLE)
+	K.shadow(im, cx + 2.0, base + 0.5, 8.0, 2.4, 0.26)
+	F.trunk(im, cx, base, 4, 4.0, 1.4, bark, sd, 0.4, 0.0, 4, 1.6)
+	var crown_bottom := int(h * 0.62)
+	var tufts: Array[Vector3] = []
+	var y := 6.0
+	var k := 0
+	while y < crown_bottom:
+		var t := (y - 4.0) / float(crown_bottom - 4)
+		var reach := 1.5 + minf(t * 1.5, 1.0) * (w / 2.0 - 8.0)
+		var side := -1.0 if k % 2 == 0 else 1.0
+		var sx := F.trunk_x(cx, int(y), base, 4, sd, 0.4, 0.0)
+		var tip := Vector2(sx + side * reach * (0.7 + K.hash2(k, 1, sd) * 0.3), y - 1.0)
+		F.limb(im, sx, y + 1.0, tip.x, tip.y, 1.4, 0.8, bark, sd + k, 0.5)
+		tufts.append(Vector3(tip.x, tip.y, 2.2 + t * 1.4))
+		tufts.append(Vector3(lerpf(sx, tip.x, 0.35), y - 1.0, 2.0 + t * 1.0))
+		y += 2.4 + K.hash2(k, 2, sd) * 1.4
+		k += 1
+	tufts.append(Vector3(cx, 4.0, 2.0))
+	tufts.sort_custom(func(a: Vector3, b: Vector3) -> bool: return a.y < b.y)
+	for i in tufts.size():
+		var tf := tufts[i]
+		F.tuft(im, tf.x, tf.y, tf.z, needles, sd + i * 3, -0.1 * tf.y / crown_bottom)
+	F.rim(im, 0.5)
+	return im
+
+
+## A whitebark pine: a low, many-stemmed pine twisted by the wind on the
+## granite above the meadows, its bark pale and smooth.
+func whitebark() -> Image:
+	var w := 56
+	var h := 58
+	var im := K.make(w, h)
+	var sd := 4600
+	var cx := w / 2.0
+	var base := h - 4
+	var bark := F.ramp(SILVER)
+	K.shadow(im, cx + 3.0, base + 0.5, 20.0, 3.4, 0.28)
+	var tips := []
+	for i in 4:
+		var dx := (i - 1.5) * 6.0
+		var top := Vector2(cx + dx * 2.0 + (K.hash2(i, 1, sd) - 0.5) * 6.0, 14.0 + absf(dx) * 0.9)
+		F.limb(im, cx + dx * 0.3, base, top.x, top.y, 4.0, 1.8, bark, sd + i * 9, 3.0)
+		tips.append(top)
+	var leaf := F.ramp(WHITEBARK_NEEDLE)
+	for i in tips.size():
+		var p: Vector2 = tips[i]
+		for c in 3:
+			var q := p + Vector2((K.hash2(i, c, sd) - 0.5) * 12.0, 4.0 + c * 4.0)
+			F.blob_orig(im, q.x, q.y, 7.0 - c, 4.5, leaf, sd + i * 7 + c, -0.2 - c * 0.05, 0.2, 0.25)
+	F.rim(im, 0.5)
+	return im
+
+
+## A low clump of willow, as on the wet edges of the meadow: red stems and
+## narrow leaves, yellow in fall, bare in winter.
+func willow_low(v: int, season := 1) -> Image:
+	var w := 32 if v == 0 else 24
+	var h := 22 if v == 0 else 18
+	var im := K.make(w, h)
+	var sd := 4800 + v * 13
+	K.shadow(im, w / 2.0, h - 3.0, w / 2.0 - 2.0, 2.0, 0.24)
+	var stems := F.ramp(["3a1a14", "5a2a1c", "7e3a24", "a04c2c", "bc6438"])
+	var tips := []
+	for i in 6:
+		var top := Vector2(3.0 + i * (w - 6.0) / 5.0, 3.0 + K.hash2(i, 1, sd) * 5.0)
+		F.limb(im, w / 2.0 + (i - 2.5), h - 4.0, top.x, top.y, 1.4, 0.8, stems, sd + i, 1.0)
+		tips.append(top)
+	if season != 3:
+		crown(im, w / 2.0, h / 2.0 - 1.0, w / 2.0 - 3.0, h / 2.0 - 4.0, F.ramp(WILLOW_LOW_FALL if season == 2 else WILLOW_LOW), sd, 14, 2.6, 4.0, 0.15, 4)
 	F.rim(im, 0.5)
 	return im
