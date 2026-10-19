@@ -1,6 +1,6 @@
 class_name ItemToasts
 extends Control
-## The little cards at the bottom left that say what you just got: the item's
+## The little cards at the top left that say what you just got: the item's
 ## picture, its name, and how many. A second pickup of the same thing while
 ## its card is up adds to the count and bumps the card instead of stacking a
 ## new one. HUD makes one and feeds it from Inventory.added and Gear.added.
@@ -21,9 +21,10 @@ const COUNT_COLOR := Color(1, 0.831, 0.541)
 
 ## Each entry: {"key", "card", "count", "label", "time"}.
 var _cards: Array[Dictionary] = []
-## Pixels from the bottom of the screen to the lowest card. HUD raises it
-## while a conversation box covers the bottom of the screen.
-var bottom_margin := 44.0
+## Pixels from the top of the screen to the first card, clear of the bottom
+## left where a find's description shows. HUD lowers it while the place
+## name banner is up.
+var top_margin := 4.0
 
 
 func _ready() -> void:
@@ -134,12 +135,11 @@ func _process(delta: float) -> void:
 	_slide(delta)
 
 
-## Newest card at the bottom, older ones stacked above.
+## Oldest card at the top, newer ones stacked below.
 func _layout() -> void:
-	var bottom := UiScale.SCREEN.y - bottom_margin
-	for i in range(_cards.size() - 1, -1, -1):
+	for i in _cards.size():
 		var card: Control = _cards[i].card
-		var y := bottom - CARD_HEIGHT - (_cards.size() - 1 - i) * (CARD_HEIGHT + GAP)
+		var y := top_margin + i * (CARD_HEIGHT + GAP)
 		card.set_meta("target_y", y)
 		if not card.has_meta("placed"):
 			card.set_meta("placed", true)

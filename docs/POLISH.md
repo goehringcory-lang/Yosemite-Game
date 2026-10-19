@@ -6,7 +6,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 
 | Stardew hallmark | Here | Where | Checked by |
 |---|---|---|---|
-| "Item get" cards at the corner with picture and count | Cards slide in at the bottom left; repeats count up ("x2") with a bump; gear gets a brighter chime | `scripts/ui/item_toasts.gd` | test (stacking, counting, at most 3); shot `polish_toasts.png` |
+| "Item get" cards at the corner with picture and count | Cards slide in at the top left, clear of the message line; repeats count up ("x2") with a bump; gear gets a brighter chime | `scripts/ui/item_toasts.gd` | test (stacking, counting, at most 3); shot `polish_toasts.png` |
 | Things you pick up fly into you | Forage and story items hop up and fly into the player | `scripts/world/pickup_pop.gd` | smoke test picks forage up |
 | Every item has a picture | All 38 items, including the 12 cooked foods that showed only names before | `tools/ui/food_icons.gd` | test (every item has an icon) |
 | Shop and cooking menus show the goods | Pictures beside every trade and every dish, highlight across the row | `DialogueBox.choose(..., icons)`, `vendor.gd`, `station.gd` | shots `polish_shop.png`, `polish_campfire.png`; story test (long lists fit) |

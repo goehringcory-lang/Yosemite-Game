@@ -19,7 +19,7 @@ var food_label: Label
 var _location_text := ""
 var _location_tween: Tween
 var _status: Label
-## The "you got this" cards at the bottom left.
+## The "you got this" cards at the top left.
 var toasts: ItemToasts
 ## The menu-sized root every HUD element sits under (see UiScale).
 var _screen: Control
@@ -228,10 +228,11 @@ func hide_info() -> void:
 
 
 func _process(_delta: float) -> void:
-	# Cards ride above a conversation box (shops, cooking) so they stay readable.
-	toasts.bottom_margin = 44.0
-	for box: DialogueBox in get_tree().get_nodes_in_group("dialogue_box"):
-		toasts.bottom_margin = maxf(toasts.bottom_margin, UiScale.SCREEN.y - box.top() + 4.0)
+	# Cards drop below the place name while it's up, if it reaches over them.
+	toasts.top_margin = 4.0
+	var banner := location_panel.get_rect()
+	if location_panel.modulate.a > 0.0 and banner.position.x < 4.0 + ItemToasts.CARD_WIDTH:
+		toasts.top_margin = banner.end.y + 2.0
 	if info_panel.visible and _player and _player.global_position.distance_to(_info_anchor) > INFO_CLOSE_DISTANCE:
 		hide_info()
 	_update_cover()
