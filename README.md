@@ -31,7 +31,7 @@ godot project.godot         # opens the editor; press F5 to play
 | Climbing: place a cam or clip / eat at a ledge, shake out on a jug, or chalk up / retreat | Space or C / E / Esc | X / A / B |
 | Climbing: aid a hard move, or jug a fixed rope | Shift + arrow | Y + stick |
 | Slackline: lean back (hold the side away from the tip) | Left / Right | Stick left / right |
-| *Debug:* skip 1 hour / sleep now | F2 / F3 | |
+| *Debug:* skip 1 hour / sleep now / unlock and go to Glacier Point | F2 / F3 / F4 | |
 
 A prompt above the player's head shows what the interact button will do ("E  Read: Camp 4"), and it switches to gamepad button names when you use a gamepad. Every menu's hint line (pause menu, journal, conversations, maps) follows the same switch.
 
