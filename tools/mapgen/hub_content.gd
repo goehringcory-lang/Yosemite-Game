@@ -120,6 +120,25 @@ const CONTENT := {
 			{"spawn": "mirror_lake", "name": "Mirror Lake Trailhead"},
 			{"spawn": "el_capitan_meadow", "name": "El Capitan Meadow"},
 		],
+		# Hand corrections to the land cover (tools/mapgen/land_patches.gd).
+		"land_patches": [
+			{
+				# The foot of the Glacier Point Apron: Curry Village is its own
+				# hand-made hub, so no OSM cabins here, just forest of ponderosa,
+				# incense cedar and black oak; the Apron's smooth slabs sweeping
+				# up to the wall; and talus under Glacier Point to the east. Its
+				# loops of road and paving go too; Southside Drive stays.
+				"name": "Glacier Point Apron",
+				"unpave": true,
+				"clear": [Vector2(-119.5804, 37.7409), Vector2(-119.5651, 37.7409),
+					Vector2(-119.5651, 37.7344), Vector2(-119.5804, 37.7344)],
+				"slabs": [Vector2(-119.5814, 37.7377), Vector2(-119.5768, 37.7385),
+					Vector2(-119.5748, 37.7365), Vector2(-119.5743, 37.7344),
+					Vector2(-119.5768, 37.7320), Vector2(-119.5809, 37.7328)],
+				"talus": [Vector2(-119.5743, 37.7352), Vector2(-119.5656, 37.7360),
+					Vector2(-119.5646, 37.7320), Vector2(-119.5738, 37.7320)],
+			},
+		],
 		"exits": [
 			{"spawn": "lamon_homestead", "target_region": "lamon_homestead", "target_spawn": "gate",
 				"label": "Lamon Homestead"},

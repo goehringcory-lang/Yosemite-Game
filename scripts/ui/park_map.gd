@@ -458,7 +458,7 @@ func _any_road_open() -> bool:
 func _on_foot_text() -> String:
 	var trails: Array[String] = []
 	for door in _region.find_children("*", "RegionDoor", true, false):
-		if door.minutes > 0 and (door.closure == "" or Park.is_open(door.closure)):
+		if door.minutes > 0 and door.is_unlocked() and (door.closure == "" or Park.is_open(door.closure)):
 			trails.append(door.label)
 	return "" if trails.is_empty() else " On foot: %s." % "; ".join(trails)
 

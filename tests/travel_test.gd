@@ -73,6 +73,29 @@ func _ready() -> void:
 	check(world.region.region_id == "glacier_point", "drove to Glacier Point")
 	check(world.region.get_spawn("apron_top") != null, "Glacier Point has the Apron climb's top spot")
 
+	# The Ledge Trail: down to Curry Village from beside the hotel site, and
+	# back up, which is open now that Glacier Point is.
+	var ledge_down: RegionDoor = world.region.find_child("LedgeTrail", true, false)
+	var ledge_top: Node2D = world.region.get_spawn("ledge_trail_top")
+	check(ledge_down != null and ledge_top != null and ledge_top.position.distance_to(ledge_down.position) < 96.0, "the Ledge Trail tops out beside its own spot")
+	check(ledge_down != null and await _can_use(world.player, ledge_down), "and its trailhead can be walked up to")
+	ledge_down.interact(world.player)
+	await get_tree().create_timer(2.5).timeout
+	while world._busy:
+		await get_tree().process_frame
+	check(world.region.region_id == "curry_village" and world.player.position == world.region.get_spawn("ledge_trailhead").position,
+		"the Ledge Trail comes down behind Curry Village")
+	var ledge_up: RegionDoor = world.region.find_child("LedgeTrail", true, false)
+	check(ledge_up != null and ledge_up.is_unlocked() and await _can_use(world.player, ledge_up), "and its foot can be walked up to")
+	var set_out := GameClock.minutes
+	ledge_up.interact(world.player)
+	await get_tree().create_timer(2.5).timeout
+	while world._busy:
+		await get_tree().process_frame
+	check(world.region.region_id == "glacier_point" and world.player.position == world.region.get_spawn("ledge_trail_top").position,
+		"the Ledge Trail climbs back to Glacier Point")
+	check(GameClock.minutes - set_out == ledge_up.minutes, "the climb up takes its time (%d min)" % (GameClock.minutes - set_out))
+
 	# Topping out the Apron before the road opens: the map points to the trail down.
 	GameClock.season = GameClock.Season.SPRING
 	GameClock.day = 3

@@ -160,6 +160,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/curry/curry_mist_3.png" id="158_j4y0l"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/lamp_wrought_glow.png" id="159_252no"]
 [ext_resource type="Script" path="res://scripts/world/night_glow.gd" id="160_mcn1o"]
+[ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="161_ledge"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_te2xw"]
 size = Vector2(164, 46.08)
@@ -8136,6 +8137,15 @@ flora = NodePath("../../Flora")
 oak_canopy = NodePath("../../OakCanopy")
 amount_scale = 3.0
 
+[node name="LedgeTrail" parent="Entities" unique_id=1872187203 instance=ExtResource("161_ledge")]
+position = Vector2(1904, 352)
+label = "Ledge Trail, up to Glacier Point"
+target_region = "glacier_point"
+target_spawn = "ledge_trail_top"
+minutes = 180
+needs_hub = "glacier_point"
+locked_text = "The old Ledge Trail, built in 1872, climbs the gully beside the Apron straight up to Glacier Point, 3,200 feet above. Rockfall closed it for decades, and it's steep and loose. Climb the Glacier Point Apron first, and you'll know the rock well enough to try it."
+
 [node name="Markers" type="Node2D" parent="." unique_id=2109802212]
 
 [node name="arrival" type="Marker2D" parent="Markers" unique_id=329680862]
@@ -8170,6 +8180,9 @@ position = Vector2(944, 1500.8)
 
 [node name="apron_trailhead" type="Marker2D" parent="Markers" unique_id=2057286072]
 position = Vector2(2512, 336)
+
+[node name="ledge_trailhead" type="Marker2D" parent="Markers" unique_id=1872187204]
+position = Vector2(1904, 400)
 
 [node name="campsite_west" type="Marker2D" parent="Markers" unique_id=613699370]
 position = Vector2(528, 688)

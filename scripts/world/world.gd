@@ -136,6 +136,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			GameClock.advance_minutes(60)
 		KEY_F3:
 			sleep()
+		KEY_F4:
+			Park.unlock_hub("glacier_point")
+			go_to_region("glacier_point", "arrival")
 
 
 static func region_scene_path(id: String) -> String:

@@ -9,6 +9,7 @@ const Terrain = preload("res://tools/mapgen/terrain.gd")
 const Art = preload("res://tools/mapgen/art.gd")
 const Buildings = preload("res://tools/mapgen/hub_buildings.gd")
 const Dem = preload("res://tools/mapgen/dem.gd")
+const LandPatches = preload("res://tools/mapgen/land_patches.gd")
 const BlackOak = preload("res://scripts/objects/black_oak.gd")
 
 const TILESET := preload("res://assets/tiles/world_tileset.tres")
@@ -126,7 +127,9 @@ func build() -> Dictionary:
 	flora.fill(-1)
 	_timed("elevation", _sample_terrain)
 	_timed("OpenStreetMap", _rasterize_osm)
+	_clear_buildings()
 	_timed("terrain types", _classify)
+	_reshape_land()
 	var arrival := _spot(content.spawns.arrival)
 	_flood_fill(arrival)
 	var started := Time.get_ticks_msec()
@@ -553,6 +556,47 @@ func _classify() -> void:
 		if content.get("haze_below", false) and e < hub.walk_min_elevation - BELOW_MARGIN:
 			below[k] = 1
 			walkable[k] = 0
+
+
+## The "clear" land patches (land_patches.gd): no buildings there, and the
+## ground that isn't too steep is woods, so it gets dense forest.
+func _clear_buildings() -> void:
+	var clear := LandPatches.mask(content, "clear", w, h, func(p: Vector2) -> Vector2: return to_cell(p.x, p.y))
+	for k in w * h:
+		if clear[k] == 0:
+			continue
+		if flags[k] & F_BUILDING:
+			flags[k] &= ~F_BUILDING
+			flora[k] = -1
+		if slope[k] < STEEP_SLOPE:
+			flags[k] |= F_WOOD
+
+
+## The rest of the land patches: "unpave" (paving that leads nowhere in a
+## "clear" area becomes forest), then slab or talus at the foot of the cliff,
+## kept off the spawn points.
+func _reshape_land() -> void:
+	var to := func(p: Vector2) -> Vector2: return to_cell(p.x, p.y)
+	var spots: Array[Vector2i] = []
+	for spec: Dictionary in content.get("spawns", {}).values():
+		spots.append(_spot_cell(spec))
+	if LandPatches.wants(content, "unpave"):
+		for c in LandPatches.unpave(kind, w, h, LandPatches.mask(content, "clear", w, h, to), spots):
+			walkable[idx(c)] = 1 if elev[idx(c)] >= hub.walk_min_elevation and elev[idx(c)] <= hub.walk_max_elevation else 0
+	var slabs := LandPatches.mask(content, "slabs", w, h, to)
+	var talus := LandPatches.mask(content, "talus", w, h, to)
+	if not LandPatches.any(slabs) and not LandPatches.any(talus):
+		return
+	var keep := PackedByteArray()
+	keep.resize(w * h)
+	for c in spots:
+		for dy in range(-2, 3):
+			for dx in range(-2, 3):
+				if in_map(c + Vector2i(dx, dy)):
+					keep[idx(c + Vector2i(dx, dy))] = 1
+	for c in LandPatches.reshape(kind, w, h, slabs, talus, keep):
+		if kind[idx(c)] == Terrain.TALUS:
+			walkable[idx(c)] = 0
 
 
 func _flood_fill(start: Vector2i) -> void:

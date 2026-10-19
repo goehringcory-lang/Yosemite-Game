@@ -3052,6 +3052,13 @@ target_region = "four_mile_trailhead"
 target_spawn = "trailhead"
 minutes = 120
 
+[node name="LedgeTrail" parent="Entities" unique_id=1872187201 instance=ExtResource("31_ubaex")]
+position = Vector2(2352, 864)
+label = "Ledge Trail, down to Curry Village"
+target_region = "curry_village"
+target_spawn = "ledge_trailhead"
+minutes = 120
+
 [node name="PanoramaTrail" parent="Entities" unique_id=465065052 instance=ExtResource("31_ubaex")]
 position = Vector2(2672, 1376)
 label = "Panorama Trail, down to Happy Isles"
@@ -7522,6 +7529,9 @@ position = Vector2(144, 624)
 
 [node name="panorama_trailhead" type="Marker2D" parent="Markers" unique_id=617326261]
 position = Vector2(2608, 1360)
+
+[node name="ledge_trail_top" type="Marker2D" parent="Markers" unique_id=1872187202]
+position = Vector2(2320, 880)
 
 [node name="road_south" type="Marker2D" parent="Markers" unique_id=469476891]
 position = Vector2(1200, 2384)
