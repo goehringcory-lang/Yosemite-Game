@@ -7,7 +7,7 @@
 [node name="ElPortalStory" type="Node2D"]
 
 [node name="ModelAAxle" parent="." instance=ExtResource("1_r")]
-position = Vector2(1864, 2216)
+position = Vector2(1384, 1196)
 item_id = "model_a_axle"
 found_text = "It's half buried beside the tracks."
 
@@ -18,6 +18,6 @@ offset = Vector2(-48, 16)
 wander_radius = 64
 
 [node name="FlourSack" parent="." instance=ExtResource("1_r")]
-position = Vector2(1768, 2208)
+position = Vector2(1900, 1074)
 item_id = "flour_sack"
 found_text = "It's stenciled DEGNAN, YOSEMITE, and it's been waiting by the tracks since the last train."

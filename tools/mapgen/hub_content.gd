@@ -162,6 +162,9 @@ const CONTENT := {
 		},
 	},
 	"el_portal": {
+		# El Portal's region is built by hand now, laid out like the real
+		# town, and mapgen skips it. Its places here are the old reference.
+		"hand_made": "tools/hubs/build_el_portal.gd",
 		"places": [
 			{"name": "El Portal", "osm": "El Portal", "kind": "place=hamlet", "radius": 400, "label": true},
 			{"name": "El Portal Market", "osm": "El Portal Market", "radius": 120},
@@ -237,6 +240,9 @@ const CONTENT := {
 		"haze_below": true,
 	},
 	"wawona": {
+		# Wawona's region is built by hand now, with the Mariposa Grove, and
+		# mapgen skips it. Its places here are the old reference.
+		"hand_made": "tools/hubs/build_wawona.gd",
 		"places": [
 			{"name": "Wawona Hotel", "osm": "Wawona Hotel", "kind": "tourism=hotel", "radius": 160, "label": true},
 			{"name": "Yosemite History Center", "osm": "Yosemite History Center", "radius": 170, "label": true},
