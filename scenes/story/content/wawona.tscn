@@ -20,6 +20,6 @@ offset = Vector2(72, 40)
 wander_radius = 48
 
 [node name="SequoiaCone" parent="." instance=ExtResource("4_r")]
-position = Vector2(4944, 4176)
+position = Vector2(3200, 2836)
 item_id = "sequoia_cone"
 found_text = "It lay among the duff at the foot of the Grizzly Giant, one of the thousands of cones the old tree carries. Galen Clark asked for one."

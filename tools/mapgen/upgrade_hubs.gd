@@ -6,7 +6,7 @@ extends Node
 ## adds them to the map scenes. Add hub ids to do only those hubs.
 
 const Upgrade = preload("res://tools/mapgen/ground_upgrade.gd")
-const HUBS := ["el_portal", "wawona", "tuolumne_meadows", "yosemite_valley"]
+const HUBS := ["tuolumne_meadows", "yosemite_valley"]
 
 
 func _ready() -> void:
