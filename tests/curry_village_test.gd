@@ -160,7 +160,7 @@ func _offer(vendor: Vendor, id: String) -> ShopOffer:
 
 ## Spawns, doors and signs exist and can be walked to from the orchard gate.
 func _check_region(region: Region) -> void:
-	for spawn in ["arrival", "homestead", "shuttle", "store_door", "shop_door", "registration_porch", "plaza", "apron_trailhead", "west_road", "east_road", "campsite_west", "campsite_center", "campsite_east"]:
+	for spawn in ["arrival", "homestead", "shuttle", "store_door", "shop_door", "registration_porch", "plaza", "apron_trailhead", "ledge_trailhead", "west_road", "east_road", "campsite_west", "campsite_center", "campsite_east"]:
 		check(region.get_spawn(spawn) != null, "Curry Village has a %s spot" % spawn)
 	var ground := region.get_ground()
 	check(ground.get_used_rect().size == Vector2i(100, 64), "the village is 100 x 64 tiles")
@@ -176,7 +176,7 @@ func _check_region(region: Region) -> void:
 	var start := Vector2i(region.get_spawn("homestead").position / 32.0)
 	var reached := _flood(open, start)
 	var unreachable := PackedStringArray()
-	for spawn in ["arrival", "shuttle", "store_door", "shop_door", "registration_porch", "plaza", "apron_trailhead", "west_road", "east_road", "campsite_west", "campsite_center", "campsite_east"]:
+	for spawn in ["arrival", "shuttle", "store_door", "shop_door", "registration_porch", "plaza", "apron_trailhead", "ledge_trailhead", "west_road", "east_road", "campsite_west", "campsite_center", "campsite_east"]:
 		if not reached.has(Vector2i(region.get_spawn(spawn).position / 32.0)):
 			unreachable.append(spawn)
 	check(unreachable.is_empty(), "every spot can be walked to from the gate %s" % unreachable)
@@ -190,6 +190,24 @@ func _check_region(region: Region) -> void:
 		if not near:
 			exits.append(exit.name)
 	check(exits.is_empty(), "every door and road exit can be reached %s" % exits)
+	# The Ledge Trail up to Glacier Point is there from the start, but it opens
+	# only once the Apron is climbed, so it never skips that climb.
+	var ledge: RegionDoor = region.find_child("LedgeTrail", true, false)
+	check(ledge != null and ledge.target_region == "glacier_point" and ledge.target_spawn == "ledge_trail_top" and ledge.minutes > 0,
+		"the Ledge Trail leads up to Glacier Point")
+	if ledge != null:
+		var near := false
+		var cell := Vector2i(ledge.position / 32.0)
+		for dy in range(-2, 3):
+			for dx in range(-2, 3):
+				near = near or reached.has(cell + Vector2i(dx, dy))
+		check(near and ledge.position.distance_to(region.get_spawn("ledge_trailhead").position) < 96.0, "its trailhead can be walked to")
+		check(not Park.is_hub_unlocked("glacier_point") and not ledge.is_unlocked() and ledge.get_prompt().begins_with("Look at"),
+			"it's closed before the Apron is climbed")
+		check(ledge.locked_text.contains("1872") and ledge.locked_text.contains("Apron"), "and its sign says why")
+		Park.unlock_hub("glacier_point")
+		check(ledge.is_unlocked() and ledge.get_prompt().begins_with("Go to"), "climbing the Apron opens it")
+		Park.unlocked_hubs.erase("glacier_point")
 	var signs := PackedStringArray()
 	for info: InfoSign in region.find_children("*", "InfoSign", true, false):
 		var cell := Vector2i(info.position / 32.0)

@@ -503,6 +503,17 @@ func _place_life() -> void:
 		"A stone deck, cold water, and a lot of kids on a hot afternoon. In winter the pool is drained and the deck becomes an ice rink.")
 	sign_prop("ApronSign", CS + "trail_post_apron.png", foot(76, 9.5), Vector2(8, 4), "Glacier Point Apron",
 		"A sweep of smooth granite slabs rises from behind the cabins toward Glacier Point, 3,200 feet above. The trail at the top corner climbs the talus to its foot.")
+	# The Ledge Trail (1872), straight up the gully beside the Apron to Glacier
+	# Point, at the head of the path west of the closed cabins. Rockfall closed
+	# it for decades; here it opens once you've climbed the Apron, so it never
+	# skips the climb that opens Glacier Point.
+	var ledge := instance_scene("res://scenes/objects/region_door.tscn", foot(59, 10), "LedgeTrail")
+	ledge.set("label", "Ledge Trail, up to Glacier Point")
+	ledge.set("target_region", "glacier_point")
+	ledge.set("target_spawn", "ledge_trail_top")
+	ledge.set("minutes", 180)
+	ledge.set("needs_hub", "glacier_point")
+	ledge.set("locked_text", "The old Ledge Trail, built in 1872, climbs the gully beside the Apron straight up to Glacier Point, 3,200 feet above. Rockfall closed it for decades, and it's steep and loose. Climb the Glacier Point Apron first, and you'll know the rock well enough to try it.")
 	sign_prop("StonemanSign", "res://assets/sprites/info_sign.png", foot(40, 54), Vector2(12, 4), "Stoneman Meadow",
 		"In spring the meadow floods, and Half Dome shows up upside down in the pools. Stay on the trail: the grass here is easy to trample.")
 	sign_prop("MercedSign", "res://assets/sprites/info_sign.png", foot(20, 58), Vector2(12, 4), "The Merced River",
@@ -551,6 +562,7 @@ func _place_markers_and_exits() -> void:
 	marker("amphitheater", 66, 47.6)
 	marker("pool_side", 29, 46.4)
 	marker("apron_trailhead", 78, 10)
+	marker("ledge_trailhead", 59, 12)
 	marker("campsite_west", 16, 21)
 	marker("campsite_center", 33, 21)
 	marker("campsite_east", 50, 21)

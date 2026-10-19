@@ -359,6 +359,9 @@ func _place_rim_trails() -> void:
 	# the road opens can always walk down.
 	_trail_door("FourMileTrail", foot(3, 19), "Four Mile Trail, down to the Valley", "yosemite_valley", "four_mile_trailhead", 120)
 	_trail_door("PanoramaTrail", foot(83, 42), "Panorama Trail, down to Happy Isles", "yosemite_valley", "happy_isles", 240)
+	# The Ledge Trail tops out by the Mountain House footings (Curry Village's
+	# end opens once you've climbed the Apron).
+	_trail_door("LedgeTrail", foot(73, 26), "Ledge Trail, down to Curry Village", "curry_village", "ledge_trailhead", 120)
 	_info_sign("FourMileSign", foot(39, 35), "Four Mile Trail",
 		"Down to the Valley floor along the rim and then in switchbacks, past Union Point. It's 4.8 miles now; the toll trail built in 1872 was four.")
 	_info_sign("PanoramaSign", foot(63, 33), "Panorama Trail",
@@ -390,6 +393,7 @@ func _place_markers_and_places() -> void:
 	marker("snack_stand", 50, 39)
 	marker("four_mile_trailhead", 4, 19)
 	marker("panorama_trailhead", 81, 42)
+	marker("ledge_trail_top", 72, 27)
 	marker("road_south", 37, 74)
 	place("Glacier Point", 63, 9, 9)
 	place("Overhanging Rock", 55, 8, 2, false)
