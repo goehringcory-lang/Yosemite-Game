@@ -9,6 +9,8 @@ extends RefCounted
 
 const Terrain = preload("res://tools/mapgen/terrain.gd")
 const Ground = preload("res://tools/hubs/ahwahnee_ground.gd")
+const HubContent = preload("res://tools/mapgen/hub_content.gd")
+const LandPatches = preload("res://tools/mapgen/land_patches.gd")
 const T := 16
 const OUT_DIR := "res://assets/map/ground/"
 ## Brightness of each hillshade alternative tile (see Terrain.SHADE_MODULATE).
@@ -28,6 +30,18 @@ static func apply(hub_id: String, attach_only := false, seed_value := 0) -> bool
 			map.remove_child(stale)
 			stale.free()
 		return _finish(map, hub_id, map_path)
+	var im := paint(map, hub_id, seed_value)
+	var out := ProjectSettings.globalize_path(OUT_DIR + hub_id + "_ground.png")
+	DirAccess.make_dir_recursive_absolute(out.get_base_dir())
+	im.save_png(out)
+
+	map.free()
+	return true
+
+
+## Paints [param map]'s ground picture (16px to a tile) from its hidden tile
+## ground and hillshade, with the hub's slab land patches (land_patches.gd).
+static func paint(map: Node, hub_id: String, seed_value := 0) -> Image:
 	var ground := map.get_node("Ground") as TileMapLayer
 	var size: Vector2i = map.get("size_in_tiles")
 	var w := size.x
@@ -50,6 +64,10 @@ static func apply(hub_id: String, attach_only := false, seed_value := 0) -> bool
 			kind[k] = ground.get_cell_atlas_coords(cell).y
 			tint[k] = SHADE_LIGHT[clampi(ground.get_cell_alternative_tile(cell), 0, 3)]
 	var painter := Ground.new()
+	var to_cell := func(p: Vector2) -> Vector2: return map.call("lonlat_to_position", p) / 32.0
+	var slabs := LandPatches.mask(HubContent.CONTENT.get(hub_id, {}), "slabs", w, h, to_cell)
+	if LandPatches.any(slabs):
+		painter.slab_tiles = slabs
 	painter.tint = tint
 	painter.road_shoulders = true
 	var im := painter.paint(kind, w, h, seed_value if seed_value != 0 else hub_id.hash() & 0xffff)
@@ -59,12 +77,7 @@ static func apply(hub_id: String, attach_only := false, seed_value := 0) -> bool
 		for x in w:
 			if drawn[y * w + x] == 0:
 				im.fill_rect(Rect2i(x * T, y * T, T, T), Color(0, 0, 0, 0))
-	var out := ProjectSettings.globalize_path(OUT_DIR + hub_id + "_ground.png")
-	DirAccess.make_dir_recursive_absolute(out.get_base_dir())
-	im.save_png(out)
-
-	map.free()
-	return true
+	return im
 
 
 ## Needs the PNG imported first (the tool's second pass).

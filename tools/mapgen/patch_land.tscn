@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tools/mapgen/patch_land.gd" id="1_pl"]
+
+[node name="PatchLand" type="Node"]
+script = ExtResource("1_pl")
