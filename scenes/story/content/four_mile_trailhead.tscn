@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_ccc_worker.tres" id="2_r"]
+[ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="3_r"]
+[ext_resource type="Resource" path="res://data/routes/steck_salathe.tres" id="4_r"]
+
+[node name="FourMileTrailheadStory" type="Node2D"]
+
+[node name="VisitorCccWorker" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "trailhead"
+offset = Vector2(64, 32)
+wander_radius = 64
+
+
+[node name="SteckSalathe" parent="." instance=ExtResource("3_r")]
+position = Vector2(1488, 336)
+route = ExtResource("4_r")

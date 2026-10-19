@@ -566,9 +566,8 @@ func _place_markers_and_exits() -> void:
 	place("Merced River", 40, 62, 4, false)
 	# Roads out, the way home, and the trail up to the Apron.
 	region_exit("HomesteadGate", tile_pos(99, 38), Vector2(12, 60), "Lamon Homestead", "lamon_homestead", "gate")
-	region_exit("WestRoad", tile_pos(0, 51), Vector2(12, 48), "Southside Drive west", "yosemite_valley", "curry_village")
-	region_exit("EastRoad", tile_pos(99, 51), Vector2(12, 48), "Southside Drive east", "yosemite_valley", "happy_isles")
-	region_exit("ApronTrail", tile_pos(79, 7), Vector2(48, 12), "Glacier Point Apron", "yosemite_valley", "apron_base")
+	region_exit("WestRoad", tile_pos(0, 51), Vector2(12, 48), "Southside Drive west", "housekeeping_camp", "east")
+	region_exit("EastRoad", tile_pos(99, 51), Vector2(12, 48), "Southside Drive east", "upper_pines", "west")
 
 
 # ---------------------------------------------------------------- interiors

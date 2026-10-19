@@ -6669,8 +6669,8 @@ shape = SubResource("RectangleShape2D_75cfo")
 position = Vector2(16, 1872)
 script = ExtResource("61_kks21")
 label = "Northside Drive"
-target_region = "yosemite_valley"
-target_spawn = "the_ahwahnee"
+target_region = "ahwahnee_meadow"
+target_spawn = "east"
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/NorthsideDriveWest" unique_id=2137158721]
 shape = SubResource("RectangleShape2D_mporn")

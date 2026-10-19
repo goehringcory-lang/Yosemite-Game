@@ -357,8 +357,8 @@ func _trail_door(node_name: String, at_pos: Vector2, label: String, target_regio
 func _place_rim_trails() -> void:
 	# No winter closure from the top: a climber who tops out the Apron before
 	# the road opens can always walk down.
-	_trail_door("FourMileTrail", foot(3, 19), "Four Mile Trail, down to the Valley", "yosemite_valley", "four_mile_trailhead", 120)
-	_trail_door("PanoramaTrail", foot(83, 42), "Panorama Trail, down to Happy Isles", "yosemite_valley", "happy_isles", 240)
+	_trail_door("FourMileTrail", foot(3, 19), "Four Mile Trail, down to the Valley", "four_mile_trailhead", "trailhead", 120)
+	_trail_door("PanoramaTrail", foot(83, 42), "Panorama Trail, down to Happy Isles", "happy_isles", "panorama", 240)
 	_info_sign("FourMileSign", foot(39, 35), "Four Mile Trail",
 		"Down to the Valley floor along the rim and then in switchbacks, past Union Point. It's 4.8 miles now; the toll trail built in 1872 was four.")
 	_info_sign("PanoramaSign", foot(63, 33), "Panorama Trail",

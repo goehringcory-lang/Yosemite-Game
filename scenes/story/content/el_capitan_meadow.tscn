@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/warren_harding.tres" id="2_r"]
+[ext_resource type="Resource" path="res://data/characters/beverly_johnson.tres" id="3_r"]
+[ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="4_r"]
+[ext_resource type="Resource" path="res://data/routes/the_nose.tres" id="5_r"]
+[ext_resource type="Resource" path="res://data/routes/nutcracker.tres" id="6_r"]
+
+[node name="ElCapitanMeadowStory" type="Node2D"]
+
+[node name="WarrenHarding" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "meadow"
+offset = Vector2(-48, -32)
+
+
+[node name="BeverlyJohnson" parent="." instance=ExtResource("1_r")]
+character = ExtResource("3_r")
+spot = "meadow"
+offset = Vector2(32, -48)
+
+
+[node name="TheNose" parent="." instance=ExtResource("4_r")]
+position = Vector2(1296, 528)
+route = ExtResource("5_r")
+
+
+[node name="Nutcracker" parent="." instance=ExtResource("4_r")]
+position = Vector2(2128, 400)
+route = ExtResource("6_r")

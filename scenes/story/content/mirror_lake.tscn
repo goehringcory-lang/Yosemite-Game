@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/tenaya.tres" id="2_r"]
+[ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="3_r"]
+[ext_resource type="Resource" path="res://data/routes/astroman.tres" id="4_r"]
+
+[node name="MirrorLakeStory" type="Node2D"]
+
+[node name="Tenaya" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "lakeshore"
+offset = Vector2(32, -32)
+
+
+[node name="Astroman" parent="." instance=ExtResource("3_r")]
+position = Vector2(400, 464)
+route = ExtResource("4_r")

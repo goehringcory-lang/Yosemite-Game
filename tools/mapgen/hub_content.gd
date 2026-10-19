@@ -16,6 +16,11 @@ extends RefCounted
 
 const CONTENT := {
 	"yosemite_valley": {
+		# The Valley is built by hand now: Yosemite Village, Curry Village, the
+		# Ahwahnee and the homestead, and the small areas and trail scenes
+		# between them (tools/hubs/build_valley_floor.gd). Mapgen skips it; its
+		# places here are the old reference (the park map still reads them).
+		"hand_made": "tools/hubs/build_valley_floor.gd",
 		"places": [
 			{"name": "Yosemite Village", "osm": "Yosemite Village", "radius": 280, "label": true},
 			{"name": "Cook's Meadow", "osm": "Cook's Meadow", "radius": 260, "label": true},

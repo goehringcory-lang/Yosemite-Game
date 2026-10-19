@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/george_anderson.tres" id="2_r"]
+[ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="3_r"]
+[ext_resource type="Resource" path="res://data/routes/snake_dike.tres" id="4_r"]
+
+[node name="HappyIslesStory" type="Node2D"]
+
+[node name="GeorgeAnderson" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "arrival"
+offset = Vector2(-76, 0)
+
+
+[node name="SnakeDike" parent="." instance=ExtResource("3_r")]
+position = Vector2(1936, 368)
+route = ExtResource("4_r")

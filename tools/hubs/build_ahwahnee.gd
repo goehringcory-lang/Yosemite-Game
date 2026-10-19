@@ -527,7 +527,7 @@ func _grounds_markers_and_exits() -> void:
 	place("Royal Arch Cascade", int(_land_consts.get("POOL_POS", Vector2i(416, 210)).x / T), 17, 9)
 	place("Royal Arches", 58, 8, 30)
 	region_exit("ToStonemanBridge", tile_pos(_cx + 0.5, GH - 0.5), Vector2(64, 12), "Stoneman Bridge", "ahwahnee_trail", "north_entry")
-	region_exit("NorthsideDriveWest", tile_pos(0, 58), Vector2(12, 56), "Northside Drive", "yosemite_valley", "the_ahwahnee")
+	region_exit("NorthsideDriveWest", tile_pos(0, 58), Vector2(12, 56), "Northside Drive", "ahwahnee_meadow", "east")
 
 
 # ================================================================ HOMESTEAD

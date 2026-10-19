@@ -13,6 +13,7 @@
 [ext_resource type="Resource" path="res://data/routes/firefall_slab.tres" id="11_r"]
 [ext_resource type="PackedScene" path="res://scenes/story/pickup.tscn" id="12_r"]
 [ext_resource type="Script" path="res://scripts/world/firefall.gd" id="13_r"]
+[ext_resource type="Resource" path="res://data/routes/glacier_point_apron.tres" id="14_r"]
 
 [node name="CurryVillageStory" type="Node2D"]
 
@@ -63,6 +64,10 @@ offset = Vector2(-168, -64)
 [node name="FirefallSlab" parent="." instance=ExtResource("10_r")]
 position = Vector2(2300, 236)
 route = ExtResource("11_r")
+
+[node name="GlacierPointApron" parent="." instance=ExtResource("10_r")]
+position = Vector2(2608, 236)
+route = ExtResource("14_r")
 
 [node name="CurryRentalShoes" parent="." instance=ExtResource("12_r")]
 position = Vector2(1640, 660)

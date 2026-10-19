@@ -24,11 +24,9 @@ func _ready() -> void:
 	check(find_named(world.region, "Chuckah") != null, "homestead has the chuckah")
 	check(find_named(world.region, "Campfire") != null, "homestead has a campfire")
 	check(get_tree().get_first_node_in_group("journal") != null, "journal exists")
-	world._enter_region("yosemite_valley", "apron_base")
-	await get_tree().process_frame
-	check(find_named(world.region, "GlacierPointApron") != null, "Apron climb start is placed")
 	world._enter_region("curry_village", "apron_trailhead")
 	await get_tree().process_frame
+	check(find_named(world.region, "GlacierPointApron") != null, "Apron climb start is placed")
 	check(find_named(world.region, "FirefallSlab") != null and find_named(world.region, "WrenAlvarez") != null,
 		"Firefall Slab and Wren are at the foot of the Apron in Curry Village")
 	check(find_named(world.region, "CurryRentalShoes") != null, "the lost rental shoes are in Curry Village")

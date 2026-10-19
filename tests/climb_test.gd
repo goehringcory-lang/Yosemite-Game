@@ -647,10 +647,10 @@ func test_climb_ending_past_the_curfew() -> void:
 	var world: Node = load("res://scenes/world/world.tscn").instantiate()
 	get_tree().root.add_child(world)
 	await get_tree().process_frame
-	world._enter_region("yosemite_valley", "apron_base")
+	world._enter_region("curry_village", "apron_trailhead")
 	await get_tree().process_frame
 	var start: ClimbStart = world.find_child("GlacierPointApron", true, false)
-	check(start != null and start.route.destination_hub != "", "the Apron's start is in the Valley and leads somewhere")
+	check(start != null and start.route.destination_hub != "", "the Apron's start is in Curry Village and leads somewhere")
 	QuestLog.record_climb(start.route.id) # no tick report to wait on
 	Gear.owned = kit_for(start.route)
 	var day := GameClock.day

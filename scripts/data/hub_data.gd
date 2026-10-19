@@ -44,8 +44,10 @@ extends Resource
 @export var walk_max_elevation := 5000.0
 
 
+## The hub's main scene: the area drivers arrive in if it has one (the Valley
+## is many hand-made areas, and arrives in Yosemite Village), else its map.
 func scene_path() -> String:
-	return "res://scenes/regions/%s.tscn" % id
+	return "res://scenes/regions/%s.tscn" % (arrival_region if arrival_region != "" else id)
 
 
 func get_elevation_text() -> String:

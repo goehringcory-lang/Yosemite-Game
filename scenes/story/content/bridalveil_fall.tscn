@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/routes/higher_cathedral_spire.tres" id="2_r"]
+
+[node name="BridalveilFallStory" type="Node2D"]
+
+[node name="HigherCathedralSpire" parent="." instance=ExtResource("1_r")]
+position = Vector2(1616, 368)
+route = ExtResource("2_r")

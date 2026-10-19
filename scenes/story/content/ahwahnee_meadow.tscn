@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/maria_lebrado.tres" id="2_r"]
+
+[node name="AhwahneeMeadowStory" type="Node2D"]
+
+[node name="MariaLebrado" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "meadow"
+offset = Vector2(0, -40)
