@@ -26,9 +26,9 @@ func _ready() -> void:
 	check(Park.routes.size() == 10, "routes connect all five hubs (%d)" % Park.routes.size())
 	var start := GameClock.minutes
 
-	# The homestead gate leads into the Valley, near the Lamon orchard.
-	await world.go_to_region("yosemite_valley", "lamon_homestead")
-	check(world.region.region_id == "yosemite_valley", "the gate leads into Yosemite Valley")
+	# The homestead gate leads into Curry Village, in the Valley.
+	await world.go_to_region("curry_village", "homestead")
+	check(world.region.region_id == "curry_village", "the gate leads into Curry Village")
 	check(world.player.get_parent() == world.region.entities, "the player moved into the Valley's Entities")
 	check(world.forage == null or world.forage.get_parent() == world.region.entities, "the Valley uses its own forage spawner")
 	check(world.hud.location_label.text.begins_with("Yosemite Valley"), "location banner shows the hub (%s)" % world.hud.location_label.text)
@@ -112,11 +112,11 @@ func _ready() -> void:
 	world.park_map.close()
 
 	# A climb (or any other system) can move the player directly.
-	get_tree().call_group("world", "go_to_region", "yosemite_valley", "apron_base")
+	get_tree().call_group("world", "go_to_region", "el_capitan_meadow", "the_nose")
 	await get_tree().create_timer(2.5).timeout
 	while world._busy:
 		await get_tree().process_frame
-	check(world.region.region_id == "yosemite_valley" and world.player.position == world.region.get_spawn("apron_base").position,
+	check(world.region.region_id == "el_capitan_meadow" and world.player.position == world.region.get_spawn("the_nose").position,
 		"go_to_region lands on a named spot")
 
 	# Tuolumne needs both an unlock and an open Tioga Road.
@@ -128,11 +128,11 @@ func _ready() -> void:
 	# It's too late for a long drive near midnight (arrival after 1 AM).
 	GameClock.minutes = 23 * 60 + 40
 	await world.travel(to_tuolumne)
-	check(world.region.region_id == "yosemite_valley", "no 90-minute drive at 11:40 PM")
+	check(world.region.region_id == "el_capitan_meadow", "no 90-minute drive at 11:40 PM")
 	GameClock.minutes = 9 * 60
 
 	# Road exits open the travel map with the right destination picked.
-	var exit: RegionExit = world.region.get_node("Map/Exits").get_child(0)
+	var exit: RegionExit = world.region.get_node("Exits/NorthsideDriveWest")
 	world.use_exit(exit)
 	check(world.park_map.visible and world.park_map._selected == exit.travel_to, "a road exit opens the map to %s" % exit.travel_to)
 	world.park_map.close()
@@ -164,6 +164,7 @@ func _ready() -> void:
 	await _check_menus(world)
 	await _check_central_hub(world)
 	await _check_getting_around(world)
+	_check_valley_links()
 	await _check_curfew(world)
 
 	# Winter closes both seasonal roads.
@@ -472,7 +473,7 @@ func _check_central_hub(world: Node) -> void:
 	var before := GameClock.minutes
 	stop.ride(stop.destinations().filter(func(d: Dictionary) -> bool: return d.name == "Happy Isles")[0])
 	await get_tree().create_timer(2.5).timeout
-	check(world.region.region_id == "yosemite_valley" and world.player.position == world.region.get_spawn("happy_isles").position,
+	check(world.region.region_id == "happy_isles" and world.player.position == world.region.get_spawn("shuttle").position,
 		"the shuttle drops you at Happy Isles")
 	check(GameClock.minutes - before == ShuttleStop.RIDE_MINUTES, "the shuttle ride takes %d minutes" % ShuttleStop.RIDE_MINUTES)
 	for dest: Dictionary in ShuttleStop.STOPS:
@@ -501,18 +502,53 @@ func _check_getting_around(world: Node) -> void:
 	check(stop != null and await _can_use(player, stop), "the Ahwahnee has a shuttle stop you can walk up to")
 	check(stop != null and stop.destinations().size() == ShuttleStop.STOPS.size() - 1, "it rides to every other stop")
 
-	# Out by Northside Drive and back in by the trailhead sign beside it.
+	# Out by Northside Drive across Ahwahnee Meadow, and back up the road.
 	var road: RegionExit = world.region.find_child("NorthsideDriveWest", true, false)
 	await world.go_to_region(road.target_region, road.target_spawn)
-	var door: RegionDoor = world.region.find_child("AhwahneeDoor", true, false)
-	check(door != null and door.position.distance_to(world.region.get_spawn(road.target_spawn).position) < 128.0,
+	check(world.region.region_id == "ahwahnee_meadow", "the road west crosses Ahwahnee Meadow")
+	var back: RegionExit = world.region.find_child("ToAhwahnee", true, false)
+	check(back != null and back.position.distance_to(world.region.get_spawn(road.target_spawn).position) < 128.0,
 		"the way back into the Ahwahnee is beside where its road comes out")
-	check(door != null and await _can_use(player, door), "and it can be walked up to")
-	door.interact(player)
+	player.position = back.position
 	await get_tree().create_timer(2.5).timeout
 	check(world.region.region_id == "the_ahwahnee" and not player.test_move(player.global_transform, Vector2.ZERO),
-		"the sign leads back into the Ahwahnee grounds")
+		"walking back up the road leads into the Ahwahnee grounds")
 	world._enter_region(Park.HOME_REGION, Park.HOME_SPAWN)
+
+
+## Each place in the Valley is one scene, joined to its neighbors by roads
+## and trails. Every road between two Valley scenes lands on a spot that
+## exists, and a road straight back starts right beside it (so turning round
+## takes you back where you came from, never somewhere else).
+func _check_valley_links() -> void:
+	var scenes := {}
+	for file in DirAccess.get_files_at("res://scenes/regions"):
+		if file.ends_with(".tscn"):
+			var region: Region = load("res://scenes/regions/" + file).instantiate()
+			if region.hub_id == "yosemite_valley" and not region.indoors:
+				scenes[region.region_id] = region
+			else:
+				region.free()
+	check(not scenes.has("yosemite_valley"), "there is no big Valley map: each place is its own scene")
+	var broken := PackedStringArray()
+	var count := 0
+	for id: String in scenes:
+		for exit in (scenes[id] as Region).find_children("*", "RegionExit", true, false):
+			if not scenes.has(exit.target_region):
+				continue
+			count += 1
+			var there: Region = scenes[exit.target_region]
+			var spot := there.get_spawn(exit.target_spawn)
+			if spot == null:
+				broken.append("%s -> %s/%s (no spot)" % [id, exit.target_region, exit.target_spawn])
+				continue
+			var back := there.find_children("*", "RegionExit", true, false).filter(func(e: RegionExit) -> bool:
+				return e.target_region == id and e.position.distance_to(spot.position) < 200.0)
+			if back.is_empty():
+				broken.append("%s -> %s/%s (no way back)" % [id, exit.target_region, exit.target_spawn])
+	for region: Region in scenes.values():
+		region.free()
+	check(count >= 30 and broken.is_empty(), "%d roads between Valley scenes all lead back the way they came (%s)" % [count, ", ".join(broken)])
 
 
 ## How far the player gets in a few physics frames of holding [param action].
@@ -560,7 +596,7 @@ func _check_curfew(world: Node) -> void:
 	# A ride that ends at 2 AM.
 	var day := GameClock.day
 	GameClock.minutes = 25 * 60 + 50
-	await world.go_to_region("yosemite_valley", "happy_isles", ShuttleStop.RIDE_MINUTES)
+	await world.go_to_region("happy_isles", "shuttle", ShuttleStop.RIDE_MINUTES)
 	await get_tree().create_timer(4.0).timeout
 	check(GameClock.day == day + 1 and world.region.region_id == Park.HOME_REGION and world.player.can_act and not world._busy,
 		"a ride that ends at 2 AM still passes the player out (day %d, %s)" % [GameClock.day, world.region.region_id])

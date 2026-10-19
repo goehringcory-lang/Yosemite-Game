@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c46uhsw3wo5oj"
-path="res://.godot/imported/yosemite_valley_ground.png-85e33688d2245bb4936423328991dbeb.ctex"
+uid="uid://b7iffyw0d1fcw"
+path="res://.godot/imported/cathedral_fall_0.png-86c179f2688d5980a4b92a552bbc0e5f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/map/ground/yosemite_valley_ground.png"
-dest_files=["res://.godot/imported/yosemite_valley_ground.png-85e33688d2245bb4936423328991dbeb.ctex"]
+source_file="res://assets/sprites/valley/cathedral_fall_0.png"
+dest_files=["res://.godot/imported/cathedral_fall_0.png-86c179f2688d5980a4b92a552bbc0e5f.ctex"]
 
 [params]
 

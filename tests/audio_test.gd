@@ -169,14 +169,11 @@ func test_emitters() -> void:
 				crackling += 1
 	check(fires > 0 and crackling == fires, "every Camp 4 fire ring crackles (%d of %d)" % [crackling, fires])
 	check(world.region.find_children("Sound_waterfall", "", true, false).size() == 1, "Lower Yosemite Fall roars from its spray, and only once")
-	world._enter_region("yosemite_valley", "arrival")
+	world._enter_region("bridalveil_fall", "east")
 	await get_tree().process_frame
-	var falls := PackedStringArray()
-	for place in world.region.get_places():
-		if place.get_node_or_null("Sound_waterfall"):
-			falls.append(place.display_name)
-	check("Yosemite Falls" in falls and "Bridalveil Fall" in falls and "Lower Yosemite Fall" in falls, "the Valley's waterfalls roar (%s)" % ", ".join(falls))
-	var emitter: SoundEmitter = world.region.get_places().filter(func(p: Place) -> bool: return p.display_name == "Yosemite Falls")[0].get_node("Sound_waterfall")
+	var roars: Array = world.region.find_children("Sound_waterfall", "", true, false)
+	check(roars.size() == 1, "Bridalveil Fall roars from its spray, and only once (%d)" % roars.size())
+	var emitter: SoundEmitter = roars[0]
 	emitter._refresh_level() # the dummy driver can drop a playback that starts on the same frame
 	check(emitter.bus == Sound.BUS_AMBIENCE and emitter.stream != null and emitter.playing, "a waterfall plays its loop on the Ambience bus")
 	GameClock.season = GameClock.Season.SPRING
@@ -186,11 +183,18 @@ func test_emitters() -> void:
 	emitter._refresh_level()
 	check(emitter.volume_linear < spring * 0.5, "falls are loud in spring and quiet in fall (%.2f, %.2f)" % [spring, emitter.volume_linear])
 	GameClock.season = GameClock.Season.SUMMER
+	world._enter_region("tunnel_view", "arrival")
+	await get_tree().process_frame
+	var falls := PackedStringArray()
+	for place in world.region.get_places():
+		if place.get_node_or_null("Sound_waterfall"):
+			falls.append(place.display_name)
+	check("Bridalveil Fall" in falls, "Bridalveil Fall roars across the view from Tunnel View (%s)" % ", ".join(falls))
 	world._enter_region("wawona", "arrival")
 	await get_tree().process_frame
 	var trailhead: Array = world.region.get_places().filter(func(p: Place) -> bool: return p.display_name.contains("Trailhead") and p.get_node_or_null("Sound_waterfall") != null)
 	check(trailhead.is_empty(), "a trailhead named for a fall makes no sound")
-	world._enter_region("yosemite_valley", "arrival")
+	world._enter_region("bridalveil_fall", "east")
 	await get_tree().process_frame
 	check(emitter.playing, "a waterfall starts again when you come back")
 

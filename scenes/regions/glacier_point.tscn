@@ -3048,8 +3048,8 @@ label = "Sentinel Dome Trailhead"
 [node name="FourMileTrail" parent="Entities" unique_id=30927176 instance=ExtResource("31_ubaex")]
 position = Vector2(112, 640)
 label = "Four Mile Trail, down to the Valley"
-target_region = "yosemite_valley"
-target_spawn = "four_mile_trailhead"
+target_region = "four_mile_trailhead"
+target_spawn = "trailhead"
 minutes = 120
 
 [node name="LedgeTrail" parent="Entities" unique_id=1872187201 instance=ExtResource("31_ubaex")]
@@ -3062,8 +3062,8 @@ minutes = 120
 [node name="PanoramaTrail" parent="Entities" unique_id=465065052 instance=ExtResource("31_ubaex")]
 position = Vector2(2672, 1376)
 label = "Panorama Trail, down to Happy Isles"
-target_region = "yosemite_valley"
-target_spawn = "happy_isles"
+target_region = "happy_isles"
+target_spawn = "panorama"
 minutes = 240
 
 [node name="FourMileSign" type="StaticBody2D" parent="Entities" unique_id=395267382]

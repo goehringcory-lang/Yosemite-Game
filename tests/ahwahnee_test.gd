@@ -126,7 +126,7 @@ func _ready() -> void:
 	var to_bridge: RegionExit = grounds.get_node("Exits/ToStonemanBridge")
 	check(to_bridge.target_region == "ahwahnee_trail" and to_bridge.target_spawn == "north_entry", "the drive's foot leads back to the bridge")
 	var west_exit: RegionExit = grounds.get_node("Exits/NorthsideDriveWest")
-	check(west_exit.target_region == "yosemite_valley" and west_exit.target_spawn == "the_ahwahnee", "the west road leads to the Valley map")
+	check(west_exit.target_region == "ahwahnee_meadow" and west_exit.target_spawn == "east", "the west road leads across Ahwahnee Meadow")
 
 	# The front doors read as a sign, and the hotel can't be entered.
 	var door: InfoSign = grounds.find_child("MainEntrance", true, false)

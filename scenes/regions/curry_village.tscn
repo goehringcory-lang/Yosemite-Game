@@ -1182,9 +1182,6 @@ size = Vector2(24, 96)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_aahlc"]
 size = Vector2(24, 96)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_b101s"]
-size = Vector2(96, 24)
-
 [sub_resource type="SpriteFrames" id="SpriteFrames_xj5ll"]
 animations = [{
 "frames": [{
@@ -8294,8 +8291,8 @@ shape = SubResource("RectangleShape2D_fe3nq")
 position = Vector2(16, 1648)
 script = ExtResource("147_nswll")
 label = "Southside Drive west"
-target_region = "yosemite_valley"
-target_spawn = "curry_village"
+target_region = "housekeeping_camp"
+target_spawn = "east"
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/WestRoad" unique_id=1767885853]
 shape = SubResource("RectangleShape2D_rkq75")
@@ -8304,21 +8301,11 @@ shape = SubResource("RectangleShape2D_rkq75")
 position = Vector2(3184, 1648)
 script = ExtResource("147_nswll")
 label = "Southside Drive east"
-target_region = "yosemite_valley"
-target_spawn = "happy_isles"
+target_region = "upper_pines"
+target_spawn = "west"
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/EastRoad" unique_id=1971880020]
 shape = SubResource("RectangleShape2D_aahlc")
-
-[node name="ApronTrail" type="Area2D" parent="Exits" unique_id=1416302028]
-position = Vector2(2544, 240)
-script = ExtResource("147_nswll")
-label = "Glacier Point Apron"
-target_region = "yosemite_valley"
-target_spawn = "apron_base"
-
-[node name="Shape" type="CollisionShape2D" parent="Exits/ApronTrail" unique_id=1845511584]
-shape = SubResource("RectangleShape2D_b101s")
 
 [node name="CurryWall" type="Sprite2D" parent="." unique_id=1241660923]
 z_index = -8

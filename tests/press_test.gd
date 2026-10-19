@@ -8,7 +8,9 @@ extends Node
 
 const PRESS_ORDER := ["enid_press", "hodges_herbarium", "hodges_canyon", "clark_grove_sprigs", "enid_rim", "muir_cassiope", "enid_full_press"]
 const REGIONS := ["lamon_homestead", "curry_village", "ahwahnee_trail", "the_ahwahnee", "yosemite_village",
-	"yosemite_valley", "el_portal", "wawona", "glacier_point", "tuolumne_meadows"]
+	"el_capitan_meadow", "tunnel_view", "happy_isles", "mirror_lake", "leidig_meadow", "four_mile_trailhead",
+	"bridalveil_fall", "housekeeping_camp", "ahwahnee_meadow", "upper_pines", "tenaya_creek",
+	"el_portal", "wawona", "glacier_point", "tuolumne_meadows"]
 
 var failures := 0
 

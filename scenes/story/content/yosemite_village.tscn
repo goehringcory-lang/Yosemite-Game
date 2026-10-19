@@ -13,6 +13,7 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_motorist.tres" id="14_r"]
 [ext_resource type="Script" path="res://scripts/world/moonbow.gd" id="15_r"]
 [ext_resource type="Resource" path="res://data/characters/enid_michael.tres" id="16_r"]
+[ext_resource type="Resource" path="res://data/characters/maggie_howard.tres" id="17_r"]
 
 [node name="YosemiteVillageStory" type="Node2D"]
 
@@ -46,6 +47,11 @@ character = ExtResource("11_r")
 spot = "bests_studio"
 offset = Vector2(0, 48)
 wander_radius = 32
+
+[node name="Tabuce" parent="." instance=ExtResource("1_r")]
+character = ExtResource("17_r")
+spot = "indian_village"
+offset = Vector2(48, 40)
 
 [node name="LucyTelles" parent="." instance=ExtResource("1_r")]
 character = ExtResource("12_r")

@@ -9417,8 +9417,8 @@ show_on_map = true
 position = Vector2(16, 1232)
 script = ExtResource("122_pa78c")
 label = "Northside Drive west"
-target_region = "yosemite_valley"
-target_spawn = "northside_west"
+target_region = "leidig_meadow"
+target_spawn = "east"
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/NorthsideWest" unique_id=2135061225]
 shape = SubResource("RectangleShape2D_jwjqj")
@@ -9427,8 +9427,8 @@ shape = SubResource("RectangleShape2D_jwjqj")
 position = Vector2(3824, 1232)
 script = ExtResource("122_pa78c")
 label = "Northside Drive east"
-target_region = "yosemite_valley"
-target_spawn = "the_ahwahnee"
+target_region = "ahwahnee_meadow"
+target_spawn = "west"
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/NorthsideEast" unique_id=1706730620]
 shape = SubResource("RectangleShape2D_yoymr")
@@ -9437,8 +9437,8 @@ shape = SubResource("RectangleShape2D_yoymr")
 position = Vector2(2288, 2032)
 script = ExtResource("122_pa78c")
 label = "Southside Drive"
-target_region = "yosemite_valley"
-target_spawn = "southside_sentinel"
+target_region = "four_mile_trailhead"
+target_spawn = "east"
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/SentinelSouth" unique_id=788524405]
 shape = SubResource("RectangleShape2D_8uq1k")
@@ -9447,8 +9447,8 @@ shape = SubResource("RectangleShape2D_8uq1k")
 position = Vector2(16, 1808)
 script = ExtResource("122_pa78c")
 label = "Southside Drive west"
-target_region = "yosemite_valley"
-target_spawn = "four_mile_trailhead"
+target_region = "four_mile_trailhead"
+target_spawn = "east"
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/SouthsideWest" unique_id=782594680]
 shape = SubResource("RectangleShape2D_0emsw")
@@ -9457,8 +9457,8 @@ shape = SubResource("RectangleShape2D_0emsw")
 position = Vector2(3824, 1808)
 script = ExtResource("122_pa78c")
 label = "Southside Drive east"
-target_region = "yosemite_valley"
-target_spawn = "curry_village"
+target_region = "housekeeping_camp"
+target_spawn = "west"
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/SouthsideEast" unique_id=1716458571]
 shape = SubResource("RectangleShape2D_noudn")

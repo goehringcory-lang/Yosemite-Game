@@ -1,7 +1,8 @@
 extends AhwahneeStyle
 ## Builds the Yosemite Valley central hub: Yosemite Village and Camp 4 at
 ## walking scale, with their stores, the Indian Village, the gear traders,
-## the creek and river bridges, and exits back to the full Valley map.
+## the creek and river bridges, and roads out to the trail scenes between
+## the Valley's areas.
 ## Run from the project folder:
 ##
 ##   godot --headless --path . res://tools/hubs/build_hubs.tscn
@@ -695,27 +696,28 @@ func _place_markers_and_places() -> void:
 	_place("Yosemite Chapel", 76, 56, 3)
 
 
-## Roads out of the hub lead back onto the full Valley map.
+## Roads out of the hub lead onto the trail scenes between the Valley's
+## areas (tools/hubs/build_valley_floor.gd).
 func _place_exits() -> void:
 	var exits := [
-		["NorthsideWest", Vector2i(0, 38), "northside_west", "Northside Drive west", true],
-		["NorthsideEast", Vector2i(W - 1, 38), "the_ahwahnee", "Northside Drive east", true],
-		["SentinelSouth", Vector2i(71, H - 1), "southside_sentinel", "Southside Drive", false],
-		["SouthsideWest", Vector2i(0, 56), "four_mile_trailhead", "Southside Drive west", true],
-		["SouthsideEast", Vector2i(W - 1, 56), "curry_village", "Southside Drive east", true],
+		["NorthsideWest", Vector2i(0, 38), "leidig_meadow", "east", "Northside Drive west", true],
+		["NorthsideEast", Vector2i(W - 1, 38), "ahwahnee_meadow", "west", "Northside Drive east", true],
+		["SentinelSouth", Vector2i(71, H - 1), "four_mile_trailhead", "east", "Southside Drive", false],
+		["SouthsideWest", Vector2i(0, 56), "four_mile_trailhead", "east", "Southside Drive west", true],
+		["SouthsideEast", Vector2i(W - 1, 56), "housekeeping_camp", "west", "Southside Drive east", true],
 	]
 	for e: Array in exits:
 		var area := Area2D.new()
 		area.set_script(load("res://scripts/world/region_exit.gd"))
 		area.name = e[0]
 		area.position = _tile_pos(e[1].x, e[1].y)
-		area.set("label", e[3])
-		area.set("target_region", "yosemite_valley")
-		area.set("target_spawn", e[2])
+		area.set("label", e[4])
+		area.set("target_region", e[2])
+		area.set("target_spawn", e[3])
 		var shape := CollisionShape2D.new()
 		shape.name = "Shape"
 		var rect := RectangleShape2D.new()
-		rect.size = Vector2(12, 16) if e[4] else Vector2(16, 12)
+		rect.size = Vector2(12, 16) if e[5] else Vector2(16, 12)
 		shape.shape = rect
 		area.add_child(shape)
 		_exits.add_child(area)

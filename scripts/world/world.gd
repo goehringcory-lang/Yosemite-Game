@@ -13,6 +13,9 @@ signal region_changed(region: Region)
 const BEAR_TRACKS_MESSAGE := "Bear tracks by the fence this morning. Your pack was zipped."
 ## Seconds to let the "passed out" message show before the tracks message.
 const BEAR_TRACKS_DELAY := 3.8
+## Regions that are gone, and where a save made in one picks up instead.
+## The big Valley map became separate areas joined by trail scenes.
+const RETIRED_REGIONS := {"yosemite_valley": "yosemite_village"}
 
 ## The region the player is in.
 var region: Region
@@ -65,6 +68,7 @@ func _ready() -> void:
 	add_child(StringLights.new())
 	var saved := SaveManager.peek_node(name)
 	var start := str(saved.get("region", Park.HOME_REGION))
+	start = RETIRED_REGIONS.get(start, start)
 	if not ResourceLoader.exists(region_scene_path(start)):
 		start = Park.HOME_REGION
 	# A loaded save puts the player back where they were; this is the fallback.

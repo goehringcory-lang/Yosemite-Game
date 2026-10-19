@@ -357,8 +357,8 @@ func _trail_door(node_name: String, at_pos: Vector2, label: String, target_regio
 func _place_rim_trails() -> void:
 	# No winter closure from the top: a climber who tops out the Apron before
 	# the road opens can always walk down.
-	_trail_door("FourMileTrail", foot(3, 19), "Four Mile Trail, down to the Valley", "yosemite_valley", "four_mile_trailhead", 120)
-	_trail_door("PanoramaTrail", foot(83, 42), "Panorama Trail, down to Happy Isles", "yosemite_valley", "happy_isles", 240)
+	_trail_door("FourMileTrail", foot(3, 19), "Four Mile Trail, down to the Valley", "four_mile_trailhead", "trailhead", 120)
+	_trail_door("PanoramaTrail", foot(83, 42), "Panorama Trail, down to Happy Isles", "happy_isles", "panorama", 240)
 	# The Ledge Trail tops out by the Mountain House footings (Curry Village's
 	# end opens once you've climbed the Apron).
 	_trail_door("LedgeTrail", foot(73, 26), "Ledge Trail, down to Curry Village", "curry_village", "ledge_trailhead", 120)

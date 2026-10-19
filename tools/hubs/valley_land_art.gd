@@ -17,6 +17,10 @@ const SKIRT := 44
 const FALL_W := 48
 const FALL_H := 128
 
+## Added to every noise seed, so another wall (El Capitan, Sentinel Rock)
+## isn't the Village's wall again. 0 draws the Village's.
+var seed_offset := 0
+
 
 ## Writes the wall and the fall frames into [param dir] as "<prefix>_wall.png"
 ## and so on. [param prof] is, for every pixel column of the map, the y where
@@ -41,18 +45,18 @@ func village_wall(prof: PackedInt32Array, fall_cx: int) -> Image:
 	for p in prof:
 		tallest = maxi(tallest, p)
 	var Hh := tallest + SKIRT
-	var n_base := _noise(31, 2)
-	var n_fine := _noise(32)
-	var n_join := _noise(33, 3)
-	var n_streak := _noise(34, 2)
-	var n_wet := _noise(35, 2)
-	var n_lichen := _noise(36, 3)
-	var n_crack := _noise(37, 3)
-	var n_warp := _noise(38, 2)
-	var n_shade := _noise(39, 2)
-	var n_rim := _noise(40, 2)
+	var n_base := _noise(31 + seed_offset, 2)
+	var n_fine := _noise(32 + seed_offset)
+	var n_join := _noise(33 + seed_offset, 3)
+	var n_streak := _noise(34 + seed_offset, 2)
+	var n_wet := _noise(35 + seed_offset, 2)
+	var n_lichen := _noise(36 + seed_offset, 3)
+	var n_crack := _noise(37 + seed_offset, 3)
+	var n_warp := _noise(38 + seed_offset, 2)
+	var n_shade := _noise(39 + seed_offset, 2)
+	var n_rim := _noise(40 + seed_offset, 2)
 	var rng := RandomNumberGenerator.new()
-	rng.seed = 1851
+	rng.seed = 1851 + seed_offset
 
 	var hgt := PackedFloat32Array()
 	hgt.resize(W * Hh)

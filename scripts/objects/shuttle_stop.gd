@@ -10,9 +10,9 @@ const STOPS := [
 	{"name": "The Ahwahnee", "region": "the_ahwahnee", "spawn": "entrance_circle"},
 	{"name": "Lamon Homestead (Curry orchard)", "region": "lamon_homestead", "spawn": "shuttle"},
 	{"name": "Curry Village", "region": "curry_village", "spawn": "shuttle"},
-	{"name": "Happy Isles", "region": "yosemite_valley", "spawn": "happy_isles"},
-	{"name": "Mirror Lake Trailhead", "region": "yosemite_valley", "spawn": "mirror_lake"},
-	{"name": "El Capitan Meadow", "region": "yosemite_valley", "spawn": "el_capitan_meadow"},
+	{"name": "Happy Isles", "region": "happy_isles", "spawn": "shuttle"},
+	{"name": "Mirror Lake Trailhead", "region": "mirror_lake", "spawn": "shuttle"},
+	{"name": "El Capitan Meadow", "region": "el_capitan_meadow", "spawn": "shuttle"},
 ]
 const RIDE_MINUTES := 15
 

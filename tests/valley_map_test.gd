@@ -25,7 +25,7 @@ func _ready() -> void:
 	await get_tree().process_frame
 	var map: ParkMap = world.park_map
 
-	await world.go_to_region("yosemite_valley", "lamon_homestead")
+	await world.go_to_region(Park.HOME_REGION, Park.HOME_SPAWN)
 	_press("map")
 	await get_tree().process_frame
 	check(map.visible and map._tab == ParkMap.Tab.AREA, "M opens the illustrated Valley map first")
@@ -58,7 +58,7 @@ func _ready() -> void:
 	_press("map")
 	check(map.visible and map._points[map._cursor].id == "lamon_homestead", "at home the cursor starts at the homestead (%s)" % map._points[map._cursor].id)
 	_press("map")
-	await world.go_to_region("yosemite_valley", "lamon_homestead")
+	await world.go_to_region(Park.HOME_REGION, Park.HOME_SPAWN)
 
 	# A kiosk opens the park map to travel, with Tab to the Valley map.
 	world.open_travel_map("")
@@ -79,7 +79,7 @@ func _ready() -> void:
 			map._cursor = i
 	map._ride()
 	await get_tree().create_timer(2.5).timeout
-	check(world.region.region_id == "yosemite_valley" and world.player.position == world.region.get_spawn("happy_isles").position,
+	check(world.region.region_id == "happy_isles" and world.player.position == world.region.get_spawn("shuttle").position,
 		"choosing Happy Isles on the map rides there")
 	check(GameClock.minutes - before == ShuttleStop.RIDE_MINUTES, "the ride takes %d minutes" % ShuttleStop.RIDE_MINUTES)
 	for stop: Dictionary in ShuttleStop.STOPS:
