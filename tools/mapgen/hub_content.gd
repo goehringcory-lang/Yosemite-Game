@@ -294,6 +294,9 @@ const CONTENT := {
 		"style": "wawona",
 	},
 	"tuolumne_meadows": {
+		# Tuolumne's region is built by hand now, laid out like the real
+		# meadow, and mapgen skips it. Its places here are the old reference.
+		"hand_made": "tools/hubs/build_tuolumne.gd",
 		"places": [
 			{"name": "Tuolumne Meadows", "osm": "Tuolumne Meadows", "kind": "natural=wetland", "radius": 900, "label": true},
 			{"name": "Tuolumne Meadows Visitor Center", "osm": "Yosemite Toulumne Meadows Visitor Center", "radius": 110},

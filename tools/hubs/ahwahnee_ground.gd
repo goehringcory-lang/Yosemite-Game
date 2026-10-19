@@ -45,6 +45,9 @@ var edge_trim := true
 ## with moss only in the hollows.
 var smooth_granite := false
 var fir_duff := false
+## Paints the subalpine forest floor as granite sand under a litter of
+## lodgepole needles (Tuolumne), not bare sand.
+var subalpine_duff := false
 ## Optional per-tile mask (1 = slab): granite and cliff tiles marked here are
 ## painted as smooth slabs whatever [member smooth_granite] says. The Valley
 ## map uses it for the Glacier Point Apron (see tools/mapgen/land_patches.gd).
@@ -506,7 +509,10 @@ func _color(k: int, x: int, y: int, i: int, tx: int, ty: int) -> Color:
 				return _fir_duff(x, y, a, b, n, r)
 			return _forest(x, y, a, b, n, r).lerp(c("2f4a3a"), 0.28)
 		Terrain.SUBALPINE:
-			return _granite_sand(x, y, a, b, n, r)
+			var sand := _granite_sand(x, y, a, b, n, r)
+			if subalpine_duff:
+				return sand.lerp(_fir_duff(x, y, a, b, n, r), 0.6)
+			return sand
 		Terrain.FOOTHILL:
 			return _golden(x, y, i, a, b, n, r)
 		Terrain.SCRUB:

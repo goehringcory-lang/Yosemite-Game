@@ -17,7 +17,7 @@ offset = Vector2(-40, -24)
 wander_radius = 32
 
 [node name="CathedralPeak" parent="." instance=ExtResource("3_r")]
-position = Vector2(400, 2288)
+position = Vector2(720, 2582)
 route = ExtResource("4_r")
 
 [node name="CarrieBethel" parent="." instance=ExtResource("1_r")]
@@ -26,7 +26,7 @@ spot = "soda_springs"
 offset = Vector2(32, 16)
 
 [node name="LyellGlacier" parent="." instance=ExtResource("3_r")]
-position = Vector2(5600, 1680)
+position = Vector2(4272, 2032)
 route = ExtResource("6_r")
 
 [node name="VisitorBackpacker" parent="." instance=ExtResource("1_r")]
