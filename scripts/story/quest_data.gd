@@ -54,6 +54,12 @@ extends Resource
 ## What the giver says while the quest is ready except for the season, so
 ## the player knows to come back ("Come and see me when the snow flies").
 @export var out_of_season: PackedStringArray
+## What the giver says while every main-line quest in [member requires] is
+## done but a side story the quest still waits on isn't, so the player knows
+## who to go and see. Quest id -> line, checked in order; the first one not
+## yet finished is said. Galen Clark uses it to name who hasn't been heard
+## before the last page.
+@export var waiting_on: Dictionary = {}
 @export var intro: PackedStringArray
 ## Abilities handed over the moment the quest starts, such as the plant
 ## press that Enid Michael's first quest is about.

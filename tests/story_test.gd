@@ -30,6 +30,7 @@ func _ready() -> void:
 	test_pay_step()
 	test_register_notes()
 	test_story_beats()
+	test_last_page_waiting()
 	await test_dialogue_and_minigame_scenes()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
@@ -321,6 +322,29 @@ func test_story_beats() -> void:
 	check(idle.size() > 0, "Clark starts the story")
 	new_game()
 
+
+## Back from the glacier, Clark names whoever the last page still waits on,
+## one at a time, instead of going quiet. Before that he doesn't nag.
+func test_last_page_waiting() -> void:
+	new_game()
+	var clark := QuestLog.get_character("galen_clark")
+	QuestLog.completed.append("clark_register")
+	check(String(QuestLog.talk_to("galen_clark")[0].text) in clark.idle_lines, "early on, Clark doesn't hint at the last page")
+	QuestLog.completed.append("muir_glacier")
+	QuestLog.heard_beats.append("galen_clark:muir_glacier")
+	check("Tenaya Creek" in QuestLog.talk_to("galen_clark")[0].text, "after the glacier, Clark sends you to Tenaya first")
+	QuestLog.completed.append("tenaya_ahwahnee")
+	check("granddaughter" in QuestLog.talk_to("galen_clark")[0].text, "then to Maria Lebrado")
+	QuestLog.completed.append("lebrado_villages")
+	check("Lucy Telles" in QuestLog.talk_to("galen_clark")[0].text, "then to Lucy Telles")
+	QuestLog.completed.append("lucy_basket")
+	QuestLog.talk_to("galen_clark")
+	check(QuestLog.active.has("clark_last_page"), "and with everyone heard, he offers the last page")
+	QuestLog.completed.append_array(["clark_last_page", "lost_guardian"])
+	QuestLog.completed.append_array(["enid_press", "hodges_herbarium", "enid_leave_some", "enid_rim", "enid_dawn_chorus", "enid_full_press"])
+	var enid := QuestLog.talk_to("enid_michael")
+	check(enid.size() == 2 and "Guardian" in enid[1].text, "after the finale, Enid Michael calls you Guardian")
+	new_game()
 
 func test_tabuce_and_acorns() -> void:
 	QuestLog.talk_to("maggie_howard")

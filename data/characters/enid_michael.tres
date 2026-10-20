@@ -11,6 +11,7 @@ years = "1883–1966"
 affiliation = "National Park Service"
 bio = "Botanist and one of the park's first women ranger-naturalists, working seasonally from 1921 to 1942. She kept the wildflower garden at the Yosemite Museum and wrote hundreds of nature notes about the valley's plants and birds."
 idle_lines = PackedStringArray("Know a plant before you pick it, and never take the last one.", "Every plant here has a name, and most had several before mine.")
+story_beats = [{"after": "clark_last_page", "lines": ["Mr. Clark's book is finished? His was always about people. Mine is about plants, and plants argue a good deal less.", "Keep the press with you. Some days the ordinary ones are the ones most worth pressing."]}, {"after": "lost_guardian", "lines": ["A looking-glass on the last sheet. I've pressed flowers for twenty years, and I never once thought to look for the collector in a mirror.", "Keep filling it, Guardian. There are a hundred plants in this park you haven't met yet, and every one had a name before ours."]}]
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.659, 0.627, 0.471, 1)
 home = "Sentinel Dome"

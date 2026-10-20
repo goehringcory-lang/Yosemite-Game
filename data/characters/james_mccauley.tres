@@ -11,6 +11,7 @@ years = ""
 affiliation = "Glacier Point Mountain House"
 bio = "Irish-born builder of the Four Mile Trail from the valley floor to Glacier Point (1872), which he ran as a toll trail. He later ran the Mountain House hotel at Glacier Point, and the Firefall is said to have started with his family pushing a campfire's embers over the edge."
 idle_lines = PackedStringArray("Four miles up, three thousand feet. I had every switchback of it cut.", "The fall of fire! People came from all over to see it.")
+story_beats = [{"after": "clark_last_page", "lines": ["Finished the book, eh? Did you put the Firefall in it both ways, like I told you? Good.", "We push it off every summer evening. Come up the trail some night and argue about it. The toll's waived for authors."]}]
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.878, 0.847, 0.784, 1)
 home = "Glacier Point"
