@@ -443,6 +443,10 @@ func _check_central_hub(world: Node) -> void:
 	world.player.interaction_area.position = Vector2(0, -24)
 	for i in 4:
 		await get_tree().physics_frame
+	# process_frame fires before nodes' _process, so wait two: the second comes
+	# after the HUD has updated its prompt for the new overlap, even when a slow
+	# frame ran all four physics steps at once.
+	await get_tree().process_frame
 	await get_tree().process_frame
 	check(world.hud.prompt_panel.visible and world.hud.prompt_label.text == "E  Read: Camp 4", "facing a sign shows its prompt (%s)" % world.hud.prompt_label.text)
 	world.player.position = region.get_spawn("arrival").position
