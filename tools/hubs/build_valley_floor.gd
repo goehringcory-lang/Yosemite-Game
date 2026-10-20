@@ -416,21 +416,17 @@ func _bridalveil_fall() -> void:
 
 const TV_W := 64
 const TV_H := 44
-## The Valley floor below the view, in tiles (see GlacierArt.view_below):
-## the Merced winding up the Valley through its meadows.
-const TV_VIEW := {
-	"rivers": [[Vector2(22, 19), Vector2(26, 14), Vector2(30, 10), Vector2(33, 6), Vector2(36, 2), Vector2(38, 0)]],
-	"meadows": [Rect2(22, 11, 8, 4), Rect2(29, 5, 6, 3)],
-}
-## The walls standing up out of it, as GlacierArt._dome arguments: foot (in
-## tiles), half width and height (pixels at 16px), and lean. El Capitan's
-## great face on the left, Cathedral Rocks on the right, and Half Dome small
-## and far away up the Valley between them, its sheer face to the left.
-const TV_DOMES := [
-	[Vector2(8, 19), 170.0, 210.0, 0.45],
-	[Vector2(53, 19), 110.0, 190.0, -0.35],
-	[Vector2(35, 7), 26.0, 42.0, -0.9],
-]
+## The view itself is the title painting (El Capitan, Half Dome and
+## Bridalveil Fall from right here), seen through the drop with the vista
+## shader: the camera's top-left at the overlook shows the painting from
+## row TV_VISTA_OFFSET.y, so the valley floor meets the rim.
+const TV_VISTA := "res://assets/ui/title_background.png"
+const TV_VISTA_ANCHOR := Vector2(592, 418)
+const TV_VISTA_OFFSET := Vector2(0, 150)
+const TV_VISTA_PARALLAX := Vector2(0.0, 0.2)
+## Bridalveil Fall in the painting (scripts/ui/title_screen.gd's FALL_TOP and
+## FALL_BOTTOM, on the painting's 960x540).
+const TV_VISTA_FALLS := [[Vector2(874, 282), Vector2(858, 406), Vector2(5, 8)]]
 
 var _tv_drop := PackedByteArray()
 
@@ -469,19 +465,11 @@ func _tunnel_view() -> void:
 	start_region("TunnelView", "tunnel_view", "Tunnel View", Vector2(-119.6772, 37.7156))
 	paint_ground()
 	_save_ground_art("ground_tunnel_view", 1933)
-	var view := GlacierArt.new()
-	var im := view.view_below(_tv_drop, TV_W, TV_H, TV_VIEW)
-	for i in TV_DOMES.size():
-		var d: Array = TV_DOMES[i]
-		view._dome(im, _tv_drop, TV_W, (d[0] as Vector2) * T, d[1], d[2], d[3], 1933 + i)
+	var im := GlacierArt.new().view_below(_tv_drop, TV_W, TV_H)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(V))
 	im.save_png(ProjectSettings.globalize_path(V + "tunnel_view_below.png"))
 	import_assets()
-	_backdrop("tunnel_view_below", Vector2.ZERO, -8, V)
-	# Bridalveil Fall on Cathedral Rocks, across the view.
-	var size: Vector2i = GlacierArt.FALLS["gp_illilouette"]
-	var top := Vector2(47.0, 12.5) * T
-	_animation("BridalveilFall", "gp_illilouette", 6.0, top - Vector2(size.x / 2.0, 0), -7, G)
+	_vista(_backdrop("tunnel_view_below", Vector2.ZERO, -8, V), TV_VISTA, TV_VISTA_ANCHOR, TV_VISTA_OFFSET, TV_VISTA_PARALLAX, TV_VISTA_FALLS)
 	# The stone wall along the edge.
 	for y in range(15, 23):
 		for x in range(20, 47):

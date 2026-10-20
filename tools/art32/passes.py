@@ -57,6 +57,9 @@ def props(path: str, a: np.ndarray) -> np.ndarray:
 
 
 def structures(path: str, a: np.ndarray) -> np.ndarray:
+    if path.endswith("/vista.png"):
+        # a painting of the view past an overlook: the title painting's grade
+        return K.remap(K.scale2x(a), dither=6)
     return _lit(path, K.remap(K.scale2x(a)))
 
 

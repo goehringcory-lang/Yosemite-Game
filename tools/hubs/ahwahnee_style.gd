@@ -147,6 +147,33 @@ func _backdrop(sprite_name: String, at_pos: Vector2, z := -8, dir := S) -> Sprit
 	return sprite
 
 
+## Shows a painting of the far view through an overlook's drop (drawn by
+## GlacierArt.view_below), with the vista shader.
+## The rest are the shader's settings, in the game's 32px pixels (the scene
+## migration leaves shader settings as they are): [param anchor] is the
+## camera's top-left at the overlook, where the screen's top-left shows the
+## painting's pixel [param offset]; [param falls] holds [top, bottom,
+## half widths] of each waterfall in the painting, for the shimmer.
+func _vista(sprite: Sprite2D, painting_path: String, anchor: Vector2, offset: Vector2, parallax: Vector2, falls: Array) -> void:
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://assets/shaders/vista.gdshader")
+	mat.set_shader_parameter("painting", load(painting_path))
+	mat.set_shader_parameter("anchor", anchor)
+	mat.set_shader_parameter("offset", offset)
+	mat.set_shader_parameter("parallax", parallax)
+	var lines := PackedVector4Array()
+	var widths := PackedVector2Array()
+	for f: Array in falls:
+		lines.append(Vector4(f[0].x, f[0].y, f[1].x, f[1].y))
+		widths.append(f[2])
+	lines.resize(6)
+	widths.resize(6)
+	mat.set_shader_parameter("falls", lines)
+	mat.set_shader_parameter("fall_widths", widths)
+	mat.set_shader_parameter("fall_count", falls.size())
+	sprite.material = mat
+
+
 func _glow(sprite_name: String, at_pos: Vector2, glow_scale := 1.0, dir := S) -> void:
 	if not _has(sprite_name, dir):
 		return

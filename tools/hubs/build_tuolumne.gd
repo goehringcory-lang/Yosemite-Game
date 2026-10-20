@@ -297,7 +297,7 @@ func _place_markers() -> void:
 func _dress_tuolumne() -> void:
 	_reserve_entities(1, 3)
 	var all := Rect2i(0, 0, w, h)
-	_fringe_trees([Terrain.SUBALPINE], 3, 0.72, [["tree_lodgepole", 6.0], ["tree_whitebark", 0.3], ["tree_snag", 0.2]], 1, 20.0)
+	_fringe_trees([Terrain.SUBALPINE], 2, 0.62, [["tree_lodgepole", 6.0], ["tree_whitebark", 0.3], ["tree_snag", 0.2]], 1, 20.0)
 	_fringe_trees([Terrain.GRANITE], 6, 0.35, [["tree_whitebark", 2.0], ["tree_lodgepole", 1.5]], 0, 34.0)
 	_fringe_trees([Terrain.MEADOW], 9, 0.08, [["tree_lodgepole", 1.0]], 2, 80.0)
 	_scatter_decor("plant_willow_low", [Terrain.WET_MEADOW, Terrain.SAND], 60, all, 0)

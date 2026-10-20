@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dys8kwk27fwn5"
-path="res://.godot/imported/gp_nevada_1.png-e58677a83a588630336f580ab77d4bbb.ctex"
+uid="uid://cp7d78vxs1u7l"
+path="res://.godot/imported/vista.png-5309c43b427947e9ce6c64fdff68a2cf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/glacier/gp_nevada_1.png"
-dest_files=["res://.godot/imported/gp_nevada_1.png-e58677a83a588630336f580ab77d4bbb.ctex"]
+source_file="res://assets/sprites/glacier/vista.png"
+dest_files=["res://.godot/imported/vista.png-5309c43b427947e9ce6c64fdff68a2cf.ctex"]
 
 [params]
 
