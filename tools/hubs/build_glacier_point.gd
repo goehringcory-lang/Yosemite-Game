@@ -22,12 +22,14 @@ extends AhwahneeStyle
 ## off the east rim toward Illilouette and Nevada Falls; the Pohono Trail runs
 ## southwest to Sentinel Dome, with the fallen Jeffrey pine on its summit.
 ## Coming in, the road passes the Sentinel Dome trailhead, then Washburn
-## Point on the east rim. To the north and east the map falls away: Half
-## Dome, Liberty Cap, and Vernal, Nevada and Illilouette falls stand across
-## the canyon. The forest is red fir and Jeffrey pine, with lodgepole and
+## Point on the east rim. To the north and east the map falls away to a
+## painting of the view (glacier_vista_art.gd): Half Dome across the canyon,
+## Yosemite Falls on the north wall, and from Washburn Point, Liberty Cap and
+## Vernal, Nevada and Illilouette falls. The forest is red fir and Jeffrey pine, with lodgepole and
 ## silver snags, and manzanita and huckleberry oak on the rocky rims.
 
 const GlacierArt = preload("res://tools/hubs/glacier_art.gd")
+const GlacierVistaArt = preload("res://tools/hubs/glacier_vista_art.gd")
 
 const W := 112
 const H := 76
@@ -41,31 +43,6 @@ const NORTH_RIM := [[0, 16], [12, 14], [24, 13], [36, 14], [46, 13], [51, 11], [
 	[64, 2], [67, 3], [70, 6], [72, 10], [W, 12]]
 const EAST_RIM := [[0, 71], [8, 71], [12, 73], [18, 75], [24, 78], [30, 80], [36, 82], [42, 85], [48, 89],
 	[52, 93], [55, 99], [58, 101], [61, 99], [63, 95], [68, 96], [H, 99]]
-
-## Landmarks across the canyon, in tiles (see GlacierArt.view_below).
-## Placed so each overlook frames its real view on screen: Half Dome across
-## from the point, Curry Village straight below it, and from Washburn Point,
-## Nevada Fall under Liberty Cap with Mount Broderick beside it, Vernal Fall
-## below, and Illilouette Fall off to the right.
-const VIEW := {
-	"half_dome": Vector2(78, 19),
-	"broderick": Vector2(103.5, 54),
-	"liberty_cap": Vector2(108.5, 54.5),
-	"curry": Vector2(76, 4),
-	"rivers": [
-		# the Merced over Nevada and Vernal falls, into the gorge under Washburn
-		[Vector2(107, 56.4), Vector2(104.5, 57.6), Vector2(103, 58), Vector2(103, 59.6), Vector2(101.8, 61.5)],
-		# and out of it at Happy Isles, down through the Valley below the point
-		[Vector2(98, 52), Vector2(95, 48), Vector2(90, 40), Vector2(86, 28), Vector2(81, 16), Vector2(77, 6), Vector2(68, 1),
-			Vector2(56, 0.5), Vector2(46, 5), Vector2(30, 7), Vector2(14, 6), Vector2(0, 8)],
-		# the Illilouette, from its fall to the Merced
-		[Vector2(108, 64.4), Vector2(105, 63.2), Vector2(101.8, 61.5)],
-	],
-	"meadows": [Rect2(70, 1, 5, 2), Rect2(38, 2, 9, 4), Rect2(16, 4, 7, 3)],
-}
-## Falls over the view: [sprite prefix, top center in tiles, mist].
-const FALL_AT := [["gp_nevada", Vector2(107, 53.9), true], ["gp_vernal", Vector2(103, 58), true],
-	["gp_illilouette", Vector2(108, 62.5), false]]
 
 var drop := PackedByteArray()
 
@@ -242,18 +219,25 @@ func _build_region() -> void:
 	pack(_root, SCENE)
 
 
-## The view over the edge: one picture behind everything, and the falls.
+## The view over the edge: the drop, with the painting of the view
+## (glacier_vista_art.gd) showing through it. The camera's top-left at the
+## tip of the point frames Half Dome on the right; walking to Washburn Point
+## slides the painting along to Liberty Cap and the falls.
+const VISTA_ANCHOR := Vector2(1584, 0)
+const VISTA_OFFSET := Vector2(400, 0)
+const VISTA_PARALLAX := Vector2(0.25, 0.2)
+
+
 func _place_view() -> void:
-	var im := GlacierArt.new().view_below(drop, W, H, VIEW)
+	var im := GlacierArt.new().view_below(drop, W, H)
 	im.save_png(ProjectSettings.globalize_path(G + "view_below.png"))
+	var vista := GlacierVistaArt.new()
+	vista.vista().save_png(ProjectSettings.globalize_path(G + "vista.png"))
 	import_assets()
-	_backdrop("view_below", Vector2.ZERO, -8, G)
-	for f: Array in FALL_AT:
-		var size: Vector2i = GlacierArt.FALLS[f[0]]
-		var top: Vector2 = f[1] * T
-		_animation(f[0].to_pascal_case(), f[0], 6.0, top - Vector2(size.x / 2.0, 0), -7, G)
-		if f[2]:
-			_ambient(f[0].to_pascal_case() + "Mist", "mist", top + Vector2(0, size.y), Vector2(10, 4))
+	var falls := []
+	for f: Array in GlacierVistaArt.VISTA_FALLS:
+		falls.append([f[0] * 2.0, f[1] * 2.0, f[2] * 2.0])
+	_vista(_backdrop("view_below", Vector2.ZERO, -8, G), G + "vista.png", VISTA_ANCHOR, VISTA_OFFSET, VISTA_PARALLAX, falls)
 
 
 ## A run of parapet and pipe railing along every edge of the overlook (and of

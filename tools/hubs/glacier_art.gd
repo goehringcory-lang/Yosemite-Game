@@ -5,9 +5,9 @@ extends "res://tools/hubs/valley_art.gd"
 ## round the overlook, Overhanging Rock, the coin viewers, the stone
 ## amphitheater, the foundations of the Glacier Point Hotel, the rim forest
 ## (red fir, Jeffrey pine, lodgepole, silver snags), the fallen Jeffrey pine on
-## Sentinel Dome, and the view over the edge: the Valley floor 3,200 feet down
-## in blue haze, Half Dome, Liberty Cap, and Vernal, Nevada and Illilouette
-## falls (animated). Written to assets/sprites/glacier/ at 16px scale;
+## Sentinel Dome, and the drop past the edge (the painting of the view seen
+## through it is glacier_vista_art.gd's). Written to assets/sprites/glacier/
+## at 16px scale;
 ## tools/hubs/rebuild_glacier_point.sh moves them onto the 32px grid.
 
 const GP_OUT := "res://assets/sprites/glacier/"
@@ -19,14 +19,6 @@ const GP_TRUNKS := {
 	"gp_lodgepole": Vector2(4, 3), "gp_snag": Vector2(4, 3),
 }
 const GP_TREES := ["gp_red_fir_a", "gp_red_fir_b", "gp_jeffrey_a", "gp_jeffrey_b", "gp_lodgepole", "gp_snag"]
-## The falls drawn over the view, as [x, y] of their top center in pixels
-## (16px scale) are placed by the builder; these are their sizes and frames.
-const FALL_FRAMES := 4
-const FALLS := {
-	"gp_nevada": Vector2i(14, 40),
-	"gp_vernal": Vector2i(12, 26),
-	"gp_illilouette": Vector2i(8, 30),
-}
 
 var fir_leaf: Array[Color] = []
 var pine_leaf: Array[Color] = []
@@ -73,9 +65,6 @@ func save_all() -> void:
 	_gp_write(lodgepole(), "gp_lodgepole")
 	_gp_write(snag(), "gp_snag")
 	_gp_write(trail_post(), "trail_post")
-	for fall_name: String in FALLS:
-		for f in FALL_FRAMES:
-			_gp_write(fall_frame_gp(FALLS[fall_name], f, fall_name), "%s_%d" % [fall_name, f])
 
 
 func _gp_write(im: Image, sprite_name: String) -> void:
@@ -469,41 +458,10 @@ func fallen_jeffrey() -> Image:
 
 # ---------------------------------------------------------------- the view
 
-## One frame of a waterfall seen from across the canyon: a white ribbon
-## with streaks sliding down it, widening into spray at the foot.
-func fall_frame_gp(size: Vector2i, frame: int, fall_name: String) -> Image:
-	var w := size.x
-	var h := size.y
-	var im := K.make(w, h)
-	var sd := fall_name.hash() % 1000
-	var cx := w / 2.0
-	for yy in h:
-		var f := float(yy) / (h - 1)
-		var half := 1.6 + f * f * (w / 2.0 - 2.0)
-		for xx in w:
-			var dx := absf(xx + 0.5 - cx)
-			if dx > half:
-				continue
-			var streak := K.hash2(xx, (yy - frame * 3 + 1000) / 3, sd)
-			var t := 0.7 + (streak - 0.5) * 0.5 - dx / (half + 1.0) * 0.3
-			var a := 0.92 if f < 0.8 else lerpf(0.92, 0.35, (f - 0.8) / 0.2)
-			if dx > half - 1.0:
-				a *= 0.6
-			var col := Color("d6f1ee") if t > 0.6 else Color("9fd8d9")
-			col.a = a
-			K.px(im, xx, yy, col)
-	return im
-
-
-## The view's colors, all from the game's palette (tools/art32/palette.py),
-## so the 32px upgrade keeps them. Haze and distance are ordered dithers
-## between two of them, not in-between colors the palette doesn't have.
-const V_FOREST := [Color("12291d"), Color("1d3f2b"), Color("2c5c37"), Color("437f45")]
-const V_MEADOW := [Color("437f45"), Color("5c8f3c")]
+## The drop's colors, from the game's palette (tools/art32/palette.py), so the
+## 32px upgrade keeps them exactly: the vista shader finds the haze by color.
 const V_HAZE := Color("235679")
 const V_SHADOW := Color("2d3050")
-const V_WATER := [Color("63b3c6"), Color("9fd8d9")]
-const V_ROOF := [Color("bdb8ae"), Color("86694b")]
 const V_GRANITE := [Color("2b2a30"), Color("47464d"), Color("6a6a70"), Color("93918f"), Color("bdb8ae"), Color("e4ddcc")]
 
 
@@ -517,15 +475,13 @@ static func _mix(a: Color, b: Color, t: float, x: int, y: int) -> Color:
 	return b if _on(t, x, y) else a
 
 
-## The view over the rim, one picture the size of the map: transparent over
-## the ground, and wherever [param drop] is set (a tile past the edge), the
-## Valley floor 3,200 feet below in blue haze with the Merced winding through
-## it, the canyon of the Merced, and Half Dome, Liberty Cap and Mount
-## Broderick standing up out of the haze. [param marks] holds landmarks in
-## tiles: "rivers" (a list of polylines), "curry" (a point), "meadows"
-## (rects, drawn as soft blobs), "half_dome" (the foot of its face),
-## "liberty_cap" and "broderick" (the foot of each dome).
-func view_below(drop: PackedByteArray, tw: int, th: int, marks: Dictionary) -> Image:
+## The drop past an overlook's rim, one picture the size of the map:
+## transparent over the ground, and wherever [param drop] is set (a tile past
+## the edge), the haze color, which the vista shader
+## (assets/shaders/vista.gdshader) replaces with a painting of the view. Drawn
+## in: the lip, a lit granite edge with a dark contact line under it, and the
+## cliff's own shadow dithered over the view just below it.
+func view_below(drop: PackedByteArray, tw: int, th: int) -> Image:
 	var T16 := 16
 	var pw := tw * T16
 	var ph := th * T16
@@ -572,66 +528,15 @@ func view_below(drop: PackedByteArray, tw: int, th: int, marks: Dictionary) -> I
 			var dpx := d * T16 + (vnoise(px_ * 0.18, py * 0.18, sd) - 0.5) * 6.0
 			if dpx <= 0.0:
 				continue
-			var col := _floor_color(px_, py, sd, marks)
-			# blue haze over everything: it is all a long way down
-			col = _mix(col, V_HAZE, 0.3 + clampf(dpx / 500.0, 0.0, 0.15), px_, py)
-			# the cliff's own shadow on the haze just under the lip
+			var col := V_HAZE
+			# the cliff's own shadow on the view just under the lip
 			if dpx < 26.0:
 				col = _mix(col, V_SHADOW, (1.0 - dpx / 26.0) * 0.8, px_, py)
 			# the lip: a lit granite edge with a dark contact line under it
 			if dpx < 2.5:
 				col = V_GRANITE[4] if dpx < 1.3 else V_GRANITE[1]
 			im.set_pixel(px_, py, col)
-	# the domes across the canyon, standing up out of the haze
-	if marks.has("broderick"):
-		_dome(im, drop, tw, marks["broderick"] * T16, 40.0, 34.0, 0.15, sd + 3)
-	if marks.has("liberty_cap"):
-		_dome(im, drop, tw, marks["liberty_cap"] * T16, 30.0, 52.0, 0.4, sd + 4)
-	if marks.has("half_dome"):
-		_half_dome(im, drop, tw, marks["half_dome"] * T16, sd + 5)
 	return im
-
-
-## Only over the drop, and not on the lip: the land stays clear.
-static func _over_drop(im: Image, drop: PackedByteArray, tw: int, x: int, y: int) -> bool:
-	if x < 0 or y < 0 or x >= im.get_width() or y >= im.get_height():
-		return false
-	if not drop[(y / 16) * tw + x / 16]:
-		return false
-	var p := im.get_pixel(x, y)
-	return p.a > 0.5 and p != V_GRANITE[4] and p != V_GRANITE[1]
-
-
-## The Valley floor from 3,200 feet up: a carpet of conifer crowns a pixel
-## or two across, soft meadows, the Merced catching the light, and the pale
-## roofs of Curry Village among the trees.
-func _floor_color(px_: int, py: int, sd: int, marks: Dictionary) -> Color:
-	var v := vnoise(px_ * 0.07, py * 0.07, sd)
-	var col: Color = _mix(V_FOREST[1], V_FOREST[2], clampf(v * 1.2 - 0.2, 0.0, 1.0), px_, py)
-	var crown := K.hash2(px_ / 2, py / 2, sd + 1)
-	if crown > 0.86:
-		col = V_FOREST[3]
-	elif crown < 0.12:
-		col = V_FOREST[0]
-	var p := Vector2(px_, py)
-	for r: Rect2 in marks.get("meadows", []):
-		var c := (r.position + r.size / 2.0) * 16.0
-		var q := (p - c) / (r.size * 8.0)
-		if q.length() + (vnoise(px_ * 0.08, py * 0.08, sd + 9) - 0.5) * 0.5 < 1.0:
-			col = _mix(V_MEADOW[0], V_MEADOW[1], K.hash2(px_ / 2, py / 2, sd + 2), px_, py)
-	var wiggle := Vector2(vnoise(px_ * 0.02, py * 0.02, sd + 5) - 0.5, vnoise(py * 0.02, px_ * 0.02, sd + 6) - 0.5) * 12.0
-	for line: Array in marks.get("rivers", []):
-		var rd := _dist_to_line(p + wiggle, line, 16.0)
-		if rd < 2.6:
-			col = V_WATER[1] if K.hash2(px_, py, sd + 3) > 0.75 else V_WATER[0]
-		elif rd < 4.0:
-			col = V_HAZE # the river's shaded banks
-	if marks.has("curry"):
-		var cv: Vector2 = marks["curry"] * 16.0
-		var q := (p - cv) / Vector2(44.0, 20.0)
-		if q.length() < 1.0 and (px_ / 3 + (py / 2) * 2) % 5 == 0 and py % 2 == 0 and K.hash2(px_ / 3, py / 2, sd + 4) > 0.35:
-			col = V_ROOF[0] if px_ % 3 != 2 else V_ROOF[1]
-	return col
 
 
 static func _dist_to_line(p: Vector2, pts: Array, scale: float) -> float:
@@ -641,100 +546,3 @@ static func _dist_to_line(p: Vector2, pts: Array, scale: float) -> float:
 		var b: Vector2 = pts[i + 1] * scale
 		best = minf(best, p.distance_to(Geometry2D.get_closest_point_to_segment(p, a, b)))
 	return best
-
-
-## A granite dome standing out of the haze, the middle of its foot at
-## [param foot]: lit on its left shoulder, shaded on the right, and sinking
-## into the haze at its base.
-func _dome(im: Image, drop: PackedByteArray, tw: int, foot: Vector2, rx: float, ry: float, lean: float, sd: int) -> void:
-	for yy in range(int(foot.y - ry * 1.3), int(foot.y)):
-		for xx in range(int(foot.x - rx), int(foot.x + rx) + 1):
-			if not _over_drop(im, drop, tw, xx, yy):
-				continue
-			var dx := (xx + 0.5 - foot.x) / rx
-			var dy := (foot.y - yy) / ry
-			var top := pow(maxf(0.0, 1.0 - dx * dx), 0.7) * (1.0 - lean * dx)
-			if dy > top:
-				continue
-			if dy < _tree_line(xx, sd) * 2.2:
-				continue
-			var t := 0.62 - dx * 0.38 + (dy - 0.4) * 0.2 + (vnoise(xx * 0.4, yy * 0.1, sd) - 0.5) * 0.18
-			var col: Color = V_GRANITE[clampi(roundi(t * 5.0), 1, 5)]
-			if dy > top - 0.04:
-				col = V_GRANITE[5] if dx < 0.2 else V_GRANITE[3]
-			col = _mix(col, V_HAZE, clampf(0.6 - dy, 0.0, 0.3), xx, yy)
-			K.px(im, xx, yy, col)
-
-
-## How high (0 to 1 of a dome) the forest climbs at column [param x]: a
-## ragged line of treetops, higher in the gullies.
-static func _tree_line(x: int, sd: int) -> float:
-	var spire := 0.025 if (x % 5) == 2 else (0.012 if (x % 5) in [1, 3] else 0.0)
-	return 0.13 + (vnoise(x * 0.05, 3.0, sd + 8) - 0.4) * 0.16 + spire
-
-
-## Half Dome as Glacier Point sees it, across the canyon to the northeast:
-## the sheer northwest face on the left, from the summit halfway down, in
-## shadow and streaked; below it the broken lower shoulder and the forest
-## climbing it; the summit; and the rounded back falling away to the east in
-## sunlit shells. [param foot] is the bottom of the face's plumb line.
-func _half_dome(im: Image, drop: PackedByteArray, tw: int, foot: Vector2, sd: int) -> void:
-	var wd := 230.0
-	var ht := 260.0
-	var face_h := 0.42 # the face runs from the summit down to here
-	var x_from := int(foot.x - 120.0)
-	for xx in range(x_from, int(foot.x + wd) + 1):
-		var u := (xx - foot.x) / wd
-		var top_h: float
-		if u >= 0.0:
-			# the summit at the top of the face, a slight crown, then the long
-			# curve of the back down to the shoulder
-			top_h = ht * pow(maxf(0.0, 1.0 - pow(u, 1.8)), 0.6)
-			if u < 0.05:
-				top_h = ht * (0.975 + u * 0.5)
-		else:
-			# west of the face: the lower shoulder, falling to the canyon
-			top_h = ht * face_h * pow(maxf(0.0, 1.0 + u * wd / 120.0), 0.8)
-		top_h += (vnoise(xx * 0.12, 0.0, sd) - 0.5) * (3.0 if u >= 0.0 else 10.0)
-		var face_w := 24.0
-		for yy in range(int(foot.y - top_h), int(foot.y)):
-			if not _over_drop(im, drop, tw, xx, yy):
-				continue
-			var depth := float(yy) - (foot.y - top_h) # pixels below the skyline
-			var hgt := (foot.y - yy) / ht # 0 at the foot, 1 at the summit
-			var col: Color
-			var on_face := u >= 0.0 and xx - foot.x < face_w * (0.55 + hgt * 0.45) and hgt > face_h - 0.06
-			if on_face:
-				# the face, nearly edge on and in shadow, with dark water streaks
-				var streak := vnoise(xx * 0.45, yy * 0.025, sd + 2)
-				col = V_GRANITE[2] if streak > 0.42 else V_GRANITE[1]
-				if streak < 0.25:
-					col = V_SHADOW
-				if xx - foot.x < 1.5 and hgt > face_h:
-					col = V_GRANITE[3]
-			elif u < 0.0 or (hgt < face_h - 0.04 and u < 0.03 + (face_h - hgt) * 0.6):
-				# the broken lower shoulder: shaded slabs and talus
-				var t := 0.42 + (vnoise(xx * 0.2, yy * 0.2, sd + 7) - 0.5) * 0.5 - depth * 0.004
-				col = V_GRANITE[clampi(roundi(t * 5.0), 1, 4)]
-			else:
-				# the sunny back, in a few broad shells that follow its curve
-				var shell := fmod(depth * 0.035 + vnoise(xx * 0.03, yy * 0.04, sd + 3) * 0.8, 1.0)
-				var t := 0.95 - u * 0.45 - depth * 0.0015 + (K.hash2(xx, yy, sd) - 0.5) * 0.1
-				col = V_GRANITE[clampi(roundi(t * 5.0), 2, 5)]
-				if shell < 0.04 and K.hash2(xx / 3, yy, sd + 11) > 0.35:
-					col = V_GRANITE[3]
-				if depth < 2.0:
-					col = V_GRANITE[5]
-			# the forest of the canyon climbs the lower slopes, ragged: below the
-			# tree line the floor shows through
-			if hgt < _tree_line(xx, sd) + (K.hash2(xx, yy, sd + 9) - 0.5) * 0.04:
-				continue
-			col = _mix(col, V_HAZE, clampf(0.32 - hgt * 0.8, 0.0, 0.3), xx, yy)
-			K.px(im, xx, yy, col)
-	# a few dark conifers clinging to the shoulders
-	for i in 40:
-		var tx := int(foot.x - 100.0 + (wd + 100.0) * K.hash2(i, 1, sd))
-		var ty := int(foot.y - ht * (0.12 + K.hash2(i, 2, sd) * 0.16))
-		if _over_drop(im, drop, tw, tx, ty) and im.get_pixel(tx, ty) in V_GRANITE:
-			K.px(im, tx, ty, V_FOREST[1])
-			K.px(im, tx, ty - 1, V_FOREST[2])
