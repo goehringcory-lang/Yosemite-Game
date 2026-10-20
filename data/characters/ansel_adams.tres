@@ -11,6 +11,7 @@ years = "1902–1984"
 affiliation = "Sierra Club; Best's Studio"
 bio = "Photographer who first came to Yosemite as a boy in 1916. In 1927 he made 'Monolith, the Face of Half Dome' from the Diving Board. He married Virginia Best, whose father ran Best's Studio in the valley, and was a longtime Sierra Club leader."
 idle_lines = PackedStringArray("The light changes every minute. You learn to wait.", "Jules had the best hands of any student I taught. Then he found rock climbing.")
+story_beats = [{"after": "clark_last_page", "lines": ["The Register's finished? Then you've done what I keep trying to do with a camera: get the whole valley onto paper.", "My pictures mostly leave the people out. Yours doesn't. I've been thinking about that."]}]
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.227, 0.227, 0.220, 1)
 home = "Best's Studio, Yosemite Village"

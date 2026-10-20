@@ -413,6 +413,23 @@ func waiting_for_season(character_id: String) -> QuestData:
 	return null
 
 
+## What this person says about a quest of theirs that's waiting on a side
+## story (QuestData.waiting_on), or "". Only once the main line has caught up,
+## so nobody nags about it early.
+func waiting_hint(character_id: String) -> String:
+	for quest: QuestData in QUESTS:
+		if quest.giver != character_id or quest.waiting_on.is_empty() or active.has(quest.id) or is_completed(quest.id):
+			continue
+		var main_done := Array(quest.requires).all(func(id: String) -> bool:
+			return is_completed(id) or not get_quest(id).main_line)
+		if not main_done:
+			continue
+		for id: String in quest.waiting_on:
+			if not is_completed(id):
+				return quest.waiting_on[id]
+	return ""
+
+
 func current_step(quest: QuestData) -> Dictionary:
 	if not active.has(quest.id):
 		return {}
@@ -564,6 +581,11 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 		if not beat.is_empty() and not beat.key in heard_beats:
 			heard_beats.append(beat.key)
 			_add_lines(lines, speaker, beat.lines)
+			return lines
+		# A quest held up by a side story: say who to go and see.
+		var waiting := waiting_hint(character_id)
+		if waiting != "":
+			_add_lines(lines, speaker, [waiting])
 			return lines
 		_add_lines(lines, speaker, character.idle_lines_for(character.rare_after_quest == "" or is_completed(character.rare_after_quest)))
 	return lines

@@ -11,6 +11,7 @@ years = "1898–1987"
 affiliation = "Sierra Club Rock Climbing Section"
 bio = "Oakland lawyer and one of the 1934 Higher Cathedral Spire team. He was a careful planner and later a long-serving Sierra Club leader."
 idle_lines = PackedStringArray("Plan the climb, then climb the plan. Then plan again when the rock disagrees.", "We hauled more iron up the Spire than we'd ever carried in our lives.")
+story_beats = [{"after": "clark_last_page", "lines": ["Finished, is it? I've kept a notebook on every climb since '32 and never finished one. You'll have to tell me how it's done.", "Long, easy, and beautiful, I expect. That's how most good books go."]}]
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.690, 0.604, 0.439, 1)
 home = "Curry Village, foot of the Apron trail"

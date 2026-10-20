@@ -11,6 +11,7 @@ years = "died 1884"
 affiliation = "Blacksmith and trail builder"
 bio = "Scottish-born blacksmith who made the first recorded ascent of Half Dome in October 1875. He drilled holes up the smooth granite, set iron eyebolts, and tied a rope between them. Others used his rope soon after, and later cables followed his line."
 idle_lines = PackedStringArray("Drill, bolt, step, drill again. It's slow, but it goes.", "They said nobody would ever stand on top of it.")
+story_beats = [{"after": "clark_last_page", "lines": ["So Clark's book is done. Mine's a line of holes up the back of the Dome. Yours is a good deal easier to read, and it doesn't rust."]}]
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.478, 0.165, 0.165, 1)
 home = "Happy Isles"
