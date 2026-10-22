@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/crow.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "crow"
+display_name = "Crow"
+years = "today"
+affiliation = "Park visitor"
+bio = "A tattooed camper who lives under a granite overhang up Tenaya Creek, above Mirror Lake. Invented for the game: a secret, not a historical figure."
+idle_lines = PackedStringArray("Listen. The creek changes its mind about every ten minutes.", "Rangers walked right past the cairn last week. Didn't even look.", "Every tattoo's a place. This one's Tuolumne. This one's a bad night on the Nose.", "The ravens up here know my name. Well. They know a name.", "Bear box has peanut butter and tortillas if you're hungry. Don't open the coffee can.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.15, 0.15, 0.16, 1)
+home = "Crow's Camp, up Tenaya Creek"
+visitor = true

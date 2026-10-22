@@ -18,6 +18,7 @@ extends RefCounted
 ##                              shawl, blouse, stripes
 ##   bottom, bottom_style       pants, knickers, skirt, dress (uses top color), coat_long
 ##   shoes, socks, sleeve, collar, belt, apron, bandana, badge, glasses
+##   tattoos                    ink color, on bare arms (set sleeve to the skin)
 ##   pack                       pack, frame_pack, haul_bag (+ pack_color)
 ##   carry                      rope, chalk_bag, book, register, basket, loaf, hammer,
 ##                              drill, camera, stick, cane, parasol, suitcase, rod, shovel,
@@ -182,6 +183,13 @@ const LOOKS := {
 	"visitor_dirtbag": {
 		"skin": SKIN_FAIR, "hair": "a8783a", "hair_style": "long", "hat": "headband", "hat_color": "c83a3a",
 		"top": "e0d8c0", "top_style": "stripes", "top2": "4a6a9a", "bottom": "e8e0c8", "carry": ["rope", "chalk_bag"],
+	},
+	# Crow, who camps up Tenaya Creek where nobody goes: a black tank top over
+	# arms inked to the wrist, a beanie, and a beard.
+	"crow": {
+		"skin": SKIN_TAN, "hair": "2a2018", "beard": "goatee", "beard_color": "2a2018",
+		"hat": "beanie", "hat_color": "6a7a3a", "top": "26262a", "top_style": "shirt", "sleeve": SKIN_TAN,
+		"collar": "26262a", "bottom": "4a5a6e", "shoes": "4a3a2a", "tattoos": "2a3550",
 	},
 	"visitor_rail_passenger": {
 		"skin": SKIN_TAN, "hair": "3a2a20", "hat": "bowler", "hat_color": "3a3a3a",

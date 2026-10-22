@@ -16,6 +16,8 @@ extends AhwahneeStyle
 ##                                     Housekeeping Camp - Curry Village
 ##                                                              |
 ##                                Upper Pines - Happy Isles - Tenaya Creek - Mirror Lake
+##                                                                                 :
+##                                                                (a cairn, a use trail) Crow's Camp
 ##
 ## Every road keeps its heading: leave a scene by its west edge and you come
 ## in at the east edge of the next. The wall of the Valley is always at the
@@ -30,10 +32,15 @@ extends AhwahneeStyle
 ## painted grounds in assets/sprites/ahwahnee/. Put story NPCs and climbs in
 ## scenes/story/content/<region>.tscn (placed by Marker name), not in the
 ## region scenes, so a rebuild keeps them.
+##
+## To rebuild only some of them while working on one, name them in ONLY:
+##
+##   ONLY=mirror_lake,crows_camp tools/hubs/rebuild_valley_floor.sh
 
 const ValleyLandArt = preload("res://tools/hubs/valley_land_art.gd")
 const ValleyArt = preload("res://tools/hubs/valley_art.gd")
 const Camp4Art = preload("res://tools/hubs/camp4_art.gd")
+const CrowArt = preload("res://tools/hubs/crow_art.gd")
 const GlacierArt = preload("res://tools/hubs/glacier_art.gd")
 
 const V := "res://assets/sprites/valley/"
@@ -44,7 +51,7 @@ const G := "res://assets/sprites/glacier/"
 const C := "res://assets/sprites/curry/"
 const DIR := "res://scenes/regions/"
 const SCENES := ["el_capitan_meadow", "tunnel_view", "happy_isles", "mirror_lake", "leidig_meadow",
-	"four_mile_trailhead", "bridalveil_fall", "housekeeping_camp", "ahwahnee_meadow", "upper_pines", "tenaya_creek"]
+	"four_mile_trailhead", "bridalveil_fall", "housekeeping_camp", "ahwahnee_meadow", "upper_pines", "tenaya_creek", "crows_camp"]
 
 const FOREST_TABLE := [["tree_ponderosa", 4.0], ["tree_incense_cedar", 3.5], ["tree_black_oak", 2.5], ["tree_white_fir", 1.2], ["tree_dogwood", 1.0]]
 
@@ -57,19 +64,21 @@ func _ready() -> void:
 	ValleyArt.new().save_all()
 	Camp4Art.new().save_all()
 	GlacierArt.new().save_all()
+	CrowArt.new().save_all()
 	load_flora()
 	import_assets()
-	_el_capitan_meadow()
-	_leidig_meadow()
-	_four_mile_trailhead()
-	_bridalveil_fall()
-	_tunnel_view()
-	_ahwahnee_meadow()
-	_housekeeping_camp()
-	_upper_pines()
-	_happy_isles()
-	_tenaya_creek()
-	_mirror_lake()
+	var builds := {
+		"el_capitan_meadow": _el_capitan_meadow, "leidig_meadow": _leidig_meadow,
+		"four_mile_trailhead": _four_mile_trailhead, "bridalveil_fall": _bridalveil_fall,
+		"tunnel_view": _tunnel_view, "ahwahnee_meadow": _ahwahnee_meadow,
+		"housekeeping_camp": _housekeeping_camp, "upper_pines": _upper_pines,
+		"happy_isles": _happy_isles, "tenaya_creek": _tenaya_creek,
+		"mirror_lake": _mirror_lake, "crows_camp": _crows_camp,
+	}
+	var only := OS.get_environment("ONLY").split(",", false)
+	for id: String in builds:
+		if only.is_empty() or id in only:
+			(builds[id] as Callable).call()
 	print("Done")
 	get_tree().quit()
 
@@ -732,6 +741,9 @@ func _mirror_lake() -> void:
 	_path([Vector2(-1, 37), Vector2(16, 36), Vector2(24, 33), Vector2(52, 32), Vector2(60, 26), Vector2(62, 18)], 2, Terrain.TRAIL, 0.4)
 	_path([Vector2(14, 34), Vector2(12, _foot_of_wall(12))], 1, Terrain.TRAIL, 0.4)
 	_bridge(14, 33, 38, 2)
+	# Past the cairn, a faint use trail along the gravel of the creek bank,
+	# east into the boulders: the way to Crow's Camp.
+	_path([Vector2(61, 25), Vector2(65, 26), Vector2(69, 25), Vector2(73, 25)], 2, Terrain.SAND, 0.3)
 	_mark_open()
 
 	start_region("MirrorLake", "mirror_lake", "Mirror Lake", Vector2(-119.5480, 37.7460))
@@ -743,13 +755,85 @@ func _mirror_lake() -> void:
 	_info_sign("WashingtonColumnSign", foot(16, 33), "Washington Column",
 		"The granite pillar beside the Royal Arches. Astroman climbs its east face: when John Bachar, Ron Kauk and John Long freed it in 1975, it was the hardest long free climb in the world.")
 	shuttle("ShuttleMirrorLake", "Mirror Lake Trailhead", foot(6, 36))
+	sign_prop("Cairn", B + "crow_cairn.png", foot(62, 24), Vector2(12, 5), "A cairn",
+		"Five flat stones stacked knee high beside the trail, where nothing needs marking. Past it, a faint path follows Tenaya Creek upstream into the boulders.")
 	_dress(30, 60)
 	marker("arrival", 10, 37)
 	marker("shuttle", 6, 37)
 	marker("west", 2, 37.5)
 	marker("lakeshore", 38, 31)
 	marker("astroman", 12, _foot_of_wall(12))
+	marker("cairn", 68, 25.5)
 	place("Mirror Lake", 38, 25, 14)
 	place("Half Dome", 50, 3, 0)
 	region_exit("ToTenayaCreek", tile_pos(-0.5, 37.5), Vector2(12, 48), "Tenaya Creek, to Happy Isles", "tenaya_creek", "east")
+	region_exit("ToCrowsCamp", tile_pos(71.5, 25.5), Vector2(12, 48), "A faint path up Tenaya Creek", "crows_camp", "west")
 	_finish("mirror_lake", 2.0)
+
+
+# ================================================================ Crow's Camp
+
+## A secret: past the cairn at Mirror Lake, a use trail climbs along Tenaya
+## Creek and threads up through a field of fallen boulders to a little camp
+## under a granite overhang, with a bear box and a fire ring. Crow lives
+## here (scenes/story/content/crows_camp.tscn). Not on any map.
+func _crows_camp() -> void:
+	_begin(48, 34, 1975)
+	_wall(6.0, 2.0, 3)
+	var creek := [Vector2(-1, 29), Vector2(14, 28), Vector2(28, 26), Vector2(40, 23), Vector2(49, 19)]
+	_water(creek, 2, Terrain.CREEK, 0.5)
+	# The boulder field: talus everywhere between the creek and the wall...
+	for y in range(9, 26):
+		for x in range(2, 47):
+			if at(x, y) == Terrain.FOREST and noise.get_noise_2d(x * 2.0, y * 2.0) > -0.25:
+				put(x, y, Terrain.TALUS)
+	# ...but the camp's clearing under the overhang, and the one way up to it:
+	# a winding ribbon of granite slab between the blocks.
+	_ellipse(37.0, 13.0, 7.0, 3.0, Terrain.CAMP, 0.15)
+	var way := [Vector2(-1, 25), Vector2(5, 25), Vector2(9, 22), Vector2(15, 21), Vector2(19, 18),
+		Vector2(25, 17), Vector2(28, 14), Vector2(33, 13)]
+	_path(way, 2, Terrain.GRANITE, 0.2)
+	_mark_open()
+	for y in h:
+		for x in w:
+			if at(x, y) == Terrain.GRANITE:
+				no_trees[y * w + x] = 1
+
+	start_region("CrowsCamp", "crows_camp", "Crow's Camp", Vector2(-119.5420, 37.7480))
+	paint_ground()
+	_save_ground_art("ground_crows_camp", 1975)
+	_place_wall("crows_camp", 111)
+	decor("Overhang", B + "crow_overhang.png", foot(37, 10), Vector2(CrowArt.OVERHANG_BASE, 14))
+	decor("BearBox", B + "bear_box.png", foot(32, 12), Vector2(14, 6))
+	var ring := decor("FireRing", B + "camp4_fire_ring.png", foot(39, 14) + Vector2(0, Camp4Art.FIRE_INSET), Vector2(22, 6))
+	animate(ring, Camp4Art.FIRE_FRAMES, 8.0)
+	night_light(ring, Vector2(0, -10), 60.0, 0.9, 0.35)
+	ambient(ring, "sparks", Vector2(0, -14), Vector2(3, 1))
+	ambient(ring, "smoke", Vector2(0, -18), Vector2(2, 1))
+	decor("Stump", S + _pick("log_stump") + ".png", foot(42, 14), Vector2(10, 5))
+	sign_prop("Cairn", B + "crow_cairn.png", foot(4, 23), Vector2(12, 5), "Another cairn",
+		"The same five flat stones. Someone wants a few people to find the way, and not many.")
+	# Big blocks crowding the slab, so the way up feels like a squeeze.
+	var blocks := 0
+	for i in way.size() - 1:
+		var a: Vector2 = way[i]
+		var b: Vector2 = way[i + 1]
+		for k in 3:
+			var p := a.lerp(b, (k + 0.5) / 3.0) + Vector2(0, -3 if (i + k) % 2 == 0 else 3)
+			var c := Vector2i(p)
+			if c.x < 1 or c.x >= w - 1 or at(c.x, c.y) != Terrain.TALUS:
+				continue
+			if (i + k) % 3 == 0:
+				decor("Boulder%d" % blocks, B + "camp4_boulder.png", foot(p.x, p.y), Vector2(48, 12))
+			else:
+				_prop(_pick("rock_granite"), foot(p.x, p.y))
+			blocks += 1
+	_scatter_decor("rock_granite", [Terrain.TALUS], 30, Rect2i(0, 8, w, 20), 1)
+	_scatter_decor("rock_mossy", [Terrain.FOREST], 8, Rect2i(0, 0, w, h), 1)
+	_dress(10, 40)
+	marker("arrival", 2, 25.5)
+	marker("west", 2, 25.5)
+	marker("camp", 36, 14)
+	place("Crow's Camp", 37, 13, 8, false)
+	region_exit("ToMirrorLake", tile_pos(-0.5, 25.5), Vector2(12, 48), "Back down to Mirror Lake", "mirror_lake", "cairn")
+	_finish("crows_camp", 1.0)

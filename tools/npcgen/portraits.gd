@@ -223,6 +223,8 @@ func paint(look: Dictionary, id: String, mood := "neutral") -> Image:
 		_hair_back(hair, style)
 	_torso(look)
 	_neck(skin)
+	if look.has("tattoos"):
+		_tattoos(col(look.tattoos), look)
 	if look.has("bandana"):
 		_bandana(col(look.bandana))
 	_head(skin)
@@ -332,6 +334,29 @@ func _torso(look: Dictionary) -> void:
 func _neck(skin: Color) -> void:
 	rect(17, 25, 6, 6, darker(skin, 0.15))
 	rect(17, 25, 2, 4, darker(skin, 0.08))
+
+
+## Ink on the neck and the bare shoulders: a crow's wing on the left, a
+## sun and a row of dots on the right, and a line up the side of the neck.
+func _tattoos(ink: Color, look: Dictionary) -> void:
+	var skin := col(look.get("skin", Looks.SKIN_FAIR))
+	# bare shoulders either side of a tank top's straps
+	if look.has("sleeve"):
+		for y in range(31, S):
+			for x in range(5, 13):
+				if at(x, y).a > 0.5:
+					px(x, y, skin if x > 7 or y > 32 else lighter(skin, 0.06))
+			for x in range(27, 35):
+				if at(x, y).a > 0.5:
+					px(x, y, darker(skin, 0.12))
+	for p in [Vector2i(6, 34), Vector2i(7, 33), Vector2i(8, 33), Vector2i(9, 34), Vector2i(10, 35), Vector2i(7, 35),
+			Vector2i(8, 36), Vector2i(9, 37), Vector2i(6, 37), Vector2i(7, 38)]:
+		px(p.x, p.y, ink)
+	for p in [Vector2i(30, 34), Vector2i(29, 35), Vector2i(31, 35), Vector2i(30, 36), Vector2i(28, 34), Vector2i(32, 34),
+			Vector2i(29, 38), Vector2i(31, 38), Vector2i(33, 38)]:
+		px(p.x, p.y, ink)
+	for y in range(26, 30):
+		px(21 + (y % 2), y, ink)
 
 
 func _bandana(c: Color) -> void:
