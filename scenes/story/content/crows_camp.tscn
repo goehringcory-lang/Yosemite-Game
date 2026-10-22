@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/crow.tres" id="2_r"]
+[ext_resource type="Script" path="res://scripts/story/crow.gd" id="3_r"]
+
+[node name="CrowsCampStory" type="Node2D"]
+
+[node name="Crow" parent="." instance=ExtResource("1_r")]
+script = ExtResource("3_r")
+character = ExtResource("2_r")
+spot = "camp"
+stands_still = true

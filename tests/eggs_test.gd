@@ -1,6 +1,6 @@
 extends Node
 ## Headless test of the Easter eggs: the Firefall, the moonbow, the Camp 4 night
-## details, the bear boxes, and the conditional story notes. See
+## details, the bear boxes, the conditional story notes, and Crow's Camp. See
 ## docs/DESIGN.md ("Easter eggs").
 ## Run: godot --headless --path . res://tests/eggs_test.tscn
 ## Exit code is the number of failed checks. Uses its own save file.
@@ -39,6 +39,7 @@ func _ready() -> void:
 	await test_village()
 	await test_wawona()
 	await test_bear_tracks()
+	await test_crows_camp()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
 
@@ -245,3 +246,68 @@ func test_bear_tracks() -> void:
 	await get_tree().create_timer(world.BEAR_TRACKS_DELAY + 0.5).timeout
 	check(world.hud.message_label.text != tracks, "an ordinary night doesn't repeat it")
 	SaveManager.delete_save()
+
+
+func _find_box() -> DialogueBox:
+	for child in get_tree().root.get_children():
+		if child is DialogueBox and not child.is_queued_for_deletion():
+			return child
+	return null
+
+
+func _trip_effects() -> Array:
+	return get_tree().root.get_children().filter(func(n: Node) -> bool: return n is TripEffect and not n.is_queued_for_deletion())
+
+
+## The secret up Tenaya Creek: the cairn at Mirror Lake, the way through the
+## boulders, and Crow, his paper and his joint.
+func test_crows_camp() -> void:
+	world._enter_region("mirror_lake", "cairn")
+	await get_tree().process_frame
+	var cairn := world.region.find_child("Cairn", true, false) as InfoSign
+	check(cairn != null and "cairn" in cairn.title.to_lower(), "a cairn stands on the Mirror Lake shore")
+	var way: RegionExit = world.region.find_child("ToCrowsCamp", true, false)
+	check(way != null and way.target_region == "crows_camp", "past it, a path leads up Tenaya Creek to Crow's Camp")
+	world._enter_region("crows_camp", "west")
+	await get_tree().process_frame
+	check(world.region.region_id == "crows_camp", "the path comes out in Crow's Camp")
+	var crow := world.region.find_child("Crow", true, false) as Crow
+	check(crow != null and crow.character.id == "crow" and crow.character.visitor, "Crow camps there, a visitor, not in the Register")
+	var box := world.region.entities.get_node_or_null("BearBox") as InfoSign
+	check(box != null and "DON'T" in box.text, "his bear box can be read")
+	var places: Array = world.region.get_places()
+	check(places.all(func(p: Place) -> bool: return not p.show_on_map), "the camp isn't labelled on the map")
+	set_time(SUMMER, 5, 23)
+	check(crow.is_out(), "Crow is home at night too")
+	GameClock.minutes = 12 * 60
+	if crow == null:
+		return
+	# First meeting: say yes to the paper, then to the joint.
+	QuestLog.heard_beats.erase(Crow.MET)
+	Crow.paper_day = ""
+	var player: Player = world.player
+	Engine.time_scale = 8.0
+	crow.interact(player)
+	var tripped := false
+	var hazed := false
+	for i in 4000:
+		await get_tree().process_frame
+		var fx := _trip_effects()
+		if not fx.is_empty():
+			if fx.any(func(f: TripEffect) -> bool: return f.layer == 50 and f.intensity > 0.5):
+				tripped = true
+			if fx.any(func(f: TripEffect) -> bool: return f.layer == 49):
+				hazed = true
+		var dialogue := _find_box()
+		if dialogue:
+			dialogue._cursor = 0
+			dialogue.press()
+		elif not crow._talking:
+			break
+	Engine.time_scale = 1.0
+	check(tripped, "the little piece of paper turns the screen psychedelic")
+	check(hazed, "and the joint leaves a haze")
+	check(Crow.has_met() and player.can_act and not crow._talking, "then he remembers you and lets you go")
+	check(Crow.paper_day == Crow._today(), "one paper a day")
+	for fx: TripEffect in _trip_effects():
+		fx.free()

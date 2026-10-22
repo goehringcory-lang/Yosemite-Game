@@ -302,6 +302,16 @@ func draw_figure(look: Dictionary, facing: int, step: int) -> void:
 		rect(12, 12 + swing_r, 1, 5, tone(sleeve, -0.3))
 		px(3, 17 + swing_l, skin)
 		px(12, 17 + swing_r, tone(skin, -0.12))
+	if look.has("tattoos"):
+		var ink := col(look.tattoos)
+		if side:
+			px(7, 13 + swing_l, ink)
+			px(8, 15 + swing_l, ink)
+		else:
+			px(3, 13 + swing_l, ink)
+			px(3, 15 + swing_l, ink)
+			px(12, 14 + swing_r, ink)
+			px(12, 16 + swing_r, ink)
 
 	# ---- head: a big round face, 10 px tall with the hair
 	var skin_lit := tone(skin, 0.12)

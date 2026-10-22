@@ -10,6 +10,7 @@ const BEAR_BOX_TEXT := "Bear box. Food, coolers, and anything with a smell go in
 const FIREFALL_TEXT := "The call is going up from the rim: 'Let the fire fall!' High above the wall, the bonfire's glow sits on Glacier Point, and a ribbon of embers begins to run down the granite."
 const MOONBOW_TEXT := "Full moon in spring. The spray at the base catches the light, and a faint white arc forms in the mist: a moonbow."
 const MIDNIGHT_TEXT := "Past midnight. The bolt is freshly chalked, and a headlamp sits on the ledge."
+const CROW_BEAR_BOX_TEXT := "Crow's bear box. Inside: peanut butter, a stack of tortillas, a paperback with no cover, and a coffee can with DON'T written on the lid in Sharpie."
 const CLARK_NOTE_TEXT := "A note is pinned inside the window, in Clark's hand: 'Write it at the front of the book, not the back.'"
 
 
@@ -40,6 +41,10 @@ static func dress(region: Region) -> void:
 				lamp.position = Vector2(12, -52)
 				boulder.add_child(lamp)
 			_slackline(region)
+		"crows_camp":
+			var box := region.entities.get_node_or_null("BearBox") as StaticBody2D
+			if box and not box is InfoSign:
+				make_readable(box, "Bear Box", CROW_BEAR_BOX_TEXT, Vector2(40, 32), Vector2(0, -12))
 		"wawona":
 			var clark := _sign(region, "Sign_Clarks_Station")
 			if clark:
