@@ -320,6 +320,8 @@ func _enter_region(id: String, spawn_name := "") -> void:
 	var plants := PlantSpawner.attach(region)
 	if plants:
 		plants.refresh()
+	if not region.indoors:
+		Chongo.visit(region)
 	region_changed.emit(region)
 	_update_location()
 	_preload_neighbors()

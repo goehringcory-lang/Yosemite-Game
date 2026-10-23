@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/chongo.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "chongo"
+display_name = "Chongo"
+years = "today"
+affiliation = "Park visitor"
+bio = "A Camp 4 boulderer who turns up at a different rock every day with a stack of the physics book he wrote himself. Invented for the game, with a nod to the real Camp 4 dirtbag of the same name: not a historical portrait."
+idle_lines = PackedStringArray("This boulder's been falling for ten thousand years. It's just really, really patient about it.", "Friction is the only force that's ever been on my side.", "Gravity's not pulling you down, man. The Earth is pushing up. Chapter 4.", "Every problem on this rock is a physics problem. Some of them are also a fear problem.", "Glaciers dropped these here. Nobody asked the glaciers.", "I don't sleep in the Valley. I just lie very still at a low potential energy.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.48, 0.29, 0.35, 1)
+home = "Somewhere near a boulder"
+visitor = true

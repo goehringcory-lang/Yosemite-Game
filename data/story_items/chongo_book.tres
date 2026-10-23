@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/story_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(224, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "chongo_book"
+display_name = "Chongo's Physics Book"
+description = "\"The Boulder Problem: Gravity, Granite, and Everything Else,\" by Chongo. Photocopied, hole-punched, and chalky. Chapter 1 proves that every boulder is just a very slow falling object. Chapter 9 is mostly diagrams of Half Dome. The margins say \"TRUST THE FRICTION.\""
+icon = SubResource("AtlasTexture_icon")
