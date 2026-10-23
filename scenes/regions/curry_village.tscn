@@ -161,6 +161,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/lamp_wrought_glow.png" id="159_252no"]
 [ext_resource type="Script" path="res://scripts/world/night_glow.gd" id="160_mcn1o"]
 [ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="161_ledge"]
+[ext_resource type="PackedScene" path="res://scenes/regions/dressing/curry_village.tscn" id="dressing_1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_te2xw"]
 size = Vector2(164, 46.08)
@@ -1263,6 +1264,8 @@ script = ExtResource("4_5eddy")
 
 [node name="Entities" type="Node2D" parent="." unique_id=707315022]
 y_sort_enabled = true
+
+[node name="Dressing" parent="Entities" instance=ExtResource("dressing_1")]
 
 [node name="Registration" type="StaticBody2D" parent="Entities" unique_id=659879277]
 position = Vector2(1104, 1120)

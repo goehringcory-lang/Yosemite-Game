@@ -26,6 +26,13 @@ const ROWS := {Vector2i.DOWN: 0, Vector2i.UP: 1, Vector2i.LEFT: 2, Vector2i.RIGH
 @export_enum("Always", "Early home", "Later home") var stays := 0
 ## Never strolls, whatever the hour (the crowd in the Guardian's cave).
 @export var stands_still := false
+## A visitor's day, as Stardew Valley's villagers keep one: stops like
+## "9:00 plaza", each a time and a spot in this region, in order. They walk
+## to each stop by the open ground (WalkGrid) when its time comes and stroll
+## about it (wander_radius) until the next. The first stop is home: they
+## come out of it in the morning and walk back to it to go in at night.
+## Empty keeps them about [member spot] all day.
+@export var timetable: PackedStringArray
 
 var facing := Vector2i.DOWN
 var _home := Vector2.ZERO
@@ -41,6 +48,14 @@ var quest_marker: QuestMarker
 ## Visitors keep hours (see is_out): out of doors by day, home at night.
 var _out := true
 var _routine_check := 0.0
+## The timetable as [minutes, spot] pairs, and the stop they're keeping.
+var _stops: Array = []
+var _stop := -1
+## The turning points still to walk through on the way to a stop.
+var _route := PackedVector2Array()
+var _heading_home := false
+## Walking pace between stops (tests speed it up).
+var travel_speed := TRAVEL_SPEED
 
 ## Visitors head home between these hours (each at their own time) and come
 ## back out in the morning; on a rainy day about half of them stay in.
@@ -52,6 +67,9 @@ const OUT_FROM := 7.0
 ## the middle of the day (up to STROLL px), staying nearer in the evening, and
 ## standing at it again overnight.
 const STROLL := 72.0
+## How fast people walk between stops (pixels a second): a purposeful walk,
+## quicker than a stroll, slower than the player.
+const TRAVEL_SPEED := 56.0
 
 
 func _ready() -> void:
@@ -66,9 +84,20 @@ func _ready() -> void:
 	_target = _home
 	_rng.seed = hash(name)
 	_wait = _rng.randf_range(0.5, 3.0)
+	_stops = parse_timetable(timetable)
+	if not _stops.is_empty():
+		# Start the day where the timetable has them now.
+		_stop = stop_index(GameClock.minutes)
+		# (not snapped to the walk grid yet: the map's bodies may not be in
+		# the physics space until the next frame)
+		var at: Variant = _spot_position(_stops[_stop][1] if is_out() else _stops[0][1], false)
+		if at != null:
+			global_position = at
+			_home = at
+			_target = at
 	# Wanderers (and quest givers, who stroll by day) bump into the map
 	# (layer 1) and the player (layer 2).
-	collision_mask = 3 if wander_radius > 0.0 or (character and not character.visitor) else 0
+	collision_mask = 3 if wander_radius > 0.0 or not _stops.is_empty() or (character and not character.visitor) else 0
 	if character and character.sprite_sheet:
 		_sprite = Sprite2D.new()
 		_sprite.texture = character.sprite_sheet
@@ -113,8 +142,98 @@ func _process(delta: float) -> void:
 		return
 	_routine_check = 0.5
 	var out := is_out()
-	if out != _out and not _talking:
-		_set_out(out)
+	if _stops.is_empty():
+		if out != _out and not _talking:
+			_set_out(out)
+		return
+	if _talking:
+		return
+	if not out and _out and not _heading_home:
+		# home time: walk back to the first stop, then go in (see _arrive)
+		_heading_home = true
+		_go_to(_stops[0][1])
+	elif out and not _out:
+		# morning: out of the door at home
+		_heading_home = false
+		var home: Variant = _spot_position(_stops[0][1])
+		if home != null:
+			global_position = home
+		_stop = -1
+		_set_out(true)
+	if out and not _heading_home:
+		var now := stop_index(GameClock.minutes)
+		if now != _stop:
+			_stop = now
+			_go_to(_stops[now][1])
+
+
+## [param lines] ("9:00 plaza", "13:30 pool_side") as [minutes, spot] pairs
+## in time order. Lines that don't read are skipped with a warning.
+static func parse_timetable(lines: PackedStringArray) -> Array:
+	var stops := []
+	for line in lines:
+		var parts := line.strip_edges().split(" ", false)
+		var clock := parts[0].split(":") if parts.size() == 2 else PackedStringArray()
+		if clock.size() != 2 or not clock[0].is_valid_int() or not clock[1].is_valid_int():
+			push_warning("timetable: can't read '%s'" % line)
+			continue
+		stops.append([int(clock[0]) * 60 + int(clock[1]), parts[1]])
+	stops.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	return stops
+
+
+## Which stop of the timetable holds at [param minutes] past midnight: the
+## last one begun, or home (the first) before the day's first stop.
+func stop_index(minutes: int) -> int:
+	var index := 0
+	for i in _stops.size():
+		if _stops[i][0] <= minutes:
+			index = i
+	return index
+
+
+## Where this person stands at [param spot_name]: the marker, moved a little
+## their own way so people sharing a stop don't stand in one another, onto
+## open ground. Null if the region has no such spot.
+func _spot_position(spot_name: String, snap := true) -> Variant:
+	var region := _find_region()
+	var marker: Marker2D = region.get_spawn(spot_name) if region else null
+	if marker == null:
+		push_warning("%s: no spot named '%s'" % [name, spot_name])
+		return null
+	var nudge := Vector2.from_angle(float(absi(hash(name + spot_name)) % 628) / 100.0) * 20.0
+	var at := marker.global_position + nudge
+	if snap:
+		at = WalkGrid.of(region).nearest_open(at)
+	return at
+
+
+## Sets off for [param spot_name] by the open ground.
+func _go_to(spot_name: String) -> void:
+	var at: Variant = _spot_position(spot_name)
+	if at == null:
+		return
+	_home = at
+	_target = at
+	_route = WalkGrid.of(_find_region()).route(global_position, at)
+	if _route.is_empty():
+		_route = PackedVector2Array([at])
+	_stuck_time = 0.0
+	_wait = 0.0
+
+
+## The end of a walk: at a stop they stroll about it; at home time they go in.
+func _arrive() -> void:
+	velocity = Vector2.ZERO
+	_update_frame(false)
+	_wait = _rng.randf_range(1.0, 4.0)
+	if _heading_home:
+		_set_out(false)
+
+
+## True while walking between stops.
+func is_travelling() -> bool:
+	return not _route.is_empty()
 
 
 ## True when this visitor is about: from OUT_FROM until their own hour
@@ -183,6 +302,11 @@ func roam_radius() -> float:
 func _physics_process(delta: float) -> void:
 	if _talking or not visible:
 		return
+	if not _route.is_empty():
+		_follow_route(delta)
+		return
+	if _heading_home:
+		return
 	var radius := roam_radius()
 	if radius <= 0.0:
 		# standing at their spot: walk back to it first if they're out
@@ -211,6 +335,35 @@ func _physics_process(delta: float) -> void:
 	if global_position.distance_to(before) < walk_speed * delta * 0.25:
 		_stuck_time += delta
 	_face(to_target)
+	_walk_time += delta
+	_update_frame(true)
+
+
+## One step along the route. Someone in the way (the player, another
+## person) holds them up a moment, then they find a way round.
+func _follow_route(delta: float) -> void:
+	var to_point := _route[0] - global_position
+	if to_point.length() < 4.0:
+		_route.remove_at(0)
+		_stuck_time = 0.0
+		if _route.is_empty():
+			_arrive()
+		return
+	# the last bit of a step lands on the point rather than past it
+	velocity = to_point.normalized() * minf(travel_speed, to_point.length() / delta)
+	var before := global_position
+	move_and_slide()
+	if global_position.distance_to(before) < velocity.length() * delta * 0.25:
+		_stuck_time += delta
+		if _stuck_time > 1.5:
+			_stuck_time = 0.0
+			var goal := _route[_route.size() - 1]
+			var again := WalkGrid.of(_find_region()).route(global_position, goal)
+			# no way round: skip ahead rather than stand stuck forever
+			_route = again if not again.is_empty() and again[0].distance_to(_route[0]) > 4.0 else _route.slice(1)
+			if _route.is_empty():
+				_arrive()
+	_face(to_point)
 	_walk_time += delta
 	_update_frame(true)
 

@@ -48,6 +48,8 @@ func _ready() -> void:
 	await test_detail_cards(world)
 	test_friendship(world)
 	await test_day_log(world)
+	test_panel_stretch()
+	await test_nearest_target(world)
 	SaveManager.delete_save()
 	print("OK: %d failure(s)" % failures if failures == 0 else "FAILED: %d failure(s)" % failures)
 	get_tree().quit(failures)
@@ -549,3 +551,52 @@ func test_day_log(world: Node) -> void:
 	check(closed[0], "pressing twice goes to sleep")
 	GameClock.start_new_day()
 	check(log.is_empty(), "the page starts over in the morning")
+
+
+## The panels' nine-slice middle is one color, so no stripe grows with the
+## panel and cuts through its first line of text.
+func test_panel_stretch() -> void:
+	for name in ["panel", "panel_banner"]:
+		var image: Image = load("res://assets/ui/%s.png" % name).get_image()
+		var fill := image.get_pixel(16, 16)
+		var flat := true
+		for y in range(8, 24):
+			for x in range(8, 24):
+				if not image.get_pixel(x, y).is_equal_approx(fill):
+					flat = false
+		check(flat, "the %s's stretched middle is one color" % name)
+
+
+## With two things in reach, the prompt names the one you face squarely.
+func test_nearest_target(world: Node) -> void:
+	var player: Player = world.player
+	var script := GDScript.new()
+	script.source_code = "extends Node2D\nfunc interact(_player: Node) -> void:\n\tpass\n"
+	script.reload()
+	var things: Array[Node2D] = []
+	for offset: Vector2 in [Vector2(10, 0), Vector2(0, 0)]:
+		var thing := Node2D.new()
+		thing.set_script(script)
+		var area := Area2D.new()
+		area.collision_layer = 4
+		var shape := CollisionShape2D.new()
+		var box := RectangleShape2D.new()
+		box.size = Vector2(8, 8)
+		shape.shape = box
+		area.add_child(shape)
+		thing.add_child(area)
+		player.get_parent().add_child(thing)
+		thing.global_position = player.interaction_area.global_position + offset
+		things.append(thing)
+	for i in 3:
+		await get_tree().physics_frame
+	check(player.get_target() == things[1], "of two things in reach, the one straight ahead is the target")
+	# swapped, both still in reach
+	var reach := player.interaction_area.global_position
+	things[0].global_position = reach
+	things[1].global_position = reach + Vector2(10, 0)
+	for i in 3:
+		await get_tree().physics_frame
+	check(player.get_target() == things[0], "swap them and the other is the target")
+	for thing in things:
+		thing.queue_free()

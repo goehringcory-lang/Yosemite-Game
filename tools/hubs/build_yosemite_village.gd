@@ -305,6 +305,8 @@ func _build_region() -> void:
 	_place_markers_and_places()
 	_place_exits()
 	_dress_village()
+	# the town clutter (tools/hubs/dress_towns.gd), in world pixels already
+	instance_scene("res://scenes/regions/dressing/yosemite_village.tscn", Vector2.ZERO, "Dressing")
 	place_blockers()
 	add_forage("yosemite_village", 2.0)
 

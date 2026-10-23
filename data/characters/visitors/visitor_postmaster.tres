@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_postmaster.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_postmaster"
+display_name = "Postmaster"
+years = "1930s"
+affiliation = "Park visitor"
+bio = "An everyday worker carrying the Valley's mail in the 1930s. Not a historical figure."
+idle_lines = PackedStringArray("Postcards of Half Dome, all day long. I could draw it from memory.", "The mail stage comes up from El Portal every morning, snow or no snow.", "Write home! Your mother would like to know you haven't fallen off anything.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Yosemite Valley"
+visitor = true

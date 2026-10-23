@@ -14,6 +14,8 @@
 [ext_resource type="PackedScene" path="res://scenes/story/pickup.tscn" id="12_r"]
 [ext_resource type="Script" path="res://scripts/world/firefall.gd" id="13_r"]
 [ext_resource type="Resource" path="res://data/routes/glacier_point_apron.tres" id="14_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_lifeguard.tres" id="tt_visitor_lifeguard"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_housekeeper.tres" id="tt_visitor_housekeeper"]
 
 [node name="CurryVillageStory" type="Node2D"]
 
@@ -27,23 +29,27 @@ character = ExtResource("3_r")
 spot = "campsite_center"
 offset = Vector2(-20, 40)
 wander_radius = 48
+timetable = PackedStringArray("7:00 campsite_center", "8:30 store_door", "10:00 plaza", "12:30 pool_side", "15:00 orchard", "17:30 plaza", "19:30 amphitheater")
 
 [node name="VisitorPavilionCook" parent="." instance=ExtResource("1_r")]
 character = ExtResource("4_r")
 spot = "pavilion_door"
 offset = Vector2(40, 4)
+timetable = PackedStringArray("7:00 campsite_west", "7:40 pavilion_door", "14:00 store_door", "15:00 pavilion_door", "19:30 plaza")
 
 [node name="VisitorRanger" parent="." instance=ExtResource("1_r")]
 character = ExtResource("5_r")
 spot = "amphitheater"
 offset = Vector2(-12, -8)
 wander_radius = 40
+timetable = PackedStringArray("7:00 campsite_east", "8:00 registration_porch", "10:00 apron_trailhead", "13:00 pool_side", "15:30 plaza", "18:30 amphitheater")
 
 [node name="VisitorTourist" parent="." instance=ExtResource("1_r")]
 character = ExtResource("6_r")
 spot = "plaza"
 offset = Vector2(-40, 60)
 wander_radius = 80
+timetable = PackedStringArray("7:00 campsite_east", "8:00 pavilion_door", "9:30 plaza", "11:00 apron_trailhead", "13:00 pavilion_door", "14:30 pool_side", "17:00 plaza", "19:00 amphitheater")
 
 [node name="JulesEichorn" parent="." instance=ExtResource("1_r")]
 character = ExtResource("7_r")
@@ -77,3 +83,13 @@ found_text = "Somebody's rental shoes from the Mountain Shop, left outside a ten
 [node name="Firefall" type="Node2D" parent="."]
 position = Vector2(1960, 16)
 script = ExtResource("13_r")
+
+[node name="VisitorLifeguard" parent="." instance=ExtResource("1_r")]
+character = ExtResource("tt_visitor_lifeguard")
+wander_radius = 48
+timetable = PackedStringArray("7:00 campsite_west", "9:30 pool_side", "12:30 pavilion_door", "13:30 pool_side", "18:00 plaza")
+
+[node name="VisitorHousekeeper" parent="." instance=ExtResource("1_r")]
+character = ExtResource("tt_visitor_housekeeper")
+wander_radius = 40
+timetable = PackedStringArray("7:00 campsite_center", "7:30 campsite_west", "9:30 campsite_center", "11:30 campsite_east", "13:00 pavilion_door", "14:30 store_door", "16:00 registration_porch", "18:30 plaza")

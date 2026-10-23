@@ -19,13 +19,22 @@ func _ready() -> void:
 	add_child(Footfall.new())
 
 
-## The interactable in front of the player, or null.
+## The interactable in front of the player, or null. When several overlap
+## (a person by a sign), the one nearest the middle of the reach wins, so the
+## prompt names what you're facing rather than whichever came first.
 func get_target() -> Node:
+	var best: Node = null
+	var best_distance := INF
+	var reach := interaction_area.global_position
 	for area in interaction_area.get_overlapping_areas():
 		var target := area.get_parent()
-		if target.has_method("interact"):
-			return target
-	return null
+		if not target.has_method("interact"):
+			continue
+		var distance := reach.distance_squared_to(area.global_position)
+		if distance < best_distance:
+			best = target
+			best_distance = distance
+	return best
 
 
 ## A short verb for [param target], shown in the HUD prompt ("Talk", "Read").

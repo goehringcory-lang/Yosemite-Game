@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_lifeguard.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_lifeguard"
+display_name = "Lifeguard"
+years = "1950s"
+affiliation = "Park visitor"
+bio = "An everyday worker at the Curry Village pool in the 1950s. Not a historical figure."
+idle_lines = PackedStringArray("Walk on the deck, please! It's granite under there, and granite doesn't forgive.", "That water comes off the snow. Nobody stays in long.", "In winter they drain it and flood the deck for skating. Same job, warmer coat.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Curry Village"
+visitor = true
