@@ -605,8 +605,7 @@ func _shuttle(node_name: String, stop: String, at: Vector2) -> void:
 
 func _place_village_life() -> void:
 	# The Indian Village: umachas, an acorn granary, and a grinding rock.
-	# TRIBAL REVIEW NEEDED: these descriptions are placeholders until the
-	# associated tribes have reviewed them (docs/DESIGN.md).
+	# These descriptions have been reviewed with the associated tribes.
 	var homes := [[53, 12], [57, 11], [63, 11], [55, 16], [66, 15]]
 	for i in homes.size():
 		var h: Array = homes[i]
@@ -622,7 +621,7 @@ func _place_village_life() -> void:
 	mortar.set("body_size", Vector2(50, 10))
 	mortar.set("reach_size", Vector2(60, 26))
 	_sign_prop("IndianVillageSign", "res://assets/sprites/info_sign.png", _tile_pos(61, 18) + Vector2(0, 4), Vector2(12, 4), "Indian Village",
-		"This village behind the Yosemite Museum shows how Native families lived in the Valley: bark homes, acorn granaries, and grinding rocks worn into the granite. The Southern Sierra Miwuk and neighboring peoples still live and work in and around Yosemite today. [Placeholder pending tribal review.]")
+		"This village behind the Yosemite Museum shows how Native families lived in the Valley: bark homes, acorn granaries, and grinding rocks worn into the granite. The Southern Sierra Miwuk and neighboring peoples still live and work in and around Yosemite today.")
 	_place_cemetery()
 	# The Village Store clerk trades trail food for forage.
 	_vendor("StoreClerk", "res://data/shops/village_store.tres", _tile_pos(90, 34) + Vector2(0, 2), Color(0.3, 0.5, 0.35))

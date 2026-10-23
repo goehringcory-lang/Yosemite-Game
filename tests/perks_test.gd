@@ -231,7 +231,7 @@ func test_toast_and_journal(world: Node) -> void:
 	check("Perks: what the valley taught you (%d of %d)" % [Perks.earned.size(), Perks.PERKS.size()] in lines, "the Journal counts your perks")
 	check("Muir's Stride: You walk a little faster." in lines, "an earned perk shows its effect")
 	check(lines.any(func(l: String) -> bool: return "John Muir walked" in l), "...and its line of history")
-	check(lines.any(func(l: String) -> bool: return "Tabuce" in l and "tribal review" in l), "Tabuce's perk is marked for tribal review")
+	check(lines.any(func(l: String) -> bool: return "Tabuce" in l) and not lines.any(func(l: String) -> bool: return "Tabuce" in l and "tribal review" in l), "Tabuce's perk is listed, with no review flag")
 
 
 func test_save_and_load() -> void:

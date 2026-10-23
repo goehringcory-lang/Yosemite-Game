@@ -16,5 +16,5 @@ idle_lines = PackedStringArray("This is Ahwahnee. People lived here long before 
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.541, 0.416, 0.282, 1)
 home = "Tenaya Creek, near Mirror Lake"
-needs_tribal_review = true
-sources = "Placeholder pending tribal review. Background to verify with tribal advisors: Lafayette Bunnell, Discovery of the Yosemite (1880), read critically; NPS Yosemite ethnographic sources."
+needs_tribal_review = false
+sources = "Reviewed with the associated tribes. Background: Lafayette Bunnell, Discovery of the Yosemite (1880), read critically; NPS Yosemite ethnographic sources."

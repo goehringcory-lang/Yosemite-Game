@@ -4,8 +4,8 @@ extends RefCounted
 ##
 ## Looks follow each person's era and documented photographs where they
 ## exist. Native people are drawn in the everyday clothes they wore in
-## photographs of their time, never regalia. Their looks are placeholders
-## pending tribal review, like their dialogue.
+## photographs of their time, never regalia. Their looks have been reviewed
+## with the associated tribes, like their dialogue.
 ##
 ## Keys (all optional):
 ##   skin, hair, eyes           hex colors

@@ -15,7 +15,7 @@ This is the full cast of people the player meets, where they live in the park, a
   godot --headless --path . --import
   ```
   You can replace any PNG with hand-drawn art in the same layout.
-- Looks follow each person's era and period photographs. Native people are drawn in the everyday clothes they wore in photos from their time, **never regalia**. Their looks are placeholders pending tribal review, like their dialogue.
+- Looks follow each person's era and period photographs. Native people are drawn in the everyday clothes they wore in photos from their time, **never regalia**. Their looks have been through tribal review, like their dialogue.
 - Story item icons are in `assets/sprites/story_items.png`, drawn by the same tool. The sequoia cone and the flour sack are hand-drawn in `assets/sprites/side_quest_items.png`.
 
 ## Placing people
@@ -33,7 +33,7 @@ NPCs go in a hub's story overlay (`scenes/story/content/<hub>.tscn`). Each NPC h
 
 ## The cast
 
-✦ = flagged `needs_tribal_review`. Their dialogue is marked **[Placeholder dialogue pending tribal review]** and must be written or approved with the associated tribes before release.
+✦ = Native characters. Their looks, dialogue and Register entries have been through tribal review with the associated tribes. Anything new written for them gets the same review first, and carries `needs_tribal_review` until it has.
 
 | Person | Years | Where | Gives |
 |---|---|---|---|
@@ -290,8 +290,8 @@ The Mountain Shop and Camp 4 traders sell more of the same pieces for food (cams
 
 ## Before release
 
-- **Tribal review** for Tenaya, Tabuce, Lucy Telles, Maria Lebrado, and Carrie Bethel: their looks, dialogue, the acorn and pine nut practices, and the Register entries about Ahwahnee and the village sites. It covers whether each person appears at all.
-- **Tribal review, side stories:** Hodges's *Bear Season* speaks of storing acorns in a chuckah (part of the acorn-practice review), and Muir's *A Fire at Soda Springs* and its Register note say the 1890 park was drawn without asking the Native people who lived there. Neither puts words in a Native person's mouth, but both describe Native life and should go through the same review.
+- **Tribal review** is done for Tenaya, Tabuce, Lucy Telles, Maria Lebrado, and Carrie Bethel (their looks, dialogue, the acorn and pine nut practices, and the Register entries about Ahwahnee and the village sites), for the side stories that describe Native life (Hodges's *Bear Season*, Muir's *A Fire at Soda Springs*), and for the Indian Village, the Museum's weavers panel and the Ahwahnee's patterns.
+- **Still to write with the tribes:** what those five say in the finale at the mirror (`GuardianMirror`, still a placeholder line), and whether they're part of that scene.
 - **Verify** every character's `sources`, and fill in the blank dates (Degnan, McCauley, Tabuce).
 - **Verify the side-story Register notes:** Clark in the Mariposa Grove (1857) and the start of prescribed fire in the groves (early 1970s); Enid Michael's start as a ranger-naturalist (1921) and her Yosemite Nature Notes; bear feeding shows (1920s to 1940) and the date of the last Yosemite grizzly (usually given as 1895); the Yosemite Valley Railroad (1907 to 1945, year-round to El Portal); Muir and Robert Underwood Johnson at Soda Springs (1889); the tin cup, tea, and dried bread Muir is said to have carried.
 - **Permission:** Royal Robbins's family (he died in 2017).

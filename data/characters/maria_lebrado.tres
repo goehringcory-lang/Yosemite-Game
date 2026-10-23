@@ -16,5 +16,5 @@ idle_lines = PackedStringArray("I was a girl when they came. I remember where ev
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.165, 0.165, 0.188, 1)
 home = "The meadow by the Ahwahnee"
-needs_tribal_review = true
-sources = "Placeholder pending tribal review. To verify with tribal advisors: NPS records of the 1929 visit; Yosemite Nature Notes (1929)."
+needs_tribal_review = false
+sources = "Reviewed with the associated tribes. NPS records of the 1929 visit; Yosemite Nature Notes (1929)."
