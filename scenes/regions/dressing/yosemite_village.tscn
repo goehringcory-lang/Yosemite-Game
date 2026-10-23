@@ -1,0 +1,239 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/newspaper_rack.png" id="1_tnvcd"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/mailbox.png" id="2_e1i0f"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/trash_can.png" id="3_kho8d"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/sandwich_board.png" id="4_bfpyu"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/firewood.png" id="5_btccn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/ice_chest.png" id="6_hd30b"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/barrel.png" id="7_4fp2p"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/crate_stack.png" id="8_6w4ti"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/milk_cans.png" id="9_mptq4"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/picnic_table.png" id="10_vpm2p"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/flower_bed_1.png" id="11_q3vrn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/flower_bed_0.png" id="12_42uu8"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/worn_patch_a.png" id="13_1aq40"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/worn_patch_b.png" id="14_qv2ev"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w2wc0"]
+size = Vector2(14, 6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o0qn3"]
+size = Vector2(16, 6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2ly6m"]
+size = Vector2(16, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_iw0bs"]
+size = Vector2(16, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0ta62"]
+size = Vector2(16, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g8e60"]
+size = Vector2(18, 6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_h1stf"]
+size = Vector2(30, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6sdbb"]
+size = Vector2(34, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u8tf6"]
+size = Vector2(20, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xsv0t"]
+size = Vector2(38, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hcyaq"]
+size = Vector2(26, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j68ww"]
+size = Vector2(54, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qo3ug"]
+size = Vector2(62, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gacfv"]
+size = Vector2(62, 10)
+
+[node name="Dressing" type="Node2D" unique_id=1283436241]
+y_sort_enabled = true
+
+[node name="NewspaperRack1" type="StaticBody2D" parent="." unique_id=1111527592]
+position = Vector2(1716, 748)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="NewspaperRack1" unique_id=614544564]
+texture = ExtResource("1_tnvcd")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="NewspaperRack1" unique_id=1300121793]
+position = Vector2(0, -3)
+shape = SubResource("RectangleShape2D_w2wc0")
+
+[node name="Mailbox1" type="StaticBody2D" parent="." unique_id=2079283363]
+position = Vector2(2664, 748)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Mailbox1" unique_id=220788552]
+texture = ExtResource("2_e1i0f")
+offset = Vector2(0, -18)
+
+[node name="Collision" type="CollisionShape2D" parent="Mailbox1" unique_id=398968686]
+position = Vector2(0, -3)
+shape = SubResource("RectangleShape2D_o0qn3")
+
+[node name="TrashCan1" type="StaticBody2D" parent="." unique_id=1600344324]
+position = Vector2(1850, 806)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TrashCan1" unique_id=841680369]
+texture = ExtResource("3_kho8d")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="TrashCan1" unique_id=640719683]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_2ly6m")
+
+[node name="TrashCan2" type="StaticBody2D" parent="." unique_id=1769065175]
+position = Vector2(2652, 806)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TrashCan2" unique_id=17781175]
+texture = ExtResource("3_kho8d")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="TrashCan2" unique_id=1525536807]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_iw0bs")
+
+[node name="TrashCan3" type="StaticBody2D" parent="." unique_id=755312713]
+position = Vector2(2160, 1094)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TrashCan3" unique_id=935184184]
+texture = ExtResource("3_kho8d")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="TrashCan3" unique_id=1917006622]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_0ta62")
+
+[node name="SandwichBoard1" type="StaticBody2D" parent="." unique_id=1551766840]
+position = Vector2(2444, 1058)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="SandwichBoard1" unique_id=1871885150]
+texture = ExtResource("4_bfpyu")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="SandwichBoard1" unique_id=280708688]
+position = Vector2(0, -3)
+shape = SubResource("RectangleShape2D_g8e60")
+
+[node name="Firewood1" type="StaticBody2D" parent="." unique_id=408629610]
+position = Vector2(2760, 1068)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Firewood1" unique_id=148782352]
+texture = ExtResource("5_btccn")
+offset = Vector2(0, -15)
+
+[node name="Collision" type="CollisionShape2D" parent="Firewood1" unique_id=2000293340]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_h1stf")
+
+[node name="IceChest1" type="StaticBody2D" parent="." unique_id=1962012696]
+position = Vector2(3010, 1072)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="IceChest1" unique_id=1424976388]
+texture = ExtResource("6_hd30b")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="IceChest1" unique_id=62064596]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_6sdbb")
+
+[node name="Barrel1" type="StaticBody2D" parent="." unique_id=897695070]
+position = Vector2(2732, 1112)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Barrel1" unique_id=2077239337]
+texture = ExtResource("7_4fp2p")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="Barrel1" unique_id=1979034947]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_u8tf6")
+
+[node name="CrateStack1" type="StaticBody2D" parent="." unique_id=1166845835]
+position = Vector2(3086, 1036)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="CrateStack1" unique_id=1939163083]
+texture = ExtResource("8_6w4ti")
+offset = Vector2(0, -22)
+
+[node name="Collision" type="CollisionShape2D" parent="CrateStack1" unique_id=537734181]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_xsv0t")
+
+[node name="MilkCans1" type="StaticBody2D" parent="." unique_id=1403225906]
+position = Vector2(3060, 1062)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="MilkCans1" unique_id=678128247]
+texture = ExtResource("9_mptq4")
+offset = Vector2(0, -15)
+
+[node name="Collision" type="CollisionShape2D" parent="MilkCans1" unique_id=2052667666]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_hcyaq")
+
+[node name="PicnicTable1" type="StaticBody2D" parent="." unique_id=603225798]
+position = Vector2(2480, 1024)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="PicnicTable1" unique_id=1605654806]
+texture = ExtResource("10_vpm2p")
+offset = Vector2(0, -18)
+
+[node name="Collision" type="CollisionShape2D" parent="PicnicTable1" unique_id=1342721832]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_j68ww")
+
+[node name="FlowerBed11" type="StaticBody2D" parent="." unique_id=750863303]
+position = Vector2(1780, 852)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="FlowerBed11" unique_id=2106464777]
+texture = ExtResource("11_q3vrn")
+offset = Vector2(0, -12)
+
+[node name="Collision" type="CollisionShape2D" parent="FlowerBed11" unique_id=1643116332]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_qo3ug")
+
+[node name="FlowerBed01" type="StaticBody2D" parent="." unique_id=442308894]
+position = Vector2(2530, 852)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="FlowerBed01" unique_id=183430235]
+texture = ExtResource("12_42uu8")
+offset = Vector2(0, -12)
+
+[node name="Collision" type="CollisionShape2D" parent="FlowerBed01" unique_id=119512500]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_gacfv")
+
+[node name="WornPatchA1" type="Sprite2D" parent="." unique_id=1733672037]
+position = Vector2(2240, 0)
+texture = ExtResource("13_1aq40")
+offset = Vector2(0, 988)
+
+[node name="WornPatchB1" type="Sprite2D" parent="." unique_id=994173958]
+position = Vector2(2960, 0)
+texture = ExtResource("14_qv2ev")
+offset = Vector2(0, 852)

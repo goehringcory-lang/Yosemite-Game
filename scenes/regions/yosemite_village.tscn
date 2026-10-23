@@ -153,6 +153,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_duff_1.png" id="151_q4ehg"]
 [ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_duff_2.png" id="152_6iamc"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/lamp_wrought_glow.png" id="153_1u4bw"]
+[ext_resource type="PackedScene" path="res://scenes/regions/dressing/yosemite_village.tscn" id="dressing_1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yond7"]
 size = Vector2(184, 50.16)
@@ -1432,6 +1433,8 @@ script = ExtResource("4_2aix4")
 
 [node name="Entities" type="Node2D" parent="." unique_id=1099651843]
 y_sort_enabled = true
+
+[node name="Dressing" parent="Entities" instance=ExtResource("dressing_1")]
 
 [node name="WelcomeCenter" type="StaticBody2D" parent="Entities" unique_id=1537483678]
 position = Vector2(1808, 704)

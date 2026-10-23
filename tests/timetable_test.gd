@@ -1,6 +1,7 @@
 extends Node
-## Checks the people who keep a timetable (NPC.timetable): the walk grid
-## routes round buildings, every stop in each town is reachable from every
+## Checks the people who keep a timetable (NPC.timetable) and the towns
+## they walk through: each town is dressed with its clutter, the walk grid
+## routes round buildings (and the clutter), every stop in each town is reachable from every
 ## other, and a visitor walks to each stop when its time comes, walks home
 ## at night and goes in, and comes back out of home in the morning.
 ## Run: godot --headless --path . res://tests/timetable_test.tscn
@@ -50,6 +51,8 @@ func test_town(world: Node) -> void:
 	var start := Time.get_ticks_msec()
 	var grid := WalkGrid.of(region)
 	print("      walk grid for %s built in %d ms" % [town, Time.get_ticks_msec() - start])
+	var dressing := region.get_node_or_null("Entities/Dressing")
+	check(dressing != null and dressing.get_child_count() >= 15, "%s is dressed with the town clutter (%d pieces)" % [town, dressing.get_child_count() if dressing else 0])
 	var keepers := _keepers(region)
 	check(keepers.size() >= 4, "%s has people keeping a timetable (%d)" % [town, keepers.size()])
 	# Every stop anyone keeps is reachable from every other.

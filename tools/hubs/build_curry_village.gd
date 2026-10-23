@@ -266,6 +266,8 @@ func _build_village() -> void:
 	_place_orchard()
 	_place_markers_and_exits()
 	_dress_village()
+	# the town clutter (tools/hubs/dress_towns.gd), in world pixels already
+	instance_scene("res://scenes/regions/dressing/curry_village.tscn", Vector2.ZERO, "Dressing")
 	place_blockers()
 	add_forage("curry_village", 3.0)
 	pack(_root, VILLAGE_SCENE)
