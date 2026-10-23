@@ -119,7 +119,7 @@ const PAGES: Array[Dictionary] = [
 const HISTORY := {
 	"tenaya_ahwahnee": "In March 1851 the Mariposa Battalion, a state-backed militia, entered the valley, burned villages and stored food, and forced the Ahwahneechee out. That spring Tenaya's youngest son was killed. Tenaya's words in this game are a placeholder pending tribal review by the associated tribes. Bunnell's Discovery of the Yosemite (1880), written by a Battalion member, has to be read critically.",
 	"lebrado_villages": "Documented: in 1929 Maria Lebrado, Tenaya's granddaughter, came back to the valley and identified village sites for park staff. Which sites, and how her account is told, waits on tribal review; her words here are a placeholder.",
-	"clark_register": "Documented: Lincoln signed the Yosemite Grant on June 30, 1864, and the state's commissioners named Galen Clark Guardian in 1866. Dramatized: the Register itself, which is invented for the game, and Clark's words.",
+	"clark_register": "Documented: Lincoln signed the Yosemite Grant on June 30, 1864, and the state's commissioners named Galen Clark Guardian in 1866. Dramatized: the Register itself and the missing Guardian, which are invented for the game, and Clark's words.",
 	"lamon_orchard": "Documented: James Lamon settled at the upper end of the valley around 1859 and planted apple trees there; some still grow near Curry Village. His words here are dramatized.",
 	"tabuce_chuckah": "Documented: Maggie Howard (Tabuce) demonstrated acorn preparation and basketry for visitors at the Yosemite Museum for many years. The steps here are simplified for the game, and how they're told waits on tribal review.",
 	"degnan_bread": "Documented: Bridget and John Degnan settled in the valley in 1884, and the bread she baked in her kitchen grew into Degnan's bakery and store. Dramatized: her deliveries to climbers, who came decades later.",
@@ -151,7 +151,7 @@ const HISTORY := {
 	"hodges_herbarium": "Documented: California appointed Guardians of the Yosemite Grant from 1866 until the Valley was returned to the federal government in 1906. Galen Clark served twice, with James Hutchings and Walter Dennison among those between his terms. Dramatized: the station herbarium and Hodges's files.",
 	"clark_grove_sprigs": "Documented: Galen Clark chose his own grave in the Yosemite Valley cemetery and planted giant sequoia seedlings around it, years before he died in 1910. Dramatized: the tin box under the Royal Arches.",
 	"muir_cassiope": "Documented: Muir wrote of hunting for Cassiope, the white mountain heather, in his first Sierra summer (1869), and of meeting it in bloom on a later trip into the high country. Dramatized: the errand, and his words here.",
-	"lost_guardian": "Invented for the game: there was no lost Guardian, no cave, and no mirror. Documented: the Guardian's office ended in 1906, and this valley has been looked after by a great many people before, during, and since, the seven traditionally associated tribes first among them.",
+	"lost_guardian": "Invented for the game: there was no missing Guardian, no cave, and no mirror, and the sightings people pass on are the game's. Documented: the Guardian's office ended in 1906, and this valley has been looked after by a great many people before, during, and since, the seven traditionally associated tribes first among them.",
 }
 
 
