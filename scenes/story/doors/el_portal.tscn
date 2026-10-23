@@ -1,0 +1,102 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/building_door.gd" id="1_vay6g"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oaywj"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4cjoh"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g3y6b"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_uiiyy"]
+size = Vector2(56, 44)
+
+[node name="ElPortalDoors" type="Node2D" unique_id=1947930021]
+
+[node name="DoorToElPortalMarket" type="StaticBody2D" parent="." unique_id=1184677688]
+position = Vector2(1680, 704)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_vay6g")
+open_hour = 7
+close_hour = 21
+label = "El Portal Market"
+target_region = "el_portal_market"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToElPortalMarket" unique_id=1985811873]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToElPortalMarket/Hitbox" unique_id=258679487]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_oaywj")
+
+[node name="el_portal_market_door" type="Marker2D" parent="." unique_id=1001038146]
+position = Vector2(1680, 744)
+
+[node name="DoorToElPortalPostOffice" type="StaticBody2D" parent="." unique_id=163235309]
+position = Vector2(2032, 704)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_vay6g")
+open_hour = 9
+close_hour = 17
+label = "El Portal Post Office"
+target_region = "el_portal_post_office"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToElPortalPostOffice" unique_id=1407481304]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToElPortalPostOffice/Hitbox" unique_id=1152456446]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_4cjoh")
+
+[node name="el_portal_post_office_door" type="Marker2D" parent="." unique_id=154695855]
+position = Vector2(2032, 744)
+
+[node name="DoorToYosemiteViewLodge" type="StaticBody2D" parent="." unique_id=241894118]
+position = Vector2(368, 1056)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_vay6g")
+label = "Yosemite View Lodge"
+target_region = "yosemite_view_lodge"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToYosemiteViewLodge" unique_id=1474019237]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToYosemiteViewLodge/Hitbox" unique_id=1549796484]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_g3y6b")
+
+[node name="yosemite_view_lodge_door" type="Marker2D" parent="." unique_id=1633241165]
+position = Vector2(368, 1096)
+
+[node name="DoorToYosemiteViewLodge2" type="StaticBody2D" parent="." unique_id=329200712]
+position = Vector2(720, 1056)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_vay6g")
+label = "Yosemite View Lodge"
+target_region = "yosemite_view_lodge"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToYosemiteViewLodge2" unique_id=416692368]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToYosemiteViewLodge2/Hitbox" unique_id=1884034740]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_uiiyy")

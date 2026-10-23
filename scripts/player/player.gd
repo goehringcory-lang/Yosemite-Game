@@ -19,13 +19,19 @@ func _ready() -> void:
 	add_child(Footfall.new())
 
 
-## The interactable in front of the player, or null.
+## The interactable in front of the player, or null. One with a higher
+## interact_priority wins (a building's door over the building's sign).
 func get_target() -> Node:
+	var best: Node = null
+	var best_priority := -1
 	for area in interaction_area.get_overlapping_areas():
 		var target := area.get_parent()
 		if target.has_method("interact"):
-			return target
-	return null
+			var priority: int = target.get("interact_priority") if "interact_priority" in target else 0
+			if priority > best_priority:
+				best = target
+				best_priority = priority
+	return best
 
 
 ## A short verb for [param target], shown in the HUD prompt ("Talk", "Read").

@@ -1,0 +1,285 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/building_door.gd" id="1_y2tvg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jec2t"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tjtpg"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sgl2m"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lb6a7"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_k5iw2"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3x4go"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_uc6uq"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t623x"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x770y"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qfe7v"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hrl8j"]
+size = Vector2(56, 44)
+
+[node name="WawonaDoors" type="Node2D" unique_id=756699361]
+
+[node name="DoorToWawonaStore" type="StaticBody2D" parent="." unique_id=1178514435]
+position = Vector2(1616, 544)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_y2tvg")
+open_hour = 8
+close_hour = 20
+label = "Wawona Store"
+target_region = "wawona_store"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToWawonaStore" unique_id=1756360474]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToWawonaStore/Hitbox" unique_id=1692103635]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_jec2t")
+
+[node name="wawona_store_door" type="Marker2D" parent="." unique_id=1154733513]
+position = Vector2(1616, 584)
+
+[node name="DoorToWawonaHotelLobby" type="StaticBody2D" parent="." unique_id=1263364842]
+position = Vector2(720, 1152)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_y2tvg")
+label = "Wawona Hotel"
+target_region = "wawona_hotel_lobby"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToWawonaHotelLobby" unique_id=1968214745]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToWawonaHotelLobby/Hitbox" unique_id=688219055]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_tjtpg")
+
+[node name="wawona_hotel_lobby_door" type="Marker2D" parent="." unique_id=1100974964]
+position = Vector2(720, 1192)
+
+[node name="DoorToHillStudio" type="StaticBody2D" parent="." unique_id=1083397174]
+position = Vector2(224, 1152)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_y2tvg")
+open_hour = 9
+close_hour = 17
+label = "Thomas Hill's Studio"
+target_region = "hill_studio"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToHillStudio" unique_id=492291367]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToHillStudio/Hitbox" unique_id=1568512766]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_sgl2m")
+
+[node name="hill_studio_door" type="Marker2D" parent="." unique_id=1562010349]
+position = Vector2(224, 1192)
+
+[node name="DoorToClarkCottage" type="StaticBody2D" parent="." unique_id=1752843855]
+position = Vector2(944, 1696)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_y2tvg")
+label = "Clark Cottage"
+target_region = "clark_cottage"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToClarkCottage" unique_id=1733929572]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToClarkCottage/Hitbox" unique_id=1632714261]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_lb6a7")
+
+[node name="clark_cottage_door" type="Marker2D" parent="." unique_id=1516372624]
+position = Vector2(944, 1736)
+
+[node name="DoorToWashburnCottage" type="StaticBody2D" parent="." unique_id=1472969782]
+position = Vector2(432, 1696)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_y2tvg")
+label = "Washburn Cottage"
+target_region = "washburn_cottage"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToWashburnCottage" unique_id=1217001450]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToWashburnCottage/Hitbox" unique_id=1810907583]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_k5iw2")
+
+[node name="washburn_cottage_door" type="Marker2D" parent="." unique_id=1349868953]
+position = Vector2(432, 1736)
+
+[node name="DoorToHodgdonCabin" type="StaticBody2D" parent="." unique_id=335720353]
+position = Vector2(2240, 288)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_y2tvg")
+open_hour = 9
+close_hour = 17
+label = "Hodgdon Homestead Cabin"
+target_region = "hodgdon_cabin"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToHodgdonCabin" unique_id=553257433]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToHodgdonCabin/Hitbox" unique_id=509331329]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_3x4go")
+
+[node name="hodgdon_cabin_door" type="Marker2D" parent="." unique_id=890176157]
+position = Vector2(2240, 328)
+
+[node name="DoorToWellsFargo" type="StaticBody2D" parent="." unique_id=1905309931]
+position = Vector2(2432, 288)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_y2tvg")
+open_hour = 9
+close_hour = 17
+label = "Wells Fargo Office"
+target_region = "wells_fargo"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToWellsFargo" unique_id=1202712084]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToWellsFargo/Hitbox" unique_id=761725680]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_uc6uq")
+
+[node name="wells_fargo_door" type="Marker2D" parent="." unique_id=580654413]
+position = Vector2(2432, 328)
+
+[node name="DoorToArtistStudio" type="StaticBody2D" parent="." unique_id=1348268910]
+position = Vector2(2624, 288)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_y2tvg")
+open_hour = 9
+close_hour = 17
+label = "Artist's Studio"
+target_region = "artist_studio"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToArtistStudio" unique_id=2095173578]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToArtistStudio/Hitbox" unique_id=804885420]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_t623x")
+
+[node name="artist_studio_door" type="Marker2D" parent="." unique_id=228090102]
+position = Vector2(2624, 328)
+
+[node name="DoorToBlacksmithShop" type="StaticBody2D" parent="." unique_id=1225257665]
+position = Vector2(2560, 608)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_y2tvg")
+open_hour = 9
+close_hour = 17
+label = "Blacksmith's Shop"
+target_region = "blacksmith_shop"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToBlacksmithShop" unique_id=2059716368]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToBlacksmithShop/Hitbox" unique_id=935669413]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_x770y")
+
+[node name="blacksmith_shop_door" type="Marker2D" parent="." unique_id=858104476]
+position = Vector2(2560, 648)
+
+[node name="DoorToWawonaJail" type="StaticBody2D" parent="." unique_id=1500776543]
+position = Vector2(2736, 480)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_y2tvg")
+open_hour = 9
+close_hour = 17
+label = "Jail"
+target_region = "wawona_jail"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToWawonaJail" unique_id=485259318]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToWawonaJail/Hitbox" unique_id=351808407]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_qfe7v")
+
+[node name="wawona_jail_door" type="Marker2D" parent="." unique_id=1007787759]
+position = Vector2(2736, 520)
+
+[node name="DoorToGroveMuseum" type="StaticBody2D" parent="." unique_id=705900181]
+position = Vector2(3792, 2144)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_y2tvg")
+open_hour = 9
+close_hour = 17
+label = "Mariposa Grove Museum"
+target_region = "grove_museum"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToGroveMuseum" unique_id=1645749492]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToGroveMuseum/Hitbox" unique_id=647777626]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_hrl8j")
+
+[node name="grove_museum_door" type="Marker2D" parent="." unique_id=1609105501]
+position = Vector2(3792, 2184)
