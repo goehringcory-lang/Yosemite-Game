@@ -64,5 +64,7 @@ and station code.
   `migrate_built.py` on the scene it wrote).
 - Detail is derived from the 16px drawings (smoothed, re-colored, shaded), not
   redrawn by hand, so shapes are the originals' shapes.
-  The exception is the Ahwahnee's six interior rooms and their furniture,
-  painted natively at 32px in the palette by `tools/hubs/ahwahnee32/`.
+  The exception is the interiors: the Ahwahnee's six rooms and their
+  furniture are painted natively at 32px in the palette by
+  `tools/hubs/ahwahnee32/`, and every other room, the Camp Curry Store, the
+  Mountain Shop and the furniture they share by `tools/hubs/interiors32/`.

@@ -4,7 +4,9 @@
 # the 32px palette art (tools/art32/upgrade.py --fresh), moves the room scenes
 # it wrote onto the 32px grid (tools/art32/migrate_built.py), paints the
 # Ahwahnee's six rooms and their furniture natively at 32px over what the
-# builder drew for them (tools/hubs/ahwahnee32/paint.py), and re-imports.
+# builder drew for them (tools/hubs/ahwahnee32/paint.py), does the same for
+# every other room, the Camp Curry Store and Mountain Shop, and the furniture
+# they share (tools/hubs/interiors32/paint.py), and re-imports.
 # The doors outside (scenes/story/doors/) are written in 32px already.
 #
 #   tools/hubs/rebuild_interiors.sh
@@ -23,4 +25,5 @@ mapfile -t rooms < <(find scenes/regions -maxdepth 1 -name '*.tscn' -newer "$sta
 "$PYTHON" tools/art32/upgrade.py --fresh "${fresh[@]}"
 "$PYTHON" tools/art32/migrate_built.py "${rooms[@]}" --fresh "${fresh[@]}"
 "$PYTHON" tools/hubs/ahwahnee32/paint.py
+"$PYTHON" tools/hubs/interiors32/paint.py
 "$GODOT" --headless --path . --import > /dev/null 2>&1 || true
