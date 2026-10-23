@@ -12,6 +12,8 @@ const SIZE := 32
 const FRAME := 30
 ## Pixels in from the frame's edge where the inset starts.
 const INSET := 6
+## The nine-slice margin the theme keeps unstretched.
+const STRETCH_MARGIN := 8
 
 const OUTLINE := "150d07"
 const OUTLINE_LIT := "2e1d0f"
@@ -113,11 +115,13 @@ func _frame(im: Image, top: Color, bottom: Color, planks: bool) -> void:
 	_studs(im)
 
 
-## One pixel of the inset: a warm gradient, or planks laid in staggered rows.
+## One pixel of the inset: a lit top edge over a flat fill, or planks laid in
+## staggered rows. The lit edge stays inside the 8 px the theme never
+## stretches: the stretched middle is one color, or a stripe of the lighter
+## tone would grow with the panel and cut through its first line of text.
 func _inside(x: int, y: int, top: Color, bottom: Color, planks: bool) -> Color:
 	if not planks:
-		var g := clampf(float(y - INSET) / float(FRAME - 2 * INSET), 0.0, 1.0)
-		return top.lerp(bottom, g)
+		return top if y < STRETCH_MARGIN else bottom
 	var row := y - INSET
 	var course := row / 6
 	if row % 6 == 0:

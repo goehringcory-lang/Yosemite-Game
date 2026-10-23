@@ -104,6 +104,11 @@ A seventh and an eighth review (after the game was named Valley Days) scored 6 a
 - **The climb.** Slab holds are readable, the energy bar has a bolt instead of an "E", and move costs are no longer green.
 - **Music.** Each season has a second, afternoon piece.
 
+A later pass found two more things:
+
+- **A stripe through every menu's first line.** The panel's inset was a gradient that the 42-color palette snapped into two tones, and the lighter tone's last two rows fell in the part of the nine-slice that stretches, so a band one eighth of the panel's height cut through the Journal's and Backpack's first headings and the day's page's subtitle. The lit edge now stays in the unstretched margin and the middle is one color (`tools/ui/ui_art.gd`; test: each panel's middle is flat).
+- **The prompt could name the wrong thing.** With a person beside a sign, the use prompt named whichever overlapped first. It now names the one nearest the middle of your reach (`Player.get_target`; test: swapping two things swaps the target), and fades in when it changes.
+
 | Stardew hallmark | Here | Where | Checked by |
 |---|---|---|---|
 | A pixel font that matches the art | DotGothic16 by default (SIL Open Font License, credited with its license), with its Latin letters made proportional (`tools/fonts/proportional.py`) after a fourth review found the fixed-width "i" and "l" left gaps ("Vi l lage"); Settings > Font switches to Noto Sans | `Settings.ui_font`, `apply_font` | test (switches the theme and the climbing screen, saved, pixel by default, an i narrower than an m, license present; every screen checked to fit with both fonts) |
