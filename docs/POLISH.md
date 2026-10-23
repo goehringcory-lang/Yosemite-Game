@@ -31,6 +31,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | People stand on the ground | A soft oval shadow under the player, every person and every shopkeeper | `scripts/world/ground_shadow.gd` | shot `polish_gift_prompt.png` |
 | People keep hours | Visitors go home between 8 and 10 PM and come back at 7 AM, fading out and in; about half stay in on rainy days. People with quests keep a day near their spot: at their post first thing, strolling about it from 9 to 5, nearer in the evening, standing at it overnight | `NPC.is_out`, `NPC.roam_radius` | test (home at night and can't be talked to, back in the morning, quest givers stand overnight and stroll by day) |
 | People walk about | Wanderers stroll round their spot (existing) | `npc.gd` | cast test |
+| Villagers keep a timetable | Visitors in Curry Village and Yosemite Village walk a day of stops ("9:00 plaza"): out of home in the morning, to work, lunch and an evening spot, and home again at night, routed round buildings and props on a walk grid. Five townsfolk (a lifeguard, a housekeeper, a postmaster, a baker, a photographer) joined them | `NPC.timetable`, `scripts/world/walk_grid.gd` | `tests/timetable_test.tscn` (every stop reachable from every other, a day played sped up); `tools/shots/timetable_shot.tscn` |
 
 ## Time and place
 
@@ -40,6 +41,8 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | The end-of-day tally | The day's page at bedtime: things found and given with pictures, gear, first ascents, quests, perks, recipes, dishes | `scripts/story/day_log.gd`, `scripts/ui/day_summary.gd` | test (counts, saved with the game, clears each morning, opens and closes); shot `polish_day_summary.png` |
 | Grass that moves as you walk through it | Ferns, bracken, shrubs and flowers sway in a damped wobble with a soft rustle when you brush past | `scripts/world/rustle.gd` | test (walking through sets a fern swaying; it leans, then settles upright) |
 | Critters | Steller's jays, juncos, robins and quail hop and peck, fly off as you come near, and leave at dusk or in rain; butterflies on fair spring and summer days | `scripts/world/critters.gd`, `tools/npcgen/critter_art.gd` | test (by day outdoors only, flee when close, the right birds each season); shot `polish_critters.png` |
+| Towns that look lived in | Crates, barrels, milk cans, trash cans, picnic tables, a mailbox, a newspaper rack, a sandwich board, flower beds, firewood, an ice chest, luggage and worn lawn about both towns' plazas, shop fronts and lawns | `tools/hubs/town_clutter_art.gd`, `tools/hubs/dress_towns.gd`, `scenes/regions/dressing/` | timetable test (both towns dressed, routes still clear) |
+| Cars that stand up | Parked cars in 3/4 view: a cabin with side glass, shaded flanks, a rear face with lights, plate and bumper, tyres under it | `CurryAhwahneeArt.car`, `tools/hubs/draw_cars.gd` | by eye |
 | Seasons you can see | Blossom and leaf drift, seasonal trees and ground, snow, waterfalls that run dry (existing) | `seasonal_*.gd`, `ambient_fx.gd`, `weather.gd` | smoke and audio tests |
 | Night lighting | Windows, lamps, tents and fires glow; fireflies (existing) | `night_light.gd`, `night_glow.gd` | by eye (`docs/camp4_night.png`) |
 | String lights at night | The bulbs strung over Curry Village's plaza glow after dusk with the lit windows | `scripts/world/string_lights.gd` | shot `polish_clock_23.png` |
@@ -117,9 +120,9 @@ A later pass found two more things:
 
 The last five independent reviews scored the game 6 to 6.5 of 10 against Stardew Valley. It is not at Stardew's level. What holds it back, in the reviewers' words and ours:
 
-- **The world is sparser than Stardew's.** Plazas, lawns and lots have less clutter (crates, flower strips, wear paths, edging) than Stardew's dense towns. Curry Village's buildings keep their first size.
-- **People keep close to one spot.** Visitors go home at night, and the people with quests stroll about their spot through the day and stand at it overnight, so their stories are always within a few steps; Stardew's villagers walk full timetables between home, work and the saloon.
+- **The world is still sparser than Stardew's outside the two towns.** Curry Village and Yosemite Village are dressed with clutter now; the smaller areas, the outer hubs and Camp 4 are not, and Curry Village's buildings keep their first size.
+- **Only visitors keep timetables.** Townsfolk walk a day of stops round their town, but the people with quests stroll about their spot through the day and stand at it overnight, so their stories are always within a few steps, and nobody walks from one area to another; Stardew's villagers cross the whole map.
 - **Portraits are laid out on a 40-dot grid** and painted at the 80 px they show at (round shapes and shading at full resolution, eyes and mouths in two-pixel dots), with five-tone shading; Stardew's are 64 px and hand-drawn. Walking sprites are 16x24 (Stardew's are 16x32); the owner chose to keep that as the game's style, and the buildings were scaled to suit it.
-- **No hand-drawn art.** All art is drawn by code in a consistent style; Stardew's is hand-drawn by one artist. Cars are flat next to the 3/4-view buildings.
+- **No hand-drawn art.** All art is drawn by code in a consistent style; Stardew's is hand-drawn by one artist. That needs an artist: code can match a style, not replace one.
 - **The clock is a sky window**, not a dial with a hand.
 - **The music was never listened to.** Everything about it was checked by measurement (pitch, loudness, mix balance, loop seams, the notes of each tune printed and read), not by ear. It needs a human listen, and a composer could do better than a seeded motif generator. Stardew has several pieces a season; here there are two.
