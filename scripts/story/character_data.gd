@@ -36,6 +36,12 @@ extends Resource
 @export var color := Color(0.5, 0.4, 0.3)
 ## Where they spend their days, for the journal: "Degnan's Bakery", "Camp 4".
 @export var home: String
+## Their part in making the park what it is, one plain sentence for the
+## Journal's list of the valley's keepers (GuardianSearch.keepers). Facts
+## only, like [member bio]: what they did, not what they'd say.
+@export_multiline var legacy := ""
+## The year that part began, to put the keepers in order.
+@export var legacy_year := 0
 ## Optional: where they spend their days early in the story, until the quest
 ## [member early_until] is done. Enid Michael keeps the Museum's garden until
 ## the way to Glacier Point opens, then goes up to Sentinel Dome. An NPC node

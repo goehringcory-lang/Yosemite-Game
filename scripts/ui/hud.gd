@@ -29,6 +29,8 @@ var _message_tween: Tween
 var _info_anchor := Vector2.ZERO
 ## True while a menu, map or conversation covers the screen.
 var _covered := false
+## What the use prompt names, so a new target fades its prompt in.
+var _prompt_target: Node
 
 ## Sent when the player switches between keyboard and gamepad, so screens
 ## showing button names can refresh them.
@@ -310,6 +312,11 @@ func _update_prompt() -> void:
 	if _player and _player.can_act and not info_panel.visible and _player.is_inside_tree():
 		target = _player.get_target()
 	prompt_panel.visible = target != null
+	if target != _prompt_target:
+		_prompt_target = target
+		if target:
+			prompt_panel.modulate.a = 0.0
+			create_tween().tween_property(prompt_panel, "modulate:a", 1.0, 0.12)
 	if target == null:
 		return
 	prompt_label.text = "%s  %s" % [interact_button(), Player.prompt_for(target)]

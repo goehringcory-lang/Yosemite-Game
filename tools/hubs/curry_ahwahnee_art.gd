@@ -1032,3 +1032,138 @@ func wood_cabin(variant: int) -> Image:
 	_porch_lamp(im, 19, 24)
 	K.outline(im, RIM)
 	return im
+
+
+## A parked car in the same 3/4 view as the buildings, nose to the north:
+## the hood, a cabin narrower than the body with its side glass showing, the
+## roof and the rear deck seen from above, then the rear face standing up
+## (tail lights, plate, a chrome bumper) with the tyres under it. The body is
+## lit down its left flank and shaded down its right. Styles keep the sizes
+## curry_art.gd gave them (so the scenes that park them don't change):
+## 0 sedan, 1 woodie wagon with a roof rack, 2 pickup with a crate in the
+## bed, 3 camper bus with a split windshield, 4 motor home.
+func car(style: int, paint: Color) -> Image:
+	var w := 32 if style == 4 else 28
+	var h: int = [42, 46, 46, 40, 58][style]
+	var im := K.make(w, h)
+	K.shadow(im, w / 2.0, h - 3.0, w / 2.0, 3.2, 0.32)
+	var bw := w - 6
+	var x0 := 3
+	var lit := paint.lightened(0.24)
+	var shade := paint.darkened(0.24)
+	var deep := paint.darkened(0.46)
+	var glass := c("4f6f84")
+	var glass_hi := c("a6c4d4")
+	var glass_dark := c("2e4352")
+	var chrome := c("c8c8c0")
+	var face_h := 9
+	var face_top := h - 5 - face_h
+	# front tyres peeking out beside the hood
+	for side_x in [x0 - 1, x0 + bw - 1]:
+		K.rect(im, side_x, 6, 2, 6, c("1c1c20"))
+	# the body from above: rounded at the nose, lit left, shaded right
+	K.rect(im, x0, 3, bw, face_top - 3, paint)
+	K.px(im, x0, 3, Color(0, 0, 0, 0))
+	K.px(im, x0 + bw - 1, 3, Color(0, 0, 0, 0))
+	K.vline(im, x0, 4, face_top - 4, lit)
+	K.vline(im, x0 + 1, 4, face_top - 4, paint.lightened(0.1))
+	K.vline(im, x0 + bw - 2, 4, face_top - 4, shade)
+	K.vline(im, x0 + bw - 1, 4, face_top - 4, deep)
+	K.hline(im, x0 + 1, 3, bw - 2, lit)
+	# headlamps and the front bumper
+	K.rect(im, x0 + 1, 3, 3, 2, c("ffe9a0"))
+	K.rect(im, x0 + bw - 4, 3, 3, 2, c("f0d880"))
+	K.hline(im, x0 + 2, 2, bw - 4, chrome)
+	# the cabin: [hood, windshield, roof, rear window] lengths
+	var cab: Array = [[8, 4, 8, 3], [7, 4, 15, 0], [7, 3, 6, 1], [0, 4, face_top - 8, 0], [5, 5, face_top - 13, 0]][style]
+	var cx0 := x0 + 2
+	var cw := bw - 4
+	var y := 3 + int(cab[0])
+	if cab[0] > 0:
+		# a lit crease down the middle of the hood
+		K.vline(im, x0 + bw / 2 - 1, 5, int(cab[0]) - 3, paint.lightened(0.12))
+	# windshield, narrowing toward the roof
+	for i in int(cab[1]):
+		var inset := 1 if i == 0 else 0
+		K.hline(im, cx0 + inset, y + i, cw - inset * 2, glass if i > 0 else glass_hi)
+	K.px(im, cx0 + 1, y + 1, glass_hi)
+	if style == 3:
+		K.vline(im, x0 + bw / 2, y, int(cab[1]), paint)
+	y += int(cab[1])
+	var roof_len := int(cab[2])
+	var roof_col := paint.lightened(0.08)
+	if style == 3 or style == 4:
+		roof_col = c("efe6cf") if style == 3 else c("f2ecd8")
+	# the side glass shows down both sides of the cabin, the roof between
+	K.rect(im, cx0, y, cw, roof_len, roof_col)
+	K.hline(im, cx0, y, cw, roof_col.lightened(0.2))
+	K.vline(im, cx0, y, roof_len, glass_hi.darkened(0.1))
+	K.vline(im, cx0 + cw - 1, y, roof_len, glass_dark)
+	match style:
+		1:
+			# a woodie: timber panels on the flanks, a rack with a rolled tent
+			K.rect(im, x0, y - 6, 2, roof_len + 4, c("946840"))
+			K.rect(im, x0 + bw - 2, y - 6, 2, roof_len + 4, c("6e4a2e"))
+			for rx in [cx0 + 2, cx0 + cw - 3]:
+				K.vline(im, rx, y + 1, roof_len - 2, c("5a3a22"))
+			K.rect(im, cx0 + 3, y + 4, cw - 6, 7, c("8a6a48"))
+			K.hline(im, cx0 + 3, y + 4, cw - 6, c("b0906a"))
+			K.hline(im, cx0 + 3, y + 10, cw - 6, c("5a4a30"))
+		2:
+			# the cab's back window, then the open bed with a crate in it
+			K.hline(im, cx0, y + roof_len, cw, glass_dark)
+			var bed_y := y + roof_len + 1
+			var bed_h := face_top - bed_y
+			K.rect(im, x0 + 2, bed_y, bw - 4, bed_h, c("3a3026"))
+			K.hline(im, x0 + 2, bed_y, bw - 4, c("24201a"))
+			K.rect(im, x0 + 5, bed_y + 3, 9, 6, c("a07a4e"))
+			K.hline(im, x0 + 5, bed_y + 3, 9, c("c49a68"))
+			K.vline(im, x0 + 13, bed_y + 3, 6, c("6e5034"))
+		3:
+			# the bus's two-tone waist and a roof rack
+			K.rect(im, cx0 + 3, y + 4, cw - 6, 3, c("d8d0b8"))
+			K.rect(im, cx0 + 5, y + 10, cw - 10, 5, c("b8b0a0"))
+		4:
+			# the motor home's box: a stripe, a roof vent and a ladder
+			K.rect(im, x0, y + 9, bw, 3, paint)
+			K.rect(im, x0 + 4, y + 3, 7, 5, c("c8c0b0"))
+			K.hline(im, x0 + 4, y + 3, 7, c("e8e0d0"))
+			K.rect(im, x0 + bw - 9, y + 18, 5, 6, c("d8d0b8"))
+			for ly in range(y + 2, face_top - 1, 3):
+				K.hline(im, x0 + bw - 4, ly, 2, c("8a8478"))
+	# a dark seam where the cabin meets the body, so it stands proud of it
+	var cab_top := 3 + int(cab[0])
+	var cab_end := y + roof_len + (3 if style == 0 else 0)
+	if style != 3 and style != 4:
+		K.vline(im, cx0 - 1, cab_top, cab_end - cab_top, deep)
+		K.vline(im, cx0 + cw, cab_top, cab_end - cab_top, deep)
+		K.hline(im, cx0, cab_top - 1, cw, deep)
+	if style == 0:
+		# the sedan's rear window and trunk lid
+		var ry := y + roof_len
+		K.hline(im, cx0 + 1, ry, cw - 2, glass_dark)
+		K.hline(im, cx0 + 1, ry + 1, cw - 2, glass)
+		K.hline(im, cx0 + 2, ry + 2, cw - 4, glass_dark)
+	# the rear face, standing up: a lit top edge, tail lights, the plate
+	K.rect(im, x0, face_top, bw, face_h, paint.darkened(0.2))
+	K.hline(im, x0, face_top, bw, lit)
+	K.vline(im, x0, face_top + 1, face_h - 1, paint.darkened(0.08))
+	K.vline(im, x0 + bw - 1, face_top + 1, face_h - 1, deep)
+	if style == 1 or style == 3 or style == 4:
+		# a back window high in the face of the tall ones
+		K.rect(im, x0 + 3, face_top + 1, bw - 6, 2, glass_dark)
+		K.hline(im, x0 + 4, face_top + 1, 3, glass)
+	for tx in [x0 + 1, x0 + bw - 5]:
+		K.rect(im, tx, face_top + 4, 4, 2, c("c8382a"))
+		K.px(im, tx, face_top + 4, c("ff8a6a"))
+	K.rect(im, x0 + bw / 2 - 3, face_top + 4, 6, 3, c("efe6cf"))
+	K.hline(im, x0 + bw / 2 - 2, face_top + 5, 4, c("3a5a8a"))
+	# chrome bumper, and the rear tyres under it
+	K.rect(im, x0 + 1, h - 5, bw - 2, 2, chrome)
+	K.hline(im, x0 + 1, h - 5, bw - 2, c("f0f0ea"))
+	K.px(im, x0 + bw - 2, h - 4, c("8a8a84"))
+	for tx in [x0, x0 + bw - 5]:
+		K.rect(im, tx, h - 3, 5, 3, c("1c1c20"))
+		K.hline(im, tx + 1, h - 3, 3, c("3a3a40"))
+	K.outline(im)
+	return im

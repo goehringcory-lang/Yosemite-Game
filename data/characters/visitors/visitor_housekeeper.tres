@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_housekeeper.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_housekeeper"
+display_name = "Housekeeper"
+years = "1940s"
+affiliation = "Park visitor"
+bio = "An everyday worker making up Curry Village's tent cabins in the 1940s. Not a historical figure."
+idle_lines = PackedStringArray("Forty cabins before lunch, and every one of them full of pine needles.", "Keep your food in the bear box. I've seen what a bear does to a cabin.", "The Pavilion feeds us after the guests. Best meal of the day.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Curry Village"
+visitor = true

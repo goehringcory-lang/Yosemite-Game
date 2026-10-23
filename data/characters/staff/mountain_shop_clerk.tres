@@ -7,7 +7,7 @@
 script = ExtResource("1_s")
 id = "mountain_shop"
 display_name = "Marty Kessler"
-story_beats = [{"after": "harding_summit", "lines": ["The Nose, free. Wren's been telling customers she taught you everything. I've stopped correcting her.", "Your guidebook's looking worn. Tick boxes don't usually get that much use."]}, {"after": "clark_last_page", "lines": ["Heard the old guy's book is finished. You know what the shop's always said: no ticks, no stories.", "Turns out it goes the other way too."]}]
+story_beats = [{"after": "harding_summit", "lines": ["The Nose, free. Wren's been telling customers she taught you everything. I've stopped correcting her.", "Your guidebook's looking worn. Tick boxes don't usually get that much use.", "Funny thing: for three nights, half the customers swore that headlamp on the Nose was the missing Guardian. I told them it was you. They didn't believe me."]}, {"after": "clark_last_page", "lines": ["Heard the old guy's book is finished. You know what the shop's always said: no ticks, no stories.", "Turns out it goes the other way too."]}]
 years = "1970s"
 affiliation = "Curry Village Mountain Shop"
 bio = "Runs the counter at the Curry Village Mountain Shop. An invented character, not a historical figure."
