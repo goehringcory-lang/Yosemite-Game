@@ -16,9 +16,11 @@ extends Node
 ##   Belay ledge rest    climb_state.gd        leonards_belay
 ##   Crux green zone     climb_state.gd        steady_breath
 ##   Minutes per move    climb_state.gd move() light_rack
+##   Slab moves          climb_state.gd move_cost() slackliners_feet
 ##
 ## Experience that no other system keeps a count of (wild forage picked up,
-## mornings, perfect cruxes) is counted here with [method note].
+## mornings, perfect cruxes, slackline crossings) is counted here with
+## [method note], and best scores (the slackline's) with [method record].
 ##
 ## To add a perk: add an entry to PERKS, give its "unlock" a type that
 ## [method progress] understands, and read its bonus where it applies.
@@ -72,6 +74,11 @@ const PERKS: Array[Dictionary] = [
 		"how": "Tick 6 routes in the guidebook.",
 		"effect": "Each move on the wall takes 5 minutes instead of 6.",
 		"flavor": "Clean climbing in the 1970s swapped heavy steel pitons for a few nuts and hexes. A lighter rack climbs faster."},
+	{"id": "slackliners_feet", "name": "Slackliner's Feet", "amount": 1,
+		"unlock": {"stat": "slackline_crossings", "count": 5},
+		"how": "Walk a Camp 4 slackline end to end 5 times.",
+		"effect": "Moves on a friction slab cost 1 less stamina.",
+		"flavor": "Camp 4 climbers took up slacklining on rest days in the early 1980s. Walking webbing trains the quiet, trusting feet a slab asks for."},
 ]
 
 ## How long the HUD must be free before a "New perk" message shows, so it
@@ -137,6 +144,15 @@ func note(what: String, amount := 1) -> void:
 
 func stat(key: String) -> int:
 	return int(stats.get(key, 0))
+
+
+## Keeps the highest [param value] seen for [param what] (a best score).
+## Returns true if it's a new best.
+func record(what: String, value: int) -> bool:
+	if value <= stat(what):
+		return false
+	stats[what] = value
+	return true
 
 
 ## [have, need] toward a perk. For a quest it's [0 or 1, 1].

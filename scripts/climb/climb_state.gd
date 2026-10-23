@@ -353,6 +353,8 @@ func move_cost(r: int, c: int) -> int:
 		cost += 1
 	if boosts.has("nimble"):
 		cost -= 1
+	if style() == "slab":
+		cost -= int(Perks.bonus("slackliners_feet"))
 	return maxi(cost, 1)
 
 
