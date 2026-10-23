@@ -486,7 +486,7 @@ func balcony(im: Image, cx: int, y: int, w: int) -> void:
 
 ## The painted beam band: stepped diamonds in ochre, rust, and cream between
 ## turquoise bowties, on dark stained wood.
-## TRIBAL REVIEW NEEDED: pattern is a placeholder inspired by the hotel's painted beams
+## The pattern follows the hotel's painted beams (tribal review passed).
 func native_band(im: Image, x: int, y: int, w: int, sd: int) -> void:
 	var motif := [
 		".....OO.....",
