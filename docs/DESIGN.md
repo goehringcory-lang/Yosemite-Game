@@ -187,7 +187,7 @@ These people lived from before 1851 through the 1990s, and the gear they used ch
 
 ## Cultural review & rights
 
-- **Tribal consultation.** Before any Native story, character, food practice, or place name ships, it should be reviewed by the associated tribes. The NPS tribal liaison is a good first contact. Until then, their dialogue is placeholder text marked `TRIBAL REVIEW NEEDED`.
+- **Tribal consultation.** Before any Native story, character, food practice, or place name ships, it should be reviewed by the associated tribes. The NPS tribal liaison is a good first contact. Until then, their dialogue is placeholder text marked `TRIBAL REVIEW NEEDED`. The game's current Native content has been through this review; only the finale's lines for the Native characters are still to be written.
 - **Naming.** Use each tribe's own preferred spelling (Miwuk, Miwok, and Me-Wuk all appear). Avoid depicting ceremonies or sacred objects unless the tribes invite it.
 - **Real people.** Deceased historical figures are generally fine to portray respectfully. Living people (Chouinard, Jardine, Hill) and people who died recently (Julia Parker) need permission, or should be left out. This matters especially for a game sold on Steam.
 
@@ -243,6 +243,5 @@ First playable stretch:
 3. **The Glacier Point Apron** leads to Glacier Point.
 
 Still open:
-- Building materials for the chuckah. For now it only costs time. Settle this during tribal review.
 - Cams from 1930s climbers: settled by the timeline choice. Gear is described as "what they can spare from their kit," simplified to its modern version.
 - Real art for stations and the climbing screen. They're placeholder shapes for now. NPCs have generated pixel sprites (see [CAST.md](CAST.md)); hand-drawn replacements can use the same sheet layout.

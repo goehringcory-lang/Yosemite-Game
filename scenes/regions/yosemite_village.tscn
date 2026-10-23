@@ -2689,7 +2689,7 @@ position = Vector2(1968, 600)
 collision_mask = 0
 script = ExtResource("5_58pbq")
 title = "Indian Village"
-text = "This village behind the Yosemite Museum shows how Native families lived in the Valley: bark homes, acorn granaries, and grinding rocks worn into the granite. The Southern Sierra Miwuk and neighboring peoples still live and work in and around Yosemite today. [Placeholder pending tribal review.]"
+text = "This village behind the Yosemite Museum shows how Native families lived in the Valley: bark homes, acorn granaries, and grinding rocks worn into the granite. The Southern Sierra Miwuk and neighboring peoples still live and work in and around Yosemite today."
 
 [node name="Sprite" type="Sprite2D" parent="Entities/IndianVillageSign" unique_id=40462975]
 texture = ExtResource("52_4v3xh")

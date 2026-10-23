@@ -512,8 +512,8 @@ func lancet(im: Image, x: int, y: int, w: int, h: int) -> void:
 
 
 ## A band of painted pattern across the wall: stepped diamonds in the
-## Ahwahnee's colors (Native-inspired, flagged for tribal review with the
-## hotel's painted beams).
+## Ahwahnee's colors (Native-inspired, like the hotel's painted beams; tribal
+## review passed).
 func pattern_band(im: Image, y: int, h: int, w: int, cols: Array) -> void:
 	K.rect(im, 0, y, w, h, c(cols[0]))
 	K.hline(im, 0, y, w, c(cols[1]))

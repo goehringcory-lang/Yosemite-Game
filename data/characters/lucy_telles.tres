@@ -16,5 +16,5 @@ idle_lines = PackedStringArray("Sit a while. Some things you learn by watching."
 sprite_sheet = ExtResource("2_sprite")
 color = Color(0.478, 0.227, 0.290, 1)
 home = "Yosemite Museum"
-needs_tribal_review = true
-sources = "Placeholder pending tribal review. To verify with tribal advisors and the Yosemite Museum: Craig Bates and Martha Lee, Tradition and Innovation: A Basket History of the Indians of the Yosemite–Mono Lake Area (1990)."
+needs_tribal_review = false
+sources = "Reviewed with the associated tribes. Craig Bates and Martha Lee, Tradition and Innovation: A Basket History of the Indians of the Yosemite–Mono Lake Area (1990)."

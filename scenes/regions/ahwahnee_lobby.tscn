@@ -3,11 +3,11 @@
 [ext_resource type="Script" path="res://scripts/world/region.gd" id="1_eybph"]
 [ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="2_7ccsh"]
 [ext_resource type="Script" path="res://scripts/world/seasonal_canopy.gd" id="3_lxvro"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/counter_desk.png" id="4_v6mrj"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/luggage.png" id="5_vtik3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/counter_ahw_desk.png" id="4_v6mrj"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/luggage_ahw.png" id="5_vtik3"]
 [ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="6_xih41"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/plant_brass.png" id="7_b7m7d"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/armchair.png" id="8_x2s1b"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/plant_ahw_brass.png" id="7_b7m7d"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/armchair_ahw_red.png" id="8_x2s1b"]
 [ext_resource type="Texture2D" path="res://assets/sprites/info_sign.png" id="9_lnl1s"]
 [ext_resource type="Script" path="res://scripts/objects/building_door.gd" id="10_wy10i"]
 [ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="11_7mppt"]
@@ -49,7 +49,7 @@ size = Vector2(16, 60)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pjn55"]
 size = Vector2(88, 20)
 
-[node name="AhwahneeLobby" type="Node2D" unique_id=565890419]
+[node name="AhwahneeLobby" type="Node2D" unique_id=1268140174]
 y_sort_enabled = true
 script = ExtResource("1_eybph")
 region_id = "ahwahnee_lobby"
@@ -58,125 +58,125 @@ display_name = "The Ahwahnee: Lobby"
 geo_anchor = Vector2(-119.5745, 37.7465)
 indoors = true
 
-[node name="Ground" type="TileMapLayer" parent="." unique_id=1216998821]
+[node name="Ground" type="TileMapLayer" parent="." unique_id=1261854737]
 z_index = -10
 tile_map_data = PackedByteArray("AAAAAAAAAQAAAAgAAAABAAAAAQADAAgAAAACAAAAAQACAAgAAAADAAAAAQABAAgAAAAEAAAAAQAAAAgAAAAFAAAAAQADAAgAAAAGAAAAAQACAAgAAAAHAAAAAQABAAgAAAAIAAAAAQAAAAgAAAAJAAAAAQADAAgAAAAKAAAAAQACAAgAAAALAAAAAQABAAgAAAAMAAAAAQAAAAgAAAANAAAAAQADAAgAAAAOAAAAAQACAAgAAAAPAAAAAQABAAgAAAAQAAAAAQAAAAgAAAARAAAAAQADAAgAAAASAAAAAQACAAgAAAATAAAAAQABAAgAAAAUAAAAAQAAAAgAAAAVAAAAAQADAAgAAAAWAAAAAQACAAgAAAAXAAAAAQABAAgAAAAYAAAAAQAAAAgAAAAZAAAAAQADAAgAAAAaAAAAAQACAAgAAAAbAAAAAQABAAgAAAAcAAAAAQAAAAgAAAAdAAAAAQADAAgAAAAAAAEAAQABAAgAAAABAAEAAQABAAgAAAACAAEAAQABAAgAAAADAAEAAQABAAgAAAAEAAEAAQABAAgAAAAFAAEAAQAAAAgAAAAGAAEAAQAAAAgAAAAHAAEAAQAAAAgAAAAIAAEAAQAAAAgAAAAJAAEAAQAAAAgAAAAKAAEAAQADAAgAAAALAAEAAQADAAgAAAAMAAEAAQADAAgAAAANAAEAAQADAAgAAAAOAAEAAQADAAgAAAAPAAEAAQACAAgAAAAQAAEAAQACAAgAAAARAAEAAQACAAgAAAASAAEAAQACAAgAAAATAAEAAQACAAgAAAAUAAEAAQABAAgAAAAVAAEAAQABAAgAAAAWAAEAAQABAAgAAAAXAAEAAQABAAgAAAAYAAEAAQABAAgAAAAZAAEAAQAAAAgAAAAaAAEAAQAAAAgAAAAbAAEAAQAAAAgAAAAcAAEAAQAAAAgAAAAdAAEAAQAAAAgAAAAAAAIAAQACAAgAAAABAAIAAQADAAgAAAACAAIAAQAAAAgAAAADAAIAAQAAAAgAAAAEAAIAAQABAAgAAAAFAAIAAQABAAgAAAAGAAIAAQACAAgAAAAHAAIAAQADAAgAAAAIAAIAAQADAAgAAAAJAAIAAQAAAAgAAAAKAAIAAQAAAAgAAAALAAIAAQABAAgAAAAMAAIAAQACAAgAAAANAAIAAQACAAgAAAAOAAIAAQADAAgAAAAPAAIAAQADAAgAAAAQAAIAAQAAAAgAAAARAAIAAQABAAgAAAASAAIAAQABAAgAAAATAAIAAQACAAgAAAAUAAIAAQACAAgAAAAVAAIAAQADAAgAAAAWAAIAAQAAAAgAAAAXAAIAAQAAAAgAAAAYAAIAAQABAAgAAAAZAAIAAQABAAgAAAAaAAIAAQACAAgAAAAbAAIAAQADAAgAAAAcAAIAAQADAAgAAAAdAAIAAQAAAAgAAAAAAAMAAQADAAgAAAABAAMAAQABAAgAAAACAAMAAQACAAgAAAADAAMAAQAAAAgAAAAEAAMAAQABAAgAAAAFAAMAAQACAAgAAAAGAAMAAQAAAAgAAAAHAAMAAQABAAgAAAAIAAMAAQADAAgAAAAJAAMAAQAAAAgAAAAKAAMAAQABAAgAAAALAAMAAQADAAgAAAAMAAMAAQAAAAgAAAANAAMAAQACAAgAAAAOAAMAAQADAAgAAAAPAAMAAQAAAAgAAAAQAAMAAQACAAgAAAARAAMAAQADAAgAAAASAAMAAQABAAgAAAATAAMAAQACAAgAAAAUAAMAAQADAAgAAAAVAAMAAQABAAgAAAAWAAMAAQACAAgAAAAXAAMAAQAAAAgAAAAYAAMAAQABAAgAAAAZAAMAAQACAAgAAAAaAAMAAQAAAAgAAAAbAAMAAQABAAgAAAAcAAMAAQADAAgAAAAdAAMAAQAAAAgAAAAAAAQAAQAAAAgAAAABAAQAAQADAAgAAAACAAQAAQABAAgAAAADAAQAAQADAAgAAAAEAAQAAQABAAgAAAAFAAQAAQADAAgAAAAGAAQAAQACAAgAAAAHAAQAAQAAAAgAAAAIAAQAAQACAAgAAAAJAAQAAQAAAAgAAAAKAAQAAQACAAgAAAALAAQAAQABAAgAAAAMAAQAAQADAAgAAAANAAQAAQABAAgAAAAOAAQAAQADAAgAAAAPAAQAAQABAAgAAAAQAAQAAQAAAAgAAAARAAQAAQACAAgAAAASAAQAAQAAAAgAAAATAAQAAQACAAgAAAAUAAQAAQAAAAgAAAAVAAQAAQADAAgAAAAWAAQAAQABAAgAAAAXAAQAAQADAAgAAAAYAAQAAQABAAgAAAAZAAQAAQADAAgAAAAaAAQAAQACAAgAAAAbAAQAAQAAAAgAAAAcAAQAAQACAAgAAAAdAAQAAQAAAAgAAAAAAAUAAQABAAgAAAABAAUAAQAAABkAAAACAAUAAQADABkAAAADAAUAAQACABkAAAAEAAUAAQABABkAAAAFAAUAAQAAABkAAAAGAAUAAQADABkAAAAHAAUAAQACABkAAAAIAAUAAQABABkAAAAJAAUAAQAAABkAAAAKAAUAAQADABkAAAALAAUAAQACABkAAAAMAAUAAQABABkAAAANAAUAAQAAABkAAAAOAAUAAQADABkAAAAPAAUAAQACABkAAAAQAAUAAQABABkAAAARAAUAAQAAABkAAAASAAUAAQADABkAAAATAAUAAQACABkAAAAUAAUAAQABABkAAAAVAAUAAQAAABkAAAAWAAUAAQADABkAAAAXAAUAAQACABkAAAAYAAUAAQABABkAAAAZAAUAAQAAABkAAAAaAAUAAQADABkAAAAbAAUAAQACABkAAAAcAAUAAQABABkAAAAdAAUAAQAAAAgAAAAAAAYAAQACAAgAAAABAAYAAQACABkAAAACAAYAAQACABkAAAADAAYAAQACABkAAAAEAAYAAQACABkAAAAFAAYAAQABABkAAAAGAAYAAQABABkAAAAHAAYAAQABABkAAAAIAAYAAQABABkAAAAJAAYAAQABABkAAAAKAAYAAQAAABkAAAALAAYAAQAAABkAAAAMAAYAAQAAABkAAAANAAYAAQAAABkAAAAOAAYAAQAAABkAAAAPAAYAAQADABkAAAAQAAYAAQADABkAAAARAAYAAQADABkAAAASAAYAAQADABkAAAATAAYAAQADABkAAAAUAAYAAQACABkAAAAVAAYAAQACABkAAAAWAAYAAQACABkAAAAXAAYAAQACABkAAAAYAAYAAQACABkAAAAZAAYAAQABABkAAAAaAAYAAQABABkAAAAbAAYAAQABABkAAAAcAAYAAQABABkAAAAdAAYAAQABAAgAAAAAAAcAAQADAAgAAAABAAcAAQAAABkAAAACAAcAAQABABkAAAADAAcAAQABABkAAAAEAAcAAQACABkAAAAFAAcAAQACABkAAAAGAAcAAQADABkAAAAHAAcAAQAAABkAAAAIAAcAAQAAABkAAAAJAAcAAQABABkAAAAKAAcAAQABABkAAAALAAcAAQACABkAAAAMAAcAAQADABkAAAANAAcAAQADABkAAAAOAAcAAQAAABkAAAAPAAcAAQAAABkAAAAQAAcAAQABABkAAAARAAcAAQACABkAAAASAAcAAQACABkAAAATAAcAAQADABkAAAAUAAcAAQADABkAAAAVAAcAAQAAABkAAAAWAAcAAQABABkAAAAXAAcAAQABABkAAAAYAAcAAQACABkAAAAZAAcAAQACABkAAAAaAAcAAQADABkAAAAbAAcAAQAAABkAAAAcAAcAAQAAABkAAAAdAAcAAQABAAgAAAAAAAgAAQAAAAgAAAABAAgAAQACABkAAAACAAgAAQADABkAAAADAAgAAQABABkAAAAEAAgAAQACABkAAAAFAAgAAQADABkAAAAGAAgAAQABABkAAAAHAAgAAQACABkAAAAIAAgAAQAAABkAAAAJAAgAAQABABkAAAAKAAgAAQACABkAAAALAAgAAQAAABkAAAAMAAgAAQABABkAAAANAAgAAQADABkAAAAOAAgAAQAAABkAAAAPAAgAAQABABkAAAAQAAgAAQADABkAAAARAAgAAQAAABkAAAASAAgAAQACABkAAAATAAgAAQADABkAAAAUAAgAAQAAABkAAAAVAAgAAQACABkAAAAWAAgAAQADABkAAAAXAAgAAQABABkAAAAYAAgAAQACABkAAAAZAAgAAQADABkAAAAaAAgAAQABABkAAAAbAAgAAQACABkAAAAcAAgAAQAAABkAAAAdAAgAAQABAAgAAAAAAAkAAQABAAgAAAABAAkAAQAAABkAAAACAAkAAQACABkAAAADAAkAAQAAABkAAAAEAAkAAQACABkAAAAFAAkAAQAAABkAAAAGAAkAAQADABkAAAAHAAkAAQABABkAAAAIAAkAAQADABkAAAAJAAkAAQABABkAAAAKAAkAAQADABkAAAALAAkAAQACABkAAAAMAAkAAQAAABkAAAANAAkAAQACABkAAAAOAAkAAQAAABkAAAAPAAkAAQACABkAAAAQAAkAAQABABkAAAARAAkAAQADABkAAAASAAkAAQABABkAAAATAAkAAQADABkAAAAUAAkAAQABABkAAAAVAAkAAQAAABkAAAAWAAkAAQACABkAAAAXAAkAAQAAABkAAAAYAAkAAQACABkAAAAZAAkAAQAAABkAAAAaAAkAAQADABkAAAAbAAkAAQABABkAAAAcAAkAAQADABkAAAAdAAkAAQABAAgAAAAAAAoAAQACAAgAAAABAAoAAQABABkAAAACAAoAAQAAABkAAAADAAoAAQADABkAAAAEAAoAAQACABkAAAAFAAoAAQABABkAAAAGAAoAAQAAABkAAAAHAAoAAQADABkAAAAIAAoAAQACABkAAAAJAAoAAQABABkAAAAKAAoAAQAAABkAAAALAAoAAQADABkAAAAMAAoAAQACABkAAAANAAoAAQABABkAAAAOAAoAAQAAABkAAAAPAAoAAQADABkAAAAQAAoAAQACABkAAAARAAoAAQABABkAAAASAAoAAQAAABkAAAATAAoAAQADABkAAAAUAAoAAQACABkAAAAVAAoAAQABABkAAAAWAAoAAQAAABkAAAAXAAoAAQADABkAAAAYAAoAAQACABkAAAAZAAoAAQABABkAAAAaAAoAAQAAABkAAAAbAAoAAQADABkAAAAcAAoAAQACABkAAAAdAAoAAQABAAgAAAAAAAsAAQADABkAAAABAAsAAQADABkAAAACAAsAAQADABkAAAADAAsAAQADABkAAAAEAAsAAQADABkAAAAFAAsAAQACABkAAAAGAAsAAQACABkAAAAHAAsAAQACABkAAAAIAAsAAQACABkAAAAJAAsAAQACABkAAAAKAAsAAQABABkAAAALAAsAAQABABkAAAAMAAsAAQABABkAAAANAAsAAQABABkAAAAOAAsAAQABABkAAAAPAAsAAQAAABkAAAAQAAsAAQAAABkAAAARAAsAAQAAABkAAAASAAsAAQAAABkAAAATAAsAAQAAABkAAAAUAAsAAQADABkAAAAVAAsAAQADABkAAAAWAAsAAQADABkAAAAXAAsAAQADABkAAAAYAAsAAQADABkAAAAZAAsAAQACABkAAAAaAAsAAQACABkAAAAbAAsAAQACABkAAAAcAAsAAQACABkAAAAdAAsAAQACABkAAAAAAAwAAQAAABkAAAABAAwAAQABABkAAAACAAwAAQACABkAAAADAAwAAQACABkAAAAEAAwAAQADABkAAAAFAAwAAQADABkAAAAGAAwAAQAAABkAAAAHAAwAAQABABkAAAAIAAwAAQABABkAAAAJAAwAAQACABkAAAAKAAwAAQACABkAAAALAAwAAQADABkAAAAMAAwAAQAAABkAAAANAAwAAQAAABkAAAAOAAwAAQABABkAAAAPAAwAAQABABkAAAAQAAwAAQACABkAAAARAAwAAQADABkAAAASAAwAAQADABkAAAATAAwAAQAAABkAAAAUAAwAAQAAABkAAAAVAAwAAQABABkAAAAWAAwAAQACABkAAAAXAAwAAQACABkAAAAYAAwAAQADABkAAAAZAAwAAQADABkAAAAaAAwAAQAAABkAAAAbAAwAAQABABkAAAAcAAwAAQABABkAAAAdAAwAAQACABkAAAAAAA0AAQABAAgAAAABAA0AAQADABkAAAACAA0AAQAAABkAAAADAA0AAQACABkAAAAEAA0AAQADABkAAAAFAA0AAQAAABkAAAAGAA0AAQACABkAAAAHAA0AAQADABkAAAAIAA0AAQABABkAAAAJAA0AAQACABkAAAAKAA0AAQADABkAAAALAA0AAQABABkAAAAMAA0AAQACABkAAAANAA0AAQAAABkAAAAOAA0AAQABABkAAAAPAA0AAQACABkAAAAQAA0AAQAAABkAAAARAA0AAQABABkAAAASAA0AAQADABkAAAATAA0AAQAAABkAAAAUAA0AAQABABkAAAAVAA0AAQADABkAAAAWAA0AAQAAABkAAAAXAA0AAQACABkAAAAYAA0AAQADABkAAAAZAA0AAQAAABkAAAAaAA0AAQACABkAAAAbAA0AAQADABkAAAAcAA0AAQABABkAAAAdAA0AAQACAAgAAAAAAA4AAQACAAgAAAABAA4AAQABABkAAAACAA4AAQADABkAAAADAA4AAQABABkAAAAEAA4AAQADABkAAAAFAA4AAQABABkAAAAGAA4AAQAAABkAAAAHAA4AAQACABkAAAAIAA4AAQAAABkAAAAJAA4AAQACABkAAAAKAA4AAQAAABkAAAALAA4AAQADABkAAAAMAA4AAQABABkAAAANAA4AAQADABkAAAAOAA4AAQABABkAAAAPAA4AAQADABkAAAAQAA4AAQACABkAAAARAA4AAQAAABkAAAASAA4AAQACABkAAAATAA4AAQAAABkAAAAUAA4AAQACABkAAAAVAA4AAQABABkAAAAWAA4AAQADABkAAAAXAA4AAQABABkAAAAYAA4AAQADABkAAAAZAA4AAQABABkAAAAaAA4AAQAAABkAAAAbAA4AAQACABkAAAAcAA4AAQAAABkAAAAdAA4AAQACAAgAAAAAAA8AAQADAAgAAAABAA8AAQACABkAAAACAA8AAQABABkAAAADAA8AAQAAABkAAAAEAA8AAQADABkAAAAFAA8AAQACABkAAAAGAA8AAQABABkAAAAHAA8AAQAAABkAAAAIAA8AAQADABkAAAAJAA8AAQACABkAAAAKAA8AAQABABkAAAALAA8AAQAAABkAAAAMAA8AAQADABkAAAANAA8AAQACABkAAAAOAA8AAQABABkAAAAPAA8AAQAAABkAAAAQAA8AAQADABkAAAARAA8AAQACABkAAAASAA8AAQABABkAAAATAA8AAQAAABkAAAAUAA8AAQADABkAAAAVAA8AAQACABkAAAAWAA8AAQABABkAAAAXAA8AAQAAABkAAAAYAA8AAQADABkAAAAZAA8AAQACABkAAAAaAA8AAQABABkAAAAbAA8AAQAAABkAAAAcAA8AAQADABkAAAAdAA8AAQACAAgAAAAAABAAAQAAAAgAAAABABAAAQAAAAgAAAACABAAAQAAAAgAAAADABAAAQAAAAgAAAAEABAAAQAAAAgAAAAFABAAAQADAAgAAAAGABAAAQADAAgAAAAHABAAAQADAAgAAAAIABAAAQADAAgAAAAJABAAAQADAAgAAAAKABAAAQACAAgAAAALABAAAQACAAgAAAAMABAAAQACAAgAAAANABAAAQACAAgAAAAOABAAAQACABkAAAAPABAAAQABABkAAAAQABAAAQABAAgAAAARABAAAQABAAgAAAASABAAAQABAAgAAAATABAAAQABAAgAAAAUABAAAQAAAAgAAAAVABAAAQAAAAgAAAAWABAAAQAAAAgAAAAXABAAAQAAAAgAAAAYABAAAQAAAAgAAAAZABAAAQADAAgAAAAaABAAAQADAAgAAAAbABAAAQADAAgAAAAcABAAAQADAAgAAAAdABAAAQADAAgAAAA=")
 tile_set = ExtResource("2_7ccsh")
 
-[node name="Blocker" type="TileMapLayer" parent="." unique_id=1730159880]
+[node name="Blocker" type="TileMapLayer" parent="." unique_id=1304743992]
 visible = false
 tile_map_data = PackedByteArray("AAAAAAQAAwAAAAAAAAABAAQAAwAAAAAAAAACAAQAAwAAAAAAAAADAAQAAwAAAAAAAAAEAAQAAwAAAAAAAAAFAAQAAwAAAAAAAAAGAAQAAwAAAAAAAAAHAAQAAwAAAAAAAAAIAAQAAwAAAAAAAAAJAAQAAwAAAAAAAAAKAAQAAwAAAAAAAAALAAQAAwAAAAAAAAAMAAQAAwAAAAAAAAANAAQAAwAAAAAAAAAOAAQAAwAAAAAAAAAPAAQAAwAAAAAAAAAQAAQAAwAAAAAAAAARAAQAAwAAAAAAAAASAAQAAwAAAAAAAAATAAQAAwAAAAAAAAAUAAQAAwAAAAAAAAAVAAQAAwAAAAAAAAAWAAQAAwAAAAAAAAAXAAQAAwAAAAAAAAAYAAQAAwAAAAAAAAAZAAQAAwAAAAAAAAAaAAQAAwAAAAAAAAAbAAQAAwAAAAAAAAAcAAQAAwAAAAAAAAAdAAQAAwAAAAAAAAAAAAUAAwAAAAAAAAAdAAUAAwAAAAAAAAAAAAYAAwAAAAAAAAAdAAYAAwAAAAAAAAAAAAcAAwAAAAAAAAAdAAcAAwAAAAAAAAAAAAgAAwAAAAAAAAAdAAgAAwAAAAAAAAAAAAkAAwAAAAAAAAAdAAkAAwAAAAAAAAAAAAoAAwAAAAAAAAAdAAoAAwAAAAAAAAAAAA0AAwAAAAAAAAAdAA0AAwAAAAAAAAAAAA4AAwAAAAAAAAAdAA4AAwAAAAAAAAAAAA8AAwAAAAAAAAAdAA8AAwAAAAAAAAAAABAAAwAAAAAAAAABABAAAwAAAAAAAAACABAAAwAAAAAAAAADABAAAwAAAAAAAAAEABAAAwAAAAAAAAAFABAAAwAAAAAAAAAGABAAAwAAAAAAAAAHABAAAwAAAAAAAAAIABAAAwAAAAAAAAAJABAAAwAAAAAAAAAKABAAAwAAAAAAAAALABAAAwAAAAAAAAAMABAAAwAAAAAAAAANABAAAwAAAAAAAAAQABAAAwAAAAAAAAARABAAAwAAAAAAAAASABAAAwAAAAAAAAATABAAAwAAAAAAAAAUABAAAwAAAAAAAAAVABAAAwAAAAAAAAAWABAAAwAAAAAAAAAXABAAAwAAAAAAAAAYABAAAwAAAAAAAAAZABAAAwAAAAAAAAAaABAAAwAAAAAAAAAbABAAAwAAAAAAAAAcABAAAwAAAAAAAAAdABAAAwAAAAAAAAA=")
 tile_set = ExtResource("2_7ccsh")
 
-[node name="Flora" type="TileMapLayer" parent="." unique_id=155138352]
+[node name="Flora" type="TileMapLayer" parent="." unique_id=1740750841]
 y_sort_enabled = true
 tile_set = ExtResource("2_7ccsh")
 
-[node name="OakCanopy" type="TileMapLayer" parent="." unique_id=2097240304]
+[node name="OakCanopy" type="TileMapLayer" parent="." unique_id=918479590]
 y_sort_enabled = true
 tile_set = ExtResource("2_7ccsh")
 script = ExtResource("3_lxvro")
 
-[node name="Entities" type="Node2D" parent="." unique_id=1444991248]
+[node name="Entities" type="Node2D" parent="." unique_id=32842565]
 y_sort_enabled = true
 
-[node name="Counter1" type="StaticBody2D" parent="Entities" unique_id=713598159]
+[node name="Counter1" type="StaticBody2D" parent="Entities" unique_id=1558368422]
 position = Vector2(192, 224)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Counter1" unique_id=2102826867]
+[node name="Sprite" type="Sprite2D" parent="Entities/Counter1" unique_id=1620261498]
 texture = ExtResource("4_v6mrj")
 offset = Vector2(0, -30)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Counter1" unique_id=1590828830]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Counter1" unique_id=1805398248]
 position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_ad114")
 
-[node name="Luggage2" type="StaticBody2D" parent="Entities" unique_id=1158793459]
+[node name="Luggage2" type="StaticBody2D" parent="Entities" unique_id=1587746598]
 position = Vector2(800, 240)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Luggage2" unique_id=115268657]
+[node name="Sprite" type="Sprite2D" parent="Entities/Luggage2" unique_id=29974418]
 texture = ExtResource("5_vtik3")
 offset = Vector2(0, -34)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Luggage2" unique_id=1730424783]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Luggage2" unique_id=152876154]
 position = Vector2(0, -10.2)
 shape = SubResource("RectangleShape2D_lcju1")
 
-[node name="Plant3" type="StaticBody2D" parent="Entities" unique_id=764888843]
+[node name="Plant3" type="StaticBody2D" parent="Entities" unique_id=878696445]
 position = Vector2(720, 220)
 collision_mask = 0
 script = ExtResource("6_xih41")
 title = "The Ahwahnee"
 text = "The Ahwahnee opened in July 1927. Gilbert Stanley Underwood built it of granite, steel and concrete stained to look like redwood, so it would fit under the cliffs and never burn like the wooden hotels before it. Two art historians, Phyllis Ackerman and Arthur Upham Pope, chose its decoration, and Jeannette Dyer Spencer drew its patterns from the baskets of the Valley's people."
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Plant3" unique_id=1200126639]
+[node name="Sprite" type="Sprite2D" parent="Entities/Plant3" unique_id=649724381]
 texture = ExtResource("7_b7m7d")
 offset = Vector2(0, -28)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Plant3" unique_id=1945681374]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Plant3" unique_id=113784375]
 position = Vector2(0, -8.4)
 shape = SubResource("RectangleShape2D_us3kd")
 
-[node name="Hitbox" type="Area2D" parent="Entities/Plant3" unique_id=1279306734]
+[node name="Hitbox" type="Area2D" parent="Entities/Plant3" unique_id=804107121]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
-[node name="Shape" type="CollisionShape2D" parent="Entities/Plant3/Hitbox" unique_id=2106207515]
+[node name="Shape" type="CollisionShape2D" parent="Entities/Plant3/Hitbox" unique_id=1852604961]
 position = Vector2(0, -20.4)
 shape = SubResource("RectangleShape2D_e8km2")
 
-[node name="Armchair4" type="StaticBody2D" parent="Entities" unique_id=454832034]
+[node name="Armchair4" type="StaticBody2D" parent="Entities" unique_id=1517603305]
 position = Vector2(120, 400)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Armchair4" unique_id=1174732152]
+[node name="Sprite" type="Sprite2D" parent="Entities/Armchair4" unique_id=82463614]
 texture = ExtResource("8_x2s1b")
 offset = Vector2(0, -22)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair4" unique_id=1466575692]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair4" unique_id=1900393800]
 position = Vector2(0, -6.6)
 shape = SubResource("RectangleShape2D_nnl7g")
 
-[node name="Armchair5" type="StaticBody2D" parent="Entities" unique_id=190580045]
+[node name="Armchair5" type="StaticBody2D" parent="Entities" unique_id=384758858]
 position = Vector2(840, 400)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Armchair5" unique_id=503845469]
+[node name="Sprite" type="Sprite2D" parent="Entities/Armchair5" unique_id=1949438555]
 texture = ExtResource("8_x2s1b")
 offset = Vector2(0, -22)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair5" unique_id=1444019166]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair5" unique_id=1767825025]
 position = Vector2(0, -6.6)
 shape = SubResource("RectangleShape2D_5dq2x")
 
-[node name="Sign6" type="StaticBody2D" parent="Entities" unique_id=1714009494]
+[node name="Sign6" type="StaticBody2D" parent="Entities" unique_id=693141506]
 position = Vector2(300, 440)
 collision_mask = 0
 script = ExtResource("6_xih41")
 title = "The floor"
-text = "The lobby floor is set with patterns taken from local baskets, like the bands on the beams. (These patterns are flagged for tribal review with the rest of the hotel's Native-inspired design.)"
+text = "The lobby floor is set with patterns taken from local baskets, like the bands on the beams."
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Sign6" unique_id=875508466]
+[node name="Sprite" type="Sprite2D" parent="Entities/Sign6" unique_id=1509831008]
 texture = ExtResource("9_lnl1s")
 offset = Vector2(0, -16)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Sign6" unique_id=1799708263]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Sign6" unique_id=1306064968]
 position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_pauau")
 
-[node name="Hitbox" type="Area2D" parent="Entities/Sign6" unique_id=2026511775]
+[node name="Hitbox" type="Area2D" parent="Entities/Sign6" unique_id=1498367998]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
-[node name="Shape" type="CollisionShape2D" parent="Entities/Sign6/Hitbox" unique_id=995545795]
+[node name="Shape" type="CollisionShape2D" parent="Entities/Sign6/Hitbox" unique_id=866445809]
 position = Vector2(0, -14)
 shape = SubResource("RectangleShape2D_5mjgr")
 
-[node name="ToAhwahneeMuralRoom" type="StaticBody2D" parent="Entities" unique_id=1616811813]
+[node name="ToAhwahneeMuralRoom" type="StaticBody2D" parent="Entities" unique_id=1426936280]
 position = Vector2(480, 168)
 collision_layer = 0
 collision_mask = 0
@@ -185,69 +185,69 @@ label = "Elevator Lobby"
 target_region = "ahwahnee_mural_room"
 target_spawn = "door"
 
-[node name="Hitbox" type="Area2D" parent="Entities/ToAhwahneeMuralRoom" unique_id=74095730]
+[node name="Hitbox" type="Area2D" parent="Entities/ToAhwahneeMuralRoom" unique_id=1764717613]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
-[node name="Shape" type="CollisionShape2D" parent="Entities/ToAhwahneeMuralRoom/Hitbox" unique_id=2103035596]
+[node name="Shape" type="CollisionShape2D" parent="Entities/ToAhwahneeMuralRoom/Hitbox" unique_id=1560633774]
 position = Vector2(0, -34)
 shape = SubResource("RectangleShape2D_u61nl")
 
-[node name="Markers" type="Node2D" parent="." unique_id=108648148]
+[node name="Markers" type="Node2D" parent="." unique_id=52381887]
 
-[node name="from_dining" type="Marker2D" parent="Markers" unique_id=1748075076]
+[node name="from_dining" type="Marker2D" parent="Markers" unique_id=1221172075]
 position = Vector2(60, 384)
 
-[node name="from_lounge" type="Marker2D" parent="Markers" unique_id=1968764098]
+[node name="from_lounge" type="Marker2D" parent="Markers" unique_id=915180085]
 position = Vector2(900, 384)
 
-[node name="from_mural" type="Marker2D" parent="Markers" unique_id=1661671396]
+[node name="from_mural" type="Marker2D" parent="Markers" unique_id=2082836786]
 position = Vector2(480, 200)
 
-[node name="door" type="Marker2D" parent="Markers" unique_id=1700039555]
+[node name="door" type="Marker2D" parent="Markers" unique_id=1443647741]
 position = Vector2(480, 488)
 
-[node name="Places" type="Node2D" parent="." unique_id=1637764252]
+[node name="Places" type="Node2D" parent="." unique_id=972972353]
 
-[node name="Exits" type="Node2D" parent="." unique_id=1141241711]
+[node name="Exits" type="Node2D" parent="." unique_id=1852375767]
 
-[node name="ToAhwahneeDiningRoom" type="Area2D" parent="Exits" unique_id=915446270]
+[node name="ToAhwahneeDiningRoom" type="Area2D" parent="Exits" unique_id=969370626]
 position = Vector2(8, 384)
 script = ExtResource("11_7mppt")
 label = "Dining Room"
 target_region = "ahwahnee_dining_room"
 target_spawn = "from_lobby"
 
-[node name="Shape" type="CollisionShape2D" parent="Exits/ToAhwahneeDiningRoom" unique_id=1236292966]
+[node name="Shape" type="CollisionShape2D" parent="Exits/ToAhwahneeDiningRoom" unique_id=2013802581]
 shape = SubResource("RectangleShape2D_p4rj5")
 
-[node name="ToAhwahneeGreatLounge" type="Area2D" parent="Exits" unique_id=358382688]
+[node name="ToAhwahneeGreatLounge" type="Area2D" parent="Exits" unique_id=1671516105]
 position = Vector2(952, 384)
 script = ExtResource("11_7mppt")
 label = "Great Lounge"
 target_region = "ahwahnee_great_lounge"
 target_spawn = "from_lobby"
 
-[node name="Shape" type="CollisionShape2D" parent="Exits/ToAhwahneeGreatLounge" unique_id=219277284]
+[node name="Shape" type="CollisionShape2D" parent="Exits/ToAhwahneeGreatLounge" unique_id=358048750]
 shape = SubResource("RectangleShape2D_b2vv4")
 
-[node name="ToOutside" type="Area2D" parent="Exits" unique_id=2042285303]
+[node name="ToOutside" type="Area2D" parent="Exits" unique_id=516943042]
 position = Vector2(480, 536)
 script = ExtResource("11_7mppt")
 label = "The Ahwahnee grounds"
 target_region = "the_ahwahnee"
 target_spawn = "ahwahnee_lobby_door"
 
-[node name="Shape" type="CollisionShape2D" parent="Exits/ToOutside" unique_id=1070700875]
+[node name="Shape" type="CollisionShape2D" parent="Exits/ToOutside" unique_id=2082725494]
 shape = SubResource("RectangleShape2D_pjn55")
 
-[node name="Room" type="Sprite2D" parent="." unique_id=463065506]
+[node name="Room" type="Sprite2D" parent="." unique_id=1892108764]
 z_index = -8
 texture = ExtResource("12_2gk72")
 centered = false
 
-[node name="Dark" type="Polygon2D" parent="." unique_id=1561435253]
+[node name="Dark" type="Polygon2D" parent="." unique_id=349471836]
 z_index = -12
 color = Color(0.05490196, 0.043137256, 0.039215688, 1)
 polygon = PackedVector2Array(-1200, -1200, 1680, -1200, 1680, 1472, -1200, 1472)

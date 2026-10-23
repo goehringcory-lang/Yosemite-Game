@@ -879,7 +879,7 @@ func sequoia() -> Image:
 ## Each course of slabs overlaps the one below it and throws a shadow, the
 ## apex is sooted by the fire inside, and the doorway has a lintel pole and a
 ## hanging woven mat. A worn patch of earth and a ring of stones sit at the base.
-## TRIBAL REVIEW NEEDED: a placeholder shape until the tribes have reviewed it.
+## Reviewed with the associated tribes.
 func umacha() -> Image:
 	var w := 32
 	var h := 44
@@ -957,7 +957,7 @@ func sd_for(v: int) -> int:
 ## An acorn granary: a tall woven store on poles under a thatched cap, with
 ## flat stones under the cap to keep out mice, a basket-weave body and cord
 ## bands, and thatch in layered rings. The poles stand on stones.
-## TRIBAL REVIEW NEEDED: a placeholder shape until the tribes have reviewed it.
+## Reviewed with the associated tribes.
 func chuckah() -> Image:
 	var w := 20
 	var h := 40

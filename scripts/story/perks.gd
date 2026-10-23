@@ -32,7 +32,7 @@ signal changed
 ##   {"quest": id}                 finish that quest
 ##   {"stat": name, "count": n}    reach n of a counted stat (see progress())
 ## "amount" is what bonus() returns once it's earned. "review" marks Native
-## content that is a placeholder until tribal review (see STORY.md).
+## content that hasn't been through tribal review yet (see STORY.md).
 const PERKS: Array[Dictionary] = [
 	{"id": "muirs_stride", "name": "Muir's Stride", "amount": 0.08,
 		"unlock": {"stat": "mornings", "count": 14},
@@ -44,7 +44,7 @@ const PERKS: Array[Dictionary] = [
 		"how": "Pick up 25 wild plants and berries.",
 		"effect": "One more wild find turns up each morning, wherever you are.",
 		"flavor": "Enid Michael, a ranger-naturalist from 1921, kept a wildflower garden by the Valley museum and wrote hundreds of nature notes on what grew where."},
-	{"id": "tabuces_patience", "name": "Tabuce's Patience", "amount": 0.25, "review": true,
+	{"id": "tabuces_patience", "name": "Tabuce's Patience", "amount": 0.25,
 		"unlock": {"stat": "acorn_meals", "count": 3},
 		"how": "Cook acorn mush or acorn cakes 3 times.",
 		"effect": "Grinding at the mortar and leaching at the basin take a quarter less time.",

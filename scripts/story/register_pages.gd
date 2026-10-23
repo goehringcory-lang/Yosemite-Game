@@ -7,14 +7,14 @@ extends RefCounted
 ## his account "at the front of the book, not the back", and Clark says the
 ## same of Maria Lebrado's. "notes" are later hands in the margin, so a page
 ## can be annotated or contradicted as the player hears more people.
-## "review" pages carry Native people's words and are placeholders until
-## tribal review, like their dialogue. Each story also carries a Register
+## "review" marks a page carrying Native people's words that hasn't been
+## through tribal review yet (STORY.md). Each story also carries a Register
 ## note (HISTORY) saying what's documented and what's dramatized.
 
 const PAGES: Array[Dictionary] = [
-	{"quest": "tenaya_ahwahnee", "front": true, "review": true, "by": "Tenaya",
+	{"quest": "tenaya_ahwahnee", "front": true, "by": "Tenaya",
 		"text": "Our villages were here. In 1851 soldiers came, burned our homes and our food, and made us leave."},
-	{"quest": "lebrado_villages", "front": true, "review": true, "by": "Maria Lebrado (Totuya)",
+	{"quest": "lebrado_villages", "front": true, "by": "Maria Lebrado (Totuya)",
 		"text": "She was a girl in 1851 when the soldiers came. She remembers where the villages stood: by the river, and below the cliffs."},
 	{"quest": "clark_register", "by": "Galen Clark",
 		"text": "1864: the valley and the Big Tree Grove granted to California, 'for public use, resort and recreation.' 1866: the State made me Guardian. These pages record what happens here.",
@@ -27,7 +27,7 @@ const PAGES: Array[Dictionary] = [
 		"notes": [
 			{"quest": "lamon_winter", "text": "Added later: I didn't learn to lay food by on my own. The people here had been doing it for a very long time."},
 		]},
-	{"quest": "tabuce_chuckah", "review": true, "by": "Tabuce (Maggie Howard)",
+	{"quest": "tabuce_chuckah", "by": "Tabuce (Maggie Howard)",
 		"text": "Gather acorns in the fall and keep them in a chuckah. Pound them, rinse the flour until the bitterness is gone, and cook it with hot stones."},
 	{"quest": "degnan_bread", "by": "Bridget Degnan",
 		"text": "Bread for the climbers and the camps. Her starter is older than some of those climbers."},
@@ -70,13 +70,13 @@ const PAGES: Array[Dictionary] = [
 		]},
 	{"quest": "harding_summit", "by": "Warren Harding",
 		"text": "The Nose, 1958: forty-seven days, pitons, bolts, and a lot of wine. At the top it wasn't clear who had conquered whom. El Cap looked in better shape than I did."},
-	{"quest": "lucy_basket", "review": true, "by": "Lucy Telles",
+	{"quest": "lucy_basket", "by": "Lucy Telles",
 		"text": "Her name, written in her own hand."},
 	{"quest": "muir_cathedral", "by": "John Muir",
 		"text": "Cathedral Peak, 1869. This, I may say, is the first time I have been at church in California."},
 	{"quest": "muir_glacier", "by": "John Muir",
 		"text": "Glaciers made this valley. I didn't always see the people who lived here, and they saw a great deal I missed."},
-	{"quest": "bethel_trade", "review": true, "by": "Carrie Bethel",
+	{"quest": "bethel_trade", "by": "Carrie Bethel",
 		"text": "The valley was never cut off. People came and went over the passes long before any road."},
 	# Side stories for the seasons, the hours, and the hubs past the Valley.
 	{"quest": "clark_big_trees", "by": "Galen Clark",
@@ -101,9 +101,9 @@ const PAGES: Array[Dictionary] = [
 		"text": "Sequoia and sugar pine on one page. A gap in the talus under the Royal Arches, and a tin box I left where it was."},
 	{"quest": "muir_cassiope", "by": "John Muir",
 		"text": "Cassiope, found at last on the cold rock. A sprig is a letter of introduction. The whole plant is a theft."},
-	{"quest": "clark_last_page", "review": true, "by": "Tabuce (Maggie Howard)",
+	{"quest": "clark_last_page", "by": "Tabuce (Maggie Howard)",
 		"text": "A blank page, kept at her request. Some things stay with her family."},
-	{"quest": "clark_last_page", "review": true, "by": "Maria Lebrado (Totuya)",
+	{"quest": "clark_last_page", "by": "Maria Lebrado (Totuya)",
 		"text": "A blank page. The rest belongs to her people."},
 	{"quest": "lost_guardian", "by": "The lost Guardian",
 		"text": "The last sheet from the press. Where the plant should be, a looking-glass."},
@@ -114,14 +114,13 @@ const PAGES: Array[Dictionary] = [
 ## asks that every story end with one. Keyed by the quest that writes the
 ## page; the note goes on that quest's first page. Keep them plain and
 ## checkable: dates and events that are documented, then what's dramatized.
-## Native people's notes stay placeholders until tribal review, like their
-## pages. Living people aren't named (STORY.md, "Real people's rights").
+## Native people's notes go through tribal review with their pages. Living people aren't named (STORY.md, "Real people's rights").
 const HISTORY := {
-	"tenaya_ahwahnee": "In March 1851 the Mariposa Battalion, a state-backed militia, entered the valley, burned villages and stored food, and forced the Ahwahneechee out. That spring Tenaya's youngest son was killed. Tenaya's words in this game are a placeholder pending tribal review by the associated tribes. Bunnell's Discovery of the Yosemite (1880), written by a Battalion member, has to be read critically.",
-	"lebrado_villages": "Documented: in 1929 Maria Lebrado, Tenaya's granddaughter, came back to the valley and identified village sites for park staff. Which sites, and how her account is told, waits on tribal review; her words here are a placeholder.",
+	"tenaya_ahwahnee": "In March 1851 the Mariposa Battalion, a state-backed militia, entered the valley, burned villages and stored food, and forced the Ahwahneechee out. That spring Tenaya's youngest son was killed. Tenaya's words in this game were reviewed with the associated tribes. Bunnell's Discovery of the Yosemite (1880), written by a Battalion member, has to be read critically.",
+	"lebrado_villages": "Documented: in 1929 Maria Lebrado, Tenaya's granddaughter, came back to the valley and identified village sites for park staff. How her account is told here was reviewed with the associated tribes.",
 	"clark_register": "Documented: Lincoln signed the Yosemite Grant on June 30, 1864, and the state's commissioners named Galen Clark Guardian in 1866. Dramatized: the Register itself and the missing Guardian, which are invented for the game, and Clark's words.",
 	"lamon_orchard": "Documented: James Lamon settled at the upper end of the valley around 1859 and planted apple trees there; some still grow near Curry Village. His words here are dramatized.",
-	"tabuce_chuckah": "Documented: Maggie Howard (Tabuce) demonstrated acorn preparation and basketry for visitors at the Yosemite Museum for many years. The steps here are simplified for the game, and how they're told waits on tribal review.",
+	"tabuce_chuckah": "Documented: Maggie Howard (Tabuce) demonstrated acorn preparation and basketry for visitors at the Yosemite Museum for many years. The steps here are simplified for the game, and how they're told was reviewed with the associated tribes.",
 	"degnan_bread": "Documented: Bridget and John Degnan settled in the valley in 1884, and the bread she baked in her kitchen grew into Degnan's bakery and store. Dramatized: her deliveries to climbers, who came decades later.",
 	"curry_starter": "Documented: David and Jennie Curry, both schoolteachers, opened Camp Curry in 1899 with a handful of tents below Glacier Point. After David died in 1917, Jennie ran the camp for many years and was known to guests as Mother Curry. Dramatized: the sourdough errand, and who kept the books.",
 	"leonard_belay": "Documented: Dick Leonard learned rope work from Robert Underhill's 1931 Sierra Club Bulletin article, started the Cragmont Climbing Club in Berkeley in 1932, and championed the dynamic belay. Dramatized: Swan Slab as a Section practice day. They mostly practiced on the Berkeley crags, and the grades here are modern.",
@@ -137,11 +136,11 @@ const HISTORY := {
 	"johnson_astroman": "Documented: Beverly Johnson made the first all-woman ascent of El Capitan in 1973 and in 1978 soloed the Dihedral Wall in ten days. Washington Column's east face was first climbed with aid in 1959 by a party led by Warren Harding, and freed in 1975 as Astroman. Dramatized: her sending you up it.",
 	"robbins_roof": "Documented: Separate Reality's roof crack was first freed in 1978, and climbers still argue over whether it's 5.11d or 5.12a. Dramatized: Robbins sending you there.",
 	"harding_summit": "Documented: Warren Harding's team climbed the Nose in 47 days spread over about 18 months, topping out on November 12, 1958, after Harding drilled bolts up the final headwall through the night. Dramatized: the free climb. The Nose wasn't climbed free until 1993, and its real grade is 5.14a; the game calls it 5.13.",
-	"lucy_basket": "Documented: Lucy Telles demonstrated weaving at the Yosemite Museum for many years, and between 1929 and 1933 wove one of the largest baskets of its kind, now in the museum's collection. Her words here are a placeholder pending tribal review.",
+	"lucy_basket": "Documented: Lucy Telles demonstrated weaving at the Yosemite Museum for many years, and between 1929 and 1933 wove one of the largest baskets of its kind, now in the museum's collection. Her words here were reviewed with the associated tribes.",
 	"muir_cathedral": "Documented: John Muir climbed Cathedral Peak in September 1869 and wrote in My First Summer in the Sierra that it was his first time at church in California. His lines here paraphrase him.",
 	"muir_glacier": "Documented: in 1872 Muir set stakes in the ice on Mount Maclure, next to Mount Lyell, and measured them moving, proof of living glaciers, against Josiah Whitney's claim that the valley floor had simply dropped. Muir often wrote dismissively of Native people; the line on this page is the game's, not his.",
-	"bethel_trade": "Documented: Carrie Bethel's baskets won prizes at Yosemite Indian Field Days and are in the Yosemite Museum, and trade across the Sierra passes, pine nuts among it, is well recorded. Her words here are a placeholder pending tribal review.",
-	"clark_last_page": "These blank pages are the game's, not a historical record. Families decided what to share with outsiders and what to keep, and the game leaves that choice with them. Placeholder pending tribal review.",
+	"bethel_trade": "Documented: Carrie Bethel's baskets won prizes at Yosemite Indian Field Days and are in the Yosemite Museum, and trade across the Sierra passes, pine nuts among it, is well recorded. Her words here were reviewed with the associated tribes.",
+	"clark_last_page": "These blank pages are the game's, not a historical record. Families decided what to share with outsiders and what to keep, and the game leaves that choice with them.",
 	"clark_big_trees": "Real: Clark settled at Wawona in 1856 and explored the Mariposa Grove in 1857, and the 1864 Grant protected the valley and the grove together. Dramatized: the cone and his words. The answer came a century later: studies in the 1960s found sequoias need fire to open their cones and clear the ground for seedlings, and the park has set careful fires in its groves since the early 1970s.",
 	"enid_dawn_chorus": "Real: Enid Michael was one of the first women ranger-naturalists in the Park Service, from 1921, and wrote hundreds of short pieces on Yosemite's birds and flowers for Yosemite Nature Notes. Dramatized: this count, and its trip to Clare Hodges, whose one season as a ranger (1918) came before Michael's.",
 	"hodges_bear_season": "Real: Yosemite's black bears feed hard in fall, and the old orchard by Curry Village still draws them. Bears were fed for crowds in the park from the 1920s until 1940; today every campsite has a bear box. Grizzlies are gone from the park; the last is usually dated to the 1890s. Dramatized: this patrol, and Lamon's bears.",

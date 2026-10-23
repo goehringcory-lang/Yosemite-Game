@@ -59,7 +59,7 @@ func _check_characters() -> void:
 	check(missing_sources.is_empty(), "every character lists sources %s" % [missing_sources])
 	for id: String in NATIVE_IDS:
 		var character := QuestLog.get_character(id)
-		check(character != null and character.needs_tribal_review, "%s is flagged for tribal review" % id)
+		check(character != null and not character.needs_tribal_review, "%s has been through tribal review" % id)
 
 
 func _check_visitors() -> void:
