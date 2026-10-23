@@ -544,6 +544,12 @@ func _hat(kind: String, c: Color, band: Color, _hair: Color) -> void:
 			rect(13, 13, 14, 2, darker(c, 0.3))
 			rect(12, 14, 16, 1, darker(c, 0.4))
 			px(20, 5, darker(c, 0.2))
+		"toque":
+			rect(12, 8, 16, 6, darker(c, 0.08))
+			for x in range(14, 27, 3):
+				rect(x, 8, 1, 6, darker(c, 0.2))
+			rect(12, 13, 16, 1, darker(c, 0.3))
+			shaded(20, 4.5, 10.5, 5, c, -100, 9)
 		"painter_cap":
 			shaded(20, 11, 9.4, 5, c, -100, 13)
 			rect(14, 12, 12, 2, darker(c, 0.2))

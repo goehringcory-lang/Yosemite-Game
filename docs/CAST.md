@@ -28,6 +28,7 @@ NPCs go in a hub's story overlay (`scenes/story/content/<hub>.tscn`). Each NPC h
 | `spot` | A marker name in the hub (`camp_4`, `curry_village`, …). They follow the marker if the map is regenerated. |
 | `offset` | Offset from the spot, so several people can share one |
 | `wander_radius` | How far they stroll from where they start. 0 means they stay put. They stop and face you when you talk. |
+| `only_on_step`, `away_on_step` | `"quest_id:step index"`: only here (or away) while that quest is on that step. The Ahwahnee's chef leaves his dining room and waits under the old oak this way. |
 
 `tests/cast_test.tscn` checks that everyone stands on open ground.
 
@@ -69,6 +70,11 @@ Two invented people work at the Curry Village Mountain Shop. They're not histori
 - **Marty Kessler** runs the counter (the shop's Vendor; quests reach him through the shop's `talk_target`, `mountain_shop`). He trades you the guidebook and fits you with your first kit.
 - **Wren Alvarez** started at the shop this week, doesn't know anyone in the Valley, and waits at the foot of Firefall Slab with a rope, looking for a partner.
 
+### Ahwahnee staff
+
+- **Lucien Marchand**, the Ahwahnee's head chef (1930s), invented like the Mountain Shop's two (`data/characters/staff/ahwahnee_chef.tres`). He works in the dining room (`scenes/story/content/ahwahnee_dining_room.tscn`) and gives one side story, *The Chef's Larder*: wild strawberries and yerba buena for a tart, and in return he takes you out to the old black oak at the edge of the Tea Lawn, pulls back the wild grape that hangs over its trunk, and shows you a face carved into the bark.
+- **The carved oak** (`CarvedOak`, `scripts/objects/carved_oak.gd`; art by `tools/hubs/ahwahnee32/carved_tree.py`) is invented. The carving shows a face with long hair, no regalia, and the chef says plainly that he doesn't know who carved it or who it shows, and that the story belongs to the families whose valley this was first. Because it depicts a Native person, the carving, its description and the chef's lines about it are **pending tribal review**; until that review, it's a placeholder.
+
 **Firefall Slab** is an invented route too: a stand-in for the many bolted friction climbs on the lower Glacier Point Apron, named for the Firefall that poured from the cliff above.
 
 ### Visitors
@@ -102,7 +108,8 @@ Talking to a visitor gets one random line.
 | The west end | yosemite_valley, near Valley View | Separate Reality |
 | Happy Isles | yosemite_valley · `happy_isles` | Anderson; Snake Dike |
 | The Ahwahnee / Royal Arches | yosemite_valley · `the_ahwahnee` | Maria Lebrado; Royal Arches |
-| The Ahwahnee grounds (walk north from the homestead: `ahwahnee_trail`, then `the_ahwahnee`) | the_ahwahnee · `front_door`, `rose_garden`, `tea_lawn`, `cascade`, `ahwahnee_meadow` | Royal Robbins and the Royal Arches start behind the hotel. The hotel's doors are still a sign, with no inside. |
+| The Ahwahnee grounds (walk north from the homestead: `ahwahnee_trail`, then `the_ahwahnee`) | the_ahwahnee · `front_door`, `rose_garden`, `tea_lawn`, `cascade`, `ahwahnee_meadow` | Royal Robbins and the Royal Arches start behind the hotel. The old carved oak stands at the west edge of the Tea Lawn. |
+| The Ahwahnee Dining Room | ahwahnee_dining_room (through the lobby) | Lucien Marchand, the head chef, at the west end |
 | The gap in the talus (the Guardian's cave) | the_ahwahnee · `cave_mouth`, then `guardian_cave` | Under the Royal Arches, east of the climb's start. Shut until Clark's last quest. Inside: the looking-glass, and at the end, everyone. |
 | Mirror Lake | yosemite_valley · `mirror_lake` | Tenaya |
 | Glacier Point Apron | yosemite_valley · `apron_base` | the Apron climb |
@@ -231,6 +238,9 @@ The seasons, the hours, and the hubs past the Valley:
                                     in your chuckah, warn Lamon about bears → 3 jerky
   Degnan: Snowbound ............... (winter only; after Bread for the Valley and Leave Some Behind)
                                     her flour from the El Portal railyard + toasted toyon → bread pudding recipe, 2 bread
+  Chef Marchand: The Chef's Larder  (spring and summer; after The Guardian's Register) 4 wild strawberries,
+                                    2 yerba buena, then meet him at the old oak on the Tea Lawn
+                                    → he shows you the carved face in its bark, 2 bread pudding
 Other:
   Lucy Telles: The Big Basket ✦ ... her name in the Register → 2 acorn cakes
   Carrie Bethel: Over the Crest ✦ . 4 acorn flour → 10 pine nuts
@@ -291,6 +301,7 @@ The Mountain Shop and Camp 4 traders sell more of the same pieces for food (cams
 ## Before release
 
 - **Tribal review** is done for Tenaya, Tabuce, Lucy Telles, Maria Lebrado, and Carrie Bethel (their looks, dialogue, the acorn and pine nut practices, and the Register entries about Ahwahnee and the village sites), for the side stories that describe Native life (Hodges's *Bear Season*, Muir's *A Fire at Soda Springs*), and for the Indian Village, the Museum's weavers panel and the Ahwahnee's patterns.
+- **Pending tribal review:** the carved oak on the Ahwahnee's Tea Lawn (its art, its description, and Chef Marchand's lines about it in *The Chef's Larder*). It's invented, and it depicts a Native person, so it needs the same review as the Native characters before it ships.
 - **Still to write with the tribes:** what those five say in the finale at the mirror (`GuardianMirror`, still a placeholder line), and whether they're part of that scene.
 - **Verify** every character's `sources`, and fill in the blank dates (Degnan, McCauley, Tabuce).
 - **Verify the side-story Register notes:** Clark in the Mariposa Grove (1857) and the start of prescribed fire in the groves (early 1970s); Enid Michael's start as a ranger-naturalist (1921) and her Yosemite Nature Notes; bear feeding shows (1920s to 1940) and the date of the last Yosemite grizzly (usually given as 1895); the Yosemite Valley Railroad (1907 to 1945, year-round to El Portal); Muir and Robert Underwood Johnson at Soda Springs (1889); the tin cup, tea, and dried bread Muir is said to have carried.

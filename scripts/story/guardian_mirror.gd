@@ -35,14 +35,15 @@ const GATHERING := [
 	["jennie_curry", "I'll give that empty tent to somebody who needs one. The Guardian has a camp."],
 	["john_muir", "The mountains did notice. I'm nearly sure of it now."],
 	["wren_alvarez", "First tick to last. I knew on Firefall Slab."],
+	["ahwahnee_chef", "Somebody had better feed all these people. Come by the kitchen after, all of you."],
 	["", "[Placeholder pending tribal review: what Tenaya, Tabuce, Lucy Telles, Maria Lebrado and Carrie Bethel say here, and whether they are part of this scene.]"],
 	["galen_clark", "Every one of us kept this valley for a while, and every one of us was afraid there'd be nobody after. We were all looking for the Guardian, and the whole time you were the one doing the looking."],
 	["galen_clark", "You had to do all of it to find this out. The quests were never a test. They were the work, and the work is what a Guardian is."],
 ]
-## Where the crowd stands: three rows across the cave, with the way to the
+## Where the crowd stands: four rows across the cave, with the way to the
 ## mirror left open down the middle.
 const COLUMNS := [120, 200, 280, 360, 600, 680, 760, 840]
-const ROWS := [300, 356, 412]
+const ROWS := [300, 356, 412, 468]
 
 var _busy := false
 
@@ -102,7 +103,7 @@ static func closing_lines() -> Array[Dictionary]:
 	])
 
 
-## Stands everyone in the Register (and the Mountain Shop's two) in the cave
+## Stands everyone in the Register (and the invented staff) in the cave
 ## behind the player, facing the mirror. Safe to call again.
 func gather() -> void:
 	var entities := get_parent()

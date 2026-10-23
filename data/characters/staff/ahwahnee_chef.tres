@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/ahwahnee_chef.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "ahwahnee_chef"
+display_name = "Lucien Marchand"
+years = "1930s"
+affiliation = "The Ahwahnee (head chef)"
+bio = "Head chef in the Ahwahnee's kitchen. Came up from San Francisco to cook for a grand hotel, and stayed for what grows in the meadows around it. An invented character, not a historical figure."
+idle_lines = PackedStringArray("Thirty-four-foot ceilings, and still the stock pot fogs the windows by six.", "The guests want lobster in the mountains. I give them trout from the Merced and they forget all about it.", "A cook who doesn't walk in the meadow every morning is only reading recipes.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.941, 0.925, 0.878, 1)
+home = "The Ahwahnee Dining Room"
+staff = true
+sources = "Invented for the game. The Ahwahnee opened in 1927; its dining room has 34-foot ceilings and sugar pine trusses. The carved oak on the Tea Lawn is invented too, and what it shows is pending tribal review."

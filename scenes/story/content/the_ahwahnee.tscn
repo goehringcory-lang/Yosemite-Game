@@ -7,6 +7,14 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/shuttle_stop.tscn" id="5_r"]
 [ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="6_r"]
 [ext_resource type="Texture2D" path="res://assets/sprites/cave/cave_mouth.png" id="7_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/info_sign.tscn" id="8_r"]
+[ext_resource type="Script" path="res://scripts/objects/carved_oak.gd" id="9_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/carved_oak_hidden.png" id="10_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/carved_oak.png" id="11_r"]
+[ext_resource type="Resource" path="res://data/characters/staff/ahwahnee_chef.tres" id="12_r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oak"]
+size = Vector2(44, 14)
 
 [node name="TheAhwahneeStory" type="Node2D"]
 
@@ -33,3 +41,25 @@ locked_text = "Two fallen blocks lean together at the foot of the Royal Arches, 
 [node name="Sprite" parent="GuardianCaveMouth" index="0"]
 texture = ExtResource("7_r")
 offset = Vector2(0, -30)
+
+[node name="CarvedOak" parent="." instance=ExtResource("8_r")]
+position = Vector2(668, 1176)
+script = ExtResource("9_r")
+hidden_texture = ExtResource("10_r")
+revealed_texture = ExtResource("11_r")
+title = "The Old Black Oak"
+text = "A black oak older than the hotel, at the far edge of the Tea Lawn. Wild grape hangs down its trunk in a thick green curtain. The kitchen staff seem to step around it on purpose."
+revealed_text = "A black oak older than the hotel. Someone, long ago, carved a face into its trunk: long hair, eyes nearly shut, a calm mouth. The bark has grown in around the edges of the cuts.\n\nNobody at the Ahwahnee knows who carved it, or who it shows. Chef Marchand keeps the wild grape pulled back so it can be seen."
+
+[node name="Sprite" parent="CarvedOak" index="0"]
+texture = ExtResource("10_r")
+offset = Vector2(0, -112)
+
+[node name="Collision" parent="CarvedOak" index="1"]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_oak")
+
+[node name="AhwahneeChefAtOak" parent="." instance=ExtResource("1_r")]
+character = ExtResource("12_r")
+position = Vector2(716, 1200)
+only_on_step = "ahwahnee_chef_larder:2"

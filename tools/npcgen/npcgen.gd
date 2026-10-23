@@ -547,6 +547,12 @@ func _hat(look: Dictionary, facing: int) -> void:
 				rect(5, 5, 6, 1, tone(c, -0.3))
 			elif side:
 				rect(2, 5, 4, 1, tone(c, -0.3))
+		"toque":
+			# A chef's tall white hat: a pleated band and a puff over it.
+			_crown(4, 0, 8, 3, c)
+			rect(5, 3, 6, 2, tone(c, -0.12))
+			px(7, 3, tone(c, -0.3))
+			px(9, 3, tone(c, -0.3))
 		"painter_cap":
 			_crown(5, 2, 6, 3, c)
 			if facing == Facing.DOWN:

@@ -227,7 +227,7 @@ All of this is wired into the World. Each region's people, climbs, and cooking s
 | System | Files | Notes |
 |---|---|---|
 | Gear | `scripts/story/gear.gd`, `data/gear/*.tres` | Autoload `Gear`. You start with approach shoes. The Mountain Shop's *Fitted Out* quest gives climbing shoes, a chalk bag, a harness, and 5 quickdraws. |
-| Quests & dialogue | `scripts/story/quest_log.gd`, `quest_data.gd`, `character_data.gd`, `dialogue_box.gd`, `npc.gd` | Autoload `QuestLog`. Quest steps: have, have_food, pay, talk, chuckah, stored, made, climbed, return. Mountain Shop staff are in `QuestLog.STAFF`. |
+| Quests & dialogue | `scripts/story/quest_log.gd`, `quest_data.gd`, `character_data.gd`, `dialogue_box.gd`, `npc.gd` | Autoload `QuestLog`. Quest steps: have, have_food, pay, talk, chuckah, stored, made, climbed, return. Invented staff (the Mountain Shop's two, the Ahwahnee's chef) are in `QuestLog.STAFF`. |
 | Food & spoilage | `scripts/story/food_db.gd`, `larder.gd`, `data/food/*.tres` | Autoloads `FoodDB` (energy, shelf life) and `Larder` (spoils food overnight). |
 | Chuckah | `scripts/story/granary.gd`, `chuckah.gd` | Autoload `Granary`. Stored acorns never spoil, and one chuckah holds 40. |
 | Cooking | `scripts/story/recipes.gd`, `station.gd`, `data/recipes/*.tres` | Stations: campfire, bedrock mortar, leaching basin. Acorn chain: 4 acorns → flour → leached meal → mush or cakes. |
