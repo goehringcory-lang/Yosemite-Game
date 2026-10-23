@@ -58,6 +58,11 @@ func _init() -> void:
 	_save("flutter", _flutter(72), RATE_FX, -12.0)
 	_save("rustle", _rustle(73), RATE_FX, -14.0)
 	_save("heart", _chime([76, 81, 88], 0.09, 1.0), RATE_FX, -8.0)
+	# The Camp 4 slackline (last, so the sounds above keep their random takes).
+	_save("slack_twang", _twang(80), RATE_FX, -7.0)
+	_save("slack_gust", _gust(81), RATE_FX, -9.0)
+	_save("slack_cheer", _cheer(82), RATE_FX, -8.0)
+	_save("slack_medal", _chime([72, 76, 79, 84, 88], 0.08, 1.3), RATE_FX, -5.0)
 	print("Sounds written to %s. Run godot --headless --path . --import next." % OUT)
 	quit()
 
@@ -472,6 +477,56 @@ func _chime(notes: Array, gap: float, ring: float) -> PackedFloat32Array:
 	for k in notes.size():
 		var f := 440.0 * pow(2.0, (float(notes[k]) - 69.0) / 12.0)
 		_add_ping(buf, RATE_FX, k * gap, [[f, 1.0], [f * 2.0, 0.3], [f * 3.01, 0.1]], ring / 5.0, 0.5)
+	return buf
+
+
+## The slackline bucking under you: a low thrum of webbing, plucked, with
+## the slap of a foot.
+func _twang(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(0.5, RATE_FX)
+	_add_ping(buf, RATE_FX, 0.0, [[73.0, 1.0], [146.0, 0.55], [221.0, 0.25], [297.0, 0.1]], 0.07, 1.0)
+	_add_click(buf, RATE_FX, 0.0, 0.012, 0.5, 1800.0)
+	return buf
+
+
+## Wind coming off the wall: a long swell of band noise that rises and falls.
+func _gust(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(1.6, RATE_FX)
+	var center := PackedFloat32Array()
+	var gain := PackedFloat32Array()
+	center.resize(buf.size())
+	gain.resize(buf.size())
+	for i in buf.size():
+		var t := float(i) / buf.size()
+		center[i] = 380.0 + sin(PI * t) * 900.0
+		gain[i] = pow(sin(PI * t), 1.6) * 0.32
+	_add_band_noise(buf, RATE_FX, center, 1.1, gain)
+	_add_noise(buf, RATE_FX, 0.05, 900.0, 120.0)
+	_envelope(buf, 0.35, RATE_FX)
+	return buf
+
+
+## A few climbers cheering from the boulders: rising "whoo"s and claps.
+func _cheer(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(1.3, RATE_FX)
+	for k in 4:
+		var at := _rng.randf_range(0.0, 0.25)
+		var f := _rng.randf_range(260.0, 420.0)
+		_add_tone(buf, RATE_FX, at, _rng.randf_range(0.45, 0.7), f, f * _rng.randf_range(1.35, 1.6), 0.22, 0.45)
+	for k in 14:
+		_add_click(buf, RATE_FX, 0.1 + k * 0.075 + _rng.randf_range(-0.02, 0.02), 0.01, _rng.randf_range(0.5, 0.9), 2600.0)
+	var center := PackedFloat32Array()
+	var gain := PackedFloat32Array()
+	center.resize(buf.size())
+	gain.resize(buf.size())
+	for i in buf.size():
+		var t := float(i) / buf.size()
+		center[i] = 1100.0
+		gain[i] = 0.12 * sin(PI * minf(t * 1.6, 1.0))
+	_add_band_noise(buf, RATE_FX, center, 0.9, gain)
 	return buf
 
 

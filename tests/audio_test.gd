@@ -14,7 +14,7 @@ const SETTINGS_PATH := "user://audio_test_settings.cfg"
 const USED := ["amb_day", "amb_night", "amb_wind", "amb_rain", "waterfall", "campfire",
 	"step_dirt", "step_snow", "step_wood", "step_wet", "climb_move", "climb_clip", "climb_cam",
 	"climb_chalk", "climb_eat", "climb_fall", "climb_jug", "climb_crux", "climb_topout",
-	"ui_move", "ui_select", "ui_back"]
+	"ui_move", "ui_select", "ui_back", "slack_twang", "slack_gust", "slack_cheer", "slack_medal"]
 
 var failures := 0
 var world: Node
