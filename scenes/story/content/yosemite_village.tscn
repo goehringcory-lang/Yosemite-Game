@@ -14,6 +14,9 @@
 [ext_resource type="Script" path="res://scripts/world/moonbow.gd" id="15_r"]
 [ext_resource type="Resource" path="res://data/characters/enid_michael.tres" id="16_r"]
 [ext_resource type="Resource" path="res://data/characters/maggie_howard.tres" id="17_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_postmaster.tres" id="tt_visitor_postmaster"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_baker.tres" id="tt_visitor_baker"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_photographer.tres" id="tt_visitor_photographer"]
 
 [node name="YosemiteVillageStory" type="Node2D"]
 
@@ -36,6 +39,7 @@ character = ExtResource("9_r")
 spot = "camp_4"
 offset = Vector2(18, 20)
 wander_radius = 64
+timetable = PackedStringArray("7:00 camp_4", "9:00 lower_yosemite_fall", "12:30 village_store", "13:30 degnans_bakery", "15:00 camp_4", "18:30 camp_4_fire")
 
 [node name="BridgetDegnan" parent="." instance=ExtResource("1_r")]
 character = ExtResource("10_r")
@@ -76,7 +80,23 @@ character = ExtResource("14_r")
 spot = "cooks_meadow"
 offset = Vector2(0, 0)
 wander_radius = 96
+timetable = PackedStringArray("7:00 valley_lodge", "8:30 cooks_meadow", "10:30 welcome_center", "11:30 yosemite_museum", "12:30 village_store", "14:00 lower_yosemite_fall", "16:30 cooks_meadow", "18:30 cemetery")
 
 [node name="Moonbow" type="Node2D" parent="."]
 position = Vector2(1408, 240)
 script = ExtResource("15_r")
+
+[node name="VisitorPostmaster" parent="." instance=ExtResource("1_r")]
+character = ExtResource("tt_visitor_postmaster")
+wander_radius = 32
+timetable = PackedStringArray("7:00 valley_lodge", "8:00 post_office", "11:00 village_store", "12:00 degnans_bakery", "13:00 post_office", "15:30 welcome_center", "16:30 ranger_station", "17:30 post_office")
+
+[node name="VisitorBaker" parent="." instance=ExtResource("1_r")]
+character = ExtResource("tt_visitor_baker")
+wander_radius = 24
+timetable = PackedStringArray("7:00 east_road", "7:20 degnans_bakery", "11:30 village_store", "12:30 degnans_bakery", "16:00 cooks_meadow", "18:00 cemetery")
+
+[node name="VisitorPhotographer" parent="." instance=ExtResource("1_r")]
+character = ExtResource("tt_visitor_photographer")
+wander_radius = 64
+timetable = PackedStringArray("7:00 valley_lodge", "7:30 cooks_meadow", "9:30 lower_yosemite_fall", "12:00 degnans_bakery", "13:00 bests_studio", "15:00 yosemite_museum", "17:00 cooks_meadow", "19:00 welcome_center")

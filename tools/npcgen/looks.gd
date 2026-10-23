@@ -257,6 +257,34 @@ const LOOKS := {
 		"top": "e8e0d0", "top_style": "blouse", "top2": "6a8aa0", "bottom": "5a6a8a", "bottom_style": "skirt",
 		"carry": ["notebook"],
 	},
+	# ------------------------------------------------ Townsfolk who keep a timetable (invented)
+	# Curry Village's lifeguard and housekeeper, and Yosemite Village's
+	# postmaster, baker and photographer: everyday people with somewhere to be.
+	"visitor_lifeguard": {
+		"skin": SKIN_BROWN, "hair": "2a1a14", "hair_style": "short", "hat": "cap", "hat_color": "c8402e",
+		"top": "f0ece0", "top_style": "shirt", "top2": "c8402e", "collar": "c8402e", "bottom": "c8402e",
+		"shoes": "d8d0c0",
+	},
+	"visitor_housekeeper": {
+		"skin": SKIN_DEEP, "hair": "1a1410", "hair_style": "bun",
+		"top": "8aa0b8", "top_style": "blouse", "top2": "e8e4d8", "apron": "f0ece0", "bottom_style": "skirt",
+		"bottom": "4a4a58", "carry": ["basket"],
+	},
+	"visitor_postmaster": {
+		"skin": SKIN_FAIR, "hair": "5a4030", "beard": "mustache", "beard_color": "5a4030", "hat": "cap",
+		"hat_color": "3e4c62", "top": "3e4c62", "top_style": "jacket", "top2": "2c374a", "bottom": "3e4c62",
+		"badge": "e0c060", "carry": ["book"],
+	},
+	"visitor_baker": {
+		"skin": SKIN_TAN, "hair": "2a2018", "beard": "mustache", "beard_color": "2a2018", "hat": "painter_cap",
+		"hat_color": "f0ece0", "top": "f0ece0", "top_style": "shirt", "top2": "d8d2c0", "apron": "e8e4d8",
+		"bottom": "6a5a4a", "carry": ["loaf"],
+	},
+	"visitor_photographer": {
+		"skin": SKIN_BROWN, "hair": "2a1a14", "hair_style": "long", "glasses": true,
+		"top": "b0603a", "top_style": "sweater", "top2": "8a4a2a", "bottom": "4a5a6e", "bottom_style": "pants",
+		"shoes": "4a3a2a", "carry": ["camera"],
+	},
 }
 
 ## Icons in assets/sprites/story_items.png, left to right.
