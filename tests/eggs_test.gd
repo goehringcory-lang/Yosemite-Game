@@ -1,6 +1,6 @@
 extends Node
 ## Headless test of the Easter eggs: the Firefall, the moonbow, the Camp 4 night
-## details, the bear boxes, the conditional story notes, and Crow's Camp. See
+## details, the bear boxes, the conditional story notes, Crow's Camp, and Chongo. See
 ## docs/DESIGN.md ("Easter eggs").
 ## Run: godot --headless --path . res://tests/eggs_test.tscn
 ## Exit code is the number of failed checks. Uses its own save file.
@@ -40,6 +40,7 @@ func _ready() -> void:
 	await test_wawona()
 	await test_bear_tracks()
 	await test_crows_camp()
+	await test_chongo()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
 
@@ -311,3 +312,105 @@ func test_crows_camp() -> void:
 	check(Crow.paper_day == Crow._today(), "one paper a day")
 	for fx: TripEffect in _trip_effects():
 		fx.free()
+
+
+## Chongo, a different rock every day: where he turns up, that he stands by a
+## boulder, selling you his physics book for a snack, and a lesson after.
+func test_chongo() -> void:
+	var places := {}
+	for day in range(1, 29):
+		var morning := Chongo.haunt("1-0-%d" % day, false)
+		var afternoon := Chongo.haunt("1-0-%d" % day, true)
+		places[morning] = true
+		places[afternoon] = true
+		if morning == afternoon or morning not in Chongo.HAUNTS or afternoon not in Chongo.HAUNTS:
+			places["bad"] = true
+	check(not places.has("bad"), "Chongo moves to another of his haunts every afternoon")
+	check(places.size() >= 8, "he turns up all over the park over a season (%d places)" % places.size())
+	set_time(SUMMER, 5, 6)
+	check(Chongo.where_now() == "", "he isn't out before breakfast")
+	GameClock.minutes = 21 * 60
+	check(Chongo.where_now() == "", "or after dark")
+	# Every haunt has boulders he can stand by.
+	for id: String in Chongo.HAUNTS:
+		world._enter_region(id)
+		await get_tree().physics_frame
+		await get_tree().physics_frame
+		var key := "test:" + id
+		var spot := Chongo.pick_spot(world.region, key)
+		var rocks := Chongo.boulders(world.region)
+		check(not rocks.is_empty() and not spot.is_empty() and (spot.rock in rocks or spot.rock is Place) and WalkGrid.of(world.region).is_open(spot.at),
+			"%s has a boulder he can stand by (%d rocks)" % [id, rocks.size()])
+		check(not world.region.entities.has_node("Chongo"), "and he isn't in %s while he's off the clock" % id)
+	# Find a summer morning he's in the Village, and go meet him.
+	var day := 1
+	while Chongo.haunt("1-1-%d" % day, false) != "yosemite_village" and day < 200:
+		day += 1
+	GameClock.year = 1
+	set_time(SUMMER, day, 9)
+	check(Chongo.where_now() == "yosemite_village", "some mornings he's in the Village")
+	world._enter_region("yosemite_village")
+	var chongo: Chongo = null
+	for i in 10:
+		await get_tree().physics_frame
+		chongo = world.region.entities.get_node_or_null("Chongo") as Chongo
+		if chongo:
+			break
+	check(chongo != null and chongo.character.visitor, "there he is, a visitor, not in the Register")
+	if chongo == null:
+		return
+	check(chongo.rock in Chongo.boulders(world.region) or chongo.rock is Place, "standing by a boulder (or a named spot)")
+	check(chongo.global_position.distance_to(chongo.rock.global_position) < 80.0 or chongo.rock is Place, "right next to it")
+	var where := chongo.global_position
+	world._enter_region("curry_village")
+	await get_tree().physics_frame
+	world._enter_region("yosemite_village")
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	var again := world.region.entities.get_node_or_null("Chongo") as Chongo
+	check(again != null and again.global_position == where, "he's at the same rock when you come back")
+	# Buy the book for a snack.
+	QuestLog.heard_beats.erase(Chongo.MET)
+	QuestLog.heard_beats.erase(Chongo.SOLD)
+	for id in FoodDB.edible_in_inventory():
+		Inventory.remove(id, Inventory.count(id))
+	Inventory.remove(Chongo.BOOK, Inventory.count(Chongo.BOOK))
+	var player: Player = world.player
+	await _talk(again, player, 0)
+	check(Chongo.has_met() and not Chongo.has_sold() and Inventory.count(Chongo.BOOK) == 0, "with no food, he can't sell you the book")
+	Inventory.add("chocolate_bar")
+	await _talk(again, player, 0)
+	check(Chongo.has_sold() and Inventory.count(Chongo.BOOK) == 1, "he trades you his physics book")
+	check(Inventory.count("chocolate_bar") == 0, "for a chocolate bar")
+	check(ItemDB.get_item(Chongo.BOOK) != null and ItemDB.get_item(Chongo.BOOK).icon != null, "the book is an item with a picture")
+	var spoken: Array[String] = []
+	await _talk(again, player, 0, spoken)
+	check(spoken.any(func(t: String) -> bool: return t.begins_with("Chapter")), "then he teaches you a page of it")
+	check(player.can_act and not again._talking, "and lets you go")
+	# Later he moves on to the afternoon's rock, somewhere else.
+	GameClock.minutes = 14 * 60
+	world._enter_region("curry_village")
+	await get_tree().physics_frame
+	world._enter_region("yosemite_village")
+	await get_tree().physics_frame
+	check(not world.region.entities.has_node("Chongo"), "in the afternoon he's gone to another rock")
+	Inventory.remove(Chongo.BOOK)
+
+
+## Talks to [param npc], picking [param option] at every choice, and collects
+## what's said in [param spoken].
+func _talk(npc: NPC, player: Player, option: int, spoken: Array[String] = []) -> void:
+	Engine.time_scale = 8.0
+	npc.interact(player)
+	for i in 2000:
+		await get_tree().process_frame
+		var dialogue := _find_box()
+		if dialogue:
+			var text: String = dialogue._text_label.text
+			if text != "" and (spoken.is_empty() or spoken[-1] != text):
+				spoken.append(text)
+			dialogue._cursor = option
+			dialogue.press()
+		elif not npc._talking:
+			break
+	Engine.time_scale = 1.0

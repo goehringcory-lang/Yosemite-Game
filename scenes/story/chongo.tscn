@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Script" path="res://scripts/story/chongo.gd" id="2_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/chongo.tres" id="3_r"]
+
+[node name="Chongo" instance=ExtResource("1_r")]
+script = ExtResource("2_r")
+character = ExtResource("3_r")
+stands_still = true
