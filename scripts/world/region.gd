@@ -40,11 +40,12 @@ func get_ground() -> TileMapLayer:
 
 
 ## A named spot: a Marker2D in Markers (checked first, so hand-placed
-## markers can override generated ones) or in the generated Spawns.
+## markers can override generated ones), in the generated Spawns, or one a
+## story overlay added to Entities (the spots outside a building's door).
 func get_spawn(spawn_name: String) -> Marker2D:
-	for parent_path in ["Markers", "Map/Spawns", "Spawns"]:
+	for parent_path in ["Markers", "Map/Spawns", "Spawns", "Entities"]:
 		var parent := get_node_or_null(parent_path)
-		if parent and parent.has_node(spawn_name):
+		if parent and parent.has_node(spawn_name) and parent.get_node(spawn_name) is Marker2D:
 			return parent.get_node(spawn_name) as Marker2D
 	return null
 

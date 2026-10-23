@@ -8,6 +8,7 @@ extends RefCounted
 ## tools/mapgen can regenerate a hub without touching the story.
 
 const DIR := "res://scenes/story/content/%s.tscn"
+const DOORS_DIR := "res://scenes/story/doors/%s.tscn"
 
 
 static func path_for(region_id: String) -> String:
@@ -21,12 +22,18 @@ static func attach(region: Region) -> void:
 		return
 	region.set_meta("story_attached", true)
 	EasterEggs.dress(region)
-	var path := path_for(region.region_id)
-	if not ResourceLoader.exists(path):
-		return
-	var overlay: Node = load(path).instantiate()
-	for child in overlay.get_children():
-		overlay.remove_child(child)
-		child.owner = null
-		region.entities.add_child(child)
-	overlay.free()
+	for path in [path_for(region.region_id), doors_path_for(region.region_id)]:
+		if not ResourceLoader.exists(path):
+			continue
+		var overlay: Node = load(path).instantiate()
+		for child in overlay.get_children():
+			overlay.remove_child(child)
+			child.owner = null
+			region.entities.add_child(child)
+		overlay.free()
+
+
+## The doors into a region's buildings, and the spots outside them, written by
+## tools/hubs/build_interiors.gd.
+static func doors_path_for(region_id: String) -> String:
+	return DOORS_DIR % region_id

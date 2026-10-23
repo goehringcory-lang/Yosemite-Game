@@ -1,0 +1,135 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/building_door.gd" id="1_1h7ij"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0x7ui"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0hiim"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_37sjd"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sp60s"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3fknh"]
+size = Vector2(56, 44)
+
+[node name="TuolumneMeadowsDoors" type="Node2D" unique_id=1360231501]
+
+[node name="DoorToParsonsLodge" type="StaticBody2D" parent="." unique_id=2114110530]
+position = Vector2(1936, 480)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_1h7ij")
+open_hour = 10
+close_hour = 17
+label = "Parsons Memorial Lodge"
+target_region = "parsons_lodge"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToParsonsLodge" unique_id=95682888]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToParsonsLodge/Hitbox" unique_id=213959004]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_0x7ui")
+
+[node name="parsons_lodge_door" type="Marker2D" parent="." unique_id=340107467]
+position = Vector2(1936, 520)
+
+[node name="DoorToMccauleyCabin" type="StaticBody2D" parent="." unique_id=720984333]
+position = Vector2(2352, 448)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_1h7ij")
+open_hour = 9
+close_hour = 17
+label = "McCauley Cabin"
+target_region = "mccauley_cabin"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToMccauleyCabin" unique_id=1121085186]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToMccauleyCabin/Hitbox" unique_id=475625961]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_0hiim")
+
+[node name="mccauley_cabin_door" type="Marker2D" parent="." unique_id=89106582]
+position = Vector2(2352, 488)
+
+[node name="DoorToTuolumneVisitorCenter" type="StaticBody2D" parent="." unique_id=1990962064]
+position = Vector2(1552, 1696)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_1h7ij")
+open_hour = 9
+close_hour = 17
+label = "Tuolumne Meadows Visitor Center"
+target_region = "tuolumne_visitor_center"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToTuolumneVisitorCenter" unique_id=1317386387]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToTuolumneVisitorCenter/Hitbox" unique_id=1050331475]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_37sjd")
+
+[node name="tuolumne_visitor_center_door" type="Marker2D" parent="." unique_id=1725918160]
+position = Vector2(1552, 1736)
+
+[node name="DoorToTuolumneStore" type="StaticBody2D" parent="." unique_id=1820668524]
+position = Vector2(2768, 1664)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_1h7ij")
+open_hour = 8
+close_hour = 20
+label = "Tuolumne Meadows Store & Grill"
+target_region = "tuolumne_store"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToTuolumneStore" unique_id=735399925]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToTuolumneStore/Hitbox" unique_id=874437625]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_sp60s")
+
+[node name="tuolumne_store_door" type="Marker2D" parent="." unique_id=1901420204]
+position = Vector2(2768, 1704)
+
+[node name="DoorToTuolumneLodge" type="StaticBody2D" parent="." unique_id=1555071023]
+position = Vector2(4144, 1728)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_1h7ij")
+open_hour = 6
+close_hour = 22
+label = "Tuolumne Meadows Lodge"
+target_region = "tuolumne_lodge"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToTuolumneLodge" unique_id=1050387883]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToTuolumneLodge/Hitbox" unique_id=1373005228]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_3fknh")
+
+[node name="tuolumne_lodge_door" type="Marker2D" parent="." unique_id=1481293541]
+position = Vector2(4144, 1768)

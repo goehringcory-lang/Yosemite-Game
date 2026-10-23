@@ -3,7 +3,7 @@ extends Node
 ## north gate, the Stoneman Meadow trail (forest, meadow, the Merced, Stoneman
 ## Bridge) and the hotel grounds. Every spot is reachable on foot, the bridge
 ## can be walked (and its parapets and the river keep you on it), the hotel
-## can't be entered, and the cascade and night glow are in place.
+## opens into its lobby, and the cascade and night glow are in place.
 ## Run: godot --headless --path . res://tests/ahwahnee_test.tscn
 ## Exit code is the number of failed checks.
 
@@ -128,9 +128,13 @@ func _ready() -> void:
 	var west_exit: RegionExit = grounds.get_node("Exits/NorthsideDriveWest")
 	check(west_exit.target_region == "ahwahnee_meadow" and west_exit.target_spawn == "east", "the west road leads across Ahwahnee Meadow")
 
-	# The front doors read as a sign, and the hotel can't be entered.
+	# The front doors tell the hotel's story and open into the lobby; the
+	# walls around them are solid.
 	var door: InfoSign = grounds.find_child("MainEntrance", true, false)
 	check(door != null and door.title == "The Ahwahnee" and door.text.contains("1927"), "the main entrance has the hotel's story")
+	var front: BuildingDoor = grounds.find_child("DoorToAhwahneeLobby", true, false)
+	check(front != null and front.target_region == "ahwahnee_lobby" and grounds.get_spawn("ahwahnee_lobby_door") != null,
+		"the front doors lead into the lobby")
 	world.player.global_position = grounds.get_spawn("front_door").global_position
 	await get_tree().physics_frame
 	var start_y: float = world.player.global_position.y

@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/building_door.gd" id="1_utnjq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a3fsn"]
+size = Vector2(56, 44)
+
+[node name="TheAhwahneeDoors" type="Node2D" unique_id=1391084767]
+
+[node name="DoorToAhwahneeLobby" type="StaticBody2D" parent="." unique_id=1228055581]
+position = Vector2(1584, 1104)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_utnjq")
+label = "The Ahwahnee"
+target_region = "ahwahnee_lobby"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToAhwahneeLobby" unique_id=595927402]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToAhwahneeLobby/Hitbox" unique_id=1494920003]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_a3fsn")
+
+[node name="ahwahnee_lobby_door" type="Marker2D" parent="." unique_id=867297574]
+position = Vector2(1584, 1172)

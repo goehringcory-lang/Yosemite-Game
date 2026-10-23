@@ -1,0 +1,53 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/building_door.gd" id="1_f2udv"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1rc6m"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wewi3"]
+size = Vector2(56, 44)
+
+[node name="CurryVillageDoors" type="Node2D" unique_id=1768738169]
+
+[node name="DoorToCurryRegistration" type="StaticBody2D" parent="." unique_id=1639364494]
+position = Vector2(1104, 1120)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_f2udv")
+label = "Registration Office"
+target_region = "curry_registration"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToCurryRegistration" unique_id=550106261]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToCurryRegistration/Hitbox" unique_id=758037916]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_1rc6m")
+
+[node name="curry_registration_door" type="Marker2D" parent="." unique_id=1648304840]
+position = Vector2(1104, 1160)
+
+[node name="DoorToCurryPavilion" type="StaticBody2D" parent="." unique_id=1021131963]
+position = Vector2(1488, 1120)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_f2udv")
+label = "Pavilion"
+target_region = "curry_pavilion"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToCurryPavilion" unique_id=925775387]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToCurryPavilion/Hitbox" unique_id=1079947425]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_wewi3")
+
+[node name="curry_pavilion_door" type="Marker2D" parent="." unique_id=1841345623]
+position = Vector2(1488, 1160)

@@ -1,0 +1,237 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/building_door.gd" id="1_rux3f"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0epv0"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w40q4"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pkdus"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_74xg2"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_e2ums"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vuvga"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ohnlc"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c8w0j"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_18scq"]
+size = Vector2(56, 44)
+
+[node name="YosemiteVillageDoors" type="Node2D" unique_id=1072233131]
+
+[node name="DoorToWelcomeCenter" type="StaticBody2D" parent="." unique_id=1424650180]
+position = Vector2(1808, 704)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_rux3f")
+open_hour = 9
+close_hour = 17
+label = "Valley Welcome Center"
+target_region = "welcome_center"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToWelcomeCenter" unique_id=932942279]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToWelcomeCenter/Hitbox" unique_id=708092869]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_0epv0")
+
+[node name="welcome_center_door" type="Marker2D" parent="." unique_id=1939913770]
+position = Vector2(1808, 744)
+
+[node name="DoorToYosemiteMuseum" type="StaticBody2D" parent="." unique_id=898435946]
+position = Vector2(2064, 704)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_rux3f")
+open_hour = 9
+close_hour = 17
+label = "Yosemite Museum"
+target_region = "yosemite_museum"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToYosemiteMuseum" unique_id=1985119698]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToYosemiteMuseum/Hitbox" unique_id=1954374688]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_w40q4")
+
+[node name="yosemite_museum_door" type="Marker2D" parent="." unique_id=1327276329]
+position = Vector2(2064, 744)
+
+[node name="DoorToBestsStudio" type="StaticBody2D" parent="." unique_id=1966520734]
+position = Vector2(2320, 704)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_rux3f")
+open_hour = 9
+close_hour = 18
+label = "Best's Studio"
+target_region = "bests_studio"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToBestsStudio" unique_id=1208379338]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToBestsStudio/Hitbox" unique_id=1508079396]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_pkdus")
+
+[node name="bests_studio_door" type="Marker2D" parent="." unique_id=2033982939]
+position = Vector2(2320, 744)
+
+[node name="DoorToWildernessCenter" type="StaticBody2D" parent="." unique_id=405258855]
+position = Vector2(2544, 704)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_rux3f")
+open_hour = 8
+close_hour = 17
+label = "Wilderness Center"
+target_region = "wilderness_center"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToWildernessCenter" unique_id=85943775]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToWildernessCenter/Hitbox" unique_id=98252719]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_74xg2")
+
+[node name="wilderness_center_door" type="Marker2D" parent="." unique_id=1781679947]
+position = Vector2(2544, 744)
+
+[node name="DoorToValleyPostOffice" type="StaticBody2D" parent="." unique_id=1410211190]
+position = Vector2(2768, 704)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_rux3f")
+open_hour = 9
+close_hour = 17
+label = "Yosemite Valley Post Office"
+target_region = "valley_post_office"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToValleyPostOffice" unique_id=2121459158]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToValleyPostOffice/Hitbox" unique_id=741824234]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_e2ums")
+
+[node name="valley_post_office_door" type="Marker2D" parent="." unique_id=576245334]
+position = Vector2(2768, 744)
+
+[node name="DoorToDegnans" type="StaticBody2D" parent="." unique_id=1600378253]
+position = Vector2(2352, 1024)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_rux3f")
+open_hour = 7
+close_hour = 20
+label = "Degnan's"
+target_region = "degnans"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToDegnans" unique_id=1584636726]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToDegnans/Hitbox" unique_id=1284083068]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_vuvga")
+
+[node name="degnans_door" type="Marker2D" parent="." unique_id=1843615961]
+position = Vector2(2352, 1064)
+
+[node name="DoorToVillageStoreInside" type="StaticBody2D" parent="." unique_id=1953293654]
+position = Vector2(2896, 1056)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_rux3f")
+open_hour = 8
+close_hour = 22
+label = "Village Store"
+target_region = "village_store_inside"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToVillageStoreInside" unique_id=1892811177]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToVillageStoreInside/Hitbox" unique_id=1092473311]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_ohnlc")
+
+[node name="village_store_inside_door" type="Marker2D" parent="." unique_id=54480359]
+position = Vector2(2896, 1096)
+
+[node name="DoorToValleyLodgeLobby" type="StaticBody2D" parent="." unique_id=1816361908]
+position = Vector2(1232, 1440)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_rux3f")
+label = "Yosemite Valley Lodge"
+target_region = "valley_lodge_lobby"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToValleyLodgeLobby" unique_id=1645025312]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToValleyLodgeLobby/Hitbox" unique_id=1913557005]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_c8w0j")
+
+[node name="valley_lodge_lobby_door" type="Marker2D" parent="." unique_id=1268716904]
+position = Vector2(1232, 1480)
+
+[node name="DoorToYosemiteChapel" type="StaticBody2D" parent="." unique_id=1758726543]
+position = Vector2(2448, 1888)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_rux3f")
+open_hour = 7
+close_hour = 21
+label = "Yosemite Chapel"
+target_region = "yosemite_chapel"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToYosemiteChapel" unique_id=1115770594]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToYosemiteChapel/Hitbox" unique_id=763841430]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_18scq")
+
+[node name="yosemite_chapel_door" type="Marker2D" parent="." unique_id=2109706415]
+position = Vector2(2448, 1928)

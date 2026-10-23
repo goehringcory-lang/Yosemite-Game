@@ -415,7 +415,7 @@ func _place_hotel() -> void:
 	_glow("hotel_glow", _hotel_pos)
 	# Its doors read as a sign: you can't go in yet.
 	_info("MainEntrance", Vector2(_door_x, HOTEL_BASE_ROW * T + 22), Vector2(56, 30), "The Ahwahnee",
-		"The Ahwahnee opened in July 1927. Its architect, Gilbert Stanley Underwood, built it of granite, steel, and concrete stained to look like redwood, so that it would fit under the cliffs and never burn like the wooden hotels before it. The painted patterns on its beams and the stained glass inside were designed for it. It is a National Historic Landmark. The great doors are closed for now.")
+		"The Ahwahnee opened in July 1927. Its architect, Gilbert Stanley Underwood, built it of granite, steel, and concrete stained to look like redwood, so that it would fit under the cliffs and never burn like the wooden hotels before it. The painted patterns on its beams and the stained glass inside were designed for it. It is a National Historic Landmark.")
 
 
 func _grounds_gardens() -> void:

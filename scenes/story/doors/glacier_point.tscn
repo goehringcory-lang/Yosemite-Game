@@ -1,0 +1,55 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/building_door.gd" id="1_u51yk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g3ou2"]
+size = Vector2(56, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q8eet"]
+size = Vector2(56, 44)
+
+[node name="GlacierPointDoors" type="Node2D" unique_id=434423928]
+
+[node name="DoorToGlacierSnackStand" type="StaticBody2D" parent="." unique_id=1304875447]
+position = Vector2(1616, 1184)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_u51yk")
+open_hour = 9
+close_hour = 18
+label = "Glacier Point Gifts & Snacks"
+target_region = "glacier_snack_stand"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToGlacierSnackStand" unique_id=731045596]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToGlacierSnackStand/Hitbox" unique_id=581065351]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_g3ou2")
+
+[node name="glacier_snack_stand_door" type="Marker2D" parent="." unique_id=14075013]
+position = Vector2(1616, 1224)
+
+[node name="DoorToGeologyHut" type="StaticBody2D" parent="." unique_id=1184244083]
+position = Vector2(2256, 608)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_u51yk")
+label = "Geology Hut"
+target_region = "geology_hut"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToGeologyHut" unique_id=654032158]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToGeologyHut/Hitbox" unique_id=1585401235]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_q8eet")
+
+[node name="geology_hut_door" type="Marker2D" parent="." unique_id=1678124003]
+position = Vector2(2256, 648)
