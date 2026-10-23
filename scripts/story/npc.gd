@@ -24,6 +24,12 @@ const ROWS := {Vector2i.DOWN: 0, Vector2i.UP: 1, Vector2i.LEFT: 2, Vector2i.RIGH
 ## which of their two homes this node stands at. They're only here while
 ## they live here.
 @export_enum("Always", "Early home", "Later home") var stays := 0
+## Only here while a quest is on one step, as "quest_id:step index" (the
+## chef waiting under the carved oak while you walk out to meet him).
+@export var only_on_step := ""
+## Away while a quest is on one step, as "quest_id:step index" (the chef's
+## out of his kitchen then).
+@export var away_on_step := ""
 ## Never strolls, whatever the hour (the crowd in the Guardian's cave).
 @export var stands_still := false
 ## A visitor's day, as Stardew Valley's villagers keep one: stops like
@@ -111,16 +117,35 @@ func _ready() -> void:
 	if character and not character.visitor and not stands_still:
 		quest_marker = QuestMarker.new(character.id)
 		add_child(quest_marker)
-	if stays != 0:
+	if _comes_and_goes():
 		QuestLog.changed.connect(_refresh_stay)
 		_refresh_stay()
 
 
-## True while this node is where the person lives (see [member stays]).
+## True if the story moves them about (see [member stays], [member only_on_step]
+## and [member away_on_step]).
+func _comes_and_goes() -> bool:
+	return stays != 0 or only_on_step != "" or away_on_step != ""
+
+
+## True while this node is where the person is now (see [member stays],
+## [member only_on_step] and [member away_on_step]).
 func is_here() -> bool:
-	if stays == 0 or character == null:
+	if character == null:
+		return true
+	if only_on_step != "" and not _on_step(only_on_step):
+		return false
+	if away_on_step != "" and _on_step(away_on_step):
+		return false
+	if stays == 0:
 		return true
 	return character.at_early_home(QuestLog.is_completed) == (stays == 1)
+
+
+## True while the quest in [param quest_step] ("quest_id:step index") is on that step.
+static func _on_step(quest_step: String) -> bool:
+	var parts := quest_step.split(":")
+	return parts.size() == 2 and QuestLog.active.get(parts[0], -1) == int(parts[1])
 
 
 ## Shows or hides them as they move between their two homes. Never in the
@@ -403,7 +428,7 @@ func interact(player: Player) -> void:
 		if QuestLog.final_entry_pending() and character.id == "galen_clark":
 			await _write_last_page(player)
 	_talking = false
-	if stays != 0:
+	if _comes_and_goes():
 		_refresh_stay()
 	if quest_marker:
 		quest_marker.hidden_while_talking = false

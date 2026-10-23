@@ -51,9 +51,10 @@ extends Resource
 ## An everyday park visitor from one of the park's eras, not a historical figure. Visitors
 ## only chat: they never give quests or appear in the Register.
 @export var visitor := false
-## Invented Mountain Shop staff, not historical figures. Unlike visitors they
-## can give shop quests and partner on climbs, but they never appear in the
-## Register. They live in QuestLog.STAFF, not QuestLog.CHARACTERS.
+## Invented staff (the Mountain Shop's, the Ahwahnee's chef), not historical
+## figures. Unlike visitors they can give quests and partner on climbs, but
+## they never appear in the Register. They live in QuestLog.STAFF, not
+## QuestLog.CHARACTERS.
 @export var staff := false
 
 @export_group("Review")

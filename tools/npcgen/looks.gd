@@ -12,7 +12,7 @@ extends RefCounted
 ##   hair_style                 short, long, braid, bun, bald, wild, none
 ##   beard                      none, mustache, goatee, short, long (+ beard_color)
 ##   hat                        wide, campaign, fedora, bowler, top, cap, painter_cap,
-##                              beanie, bonnet, scarf, headband, helmet (+ hat_color, hat_band)
+##                              beanie, bonnet, scarf, headband, helmet, toque (+ hat_color, hat_band)
 ##   top, top2                  shirt color, accent color
 ##   top_style                  shirt, vest, suspenders, jacket, plaid, sweater, coat,
 ##                              shawl, blouse, stripes
@@ -227,6 +227,13 @@ const LOOKS := {
 		"skin": SKIN_TAN, "hair": "3a2418", "hair_style": "braid", "hat": "headband", "hat_color": "e8b040",
 		"top": "4a8a8a", "top_style": "shirt", "top2": "2f6464", "bottom": "7a6a52", "bottom_style": "knickers",
 		"socks": "c8402e", "shoes": "c8502e", "pack": "pack", "pack_color": "8a5a3a", "carry": ["rope"],
+	},
+	# ------------------------------------------------ Ahwahnee staff (invented, not historical)
+	"ahwahnee_chef": {
+		"skin": SKIN_FAIR, "hair": "4a3a2e", "beard": "mustache", "beard_color": "4a3a2e",
+		"hat": "toque", "hat_color": "f5eee0",
+		"top": "f0ece0", "top_style": "jacket", "top2": "d8d2c0", "collar": "b3362b",
+		"bottom": "3a3a42", "apron": "e8e4d8", "shoes": "2a1f1a",
 	},
 	# ------------------------------------------------ Curry Village visitors
 	"visitor_pavilion_cook": {

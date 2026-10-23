@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "ahwahnee_chef_larder"
+title = "The Chef's Larder"
+giver = "ahwahnee_chef"
+requires = PackedStringArray("clark_register")
+offered_in = 3
+out_of_season = PackedStringArray("Nothing I need grows under the snow. Come back in spring, when the strawberries flower in the meadow.", "Then I'll have a job for you, and something to show you after.")
+intro = PackedStringArray("You! You look like somebody who walks. Do you know what I have for tonight's dessert? Nothing. The supply truck is stuck behind a rockslide on the El Portal Road.", "Two hundred guests, and every one of them expects a tart. So I'll make one from the valley itself.", "Bring me wild strawberries from the meadows, and yerba buena from along the river. I'll make a syrup of the mint.", "Do this, and I'll show you something. A tree, just outside these walls. Most of the people who sleep here never see it.")
+steps = [{"type": "have", "item": "wild_strawberry", "count": 4, "consume": true, "objective": "Gather 4 wild strawberries for Chef Marchand (meadows, spring and summer)", "reminder": "Strawberries hide low in the grass. Try the Ahwahnee Meadow, just east of the hotel.", "done": ["Look at them. Small, and sweeter than anything off the truck."]}, {"type": "have", "item": "yerba_buena", "count": 2, "consume": true, "objective": "Gather 2 sprigs of yerba buena for Chef Marchand (riverbanks, spring and summer)", "reminder": "Yerba buena runs along the shady banks of the Merced. Follow your nose, it smells of mint.", "done": ["Ah, that smell. That's the syrup. The tart is as good as made.", "Now, I made you a promise. Come, I'll take off my apron. Meet me at the old black oak at the far edge of the Tea Lawn, west of the patio."]}, {"type": "talk", "target": "ahwahnee_chef", "objective": "Meet Chef Marchand at the old black oak, west of the Ahwahnee's Tea Lawn", "reminder": "The oak at the edge of the Tea Lawn, with the wild grape hanging down its trunk.", "done": ["Here. Most people walk right past it. The wild grape grows back over it every summer.", "(He lifts the vines aside with both hands, like a curtain.)", "There. A face, carved into the bark. Long hair, eyes nearly shut, as if he were listening to the creek.", "It was here before the hotel. The bark has been growing in around the cuts for a long time.", "I don't know who carved it, or who it shows. The people who would know are the families whose valley this was long before there was a hotel. That story is theirs to tell, not a cook's.", "So I don't tell it. I only bring people here who've helped feed the place, and I keep the vines pulled back for a while."]}]
+outro = PackedStringArray("Now I'd better go and make two hundred tarts.", "Take this from the kitchen. Yesterday's bread pudding, still better than anything in Curry Village. Don't tell Mrs. Curry I said so.")
+reward_items = {"bread_pudding": 2}

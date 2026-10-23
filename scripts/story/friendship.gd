@@ -49,6 +49,7 @@ const LOVES := {
 	"john_muir": ["dry_crusts", "yerba_buena_tea"],
 	"carrie_bethel": ["acorn_cake", "blue_elderberries"],
 	"wren_alvarez": ["trail_mix", "chocolate_bar"],
+	"ahwahnee_chef": ["roasted_morels", "elderberry_sauce"],
 	"mountain_shop": ["beef_jerky", "pilot_bread"],
 }
 const LOVED_LINES := [

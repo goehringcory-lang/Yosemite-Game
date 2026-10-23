@@ -61,6 +61,7 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/hodges_bear_season.tres"),
 	preload("res://data/quests/degnan_snowbound.tres"),
 	preload("res://data/quests/muir_soda_springs.tres"),
+	preload("res://data/quests/ahwahnee_chef_larder.tres"),
 	# The press book (QuestData.press_line): plants for the naturalists and
 	# rangers, beside the tick list. See Herbarium.
 	preload("res://data/quests/enid_press.tres"),
@@ -99,12 +100,14 @@ const CHARACTERS: Array[CharacterData] = [
 	preload("res://data/characters/carrie_bethel.tres"),
 ]
 
-## Invented Mountain Shop staff (CharacterData.staff). They give shop quests
-## and partner on climbs, but they aren't in the Register's cast above. The
-## clerk's id is the shop's talk_target, so talking at the counter reaches them.
+## Invented staff (CharacterData.staff): the Mountain Shop's two and the
+## Ahwahnee's head chef. They give quests (and Wren partners on climbs), but
+## they aren't in the Register's cast above. The clerk's id is the shop's
+## talk_target, so talking at the counter reaches them.
 const STAFF: Array[CharacterData] = [
 	preload("res://data/characters/staff/mountain_shop_clerk.tres"),
 	preload("res://data/characters/staff/wren_alvarez.tres"),
+	preload("res://data/characters/staff/ahwahnee_chef.tres"),
 ]
 
 ## What the player can write on the Register's last page, after The Last Page.
