@@ -31,6 +31,7 @@ func _ready() -> void:
 	test_register_notes()
 	test_story_beats()
 	test_last_page_waiting()
+	test_missing_guardian()
 	await test_dialogue_and_minigame_scenes()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
@@ -58,7 +59,7 @@ func test_leonard_quest() -> void:
 		"Leonard waits until you've climbed with Wren")
 	QuestLog.completed.append("partner_apron")
 	var lines := QuestLog.talk_to("dick_leonard")
-	check(QuestLog.active.has("leonard_belay") and lines.size() == 4, "Dick Leonard offers his quest")
+	check(QuestLog.active.has("leonard_belay") and lines.size() == 5, "Dick Leonard offers his quest")
 	lines = QuestLog.talk_to("dick_leonard")
 	check(lines.size() == 1 and "food" in lines[0].text, "reminder while the step isn't done")
 	Inventory.add("miners_lettuce", 4)
@@ -345,6 +346,40 @@ func test_last_page_waiting() -> void:
 	var enid := QuestLog.talk_to("enid_michael")
 	check(enid.size() == 2 and "Guardian" in enid[1].text, "after the finale, Enid Michael calls you Guardian")
 	new_game()
+
+## Clark's first errand says the Guardian is missing. Sightings pile up in
+## the Journal as the tick list moves on, each one something the player did,
+## and the keepers they meet line up by the years they made the park.
+func test_missing_guardian() -> void:
+	new_game()
+	check(GuardianSearch.sightings().is_empty(), "no sightings before Clark's first errand")
+	var lines := QuestLog.talk_to("galen_clark")
+	check(lines.any(func(l: Dictionary) -> bool: return "hasn't been seen" in l.text), "Clark says the Guardian is missing")
+	for sighting: Dictionary in GuardianSearch.SIGHTINGS:
+		var quest := QuestLog.get_quest(sighting.quest)
+		check(quest != null and quest.main_line and QuestLog.get_character(sighting.who) != null,
+			"the sighting after %s follows the main line, from %s" % [sighting.quest, sighting.who])
+		check(not QuestLog.get_character(sighting.who).needs_tribal_review, "%s's sighting puts no words in a Native character's mouth" % sighting.who)
+		if sighting.who != "galen_clark":
+			var beat := QuestLog.get_character(sighting.who).latest_beat(func(q: String) -> bool: return q == sighting.quest)
+			check(not beat.is_empty() and "Guardian" in " ".join(beat.lines), "%s tells the player about the sighting after %s" % [sighting.who, sighting.quest])
+	QuestLog.active.erase("clark_register")
+	QuestLog.completed.append_array(["clark_register", "shop_guidebook", "shop_outfit", "partner_apron"])
+	check(GuardianSearch.sightings().size() == 2, "a sighting for each main-line quest done (%d)" % GuardianSearch.sightings().size())
+	QuestLog.completed.append("lamon_orchard") # or he'd offer his apples first
+	var heard := QuestLog.talk_to("james_lamon")
+	check(heard.any(func(l: Dictionary) -> bool: return "Guardian" in l.text), "Lamon passes on what he saw on the Apron")
+	for character: CharacterData in QuestLog.CHARACTERS:
+		check(character.legacy != "" and character.legacy_year > 1800, "%s has a part in making the park" % character.id)
+	Friendship.start_new_game()
+	check(GuardianSearch.keepers().is_empty(), "no keepers listed before you've met anyone")
+	Friendship.add("galen_clark", 1)
+	Friendship.add("tenaya", 1)
+	var keepers := GuardianSearch.keepers()
+	check(keepers.size() == 2 and keepers[0].id == "tenaya", "the keepers you've met, earliest first: Tenaya before Clark")
+	Friendship.start_new_game()
+	new_game()
+
 
 func test_tabuce_and_acorns() -> void:
 	QuestLog.talk_to("maggie_howard")

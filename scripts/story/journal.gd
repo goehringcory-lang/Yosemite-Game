@@ -1,7 +1,8 @@
 class_name Journal
 extends CanvasLayer
 ## The player's book, in four tabs:
-##   Journal: the Guardian's Register, the guidebook's tick list, and perks
+##   Journal: the Guardian's Register, the missing Guardian, the valley's
+##            keepers, the guidebook's tick list, and perks
 ##   Quests: the main story's next step and every open quest
 ##   Press Book: the plants you've pressed, and where the rest grow
 ##   Backpack: everything you carry (climbing gear, food, forage) in slots
@@ -346,6 +347,8 @@ func _refresh_more() -> void:
 
 func _journal_page() -> void:
 	_register()
+	_missing_guardian()
+	_keepers()
 	_friends()
 	if QuestLog.final_entry >= 0:
 		_heading("The last page")
@@ -369,6 +372,33 @@ func _register() -> void:
 		for note: String in page.notes:
 			_line("     " + note, DIM)
 		if page.review:
+			_line("     (Placeholder pending tribal review.)", DIM)
+
+
+## What people have said about the missing Guardian (GuardianSearch), and,
+## once the cave is found, whose sightings they were.
+func _missing_guardian() -> void:
+	var sightings := GuardianSearch.sightings()
+	if sightings.is_empty():
+		return
+	_heading("The missing Guardian")
+	for sighting: Dictionary in sightings:
+		_line("%s · %s" % [sighting.who, sighting.text])
+	if QuestLog.is_completed(QuestLog.FINALE_QUEST):
+		_line(GuardianSearch.ANSWER, Color(0.827, 0.894, 0.541))
+
+
+## The keepers you've met: everyone in the Register you've talked with, in
+## the order they had a hand in making the park.
+func _keepers() -> void:
+	var keepers := GuardianSearch.keepers()
+	if keepers.is_empty():
+		return
+	_heading("Keepers of the valley, through the years")
+	for character in keepers:
+		var years := " (%s)" % character.years if character.years != "" else ""
+		_line("%s%s · %s" % [character.display_name, years, character.legacy])
+		if character.needs_tribal_review:
 			_line("     (Placeholder pending tribal review.)", DIM)
 
 

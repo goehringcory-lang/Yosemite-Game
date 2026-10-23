@@ -4,13 +4,31 @@ This is the narrative frame for [docs/DESIGN.md](docs/DESIGN.md), which covers c
 
 ## Premise
 
-In 1866, California named Galen Clark the first **Guardian of Yosemite**. In this game, Clark gives the player a battered logbook, the **Guardian's Register**, on their first morning in the valley. His instructions are simple: go meet the people of this place, listen, and write down what they tell you.
+In 1866, California named Galen Clark the first **Guardian of Yosemite**. In this game there has been a Guardian ever since, in one shape or another, and now there isn't: **the Guardian of Yosemite, the one for now, has gone missing.** Nobody has seen them in a long while, and their camp under Lamon's apple trees is standing empty when the player pitches a tent in it.
+
+On the player's first morning, Clark tells them so and gives them a battered logbook, the **Guardian's Register**. His instructions are simple: go meet the people of this place, listen, write down what they tell you, and ask after the Guardian. Everyone who ever had a hand in making the valley a park is worried, and somebody must have seen something.
 
 The player camps at the Lamon Homestead and sets out across Yosemite. Everyone they meet is a real person from the park's history: Ahwahneechee and Paiute people, settlers, rangers, naturalists, and climbers. These people share their stories and teach the player what they know. As the player earns their trust, they hand over the gear that gets the player up the walls and into new parts of the park.
 
 The Register fills up as the game goes on. It starts as Clark's book, and by the end it holds many voices, some of which disagree with each other. The player comes to understand that no single person was ever the valley's guardian. It was always many people, and many of them were never asked to write in the book.
 
-Beside the Register runs a second book. Early on, **Enid Michael**, the ranger-naturalist who keeps the Museum's wildflower garden, hands the player an old **plant press** that came with a stack of bare sheets, each labeled "Collected for the Guardian of Yosemite." Nobody knows who that Guardian was. Filling the press book, plant by plant, for the park's naturalists and rangers is the game's second storyline, and the mystery of **the lost Guardian** runs through it to the very end, where the player finds out the Guardian is themselves.
+The search is the spine of the story, and its answer is the ending: the player is the missing Guardian (see "The missing Guardian" below).
+
+Beside the Register runs a second book. Early on, **Enid Michael**, the ranger-naturalist who keeps the Museum's wildflower garden, hands the player an old **plant press** that came with a stack of bare sheets, each labeled "Collected for the Guardian of Yosemite." Nobody knows who that Guardian was, and Enid suspects the labels mean the one who's gone missing. Filling the press book, plant by plant, for the park's naturalists and rangers is the game's second storyline, and it carries the same mystery to the very end, where the player finds out the Guardian is themselves.
+
+## The missing Guardian
+
+Every historical person in the game kept the valley for a while, and each had a hand in making the park it is today: Tenaya's people, who lived in Ahwahnee and cared for it long before 1851; Clark, who held it under the 1864 Grant; Lamon's orchard, McCauley's trail, Anderson's line up Half Dome; Degnan's bread and Curry's tents, which let ordinary people come and stay; Muir's writing, which made it a national park; Hodges and Enid Michael, the first women rangers and naturalists; Ansel Adams's photographs; the Rock Climbing Section's ropework, Salathé's steel, Harding's Nose, Robbins's clean climbing, and Johnson's solo. The player is meeting the valley's **keepers through history**, and all of them are worried about the same thing: who looks after it now?
+
+How the game carries this:
+
+- **Clark's opening** (`clark_register`) says the Guardian is missing and sends the player out to ask.
+- **Each keeper's first quest** has one worried line, in their own voice and from their own era. Lamon says the player is camped on the Guardian's old spot, Curry has kept them a tent since 1899, Harding says nobody's the Guardian till somebody does the job, and Beverly Johnson says to look for the work, not the person.
+- **Sightings.** As the tick list climbs, people pass on what they've heard about the Guardian, and each sighting is something the player just did: a speck on the Apron at sunrise (Lamon), someone walking up to the rim without the trail (Curry), a Nutcracker ascent that left no scratch (Degnan), an axle taken and nothing else touched (Hodges), a figure in one of Ansel Adams's negatives he can't quite make out ("It looks a bit like you"), a headlamp on the Nose (Marty), a climber on the Lyell ice whom Muir's sheepherders take for the Guardian. They're story beats, and the Journal keeps them all under "The missing Guardian" (`GuardianSearch.SIGHTINGS`), so a player who walks past one can still read it.
+- **The keepers' timeline.** The Journal lists every Register character the player has met, in the order they had a hand in making the park, each with one plain sentence of what they did (`CharacterData.legacy` and `legacy_year`). These are facts, like the bio, not dialogue. Native people's entries are marked as placeholders pending tribal review.
+- **The cave.** The mirror reads the sightings back ("Every sighting, the whole time"), and the keepers who reported them say so. Clark ends it: they were all looking for the Guardian, and the player was the one doing the looking.
+
+Sightings and worried lines never come from Native characters: anything new in their voices waits on tribal review.
 
 ## The timeline: a timeless valley
 
@@ -27,7 +45,7 @@ Cozy, curious, and grounded, with real awe at scale: a tent at dawn under Half D
 
 ## The player
 
-A newcomer with a tent and a pair of approach shoes. They have no destiny and no special heritage. What they bring is a willingness to show up, carry things, and listen. At first they treat the Register as a checklist of people to meet. Over time they learn that each story belongs to the person telling it, and that some people will choose not to share theirs.
+A newcomer with a tent and a pair of approach shoes, pitched in the missing Guardian's empty camp. They have no special heritage, and nothing marks them out except a willingness to show up, carry things, and listen. That willingness is the whole of the reveal: they become the Guardian by doing the work, and find out at the end that the Guardian everyone was looking for was them. At first they treat the Register as a checklist of people to meet. Over time they learn that each story belongs to the person telling it, and that some people will choose not to share theirs.
 
 ## The main storyline: the tick list
 
@@ -53,7 +71,7 @@ The full cast (who lives where, with sprites) and every quest chain, with the ge
 
 ### 1. Arrival: the Valley floor (Tier 0, Spring)
 
-- **Galen Clark** gives the player the Register and his own account of the 1864 Yosemite Grant: Lincoln signing the valley and the Big Tree Grove over to California "for public use, resort and recreation," and the State making him Guardian two years later. He asks the player to write down who told them each story, not just what.
+- **Galen Clark** gives the player the Register and his own account of the 1864 Yosemite Grant: Lincoln signing the valley and the Big Tree Grove over to California "for public use, resort and recreation," and the State making him Guardian two years later. Then the news: the Guardian for now has gone missing, and everyone is worried. He asks the player to ask after them, and to write down who told them each story, not just what.
 - **James Lamon**, whose cabin and apple orchard became the player's camp, tells how he settled in the valley in the late 1850s.
 - **Tenaya's** story comes early and is told plainly. The Ahwahneechee were living in Ahwahnee when the Mariposa Battalion entered it in 1851, and they were forced out. The Grant was signed 13 years later. Clark's first pages leave this out, and noticing that gap sets the direction of the game.
 - **Tabuce (Maggie Howard)** teaches the player to gather acorns, build a chuckah, and prepare acorn food. The skill starts now but pays off in the fall (quests: *Acorns for the Winter*, *The Chuckah*).
@@ -98,11 +116,11 @@ Clark's last talk is personal: he came up into these mountains in 1856 expecting
 
 The player adds one final entry of their own and can choose what it says: every voice they heard, a thank-you, the tick list, or a blank page like the ones Tabuce and Maria Lebrado asked for. Clark leafs back through the book (how many pages, in how many hands, with Tenaya's still at the front), hands it back ("when you read it, start at the front"), and the season turns. Looking after the valley doesn't end, and it was never one person's job. The Register is finished, but a closing line says the press's old labels are still unanswered.
 
-### 7. The lost Guardian (the ending)
+### 7. The missing Guardian (the ending)
 
 The finale opens only when **both** storylines are done: the last page is written and Enid Michael has seen the full press. Clark then says what he thinks ("I don't think that Guardian was ever lost. I think nobody had got there yet") and sends the player to the gap in the talus under the Royal Arches, behind the Ahwahnee. Until then the gap is there to look at, and shut.
 
-Inside is a small cave, a tin box, and the last sheet from the press. It has no plant and no outline: where the specimen should be, the sheet is cut away, and behind it hangs a looking-glass. The player leans in to read the collector's name and sees their own face. They turn around, and everyone from the story is standing in the cave behind them. Clark says it: it was you all along. The quests were never a test. They were the work, and the work is what a Guardian is.
+Inside is a small cave, a tin box, and the last sheet from the press. It has no plant and no outline: where the specimen should be, the sheet is cut away, and behind it hangs a looking-glass. The player leans in to read the collector's name and sees their own face. Every sighting the keepers passed on comes back to them too: the speck on the Apron, the clean Nutcracker, the headlamp on the Nose. They turn around, and everyone from the story is standing in the cave behind them. Clark says it: it was you all along. They were all looking for the Guardian, and the player was the one doing the looking. The quests were never a test. They were the work, and the work is what a Guardian is.
 
 How this sits with the rest of the story: the player finds out they are the Guardian by doing what everyone in the book taught them, so the title is something the valley's people hand over, not something an outsider claims. Clark's own lesson stands (nobody guards the valley alone), and the finale's Register note says plainly that the lost Guardian, the cave and the mirror are invented, and that the valley has been looked after by many people before, during and since, the seven associated tribes first among them. What Native characters say in the gathering, and whether they are in it at all, is a placeholder pending tribal review, like the rest of their dialogue.
 
@@ -110,7 +128,7 @@ Afterwards the valley stays open: the tick list and the press book can still be 
 
 ### Between the chapters: story beats
 
-People don't only speak when they have a quest. As the main line moves on, the people the player keeps passing react to it, once each, before going back to their usual lines (`CharacterData.story_beats`; only the latest piece of news is told, so someone who rushes ahead never hears stale news). Galen Clark, at the homestead gate, carries most of these: he reacts to the guidebook, the first tick, Glacier Point, Robbins's "leave no mark" (his own name is on Mount Clark, though every peak had a name before the surveyors), Salathé's steel, the Nose, and the return from the glacier, where he reminds the player that not everybody walks up to the gate. The climbing mentors, Wren, Marty, Lamon, Jennie Curry, Bridget Degnan, and Muir also have beats, and after the last page everyone who isn't waiting on tribal review says goodbye in their own voice (the naturalists, Ansel Adams, Anderson and McCauley included), so the whole valley acknowledges the ending. After the finale, the people closest to the press book (Enid Michael, Ranger Hodges, Muir, and Wren) react to the mirror. Native characters have no story beats yet: any new lines for them wait on tribal review.
+People don't only speak when they have a quest. As the main line moves on, the people the player keeps passing react to it, once each, before going back to their usual lines (`CharacterData.story_beats`; only the latest piece of news is told, so someone who rushes ahead never hears stale news). Galen Clark, at the homestead gate, carries most of these: he reacts to the guidebook, the first tick, Glacier Point, Robbins's "leave no mark" (his own name is on Mount Clark, though every peak had a name before the surveyors), Salathé's steel, the Nose, and the return from the glacier, where he reminds the player that not everybody walks up to the gate. The climbing mentors, Wren, Marty, Lamon, Jennie Curry, Bridget Degnan, Hodges, Ansel Adams, and Muir also have beats, among them the sightings of the missing Guardian (see "The missing Guardian" above), and after the last page everyone who isn't waiting on tribal review says goodbye in their own voice (the naturalists, Ansel Adams, Anderson and McCauley included), so the whole valley acknowledges the ending. After the finale, the people closest to the press book (Enid Michael, Ranger Hodges, Muir, and Wren) react to the mirror. Native characters have no story beats yet: any new lines for them wait on tribal review.
 
 Back from the glacier, Clark doesn't go quiet if the last page is still waiting on someone. He names who hasn't been heard yet, one at a time: Tenaya, then Maria Lebrado, then Lucy Telles (`QuestData.waiting_on`). These are Clark's words about them, not theirs, and he asks whether they *want* to talk, never assumes it.
 

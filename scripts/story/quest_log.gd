@@ -138,7 +138,7 @@ const EPILOGUE := [
 ]
 
 ## The line after the last page: the Register is done, the mystery isn't.
-const AFTER_EPILOGUE := "The Guardian's Register is finished, with your page at the back. But the press book's old labels still say \"Collected for the Guardian of Yosemite,\" and nobody has found out who that was."
+const AFTER_EPILOGUE := "The Guardian's Register is finished, with your page at the back. But the valley's Guardian is still missing, and the press book's old labels still say \"Collected for the Guardian of Yosemite.\""
 
 ## What Galen Clark says once the Register is finished.
 const AFTER_LAST_PAGE := [
