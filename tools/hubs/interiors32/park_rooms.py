@@ -377,6 +377,16 @@ def _deco(cv: Canvas, d: list, wh: int, sd: int, view: str, lights: list, room_i
         D.gear_rail(cv, d[1] * 2, d[2] * 2, d[3] * 2, sd + d[1])
     elif k == "mural":
         AR._mural(cv, d[1] * 2, d[2] * 2, d[3] * 2, d[4] * 2, sd)
+    elif k == "print":
+        D.park_print(cv, d[1] * 2, d[2] * 2, d[3] * 2, d[4] * 2, d[5], sd + d[1])
+    elif k == "snowshoes":
+        D.snowshoes(cv, d[1] * 2, d[2] * 2)
+    elif k == "skis":
+        D.skis(cv, d[1] * 2, d[2] * 2)
+    elif k == "quilt":
+        D.quilt(cv, d[1] * 2, d[2] * 2, d[3] * 2, d[4] * 2, sd + d[1])
+    elif k == "patches":
+        D.patches(cv, d[1] * 2, d[2] * 2, d[3] * 2, d[4] * 2, sd + d[1])
 
 
 def room_ids() -> list[str]:

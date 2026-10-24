@@ -3,7 +3,8 @@
 Valley Days palette, over the art the 16px builders drew for them: every room
 in tools/hubs/build_interiors.gd but the Ahwahnee's six (ahwahnee32/paint.py
 paints those), the Camp Curry Store and the Mountain Shop, and the furniture
-they share. tools/hubs/rebuild_interiors.sh runs it last; on its own:
+they share (furniture.py, fittings.py, goods.py). tools/hubs/rebuild_interiors.sh
+runs it last; on its own:
 
     python3 tools/hubs/interiors32/paint.py              # every room and piece
     python3 tools/hubs/interiors32/paint.py rooms        # just the rooms
@@ -41,7 +42,8 @@ def paint_rooms() -> None:
 def paint_props() -> None:
     import fittings
     import furniture
-    print("painted", furniture.paint_all() + fittings.paint_all(), "pieces")
+    import goods
+    print("painted", furniture.paint_all() + fittings.paint_all() + goods.paint_all(), "pieces")
 
 
 def preview(out_dir: str) -> None:
