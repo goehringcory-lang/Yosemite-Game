@@ -45,9 +45,6 @@ var edge_trim := true
 ## with moss only in the hollows.
 var smooth_granite := false
 var fir_duff := false
-## Paints the subalpine forest floor as a lodgepole forest's (Tuolumne): pale
-## granite sand with drifts of needle litter and tufts of sedge, not bare sand.
-var subalpine_duff := false
 ## Optional per-tile mask (1 = slab): granite and cliff tiles marked here are
 ## painted as smooth slabs whatever [member smooth_granite] says. The Valley
 ## map uses it for the Glacier Point Apron (see tools/mapgen/land_patches.gd).
@@ -509,8 +506,6 @@ func _color(k: int, x: int, y: int, i: int, tx: int, ty: int) -> Color:
 				return _fir_duff(x, y, a, b, n, r)
 			return _forest(x, y, a, b, n, r).lerp(c("2f4a3a"), 0.28)
 		Terrain.SUBALPINE:
-			if subalpine_duff:
-				return _lodgepole_floor(x, y, a, b, n, r)
 			return _granite_sand(x, y, a, b, n, r)
 		Terrain.FOOTHILL:
 			return _golden(x, y, i, a, b, n, r)
@@ -642,46 +637,6 @@ func _granite_sand(x: int, y: int, a: float, b: float, n: float, r: float) -> Co
 		col = c("8a6a48")
 	elif twig == 2:
 		col = c("4f3d2a")
-	return col
-
-
-## The lodgepole forest floor: pale, sparkling granite sand in cool and warm
-## patches, grey-brown needle litter drifted where the medium field runs
-## high, and sedge where the large field dips. Its colors sit on the palette's
-## granite and tan ramps, so the 32px upgrade keeps them pale (blends of
-## them snapped to the brown tan step and read as mud).
-func _lodgepole_floor(x: int, y: int, a: float, b: float, n: float, r: float) -> Color:
-	var lvl := _nat_tone(a * 0.45 + b * 0.55, x, y)
-	var col: Color = [c("b0925f"), c("b0925f"), c("b0925f"), c("d6bd88")][lvl]
-	if _nat_tone(clampf(b * 2.0 - 0.75, 0.0, 1.0), x, y) == 3:
-		# needle litter, with twigs
-		col = c("86694b") if (x + y * 3) % 5 else c("93918f")
-		var twig := _nat_pair(x, y, 7, 451, 0.25)
-		if twig == 1:
-			col = c("b0925f")
-		elif twig == 2:
-			col = c("5e4a38")
-	elif _nat_tone(clampf(1.12 - a * 1.7, 0.0, 1.0), x, y) >= 2:
-		# sedge and grass in the hollows
-		col = [c("5c8f3c"), c("437f45"), c("84b04a"), c("5c8f3c")][lvl]
-		var tuft := _nat_tuft(x, y, 9, 461, 0.6)
-		if tuft == 1:
-			col = c("2c5c37")
-		elif tuft == 2:
-			col = c("aecb62")
-	# granite grit: quartz glints and grey feldspar
-	var grit := _nat_pair(x, y, 5, 471, 0.35)
-	if grit == 1:
-		col = c("bdb8ae")
-	elif grit == 2:
-		col = c("93918f")
-	var peb := _nat_pebble(x, y, 9, 431, 0.14)
-	if peb == 1:
-		col = c("e4ddcc")
-	elif peb == 2:
-		col = c("93918f")
-	elif peb == 3:
-		col = c("6a6a70")
 	return col
 
 

@@ -56,6 +56,8 @@ func _ready() -> void:
 		if ground:
 			ground.material = ShaderMaterial.new()
 			(ground.material as ShaderMaterial).shader = GROUND_SHADER
+			# a region whose painted river runs (see the shader)
+			(ground.material as ShaderMaterial).set_shader_parameter("flow", region.get_meta("water_flow", Vector2.ZERO))
 			_grounds.append(ground)
 	# The needles and slabs lying on the ground (tools/hubs/dress_wilds.gd)
 	# turn with it: each sprite uses its parent's material.
