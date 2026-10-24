@@ -212,8 +212,8 @@ class Painter:
         # Depth inside the water: 0 at the shore, 1 in the middle of a wide channel.
         wm = np.isin(K, WATER_SET).astype(np.float32)
         d1 = F.blur(wm, 7)
-        d2 = F.blur(wm, 20)
-        self.depth = np.clip((d1 - 0.5) * 2.0 * 0.55 + (d2 - 0.5) * 2.0 * 0.6, 0.0, 1.0) * wm
+        d2 = F.blur(wm, 26)
+        self.depth = np.clip((d1 - 0.5) * 2.0 * 0.3 + (d2 - 0.5) * 2.0 * 0.85, 0.0, 1.0) * wm
         self.wet_near = F.blur(wm, 2)
         # Flow runs along the channel: horizontal unless its banks run up and down.
         gy, gx = np.gradient(d2)
@@ -474,7 +474,7 @@ class Painter:
         lk = m("lake")
         D = self.depth
         creek = wa & (K == CREEK)
-        wt = 8.4 - D * 4.6 + (self.Nl - 0.5) * 1.0
+        wt = 9.4 - D * 6.4 + (self.Nl - 0.5) * 0.8
         tone[wa] = wt[wa]
         # creeks run shallower and paler, blending into the river or lake they join
         cb = F.blur((K == CREEK).astype(np.float32), 10)
