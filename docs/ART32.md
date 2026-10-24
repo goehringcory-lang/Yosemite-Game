@@ -52,6 +52,15 @@ screen is painted in code, so `assets/shaders/palette_snap.gdshader`
 `tools/art32/snap_colors.py` snapped the color literals in the menu, climbing
 and station code.
 
+## The native finish outdoors
+
+The outdoor areas (all but Tuolumne Meadows) have their ground painted again
+natively by `tools/art32/ground32/`, their parked cars by
+`tools/art32/cars32.py`, and the speckle cleaned out of their granite walls by
+`tools/art32/rock32.py`; see the README's "native 32px finish". The ground
+uses ramps of its own (`ground32/ramps.py`) that extend the palette's ramps
+with in-between steps, so a meadow or a river reads as one calm surface.
+
 ## Known limits
 
 - The climbing screen is still painted at 480x270 density (palette-snapped, not redrawn at 32px).
