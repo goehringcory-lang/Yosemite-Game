@@ -1,232 +1,280 @@
 [gd_scene format=4]
 
-[ext_resource type="Script" path="res://scripts/world/region.gd" id="1_41y8n"]
-[ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="2_evie2"]
-[ext_resource type="Script" path="res://scripts/world/seasonal_canopy.gd" id="3_k7jyl"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/counter.png" id="4_v62j7"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/hearth_small.png" id="5_e4vxq"]
-[ext_resource type="Script" path="res://scripts/world/frame_cycle.gd" id="6_m66rg"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/sofa.png" id="7_dwba1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/armchair.png" id="8_vah4l"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/coffee_table.png" id="9_onpqj"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/luggage.png" id="10_q6udl"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/plant.png" id="11_ubeem"]
-[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="12_6la8p"]
-[ext_resource type="Texture2D" path="res://assets/sprites/info_sign.png" id="13_dgrvr"]
-[ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="14_drlst"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/yosemite_view_lodge.png" id="15_4lxev"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wornb"]
-size = Vector2(212, 18)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_x4em5"]
-size = Vector2(84, 28)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_8xf4m"]
-size = Vector2(100, 13.2)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_kbcds"]
-size = Vector2(28, 13.2)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_cn4ks"]
-size = Vector2(28, 13.2)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_a22q0"]
-size = Vector2(48, 12)
+[ext_resource type="Script" path="res://scripts/world/region.gd" id="1_v62j7"]
+[ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="2_e4vxq"]
+[ext_resource type="Script" path="res://scripts/world/seasonal_canopy.gd" id="3_m66rg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/counter.png" id="4_dwba1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/hearth_small.png" id="5_vah4l"]
+[ext_resource type="Script" path="res://scripts/world/frame_cycle.gd" id="6_onpqj"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/sofa.png" id="7_q6udl"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/armchair.png" id="8_ubeem"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/coffee_table.png" id="9_6la8p"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/luggage.png" id="10_dgrvr"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/plant.png" id="11_drlst"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/table_lamp.png" id="12_4lxev"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/log_box.png" id="13_wornb"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/rocker.png" id="14_x4em5"]
+[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="15_8xf4m"]
+[ext_resource type="Texture2D" path="res://assets/sprites/info_sign.png" id="16_kbcds"]
+[ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="17_cn4ks"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/yosemite_view_lodge.png" id="18_a22q0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_te2wy"]
-size = Vector2(44, 20.4)
+size = Vector2(212, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hr62v"]
-size = Vector2(24, 16.8)
+size = Vector2(84, 28)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fu4hb"]
-size = Vector2(24, 8)
+size = Vector2(100, 13.2)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4msqr"]
-size = Vector2(36, 28)
+size = Vector2(28, 13.2)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rpfn3"]
+size = Vector2(28, 13.2)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_11v71"]
+size = Vector2(48, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_i24r5"]
+size = Vector2(44, 20.4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q5olf"]
+size = Vector2(24, 16.8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ffk0g"]
+size = Vector2(28, 18)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aj1s3"]
+size = Vector2(44, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7qui7"]
+size = Vector2(24, 15.6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c2w1g"]
+size = Vector2(24, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r42hh"]
+size = Vector2(36, 28)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_11vjk"]
 size = Vector2(88, 20)
 
-[node name="YosemiteViewLodge" type="Node2D" unique_id=935584551]
+[node name="YosemiteViewLodge" type="Node2D" unique_id=598621224]
 y_sort_enabled = true
-script = ExtResource("1_41y8n")
+script = ExtResource("1_v62j7")
 region_id = "yosemite_view_lodge"
 hub_id = "el_portal"
 display_name = "Yosemite View Lodge"
 geo_anchor = Vector2(-119.7843, 37.6747)
 indoors = true
 
-[node name="Ground" type="TileMapLayer" parent="." unique_id=1863603897]
+[node name="Ground" type="TileMapLayer" parent="." unique_id=1405420581]
 z_index = -10
 tile_map_data = PackedByteArray("AAAAAAAAAQAAAAgAAAABAAAAAQADAAgAAAACAAAAAQACAAgAAAADAAAAAQABAAgAAAAEAAAAAQAAAAgAAAAFAAAAAQADAAgAAAAGAAAAAQACAAgAAAAHAAAAAQABAAgAAAAIAAAAAQAAAAgAAAAJAAAAAQADAAgAAAAKAAAAAQACAAgAAAALAAAAAQABAAgAAAAMAAAAAQAAAAgAAAANAAAAAQADAAgAAAAOAAAAAQACAAgAAAAPAAAAAQABAAgAAAAQAAAAAQAAAAgAAAARAAAAAQADAAgAAAASAAAAAQACAAgAAAATAAAAAQABAAgAAAAUAAAAAQAAAAgAAAAVAAAAAQADAAgAAAAWAAAAAQACAAgAAAAXAAAAAQABAAgAAAAYAAAAAQAAAAgAAAAZAAAAAQADAAgAAAAaAAAAAQACAAgAAAAbAAAAAQABAAgAAAAcAAAAAQAAAAgAAAAdAAAAAQADAAgAAAAAAAEAAQABAAgAAAABAAEAAQABAAgAAAACAAEAAQABAAgAAAADAAEAAQABAAgAAAAEAAEAAQABAAgAAAAFAAEAAQAAAAgAAAAGAAEAAQAAAAgAAAAHAAEAAQAAAAgAAAAIAAEAAQAAAAgAAAAJAAEAAQAAAAgAAAAKAAEAAQADAAgAAAALAAEAAQADAAgAAAAMAAEAAQADAAgAAAANAAEAAQADAAgAAAAOAAEAAQADAAgAAAAPAAEAAQACAAgAAAAQAAEAAQACAAgAAAARAAEAAQACAAgAAAASAAEAAQACAAgAAAATAAEAAQACAAgAAAAUAAEAAQABAAgAAAAVAAEAAQABAAgAAAAWAAEAAQABAAgAAAAXAAEAAQABAAgAAAAYAAEAAQABAAgAAAAZAAEAAQAAAAgAAAAaAAEAAQAAAAgAAAAbAAEAAQAAAAgAAAAcAAEAAQAAAAgAAAAdAAEAAQAAAAgAAAAAAAIAAQACAAgAAAABAAIAAQADAAgAAAACAAIAAQAAAAgAAAADAAIAAQAAAAgAAAAEAAIAAQABAAgAAAAFAAIAAQABAAgAAAAGAAIAAQACAAgAAAAHAAIAAQADAAgAAAAIAAIAAQADAAgAAAAJAAIAAQAAAAgAAAAKAAIAAQAAAAgAAAALAAIAAQABAAgAAAAMAAIAAQACAAgAAAANAAIAAQACAAgAAAAOAAIAAQADAAgAAAAPAAIAAQADAAgAAAAQAAIAAQAAAAgAAAARAAIAAQABAAgAAAASAAIAAQABAAgAAAATAAIAAQACAAgAAAAUAAIAAQACAAgAAAAVAAIAAQADAAgAAAAWAAIAAQAAAAgAAAAXAAIAAQAAAAgAAAAYAAIAAQABAAgAAAAZAAIAAQABAAgAAAAaAAIAAQACAAgAAAAbAAIAAQADAAgAAAAcAAIAAQADAAgAAAAdAAIAAQAAAAgAAAAAAAMAAQADAAgAAAABAAMAAQABAAgAAAACAAMAAQACAAgAAAADAAMAAQAAAAgAAAAEAAMAAQABAAgAAAAFAAMAAQACAAgAAAAGAAMAAQAAAAgAAAAHAAMAAQABAAgAAAAIAAMAAQADAAgAAAAJAAMAAQAAAAgAAAAKAAMAAQABAAgAAAALAAMAAQADAAgAAAAMAAMAAQAAAAgAAAANAAMAAQACAAgAAAAOAAMAAQADAAgAAAAPAAMAAQAAAAgAAAAQAAMAAQACAAgAAAARAAMAAQADAAgAAAASAAMAAQABAAgAAAATAAMAAQACAAgAAAAUAAMAAQADAAgAAAAVAAMAAQABAAgAAAAWAAMAAQACAAgAAAAXAAMAAQAAAAgAAAAYAAMAAQABAAgAAAAZAAMAAQACAAgAAAAaAAMAAQAAAAgAAAAbAAMAAQABAAgAAAAcAAMAAQADAAgAAAAdAAMAAQAAAAgAAAAAAAQAAQAAAAgAAAABAAQAAQADAAgAAAACAAQAAQABAAgAAAADAAQAAQADAAgAAAAEAAQAAQABAAgAAAAFAAQAAQADAAgAAAAGAAQAAQACAAgAAAAHAAQAAQAAAAgAAAAIAAQAAQACAAgAAAAJAAQAAQAAAAgAAAAKAAQAAQACAAgAAAALAAQAAQABAAgAAAAMAAQAAQADAAgAAAANAAQAAQABAAgAAAAOAAQAAQADAAgAAAAPAAQAAQABAAgAAAAQAAQAAQAAAAgAAAARAAQAAQACAAgAAAASAAQAAQAAAAgAAAATAAQAAQACAAgAAAAUAAQAAQAAAAgAAAAVAAQAAQADAAgAAAAWAAQAAQABAAgAAAAXAAQAAQADAAgAAAAYAAQAAQABAAgAAAAZAAQAAQADAAgAAAAaAAQAAQACAAgAAAAbAAQAAQAAAAgAAAAcAAQAAQACAAgAAAAdAAQAAQAAAAgAAAAAAAUAAQABAAgAAAABAAUAAQAAABkAAAACAAUAAQADABkAAAADAAUAAQACABkAAAAEAAUAAQABABkAAAAFAAUAAQAAABkAAAAGAAUAAQADABkAAAAHAAUAAQACABkAAAAIAAUAAQABABkAAAAJAAUAAQAAABkAAAAKAAUAAQADABkAAAALAAUAAQACABkAAAAMAAUAAQABABkAAAANAAUAAQAAABkAAAAOAAUAAQADABkAAAAPAAUAAQACABkAAAAQAAUAAQABABkAAAARAAUAAQAAABkAAAASAAUAAQADABkAAAATAAUAAQACABkAAAAUAAUAAQABABkAAAAVAAUAAQAAABkAAAAWAAUAAQADABkAAAAXAAUAAQACABkAAAAYAAUAAQABABkAAAAZAAUAAQAAABkAAAAaAAUAAQADABkAAAAbAAUAAQACABkAAAAcAAUAAQABABkAAAAdAAUAAQAAAAgAAAAAAAYAAQACAAgAAAABAAYAAQACABkAAAACAAYAAQACABkAAAADAAYAAQACABkAAAAEAAYAAQACABkAAAAFAAYAAQABABkAAAAGAAYAAQABABkAAAAHAAYAAQABABkAAAAIAAYAAQABABkAAAAJAAYAAQABABkAAAAKAAYAAQAAABkAAAALAAYAAQAAABkAAAAMAAYAAQAAABkAAAANAAYAAQAAABkAAAAOAAYAAQAAABkAAAAPAAYAAQADABkAAAAQAAYAAQADABkAAAARAAYAAQADABkAAAASAAYAAQADABkAAAATAAYAAQADABkAAAAUAAYAAQACABkAAAAVAAYAAQACABkAAAAWAAYAAQACABkAAAAXAAYAAQACABkAAAAYAAYAAQACABkAAAAZAAYAAQABABkAAAAaAAYAAQABABkAAAAbAAYAAQABABkAAAAcAAYAAQABABkAAAAdAAYAAQABAAgAAAAAAAcAAQADAAgAAAABAAcAAQAAABkAAAACAAcAAQABABkAAAADAAcAAQABABkAAAAEAAcAAQACABkAAAAFAAcAAQACABkAAAAGAAcAAQADABkAAAAHAAcAAQAAABkAAAAIAAcAAQAAABkAAAAJAAcAAQABABkAAAAKAAcAAQABABkAAAALAAcAAQACABkAAAAMAAcAAQADABkAAAANAAcAAQADABkAAAAOAAcAAQAAABkAAAAPAAcAAQAAABkAAAAQAAcAAQABABkAAAARAAcAAQACABkAAAASAAcAAQACABkAAAATAAcAAQADABkAAAAUAAcAAQADABkAAAAVAAcAAQAAABkAAAAWAAcAAQABABkAAAAXAAcAAQABABkAAAAYAAcAAQACABkAAAAZAAcAAQACABkAAAAaAAcAAQADABkAAAAbAAcAAQAAABkAAAAcAAcAAQAAABkAAAAdAAcAAQABAAgAAAAAAAgAAQAAAAgAAAABAAgAAQACABkAAAACAAgAAQADABkAAAADAAgAAQABABkAAAAEAAgAAQACABkAAAAFAAgAAQADABkAAAAGAAgAAQABABkAAAAHAAgAAQACABkAAAAIAAgAAQAAABkAAAAJAAgAAQABABkAAAAKAAgAAQACABkAAAALAAgAAQAAABkAAAAMAAgAAQABABkAAAANAAgAAQADABkAAAAOAAgAAQAAABkAAAAPAAgAAQABABkAAAAQAAgAAQADABkAAAARAAgAAQAAABkAAAASAAgAAQACABkAAAATAAgAAQADABkAAAAUAAgAAQAAABkAAAAVAAgAAQACABkAAAAWAAgAAQADABkAAAAXAAgAAQABABkAAAAYAAgAAQACABkAAAAZAAgAAQADABkAAAAaAAgAAQABABkAAAAbAAgAAQACABkAAAAcAAgAAQAAABkAAAAdAAgAAQABAAgAAAAAAAkAAQABAAgAAAABAAkAAQAAABkAAAACAAkAAQACABkAAAADAAkAAQAAABkAAAAEAAkAAQACABkAAAAFAAkAAQAAABkAAAAGAAkAAQADABkAAAAHAAkAAQABABkAAAAIAAkAAQADABkAAAAJAAkAAQABABkAAAAKAAkAAQADABkAAAALAAkAAQACABkAAAAMAAkAAQAAABkAAAANAAkAAQACABkAAAAOAAkAAQAAABkAAAAPAAkAAQACABkAAAAQAAkAAQABABkAAAARAAkAAQADABkAAAASAAkAAQABABkAAAATAAkAAQADABkAAAAUAAkAAQABABkAAAAVAAkAAQAAABkAAAAWAAkAAQACABkAAAAXAAkAAQAAABkAAAAYAAkAAQACABkAAAAZAAkAAQAAABkAAAAaAAkAAQADABkAAAAbAAkAAQABABkAAAAcAAkAAQADABkAAAAdAAkAAQABAAgAAAAAAAoAAQACAAgAAAABAAoAAQABABkAAAACAAoAAQAAABkAAAADAAoAAQADABkAAAAEAAoAAQACABkAAAAFAAoAAQABABkAAAAGAAoAAQAAABkAAAAHAAoAAQADABkAAAAIAAoAAQACABkAAAAJAAoAAQABABkAAAAKAAoAAQAAABkAAAALAAoAAQADABkAAAAMAAoAAQACABkAAAANAAoAAQABABkAAAAOAAoAAQAAABkAAAAPAAoAAQADABkAAAAQAAoAAQACABkAAAARAAoAAQABABkAAAASAAoAAQAAABkAAAATAAoAAQADABkAAAAUAAoAAQACABkAAAAVAAoAAQABABkAAAAWAAoAAQAAABkAAAAXAAoAAQADABkAAAAYAAoAAQACABkAAAAZAAoAAQABABkAAAAaAAoAAQAAABkAAAAbAAoAAQADABkAAAAcAAoAAQACABkAAAAdAAoAAQABAAgAAAAAAAsAAQADAAgAAAABAAsAAQADABkAAAACAAsAAQADABkAAAADAAsAAQADABkAAAAEAAsAAQADABkAAAAFAAsAAQACABkAAAAGAAsAAQACABkAAAAHAAsAAQACABkAAAAIAAsAAQACABkAAAAJAAsAAQACABkAAAAKAAsAAQABABkAAAALAAsAAQABABkAAAAMAAsAAQABABkAAAANAAsAAQABABkAAAAOAAsAAQABABkAAAAPAAsAAQAAABkAAAAQAAsAAQAAABkAAAARAAsAAQAAABkAAAASAAsAAQAAABkAAAATAAsAAQAAABkAAAAUAAsAAQADABkAAAAVAAsAAQADABkAAAAWAAsAAQADABkAAAAXAAsAAQADABkAAAAYAAsAAQADABkAAAAZAAsAAQACABkAAAAaAAsAAQACABkAAAAbAAsAAQACABkAAAAcAAsAAQACABkAAAAdAAsAAQACAAgAAAAAAAwAAQAAAAgAAAABAAwAAQABABkAAAACAAwAAQACABkAAAADAAwAAQACABkAAAAEAAwAAQADABkAAAAFAAwAAQADABkAAAAGAAwAAQAAABkAAAAHAAwAAQABABkAAAAIAAwAAQABABkAAAAJAAwAAQACABkAAAAKAAwAAQACABkAAAALAAwAAQADABkAAAAMAAwAAQAAABkAAAANAAwAAQAAABkAAAAOAAwAAQABABkAAAAPAAwAAQABABkAAAAQAAwAAQACABkAAAARAAwAAQADABkAAAASAAwAAQADABkAAAATAAwAAQAAABkAAAAUAAwAAQAAABkAAAAVAAwAAQABABkAAAAWAAwAAQACABkAAAAXAAwAAQACABkAAAAYAAwAAQADABkAAAAZAAwAAQADABkAAAAaAAwAAQAAABkAAAAbAAwAAQABABkAAAAcAAwAAQABABkAAAAdAAwAAQACAAgAAAAAAA0AAQABAAgAAAABAA0AAQADABkAAAACAA0AAQAAABkAAAADAA0AAQACABkAAAAEAA0AAQADABkAAAAFAA0AAQAAABkAAAAGAA0AAQACABkAAAAHAA0AAQADABkAAAAIAA0AAQABABkAAAAJAA0AAQACABkAAAAKAA0AAQADABkAAAALAA0AAQABABkAAAAMAA0AAQACABkAAAANAA0AAQAAABkAAAAOAA0AAQABABkAAAAPAA0AAQACABkAAAAQAA0AAQAAABkAAAARAA0AAQABABkAAAASAA0AAQADABkAAAATAA0AAQAAABkAAAAUAA0AAQABABkAAAAVAA0AAQADABkAAAAWAA0AAQAAABkAAAAXAA0AAQACABkAAAAYAA0AAQADABkAAAAZAA0AAQAAABkAAAAaAA0AAQACABkAAAAbAA0AAQADABkAAAAcAA0AAQABABkAAAAdAA0AAQACAAgAAAAAAA4AAQACAAgAAAABAA4AAQABABkAAAACAA4AAQADABkAAAADAA4AAQABABkAAAAEAA4AAQADABkAAAAFAA4AAQABABkAAAAGAA4AAQAAABkAAAAHAA4AAQACABkAAAAIAA4AAQAAABkAAAAJAA4AAQACABkAAAAKAA4AAQAAABkAAAALAA4AAQADABkAAAAMAA4AAQABABkAAAANAA4AAQADABkAAAAOAA4AAQABABkAAAAPAA4AAQADABkAAAAQAA4AAQACABkAAAARAA4AAQAAABkAAAASAA4AAQACABkAAAATAA4AAQAAABkAAAAUAA4AAQACABkAAAAVAA4AAQABABkAAAAWAA4AAQADABkAAAAXAA4AAQABABkAAAAYAA4AAQADABkAAAAZAA4AAQABABkAAAAaAA4AAQAAABkAAAAbAA4AAQACABkAAAAcAA4AAQAAABkAAAAdAA4AAQACAAgAAAAAAA8AAQADAAgAAAABAA8AAQACABkAAAACAA8AAQABABkAAAADAA8AAQAAABkAAAAEAA8AAQADABkAAAAFAA8AAQACABkAAAAGAA8AAQABABkAAAAHAA8AAQAAABkAAAAIAA8AAQADABkAAAAJAA8AAQACABkAAAAKAA8AAQABABkAAAALAA8AAQAAABkAAAAMAA8AAQADABkAAAANAA8AAQACABkAAAAOAA8AAQABABkAAAAPAA8AAQAAABkAAAAQAA8AAQADABkAAAARAA8AAQACABkAAAASAA8AAQABABkAAAATAA8AAQAAABkAAAAUAA8AAQADABkAAAAVAA8AAQACABkAAAAWAA8AAQABABkAAAAXAA8AAQAAABkAAAAYAA8AAQADABkAAAAZAA8AAQACABkAAAAaAA8AAQABABkAAAAbAA8AAQAAABkAAAAcAA8AAQADABkAAAAdAA8AAQACAAgAAAAAABAAAQAAAAgAAAABABAAAQAAAAgAAAACABAAAQAAAAgAAAADABAAAQAAAAgAAAAEABAAAQAAAAgAAAAFABAAAQADAAgAAAAGABAAAQADAAgAAAAHABAAAQADAAgAAAAIABAAAQADAAgAAAAJABAAAQADAAgAAAAKABAAAQACAAgAAAALABAAAQACAAgAAAAMABAAAQACAAgAAAANABAAAQACAAgAAAAOABAAAQACABkAAAAPABAAAQABABkAAAAQABAAAQABAAgAAAARABAAAQABAAgAAAASABAAAQABAAgAAAATABAAAQABAAgAAAAUABAAAQAAAAgAAAAVABAAAQAAAAgAAAAWABAAAQAAAAgAAAAXABAAAQAAAAgAAAAYABAAAQAAAAgAAAAZABAAAQADAAgAAAAaABAAAQADAAgAAAAbABAAAQADAAgAAAAcABAAAQADAAgAAAAdABAAAQADAAgAAAA=")
-tile_set = ExtResource("2_evie2")
+tile_set = ExtResource("2_e4vxq")
 
-[node name="Blocker" type="TileMapLayer" parent="." unique_id=1743213638]
+[node name="Blocker" type="TileMapLayer" parent="." unique_id=685971760]
 visible = false
 tile_map_data = PackedByteArray("AAAAAAQAAwAAAAAAAAABAAQAAwAAAAAAAAACAAQAAwAAAAAAAAADAAQAAwAAAAAAAAAEAAQAAwAAAAAAAAAFAAQAAwAAAAAAAAAGAAQAAwAAAAAAAAAHAAQAAwAAAAAAAAAIAAQAAwAAAAAAAAAJAAQAAwAAAAAAAAAKAAQAAwAAAAAAAAALAAQAAwAAAAAAAAAMAAQAAwAAAAAAAAANAAQAAwAAAAAAAAAOAAQAAwAAAAAAAAAPAAQAAwAAAAAAAAAQAAQAAwAAAAAAAAARAAQAAwAAAAAAAAASAAQAAwAAAAAAAAATAAQAAwAAAAAAAAAUAAQAAwAAAAAAAAAVAAQAAwAAAAAAAAAWAAQAAwAAAAAAAAAXAAQAAwAAAAAAAAAYAAQAAwAAAAAAAAAZAAQAAwAAAAAAAAAaAAQAAwAAAAAAAAAbAAQAAwAAAAAAAAAcAAQAAwAAAAAAAAAdAAQAAwAAAAAAAAAAAAUAAwAAAAAAAAAdAAUAAwAAAAAAAAAAAAYAAwAAAAAAAAAdAAYAAwAAAAAAAAAAAAcAAwAAAAAAAAAdAAcAAwAAAAAAAAAAAAgAAwAAAAAAAAAdAAgAAwAAAAAAAAAAAAkAAwAAAAAAAAAdAAkAAwAAAAAAAAAAAAoAAwAAAAAAAAAdAAoAAwAAAAAAAAAAAAsAAwAAAAAAAAAdAAsAAwAAAAAAAAAAAAwAAwAAAAAAAAAdAAwAAwAAAAAAAAAAAA0AAwAAAAAAAAAdAA0AAwAAAAAAAAAAAA4AAwAAAAAAAAAdAA4AAwAAAAAAAAAAAA8AAwAAAAAAAAAdAA8AAwAAAAAAAAAAABAAAwAAAAAAAAABABAAAwAAAAAAAAACABAAAwAAAAAAAAADABAAAwAAAAAAAAAEABAAAwAAAAAAAAAFABAAAwAAAAAAAAAGABAAAwAAAAAAAAAHABAAAwAAAAAAAAAIABAAAwAAAAAAAAAJABAAAwAAAAAAAAAKABAAAwAAAAAAAAALABAAAwAAAAAAAAAMABAAAwAAAAAAAAANABAAAwAAAAAAAAAQABAAAwAAAAAAAAARABAAAwAAAAAAAAASABAAAwAAAAAAAAATABAAAwAAAAAAAAAUABAAAwAAAAAAAAAVABAAAwAAAAAAAAAWABAAAwAAAAAAAAAXABAAAwAAAAAAAAAYABAAAwAAAAAAAAAZABAAAwAAAAAAAAAaABAAAwAAAAAAAAAbABAAAwAAAAAAAAAcABAAAwAAAAAAAAAdABAAAwAAAAAAAAA=")
-tile_set = ExtResource("2_evie2")
+tile_set = ExtResource("2_e4vxq")
 
-[node name="Flora" type="TileMapLayer" parent="." unique_id=2134087916]
+[node name="Flora" type="TileMapLayer" parent="." unique_id=221018315]
 y_sort_enabled = true
-tile_set = ExtResource("2_evie2")
+tile_set = ExtResource("2_e4vxq")
 
-[node name="OakCanopy" type="TileMapLayer" parent="." unique_id=1173535569]
+[node name="OakCanopy" type="TileMapLayer" parent="." unique_id=1529919732]
 y_sort_enabled = true
-tile_set = ExtResource("2_evie2")
-script = ExtResource("3_k7jyl")
+tile_set = ExtResource("2_e4vxq")
+script = ExtResource("3_m66rg")
 
-[node name="Entities" type="Node2D" parent="." unique_id=674814102]
+[node name="Entities" type="Node2D" parent="." unique_id=490062538]
 y_sort_enabled = true
 
-[node name="Counter1" type="StaticBody2D" parent="Entities" unique_id=520730044]
+[node name="Counter1" type="StaticBody2D" parent="Entities" unique_id=1390185464]
 position = Vector2(200, 224)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Counter1" unique_id=1038078342]
-texture = ExtResource("4_v62j7")
+[node name="Sprite" type="Sprite2D" parent="Entities/Counter1" unique_id=46274302]
+texture = ExtResource("4_dwba1")
 offset = Vector2(0, -30)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Counter1" unique_id=1278356790]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Counter1" unique_id=1600981987]
 position = Vector2(0, -9)
-shape = SubResource("RectangleShape2D_wornb")
+shape = SubResource("RectangleShape2D_te2wy")
 
-[node name="Hearth2" type="StaticBody2D" parent="Entities" unique_id=1589555049]
+[node name="Hearth2" type="StaticBody2D" parent="Entities" unique_id=9806024]
 position = Vector2(800, 208)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Hearth2" unique_id=1657498738]
-texture = ExtResource("5_e4vxq")
+[node name="Sprite" type="Sprite2D" parent="Entities/Hearth2" unique_id=1082873070]
+texture = ExtResource("5_vah4l")
 offset = Vector2(0, -56)
 hframes = 2
-script = ExtResource("6_m66rg")
+script = ExtResource("6_onpqj")
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Hearth2" unique_id=1213046285]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Hearth2" unique_id=1339273596]
 position = Vector2(0, -14)
-shape = SubResource("RectangleShape2D_x4em5")
+shape = SubResource("RectangleShape2D_hr62v")
 
-[node name="Sofa3" type="StaticBody2D" parent="Entities" unique_id=2010099862]
+[node name="Sofa3" type="StaticBody2D" parent="Entities" unique_id=2077208953]
 position = Vector2(480, 320)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Sofa3" unique_id=1560923910]
-texture = ExtResource("7_dwba1")
+[node name="Sprite" type="Sprite2D" parent="Entities/Sofa3" unique_id=1538713538]
+texture = ExtResource("7_q6udl")
 offset = Vector2(0, -22)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Sofa3" unique_id=920262300]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Sofa3" unique_id=107350506]
 position = Vector2(0, -6.6)
-shape = SubResource("RectangleShape2D_8xf4m")
+shape = SubResource("RectangleShape2D_fu4hb")
 
-[node name="Armchair4" type="StaticBody2D" parent="Entities" unique_id=182402973]
+[node name="Armchair4" type="StaticBody2D" parent="Entities" unique_id=1049323274]
 position = Vector2(340, 392)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Armchair4" unique_id=1002568427]
-texture = ExtResource("8_vah4l")
+[node name="Sprite" type="Sprite2D" parent="Entities/Armchair4" unique_id=1583487918]
+texture = ExtResource("8_ubeem")
 offset = Vector2(0, -22)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair4" unique_id=1002308106]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair4" unique_id=2038214455]
 position = Vector2(0, -6.6)
-shape = SubResource("RectangleShape2D_kbcds")
+shape = SubResource("RectangleShape2D_4msqr")
 
-[node name="Armchair5" type="StaticBody2D" parent="Entities" unique_id=1368950694]
+[node name="Armchair5" type="StaticBody2D" parent="Entities" unique_id=1352840930]
 position = Vector2(620, 392)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Armchair5" unique_id=1071081821]
-texture = ExtResource("8_vah4l")
+[node name="Sprite" type="Sprite2D" parent="Entities/Armchair5" unique_id=2102445288]
+texture = ExtResource("8_ubeem")
 offset = Vector2(0, -22)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair5" unique_id=440402281]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair5" unique_id=592478401]
 position = Vector2(0, -6.6)
-shape = SubResource("RectangleShape2D_cn4ks")
+shape = SubResource("RectangleShape2D_rpfn3")
 
-[node name="CoffeeTable6" type="StaticBody2D" parent="Entities" unique_id=1772039067]
+[node name="CoffeeTable6" type="StaticBody2D" parent="Entities" unique_id=88479669]
 position = Vector2(480, 400)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/CoffeeTable6" unique_id=1917052037]
-texture = ExtResource("9_onpqj")
+[node name="Sprite" type="Sprite2D" parent="Entities/CoffeeTable6" unique_id=537685538]
+texture = ExtResource("9_6la8p")
 offset = Vector2(0, -14)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/CoffeeTable6" unique_id=236944378]
+[node name="Collision" type="CollisionShape2D" parent="Entities/CoffeeTable6" unique_id=1637518424]
 position = Vector2(0, -6)
-shape = SubResource("RectangleShape2D_a22q0")
+shape = SubResource("RectangleShape2D_11v71")
 
-[node name="Luggage7" type="StaticBody2D" parent="Entities" unique_id=127984533]
+[node name="Luggage7" type="StaticBody2D" parent="Entities" unique_id=1523738159]
 position = Vector2(120, 472)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Luggage7" unique_id=1960272687]
-texture = ExtResource("10_q6udl")
+[node name="Sprite" type="Sprite2D" parent="Entities/Luggage7" unique_id=1791751620]
+texture = ExtResource("10_dgrvr")
 offset = Vector2(0, -34)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Luggage7" unique_id=735882238]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Luggage7" unique_id=869085493]
 position = Vector2(0, -10.2)
-shape = SubResource("RectangleShape2D_te2wy")
+shape = SubResource("RectangleShape2D_i24r5")
 
-[node name="Plant8" type="StaticBody2D" parent="Entities" unique_id=1140820659]
+[node name="Plant8" type="StaticBody2D" parent="Entities" unique_id=226180946]
 position = Vector2(880, 472)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Plant8" unique_id=1875589903]
-texture = ExtResource("11_ubeem")
+[node name="Sprite" type="Sprite2D" parent="Entities/Plant8" unique_id=1152017874]
+texture = ExtResource("11_drlst")
 offset = Vector2(0, -28)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Plant8" unique_id=632335453]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Plant8" unique_id=1628476823]
 position = Vector2(0, -8.4)
-shape = SubResource("RectangleShape2D_hr62v")
+shape = SubResource("RectangleShape2D_q5olf")
 
-[node name="Sign9" type="StaticBody2D" parent="Entities" unique_id=1034346452]
+[node name="TableLamp9" type="StaticBody2D" parent="Entities" unique_id=1167388633]
+position = Vector2(392, 312)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/TableLamp9" unique_id=655210272]
+texture = ExtResource("12_4lxev")
+offset = Vector2(0, -30)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/TableLamp9" unique_id=1103942366]
+position = Vector2(0, -9)
+shape = SubResource("RectangleShape2D_ffk0g")
+
+[node name="LogBox10" type="StaticBody2D" parent="Entities" unique_id=1683360732]
+position = Vector2(892, 208)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/LogBox10" unique_id=821655881]
+texture = ExtResource("13_wornb")
+offset = Vector2(0, -18)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/LogBox10" unique_id=1739786856]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_aj1s3")
+
+[node name="Rocker11" type="StaticBody2D" parent="Entities" unique_id=286832769]
+position = Vector2(740, 300)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/Rocker11" unique_id=1993422675]
+texture = ExtResource("14_x4em5")
+offset = Vector2(0, -26)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/Rocker11" unique_id=218563360]
+position = Vector2(0, -7.8)
+shape = SubResource("RectangleShape2D_7qui7")
+
+[node name="Sign12" type="StaticBody2D" parent="Entities" unique_id=1419307757]
 position = Vector2(800, 440)
 collision_mask = 0
-script = ExtResource("12_6la8p")
+script = ExtResource("15_8xf4m")
 title = "On the Merced"
 text = "The lodge sits right on the Merced River at the park's western edge. In spring the river roars past the rooms; by fall you can wade it."
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Sign9" unique_id=1575305965]
-texture = ExtResource("13_dgrvr")
+[node name="Sprite" type="Sprite2D" parent="Entities/Sign12" unique_id=1350459863]
+texture = ExtResource("16_kbcds")
 offset = Vector2(0, -16)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Sign9" unique_id=856830307]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Sign12" unique_id=43134687]
 position = Vector2(0, -4)
-shape = SubResource("RectangleShape2D_fu4hb")
+shape = SubResource("RectangleShape2D_c2w1g")
 
-[node name="Hitbox" type="Area2D" parent="Entities/Sign9" unique_id=1440546449]
+[node name="Hitbox" type="Area2D" parent="Entities/Sign12" unique_id=802096544]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
-[node name="Shape" type="CollisionShape2D" parent="Entities/Sign9/Hitbox" unique_id=983178300]
+[node name="Shape" type="CollisionShape2D" parent="Entities/Sign12/Hitbox" unique_id=779384322]
 position = Vector2(0, -14)
-shape = SubResource("RectangleShape2D_4msqr")
+shape = SubResource("RectangleShape2D_r42hh")
 
-[node name="Markers" type="Node2D" parent="." unique_id=640500150]
+[node name="Markers" type="Node2D" parent="." unique_id=134326435]
 
-[node name="door" type="Marker2D" parent="Markers" unique_id=100159962]
+[node name="door" type="Marker2D" parent="Markers" unique_id=1872538506]
 position = Vector2(480, 488)
 
-[node name="Places" type="Node2D" parent="." unique_id=1209584789]
+[node name="Places" type="Node2D" parent="." unique_id=1067580512]
 
-[node name="Exits" type="Node2D" parent="." unique_id=1716853449]
+[node name="Exits" type="Node2D" parent="." unique_id=1941502678]
 
-[node name="ToOutside" type="Area2D" parent="Exits" unique_id=1265901494]
+[node name="ToOutside" type="Area2D" parent="Exits" unique_id=1796478215]
 position = Vector2(480, 536)
-script = ExtResource("14_drlst")
+script = ExtResource("17_cn4ks")
 label = "El Portal"
 target_region = "el_portal"
 target_spawn = "yosemite_view_lodge_door"
 
-[node name="Shape" type="CollisionShape2D" parent="Exits/ToOutside" unique_id=915249224]
-shape = SubResource("RectangleShape2D_rpfn3")
+[node name="Shape" type="CollisionShape2D" parent="Exits/ToOutside" unique_id=381622049]
+shape = SubResource("RectangleShape2D_11vjk")
 
-[node name="Room" type="Sprite2D" parent="." unique_id=932557145]
+[node name="Room" type="Sprite2D" parent="." unique_id=2143955215]
 z_index = -8
-texture = ExtResource("15_4lxev")
+texture = ExtResource("18_a22q0")
 centered = false
 
-[node name="Dark" type="Polygon2D" parent="." unique_id=928786221]
+[node name="Dark" type="Polygon2D" parent="." unique_id=1689102396]
 z_index = -12
 color = Color(0.05490196, 0.043137256, 0.039215688, 1)
 polygon = PackedVector2Array(-1200, -1200, 1680, -1200, 1680, 1472, -1200, 1472)

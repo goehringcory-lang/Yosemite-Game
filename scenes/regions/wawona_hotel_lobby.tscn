@@ -1,260 +1,307 @@
 [gd_scene format=4]
 
-[ext_resource type="Script" path="res://scripts/world/region.gd" id="1_4v3er"]
-[ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="2_8uxu7"]
-[ext_resource type="Script" path="res://scripts/world/seasonal_canopy.gd" id="3_18kw4"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/counter.png" id="4_pgfjk"]
-[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="5_8xppq"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/piano_parlor.png" id="6_wg7ef"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/sofa_parlor.png" id="7_7tdr3"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/armchair.png" id="8_ioi1h"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/coffee_table.png" id="9_dt6km"]
-[ext_resource type="Texture2D" path="res://assets/sprites/info_sign.png" id="10_8bk4t"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/plant.png" id="11_tgbxq"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/lamp.png" id="12_x5dcu"]
-[ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="13_m054d"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/wawona_hotel_lobby.png" id="14_s1krv"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_j6p5s"]
-size = Vector2(212, 18)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_xuu0a"]
-size = Vector2(60, 20.4)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_fnwyp"]
-size = Vector2(72, 44.4)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_0fkni"]
-size = Vector2(100, 13.2)
+[ext_resource type="Script" path="res://scripts/world/region.gd" id="1_18kw4"]
+[ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="2_pgfjk"]
+[ext_resource type="Script" path="res://scripts/world/seasonal_canopy.gd" id="3_8xppq"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/counter.png" id="4_wg7ef"]
+[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="5_7tdr3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/piano_parlor.png" id="6_ioi1h"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/sofa_parlor.png" id="7_dt6km"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/armchair.png" id="8_8bk4t"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/coffee_table.png" id="9_tgbxq"]
+[ext_resource type="Texture2D" path="res://assets/sprites/info_sign.png" id="10_x5dcu"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/plant.png" id="11_m054d"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/lamp.png" id="12_s1krv"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/table_lamp.png" id="13_j6p5s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/rocker.png" id="14_xuu0a"]
+[ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="15_fnwyp"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/wawona_hotel_lobby.png" id="16_0fkni"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vsflx"]
-size = Vector2(28, 13.2)
+size = Vector2(212, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tafu5"]
-size = Vector2(28, 13.2)
+size = Vector2(60, 20.4)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vusqb"]
-size = Vector2(48, 12)
+size = Vector2(72, 44.4)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g1tx0"]
-size = Vector2(24, 8)
+size = Vector2(100, 13.2)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q08yy"]
-size = Vector2(36, 28)
+size = Vector2(28, 13.2)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7lrmb"]
-size = Vector2(24, 16.8)
+size = Vector2(28, 13.2)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_aaycp"]
-size = Vector2(16, 24)
+size = Vector2(48, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cdggt"]
-size = Vector2(16, 60)
+size = Vector2(24, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mmdxk"]
+size = Vector2(36, 28)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rsfxy"]
+size = Vector2(24, 16.8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tx31r"]
+size = Vector2(16, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qc8er"]
+size = Vector2(28, 18)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ykc3n"]
+size = Vector2(28, 18)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_osdyn"]
+size = Vector2(24, 15.6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hy2p1"]
+size = Vector2(16, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mv5oh"]
 size = Vector2(88, 20)
 
-[node name="WawonaHotelLobby" type="Node2D" unique_id=1484397205]
+[node name="WawonaHotelLobby" type="Node2D" unique_id=277734592]
 y_sort_enabled = true
-script = ExtResource("1_4v3er")
+script = ExtResource("1_18kw4")
 region_id = "wawona_hotel_lobby"
 hub_id = "wawona"
 display_name = "Wawona Hotel"
 geo_anchor = Vector2(-119.6555, 37.5366)
 indoors = true
 
-[node name="Ground" type="TileMapLayer" parent="." unique_id=846804646]
+[node name="Ground" type="TileMapLayer" parent="." unique_id=970411213]
 z_index = -10
 tile_map_data = PackedByteArray("AAAAAAAAAQAAAAgAAAABAAAAAQADAAgAAAACAAAAAQACAAgAAAADAAAAAQABAAgAAAAEAAAAAQAAAAgAAAAFAAAAAQADAAgAAAAGAAAAAQACAAgAAAAHAAAAAQABAAgAAAAIAAAAAQAAAAgAAAAJAAAAAQADAAgAAAAKAAAAAQACAAgAAAALAAAAAQABAAgAAAAMAAAAAQAAAAgAAAANAAAAAQADAAgAAAAOAAAAAQACAAgAAAAPAAAAAQABAAgAAAAQAAAAAQAAAAgAAAARAAAAAQADAAgAAAASAAAAAQACAAgAAAATAAAAAQABAAgAAAAUAAAAAQAAAAgAAAAVAAAAAQADAAgAAAAWAAAAAQACAAgAAAAXAAAAAQABAAgAAAAYAAAAAQAAAAgAAAAZAAAAAQADAAgAAAAaAAAAAQACAAgAAAAbAAAAAQABAAgAAAAcAAAAAQAAAAgAAAAdAAAAAQADAAgAAAAeAAAAAQACAAgAAAAfAAAAAQABAAgAAAAAAAEAAQABAAgAAAABAAEAAQABAAgAAAACAAEAAQABAAgAAAADAAEAAQABAAgAAAAEAAEAAQABAAgAAAAFAAEAAQAAAAgAAAAGAAEAAQAAAAgAAAAHAAEAAQAAAAgAAAAIAAEAAQAAAAgAAAAJAAEAAQAAAAgAAAAKAAEAAQADAAgAAAALAAEAAQADAAgAAAAMAAEAAQADAAgAAAANAAEAAQADAAgAAAAOAAEAAQADAAgAAAAPAAEAAQACAAgAAAAQAAEAAQACAAgAAAARAAEAAQACAAgAAAASAAEAAQACAAgAAAATAAEAAQACAAgAAAAUAAEAAQABAAgAAAAVAAEAAQABAAgAAAAWAAEAAQABAAgAAAAXAAEAAQABAAgAAAAYAAEAAQABAAgAAAAZAAEAAQAAAAgAAAAaAAEAAQAAAAgAAAAbAAEAAQAAAAgAAAAcAAEAAQAAAAgAAAAdAAEAAQAAAAgAAAAeAAEAAQADAAgAAAAfAAEAAQADAAgAAAAAAAIAAQACAAgAAAABAAIAAQADAAgAAAACAAIAAQAAAAgAAAADAAIAAQAAAAgAAAAEAAIAAQABAAgAAAAFAAIAAQABAAgAAAAGAAIAAQACAAgAAAAHAAIAAQADAAgAAAAIAAIAAQADAAgAAAAJAAIAAQAAAAgAAAAKAAIAAQAAAAgAAAALAAIAAQABAAgAAAAMAAIAAQACAAgAAAANAAIAAQACAAgAAAAOAAIAAQADAAgAAAAPAAIAAQADAAgAAAAQAAIAAQAAAAgAAAARAAIAAQABAAgAAAASAAIAAQABAAgAAAATAAIAAQACAAgAAAAUAAIAAQACAAgAAAAVAAIAAQADAAgAAAAWAAIAAQAAAAgAAAAXAAIAAQAAAAgAAAAYAAIAAQABAAgAAAAZAAIAAQABAAgAAAAaAAIAAQACAAgAAAAbAAIAAQADAAgAAAAcAAIAAQADAAgAAAAdAAIAAQAAAAgAAAAeAAIAAQAAAAgAAAAfAAIAAQABAAgAAAAAAAMAAQADAAgAAAABAAMAAQABAAgAAAACAAMAAQACAAgAAAADAAMAAQAAAAgAAAAEAAMAAQABAAgAAAAFAAMAAQACAAgAAAAGAAMAAQAAAAgAAAAHAAMAAQABAAgAAAAIAAMAAQADAAgAAAAJAAMAAQAAAAgAAAAKAAMAAQABAAgAAAALAAMAAQADAAgAAAAMAAMAAQAAAAgAAAANAAMAAQACAAgAAAAOAAMAAQADAAgAAAAPAAMAAQAAAAgAAAAQAAMAAQACAAgAAAARAAMAAQADAAgAAAASAAMAAQABAAgAAAATAAMAAQACAAgAAAAUAAMAAQADAAgAAAAVAAMAAQABAAgAAAAWAAMAAQACAAgAAAAXAAMAAQAAAAgAAAAYAAMAAQABAAgAAAAZAAMAAQACAAgAAAAaAAMAAQAAAAgAAAAbAAMAAQABAAgAAAAcAAMAAQADAAgAAAAdAAMAAQAAAAgAAAAeAAMAAQABAAgAAAAfAAMAAQADAAgAAAAAAAQAAQAAAAgAAAABAAQAAQADAAgAAAACAAQAAQABAAgAAAADAAQAAQADAAgAAAAEAAQAAQABAAgAAAAFAAQAAQADAAgAAAAGAAQAAQACAAgAAAAHAAQAAQAAAAgAAAAIAAQAAQACAAgAAAAJAAQAAQAAAAgAAAAKAAQAAQACAAgAAAALAAQAAQABAAgAAAAMAAQAAQADAAgAAAANAAQAAQABAAgAAAAOAAQAAQADAAgAAAAPAAQAAQABAAgAAAAQAAQAAQAAAAgAAAARAAQAAQACAAgAAAASAAQAAQAAAAgAAAATAAQAAQACAAgAAAAUAAQAAQAAAAgAAAAVAAQAAQADAAgAAAAWAAQAAQABAAgAAAAXAAQAAQADAAgAAAAYAAQAAQABAAgAAAAZAAQAAQADAAgAAAAaAAQAAQACAAgAAAAbAAQAAQAAAAgAAAAcAAQAAQACAAgAAAAdAAQAAQAAAAgAAAAeAAQAAQACAAgAAAAfAAQAAQABAAgAAAAAAAUAAQABAAgAAAABAAUAAQAAABkAAAACAAUAAQADABkAAAADAAUAAQACABkAAAAEAAUAAQABABkAAAAFAAUAAQAAABkAAAAGAAUAAQADABkAAAAHAAUAAQACABkAAAAIAAUAAQABABkAAAAJAAUAAQAAABkAAAAKAAUAAQADABkAAAALAAUAAQACABkAAAAMAAUAAQABABkAAAANAAUAAQAAABkAAAAOAAUAAQADABkAAAAPAAUAAQACABkAAAAQAAUAAQABABkAAAARAAUAAQAAABkAAAASAAUAAQADABkAAAATAAUAAQACABkAAAAUAAUAAQABABkAAAAVAAUAAQAAABkAAAAWAAUAAQADABkAAAAXAAUAAQACABkAAAAYAAUAAQABABkAAAAZAAUAAQAAABkAAAAaAAUAAQADABkAAAAbAAUAAQACABkAAAAcAAUAAQABABkAAAAdAAUAAQAAABkAAAAeAAUAAQADABkAAAAfAAUAAQACAAgAAAAAAAYAAQACAAgAAAABAAYAAQACABkAAAACAAYAAQACABkAAAADAAYAAQACABkAAAAEAAYAAQACABkAAAAFAAYAAQABABkAAAAGAAYAAQABABkAAAAHAAYAAQABABkAAAAIAAYAAQABABkAAAAJAAYAAQABABkAAAAKAAYAAQAAABkAAAALAAYAAQAAABkAAAAMAAYAAQAAABkAAAANAAYAAQAAABkAAAAOAAYAAQAAABkAAAAPAAYAAQADABkAAAAQAAYAAQADABkAAAARAAYAAQADABkAAAASAAYAAQADABkAAAATAAYAAQADABkAAAAUAAYAAQACABkAAAAVAAYAAQACABkAAAAWAAYAAQACABkAAAAXAAYAAQACABkAAAAYAAYAAQACABkAAAAZAAYAAQABABkAAAAaAAYAAQABABkAAAAbAAYAAQABABkAAAAcAAYAAQABABkAAAAdAAYAAQABABkAAAAeAAYAAQAAABkAAAAfAAYAAQAAAAgAAAAAAAcAAQADAAgAAAABAAcAAQAAABkAAAACAAcAAQABABkAAAADAAcAAQABABkAAAAEAAcAAQACABkAAAAFAAcAAQACABkAAAAGAAcAAQADABkAAAAHAAcAAQAAABkAAAAIAAcAAQAAABkAAAAJAAcAAQABABkAAAAKAAcAAQABABkAAAALAAcAAQACABkAAAAMAAcAAQADABkAAAANAAcAAQADABkAAAAOAAcAAQAAABkAAAAPAAcAAQAAABkAAAAQAAcAAQABABkAAAARAAcAAQACABkAAAASAAcAAQACABkAAAATAAcAAQADABkAAAAUAAcAAQADABkAAAAVAAcAAQAAABkAAAAWAAcAAQABABkAAAAXAAcAAQABABkAAAAYAAcAAQACABkAAAAZAAcAAQACABkAAAAaAAcAAQADABkAAAAbAAcAAQAAABkAAAAcAAcAAQAAABkAAAAdAAcAAQABABkAAAAeAAcAAQABABkAAAAfAAcAAQACAAgAAAAAAAgAAQAAAAgAAAABAAgAAQACABkAAAACAAgAAQADABkAAAADAAgAAQABABkAAAAEAAgAAQACABkAAAAFAAgAAQADABkAAAAGAAgAAQABABkAAAAHAAgAAQACABkAAAAIAAgAAQAAABkAAAAJAAgAAQABABkAAAAKAAgAAQACABkAAAALAAgAAQAAABkAAAAMAAgAAQABABkAAAANAAgAAQADABkAAAAOAAgAAQAAABkAAAAPAAgAAQABABkAAAAQAAgAAQADABkAAAARAAgAAQAAABkAAAASAAgAAQACABkAAAATAAgAAQADABkAAAAUAAgAAQAAABkAAAAVAAgAAQACABkAAAAWAAgAAQADABkAAAAXAAgAAQABABkAAAAYAAgAAQACABkAAAAZAAgAAQADABkAAAAaAAgAAQABABkAAAAbAAgAAQACABkAAAAcAAgAAQAAABkAAAAdAAgAAQABABkAAAAeAAgAAQACABkAAAAfAAgAAQAAAAgAAAAAAAkAAQABAAgAAAABAAkAAQAAABkAAAACAAkAAQACABkAAAADAAkAAQAAABkAAAAEAAkAAQACABkAAAAFAAkAAQAAABkAAAAGAAkAAQADABkAAAAHAAkAAQABABkAAAAIAAkAAQADABkAAAAJAAkAAQABABkAAAAKAAkAAQADABkAAAALAAkAAQACABkAAAAMAAkAAQAAABkAAAANAAkAAQACABkAAAAOAAkAAQAAABkAAAAPAAkAAQACABkAAAAQAAkAAQABABkAAAARAAkAAQADABkAAAASAAkAAQABABkAAAATAAkAAQADABkAAAAUAAkAAQABABkAAAAVAAkAAQAAABkAAAAWAAkAAQACABkAAAAXAAkAAQAAABkAAAAYAAkAAQACABkAAAAZAAkAAQAAABkAAAAaAAkAAQADABkAAAAbAAkAAQABABkAAAAcAAkAAQADABkAAAAdAAkAAQABABkAAAAeAAkAAQADABkAAAAfAAkAAQACAAgAAAAAAAoAAQACAAgAAAABAAoAAQABABkAAAACAAoAAQAAABkAAAADAAoAAQADABkAAAAEAAoAAQACABkAAAAFAAoAAQABABkAAAAGAAoAAQAAABkAAAAHAAoAAQADABkAAAAIAAoAAQACABkAAAAJAAoAAQABABkAAAAKAAoAAQAAABkAAAALAAoAAQADABkAAAAMAAoAAQACABkAAAANAAoAAQABABkAAAAOAAoAAQAAABkAAAAPAAoAAQADABkAAAAQAAoAAQACABkAAAARAAoAAQABABkAAAASAAoAAQAAABkAAAATAAoAAQADABkAAAAUAAoAAQACABkAAAAVAAoAAQABABkAAAAWAAoAAQAAABkAAAAXAAoAAQADABkAAAAYAAoAAQACABkAAAAZAAoAAQABABkAAAAaAAoAAQAAABkAAAAbAAoAAQADABkAAAAcAAoAAQACABkAAAAdAAoAAQABABkAAAAeAAoAAQAAABkAAAAfAAoAAQADAAgAAAAAAAsAAQADAAgAAAABAAsAAQADABkAAAACAAsAAQADABkAAAADAAsAAQADABkAAAAEAAsAAQADABkAAAAFAAsAAQACABkAAAAGAAsAAQACABkAAAAHAAsAAQACABkAAAAIAAsAAQACABkAAAAJAAsAAQACABkAAAAKAAsAAQABABkAAAALAAsAAQABABkAAAAMAAsAAQABABkAAAANAAsAAQABABkAAAAOAAsAAQABABkAAAAPAAsAAQAAABkAAAAQAAsAAQAAABkAAAARAAsAAQAAABkAAAASAAsAAQAAABkAAAATAAsAAQAAABkAAAAUAAsAAQADABkAAAAVAAsAAQADABkAAAAWAAsAAQADABkAAAAXAAsAAQADABkAAAAYAAsAAQADABkAAAAZAAsAAQACABkAAAAaAAsAAQACABkAAAAbAAsAAQACABkAAAAcAAsAAQACABkAAAAdAAsAAQACABkAAAAeAAsAAQABABkAAAAfAAsAAQABAAgAAAAAAAwAAQAAAAgAAAABAAwAAQABABkAAAACAAwAAQACABkAAAADAAwAAQACABkAAAAEAAwAAQADABkAAAAFAAwAAQADABkAAAAGAAwAAQAAABkAAAAHAAwAAQABABkAAAAIAAwAAQABABkAAAAJAAwAAQACABkAAAAKAAwAAQACABkAAAALAAwAAQADABkAAAAMAAwAAQAAABkAAAANAAwAAQAAABkAAAAOAAwAAQABABkAAAAPAAwAAQABABkAAAAQAAwAAQACABkAAAARAAwAAQADABkAAAASAAwAAQADABkAAAATAAwAAQAAABkAAAAUAAwAAQAAABkAAAAVAAwAAQABABkAAAAWAAwAAQACABkAAAAXAAwAAQACABkAAAAYAAwAAQADABkAAAAZAAwAAQADABkAAAAaAAwAAQAAABkAAAAbAAwAAQABABkAAAAcAAwAAQABABkAAAAdAAwAAQACABkAAAAeAAwAAQACABkAAAAfAAwAAQADABkAAAAAAA0AAQABAAgAAAABAA0AAQADABkAAAACAA0AAQAAABkAAAADAA0AAQACABkAAAAEAA0AAQADABkAAAAFAA0AAQAAABkAAAAGAA0AAQACABkAAAAHAA0AAQADABkAAAAIAA0AAQABABkAAAAJAA0AAQACABkAAAAKAA0AAQADABkAAAALAA0AAQABABkAAAAMAA0AAQACABkAAAANAA0AAQAAABkAAAAOAA0AAQABABkAAAAPAA0AAQACABkAAAAQAA0AAQAAABkAAAARAA0AAQABABkAAAASAA0AAQADABkAAAATAA0AAQAAABkAAAAUAA0AAQABABkAAAAVAA0AAQADABkAAAAWAA0AAQAAABkAAAAXAA0AAQACABkAAAAYAA0AAQADABkAAAAZAA0AAQAAABkAAAAaAA0AAQACABkAAAAbAA0AAQADABkAAAAcAA0AAQABABkAAAAdAA0AAQACABkAAAAeAA0AAQADABkAAAAfAA0AAQABABkAAAAAAA4AAQACAAgAAAABAA4AAQABABkAAAACAA4AAQADABkAAAADAA4AAQABABkAAAAEAA4AAQADABkAAAAFAA4AAQABABkAAAAGAA4AAQAAABkAAAAHAA4AAQACABkAAAAIAA4AAQAAABkAAAAJAA4AAQACABkAAAAKAA4AAQAAABkAAAALAA4AAQADABkAAAAMAA4AAQABABkAAAANAA4AAQADABkAAAAOAA4AAQABABkAAAAPAA4AAQADABkAAAAQAA4AAQACABkAAAARAA4AAQAAABkAAAASAA4AAQACABkAAAATAA4AAQAAABkAAAAUAA4AAQACABkAAAAVAA4AAQABABkAAAAWAA4AAQADABkAAAAXAA4AAQABABkAAAAYAA4AAQADABkAAAAZAA4AAQABABkAAAAaAA4AAQAAABkAAAAbAA4AAQACABkAAAAcAA4AAQAAABkAAAAdAA4AAQACABkAAAAeAA4AAQAAABkAAAAfAA4AAQADAAgAAAAAAA8AAQADAAgAAAABAA8AAQACABkAAAACAA8AAQABABkAAAADAA8AAQAAABkAAAAEAA8AAQADABkAAAAFAA8AAQACABkAAAAGAA8AAQABABkAAAAHAA8AAQAAABkAAAAIAA8AAQADABkAAAAJAA8AAQACABkAAAAKAA8AAQABABkAAAALAA8AAQAAABkAAAAMAA8AAQADABkAAAANAA8AAQACABkAAAAOAA8AAQABABkAAAAPAA8AAQAAABkAAAAQAA8AAQADABkAAAARAA8AAQACABkAAAASAA8AAQABABkAAAATAA8AAQAAABkAAAAUAA8AAQADABkAAAAVAA8AAQACABkAAAAWAA8AAQABABkAAAAXAA8AAQAAABkAAAAYAA8AAQADABkAAAAZAA8AAQACABkAAAAaAA8AAQABABkAAAAbAA8AAQAAABkAAAAcAA8AAQADABkAAAAdAA8AAQACABkAAAAeAA8AAQABABkAAAAfAA8AAQAAAAgAAAAAABAAAQAAAAgAAAABABAAAQAAAAgAAAACABAAAQAAAAgAAAADABAAAQAAAAgAAAAEABAAAQAAAAgAAAAFABAAAQADAAgAAAAGABAAAQADAAgAAAAHABAAAQADAAgAAAAIABAAAQADAAgAAAAJABAAAQADAAgAAAAKABAAAQACAAgAAAALABAAAQACAAgAAAAMABAAAQACAAgAAAANABAAAQACAAgAAAAOABAAAQACAAgAAAAPABAAAQABABkAAAAQABAAAQABABkAAAARABAAAQABAAgAAAASABAAAQABAAgAAAATABAAAQABAAgAAAAUABAAAQAAAAgAAAAVABAAAQAAAAgAAAAWABAAAQAAAAgAAAAXABAAAQAAAAgAAAAYABAAAQAAAAgAAAAZABAAAQADAAgAAAAaABAAAQADAAgAAAAbABAAAQADAAgAAAAcABAAAQADAAgAAAAdABAAAQADAAgAAAAeABAAAQACAAgAAAAfABAAAQACAAgAAAA=")
-tile_set = ExtResource("2_8uxu7")
+tile_set = ExtResource("2_pgfjk")
 
-[node name="Blocker" type="TileMapLayer" parent="." unique_id=491719684]
+[node name="Blocker" type="TileMapLayer" parent="." unique_id=727096764]
 visible = false
 tile_map_data = PackedByteArray("AAAAAAQAAwAAAAAAAAABAAQAAwAAAAAAAAACAAQAAwAAAAAAAAADAAQAAwAAAAAAAAAEAAQAAwAAAAAAAAAFAAQAAwAAAAAAAAAGAAQAAwAAAAAAAAAHAAQAAwAAAAAAAAAIAAQAAwAAAAAAAAAJAAQAAwAAAAAAAAAKAAQAAwAAAAAAAAALAAQAAwAAAAAAAAAMAAQAAwAAAAAAAAANAAQAAwAAAAAAAAAOAAQAAwAAAAAAAAAPAAQAAwAAAAAAAAAQAAQAAwAAAAAAAAARAAQAAwAAAAAAAAASAAQAAwAAAAAAAAATAAQAAwAAAAAAAAAUAAQAAwAAAAAAAAAVAAQAAwAAAAAAAAAWAAQAAwAAAAAAAAAXAAQAAwAAAAAAAAAYAAQAAwAAAAAAAAAZAAQAAwAAAAAAAAAaAAQAAwAAAAAAAAAbAAQAAwAAAAAAAAAcAAQAAwAAAAAAAAAdAAQAAwAAAAAAAAAeAAQAAwAAAAAAAAAfAAQAAwAAAAAAAAAAAAUAAwAAAAAAAAAfAAUAAwAAAAAAAAAAAAYAAwAAAAAAAAAfAAYAAwAAAAAAAAAAAAcAAwAAAAAAAAAfAAcAAwAAAAAAAAAAAAgAAwAAAAAAAAAfAAgAAwAAAAAAAAAAAAkAAwAAAAAAAAAfAAkAAwAAAAAAAAAAAAoAAwAAAAAAAAAfAAoAAwAAAAAAAAAAAAsAAwAAAAAAAAAfAAsAAwAAAAAAAAAAAAwAAwAAAAAAAAAAAA0AAwAAAAAAAAAAAA4AAwAAAAAAAAAfAA4AAwAAAAAAAAAAAA8AAwAAAAAAAAAfAA8AAwAAAAAAAAAAABAAAwAAAAAAAAABABAAAwAAAAAAAAACABAAAwAAAAAAAAADABAAAwAAAAAAAAAEABAAAwAAAAAAAAAFABAAAwAAAAAAAAAGABAAAwAAAAAAAAAHABAAAwAAAAAAAAAIABAAAwAAAAAAAAAJABAAAwAAAAAAAAAKABAAAwAAAAAAAAALABAAAwAAAAAAAAAMABAAAwAAAAAAAAANABAAAwAAAAAAAAAOABAAAwAAAAAAAAARABAAAwAAAAAAAAASABAAAwAAAAAAAAATABAAAwAAAAAAAAAUABAAAwAAAAAAAAAVABAAAwAAAAAAAAAWABAAAwAAAAAAAAAXABAAAwAAAAAAAAAYABAAAwAAAAAAAAAZABAAAwAAAAAAAAAaABAAAwAAAAAAAAAbABAAAwAAAAAAAAAcABAAAwAAAAAAAAAdABAAAwAAAAAAAAAeABAAAwAAAAAAAAAfABAAAwAAAAAAAAA=")
-tile_set = ExtResource("2_8uxu7")
+tile_set = ExtResource("2_pgfjk")
 
-[node name="Flora" type="TileMapLayer" parent="." unique_id=225372935]
+[node name="Flora" type="TileMapLayer" parent="." unique_id=1592092998]
 y_sort_enabled = true
-tile_set = ExtResource("2_8uxu7")
+tile_set = ExtResource("2_pgfjk")
 
-[node name="OakCanopy" type="TileMapLayer" parent="." unique_id=1362484421]
+[node name="OakCanopy" type="TileMapLayer" parent="." unique_id=1196471174]
 y_sort_enabled = true
-tile_set = ExtResource("2_8uxu7")
-script = ExtResource("3_18kw4")
+tile_set = ExtResource("2_pgfjk")
+script = ExtResource("3_8xppq")
 
-[node name="Entities" type="Node2D" parent="." unique_id=692693436]
+[node name="Entities" type="Node2D" parent="." unique_id=1010794310]
 y_sort_enabled = true
 
-[node name="Counter1" type="StaticBody2D" parent="Entities" unique_id=539399462]
+[node name="Counter1" type="StaticBody2D" parent="Entities" unique_id=1759839364]
 position = Vector2(220, 224)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Counter1" unique_id=1888747514]
-texture = ExtResource("4_pgfjk")
+[node name="Sprite" type="Sprite2D" parent="Entities/Counter1" unique_id=1048725629]
+texture = ExtResource("4_wg7ef")
 offset = Vector2(0, -30)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Counter1" unique_id=1396529654]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Counter1" unique_id=703493556]
 position = Vector2(0, -9)
-shape = SubResource("RectangleShape2D_j6p5s")
+shape = SubResource("RectangleShape2D_vsflx")
 
-[node name="Piano2" type="StaticBody2D" parent="Entities" unique_id=1774778262]
+[node name="Piano2" type="StaticBody2D" parent="Entities" unique_id=1063467538]
 position = Vector2(860, 224)
 collision_mask = 0
-script = ExtResource("5_8xppq")
+script = ExtResource("5_7tdr3")
 title = "The parlor piano"
 text = "For decades a pianist has played old songs of Yosemite and the West in the hotel's Sun Room in the evenings, and the guests sing along."
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Piano2" unique_id=883588974]
-texture = ExtResource("6_wg7ef")
+[node name="Sprite" type="Sprite2D" parent="Entities/Piano2" unique_id=615557373]
+texture = ExtResource("6_ioi1h")
 offset = Vector2(0, -34)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Piano2" unique_id=1724533788]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Piano2" unique_id=2047617297]
 position = Vector2(0, -10.2)
-shape = SubResource("RectangleShape2D_xuu0a")
+shape = SubResource("RectangleShape2D_tafu5")
 
-[node name="Hitbox" type="Area2D" parent="Entities/Piano2" unique_id=959115253]
+[node name="Hitbox" type="Area2D" parent="Entities/Piano2" unique_id=1274758076]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
-[node name="Shape" type="CollisionShape2D" parent="Entities/Piano2/Hitbox" unique_id=209521424]
+[node name="Shape" type="CollisionShape2D" parent="Entities/Piano2/Hitbox" unique_id=775975738]
 position = Vector2(0, -22.2)
-shape = SubResource("RectangleShape2D_fnwyp")
+shape = SubResource("RectangleShape2D_vusqb")
 
-[node name="Sofa3" type="StaticBody2D" parent="Entities" unique_id=1541503997]
+[node name="Sofa3" type="StaticBody2D" parent="Entities" unique_id=1832401257]
 position = Vector2(520, 320)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Sofa3" unique_id=1090445358]
-texture = ExtResource("7_7tdr3")
+[node name="Sprite" type="Sprite2D" parent="Entities/Sofa3" unique_id=675496356]
+texture = ExtResource("7_dt6km")
 offset = Vector2(0, -22)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Sofa3" unique_id=2085264010]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Sofa3" unique_id=1214657306]
 position = Vector2(0, -6.6)
-shape = SubResource("RectangleShape2D_0fkni")
+shape = SubResource("RectangleShape2D_g1tx0")
 
-[node name="Armchair4" type="StaticBody2D" parent="Entities" unique_id=1331801238]
+[node name="Armchair4" type="StaticBody2D" parent="Entities" unique_id=718161271]
 position = Vector2(392, 392)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Armchair4" unique_id=1407478966]
-texture = ExtResource("8_ioi1h")
+[node name="Sprite" type="Sprite2D" parent="Entities/Armchair4" unique_id=870597122]
+texture = ExtResource("8_8bk4t")
 offset = Vector2(0, -22)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair4" unique_id=1371544121]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair4" unique_id=1343586295]
 position = Vector2(0, -6.6)
-shape = SubResource("RectangleShape2D_vsflx")
+shape = SubResource("RectangleShape2D_q08yy")
 
-[node name="Armchair5" type="StaticBody2D" parent="Entities" unique_id=1480511864]
+[node name="Armchair5" type="StaticBody2D" parent="Entities" unique_id=1889641351]
 position = Vector2(648, 392)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Armchair5" unique_id=967407695]
-texture = ExtResource("8_ioi1h")
+[node name="Sprite" type="Sprite2D" parent="Entities/Armchair5" unique_id=42147013]
+texture = ExtResource("8_8bk4t")
 offset = Vector2(0, -22)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair5" unique_id=1978070788]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Armchair5" unique_id=1741107818]
 position = Vector2(0, -6.6)
-shape = SubResource("RectangleShape2D_tafu5")
+shape = SubResource("RectangleShape2D_7lrmb")
 
-[node name="CoffeeTable6" type="StaticBody2D" parent="Entities" unique_id=1304721426]
+[node name="CoffeeTable6" type="StaticBody2D" parent="Entities" unique_id=1257580706]
 position = Vector2(520, 400)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/CoffeeTable6" unique_id=330846778]
-texture = ExtResource("9_dt6km")
+[node name="Sprite" type="Sprite2D" parent="Entities/CoffeeTable6" unique_id=2061408931]
+texture = ExtResource("9_tgbxq")
 offset = Vector2(0, -14)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/CoffeeTable6" unique_id=1318937434]
+[node name="Collision" type="CollisionShape2D" parent="Entities/CoffeeTable6" unique_id=1564308338]
 position = Vector2(0, -6)
-shape = SubResource("RectangleShape2D_vusqb")
+shape = SubResource("RectangleShape2D_aaycp")
 
-[node name="Sign7" type="StaticBody2D" parent="Entities" unique_id=565704004]
+[node name="Sign7" type="StaticBody2D" parent="Entities" unique_id=81748458]
 position = Vector2(120, 440)
 collision_mask = 0
-script = ExtResource("5_8xppq")
+script = ExtResource("5_7tdr3")
 title = "The Wawona Hotel"
 text = "The main hotel building opened in 1879, on the site of Galen Clark's station, where he had fed and housed travelers since the 1850s. The Washburn brothers built it up into a summer resort with a golf course, a lawn and a fountain, and the stages to the Valley stopped here."
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Sign7" unique_id=136216592]
-texture = ExtResource("10_8bk4t")
+[node name="Sprite" type="Sprite2D" parent="Entities/Sign7" unique_id=1118476654]
+texture = ExtResource("10_x5dcu")
 offset = Vector2(0, -16)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Sign7" unique_id=19646914]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Sign7" unique_id=1387431333]
 position = Vector2(0, -4)
-shape = SubResource("RectangleShape2D_g1tx0")
+shape = SubResource("RectangleShape2D_cdggt")
 
-[node name="Hitbox" type="Area2D" parent="Entities/Sign7" unique_id=48013832]
+[node name="Hitbox" type="Area2D" parent="Entities/Sign7" unique_id=881993227]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
-[node name="Shape" type="CollisionShape2D" parent="Entities/Sign7/Hitbox" unique_id=1751983139]
+[node name="Shape" type="CollisionShape2D" parent="Entities/Sign7/Hitbox" unique_id=1988538377]
 position = Vector2(0, -14)
-shape = SubResource("RectangleShape2D_q08yy")
+shape = SubResource("RectangleShape2D_mmdxk")
 
-[node name="Plant8" type="StaticBody2D" parent="Entities" unique_id=1559929555]
+[node name="Plant8" type="StaticBody2D" parent="Entities" unique_id=780116110]
 position = Vector2(80, 256)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Plant8" unique_id=1374630389]
-texture = ExtResource("11_tgbxq")
+[node name="Sprite" type="Sprite2D" parent="Entities/Plant8" unique_id=8981785]
+texture = ExtResource("11_m054d")
 offset = Vector2(0, -28)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Plant8" unique_id=703352090]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Plant8" unique_id=1236376164]
 position = Vector2(0, -8.4)
-shape = SubResource("RectangleShape2D_7lrmb")
+shape = SubResource("RectangleShape2D_rsfxy")
 
-[node name="Lamp9" type="StaticBody2D" parent="Entities" unique_id=315483090]
+[node name="Lamp9" type="StaticBody2D" parent="Entities" unique_id=537663641]
 position = Vector2(940, 472)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Lamp9" unique_id=1602832736]
-texture = ExtResource("12_x5dcu")
+[node name="Sprite" type="Sprite2D" parent="Entities/Lamp9" unique_id=817998424]
+texture = ExtResource("12_s1krv")
 offset = Vector2(0, -40)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Lamp9" unique_id=1805899016]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Lamp9" unique_id=895984353]
 position = Vector2(0, -12)
-shape = SubResource("RectangleShape2D_aaycp")
+shape = SubResource("RectangleShape2D_tx31r")
 
-[node name="Markers" type="Node2D" parent="." unique_id=1229514909]
+[node name="TableLamp10" type="StaticBody2D" parent="Entities" unique_id=1251893042]
+position = Vector2(320, 392)
+collision_mask = 0
 
-[node name="from_dining" type="Marker2D" parent="Markers" unique_id=394110366]
+[node name="Sprite" type="Sprite2D" parent="Entities/TableLamp10" unique_id=406609180]
+texture = ExtResource("13_j6p5s")
+offset = Vector2(0, -30)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/TableLamp10" unique_id=1964681408]
+position = Vector2(0, -9)
+shape = SubResource("RectangleShape2D_qc8er")
+
+[node name="TableLamp11" type="StaticBody2D" parent="Entities" unique_id=819529749]
+position = Vector2(720, 392)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/TableLamp11" unique_id=240335068]
+texture = ExtResource("13_j6p5s")
+offset = Vector2(0, -30)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/TableLamp11" unique_id=1374921866]
+position = Vector2(0, -9)
+shape = SubResource("RectangleShape2D_ykc3n")
+
+[node name="Rocker12" type="StaticBody2D" parent="Entities" unique_id=1544904124]
+position = Vector2(880, 380)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/Rocker12" unique_id=574426882]
+texture = ExtResource("14_xuu0a")
+offset = Vector2(0, -26)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/Rocker12" unique_id=209195563]
+position = Vector2(0, -7.8)
+shape = SubResource("RectangleShape2D_osdyn")
+
+[node name="Markers" type="Node2D" parent="." unique_id=290466264]
+
+[node name="from_dining" type="Marker2D" parent="Markers" unique_id=1301045525]
 position = Vector2(964, 416)
 
-[node name="door" type="Marker2D" parent="Markers" unique_id=1189489476]
+[node name="door" type="Marker2D" parent="Markers" unique_id=2004461644]
 position = Vector2(512, 488)
 
-[node name="Places" type="Node2D" parent="." unique_id=1779880749]
+[node name="Places" type="Node2D" parent="." unique_id=2126298792]
 
-[node name="Exits" type="Node2D" parent="." unique_id=1153906995]
+[node name="Exits" type="Node2D" parent="." unique_id=64971840]
 
-[node name="ToWawonaHotelDining" type="Area2D" parent="Exits" unique_id=1437448218]
+[node name="ToWawonaHotelDining" type="Area2D" parent="Exits" unique_id=1323198160]
 position = Vector2(1016, 416)
-script = ExtResource("13_m054d")
+script = ExtResource("15_fnwyp")
 label = "Dining Room"
 target_region = "wawona_hotel_dining"
 target_spawn = "from_lobby"
 
-[node name="Shape" type="CollisionShape2D" parent="Exits/ToWawonaHotelDining" unique_id=1379056000]
-shape = SubResource("RectangleShape2D_cdggt")
+[node name="Shape" type="CollisionShape2D" parent="Exits/ToWawonaHotelDining" unique_id=569668649]
+shape = SubResource("RectangleShape2D_hy2p1")
 
-[node name="ToOutside" type="Area2D" parent="Exits" unique_id=313412681]
+[node name="ToOutside" type="Area2D" parent="Exits" unique_id=1010227538]
 position = Vector2(512, 536)
-script = ExtResource("13_m054d")
+script = ExtResource("15_fnwyp")
 label = "Wawona"
 target_region = "wawona"
 target_spawn = "wawona_hotel_lobby_door"
 
-[node name="Shape" type="CollisionShape2D" parent="Exits/ToOutside" unique_id=789443683]
-shape = SubResource("RectangleShape2D_mmdxk")
+[node name="Shape" type="CollisionShape2D" parent="Exits/ToOutside" unique_id=750317219]
+shape = SubResource("RectangleShape2D_mv5oh")
 
-[node name="Room" type="Sprite2D" parent="." unique_id=644743067]
+[node name="Room" type="Sprite2D" parent="." unique_id=150877313]
 z_index = -8
-texture = ExtResource("14_s1krv")
+texture = ExtResource("16_0fkni")
 centered = false
 
-[node name="Dark" type="Polygon2D" parent="." unique_id=1927979214]
+[node name="Dark" type="Polygon2D" parent="." unique_id=79531655]
 z_index = -12
 color = Color(0.05490196, 0.043137256, 0.039215688, 1)
 polygon = PackedVector2Array(-1200, -1200, 1712, -1200, 1712, 1472, -1200, 1472)

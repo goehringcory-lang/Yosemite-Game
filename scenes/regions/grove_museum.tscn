@@ -1,179 +1,211 @@
 [gd_scene format=4]
 
-[ext_resource type="Script" path="res://scripts/world/region.gd" id="1_4bxof"]
-[ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="2_ntvat"]
-[ext_resource type="Script" path="res://scripts/world/seasonal_canopy.gd" id="3_b81g3"]
-[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="4_x66pa"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/case_cones.png" id="5_2dllr"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/panel.png" id="6_prcmv"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/bench.png" id="7_7frcb"]
-[ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="8_hboh5"]
-[ext_resource type="Texture2D" path="res://assets/sprites/interiors/grove_museum.png" id="9_dodm7"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_35yda"]
-size = Vector2(132, 18)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_by4uw"]
-size = Vector2(144, 42)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_405ec"]
-size = Vector2(48, 21.6)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_apxdf"]
-size = Vector2(60, 45.6)
+[ext_resource type="Script" path="res://scripts/world/region.gd" id="1_b81g3"]
+[ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="2_x66pa"]
+[ext_resource type="Script" path="res://scripts/world/seasonal_canopy.gd" id="3_2dllr"]
+[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="4_prcmv"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/case_cones.png" id="5_7frcb"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/panel.png" id="6_hboh5"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/bench.png" id="7_dodm7"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/book_table.png" id="8_35yda"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/plush_bin.png" id="9_by4uw"]
+[ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="10_405ec"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/grove_museum.png" id="11_apxdf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jaixv"]
-size = Vector2(48, 21.6)
+size = Vector2(132, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_36eh7"]
-size = Vector2(60, 45.6)
+size = Vector2(144, 42)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vw2kc"]
-size = Vector2(84, 12)
+size = Vector2(48, 21.6)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5i0m3"]
+size = Vector2(60, 45.6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oevw1"]
+size = Vector2(48, 21.6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7pjlf"]
+size = Vector2(60, 45.6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_piyel"]
+size = Vector2(84, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_d0q8m"]
+size = Vector2(76, 14.4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_broem"]
+size = Vector2(32, 14.4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ucy5a"]
 size = Vector2(88, 20)
 
-[node name="GroveMuseum" type="Node2D" unique_id=907647981]
+[node name="GroveMuseum" type="Node2D" unique_id=207615501]
 y_sort_enabled = true
-script = ExtResource("1_4bxof")
+script = ExtResource("1_b81g3")
 region_id = "grove_museum"
 hub_id = "wawona"
 display_name = "Mariposa Grove Museum"
 geo_anchor = Vector2(-119.6555, 37.5366)
 indoors = true
 
-[node name="Ground" type="TileMapLayer" parent="." unique_id=1029549105]
+[node name="Ground" type="TileMapLayer" parent="." unique_id=2095360889]
 z_index = -10
 tile_map_data = PackedByteArray("AAAAAAAAAQAAAAgAAAABAAAAAQADAAgAAAACAAAAAQACAAgAAAADAAAAAQABAAgAAAAEAAAAAQAAAAgAAAAFAAAAAQADAAgAAAAGAAAAAQACAAgAAAAHAAAAAQABAAgAAAAIAAAAAQAAAAgAAAAJAAAAAQADAAgAAAAKAAAAAQACAAgAAAALAAAAAQABAAgAAAAMAAAAAQAAAAgAAAANAAAAAQADAAgAAAAOAAAAAQACAAgAAAAPAAAAAQABAAgAAAAQAAAAAQAAAAgAAAARAAAAAQADAAgAAAASAAAAAQACAAgAAAATAAAAAQABAAgAAAAUAAAAAQAAAAgAAAAVAAAAAQADAAgAAAAWAAAAAQACAAgAAAAXAAAAAQABAAgAAAAAAAEAAQABAAgAAAABAAEAAQABAAgAAAACAAEAAQABAAgAAAADAAEAAQABAAgAAAAEAAEAAQABAAgAAAAFAAEAAQAAAAgAAAAGAAEAAQAAAAgAAAAHAAEAAQAAAAgAAAAIAAEAAQAAAAgAAAAJAAEAAQAAAAgAAAAKAAEAAQADAAgAAAALAAEAAQADAAgAAAAMAAEAAQADAAgAAAANAAEAAQADAAgAAAAOAAEAAQADAAgAAAAPAAEAAQACAAgAAAAQAAEAAQACAAgAAAARAAEAAQACAAgAAAASAAEAAQACAAgAAAATAAEAAQACAAgAAAAUAAEAAQABAAgAAAAVAAEAAQABAAgAAAAWAAEAAQABAAgAAAAXAAEAAQABAAgAAAAAAAIAAQACAAgAAAABAAIAAQADAAgAAAACAAIAAQAAAAgAAAADAAIAAQAAAAgAAAAEAAIAAQABAAgAAAAFAAIAAQABAAgAAAAGAAIAAQACAAgAAAAHAAIAAQADAAgAAAAIAAIAAQADAAgAAAAJAAIAAQAAAAgAAAAKAAIAAQAAAAgAAAALAAIAAQABAAgAAAAMAAIAAQACAAgAAAANAAIAAQACAAgAAAAOAAIAAQADAAgAAAAPAAIAAQADAAgAAAAQAAIAAQAAAAgAAAARAAIAAQABAAgAAAASAAIAAQABAAgAAAATAAIAAQACAAgAAAAUAAIAAQACAAgAAAAVAAIAAQADAAgAAAAWAAIAAQAAAAgAAAAXAAIAAQAAAAgAAAAAAAMAAQADAAgAAAABAAMAAQABAAgAAAACAAMAAQACAAgAAAADAAMAAQAAAAgAAAAEAAMAAQABAAgAAAAFAAMAAQACAAgAAAAGAAMAAQAAAAgAAAAHAAMAAQABAAgAAAAIAAMAAQADAAgAAAAJAAMAAQAAAAgAAAAKAAMAAQABAAgAAAALAAMAAQADAAgAAAAMAAMAAQAAAAgAAAANAAMAAQACAAgAAAAOAAMAAQADAAgAAAAPAAMAAQAAAAgAAAAQAAMAAQACAAgAAAARAAMAAQADAAgAAAASAAMAAQABAAgAAAATAAMAAQACAAgAAAAUAAMAAQADAAgAAAAVAAMAAQABAAgAAAAWAAMAAQACAAgAAAAXAAMAAQAAAAgAAAAAAAQAAQAAAAgAAAABAAQAAQADABkAAAACAAQAAQABABkAAAADAAQAAQADABkAAAAEAAQAAQABABkAAAAFAAQAAQADABkAAAAGAAQAAQACABkAAAAHAAQAAQAAABkAAAAIAAQAAQACABkAAAAJAAQAAQAAABkAAAAKAAQAAQACABkAAAALAAQAAQABABkAAAAMAAQAAQADABkAAAANAAQAAQABABkAAAAOAAQAAQADABkAAAAPAAQAAQABABkAAAAQAAQAAQAAABkAAAARAAQAAQACABkAAAASAAQAAQAAABkAAAATAAQAAQACABkAAAAUAAQAAQAAABkAAAAVAAQAAQADABkAAAAWAAQAAQABABkAAAAXAAQAAQADAAgAAAAAAAUAAQABAAgAAAABAAUAAQAAABkAAAACAAUAAQADABkAAAADAAUAAQACABkAAAAEAAUAAQABABkAAAAFAAUAAQAAABkAAAAGAAUAAQADABkAAAAHAAUAAQACABkAAAAIAAUAAQABABkAAAAJAAUAAQAAABkAAAAKAAUAAQADABkAAAALAAUAAQACABkAAAAMAAUAAQABABkAAAANAAUAAQAAABkAAAAOAAUAAQADABkAAAAPAAUAAQACABkAAAAQAAUAAQABABkAAAARAAUAAQAAABkAAAASAAUAAQADABkAAAATAAUAAQACABkAAAAUAAUAAQABABkAAAAVAAUAAQAAABkAAAAWAAUAAQADABkAAAAXAAUAAQACAAgAAAAAAAYAAQACAAgAAAABAAYAAQACABkAAAACAAYAAQACABkAAAADAAYAAQACABkAAAAEAAYAAQACABkAAAAFAAYAAQABABkAAAAGAAYAAQABABkAAAAHAAYAAQABABkAAAAIAAYAAQABABkAAAAJAAYAAQABABkAAAAKAAYAAQAAABkAAAALAAYAAQAAABkAAAAMAAYAAQAAABkAAAANAAYAAQAAABkAAAAOAAYAAQAAABkAAAAPAAYAAQADABkAAAAQAAYAAQADABkAAAARAAYAAQADABkAAAASAAYAAQADABkAAAATAAYAAQADABkAAAAUAAYAAQACABkAAAAVAAYAAQACABkAAAAWAAYAAQACABkAAAAXAAYAAQACAAgAAAAAAAcAAQADAAgAAAABAAcAAQAAABkAAAACAAcAAQABABkAAAADAAcAAQABABkAAAAEAAcAAQACABkAAAAFAAcAAQACABkAAAAGAAcAAQADABkAAAAHAAcAAQAAABkAAAAIAAcAAQAAABkAAAAJAAcAAQABABkAAAAKAAcAAQABABkAAAALAAcAAQACABkAAAAMAAcAAQADABkAAAANAAcAAQADABkAAAAOAAcAAQAAABkAAAAPAAcAAQAAABkAAAAQAAcAAQABABkAAAARAAcAAQACABkAAAASAAcAAQACABkAAAATAAcAAQADABkAAAAUAAcAAQADABkAAAAVAAcAAQAAABkAAAAWAAcAAQABABkAAAAXAAcAAQABAAgAAAAAAAgAAQAAAAgAAAABAAgAAQACABkAAAACAAgAAQADABkAAAADAAgAAQABABkAAAAEAAgAAQACABkAAAAFAAgAAQADABkAAAAGAAgAAQABABkAAAAHAAgAAQACABkAAAAIAAgAAQAAABkAAAAJAAgAAQABABkAAAAKAAgAAQACABkAAAALAAgAAQAAABkAAAAMAAgAAQABABkAAAANAAgAAQADABkAAAAOAAgAAQAAABkAAAAPAAgAAQABABkAAAAQAAgAAQADABkAAAARAAgAAQAAABkAAAASAAgAAQACABkAAAATAAgAAQADABkAAAAUAAgAAQAAABkAAAAVAAgAAQACABkAAAAWAAgAAQADABkAAAAXAAgAAQABAAgAAAAAAAkAAQABAAgAAAABAAkAAQAAABkAAAACAAkAAQACABkAAAADAAkAAQAAABkAAAAEAAkAAQACABkAAAAFAAkAAQAAABkAAAAGAAkAAQADABkAAAAHAAkAAQABABkAAAAIAAkAAQADABkAAAAJAAkAAQABABkAAAAKAAkAAQADABkAAAALAAkAAQACABkAAAAMAAkAAQAAABkAAAANAAkAAQACABkAAAAOAAkAAQAAABkAAAAPAAkAAQACABkAAAAQAAkAAQABABkAAAARAAkAAQADABkAAAASAAkAAQABABkAAAATAAkAAQADABkAAAAUAAkAAQABABkAAAAVAAkAAQAAABkAAAAWAAkAAQACABkAAAAXAAkAAQAAAAgAAAAAAAoAAQACAAgAAAABAAoAAQABABkAAAACAAoAAQAAABkAAAADAAoAAQADABkAAAAEAAoAAQACABkAAAAFAAoAAQABABkAAAAGAAoAAQAAABkAAAAHAAoAAQADABkAAAAIAAoAAQACABkAAAAJAAoAAQABABkAAAAKAAoAAQAAABkAAAALAAoAAQADABkAAAAMAAoAAQACABkAAAANAAoAAQABABkAAAAOAAoAAQAAABkAAAAPAAoAAQADABkAAAAQAAoAAQACABkAAAARAAoAAQABABkAAAASAAoAAQAAABkAAAATAAoAAQADABkAAAAUAAoAAQACABkAAAAVAAoAAQABABkAAAAWAAoAAQAAABkAAAAXAAoAAQADAAgAAAAAAAsAAQADAAgAAAABAAsAAQADABkAAAACAAsAAQADABkAAAADAAsAAQADABkAAAAEAAsAAQADABkAAAAFAAsAAQACABkAAAAGAAsAAQACABkAAAAHAAsAAQACABkAAAAIAAsAAQACABkAAAAJAAsAAQACABkAAAAKAAsAAQABABkAAAALAAsAAQABABkAAAAMAAsAAQABABkAAAANAAsAAQABABkAAAAOAAsAAQABABkAAAAPAAsAAQAAABkAAAAQAAsAAQAAABkAAAARAAsAAQAAABkAAAASAAsAAQAAABkAAAATAAsAAQAAABkAAAAUAAsAAQADABkAAAAVAAsAAQADABkAAAAWAAsAAQADABkAAAAXAAsAAQADAAgAAAAAAAwAAQAAAAgAAAABAAwAAQABABkAAAACAAwAAQACABkAAAADAAwAAQACABkAAAAEAAwAAQADABkAAAAFAAwAAQADABkAAAAGAAwAAQAAABkAAAAHAAwAAQABABkAAAAIAAwAAQABABkAAAAJAAwAAQACABkAAAAKAAwAAQACABkAAAALAAwAAQADABkAAAAMAAwAAQAAABkAAAANAAwAAQAAABkAAAAOAAwAAQABABkAAAAPAAwAAQABABkAAAAQAAwAAQACABkAAAARAAwAAQADABkAAAASAAwAAQADABkAAAATAAwAAQAAABkAAAAUAAwAAQAAABkAAAAVAAwAAQABABkAAAAWAAwAAQACABkAAAAXAAwAAQACAAgAAAAAAA0AAQABAAgAAAABAA0AAQADAAgAAAACAA0AAQAAAAgAAAADAA0AAQACAAgAAAAEAA0AAQADAAgAAAAFAA0AAQAAAAgAAAAGAA0AAQACAAgAAAAHAA0AAQADAAgAAAAIAA0AAQABAAgAAAAJAA0AAQACAAgAAAAKAA0AAQADAAgAAAALAA0AAQABABkAAAAMAA0AAQACABkAAAANAA0AAQAAAAgAAAAOAA0AAQABAAgAAAAPAA0AAQACAAgAAAAQAA0AAQAAAAgAAAARAA0AAQABAAgAAAASAA0AAQADAAgAAAATAA0AAQAAAAgAAAAUAA0AAQABAAgAAAAVAA0AAQADAAgAAAAWAA0AAQAAAAgAAAAXAA0AAQACAAgAAAA=")
-tile_set = ExtResource("2_ntvat")
+tile_set = ExtResource("2_x66pa")
 
-[node name="Blocker" type="TileMapLayer" parent="." unique_id=151316021]
+[node name="Blocker" type="TileMapLayer" parent="." unique_id=1988395291]
 visible = false
 tile_map_data = PackedByteArray("AAAAAAMAAwAAAAAAAAABAAMAAwAAAAAAAAACAAMAAwAAAAAAAAADAAMAAwAAAAAAAAAEAAMAAwAAAAAAAAAFAAMAAwAAAAAAAAAGAAMAAwAAAAAAAAAHAAMAAwAAAAAAAAAIAAMAAwAAAAAAAAAJAAMAAwAAAAAAAAAKAAMAAwAAAAAAAAALAAMAAwAAAAAAAAAMAAMAAwAAAAAAAAANAAMAAwAAAAAAAAAOAAMAAwAAAAAAAAAPAAMAAwAAAAAAAAAQAAMAAwAAAAAAAAARAAMAAwAAAAAAAAASAAMAAwAAAAAAAAATAAMAAwAAAAAAAAAUAAMAAwAAAAAAAAAVAAMAAwAAAAAAAAAWAAMAAwAAAAAAAAAXAAMAAwAAAAAAAAAAAAQAAwAAAAAAAAAXAAQAAwAAAAAAAAAAAAUAAwAAAAAAAAAXAAUAAwAAAAAAAAAAAAYAAwAAAAAAAAAXAAYAAwAAAAAAAAAAAAcAAwAAAAAAAAAXAAcAAwAAAAAAAAAAAAgAAwAAAAAAAAAXAAgAAwAAAAAAAAAAAAkAAwAAAAAAAAAXAAkAAwAAAAAAAAAAAAoAAwAAAAAAAAAXAAoAAwAAAAAAAAAAAAsAAwAAAAAAAAAXAAsAAwAAAAAAAAAAAAwAAwAAAAAAAAAXAAwAAwAAAAAAAAAAAA0AAwAAAAAAAAABAA0AAwAAAAAAAAACAA0AAwAAAAAAAAADAA0AAwAAAAAAAAAEAA0AAwAAAAAAAAAFAA0AAwAAAAAAAAAGAA0AAwAAAAAAAAAHAA0AAwAAAAAAAAAIAA0AAwAAAAAAAAAJAA0AAwAAAAAAAAAKAA0AAwAAAAAAAAANAA0AAwAAAAAAAAAOAA0AAwAAAAAAAAAPAA0AAwAAAAAAAAAQAA0AAwAAAAAAAAARAA0AAwAAAAAAAAASAA0AAwAAAAAAAAATAA0AAwAAAAAAAAAUAA0AAwAAAAAAAAAVAA0AAwAAAAAAAAAWAA0AAwAAAAAAAAAXAA0AAwAAAAAAAAA=")
-tile_set = ExtResource("2_ntvat")
+tile_set = ExtResource("2_x66pa")
 
-[node name="Flora" type="TileMapLayer" parent="." unique_id=1952777024]
+[node name="Flora" type="TileMapLayer" parent="." unique_id=971219785]
 y_sort_enabled = true
-tile_set = ExtResource("2_ntvat")
+tile_set = ExtResource("2_x66pa")
 
-[node name="OakCanopy" type="TileMapLayer" parent="." unique_id=1351866544]
+[node name="OakCanopy" type="TileMapLayer" parent="." unique_id=2103818978]
 y_sort_enabled = true
-tile_set = ExtResource("2_ntvat")
-script = ExtResource("3_b81g3")
+tile_set = ExtResource("2_x66pa")
+script = ExtResource("3_2dllr")
 
-[node name="Entities" type="Node2D" parent="." unique_id=1764900407]
+[node name="Entities" type="Node2D" parent="." unique_id=163123576]
 y_sort_enabled = true
 
-[node name="Case1" type="StaticBody2D" parent="Entities" unique_id=1630574979]
+[node name="Case1" type="StaticBody2D" parent="Entities" unique_id=46863264]
 position = Vector2(384, 240)
 collision_mask = 0
-script = ExtResource("4_x66pa")
+script = ExtResource("4_prcmv")
 title = "Sequoia cones"
 text = "A giant sequoia's cone is only the size of a hen's egg, and its seeds are as small as flakes of oatmeal. Cones can hang green on the tree for twenty years; fire opens them and clears the ground the seedlings need."
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Case1" unique_id=692648944]
-texture = ExtResource("5_2dllr")
+[node name="Sprite" type="Sprite2D" parent="Entities/Case1" unique_id=1154494818]
+texture = ExtResource("5_7frcb")
 offset = Vector2(0, -30)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Case1" unique_id=166511169]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Case1" unique_id=389209318]
 position = Vector2(0, -9)
-shape = SubResource("RectangleShape2D_35yda")
+shape = SubResource("RectangleShape2D_jaixv")
 
-[node name="Hitbox" type="Area2D" parent="Entities/Case1" unique_id=838969714]
+[node name="Hitbox" type="Area2D" parent="Entities/Case1" unique_id=677811935]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
-[node name="Shape" type="CollisionShape2D" parent="Entities/Case1/Hitbox" unique_id=911875362]
+[node name="Shape" type="CollisionShape2D" parent="Entities/Case1/Hitbox" unique_id=169581334]
 position = Vector2(0, -21)
-shape = SubResource("RectangleShape2D_by4uw")
+shape = SubResource("RectangleShape2D_36eh7")
 
-[node name="Panel2" type="StaticBody2D" parent="Entities" unique_id=1823155554]
+[node name="Panel2" type="StaticBody2D" parent="Entities" unique_id=725792955]
 position = Vector2(140, 320)
 collision_mask = 0
-script = ExtResource("4_x66pa")
+script = ExtResource("4_prcmv")
 title = "Galen Clark's cabin"
 text = "This cabin was built in 1930 in the style of the one Galen Clark built in the grove. He found the grove in 1857 and spent much of his life guarding it."
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Panel2" unique_id=505242128]
-texture = ExtResource("6_prcmv")
+[node name="Sprite" type="Sprite2D" parent="Entities/Panel2" unique_id=1140799483]
+texture = ExtResource("6_hboh5")
 offset = Vector2(0, -36)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Panel2" unique_id=361228195]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Panel2" unique_id=1170642330]
 position = Vector2(0, -10.8)
-shape = SubResource("RectangleShape2D_405ec")
+shape = SubResource("RectangleShape2D_vw2kc")
 
-[node name="Hitbox" type="Area2D" parent="Entities/Panel2" unique_id=86036925]
+[node name="Hitbox" type="Area2D" parent="Entities/Panel2" unique_id=2101311987]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
-[node name="Shape" type="CollisionShape2D" parent="Entities/Panel2/Hitbox" unique_id=1868374471]
+[node name="Shape" type="CollisionShape2D" parent="Entities/Panel2/Hitbox" unique_id=1372789034]
 position = Vector2(0, -22.8)
-shape = SubResource("RectangleShape2D_apxdf")
+shape = SubResource("RectangleShape2D_5i0m3")
 
-[node name="Panel3" type="StaticBody2D" parent="Entities" unique_id=1944393442]
+[node name="Panel3" type="StaticBody2D" parent="Entities" unique_id=1379434226]
 position = Vector2(628, 320)
 collision_mask = 0
-script = ExtResource("4_x66pa")
+script = ExtResource("4_prcmv")
 title = "The Grizzly Giant"
 text = "The Grizzly Giant is around 3,000 years old, one of the oldest living trees in the grove. It was already huge when the Valley's people first named it."
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Panel3" unique_id=1440779797]
-texture = ExtResource("6_prcmv")
+[node name="Sprite" type="Sprite2D" parent="Entities/Panel3" unique_id=1903221205]
+texture = ExtResource("6_hboh5")
 offset = Vector2(0, -36)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Panel3" unique_id=1791644163]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Panel3" unique_id=1949836274]
 position = Vector2(0, -10.8)
-shape = SubResource("RectangleShape2D_jaixv")
+shape = SubResource("RectangleShape2D_oevw1")
 
-[node name="Hitbox" type="Area2D" parent="Entities/Panel3" unique_id=1418031461]
+[node name="Hitbox" type="Area2D" parent="Entities/Panel3" unique_id=176261028]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
-[node name="Shape" type="CollisionShape2D" parent="Entities/Panel3/Hitbox" unique_id=793510181]
+[node name="Shape" type="CollisionShape2D" parent="Entities/Panel3/Hitbox" unique_id=1250810289]
 position = Vector2(0, -22.8)
-shape = SubResource("RectangleShape2D_36eh7")
+shape = SubResource("RectangleShape2D_7pjlf")
 
-[node name="Bench4" type="StaticBody2D" parent="Entities" unique_id=1233581094]
+[node name="Bench4" type="StaticBody2D" parent="Entities" unique_id=1712481258]
 position = Vector2(384, 320)
 collision_mask = 0
 
-[node name="Sprite" type="Sprite2D" parent="Entities/Bench4" unique_id=481814181]
-texture = ExtResource("7_7frcb")
+[node name="Sprite" type="Sprite2D" parent="Entities/Bench4" unique_id=199997326]
+texture = ExtResource("7_dodm7")
 offset = Vector2(0, -16)
 
-[node name="Collision" type="CollisionShape2D" parent="Entities/Bench4" unique_id=29663207]
+[node name="Collision" type="CollisionShape2D" parent="Entities/Bench4" unique_id=670039039]
 position = Vector2(0, -6)
-shape = SubResource("RectangleShape2D_vw2kc")
+shape = SubResource("RectangleShape2D_piyel")
 
-[node name="Markers" type="Node2D" parent="." unique_id=1172084122]
+[node name="BookTable5" type="StaticBody2D" parent="Entities" unique_id=1334535566]
+position = Vector2(600, 408)
+collision_mask = 0
 
-[node name="door" type="Marker2D" parent="Markers" unique_id=461886584]
+[node name="Sprite" type="Sprite2D" parent="Entities/BookTable5" unique_id=1678839898]
+texture = ExtResource("8_35yda")
+offset = Vector2(0, -24)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/BookTable5" unique_id=2039289183]
+position = Vector2(0, -7.2)
+shape = SubResource("RectangleShape2D_d0q8m")
+
+[node name="PlushBin6" type="StaticBody2D" parent="Entities" unique_id=114757617]
+position = Vector2(160, 408)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="Entities/PlushBin6" unique_id=98960227]
+texture = ExtResource("9_by4uw")
+offset = Vector2(0, -24)
+
+[node name="Collision" type="CollisionShape2D" parent="Entities/PlushBin6" unique_id=914458595]
+position = Vector2(0, -7.2)
+shape = SubResource("RectangleShape2D_broem")
+
+[node name="Markers" type="Node2D" parent="." unique_id=164250788]
+
+[node name="door" type="Marker2D" parent="Markers" unique_id=2031973607]
 position = Vector2(384, 392)
 
-[node name="Places" type="Node2D" parent="." unique_id=312150753]
+[node name="Places" type="Node2D" parent="." unique_id=1972178692]
 
-[node name="Exits" type="Node2D" parent="." unique_id=1539774029]
+[node name="Exits" type="Node2D" parent="." unique_id=644547456]
 
-[node name="ToOutside" type="Area2D" parent="Exits" unique_id=1644863279]
+[node name="ToOutside" type="Area2D" parent="Exits" unique_id=1582423411]
 position = Vector2(384, 440)
-script = ExtResource("8_hboh5")
+script = ExtResource("10_405ec")
 label = "Wawona"
 target_region = "wawona"
 target_spawn = "grove_museum_door"
 
-[node name="Shape" type="CollisionShape2D" parent="Exits/ToOutside" unique_id=1805388551]
-shape = SubResource("RectangleShape2D_5i0m3")
+[node name="Shape" type="CollisionShape2D" parent="Exits/ToOutside" unique_id=2116234881]
+shape = SubResource("RectangleShape2D_ucy5a")
 
-[node name="Room" type="Sprite2D" parent="." unique_id=1946129843]
+[node name="Room" type="Sprite2D" parent="." unique_id=234226909]
 z_index = -8
-texture = ExtResource("9_dodm7")
+texture = ExtResource("11_apxdf")
 centered = false
 
-[node name="Dark" type="Polygon2D" parent="." unique_id=1945208286]
+[node name="Dark" type="Polygon2D" parent="." unique_id=2079474885]
 z_index = -12
 color = Color(0.05490196, 0.043137256, 0.039215688, 1)
 polygon = PackedVector2Array(-1200, -1200, 1584, -1200, 1584, 1424, -1200, 1424)

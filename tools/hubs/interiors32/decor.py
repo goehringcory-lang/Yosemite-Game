@@ -2,7 +2,9 @@
 the place outside, framed paintings, photographs, maps and menus, signs,
 shelves of goods, pegs of tools and coats, post-office boxes, a flag, a
 clock, lancet windows, a cross, notice boards, antlers, a rack of shirts,
-the Museum's baskets and a jail's bars. Positions are in 32px pixels."""
+the Museum's baskets and a jail's bars, screen-printed park posters,
+snowshoes and old skis, a patchwork quilt and a board of patches and pins.
+Positions are in 32px pixels."""
 from __future__ import annotations
 
 import materials as M
@@ -774,3 +776,235 @@ def gear_rail(cv: Canvas, x: int, y: int, w: int, seed: int) -> None:
             cv.hline(px - 8, y + 19, 17, down(c))
             for v in (-3, 2):
                 cv.px(px + v, y + 10, "K0")
+
+
+# ---------------------------------------------------------------- keepsakes on the walls
+
+def park_print(cv: Canvas, x: int, y: int, w: int, h: int, look: str, seed: int) -> None:
+    """A screen-printed park poster in a thin black frame, in the flat bands
+    of color of the old travel posters: Half Dome at sunset (dome), Yosemite
+    Falls (falls), the big trees (grove), a high meadow and its river
+    (meadow), or El Capitan at night with climbers' headlamps on the wall
+    (elcap). YOSEMITE across the foot."""
+    cv.rect(x - 4, y - 4, w + 8, h + 8, "K0")
+    cv.hline(x - 4, y - 4, w + 8, "G1")
+    foot = 13 if text_width("YOSEMITE") <= w - 4 else 6
+    ph = h - foot
+    skies = {"dome": ["A1", "A2", "O2", "O3"], "falls": ["W2", "W3", "W3", "W4"], "grove": ["O2", "O3", "O3", "A3"],
+             "meadow": ["W3", "W4", "W4", "N"], "elcap": ["K0", "K1", "K1", "W0"]}[look]
+    for yy in range(ph):
+        cv.hline(x, y + yy, w, skies[min(3, yy * 4 // max(1, int(ph * 0.7)))])
+    for xx in range(w):
+        u = xx / max(1, w - 1)
+        if look == "dome":
+            # Half Dome: the rounded back rising to the right, then the sheer face
+            if 0.28 < u <= 0.74:
+                dome = 0.24 + 0.42 * (1 - math.sqrt(max(0.0, 1 - ((0.74 - u) / 0.46) ** 2)))
+            else:
+                dome = 0.58 + 0.04 * math.sin(u * 9)
+            far = 0.45 + 0.08 * math.sin(u * 7 + 1)
+            cv.vline(x + xx, y + int(far * ph), ph - int(far * ph), "L")
+            cv.vline(x + xx, y + int(dome * ph), int(0.66 * ph) - int(dome * ph), "G1")
+            if 0.66 < u <= 0.74:
+                cv.vline(x + xx, y + int(dome * ph), int(0.66 * ph) - int(dome * ph), "S" if u > 0.71 else "L")
+            pine = 0.74 - 0.08 * abs(math.sin(u * 22)) * (hash2(xx // 3, 1, seed) * 0.5 + 0.5)
+            cv.vline(x + xx, y + int(pine * ph), ph - int(pine * ph), "P0")
+        elif look == "falls":
+            cliff = 0.18 + 0.08 * math.sin(u * 5 + 2)
+            cv.vline(x + xx, y + int(cliff * ph), ph - int(cliff * ph), "G3" if u < 0.55 else "G2")
+            if abs(u - 0.42) < 0.05:
+                cv.vline(x + xx, y + int(cliff * ph) + 1, int(0.45 * ph), "N")
+            if abs(u - 0.45) < 0.08:
+                cv.vline(x + xx, y + int(0.66 * ph), int(0.06 * ph), "N")
+            pine = 0.7 - 0.12 * abs(math.sin(u * 18 + 1))
+            cv.vline(x + xx, y + int(pine * ph), ph - int(pine * ph), "P1")
+            cv.vline(x + xx, y + int(0.86 * ph), ph - int(0.86 * ph), "P0")
+        elif look == "grove":
+            cv.vline(x + xx, y + int(0.8 * ph), ph - int(0.8 * ph), "M0")
+            for tx, tw in ((0.22, 0.14), (0.62, 0.2), (0.9, 0.08)):
+                if abs(u - tx) < tw / 2:
+                    cv.vline(x + xx, y, int(0.86 * ph), "A0" if u < tx else "B2")
+            canopy = 0.12 + 0.08 * math.sin(u * 13)
+            cv.vline(x + xx, y, int(canopy * ph), "P1")
+        elif look == "meadow":
+            spire = 0.2 + 1.6 * abs(u - 0.68) if abs(u - 0.68) < 0.25 else 0.6
+            cv.vline(x + xx, y + int(spire * ph), int(0.62 * ph) - int(spire * ph), "G2")
+            far = 0.5 + 0.05 * math.sin(u * 9)
+            cv.vline(x + xx, y + int(far * ph), int(0.62 * ph) - int(far * ph), "G3")
+            cv.vline(x + xx, y + int(0.62 * ph), ph - int(0.62 * ph), "M1")
+            river = 0.78 + 0.08 * math.sin(u * 6)
+            cv.vline(x + xx, y + int(river * ph), 2, "W2")
+            if hash2(xx, 3, seed) > 0.8:
+                cv.px(x + xx, y + int(0.7 * ph), "O3")
+        else:
+            # El Capitan's prow: a long slab rising left to the summit, the nose dropping sheer
+            wall = 0.86 - (u - 0.08) * 3.4 if u < 0.3 else 0.12 + 0.06 * (u - 0.3)
+            cv.vline(x + xx, y + int(wall * ph), ph - int(wall * ph), "G1")
+            if u >= 0.3:
+                cv.vline(x + xx, y + int(wall * ph), 2, "G3")
+            if 0.3 <= u < 0.34:
+                cv.vline(x + xx, y + int(wall * ph), int(0.7 * ph), "G2")
+            if hash2(xx, 5, seed) > 0.93:
+                cv.px(x + xx, y + int(hash2(xx, 6, seed) * 0.12 * ph), "N")
+            pine = 0.82 - 0.06 * abs(math.sin(u * 20))
+            cv.vline(x + xx, y + int(pine * ph), ph - int(pine * ph), "P0")
+    if look == "elcap":
+        for i in range(4):
+            hx = x + int(w * (0.45 + 0.12 * i))
+            cv.px(hx, y + int(ph * (0.35 + 0.08 * i)), "O3")
+        cv.ellipse(x + int(w * 0.12), y + int(ph * 0.12), 2, 2, "N")
+    elif look == "dome":
+        cv.ellipse(x + int(w * 0.25), y + int(ph * 0.3), 4, 4, "A3")
+    # the band of lettering at the foot
+    band = {"dome": "B0", "falls": "W0", "grove": "P0", "meadow": "P1", "elcap": "K0"}[look]
+    cv.rect(x, y + ph, w, foot, band)
+    if foot > 6:
+        tw = text_width("YOSEMITE")
+        text(cv, x + (w - tw) // 2, y + ph + 3, "YOSEMITE", "O3")
+    d = np.zeros((h + 8, w + 8), np.float32)
+    d[-4:, 4:] = -0.8
+    d[4:, -4:] = -0.8
+    cv.tone(d, x=x, y=y)
+
+
+def snowshoes(cv: Canvas, x: int, y: int) -> None:
+    """A pair of old bear-paw snowshoes hung crossed on a peg: ash frames
+    bent round, rawhide webbing laced in a lattice, leather toe bindings."""
+    wall, wx, wy = cv, x, y
+    cv, x, y = Canvas(64, 56), 32, 4
+    for side in (-1, 1):
+        cx = x + side * 9
+        rx, ry = 11, 20
+        for yy in range(-ry, ry + 1):
+            span = rx * math.sqrt(max(0.0, 1 - (yy / ry) ** 2))
+            for xx in range(-int(span), int(span) + 1):
+                px, py = cx + xx + int(yy * 0.25 * side), y + 22 + yy
+                edge = abs(xx) >= int(span) - 1 or abs(yy) >= ry - 1
+                if edge:
+                    cv.px(px, py, "T1" if xx * side < 0 else "B3")
+                elif (xx + yy) % 4 == 0 or (xx - yy) % 4 == 0:
+                    cv.px(px, py, "T3")
+        # the cross-bars and the toe binding
+        cv.hline(cx - 8 + side * -1, y + 14, 16, "B2")
+        cv.hline(cx - 8 + side * 1, y + 30, 16, "B2")
+        cv.rect(cx - 4 + side * -2, y + 17, 8, 4, "B1")
+        cv.hline(cx - 4 + side * -2, y + 17, 8, "B3")
+    cv.rect(x - 2, y - 2, 5, 4, "B1")
+    cv.px(x, y - 2, "B3")
+    cv.line(x, y, x - 8, y + 4, "T1")
+    cv.line(x, y, x + 8, y + 4, "T1")
+    _hang(wall, cv, wx - x, wy - y)
+
+
+def skis(cv: Canvas, x: int, y: int) -> None:
+    """A pair of hickory skis from the old Badger Pass days crossed with
+    their bamboo poles: long, turned up at the tips, leather cable bindings
+    and wicker baskets."""
+    wall, wx, wy = cv, x, y
+    cv, x, y = Canvas(48, 88), 24, 4
+    L = 78
+    for side in (-1, 1):
+        for i in range(L):
+            t = i / L
+            px = x + int(side * (t - 0.5) * 34)
+            py = y + i
+            cv.rect(px - 2, py, 5, 1, "B3")
+            cv.px(px - 2, py, "T1")
+            cv.px(px + 2, py, "B1")
+        # the curled tip
+        tx = x - side * 17
+        cv.ellipse(tx, y - 1, 3, 2, "B3")
+        cv.px(tx, y - 2, "T2")
+        # the binding
+        bx = x + int(side * 0.05 * 34)
+        cv.rect(bx - 3, y + 40, 7, 5, "B0")
+        cv.hline(bx - 3, y + 40, 7, "B2")
+    for side in (-1, 1):
+        for i in range(0, L - 6):
+            t = i / L
+            px = x + int(side * (0.5 - t) * 22) + side * 3
+            cv.px(px, y + 4 + i, "O2" if (i // 6) % 2 else "O1")
+        bx = x + int(side * -0.42 * 22) + side * 3
+        cv.ellipse(bx, y + L - 8, 4, 2, "B1")
+        cv.ellipse(bx, y + L - 8, 2, 1, "O2")
+    _hang(wall, cv, wx - x, wy - y)
+
+
+def _hang(cv: Canvas, piece: Canvas, x: int, y: int) -> None:
+    """Hangs a piece drawn on its own canvas on the wall with its corner at
+    x, y: rimmed in dark, with its shadow cast down and to the right."""
+    piece.outline("B0")
+    cv.tone(np.where(piece.a[..., 3] >= 128, -0.9, 0.0).astype(np.float32), x=x + 3, y=y + 3)
+    cv.blit(piece, x, y)
+
+
+def quilt(cv: Canvas, x: int, y: int, w: int, h: int, seed: int) -> None:
+    """A patchwork quilt hung from a peeled-pine dowel: pieced squares of
+    calico in rust, indigo, sage and gold, each a little four-patch, with a
+    binding round the edge and stitches showing."""
+    cols = ["A0", "W1", "M0", "O2", "R", "B3", "P2", "T3"]
+    cv.rect(x - 6, y - 4, w + 12, 4, "T1")
+    cv.hline(x - 6, y - 4, w + 12, "T3")
+    cv.hline(x - 6, y - 1, w + 12, "B2")
+    cv.rect(x, y, w, h, "N")
+    s = 12
+    for gy in range(0, h - 4, s):
+        for gx in range(0, w - 4, s):
+            c1 = cols[int(hash2(gx, gy, seed) * len(cols))]
+            c2 = cols[int(hash2(gy, gx, seed + 1) * len(cols))]
+            for k, (ox, oy) in enumerate(((0, 0), (s // 2, 0), (0, s // 2), (s // 2, s // 2))):
+                cv.rect(x + 2 + gx + ox, y + 2 + gy + oy, s // 2, s // 2, c1 if k in (0, 3) else c2)
+            for k in range(0, s, 2):
+                cv.px(x + 2 + gx + k, y + 2 + gy + s // 2, "N")
+    cv.frame(x, y, w, h, "A0")
+    cv.frame(x + 1, y + 1, w - 2, h - 2, "B1")
+    # it hangs in soft folds
+    for fx in range(x + 8, x + w - 4, 18):
+        dd = np.zeros((h, 3), np.float32)
+        dd[:, 0] = -0.6
+        dd[:, 2] = 0.4
+        cv.tone(dd, x=fx, y=y)
+
+
+def patches(cv: Canvas, x: int, y: int, w: int, h: int, seed: int) -> None:
+    """A felt-covered board of things to take home: embroidered patches
+    (domes, pines, a bear, a falls) and enamel pins in rows, each on its own
+    little card."""
+    M.timber(cv, x - 4, y - 4, w + 8, h + 8, seed, vertical=False)
+    cv.rect(x, y, w, h, "P0")
+    for i in range(int(w * h / 50)):
+        cv.px(x + int(hash2(i, 1, seed) * w), y + int(hash2(i, 2, seed) * h), "P1")
+    i = 0
+    for py in range(y + 3, y + h - 12, 16):
+        for px in range(x + 3, x + w - 12, 15):
+            kind = int(hash2(i, 3, seed) * 5)
+            cv.rect(px, py, 12, 14, "N")
+            cv.px(px + 6, py + 1, "G3")
+            cx, cy = px + 6, py + 8
+            if kind == 0:
+                # an oval patch: Half Dome over the pines
+                cv.ellipse(cx, cy, 5, 4, "B1")
+                cv.ellipse(cx, cy, 4, 3, "W3")
+                cv.ellipse(cx + 1, cy + 1, 3, 2, "G4")
+                cv.hline(cx - 3, cy + 2, 7, "P2")
+            elif kind == 1:
+                # a round patch with a black bear
+                cv.ellipse(cx, cy, 5, 5, "O1")
+                cv.ellipse(cx, cy, 4, 4, "M2")
+                cv.rect(cx - 3, cy - 1, 6, 3, "B0")
+                cv.px(cx + 3, cy - 2, "B0")
+            elif kind == 2:
+                # an enamel pin: a pine on a shield
+                cv.poly([(cx - 4, cy - 4), (cx + 4, cy - 4), (cx + 4, cy + 1), (cx, cy + 5), (cx - 4, cy + 1)], "O2")
+                cv.poly([(cx, cy - 3), (cx - 3, cy + 2), (cx + 3, cy + 2)], "P1")
+            elif kind == 3:
+                # a falls on a blue arrowhead
+                cv.poly([(cx, cy - 5), (cx + 4, cy + 4), (cx - 4, cy + 4)], "W1")
+                cv.vline(cx, cy - 2, 5, "N")
+            else:
+                # a sunset sticker
+                cv.rect(cx - 4, cy - 3, 9, 7, "A1")
+                cv.hline(cx - 4, cy - 1, 9, "O2")
+                cv.ellipse(cx, cy + 1, 2, 2, "O3")
+                cv.hline(cx - 4, cy + 3, 9, "L")
+            i += 1

@@ -372,6 +372,8 @@ func deco(im: Image, d: Array, wall_h: int, sd: int) -> void:
 			_antlers(im, d[1], d[2])
 		"rack":
 			_tool_rack(im, d[1], d[2], d[3])
+		"print", "quilt", "patches":
+			frame(im, d[1], d[2], d[3], d[4], "poster", sd + d[1])
 
 
 ## A floor-to-ceiling window looking out on [param view]: the Valley's walls
@@ -1443,6 +1445,101 @@ func _p_chalkboard(_o: Dictionary) -> Image:
 
 func _p_workbench(_o: Dictionary) -> Image:
 	return workbench()
+
+
+## A side table with a lamp on it (the 32px art gives it a mica shade).
+func _p_table_lamp(_o: Dictionary) -> Image:
+	var im := K.make(20, 30)
+	K.shadow(im, 10.0, 28.0, 8.0, 1.5, 0.25)
+	K.rect(im, 3, 17, 2, 11, mat.timber[2])
+	K.rect(im, 15, 17, 2, 11, mat.timber[2])
+	K.ellipse(im, 10, 17, 8.0, 2.5, mat.timber[3])
+	K.rect(im, 7, 9, 3, 7, c("a85a3a"))
+	for yy in 8:
+		K.hline(im, 8 - (2 + yy / 3), yy + 1, (2 + yy / 3) * 2 + 1, c("e0b060"))
+	_pool(im, 8, 5, 6, 0.3)
+	K.outline(im)
+	return im
+
+
+## A rocking chair with a blanket over the seat.
+func _p_rocker(_o: Dictionary) -> Image:
+	var im := K.make(18, 26)
+	K.shadow(im, 9.0, 24.0, 8.0, 1.5, 0.25)
+	K.rect(im, 2, 1, 2, 20, mat.timber[3])
+	K.rect(im, 14, 1, 2, 20, mat.timber[3])
+	K.rect(im, 3, 2, 12, 2, mat.timber[4])
+	K.rect(im, 3, 12, 12, 4, c("a83a2a"))
+	K.hline(im, 1, 23, 16, mat.timber[2])
+	K.outline(im)
+	return im
+
+
+## A box of firewood, log ends towards the room.
+func _p_log_box(_o: Dictionary) -> Image:
+	var im := K.make(28, 18)
+	K.shadow(im, 14.0, 16.0, 12.0, 1.5, 0.3)
+	for k in 5:
+		K.ellipse(im, 4 + k * 5, 6, 2.5, 2.5, c("b08a5a"))
+	K.rect(im, 1, 9, 26, 7, mat.timber[2])
+	K.outline(im)
+	return im
+
+
+## A chainsaw-carved black bear on a stump.
+func _p_bear_carving(_o: Dictionary) -> Image:
+	var im := K.make(18, 32)
+	K.shadow(im, 9.0, 30.0, 7.0, 1.5, 0.3)
+	K.rect(im, 3, 23, 12, 7, mat.timber[3])
+	K.ellipse(im, 9, 16, 6.0, 7.0, c("3a2a1e"))
+	K.ellipse(im, 9, 6, 4.0, 4.0, c("3a2a1e"))
+	K.ellipse(im, 9, 8, 2.0, 1.5, c("b08a5a"))
+	K.outline(im)
+	return im
+
+
+## A sale table of books, or of folded shirts.
+func _p_book_table(_o: Dictionary) -> Image:
+	return _sale_table(["4a7a4a", "3a5a8a", "a84a3a", "c8a050"])
+
+
+func _p_shirt_table(_o: Dictionary) -> Image:
+	return _sale_table(["3a6a4a", "e8e0d0", "3a5a8a", "a84a3a"])
+
+
+func _sale_table(cols: Array) -> Image:
+	var im := K.make(44, 24)
+	K.shadow(im, 22.0, 22.0, 20.0, 1.5, 0.3)
+	K.rect(im, 1, 12, 2, 10, mat.timber[2])
+	K.rect(im, 41, 12, 2, 10, mat.timber[2])
+	K.rect(im, 0, 8, 44, 4, mat.timber[3])
+	for k in 4:
+		K.rect(im, 2 + k * 10, 2, 8, 6, c(cols[k]))
+	K.outline(im)
+	return im
+
+
+## A woven bin of plush bears.
+func _p_plush_bin(_o: Dictionary) -> Image:
+	var im := K.make(22, 24)
+	K.shadow(im, 11.0, 22.0, 9.0, 1.5, 0.3)
+	for k in 3:
+		K.ellipse(im, 5 + k * 6, 6, 3.0, 3.0, c("3a2a1e"))
+	K.rect(im, 1, 9, 20, 13, c("c8a050"))
+	K.outline(im)
+	return im
+
+
+## A stand of sun hats, caps and beanies.
+func _p_hat_stand(_o: Dictionary) -> Image:
+	var im := K.make(18, 40)
+	K.shadow(im, 9.0, 38.0, 6.0, 1.5, 0.25)
+	K.vline(im, 9, 3, 33, mat.iron[2])
+	for row in 3:
+		K.ellipse(im, 5, 6 + row * 10, 4.0, 2.5, c(["d8b878", "3a6a4a", "a84a3a"][row]))
+		K.ellipse(im, 13, 6 + row * 10, 4.0, 2.5, c(["d8b878", "3a5a8a", "e0a040"][row]))
+	K.outline(im)
+	return im
 
 
 ## A free-standing exhibit panel on two legs: a picture over lines of text.
