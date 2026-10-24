@@ -27,6 +27,7 @@ extends "res://tools/hubs/build_outer_hub.gd"
 ## glacial erratics left lying in the grass.
 
 const TuolumneArt = preload("res://tools/hubs/tuolumne_art.gd")
+const TuolumneGround = preload("res://tools/hubs/tuolumne_ground.gd")
 const TM := "res://assets/sprites/tuolumne/"
 const GEO := Vector2(-119.3597, 37.8736)
 ## Each granite mass: [tile x of its foot's center, tile row of its foot].
@@ -40,6 +41,8 @@ const RIVER := [Vector2(141, 26), Vector2(124, 28), Vector2(104, 25), Vector2(86
 	Vector2(34, 28), Vector2(16, 31), Vector2(-1, 28)]
 ## The footbridge carries the meadow trail across the river at this column.
 const BRIDGE_X := 63
+## The road bridge carries the spur to the Lembert Dome lot over the river.
+const ROAD_BRIDGE_X := 114
 
 
 func _ready() -> void:
@@ -53,12 +56,12 @@ func _ready() -> void:
 	get_tree().quit()
 
 
-## The Ahwahnee ground painter with the granite as smooth, glacier-polished
-## slabs and needle duff in patches on the forest's granite sand.
+## The high country's own ground painter (tuolumne_ground.gd): sedge
+## meadow, granite sand under the lodgepoles, the clear river and its sod
+## banks, the Tioga Road, and the granite as smooth, glacier-polished slabs.
 func _save_ground_art(file_name: String, seed_value: int, rings := [], soils: Array[Rect2i] = []) -> Sprite2D:
-	_painter = Ground.new()
+	_painter = TuolumneGround.new()
 	_painter.smooth_granite = true
-	_painter.subalpine_duff = true
 	var im := _painter.paint(kind, w, h, seed_value)
 	im.save_png(ProjectSettings.globalize_path(S + file_name + ".png"))
 	import_assets()
@@ -107,12 +110,15 @@ func _layout() -> void:
 	_water([Vector2(141, 38), Vector2(130, 34), Vector2(118, 28)], 2, Terrain.RIVER, 0.5)
 	# The Tioga Road along the meadow's south side, and the spur to the
 	# Lembert Dome lot over the river.
+	# (The river's tiles under each crossing are noted first: the road and
+	# the trail would paint over them.)
+	var road_wet := _wet_rows(ROAD_BRIDGE_X)
+	var trail_wet := _wet_rows(BRIDGE_X)
 	_path([Vector2(-1, 46), Vector2(40, 46), Vector2(80, 47), Vector2(110, 46), Vector2(141, 45)], 2, Terrain.ROAD)
-	_path([Vector2(114, 46), Vector2(114, 21)], 2, Terrain.ROAD)
-	for y in range(20, 40):
-		for x in [114, 115]:
-			if at(x, y) in [Terrain.RIVER, Terrain.SAND]:
-				put(x, y, Terrain.BRIDGE)
+	_path([Vector2(ROAD_BRIDGE_X, 46), Vector2(ROAD_BRIDGE_X, 21)], 2, Terrain.ROAD)
+	for y: int in road_wet:
+		for x in [ROAD_BRIDGE_X, ROAD_BRIDGE_X + 1]:
+			put(x, y, Terrain.BRIDGE)
 	fill(106, 18, 121, 21, Terrain.PARKING)
 	# The old road west from the lot to Soda Springs, and the trail to Dog Lake.
 	_path([Vector2(107, 19), Vector2(96, 18), Vector2(82, 17), Vector2(70, 18)], 2, Terrain.TRAIL, 0.3)
@@ -121,10 +127,9 @@ func _layout() -> void:
 	_ellipse(66, 16, 9, 4, Terrain.CAMP, 0.3, [Terrain.MEADOW, Terrain.SUBALPINE])
 	# The meadow trail from the visitor center over the footbridge.
 	_path([Vector2(52, 46), Vector2(56, 38), Vector2(BRIDGE_X, 32), Vector2(BRIDGE_X, 22), Vector2(65, 19)], 1, Terrain.TRAIL, 0.2)
-	for y in range(18, 40):
+	for y: int in trail_wet:
 		for x in [BRIDGE_X, BRIDGE_X + 1]:
-			if at(x, y) in [Terrain.RIVER, Terrain.SAND]:
-				put(x, y, Terrain.BRIDGE)
+			put(x, y, Terrain.BRIDGE)
 	# South of the road: the visitor center's lot, the store's, the campground
 	# loops and the lodge.
 	fill(35, 48, 44, 51, Terrain.PARKING)
@@ -149,9 +154,23 @@ func _layout() -> void:
 	clear_trees(0, 62, 18, 70) # the foot of Fairview Dome
 
 
+## The rows (from 16 to 40) where the river or its bars cross columns
+## [param x] and x + 1, so a crossing can be bridged from bank to bank.
+func _wet_rows(x: int) -> Array:
+	var rows := []
+	for y in range(16, 41):
+		if at(x, y) in [Terrain.RIVER, Terrain.SAND] or at(x + 1, y) in [Terrain.RIVER, Terrain.SAND]:
+			rows.append(y)
+	if rows.is_empty():
+		return rows
+	return range(rows[0], rows[-1] + 1)
+
+
 func _tuolumne() -> void:
 	_layout()
 	start_hub("TuolumneMeadows", "tuolumne_meadows", "Tuolumne Meadows", GEO)
+	# the river's current lines drift west, downstream (seasonal_ground.gdshader)
+	_root.set_meta("water_flow", Vector2(-9.0, 0.0))
 	paint_ground()
 	_save_ground_art("ground_tuolumne_meadows", 1889)
 	_place_masses()
@@ -192,20 +211,29 @@ func _place_soda_springs() -> void:
 		"The Sierra Club built this lodge of local granite in 1915, in memory of club leader Edward Taylor Parsons.")
 	_lit("McCauleyCabin", TM, "mccauley_cabin", 73, 14, "McCauley Cabin",
 		"A log cabin built by the McCauleys, who ran cattle in the meadows; later the rangers used it.")
-	# The footbridge, lying over the river where the trail crosses.
-	var rows := []
-	for y in range(18, 40):
-		if at(BRIDGE_X, y) == Terrain.BRIDGE:
-			rows.append(y)
-	if not rows.is_empty():
-		var top: int = rows[0]
-		var bottom: int = rows[-1]
-		var sprite := _backdrop("footbridge", Vector2(BRIDGE_X * T + T - TuolumneArt.FOOTBRIDGE.x / 2.0, top * T - 6), -7, TM)
-		sprite.scale.y = float((bottom - top + 1) * T + 12) / TuolumneArt.FOOTBRIDGE.y
+	# The footbridge, lying over the river where the trail crosses, and the
+	# road bridge on the spur to the Lembert Dome lot.
+	_span("footbridge", BRIDGE_X, TuolumneArt.FOOTBRIDGE)
+	_span("road_bridge", ROAD_BRIDGE_X, TuolumneArt.ROAD_BRIDGE)
 	_info_sign("Sign_Tuolumne_River", foot(BRIDGE_X + 2, 34), "Tuolumne River",
 		"The Dana and Lyell forks meet near here, carrying snowmelt from Mount Dana and Mount Lyell west toward Hetch Hetchy.")
 	_info_sign("Sign_Tuolumne_Meadows", foot(56, 40), "Tuolumne Meadows",
 		"8,600 feet. One of the largest high-elevation meadows in the Sierra Nevada. Snow covers it for much of the year.")
+
+
+## Lays a bridge picture over the BRIDGE tiles of columns [param x] and
+## x + 1, stretched from bank to bank.
+func _span(sprite_name: String, x: int, size: Vector2i) -> void:
+	var rows := []
+	for y in range(14, 42):
+		if at(x, y) == Terrain.BRIDGE:
+			rows.append(y)
+	if rows.is_empty():
+		return
+	var top: int = rows[0]
+	var bottom: int = rows[-1]
+	var sprite := _backdrop(sprite_name, Vector2(x * T + T - size.x / 2.0, top * T - 6), -7, TM)
+	sprite.scale.y = float((bottom - top + 1) * T + 12) / size.y
 
 
 func _place_road_south() -> void:

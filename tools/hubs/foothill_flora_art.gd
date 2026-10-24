@@ -35,7 +35,7 @@ const TRUNKS := {
 	"tree_sequoia_giant_c": Vector2(22, 8),
 	"tree_grizzly_giant": Vector2(38, 12),
 	"tree_fallen_monarch": Vector2(132, 12),
-	"tree_lodgepole_a": Vector2(5, 4), "tree_lodgepole_b": Vector2(5, 4), "tree_lodgepole_c": Vector2(4, 3),
+	"tree_lodgepole_a": Vector2(5, 4), "tree_lodgepole_b": Vector2(5, 4), "tree_lodgepole_c": Vector2(4, 3), "tree_lodgepole_d": Vector2(4, 3),
 	"tree_whitebark": Vector2(8, 5),
 }
 ## The Tunnel Tree is solid either side of its tunnel, open in the middle.
@@ -47,7 +47,7 @@ const FILES: Array[String] = [
 	"tree_buckeye", "tree_redbud", "tree_alder_a", "tree_alder_b", "tree_sugar_pine_a", "tree_sugar_pine_b",
 	"tree_sequoia_giant_a", "tree_sequoia_giant_b", "tree_sequoia_giant_c", "tree_grizzly_giant", "tree_tunnel",
 	"tree_fallen_monarch", "plant_chamise_a", "plant_chamise_b", "plant_toyon",
-	"tree_lodgepole_a", "tree_lodgepole_b", "tree_lodgepole_c", "tree_whitebark", "plant_willow_low_a", "plant_willow_low_b",
+	"tree_lodgepole_a", "tree_lodgepole_b", "tree_lodgepole_c", "tree_lodgepole_d", "tree_whitebark", "plant_willow_low_a", "plant_willow_low_b",
 ]
 const SEASON_NAMES := ["spring", "summer", "fall", "winter"]
 
@@ -71,8 +71,8 @@ const CHAR := ["120e0e", "1e1818", "2e2422", "40322c"]
 const SILVER := ["3a3634", "57514c", "7a736a", "9e968a", "c2baac", "e0d8c8"]
 const SUGAR_NEEDLE := ["17302a", "1f3e34", "2b503e", "3a6448", "4c7a54", "64905f", "82a872"]
 const CHAMISE := ["1e2a1c", "2a3a24", "3a4c2c", "4c5e34", "62723e", "7c884c"]
-const LODGEPOLE_NEEDLE := ["152a20", "1e3a28", "2a4c30", "3a6038", "4e7642", "668c4e", "82a45e"]
-const BARK_LODGEPOLE := ["2e2420", "4a3a2e", "66523e", "846c50", "a08864", "bca47e"]
+const LODGEPOLE_NEEDLE := ["12291d", "1a3826", "244a2e", "30603a", "437f45", "5c8f3c", "76a04c"]
+const BARK_LODGEPOLE := ["2b2a30", "47392e", "6a5240", "8a6c4e", "a88a62", "c9ad80"]
 const WHITEBARK_NEEDLE := ["18302a", "223e34", "30503e", "426448", "587a56", "729266"]
 const WILLOW_LOW := ["1e3420", "2a4a2a", "3a6234", "4e7a3e", "66924a", "84aa5a"]
 const WILLOW_LOW_FALL := ["3a2e14", "5a4818", "7e6620", "a2862c", "c4a83c", "dcc456"]
@@ -92,7 +92,7 @@ func save_all() -> void:
 		"tree_sequoia_giant_c": sequoia_giant(2), "tree_grizzly_giant": grizzly_giant(),
 		"tree_tunnel": tunnel_tree(), "tree_fallen_monarch": fallen_monarch(),
 		"plant_chamise_a": chamise(0), "plant_chamise_b": chamise(1), "plant_toyon": toyon(),
-		"tree_lodgepole_a": lodgepole(0), "tree_lodgepole_b": lodgepole(1), "tree_lodgepole_c": lodgepole(2),
+		"tree_lodgepole_a": lodgepole(0), "tree_lodgepole_b": lodgepole(1), "tree_lodgepole_c": lodgepole(2), "tree_lodgepole_d": lodgepole(3),
 		"tree_whitebark": whitebark(), "plant_willow_low_a": willow_low(0), "plant_willow_low_b": willow_low(1),
 	}
 	for sprite_name: String in base:
@@ -660,66 +660,156 @@ func fallen_monarch() -> Image:
 
 # ---------------------------------------------------------------- the high country
 
-## A lodgepole pine: a straight, slender trunk of thin scaly bark and a
-## narrow crown of short, dense tufts, the tree that rings Tuolumne Meadows.
+## A lodgepole pine (the Sierra's Murray lodgepole), the tree that rings
+## Tuolumne Meadows: a ruler-straight, slender trunk of thin, flaky,
+## orange-grey bark, bare low down but for dead twig stubs where the shaded
+## lower limbs have dropped, and a narrow, ragged crown of short limbs, each
+## ending in a dense, yellow-green clump of paired needles. [param v]: 0 a
+## tall old tree, 1 a mature one, 2 a young one with limbs nearly to the
+## ground, 3 a tall, thin one in a crowded stand with a short crown.
 func lodgepole(v: int) -> Image:
-	var w := [30, 28, 24][v] as int
-	var h := [108, 96, 78][v] as int
+	var w := [34, 30, 26, 26][v] as int
+	var h := [116, 100, 76, 112][v] as int
 	var im := K.make(w, h)
 	var sd := 4400 + v * 17
-	var cx := w / 2.0 + (0.5 if v == 1 else -0.5)
+	var cx: float = w / 2.0 + [-0.5, 0.5, 0.0, -0.5][v]
 	var base := h - 4
 	var bark := F.ramp(BARK_LODGEPOLE)
 	var needles := F.ramp(LODGEPOLE_NEEDLE)
-	K.shadow(im, cx + 2.0, base + 0.5, 8.0, 2.4, 0.26)
-	F.trunk(im, cx, base, 4, 4.0, 1.4, bark, sd, 0.4, 0.0, 4, 1.6)
-	var crown_bottom := int(h * 0.62)
-	var tufts: Array[Vector3] = []
-	var y := 6.0
+	# where the live crown starts, as a fraction of the height
+	var crown_bottom := int(h * [0.6, 0.62, 0.86, 0.42][v])
+	var crown_top := 3
+	K.shadow(im, cx + 3.0, base + 0.5, [10.0, 9.0, 8.0, 7.0][v] as float, 2.6, 0.28)
+	_lodgepole_trunk(im, cx, base, crown_top + 2, [4.6, 4.2, 3.4, 3.6][v], bark, sd)
+	# dead twig stubs on the bare trunk below the crown
+	var y := float(crown_bottom) + 2.0
 	var k := 0
-	while y < crown_bottom:
-		var t := (y - 4.0) / float(crown_bottom - 4)
-		var reach := 1.5 + minf(t * 1.5, 1.0) * (w / 2.0 - 8.0)
+	while y < base - 6:
 		var side := -1.0 if k % 2 == 0 else 1.0
-		var sx := F.trunk_x(cx, int(y), base, 4, sd, 0.4, 0.0)
-		var tip := Vector2(sx + side * reach * (0.7 + K.hash2(k, 1, sd) * 0.3), y - 1.0)
-		F.limb(im, sx, y + 1.0, tip.x, tip.y, 1.4, 0.8, bark, sd + k, 0.5)
-		tufts.append(Vector3(tip.x, tip.y, 2.2 + t * 1.4))
-		tufts.append(Vector3(lerpf(sx, tip.x, 0.35), y - 1.0, 2.0 + t * 1.0))
-		y += 2.4 + K.hash2(k, 2, sd) * 1.4
+		var sx: float = cx + side * 1.5
+		var length := 1.0 + K.hash2(k, 3, sd) * 2.2
+		F.line(im, sx, y, sx + side * length, y + length * 0.5, Color("4e4640") if K.hash2(k, 4, sd) < 0.5 else Color("6a6058"))
+		y += 5.0 + K.hash2(k, 5, sd) * 6.0
 		k += 1
-	tufts.append(Vector3(cx, 4.0, 2.0))
-	tufts.sort_custom(func(a: Vector3, b: Vector3) -> bool: return a.y < b.y)
-	for i in tufts.size():
-		var tf := tufts[i]
-		F.tuft(im, tf.x, tf.y, tf.z, needles, sd + i * 3, -0.1 * tf.y / crown_bottom)
+	# the crown: short limbs, alternating, each holding a few dense needle
+	# clumps, over a dark core so the crown reads as one narrow mass; the
+	# shaded (right-hand, far) clumps are drawn first so the lit ones sit on top
+	var back: Array[Vector4] = []
+	var front: Array[Vector4] = []
+	var core: Array[Vector3] = []
+	y = float(crown_top) + 3.0
+	k = 0
+	var crown_h := float(crown_bottom - crown_top)
+	var max_reach := w / 2.0 - 4.0
+	while y < crown_bottom:
+		var t := (y - crown_top) / crown_h
+		# a narrow spire that swells a little below the middle, then thins
+		var reach := (1.5 + (max_reach - 1.5) * sin(clampf(t * 1.3, 0.0, 1.0) * PI * 0.6)) * (0.55 + K.hash2(k, 1, sd) * 0.5)
+		if v == 3:
+			reach *= 0.75
+		reach = minf(reach, max_reach)
+		var side := -1.0 if (k + int(K.hash2(k, 9, sd) * 1.6)) % 2 == 0 else 1.0
+		core.append(Vector3(cx + side * 0.5, y, 1.2 + reach * 0.45))
+		# now and then a limb is missing, so the trunk shows through the crown
+		if t > 0.25 and K.hash2(k, 6, sd) < 0.14:
+			y += 2.5
+			k += 1
+			continue
+		var tip := Vector2(cx + side * reach, y - 1.0 - K.hash2(k, 2, sd) * 1.5)
+		F.limb(im, cx, y + 1.0, tip.x, tip.y + 1.0, 1.1, 0.6, bark, sd + k, 0.3)
+		var size := 1.7 + t * 1.1 + K.hash2(k, 7, sd) * 0.6
+		for j in 2:
+			var at := tip.lerp(Vector2(cx, y), j * 0.5)
+			var clump := Vector4(at.x, at.y - j * 0.5, size * (1.0 - j * 0.2), side)
+			if side > 0.0 or j == 1:
+				back.append(clump)
+			else:
+				front.append(clump)
+		y += 1.6 + K.hash2(k, 8, sd) * 1.2
+		k += 1
+	for i in core.size():
+		var q := core[i]
+		F.blob(im, q.x, q.y, q.z, 1.8, needles, sd + 900 + i, -0.42, 0.18, 0.2)
+	for i in back.size():
+		var b := back[i]
+		F.blob(im, b.x, b.y, b.z * 1.15, b.z * 0.8, needles, sd + i * 7, -0.3, 0.22, 0.24)
+	for i in front.size():
+		var f := front[i]
+		var lift := 0.02 - (f.y / float(crown_bottom)) * 0.12
+		F.blob(im, f.x, f.y, f.z * 1.2, f.z * 0.82, needles, sd + 300 + i * 7, lift, 0.22, 0.24)
+	# the leader: a short spike of new growth at the very top
+	for i in 4:
+		K.px(im, int(cx), crown_top + i, needles[2 + int(i < 2)])
+	K.px(im, int(cx) - 1, crown_top + 3, needles[2])
+	K.px(im, int(cx) + 1, crown_top + 3, needles[1])
+	# a few small cones held on the upper limbs
+	for i in 3:
+		var cy := crown_top + 8 + int(K.hash2(i, 1, sd + 5) * crown_h * 0.5)
+		var cxx := int(cx) + (2 if i % 2 == 0 else -2)
+		if im.get_pixel(clampi(cxx, 0, w - 1), clampi(cy, 0, h - 1)).a > 0.5:
+			K.px(im, cxx, cy, Color("6b4829"))
+			K.px(im, cxx, cy + 1, Color("47301f"))
 	F.rim(im, 0.5)
 	return im
 
 
-## A whitebark pine: a low, many-stemmed pine twisted by the wind on the
-## granite above the meadows, its bark pale and smooth.
+## The lodgepole's trunk: barely tapering, round, lit from the left, with
+## thin bark in small flakes (not the ponderosa's big plates) and a small
+## root flare.
+func _lodgepole_trunk(im: Image, cx: float, base: int, top: int, w_base: float, bark: Array[Color], sd: int) -> void:
+	for y in range(top, base + 1):
+		var t := float(base - y) / maxf(1.0, float(base - top))
+		var wd := lerpf(w_base, 1.4, pow(t, 1.4)) + 2.0 * pow(1.0 - t, 9.0)
+		var left := cx - wd / 2.0 + sin(y * 0.05 + sd) * 0.3
+		for x in range(floori(left), ceili(left + wd)):
+			var u := (x + 0.5 - left) / wd
+			if u < 0.0 or u > 1.0:
+				continue
+			var lam := clampf(1.0 - absf(u - 0.28) * 1.6, 0.0, 1.0)
+			# flakes: short horizontal runs a step lighter or darker
+			var fl := K.hash2((x + y / 3) / 2, y / 2, sd)
+			var tone := 0.12 + lam * 0.74 + (0.12 if fl > 0.8 else (-0.14 if fl < 0.14 else 0.0))
+			var col := F.shade(bark, tone, x, y)
+			if u > 0.8:
+				col = bark[1]
+			K.px(im, x, y, col)
+
+
+## A whitebark pine as it grows on the domes above the meadows: several
+## pale, smooth stems swept up from one base, twisted by the wind, their
+## needles in dark clumps bunched at the ends of the upturned limbs.
 func whitebark() -> Image:
 	var w := 56
-	var h := 58
+	var h := 60
 	var im := K.make(w, h)
 	var sd := 4600
 	var cx := w / 2.0
 	var base := h - 4
 	var bark := F.ramp(SILVER)
-	K.shadow(im, cx + 3.0, base + 0.5, 20.0, 3.4, 0.28)
-	var tips := []
-	for i in 4:
-		var dx := (i - 1.5) * 6.0
-		var top := Vector2(cx + dx * 2.0 + (K.hash2(i, 1, sd) - 0.5) * 6.0, 14.0 + absf(dx) * 0.9)
-		F.limb(im, cx + dx * 0.3, base, top.x, top.y, 4.0, 1.8, bark, sd + i * 9, 3.0)
-		tips.append(top)
 	var leaf := F.ramp(WHITEBARK_NEEDLE)
-	for i in tips.size():
+	K.shadow(im, cx + 3.0, base + 0.5, 20.0, 3.4, 0.28)
+	var stems := [Vector2(-17.0, 22.0), Vector2(-7.0, 9.0), Vector2(5.0, 5.0), Vector2(15.0, 16.0), Vector2(21.0, 30.0)]
+	var tips: Array[Vector2] = []
+	for i in stems.size():
+		var top := Vector2(cx + stems[i].x + (K.hash2(i, 1, sd) - 0.5) * 3.0, stems[i].y)
+		F.limb(im, cx + (i - 2.0) * 1.6, base, top.x, top.y, 4.2 - absf(i - 2.0) * 0.5, 1.6, bark, sd + i * 9, (i - 2.0) * 1.2)
+		tips.append(top)
+		# an upturned side limb halfway up
+		var mid := Vector2(lerpf(cx, top.x, 0.55), lerpf(base, top.y, 0.55))
+		var side := -1.0 if i < 2 else 1.0
+		var end := mid + Vector2(side * (5.0 + K.hash2(i, 2, sd) * 3.0), -6.0)
+		F.limb(im, mid.x, mid.y, end.x, end.y, 1.8, 1.0, bark, sd + i * 13, 1.0)
+		tips.append(end)
+	# clumps, back to front: the far ones darker
+	var order := range(tips.size())
+	order.sort_custom(func(a: int, b: int) -> bool: return tips[a].y < tips[b].y)
+	for n in order.size():
+		var i: int = order[n]
 		var p: Vector2 = tips[i]
 		for c in 3:
-			var q := p + Vector2((K.hash2(i, c, sd) - 0.5) * 12.0, 4.0 + c * 4.0)
-			F.blob_orig(im, q.x, q.y, 7.0 - c, 4.5, leaf, sd + i * 7 + c, -0.2 - c * 0.05, 0.2, 0.25)
+			var q := p + Vector2((K.hash2(i, c, sd) - 0.5) * 8.0, -1.0 + c * 2.5)
+			var r := 5.6 - c * 1.2 - (1.0 if i % 2 == 1 else 0.0)
+			F.blob(im, q.x, q.y, r * 1.2, r * 0.8, leaf, sd + i * 7 + c, -0.12 - c * 0.08, 0.2, 0.24)
 	F.rim(im, 0.5)
 	return im
 
