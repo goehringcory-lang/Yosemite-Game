@@ -1,11 +1,12 @@
 extends Node
 ## Saves screenshots of the Camp 4 slackline screen at its main moments: the
 ## line picker, stepping on, walking with a buck coming, a trick, a fall, the
-## results card with a medal, and the long line in a gust. Needs a window
+## results card with a medal, the long line in a gust, and your own line
+## rigged between two trees away from Camp 4. Needs a window
 ## (not --headless). Environment:
 ##   SHOT_HOURS   comma-separated game hours to shoot at (default 12)
 ##   SHOT_ONLY    comma-separated moments to shoot (default all): select,
-##                ready, walk, trick, fall, result, gust
+##                ready, walk, trick, fall, result, gust, travel
 ##   SHOT_DIR     folder for the PNGs (default user://)
 ## Run: SHOT_HOURS=12,19,23 godot --path . res://tools/shots/slackline_shot.tscn
 
@@ -23,7 +24,7 @@ func _ready() -> void:
 	Perks.start_new_game()
 	Gear.owned = {"climbing_shoes": 1, "chalk_bag": 1}
 	GameClock.paused = true
-	var only := _env("SHOT_ONLY", "select,ready,walk,trick,fall,result,gust").split(",")
+	var only := _env("SHOT_ONLY", "select,ready,walk,trick,fall,result,gust,travel").split(",")
 	for hour in _env("SHOT_HOURS", "12").split(","):
 		GameClock.minutes = int(hour) * 60
 		for moment in only:
@@ -39,7 +40,7 @@ func _shoot(moment: String, hour: String) -> void:
 		Perks.record("slackline_medal_camp4", 2)
 		Perks.record("slackline_best_camp4", 4410)
 	var game: SlacklineMinigame = load("res://scripts/slackline/slackline_minigame.gd").new()
-	game.setup(5)
+	game.setup(5, SlacklineState.travel_line(20, "Mirror Lake") if moment == "travel" else {})
 	add_child(game)
 	await get_tree().process_frame
 	match moment:
@@ -81,6 +82,13 @@ func _shoot(moment: String, hour: String) -> void:
 			game.go()
 			_walk_to(game, 1.0, true)
 			game._phase_age = 4.0
+			await _frames(4)
+		"travel":
+			game.go()
+			_walk_to(game, 0.6, true)
+			game._popups.clear()
+			game.set_process(false)
+			game._canvas.queue_redraw()
 			await _frames(4)
 		"gust":
 			game.begin("long")

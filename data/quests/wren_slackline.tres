@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "wren_slackline"
+title = "Gold on the Line"
+giver = "wren_alvarez"
+requires = PackedStringArray("wren_apron")
+intro = PackedStringArray("Have you been out to the slackline at Camp 4? I go every evening after the shop closes. I fall off a lot. Everybody does.", "I've been sewing a line of my own out of the shop's webbing. Marty says it's fine, as long as I stop calling it \"inventory.\" Two tree slings, pads so the bark doesn't get rubbed raw, and a ratchet to tension it.", "Here's the deal: win a gold medal on one of the Camp 4 lines, any of them, and it's yours. Not just across. Gold. That means you walked it steady, with flow, not hanging on for dear life.")
+steps = [{"type": "unlocked", "ability": "slackline_gold", "objective": "Win a gold medal on one of the Camp 4 slacklines", "reminder": "Gold on any Camp 4 line, then come tell me. Stay centered so your flow builds, and land your tricks while it's up. Flow multiplies everything.", "done": ["Gold?! Bev told me somebody had the whole campground on their feet last night. That was you?", "Okay. A deal's a deal."]}]
+outro = PackedStringArray("Here, it's all in the bag. Find two sturdy trees a few strides apart, wrap a sling round each trunk over its pad, and crank the ratchet till it sings.", "Healthy trees only, nothing dead or skinny, and take it down when you go. Then you can walk a line anywhere in the park: Tuolumne at sunset, Wawona under the big trees. I want to hear about every one.")
+reward_items = {"travel_slackline": 1}
+reward_unlocks = PackedStringArray("travel_slackline")

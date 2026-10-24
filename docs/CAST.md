@@ -212,6 +212,7 @@ Clark's guidebook errand ─┬─ Lamon: Lamon's Garden ............ onions + b
 Tabuce: Acorns for the Winter → The Chuckah ✦ .................. acorns → chuckah + acorn recipes (needed for the Nose)
 After Swan Slab:
   Wren Alvarez: The Rest of the Apron ... food, then climb the Apron with Wren → chocolate, apricots
+  Wren Alvarez: Gold on the Line ... win a gold medal on a Camp 4 slackline → Wren's Slackline (rig it between two trees anywhere)
                                           (pays off Wren's promise; the same tick finishes Eichorn's quest)
   Ansel Adams: Monolith ........... climb the Apron to the rim, report back → 2 quickdraws
   Anderson: Anderson's Iron ....... food worth 60 energy → Anderson's eyebolt (keepsake)

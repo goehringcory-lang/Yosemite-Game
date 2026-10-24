@@ -22,6 +22,9 @@ static func attach(region: Region) -> void:
 		return
 	region.set_meta("story_attached", true)
 	EasterEggs.dress(region)
+	# Wren's slackline can be rigged between trees in any outdoor region.
+	if not region.indoors:
+		region.add_child(TravelSlackline.new())
 	for path in [path_for(region.region_id), doors_path_for(region.region_id)]:
 		if not ResourceLoader.exists(path):
 			continue
