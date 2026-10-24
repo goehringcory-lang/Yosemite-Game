@@ -53,21 +53,33 @@ const LANDMARKS := {
 	"mt_maclure": {"w": 116, "h": 104, "trees": false, "snow": true, "glacier": true, "lr": 1.8, "flute": 0.6},
 	"donohue_pass": {"w": 200, "h": 56, "trees": false, "snow": true, "lr": 1.8},
 	"sierra_crest": {"w": 480, "h": 70, "trees": false, "snow": true, "lr": 1.6, "flute": 0.6},
+	# Seen from Glacier Point's viewers (BinocularView).
+	"north_rim": {"w": 170, "h": 96, "trees": true, "lr": 1.3, "t0": 0.95},
+	"mt_hoffmann": {"w": 170, "h": 60, "trees": false, "snow": true, "lr": 1.6, "flute": 0.6},
+	"mt_watkins": {"w": 110, "h": 62, "trees": true, "lr": 1.4},
+	"mt_starr_king": {"w": 90, "h": 84, "trees": true, "lr": 1.3, "flute": 0.4},
+	"mt_clark": {"w": 120, "h": 84, "trees": false, "snow": true, "lr": 1.8, "flute": 0.7},
+	"mt_florence": {"w": 140, "h": 90, "trees": false, "snow": true, "glacier": true, "lr": 1.8, "flute": 0.6},
+	"vernal_fall": {"w": 80, "h": 50, "trees": true, "fall": true, "lr": 1.3},
+	"illilouette_fall": {"w": 90, "h": 66, "trees": true, "fall": true, "lr": 1.3},
 }
 
 
 ## The landscape for [param route_id]'s profile, as layers back to front:
 ## [{"image": Image, "sink": float}] (sink = pixels the layer drops over the
-## whole climb) plus "falls": waterfalls to shimmer {"x", "y0", "y1", "layer"}.
-static func build(profile: Dictionary, pal: Dictionary, seed_value: int) -> Dictionary:
+## whole climb) plus "falls": waterfalls to shimmer {"x", "y0", "y1", "layer"}
+## and "peaks": where each landmark's summit was painted {"k", "x", "y",
+## "x0", "x1", "layer"}. [param width] paints a panorama wider than the screen.
+static func build(profile: Dictionary, pal: Dictionary, seed_value: int, width := SCREEN.x) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
 	var layers: Array[Dictionary] = []
 	var falls: Array[Dictionary] = []
+	var peaks: Array[Dictionary] = []
 	var sinks := [8.0, 18.0, 34.0]
 	var images: Array[Image] = []
 	for l in 3:
-		images.append(P.make(SCREEN.x, SCREEN.y + 150 + PAD))
+		images.append(P.make(width, SCREEN.y + 150 + PAD))
 	# A faint generic ridge in each layer so the horizon is never empty.
 	for l in 3:
 		_ridge(images[l], l, pal, rng, profile.get("alpine", false))
@@ -87,17 +99,19 @@ static func build(profile: Dictionary, pal: Dictionary, seed_value: int) -> Dict
 		if info.is_empty():
 			continue
 		var into := 0 if kind == "sierra_crest" else l
-		var found := _paint_landmark(images[into], kind, info, int(spec.x), float(spec.get("s", 1.0)), l, into, pal, rng)
+		var peak := {"k": kind, "layer": into}
+		var found := _paint_landmark(images[into], kind, info, int(spec.x), float(spec.get("s", 1.0)), l, into, pal, rng, peak)
+		peaks.append(peak)
 		for f: Dictionary in found:
 			f["layer"] = into
 			falls.append(f)
 	for l in 3:
 		layers.append({"image": images[l], "sink": sinks[l], "pad": PAD})
 	# The valley floor, far below.
-	var ground := P.make(SCREEN.x, SCREEN.y + 200 + PAD)
-	_floor(ground, profile.get("ground", "valley_forest"), pal, rng)
+	var ground := P.make(width, SCREEN.y + 200 + PAD)
+	_floor(ground, profile.get("ground", "valley_forest"), pal, rng, int(profile.get("floor_x", 0)))
 	layers.append({"image": ground, "sink": 150.0, "pad": PAD})
-	return {"layers": layers, "falls": falls}
+	return {"layers": layers, "falls": falls, "peaks": peaks}
 
 
 # ------------------------------------------------------------------ colors
@@ -325,6 +339,7 @@ static func _fall(im: Image, x: int, y0: int, y1: int, c: Dictionary, drift: flo
 
 static func _ridge(im: Image, l: int, pal: Dictionary, rng: RandomNumberGenerator, alpine: bool) -> void:
 	var c := _body(pal, l)
+	var wd := im.get_width()
 	var ramp: Array[Color] = c.ramp
 	var base: int = LAYER_BASE[l] + 6 + PAD
 	var amp: float = [30.0, 22.0, 14.0][l]
@@ -332,41 +347,42 @@ static func _ridge(im: Image, l: int, pal: Dictionary, rng: RandomNumberGenerato
 	var p2 := rng.randf() * TAU
 	var f: float = [0.011, 0.018, 0.028][l]
 	var tops := PackedInt32Array()
-	tops.resize(SCREEN.x)
-	for x in SCREEN.x:
+	tops.resize(wd)
+	for x in wd:
 		var top: float = base - amp * (0.55 + 0.3 * sin(x * f + p1) + 0.18 * sin(x * f * 2.7 + p2) + 0.08 * sin(x * f * 6.3))
 		if l == 2:
 			top += 8.0
 		tops[x] = int(top)
 	var bottom := im.get_height()
-	for x in SCREEN.x:
+	for x in wd:
 		var top := tops[x]
-		var d := tops[maxi(x - 2, 0)] - tops[mini(x + 2, SCREEN.x - 1)]
+		var d := tops[maxi(x - 2, 0)] - tops[mini(x + 2, wd - 1)]
 		var t0 := 1.9 - clampf(d * 0.35, -1.0, 1.0) + (P.noise(x / 2, l, 5) - 0.5) * 0.5
 		_band_col(im, x, top, base + 12, t0, t0 + 0.9, ramp)
 		im.fill_rect(Rect2i(x, base + 12, 1, bottom - base - 12), ramp[3])
 		_px(im, x, top, ramp[0] if d > 0 else ramp[1])
 	if l >= 1 and not alpine:
 		var tl := PackedInt32Array()
-		tl.resize(SCREEN.x)
-		for x in SCREEN.x:
+		tl.resize(wd)
+		for x in wd:
 			tl[x] = tops[x] + 5 + int(P.noise(x / 3, 9, l) * 3.0) + l * 2
 		_forest(im, 0, tops, tl, base + 4, c, 3 + l, rng)
 	elif l == 0 and not alpine:
 		# The far ridge: a thin band of forest low on the slope.
-		for x in SCREEN.x:
+		for x in wd:
 			var y := base - 6 + int(P.noise(x / 4, 4, 2) * 3.0)
 			_rect(im, x, y, 1, 24, c.tree)
 	elif alpine and l >= 1:
 		# Talus and a few snow patches high up.
-		for x in range(0, SCREEN.x, 3):
+		for x in range(0, wd, 3):
 			if P.noise(x, l, 71) > 0.62:
 				_rect(im, x, tops[x] + 2, 2 + int(P.noise(x, 3, 3) * 3.0), 1, c.snow)
 
 
 # --------------------------------------------------------------- landmarks
 
-static func _paint_landmark(im: Image, kind: String, info: Dictionary, cx: int, s: float, l: int, into: int, pal: Dictionary, rng: RandomNumberGenerator) -> Array[Dictionary]:
+## [param peak] is filled with where the summit landed: {"x", "y", "x0", "x1"}.
+static func _paint_landmark(im: Image, kind: String, info: Dictionary, cx: int, s: float, l: int, into: int, pal: Dictionary, rng: RandomNumberGenerator, peak := {}) -> Array[Dictionary]:
 	var c := _body(pal, maxi(into, 0))
 	if kind == "sierra_crest":
 		c = _body(pal, 0)
@@ -379,6 +395,11 @@ static func _paint_landmark(im: Image, kind: String, info: Dictionary, cx: int, 
 	for i in w:
 		var u := (float(i) / maxf(w - 1, 1)) * 2.0 - 1.0
 		tops[i] = base - int(_profile(kind, u, int(i / s), rng) * h)
+	var summit := 0
+	for i in w:
+		if tops[i] < tops[summit]:
+			summit = i
+	peak.merge({"x": x0 + summit, "y": tops[summit] if w > 0 else base, "x0": x0, "x1": x0 + w}, true)
 	var falls: Array[Dictionary] = []
 	var tree_h := 3 + int(s * 1.6) + (1 if l == 2 else 0)
 	var treeline := _treeline(tops, base, h, 0.14 if kind != "glacier_point" else 0.3)
@@ -478,12 +499,12 @@ static func _details(im: Image, kind: String, x0: int, w: int, h: int, tops: Pac
 			# A bright edge down the prow, with its crack just inside.
 			for y in range(tops[int(w * 0.03)] + 1, base - 2):
 				_px(im, x0 + int(w * 0.047), y, c.hi if y % 9 != 0 else c.lit)
-		"yosemite_falls", "bridalveil", "sentinel_rock", "washington_column", "glacier_point", "three_brothers", "cathedral_rocks", "royal_arches", "clouds_rest", "north_dome", "liberty_cap", "nevada_fall":
+		"yosemite_falls", "bridalveil", "sentinel_rock", "washington_column", "glacier_point", "three_brothers", "cathedral_rocks", "royal_arches", "clouds_rest", "north_dome", "liberty_cap", "nevada_fall", "mt_watkins", "mt_starr_king", "vernal_fall", "illilouette_fall", "north_rim":
 			var n := 4 if kind != "north_dome" else 2
 			_ledges(im, x0, tops, base, h, c, rng, n, 0.25, 0.8, 5, 16)
 			if kind in ["yosemite_falls", "bridalveil", "sentinel_rock", "glacier_point"]:
 				_streaks(im, x0, tops, base, c, rng, int(w * 0.1), int(w * 0.9), 5, c.shade, 0.15, 0.5, false)
-		"cockscomb", "unicorn_peak", "echo_peaks", "matthes_crest", "mt_lyell", "mt_maclure":
+		"cockscomb", "unicorn_peak", "echo_peaks", "matthes_crest", "mt_lyell", "mt_maclure", "mt_hoffmann", "mt_clark", "mt_florence":
 			# Gullies and joints between the spires.
 			_streaks(im, x0, tops, base, c, rng, 4, w - 5, 7 + w / 30, c.deep, 0.1, 0.5, false)
 			_ledges(im, x0, tops, base, h, c, rng, 4, 0.2, 0.7, 4, 10)
@@ -563,6 +584,17 @@ static func _after_trees(im: Image, kind: String, x0: int, w: int, h: int, tops:
 			# The river reaches the lip, then drops with a bend halfway.
 			_rect(im, fx4 - 10, lip - 1, 11, 1, c.water_edge)
 			falls.append(_fall(im, fx4, lip, base - int(h * 0.04), c, 2.0, 2, true))
+		"vernal_fall":
+			# A broad curtain over a square-cut lip.
+			var fx5 := x0 + int(w * 0.5)
+			var lip5 := tops[clampi(fx5 - x0, 0, w - 1)]
+			_rect(im, fx5 - 6, lip5 - 1, 9, 1, c.water_edge)
+			falls.append(_fall(im, fx5 - 1, lip5, base - int(h * 0.06), c, 0.0, 3, true))
+		"illilouette_fall":
+			# Down the back of its cleft, half hidden by the gorge's walls.
+			var fx6 := x0 + int(w * 0.5)
+			var ft6 := tops[clampi(fx6 - x0, 0, w - 1)] + 1
+			falls.append(_fall(im, fx6, ft6, base - int(h * 0.12), c, 1.0, 2, true))
 
 
 ## A sawtooth ridge: pointed teeth of random heights, 0..1.
@@ -690,6 +722,41 @@ static func _profile(kind: String, u: float, i: int, rng: RandomNumberGenerator)
 			return pow(maxf(1.0 - absf(u + 0.1) * 1.1, 0.0), 1.2) * (0.92 + 0.08 * sin(u * 15.0))
 		"donohue_pass":
 			return pow(maxf(1.0 - u * u, 0.0), 0.9) * (0.7 + 0.3 * sin(u * 5.0 + 1.0))
+		"north_rim":
+			# The Valley's north wall east of the falls: a long rim that rises
+			# to Yosemite Point, with Indian Canyon's notch further east.
+			var walls := smoothstep(-1.0, -0.85, u) * (1.0 - smoothstep(0.85, 1.0, u))
+			var level := 0.84 + 0.12 * _hump(u, 0.12, 0.5, 1.0) - 0.2 * (1.0 - smoothstep(0.0, 0.1, absf(u - 0.62)))
+			return maxf(walls * level * (0.98 + 0.02 * sin(u * 19.0)), 0.0)
+		"mt_hoffmann":
+			# A broad granite table with a craggy crest at its west end.
+			var body := pow(maxf(1.0 - pow(absf(u + 0.05), 2.2), 0.0), 0.6) * 0.82
+			var crag := pow(maxf(1.0 - absf(u + 0.38) * 3.2, 0.0), 1.3) * (0.22 + 0.12 * _teeth(i, 9.0, 4))
+			return clampf(body + crag, 0.0, 1.0)
+		"mt_watkins":
+			# A round crown over the sheer granite it shows Tenaya Canyon.
+			return pow(maxf(1.0 - pow(absf(u + 0.12), 2.2), 0.0), 0.7) * (0.94 + 0.06 * sin(u * 6.0))
+		"mt_starr_king":
+			# A smooth, steep bald dome with two smaller ones at its foot.
+			var main := pow(maxf(1.0 - pow(absf(u - 0.1), 1.7), 0.0), 0.85)
+			var low := pow(maxf(1.0 - absf(u + 0.62) * 2.8, 0.0), 0.8) * 0.42
+			return maxf(main, low)
+		"mt_clark":
+			# A sharp fin of the Clark Range, a ragged ridge falling away.
+			var fin := pow(maxf(1.0 - absf(u - 0.05) * 1.1, 0.0), 1.15) * (0.96 + 0.04 * sin(u * 23.0))
+			var arete := (0.3 + 0.12 * _teeth(i, 8.0, 6)) * clampf(1.0 - absf(u) * 0.75, 0.0, 1.0)
+			return maxf(fin, arete)
+		"mt_florence":
+			return pow(maxf(1.0 - absf(u), 0.0), 1.05) * (0.94 + 0.06 * sin(u * 13.0)) + 0.06 * _teeth(i, 11.0, 5) * (1.0 - absf(u))
+		"vernal_fall":
+			# A squared-off granite step, the river spilling over its middle.
+			var step2 := smoothstep(-1.0, -0.7, u) * (1.0 - smoothstep(0.7, 1.0, u))
+			return maxf(step2 * (0.96 + 0.04 * sin(u * 7.0)) - 0.06 * (1.0 - smoothstep(0.0, 0.16, absf(u))), 0.0)
+		"illilouette_fall":
+			# Two shoulders of the gorge and the deep cleft between them.
+			var walls := smoothstep(-1.0, -0.6, u) * (1.0 - smoothstep(0.6, 1.0, u))
+			var cleft := 0.5 * (1.0 - smoothstep(0.0, 0.3, absf(u)))
+			return maxf(walls * (0.9 + 0.1 * u) - cleft, 0.0)
 		"sierra_crest":
 			var t := 0.42 + 0.22 * sin(u * 7.0) + 0.12 * sin(u * 17.0 + 1.0) + 0.2 * _teeth(i, 17.0, 2)
 			return clampf(t, 0.05, 1.0)
@@ -743,7 +810,8 @@ static func _snow(im: Image, x0: int, w: int, tops: PackedInt32Array, base: int,
 ## The valley floor (or high-country basin) far below: forest canopy, meadow,
 ## river glints, roads, buildings. Painted as seen from a long way up: small
 ## and hazy at the far edge, bigger and richer toward the bottom.
-static func _floor(im: Image, kind: String, pal: Dictionary, rng: RandomNumberGenerator) -> void:
+## [param ox] slides the village and its meadows along a wide panorama.
+static func _floor(im: Image, kind: String, pal: Dictionary, rng: RandomNumberGenerator, ox := 0) -> void:
 	var w := im.get_width()
 	var h := im.get_height()
 	var top := 130 + PAD
@@ -803,7 +871,7 @@ static func _floor(im: Image, kind: String, pal: Dictionary, rng: RandomNumberGe
 		"moraine":
 			meadow_list = [Vector3i(120, top + 90, 40), Vector3i(330, top + 120, 50)]
 		"curry", "camp4", "ahwahnee":
-			meadow_list = [Vector3i(320, top + 90, 60), Vector3i(300, top + 52, 50), Vector3i(430, top + 100, 50), Vector3i(120, top + 70, 60)]
+			meadow_list = [Vector3i(320 + ox, top + 90, 60), Vector3i(300 + ox, top + 52, 50), Vector3i(430 + ox, top + 100, 50), Vector3i(120 + ox, top + 70, 60)]
 		_:
 			for i in 4:
 				meadow_list.append(Vector3i(rng.randi_range(40, w - 80), rng.randi_range(top + 40, top + 110), rng.randi_range(30, 64)))
@@ -863,7 +931,7 @@ static func _floor(im: Image, kind: String, pal: Dictionary, rng: RandomNumberGe
 	match kind:
 		"curry":
 			_roads(im, top + 38, pal, w)
-			_curry(im, top, pal, night, rng)
+			_curry(im, top, pal, night, rng, ox)
 		"camp4":
 			_roads(im, top + 38, pal, w)
 			_camp4(im, top, pal, night, rng)
@@ -961,27 +1029,27 @@ static func _tent(im: Image, x: int, y: int, col: Color, pal: Dictionary, night:
 
 ## Curry Village: tidy rows of canvas tent-cabins under the pines, with the
 ## dining pavilion and a lit window or two at night.
-static func _curry(im: Image, top: int, pal: Dictionary, night: bool, rng: RandomNumberGenerator) -> void:
+static func _curry(im: Image, top: int, pal: Dictionary, night: bool, rng: RandomNumberGenerator, ox := 0) -> void:
 	var roofs := _roof_cols(pal)
 	var canvas := _lit(Color("e4ddcc"), pal, 0.3, 0.1)
 	var tan := _lit(Color("d6bd88"), pal, 0.2, 0.1)
 	for row in 3:
 		for k in 8:
-			var x := 300 + k * 9 + row * 3
+			var x := ox + 300 + k * 9 + row * 3
 			var y := top + 56 + row * 12
 			var rc: Color = roofs[(k + row) % 4]
 			_cabin(im, x, y, rc, canvas if (k + row) % 2 == 0 else tan, night, pal)
 		# Paths between the rows.
-		_rect(im, 297 + row * 3, top + 62 + row * 12, 84, 1, _lit(Color("d6bd88"), pal, 0.25, 0.12))
+		_rect(im, ox + 297 + row * 3, top + 62 + row * 12, 84, 1, _lit(Color("d6bd88"), pal, 0.25, 0.12))
 	# The pavilion and the Village store, bigger roofs near the road.
-	_rect(im, 392, top + 44, 16, 2, roofs[1])
-	_rect(im, 390, top + 46, 20, 4, tan)
-	_rect(im, 394, top + 47, 2, 2, Color("f1cf6a") if night else _lit(Color("235679"), pal, 0.1, 0.1))
-	_rect(im, 398, top + 47, 2, 2, Color("f1cf6a") if night else _lit(Color("235679"), pal, 0.1, 0.1))
-	_rect(im, 390, top + 50, 20, 1, _lit(Color("12291d"), pal, 0.1, 0.05))
+	_rect(im, ox + 392, top + 44, 16, 2, roofs[1])
+	_rect(im, ox + 390, top + 46, 20, 4, tan)
+	_rect(im, ox + 394, top + 47, 2, 2, Color("f1cf6a") if night else _lit(Color("235679"), pal, 0.1, 0.1))
+	_rect(im, ox + 398, top + 47, 2, 2, Color("f1cf6a") if night else _lit(Color("235679"), pal, 0.1, 0.1))
+	_rect(im, ox + 390, top + 50, 20, 1, _lit(Color("12291d"), pal, 0.1, 0.05))
 	# Parked cars.
 	for k in 5:
-		_rect(im, 420 + k * 5, top + 52, 3, 2, [Color("b3362b"), Color("e4ddcc"), Color("6f5aa6"), Color("47464d"), Color("d8a63b")][k])
+		_rect(im, ox + 420 + k * 5, top + 52, 3, 2, [Color("b3362b"), Color("e4ddcc"), Color("6f5aa6"), Color("47464d"), Color("d8a63b")][k])
 
 
 ## Camp 4: a clearing of small colorful tents, picnic tables and fire pits.

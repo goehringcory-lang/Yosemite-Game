@@ -64,6 +64,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/glacier/snack_stand_glow.png" id="62_i623a"]
 [ext_resource type="Script" path="res://scripts/world/night_glow.gd" id="63_mh5p0"]
 [ext_resource type="Texture2D" path="res://assets/sprites/glacier/restrooms_glow.png" id="64_vlbcw"]
+[ext_resource type="Script" uid="uid://i0wunuiki2ah" path="res://scripts/objects/scenic_viewer.gd" id="65_scnvw"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p8una"]
 size = Vector2(32, 8)
@@ -1301,6 +1302,15 @@ shader_parameter/falls = PackedVector4Array(300, 60, 304, 256, 308, 272, 312, 32
 shader_parameter/fall_widths = PackedVector2Array(3, 7, 1.6, 2.4, 2.4, 4.4, 5, 9, 5, 6, 2, 4)
 shader_parameter/fall_count = 6
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_view59"]
+size = Vector2(28, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_view63"]
+size = Vector2(28, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_view68"]
+size = Vector2(28, 44)
+
 [node name="GlacierPoint" type="Node2D" unique_id=360390980]
 y_sort_enabled = true
 script = ExtResource("1_erso0")
@@ -2001,6 +2011,8 @@ shape = SubResource("RectangleShape2D_ymaay")
 [node name="Viewer59" type="StaticBody2D" parent="Entities" unique_id=579821772]
 position = Vector2(1904, 224)
 collision_mask = 0
+script = ExtResource("65_scnvw")
+facing = 330.0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Viewer59" unique_id=1256433116]
 texture = ExtResource("10_r8lxu")
@@ -2010,9 +2022,20 @@ offset = Vector2(0, -22)
 position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_bvt6q")
 
+[node name="Hitbox" type="Area2D" parent="Entities/Viewer59" unique_id=899723085]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="Entities/Viewer59/Hitbox" unique_id=809638020]
+position = Vector2(0, -22)
+shape = SubResource("RectangleShape2D_view59")
+
 [node name="Viewer63" type="StaticBody2D" parent="Entities" unique_id=804379693]
 position = Vector2(2032, 160)
 collision_mask = 0
+script = ExtResource("65_scnvw")
+facing = 65.0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Viewer63" unique_id=1469961403]
 texture = ExtResource("10_r8lxu")
@@ -2022,9 +2045,20 @@ offset = Vector2(0, -22)
 position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_mgsbc")
 
+[node name="Hitbox" type="Area2D" parent="Entities/Viewer63" unique_id=1266778563]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="Entities/Viewer63/Hitbox" unique_id=423447518]
+position = Vector2(0, -22)
+shape = SubResource("RectangleShape2D_view63")
+
 [node name="Viewer68" type="StaticBody2D" parent="Entities" unique_id=251788114]
 position = Vector2(2192, 256)
 collision_mask = 0
+script = ExtResource("65_scnvw")
+facing = 100.0
 
 [node name="Sprite" type="Sprite2D" parent="Entities/Viewer68" unique_id=1516974689]
 texture = ExtResource("10_r8lxu")
@@ -2033,6 +2067,15 @@ offset = Vector2(0, -22)
 [node name="Collision" type="CollisionShape2D" parent="Entities/Viewer68" unique_id=1868675917]
 position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_fvj27")
+
+[node name="Hitbox" type="Area2D" parent="Entities/Viewer68" unique_id=1084035045]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="Entities/Viewer68/Hitbox" unique_id=1036701119]
+position = Vector2(0, -22)
+shape = SubResource("RectangleShape2D_view68")
 
 [node name="FirefallSign" type="StaticBody2D" parent="Entities" unique_id=167400478]
 position = Vector2(2224, 384)
