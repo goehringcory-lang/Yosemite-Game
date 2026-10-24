@@ -37,6 +37,50 @@ static func attach_waterfalls(region: Region) -> void:
 		place.add_child(make("waterfall", 720.0, 1.0))
 
 
+## Rivers and creeks: the Merced, the Tuolumne, Tenaya Creek. A soft loop of
+## running water at the river tile nearest the middle of each RIVER_BLOCK of
+## the map that has river in it, so walking along the bank you're never out
+## of earshot and the sound doesn't stack up. Done once, when a region first
+## loads; regions with no river (or no tiles) get nothing.
+const RIVER_BLOCK := 14
+const RIVER_REACH := 460.0
+const RIVER_LEVEL := 0.6
+const _Terrain := preload("res://tools/mapgen/terrain.gd")
+
+
+static func attach_rivers(region: Region) -> void:
+	if region.indoors or not region.find_children("Sound_river*", "", true, false).is_empty():
+		return
+	var ground := region.get_ground()
+	if ground == null:
+		return
+	# block -> [best cell, its distance to the block's middle]
+	var best := {}
+	for cell in ground.get_used_cells():
+		if ground.get_cell_source_id(cell) != ForageSpawner.SOURCE_TERRAIN:
+			continue
+		var kind := ground.get_cell_atlas_coords(cell).y
+		if kind != _Terrain.RIVER and kind != _Terrain.CREEK:
+			continue
+		var block := Vector2i(floori(cell.x / float(RIVER_BLOCK)), floori(cell.y / float(RIVER_BLOCK)))
+		var middle := Vector2(block) * RIVER_BLOCK + Vector2.ONE * RIVER_BLOCK / 2.0
+		var d := Vector2(cell).distance_squared_to(middle)
+		if not best.has(block) or d < best[block][1]:
+			best[block] = [cell, d]
+	# where a river runs along a block's edge, two blocks' picks can sit side
+	# by side: keep the first and drop any within half a block of it
+	var placed: Array[Vector2i] = []
+	for block: Vector2i in best:
+		var cell: Vector2i = best[block][0]
+		if placed.any(func(other: Vector2i) -> bool: return Vector2(other).distance_to(Vector2(cell)) < RIVER_BLOCK / 2.0):
+			continue
+		placed.append(cell)
+		var emitter := make("river", RIVER_REACH, RIVER_LEVEL)
+		emitter.name = "Sound_river_%d_%d" % [block.x, block.y]
+		emitter.position = ground.to_global(ground.map_to_local(cell)) - region.global_position
+		region.add_child(emitter)
+
+
 func _ready() -> void:
 	bus = Sound.BUS_AMBIENCE
 	stream = Sound.loop_stream(sound)

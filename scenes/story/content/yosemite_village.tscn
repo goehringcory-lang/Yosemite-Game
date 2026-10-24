@@ -23,6 +23,7 @@
 [node name="DickLeonard" parent="." instance=ExtResource("1_r")]
 character = ExtResource("2_r")
 spot = "camp_4"
+timetable = PackedStringArray("6:00 camp_4", "17:00 village_store", "18:30 camp_4_fire", "22:30 camp_4")
 offset = Vector2(32, -48)
 
 [node name="SwanSlab" parent="." instance=ExtResource("3_r")]
@@ -32,6 +33,7 @@ route = ExtResource("4_r")
 [node name="JohnSalathe" parent="." instance=ExtResource("1_r")]
 character = ExtResource("8_r")
 spot = "camp_4"
+timetable = PackedStringArray("6:00 camp_4", "7:00 degnans_bakery", "8:30 camp_4", "19:00 camp_4_fire", "22:00 camp_4")
 offset = Vector2(-108, -14)
 
 [node name="VisitorDirtbag" parent="." instance=ExtResource("1_r")]
@@ -44,11 +46,13 @@ timetable = PackedStringArray("7:00 camp_4", "9:00 lower_yosemite_fall", "12:30 
 [node name="BridgetDegnan" parent="." instance=ExtResource("1_r")]
 character = ExtResource("10_r")
 spot = "degnans_bakery"
+timetable = PackedStringArray("5:30 degnans_bakery", "18:00 cooks_meadow", "19:30 degnans_bakery")
 offset = Vector2(0, 48)
 
 [node name="AnselAdams" parent="." instance=ExtResource("1_r")]
 character = ExtResource("11_r")
 spot = "bests_studio"
+timetable = PackedStringArray("6:00 bests_studio", "6:30 cooks_meadow", "9:30 bests_studio", "17:30 cooks_meadow", "20:00 bests_studio")
 offset = Vector2(0, 48)
 wander_radius = 32
 
@@ -72,6 +76,7 @@ stays = 1
 [node name="ClareHodges" parent="." instance=ExtResource("1_r")]
 character = ExtResource("13_r")
 spot = "ranger_station"
+timetable = PackedStringArray("6:00 ranger_station", "7:30 camp_4", "9:00 ranger_station", "15:30 lower_yosemite_fall", "17:00 ranger_station", "19:30 camp_4_fire", "21:30 ranger_station")
 offset = Vector2(0, 48)
 wander_radius = 40
 

@@ -13,10 +13,14 @@ extends StaticBody2D
 
 
 var _marker: QuestMarker
+## While trading: their lines show emotes over their head (on_line).
+var _talking := false
+var _last_emote := ""
 
 
 func _ready() -> void:
 	queue_redraw()
+	add_to_group("talkers")
 	if shop and shop.talk_target != "":
 		_marker = QuestMarker.new(shop.talk_target)
 		add_child(_marker)
@@ -39,6 +43,17 @@ func _draw() -> void:
 	draw_rect(Rect2(-10, -42, 20, 4), color.darkened(0.3))
 	draw_rect(Rect2(-8, -6, 6, 6), Color(0.25, 0.22, 0.28))
 	draw_rect(Rect2(2, -6, 6, 6), Color(0.25, 0.22, 0.28))
+
+
+## A line was shown (DialogueBox.say): if it's the keeper's, the feeling of
+## it pops up over their head, as people's do (NPC.on_line).
+func on_line(speaker: String, text: String, mood: String) -> void:
+	if not _talking or shop == null or speaker != shop.keeper:
+		return
+	var kind := Emote.for_line(text, mood)
+	if kind != "" and kind != _last_emote:
+		Emote.pop(self, kind)
+		_last_emote = kind
 
 
 func get_prompt() -> String:
@@ -109,6 +124,8 @@ func interact(player: Player) -> void:
 	if shop and shop.talk_target != "":
 		Friendship.note_talk(shop.talk_target)
 	player.can_act = false
+	_talking = true
+	_last_emote = ""
 	if _marker:
 		_marker.hidden_while_talking = true
 		_marker.refresh()
@@ -148,6 +165,7 @@ func interact(player: Player) -> void:
 			await box.say([{"speaker": shop.keeper, "text": "Deal. You hand over %s and get %s." % [Barter.describe(paid), offer_name(offer)]}])
 	box.close()
 	player.can_act = true
+	_talking = false
 	if _marker:
 		_marker.hidden_while_talking = false
 		_marker.refresh()
