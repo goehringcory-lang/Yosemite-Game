@@ -11,6 +11,9 @@ uniform float frost : hint_range(0.0, 1.0) = 0.0;
 // the painted wildflower dots are painted over with this colour (alpha 0 keeps them)
 uniform vec4 flower_fill : source_color = vec4(0.0);
 uniform vec3 frost_color : source_color = vec3(0.9, 0.94, 0.97);
+// Moving light on the painted water: bands of brighter ripples drifting with
+// the current and glints that wink on and off (0 leaves the water still).
+uniform float water_shimmer : hint_range(0.0, 1.0) = 0.0;
 
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
@@ -29,6 +32,8 @@ void fragment() {
 	float lum = dot(c.rgb, vec3(0.299, 0.587, 0.114));
 	float grass = clamp((c.g - max(c.r, c.b)) * 10.0, 0.0, 1.0);
 	float water = clamp((c.b - c.g) * 10.0, 0.0, 1.0) * step(c.r, c.g); // cyan-blue only, not purple or pink
+	// the Merced's teal: blue nearly as strong as green, both well above red
+	water = max(water, clamp((c.b / max(c.g, 0.001) - 0.8) * 8.0, 0.0, 1.0) * step(c.r + 0.06, c.g) * step(c.r + 0.04, c.b));
 	vec3 rgb = c.rgb;
 	float mx = max(c.r, max(c.g, c.b));
 	float sat = (mx - min(c.r, min(c.g, c.b))) / max(mx, 0.001);
@@ -46,6 +51,14 @@ void fragment() {
 	float cover = frost * (0.08 + 0.92 * grass) * (1.0 - water);
 	float f = step(1.0 - cover, n);
 	rgb = mix(rgb, frost_color * (0.85 + lum * 0.25), f * 0.6);
+	if (water_shimmer > 0.0 && water > 0.5) {
+		float t = TIME;
+		float band = sin(px.x * 0.19 - t * 1.4 + sin(px.y * 0.31 + t * 0.5) * 2.2) * sin(px.y * 0.47 + t * 0.8 + px.x * 0.05);
+		float lit = step(0.8, band) * (0.5 + 0.5 * step(0.5, hash(px + floor(t * 3.0))));
+		float dark = step(band, -0.88);
+		float glint = step(0.996, hash(px + vec2(floor(t * 2.5), 0.0))) * step(0.38, lum);
+		rgb += (vec3(0.07, 0.09, 0.08) * lit - vec3(0.025) * dark + vec3(0.35) * glint) * water_shimmer;
+	}
 	if (flower > 0.5 && flower_fill.a > 0.0) {
 		rgb = flower_fill.rgb * (0.9 + 0.2 * hash(px));
 	}

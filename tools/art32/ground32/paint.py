@@ -203,7 +203,7 @@ class Painter:
         road_m, self.road_b = self._smooth_mask(g == ROAD, 14)
         K = np.where(road_m, ROAD, K)
         wet_tiles = np.isin(g, WATER_SET)
-        wet_m, self.wet_b = self._smooth_mask(wet_tiles, 9, (self.Nl - 0.5) * 0.3 + (self.Nm - 0.5) * 0.12)
+        wet_m, self.wet_b = self._smooth_mask(wet_tiles, 10, (self.Nl - 0.5) * 0.36 + (self.Nm - 0.5) * 0.2)
         wet_kind = self._fill_nearest(wet_tiles, g, 3)
         K = np.where(wet_m, F.upsample(np.maximum(wet_kind, 0), T), K)
         bridge_m, _ = self._smooth_mask(g == BRIDGE, 3)
@@ -233,7 +233,7 @@ class Painter:
         self.canopy = shadows.canopy_field(self.d, self.H, self.W, ROOT, 0.5)
         if forest == "forest":
             # Duff under the crowns, grass in the openings between them.
-            self.green = isf & (P * 0.7 + (1.0 - self.canopy) * 0.5 > 0.66)
+            self.green = isf & (P * 0.95 + (1.0 - self.canopy) * 0.32 + (self.Nm - 0.5) * 0.25 > 0.7)
         elif forest == "orchard":
             self.green = isf & (P > 0.28)
         else:
@@ -256,8 +256,8 @@ class Painter:
         M[K == TRAIL] = MAT["trail"]
         M[np.isin(K, (ROAD, PARKING))] = MAT["asphalt"]
         M[np.isin(K, (PAVED, BUILT, BRIDGE))] = MAT["concrete"]
-        M[np.isin(K, (RIVER, CREEK, FALLS))] = MAT["water"]
-        M[K == LAKE] = MAT["lake"]
+        # One water for river, creek and lake, so where they meet there is no seam.
+        M[np.isin(K, (RIVER, CREEK, FALLS, LAKE))] = MAT["water"]
         return M
 
     def macro(self, base: float, steps=(0.42, 0.64), lo: float = 0.0) -> np.ndarray:
@@ -402,17 +402,30 @@ class Painter:
         dots(4, np.where(self.Np > 0.55, 0.4, 0.05).astype(np.float32), 112, slab, LICHEN)
         tal = gr & np.isin(K, (TALUS, SCREE))
         if tal.any():
+            # Talus: angular blocks of every size lying on grey grit, each lit
+            # on its upper left, dark on its lower right, with its shadow on
+            # the grit beside it.
             ys, xs = np.nonzero(tal)
             y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
-            bid, d1, gap, bdx, bdy = F.voronoi(y1 - y0, x1 - x0, 9, s + 120)
-            size = F.hash2(bid, bid * 7, s + 122)
-            lit = (-bdx - bdy) / 9.0
-            base = 4.6 + (F.hash2(bid, bid * 3, s + 121) - 0.5) * 2.0
-            t = base + np.where(lit > 0.25, 1.5, np.where(lit < -0.35, -1.2, 0.0))
-            t = np.where(gap < 1.2 + size * 0.8, 1.0, t)
             sub = tal[y0:y1, x0:x1]
+            hh, ww = y1 - y0, x1 - x0
+            grit = 3.0 + (self.Ns[y0:y1, x0:x1] > 0.55) + (self.R[y0:y1, x0:x1] > 0.9) - (self.R[y0:y1, x0:x1] < 0.08)
+            t = grit.copy()
+            for cell, seed, keep in ((13, 120, 0.62), (7, 124, 0.45)):
+                bid, d1, gap, bdx, bdy = F.voronoi(hh, ww, cell, s + seed)
+                on = F.hash2(bid, bid * 7, s + seed + 1) < keep
+                size = 0.32 + F.hash2(bid, bid * 3, s + seed + 2) * 0.16
+                inside = on & (np.maximum(np.abs(bdx), np.abs(bdy)) * 0.55 + d1 * 0.45 < cell * size)
+                base = 5.0 + np.floor(F.hash2(bid, bid * 5, s + seed + 3) * 2.0)
+                lit = (-bdx - bdy) / cell
+                bt = base + (lit > 0.12) * 1.5 - (lit < -0.22) * 1.5
+                # the shadow each block throws down and to the right
+                shadow = np.zeros_like(inside)
+                shadow[2:, 2:] = inside[:-2, :-2]
+                t = np.where(shadow & ~inside, np.minimum(t, 1.5), t)
+                t = np.where(inside, bt, t)
             tone[y0:y1, x0:x1][sub] = t[sub]
-            dots(6, 0.25, 123, tal, LICHEN)
+            dots(6, 0.22, 123, tal, LICHEN)
 
         # ---- asphalt: roads and lots
         asp = m("asphalt")
@@ -461,10 +474,12 @@ class Painter:
         lk = m("lake")
         D = self.depth
         creek = wa & (K == CREEK)
-        wt = 8.4 - D * 6.2 + (self.Nl - 0.5) * 1.0
+        wt = 8.4 - D * 4.6 + (self.Nl - 0.5) * 1.0
         tone[wa] = wt[wa]
-        tone[creek] += 1.2
-        tone[lk] = (7.0 - D * 5.5 + (self.Nl - 0.5) * 0.8)[lk]
+        # creeks run shallower and paler, blending into the river or lake they join
+        cb = F.blur((K == CREEK).astype(np.float32), 10)
+        tone[wa] += (cb * 1.2)[wa]
+        tone[lk] = (7.0 - D * 3.8 + (self.Nl - 0.5) * 0.8)[lk]
         # The bed shows through the shallows: cobbles.
         shallow = (wa | lk) & (D < np.where(creek, 0.8, 0.55))
         if shallow.any():
@@ -477,7 +492,9 @@ class Painter:
             sub = shallow[y0:y1, x0:x1]
             tone[y0:y1, x0:x1][sub] += t[sub]
         zone = self.Nm > 0.52
-        moving = wa & zone
+        # still water (the lake, and a little way into the stream beside it)
+        stillw = F.blur((K == LAKE).astype(np.float32), 12) > 0.3
+        moving = wa & zone & ~stillw
         ys, xs, pick = F.scatter(H, W, 3, 0.6, s + 152, moving)
         for i, stp in enumerate(STREAK_H):
             sel = ((pick * len(STREAK_H)).astype(int) == i) & ~self.flow_v[ys, xs]
@@ -485,8 +502,9 @@ class Painter:
         for i, stp in enumerate(STREAK_V):
             sel = ((pick * len(STREAK_V)).astype(int) == i) & self.flow_v[ys, xs]
             F.apply_tone(tone, wa, ys[sel], xs[sel], stp)
-        dots(9, 0.35, 153, wa & zone & (D > 0.15), GLINT)
-        dots(15, 0.2, 154, lk & (D > 0.2), [GLINT[1]])
+        dots(11, 0.22, 153, wa & zone & (D > 0.15) & (D < 0.7) & ~stillw, GLINT)
+        dots(21, 0.12, 156, wa & stillw & (D > 0.2) & (D < 0.6), [GLINT[1]])
+        dots(21, 0.12, 154, lk & (D > 0.2) & (D < 0.6), [GLINT[1]])
         falls = wa & (K == FALLS)
         if falls.any():
             dots(2, 0.5, 155, falls, [S(["f"], {"f": "foam"}), S(["f"], {"f": "foam_lo"})])
@@ -697,6 +715,21 @@ class Painter:
             else:
                 ends = (g[y0:y1, max(x0 - 1, 0)] == ROAD).any() and (g[y0:y1, min(x1, self.tw - 1)] == ROAD).any()
             road = bool(ends)
+            beside_road = np.isin(g[max(y0 - 1, 0):y1 + 1, max(x0 - 1, 0):x1 + 1], (ROAD,)).any()
+            if not road and beside_road:
+                # A parapet beside a road bridge: a granite wall, lit on top.
+                py0, py1, px0, px1 = y0 * T, y1 * T, x0 * T, x1 * T
+                sub_t = tone[py0:py1, px0:px1]
+                M[py0:py1, px0:px1] = MAT["granite"]
+                yy, xx = np.mgrid[py0:py1, px0:px1]
+                block = F.hash2(xx // 8 + (yy // 5) * 3, yy // 5, self.seed + 183)
+                sub_t[:] = 5.0 + (block > 0.6) - (block < 0.2)
+                sub_t[(xx + (yy // 5) * 4) % 8 == 0] = 3.0
+                sub_t[yy % 5 == 0] = 3.0
+                sub_t[yy == py0] = 7.0
+                sub_t[yy == py1 - 1] = 2.0
+                over_m[py0:py1, px0:px1] = False
+                continue
             py0, py1, px0, px1 = y0 * T, y1 * T, x0 * T, x1 * T
             if vertical:
                 px0 += 2

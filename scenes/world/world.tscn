@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="14_2x71e"]
 [ext_resource type="Script" path="res://scripts/world/weather.gd" id="15_wthr"]
 [ext_resource type="Script" path="res://scripts/world/cloud_shadows.gd" id="16_cldsh"]
+[ext_resource type="Script" path="res://scripts/world/atmosphere.gd" id="17_atmos"]
 
 [sub_resource type="Gradient" id="Gradient_26xou"]
 offsets = PackedFloat32Array(0, 0.19, 0.25, 0.29, 0.34, 0.5, 0.67, 0.73, 0.77, 0.81, 0.86, 0.9, 1)
@@ -27,6 +28,9 @@ script = ExtResource("16_cldsh")
 
 [node name="Weather" type="Node2D" parent="." unique_id=1735260195]
 script = ExtResource("15_wthr")
+
+[node name="Atmosphere" type="CanvasLayer" parent="." unique_id=1735260196]
+script = ExtResource("17_atmos")
 
 [node name="HUD" parent="." unique_id=1500331796 instance=ExtResource("14_2x71e")]
 

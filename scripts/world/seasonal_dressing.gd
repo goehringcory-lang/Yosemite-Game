@@ -15,6 +15,9 @@ const SEASON_DIR := SPRITE_DIR + "seasons/"
 const SEASON_NAMES := ["spring", "summer", "fall", "winter"]
 const GROUND_SHADER := preload("res://assets/shaders/seasonal_ground.gdshader")
 
+## Regions whose painted water keeps still (their ground predates the moving water).
+const STILL_WATER := ["tuolumne_meadows"]
+
 ## Sprites with no place in a season: they are hidden, not swapped.
 const HIDDEN_IN_WINTER := [
 	"plant_lupine", "plant_paintbrush", "plant_wildflowers_a", "plant_wildflowers_b",
