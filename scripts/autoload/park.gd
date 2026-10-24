@@ -42,6 +42,9 @@ signal hub_unlocked(id: String)
 var routes: Array[Dictionary] = []
 ## Ids of hubs opened during play (see HubData.starts_locked).
 var unlocked_hubs: Dictionary = {}
+## Peaks and falls picked out through Glacier Point's viewers (BinocularView
+## ids), so the viewer's tally carries over.
+var spotted_peaks: Dictionary = {}
 
 var _hubs_by_id: Dictionary = {}
 
@@ -55,6 +58,7 @@ func _ready() -> void:
 
 func start_new_game() -> void:
 	unlocked_hubs.clear()
+	spotted_peaks.clear()
 
 
 func get_hub(id: String) -> HubData:
@@ -141,13 +145,16 @@ static func format_minutes(minutes: int) -> String:
 
 
 func save_data() -> Dictionary:
-	return {"unlocked_hubs": unlocked_hubs.keys()}
+	return {"unlocked_hubs": unlocked_hubs.keys(), "spotted_peaks": spotted_peaks.keys()}
 
 
 func load_data(data: Dictionary) -> void:
 	unlocked_hubs.clear()
 	for id in data.get("unlocked_hubs", []):
 		unlocked_hubs[str(id)] = true
+	spotted_peaks.clear()
+	for id in data.get("spotted_peaks", []):
+		spotted_peaks[str(id)] = true
 
 
 func _date_index(season: int, day: int) -> int:

@@ -265,8 +265,15 @@ func _place_overlook() -> void:
 		"7,214 feet. The Valley floor is 3,200 feet straight down. Across the canyon: Half Dome, and to its right Liberty Cap and Nevada Fall, with Vernal Fall below. Below you, Curry Village and the Merced.")
 	_info_sign("HalfDomeSign", foot(66, 6), "Half Dome",
 		"8,842 feet, 4,800 feet above the Valley. Its sheer northwest face broke away along vertical cracks in the granite, and the glaciers below carried the fallen rock off. The cables up its back go up in late May.")
-	for v: Array in [[59, 6], [63, 4], [68, 7]]:
-		decor("Viewer%d" % v[0], G + "viewer.png", foot(v[0], v[1]), Vector2(6, 4))
+	# The coin-operated viewers: look through one and it names what you see
+	# (BinocularView). Each starts pointed its own way: Yosemite Falls from
+	# the west side, Half Dome from the tip, the falls of the Merced from the
+	# east.
+	for v: Array in [[59, 6, 330.0], [63, 4, 65.0], [68, 7, 100.0]]:
+		var viewer := decor("Viewer%d" % v[0], G + "viewer.png", foot(v[0], v[1]), Vector2(6, 4))
+		viewer.set_script(load("res://scripts/objects/scenic_viewer.gd"))
+		viewer.set("facing", v[2])
+		_hitbox(viewer, Vector2(14, 22))
 	# The Firefall: McCauley's crew pushed the embers off just east of here.
 	_info_sign("FirefallSign", foot(69, 11), "The Firefall",
 		"On summer nights from 1872 until 1968, glowing embers of red fir bark were pushed off this cliff, and fell like a waterfall of fire to the cheers from Camp Curry below. James McCauley of the Mountain House began it. The Park Service ended it because it wasn't a natural event.")
