@@ -15,7 +15,8 @@ const SEASON_DIR := SPRITE_DIR + "seasons/"
 const SEASON_NAMES := ["spring", "summer", "fall", "winter"]
 const GROUND_SHADER := preload("res://assets/shaders/seasonal_ground.gdshader")
 
-## Regions whose painted water keeps still (their ground predates the moving water).
+## Regions that don't get the shimmer on their water (Tuolumne's river runs by
+## its own "water_flow" instead; see the shader).
 const STILL_WATER := ["tuolumne_meadows"]
 
 ## Sprites with no place in a season: they are hidden, not swapped.
@@ -59,6 +60,11 @@ func _ready() -> void:
 		if ground:
 			ground.material = ShaderMaterial.new()
 			(ground.material as ShaderMaterial).shader = GROUND_SHADER
+			# a region whose painted river runs (see the shader)
+			(ground.material as ShaderMaterial).set_shader_parameter("flow", region.get_meta("water_flow", Vector2.ZERO))
+			# and the rest shimmer (STILL_WATER keeps theirs as painted)
+			var still: bool = region is Region and (region as Region).region_id in STILL_WATER
+			(ground.material as ShaderMaterial).set_shader_parameter("water_shimmer", 0.0 if still else 1.0)
 			_grounds.append(ground)
 	# The needles and slabs lying on the ground (tools/hubs/dress_wilds.gd)
 	# turn with it: each sprite uses its parent's material.
