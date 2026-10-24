@@ -22,6 +22,7 @@
 [node name="JennieCurry" parent="." instance=ExtResource("1_r")]
 character = ExtResource("2_r")
 spot = "registration_porch"
+timetable = PackedStringArray("6:00 registration_porch", "12:00 pavilion_door", "13:30 registration_porch", "20:30 amphitheater", "22:00 registration_porch")
 offset = Vector2(44, 52)
 
 [node name="VisitorCamper" parent="." instance=ExtResource("1_r")]
@@ -54,6 +55,7 @@ timetable = PackedStringArray("7:00 campsite_east", "8:00 pavilion_door", "9:30 
 [node name="JulesEichorn" parent="." instance=ExtResource("1_r")]
 character = ExtResource("7_r")
 spot = "apron_trailhead"
+timetable = PackedStringArray("6:00 apron_trailhead", "19:30 amphitheater", "21:30 apron_trailhead")
 offset = Vector2(-40, 72)
 
 [node name="BestorRobinson" parent="." instance=ExtResource("1_r")]
@@ -65,6 +67,7 @@ wander_radius = 24
 [node name="WrenAlvarez" parent="." instance=ExtResource("1_r")]
 character = ExtResource("9_r")
 spot = "apron_trailhead"
+timetable = PackedStringArray("6:00 apron_trailhead", "12:30 shop_door", "13:30 apron_trailhead", "18:30 plaza", "21:00 apron_trailhead")
 offset = Vector2(-168, -64)
 
 [node name="FirefallSlab" parent="." instance=ExtResource("10_r")]

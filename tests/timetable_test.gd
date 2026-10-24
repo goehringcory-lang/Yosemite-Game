@@ -76,8 +76,8 @@ func test_town(world: Node) -> void:
 						bad.append("%s-%s (through a wall)" % [a, b])
 						break
 	check(bad.is_empty(), "%s: every stop can be walked to from every other %s" % [town, bad])
-	# One person's day, sped up.
-	var npc: NPC = keepers[0]
+	# One visitor's day, sped up (people with quests stay out at night).
+	var npc: NPC = keepers.filter(func(n: NPC) -> bool: return n.character.visitor)[0]
 	var stops := NPC.parse_timetable(npc.timetable)
 	npc.travel_speed = 480.0
 	for i in range(1, mini(stops.size(), 4)):

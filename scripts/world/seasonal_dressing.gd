@@ -36,7 +36,7 @@ static var _looks := {}
 var _season := -1
 var _sprites: Array[Sprite2D] = []
 var _names: Array[String] = []
-var _grounds: Array[Sprite2D] = []
+var _grounds: Array[CanvasItem] = []
 
 
 func _ready() -> void:
@@ -57,6 +57,13 @@ func _ready() -> void:
 			ground.material = ShaderMaterial.new()
 			(ground.material as ShaderMaterial).shader = GROUND_SHADER
 			_grounds.append(ground)
+	# The needles and slabs lying on the ground (tools/hubs/dress_wilds.gd)
+	# turn with it: each sprite uses its parent's material.
+	var detail := region.get_node_or_null("Entities/WildDressing/GroundDetail") as CanvasItem
+	if detail:
+		detail.material = ShaderMaterial.new()
+		(detail.material as ShaderMaterial).shader = GROUND_SHADER
+		_grounds.append(detail)
 	apply()
 
 

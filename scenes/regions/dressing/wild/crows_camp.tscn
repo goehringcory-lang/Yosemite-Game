@@ -1,0 +1,84 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/wild_lichen.png" id="1_lo5tj"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/wild_twigs.png" id="2_wo8up"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/wild_needles_a.png" id="3_cyxh2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/plant_mushrooms.png" id="4_sytdy"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/wild_seedling.png" id="5_or5bm"]
+
+[node name="WildDressing" type="Node2D" unique_id=243095457]
+y_sort_enabled = true
+
+[node name="GroundDetail" type="Node2D" parent="." unique_id=1627224045]
+z_index = -8
+
+[node name="WildLichen1" type="Sprite2D" parent="GroundDetail" unique_id=2052088200]
+use_parent_material = true
+position = Vector2(1046, 470)
+texture = ExtResource("1_lo5tj")
+flip_h = true
+
+[node name="WildTwigs1" type="Sprite2D" parent="GroundDetail" unique_id=645002429]
+use_parent_material = true
+position = Vector2(1304, 910)
+texture = ExtResource("2_wo8up")
+flip_h = true
+
+[node name="WildTwigs2" type="Sprite2D" parent="GroundDetail" unique_id=1257130865]
+use_parent_material = true
+position = Vector2(1431, 911)
+texture = ExtResource("2_wo8up")
+
+[node name="WildTwigs3" type="Sprite2D" parent="GroundDetail" unique_id=1418292867]
+use_parent_material = true
+position = Vector2(1039, 951)
+texture = ExtResource("2_wo8up")
+
+[node name="WildNeedlesA1" type="Sprite2D" parent="GroundDetail" unique_id=844292738]
+use_parent_material = true
+position = Vector2(1495, 938)
+texture = ExtResource("3_cyxh2")
+
+[node name="WildTwigs4" type="Sprite2D" parent="GroundDetail" unique_id=1761537473]
+use_parent_material = true
+position = Vector2(778, 978)
+texture = ExtResource("2_wo8up")
+
+[node name="WildTwigs5" type="Sprite2D" parent="GroundDetail" unique_id=1450101902]
+use_parent_material = true
+position = Vector2(918, 988)
+texture = ExtResource("2_wo8up")
+flip_h = true
+
+[node name="WildTwigs6" type="Sprite2D" parent="GroundDetail" unique_id=25107213]
+use_parent_material = true
+position = Vector2(1419, 974)
+texture = ExtResource("2_wo8up")
+flip_h = true
+
+[node name="WildTwigs7" type="Sprite2D" parent="GroundDetail" unique_id=2002334275]
+use_parent_material = true
+position = Vector2(1272, 1010)
+texture = ExtResource("2_wo8up")
+flip_h = true
+
+[node name="WildTwigs8" type="Sprite2D" parent="GroundDetail" unique_id=1817922004]
+use_parent_material = true
+position = Vector2(626, 1051)
+texture = ExtResource("2_wo8up")
+
+[node name="WildNeedlesA2" type="Sprite2D" parent="GroundDetail" unique_id=783108060]
+use_parent_material = true
+position = Vector2(808, 1037)
+texture = ExtResource("3_cyxh2")
+
+[node name="PlantMushrooms1" type="Sprite2D" parent="." unique_id=297568511]
+position = Vector2(592, 976)
+texture = ExtResource("4_sytdy")
+offset = Vector2(0, -12)
+flip_h = true
+
+[node name="WildSeedling1" type="Sprite2D" parent="." unique_id=1171693488]
+position = Vector2(217, 1050)
+texture = ExtResource("5_or5bm")
+offset = Vector2(0, -11)

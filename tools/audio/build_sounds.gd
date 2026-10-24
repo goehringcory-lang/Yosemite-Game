@@ -63,6 +63,9 @@ func _init() -> void:
 	_save("slack_gust", _gust(81), RATE_FX, -9.0)
 	_save("slack_cheer", _cheer(82), RATE_FX, -8.0)
 	_save("slack_medal", _chime([72, 76, 79, 84, 88], 0.08, 1.3), RATE_FX, -5.0)
+	# Rivers, and the story's moments (after the rest, for the same reason).
+	_save("river", _river(), RATE_BED, -11.0)
+	_save("story_sting", _sting(), RATE_FX, -7.0)
 	print("Sounds written to %s. Run godot --headless --path . --import next." % OUT)
 	quit()
 
@@ -73,7 +76,7 @@ func _init() -> void:
 ## A sound that isn't a loop gets a short fade at its end, so it never stops
 ## on a click.
 func _save(sound_name: String, buf: PackedFloat32Array, rate: int, peak_db: float) -> void:
-	if not (sound_name.begins_with("amb_") or sound_name in ["waterfall", "campfire"]):
+	if not (sound_name.begins_with("amb_") or sound_name in ["waterfall", "campfire", "river"]):
 		var tail := mini(int(0.008 * rate), buf.size())
 		for i in tail:
 			buf[buf.size() - 1 - i] *= float(i) / tail
@@ -318,6 +321,39 @@ func _waterfall() -> PackedFloat32Array:
 		for i in n:
 			buf[i] *= swell[i]
 		)
+
+
+## A river running over cobbles: a soft rush, a wandering burble in the
+## middle, and small bubbles rising, quieter than a waterfall.
+func _river() -> PackedFloat32Array:
+	_rng.seed = 7
+	return _loop(9.0, 1.5, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
+		var n := buf.size()
+		_add_noise(buf, rate, 0.35, 420.0, 90.0)
+		_add_noise(buf, rate, 0.08, 1800.0, 500.0)
+		_add_band_noise(buf, rate, _wander(n, rate, 0.6, 500.0, 1300.0), 2.2, _wander(n, rate, 0.5, 0.05, 0.16))
+		# bubbles: quick upward chirps, a few a second
+		var t := 0.05
+		while t < float(n) / rate - 0.05:
+			var f := _rng.randf_range(380.0, 900.0)
+			_add_tone(buf, rate, t, _rng.randf_range(0.015, 0.04), f, f * _rng.randf_range(1.3, 1.8), _rng.randf_range(0.03, 0.08))
+			t += _rng.randf_range(0.08, 0.35)
+		)
+
+
+## A story moment opening: a warm chord swelling up under a high chime, the
+## way a scene in a film begins.
+func _sting() -> PackedFloat32Array:
+	_rng.seed = 9
+	var buf := _buf(3.6, RATE_FX)
+	# D, A, F#, E: open and a little wistful
+	for k in 4:
+		var f := 440.0 * pow(2.0, (float([50, 57, 66, 64][k]) - 69.0) / 12.0)
+		_add_tone(buf, RATE_FX, 0.05 + k * 0.06, 3.4, f, f, 0.16, 0.25)
+	for k in 3:
+		var f := 440.0 * pow(2.0, (float([81, 86, 88][k]) - 69.0) / 12.0)
+		_add_ping(buf, RATE_FX, 0.35 + k * 0.22, [[f, 1.0], [f * 2.0, 0.2]], 0.5, 0.22)
+	return buf
 
 
 ## A campfire: a low breathy roar, constant small crackles, and pops.

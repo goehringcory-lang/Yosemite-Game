@@ -120,8 +120,8 @@ A later pass found two more things:
 
 The last five independent reviews scored the game 6 to 6.5 of 10 against Stardew Valley. It is not at Stardew's level. What holds it back, in the reviewers' words and ours:
 
-- **The world is still sparser than Stardew's outside the two towns.** Curry Village and Yosemite Village are dressed with clutter now; the smaller areas, the outer hubs and Camp 4 are not, and Curry Village's buildings keep their first size.
-- **Only visitors keep timetables.** Townsfolk walk a day of stops round their town, but the people with quests stroll about their spot through the day and stand at it overnight, so their stories are always within a few steps, and nobody walks from one area to another; Stardew's villagers cross the whole map.
+- **Curry Village's buildings keep their first size.** The outer hubs, the smaller areas and Camp 4 now have their ground clutter and campers' gear (`tools/hubs/dress_wilds.gd`), but the lodgepole floor is still mostly a sweep of sand between the trees, kept calm on purpose.
+- **Nobody walks from one area to another.** Townsfolk and, in the two towns, the cast with quests keep a day of stops (errands morning and evening, the Camp 4 fire and the Camp Curry amphitheater after dark), but each keeps to their own area; Stardew's villagers cross the whole map. The cast outside the towns, and the Native characters everywhere, keep to their spots.
 - **Portraits are laid out on a 40-dot grid** and painted at the 80 px they show at (round shapes and shading at full resolution, eyes and mouths in two-pixel dots), with five-tone shading; Stardew's are 64 px and hand-drawn. Walking sprites are 16x24 (Stardew's are 16x32); the owner chose to keep that as the game's style, and the buildings were scaled to suit it.
 - **No hand-drawn art.** All art is drawn by code in a consistent style; Stardew's is hand-drawn by one artist. That needs an artist: code can match a style, not replace one.
 - **The clock is a sky window**, not a dial with a hand.

@@ -20,6 +20,7 @@ extends Node2D
 @export var indoors := false
 
 const SeasonalDressing = preload("res://scripts/world/seasonal_dressing.gd")
+const WILD_DRESSING_DIR := "res://scenes/regions/dressing/wild/"
 
 ## The Place nodes in this region, found once and kept until a Place enters or
 ## leaves (see Place). place_at() runs several times a second.
@@ -32,7 +33,18 @@ var _places_valid := false
 
 func _ready() -> void:
 	if not indoors:
+		_add_wild_dressing()
 		add_child(SeasonalDressing.new())
+
+
+## The ground clutter laid out by tools/hubs/dress_wilds.gd (needles, cones,
+## slabs, campers' gear), kept apart from the region scene so a rebuild never
+## loses it. Added before SeasonalDressing looks for plants to dress.
+func _add_wild_dressing() -> void:
+	var path := WILD_DRESSING_DIR + region_id + ".tscn"
+	if region_id == "" or entities.has_node("WildDressing") or not ResourceLoader.exists(path):
+		return
+	entities.add_child((load(path) as PackedScene).instantiate())
 
 
 func get_ground() -> TileMapLayer:

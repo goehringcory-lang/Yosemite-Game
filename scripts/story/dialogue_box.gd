@@ -233,8 +233,13 @@ const PAGE_CHARS := 220
 func say(lines: Array) -> void:
 	for line: Dictionary in lines:
 		var mood: String = line.get("mood", Portraits.mood_for(line.get("text", "")))
+		var first := true
 		for page in pages(line.get("text", "")):
 			_show(line.get("speaker", ""), page, [], mood)
+			if first and is_inside_tree():
+				# whoever is speaking shows it over their head (NPC.on_line)
+				get_tree().call_group("talkers", "on_line", line.get("speaker", ""), line.get("text", ""), mood)
+				first = false
 			await _next_input()
 
 
