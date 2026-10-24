@@ -14,6 +14,10 @@ extends CanvasLayer
 ##
 ## Controls: Up/Down pick a line, interact walks it (and does tricks on it),
 ## cancel steps off, goes back to the lines, or leaves.
+##
+## The same screen walks the slackline you carry (TravelSlackline), rigged
+## between two trees anywhere in the park: give [method setup] the line, and
+## there's no choosing, no crowd and no campfire, just you and the trees.
 
 ## Emitted when the player leaves the screen. [param walked] is true if they
 ## have ever walked the Camp 4 line end to end.
@@ -34,6 +38,10 @@ const PRIZE_LINE := "camp4"
 const WON := "slackline_walked"
 ## Gold on every line.
 const LEGEND := "slackline_legend"
+## Gold on any one of the Camp 4 lines (Wren's quest, wren_slackline, asks
+## for it).
+const GOLD := "slackline_gold"
+const GOLD_QUEST := "wren_slackline"
 ## Game minutes each walk takes, warm-up and all.
 const MINUTES_PER_WALK := 10
 ## Seconds from stepping onto the line to walking.
@@ -76,6 +84,9 @@ var last_medal := 0
 var new_best := false
 ## True on the walk that won the six-pack.
 var prize_now := false
+## The line you carry, rigged somewhere (SlacklineState.travel_line), or
+## empty at Camp 4.
+var travel: Dictionary = {}
 
 var _canvas: Control
 var _phase := Phase.SELECT
@@ -113,9 +124,11 @@ var _kit := {}
 
 
 ## Call before adding the node to the tree. A [param seed] of 0 or more makes
-## the lines buck the same way every time (for tests).
-func setup(seed := -1) -> void:
+## the lines buck the same way every time (for tests). [param travel_line]
+## walks your own rigged line instead of the Camp 4 ones.
+func setup(seed := -1, travel_line := {}) -> void:
 	_seed = seed
+	travel = travel_line
 
 
 func _ready() -> void:
@@ -138,6 +151,9 @@ func _ready() -> void:
 	else:
 		_rng.randomize()
 	walked = QuestLog.is_unlocked(WON)
+	# a gold won before the quest that asks for one still counts
+	if not QuestLog.is_unlocked(GOLD) and SlacklineState.LINES.any(func(l: Dictionary) -> bool: return medal_for(l.id) >= 3):
+		QuestLog.unlocks.append(GOLD)
 	_kit = {"climbing_shoes": int(Gear.owned.get("climbing_shoes", 0)), "chalk_bag": int(Gear.owned.get("chalk_bag", 0))}
 	_paint()
 	for i in ART.CROWD.size():
@@ -146,12 +162,19 @@ func _ready() -> void:
 	line_id = SlacklineState.LINES[_chosen].id
 	state = SlacklineState.new(_seed, line_id)
 	Sound.play("ui_open")
+	if is_travel():
+		begin(SlacklineState.TRAVEL)
+
+
+## True when walking your own rigged line rather than a Camp 4 one.
+func is_travel() -> bool:
+	return not travel.is_empty()
 
 
 ## Paints the backdrop, trees and stump for the hour.
 func _paint() -> void:
 	_pal = ClimbSky.palette(GameClock.minutes / 60.0)
-	_back_tex = ImageTexture.create_from_image(ART.backdrop(_pal, 4))
+	_back_tex = ImageTexture.create_from_image(ART.backdrop(_pal, 4, not is_travel()))
 	_clouds.clear()
 	for i in 3:
 		_clouds.append(ImageTexture.create_from_image(ClimbSky.cloud(_pal, 40 + i)))
@@ -192,15 +215,17 @@ static func best_for(id: String) -> int:
 ## that line isn't open yet.
 func begin(id := "") -> bool:
 	if id == "":
-		id = SlacklineState.LINES[_chosen].id
-	if not is_open(id):
+		id = SlacklineState.TRAVEL if is_travel() else SlacklineState.LINES[_chosen].id
+	if id == SlacklineState.TRAVEL and not is_travel():
+		return false
+	if id != SlacklineState.TRAVEL and not is_open(id):
 		return false
 	line_id = id
 	for i in SlacklineState.LINES.size():
 		if SlacklineState.LINES[i].id == id:
 			_chosen = i
 	attempts += 1
-	state = SlacklineState.new(_seed + attempts if _seed >= 0 else -1, line_id)
+	state = SlacklineState.new(_seed + attempts if _seed >= 0 else -1, line_id, travel if id == SlacklineState.TRAVEL else {})
 	_bounce = 0.0
 	_quiver = 0.0
 	_fall_t = 0.0
@@ -356,12 +381,18 @@ func _finish_walk() -> void:
 	_show_result()
 
 
-## Scores the walk (best score, medal, Camp 4 Legend) and opens the results card.
+## Scores the walk (best score, medal, a first gold, Camp 4 Legend) and opens
+## the results card.
 func _show_result() -> void:
 	var crossed := state.status == SlacklineState.Status.WALKED
 	last_medal = state.medal()
 	new_best = crossed and Perks.record("slackline_best_" + line_id, state.score)
 	Perks.record("slackline_medal_" + line_id, last_medal)
+	var first_gold := false
+	if last_medal >= 3 and not is_travel() and not QuestLog.is_unlocked(GOLD):
+		QuestLog.unlocks.append(GOLD)
+		first_gold = true
+		QuestLog.changed.emit()
 	if not QuestLog.is_unlocked(LEGEND) and SlacklineState.LINES.all(func(l: Dictionary) -> bool: return medal_for(l.id) >= 3):
 		QuestLog.unlocks.append(LEGEND)
 	var rows: Array = []
@@ -380,8 +411,12 @@ func _show_result() -> void:
 			note = "Silver at %d, gold at %d. Steady walking builds flow, and flow multiplies everything." % [l.silver, l.gold]
 		elif last_medal < 3:
 			note = "Gold at %d. Land your tricks with flow up for the big points." % l.gold
+		elif is_travel():
+			note = "Gold, with nobody watching but the jays."
 		else:
 			note = "Gold. Camp 4 will be talking about that one."
+		if first_gold and QuestLog.active.has(GOLD_QUEST):
+			note += " Wren will want to hear about this. She's at the foot of Firefall Slab in Curry Village."
 		if prize_now:
 			note = "You touch the far pine, and the six-pack of King Cobra on the stump is yours. " + note
 	else:
@@ -438,7 +473,9 @@ func _input(event: InputEvent) -> void:
 			else:
 				leave()
 		Phase.READY:
-			if back:
+			if back and is_travel():
+				leave()
+			elif back:
 				_to_select()
 			elif go_key:
 				go()
@@ -457,6 +494,8 @@ func _input(event: InputEvent) -> void:
 			if go_key:
 				_result = {}
 				begin(line_id)
+			elif is_travel():
+				leave()
 			else:
 				_to_select()
 
@@ -486,8 +525,10 @@ func _popup(text: String, color: Color, at: Vector2, big: bool) -> void:
 	_popups.append({"text": text, "color": color, "age": 0.0, "at": at, "big": big})
 
 
-## The crowd cheers for [param seconds].
+## The crowd cheers for [param seconds] (nobody's there on your own line).
 func _cheer(seconds: float) -> void:
+	if is_travel():
+		return
 	for c in _crowd:
 		c.cheer = seconds * _rng.randf_range(0.7, 1.0)
 		c.gasp = 0.0
@@ -497,7 +538,7 @@ func _cheer(seconds: float) -> void:
 ## Someone in the crowd calls out (see BANTER).
 func _say(kind: String, arg := "") -> void:
 	var lines: Array = BANTER.get(kind, [])
-	if lines.is_empty():
+	if lines.is_empty() or is_travel():
 		return
 	var text: String = lines[_rng.randi() % lines.size()]
 	if "%s" in text:
@@ -517,7 +558,7 @@ func _ambient(delta: float) -> void:
 			x = _rng.randf_range(0, SCREEN.x)
 		var col := Color("84b04a") if _rng.randf() < 0.5 else Color("d8a63b")
 		_fx.spawn(Vector2(x, _rng.randf_range(10, 200 if gust else 120)), Vector2(side * (_rng.randf_range(90, 160) if gust else _rng.randf_range(4, 14)), _rng.randf_range(6, 16)), _rng.randf_range(3.0, 6.0), col, 2, 2.0)
-	if _rng.randf() < delta * (4.0 if ClimbProps.night_amount(_pal) > 0.4 else 1.5):
+	if not is_travel() and _rng.randf() < delta * (4.0 if ClimbProps.night_amount(_pal) > 0.4 else 1.5):
 		_fx.spawn(ART.FIRE + Vector2(_rng.randf_range(-3, 3), -6), Vector2(_rng.randf_range(-4, 4), _rng.randf_range(-26, -14)), _rng.randf_range(0.6, 1.2), Color(0.969, 0.651, 0.29, 0.9), 1, -4.0)
 
 
@@ -529,7 +570,7 @@ func _line() -> Dictionary:
 
 
 func _anchors(l: Dictionary) -> Array[Vector2]:
-	var inset := 5.0 if l.id == "short" else 10.0
+	var inset := 5.0 if _young(l) else 10.0
 	return [Vector2(float(l.span.x) + inset, l.line_y), Vector2(float(l.span.y) - inset, l.line_y)]
 
 
@@ -546,11 +587,12 @@ func _draw_screen() -> void:
 	ci.draw_set_transform(shake.round(), 0.0, Vector2.ONE)
 	ci.draw_texture(_back_tex, Vector2.ZERO)
 	_draw_clouds(ci)
-	_draw_fire(ci)
-	_draw_crowd(ci)
+	if not is_travel():
+		_draw_fire(ci)
+		_draw_crowd(ci)
 	var l := _line()
 	_draw_trees(ci, l)
-	if l.id != "long":
+	if l.id != "long" and l.id != SlacklineState.TRAVEL:
 		ci.draw_texture(_stump_tex if not walked else _stump_taken_tex, Vector2(ART.STUMP_X - 16, ART.GROUND_Y - 36))
 	var on_line := _phase in [Phase.READY, Phase.WALK] or (_phase == Phase.RESULT and state.status == SlacklineState.Status.WALKED)
 	_draw_webbing(ci, l, on_line)
@@ -577,7 +619,7 @@ func _draw_screen() -> void:
 			_draw_walk_hud(ci)
 		Phase.RESULT:
 			_draw_walk_hud(ci)
-			var keys := "%s  %s     %s  Lines" % [_button("E", "A"), "Walk again" if state.status == SlacklineState.Status.WALKED else "Try again", _button("Esc", "B")]
+			var keys := "%s  %s     %s  %s" % [_button("E", "A"), "Walk again" if state.status == SlacklineState.Status.WALKED else "Try again", _button("Esc", "B"), "Leave" if is_travel() else "Lines"]
 			HUD.result_card(ci, _result, _phase_age, keys)
 
 
@@ -641,8 +683,14 @@ func _draw_crowd(ci: CanvasItem) -> void:
 		ci.draw_texture(tex, (at - Vector2(tex.get_width() / 2.0, tex.get_height() - 4)).round())
 
 
+## True for a line strung between slim young trees (the short line, or a
+## short rig of your own).
+func _young(l: Dictionary) -> bool:
+	return l.get("young", l.id == "short")
+
+
 func _draw_trees(ci: CanvasItem, l: Dictionary) -> void:
-	var young: bool = l.id == "short"
+	var young := _young(l)
 	for side in 2:
 		var t: Dictionary = _trees["%s%d" % [young, side]]
 		var x: float = l.span.x if side == 0 else l.span.y
@@ -689,7 +737,7 @@ func _draw_webbing(ci: CanvasItem, l: Dictionary, on_line: bool) -> void:
 		lit.append(p + Vector2(0, -0.5))
 	ci.draw_polyline(lit, WEB_LIT, 1.0)
 	# tree pro and the slings round each trunk, and the ratchet
-	var trunk := 5.0 if l.id == "short" else 10.0
+	var trunk := 5.0 if _young(l) else 10.0
 	for i in 2:
 		var tx: float = l.span.x if i == 0 else l.span.y
 		ci.draw_rect(Rect2(tx - trunk - 1, a[i].y - 4, trunk * 2 + 2, 7), OUTLINE)
@@ -829,7 +877,7 @@ func _draw_fallen(ci: CanvasItem) -> void:
 
 
 func _draw_speech(ci: CanvasItem) -> void:
-	if _speech.text == "" or _phase == Phase.SELECT:
+	if _speech.text == "" or _phase == Phase.SELECT or is_travel():
 		return
 	var spec: Dictionary = ART.CROWD[_speech.who]
 	ClimbHud.speech(ci, spec.at + Vector2(0, -8), _speech.text, "", _speech.age)

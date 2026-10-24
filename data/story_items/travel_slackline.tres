@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/story_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(256, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "travel_slackline"
+display_name = "Wren's Slackline"
+description = "Twenty-five meters of tubular webbing, two tree slings, felt pads for the bark and a ratchet, from Wren Alvarez for a gold medal at Camp 4. Walk up to a sturdy tree with another a few strides off to one side, anywhere in the park, and rig it."
+icon = SubResource("AtlasTexture_icon")

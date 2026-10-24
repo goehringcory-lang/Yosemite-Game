@@ -35,8 +35,10 @@ const STUMP_X := 462.0
 
 
 ## The whole still background for [param pal] (a ClimbSky palette): sky, far
-## walls, the forest round Camp 4, the boulders, tents and the dirt.
-static func backdrop(pal: Dictionary, seed_value: int) -> Image:
+## walls, the forest round Camp 4, the boulders, tents and the dirt. Without
+## [param camp] it's a quiet clearing anywhere in the park: the same woods,
+## with no tents, table, fire ring or crash pads.
+static func backdrop(pal: Dictionary, seed_value: int, camp := true) -> Image:
 	var im := ClimbSky.sky(pal)
 	var land := ClimbLandscape.build({"view": VIEW}, pal, seed_value)
 	# The three skyline layers, as they look from the ground. The last layer
@@ -75,6 +77,10 @@ static func backdrop(pal: Dictionary, seed_value: int) -> Image:
 		else:
 			ClimbProps.pine(im, x, GROUND_Y - 6 + rng.randi_range(-2, 2), rng.randi_range(84, 120), rng, pal)
 	_ground(im, pal, rng)
+	if not camp:
+		ClimbProps.boulder(im, 148, GROUND_Y + 10, 9, 6, rc, rng, false)
+		ClimbProps.boulder(im, 430, GROUND_Y + 6, 12, 7, rc, rng, true)
+		return im
 	# Talus and boulders at the back, with chalk on the big one.
 	_big_boulder(im, 92, GROUND_Y + 4, rc, pal, rng)
 	ClimbProps.boulder(im, 30, GROUND_Y + 8, 16, 9, rc, rng, true)

@@ -41,6 +41,11 @@ const LINES: Array[Dictionary] = [
 		"blurb": "Long, saggy and high, across the whole clearing. The wind off the wall finds you halfway."},
 ]
 
+## The id of the line you carry (see [method travel_line]), and how long it
+## must be before the wind finds it.
+const TRAVEL := "travel"
+const TRAVEL_WINDY := 24
+
 const DAMP := 1.6
 ## How hard holding an arrow key pushes you back upright.
 const PUSH := 4.5
@@ -131,10 +136,11 @@ var _milestone := 0
 var _rng := RandomNumberGenerator.new()
 
 
-## [param line_id] picks one of LINES (the Camp 4 line if it's unknown). A
+## [param line_id] picks one of LINES (the Camp 4 line if it's unknown), or
+## [param custom] is a whole line of its own (see [method travel_line]). A
 ## [param seed] of 0 or more makes the line buck the same way every time.
-func _init(seed := -1, line_id := "camp4") -> void:
-	line = line_by_id(line_id)
+func _init(seed := -1, line_id := "camp4", custom := {}) -> void:
+	line = custom if not custom.is_empty() else line_by_id(line_id)
 	if seed >= 0:
 		_rng.seed = seed
 	else:
@@ -143,6 +149,26 @@ func _init(seed := -1, line_id := "camp4") -> void:
 	_next_gust = _rng.randf_range(GUST_GAP.x * 0.5, GUST_GAP.y * 0.6)
 	# never perfectly upright, or there'd be nothing to catch at first
 	lean = _rng.randf_range(0.04, 0.08) * (1.0 if _rng.randf() < 0.5 else -1.0)
+
+
+## Your own slackline (TravelSlackline), rigged [param meters] long between
+## two trees somewhere in the park, [param where] (for its blurb). It sits
+## between the short line and the long one: a longer rig sags more, bucks
+## harder, is strung higher on screen, and past [constant TRAVEL_WINDY]
+## meters the wind finds it.
+static func travel_line(meters: int, where := "") -> Dictionary:
+	var short := line_by_id("short")
+	var long := line_by_id("long")
+	var t := clampf(float(meters - int(short.meters)) / float(int(long.meters) - int(short.meters)), 0.0, 1.0)
+	var height := "knee-high" if t < 0.3 else ("waist-high" if t < 0.7 else "head-high")
+	return {"id": TRAVEL, "name": "Your Slackline", "meters": meters, "height": height,
+		"walk_time": lerpf(short.walk_time, long.walk_time, t), "tip": lerpf(short.tip, long.tip, t),
+		"buck_gap": (short.buck_gap as Vector2).lerp(long.buck_gap, t), "buck_kick": (short.buck_kick as Vector2).lerp(long.buck_kick, t),
+		"gusts": meters >= TRAVEL_WINDY, "sag": lerpf(short.sag, long.sag, t),
+		"span": (short.span as Vector2).lerp(long.span, t).round(), "line_y": roundf(lerpf(short.line_y, long.line_y, t)),
+		"silver": int(lerpf(short.silver, long.silver, t) / 100.0) * 100, "gold": int(lerpf(short.gold, long.gold, t) / 100.0) * 100,
+		"needs": "", "young": t < 0.3,
+		"blurb": "Your own line, rigged %d m between two trees%s." % [meters, " at " + where if where != "" else ""]}
 
 
 static func line_by_id(id: String) -> Dictionary:
