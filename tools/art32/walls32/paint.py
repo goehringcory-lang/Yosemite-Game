@@ -836,23 +836,18 @@ def _forest(P: Painting, view, forest: np.ndarray, brush: np.ndarray, far: np.nd
         # metres per row at that distance (rows widen with distance), and per column
         mv = m_px * d_b / max(1.0, wall.looks[0].back)
         mh = max(0.5, getattr(view, "m_across", 2.0))
-        cell_w = int(np.clip(round(12.0 / mh), 3, 8))
-        cell_h = int(np.clip(round(25.0 / mv), 4, 12))
-        rr = np.random.default_rng(wall.seed + 20 + band)
-        gw, gh = W // cell_w + 2, H // cell_h + 2
-        ox = rr.random((gh, gw)) * cell_w
-        oy = rr.random((gh, gw)) * cell_h
-        gx = np.arange(W) // cell_w
-        gy = np.arange(H) // cell_h
-        cxs = gx[None, :] * cell_w + ox[gy[:, None], gx[None, :]]
-        cys = gy[:, None] * cell_h + oy[gy[:, None], gx[None, :]]
-        dx = (xx + 0.5 - cxs) / (cell_w * 0.62)
-        dy = (yy + 0.5 - cys) / (cell_h * 0.7)
-        cr = 1.0 - np.clip(np.abs(dx) * 1.1 + np.clip(-dy, 0, None) * 0.6, 0, 1)  # pointed above
-        li = np.clip(0.5 - dx * 0.45 - dy * 0.15, 0, 1)
+        # conifers 12 m across and 25 m tall; the foothills' oaks and
+        # chaparral round, about 9 m
+        cw_m, ch_m = (12.0, 25.0) if wall.flora != "foothill" else (9.0, 8.0)
+        cell_w = int(np.clip(round(cw_m / mh), 3, 8))
+        cell_h = int(np.clip(round(ch_m / mv), 3, 12))
+        cr, li, _tn = crown_field(W, H, cell_w, cell_h, wall.seed + 20 + band, pointed=wall.flora != "foothill")
         crown = np.where(sel, cr, crown)
         lit = np.where(sel, li, lit)
-    v = 0.18 + 0.5 * shade + 0.32 * lit * crown - 0.16 * (crown < 0.25)
+    # the canopy takes the slope's light broadly: column-to-column flicker in
+    # the terrain's facing would stripe it
+    canopy = blur_xy(shade, 3.0, 1.5)
+    v = 0.18 + 0.5 * canopy + 0.32 * lit * crown - 0.16 * (crown < 0.25)
     low = view.z < wall.base_z + 220.0
     oak = forest & low & (n_veg < 0.4) & (view.slope > 16)
     if wall.flora == "foothill":
@@ -883,6 +878,54 @@ def _forest(P: Painting, view, forest: np.ndarray, brush: np.ndarray, far: np.nd
                     break
                 P.mat[yk, x] = P.m("far" if far[y, x] else "forest")
                 P.val[yk, x] = 0.25 + 0.3 * shade[y, x]
+
+
+def crown_field(W: int, H: int, cw: float, ch: float, seed: int, pointed: bool = True,
+                size: tuple[float, float] = (0.8, 1.2)) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """A canopy of tree crowns on a staggered, jittered grid of [param cw] x
+    [param ch] cells: every pixel belongs to the nearest crown (searching the
+    cells round it, so no straight seams run between them). Returns how far
+    into its crown each pixel is (1 at the heart, 0 at the rim or in a gap),
+    how lit it is from the upper left, and the crown's own random tint."""
+    rr = np.random.default_rng(seed)
+    gw, gh = int(W / cw) + 4, int(H / ch) + 4
+    ox = rr.random((gh, gw)) * 0.7 + 0.15
+    oy = rr.random((gh, gw)) * 0.7 + 0.15
+    sz = rr.uniform(size[0], size[1], (gh, gw))
+    tn = rr.random((gh, gw))
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    yy += 0.5
+    xx += 0.5
+    gy0 = np.floor(yy / ch).astype(np.int32)
+    best = np.full((H, W), 9.0, np.float32)
+    bdx = np.zeros((H, W), np.float32)
+    bdy = np.zeros((H, W), np.float32)
+    btn = np.zeros((H, W), np.float32)
+    for dyc in (-1, 0, 1):
+        gy = np.clip(gy0 + dyc, 0, gh - 1)
+        # every other row of cells shifts half a cell, like brickwork
+        shift = (gy % 2) * 0.5
+        gx0 = np.floor(xx / cw - shift).astype(np.int32)
+        for dxc in (-1, 0, 1):
+            gx = np.clip(gx0 + dxc, 0, gw - 1)
+            cx = (gx + shift + ox[gy, gx]) * cw
+            cy = (gy + oy[gy, gx]) * ch
+            s = sz[gy, gx]
+            dx = (xx - cx) / (cw * 0.62 * s)
+            dy = (yy - cy) / (ch * 0.62 * s)
+            if pointed:
+                # a conifer: pointed above, broad below
+                d = np.abs(dx) * (1.0 + np.clip(-dy, 0, None) * 0.9) + np.abs(dy) * 0.55
+            else:
+                d = np.sqrt(dx * dx + dy * dy)
+            closer = d < best
+            best = np.where(closer, d, best)
+            bdx = np.where(closer, dx, bdx)
+            bdy = np.where(closer, dy, bdy)
+            btn = np.where(closer, tn[gy, gx], btn)
+    crown = np.clip(1.0 - best, 0, 1)
+    lit = np.clip(0.5 - bdx * 0.45 - bdy * 0.2, 0, 1)
+    return crown, lit, btn
 
 
 def _talus(P: Painting, talus: np.ndarray, shade: np.ndarray, W: int, H: int, wall: Wall) -> None:

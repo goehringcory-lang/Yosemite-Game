@@ -32,7 +32,7 @@ sys.path.insert(0, HERE)
 
 import dem as D  # noqa: E402
 import osm as O  # noqa: E402
-from paint import BAYER, blur, noise  # noqa: E402
+from paint import BAYER, blur, crown_field, noise  # noqa: E402
 from pixel32 import scale2x  # noqa: E402
 
 EARTH_R = 6371000.0
@@ -426,33 +426,25 @@ def _compose(view: View, px, cls, lit, cv, out_path: str, ee: float, en: float, 
     return _falls(view, white & (dist > 1000), cv, px, ee, en)
 
 
-def _crowns(dist: np.ndarray, f_px: float, W: int, H: int) -> np.ndarray:
+def _crowns(dist: np.ndarray, f_px: float, W: int, H: int) -> tuple[np.ndarray, np.ndarray]:
     """Tree crowns about 11 m across, as many pixels as that is at each
     distance: 1 at a crown's lit top, 0 in the gaps; and each crown's own
     random tint, 0..1."""
     out = np.zeros((H, W), np.float32)
     tint = np.zeros((H, W), np.float32)
-    yy, xx = np.mgrid[0:H, 0:W]
     for i, (lo, hi) in enumerate(((0, 1400), (1400, 2600), (2600, 5000), (5000, 1e9))):
         sel = (dist >= lo) & (dist < hi)
         if not sel.any():
             continue
         d = float(np.median(dist[sel]))
-        cw = int(np.clip(round(11.0 * f_px / d), 1, 5))
-        ch = max(1, int(round(cw * 1.4)))
-        rr = np.random.default_rng(30 + i)
-        gw, gh = W // cw + 2, H // ch + 2
-        ox = rr.random((gh, gw)) * cw
-        oy = rr.random((gh, gw)) * ch
-        gx = xx // cw
-        gy = yy // ch
-        dx = (xx + 0.5 - (gx * cw + ox[gy, gx])) / max(0.6, cw * 0.6)
-        dy = (yy + 0.5 - (gy * ch + oy[gy, gx])) / max(0.6, ch * 0.6)
-        size = 0.75 + 0.5 * rr.random((gh, gw))[gy, gx]
-        cr = np.clip(1.0 - np.sqrt(dx * dx + dy * dy) / size, 0, 1)
-        tn = rr.random((gh, gw))[gy, gx]
-        if cw == 1:
+        cw = float(np.clip(11.0 * f_px / d, 1.0, 5.0))
+        if cw < 1.6:
+            # too far to make out single trees: a fine, even texture
+            rr = np.random.default_rng(30 + i)
             cr = (rr.random((H, W)) > 0.45).astype(np.float32) * 0.8
+            tn = rr.random((H, W)).astype(np.float32)
+        else:
+            cr, _lit, tn = crown_field(W, H, cw, cw * 1.25, 30 + i, pointed=False)
         out = np.where(sel, cr, out)
         tint = np.where(sel, tn, tint)
     return out, tint
