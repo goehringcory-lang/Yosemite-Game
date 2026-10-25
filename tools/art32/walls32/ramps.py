@@ -30,6 +30,8 @@ RAMPS: dict[str, list[str]] = {
     "haze": ["3a4c4d", "435556", "4d5f5e", "586966", "63736f", "6f7e78", "7b8981"],
     # The sky over the rim: deep blue overhead to a pale haze at the horizon.
     "sky": ["3a6f96", "4a80a5", "5c91b3", "70a1bf", "86b1ca", "9dc0d3", "b3cddb", "c7d9e2", "d8e4e8"],
+    # Foothill grass cured gold in summer.
+    "straw": ["4a3d26", "5e4d2f", "735f39", "887245", "9d8552", "b19860", "c3aa70"],
     # Black oak and brush on the talus and ledges: olive.
     "oak": ["162313", "1f2f19", "293c1f", "344926", "40572d", "4d6534", "5b733c"],
     "brush": ["1d2515", "28321b", "343f21", "414c28", "4f5a30", "5e6838", "6d7642"],

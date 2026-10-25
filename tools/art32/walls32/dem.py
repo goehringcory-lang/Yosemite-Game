@@ -12,6 +12,7 @@ import math
 import os
 import time
 import urllib.request
+import warnings
 
 import numpy as np
 from PIL import Image
@@ -117,4 +118,23 @@ def fetch(e0: float, n0: float, e1: float, n1: float, res: float = 2.0) -> DEM:
                 os.remove(part_path)
         Image.fromarray(z, "F").save(path)
     z = np.array(Image.open(path), dtype=np.float32)
-    return DEM(z, e0, n1, res)
+    return DEM(fill_gaps(z), e0, n1, res)
+
+
+def fill_gaps(z: np.ndarray) -> np.ndarray:
+    """The service now and then hands back a few cells of no-data (huge or
+    zero values): fill each from the good cells round it."""
+    bad = ~np.isfinite(z) | (z < -100.0) | (z > 5000.0) | (np.abs(z) < 1.0)
+    if not bad.any():
+        return z
+    z = np.where(bad, np.nan, z).astype(np.float32)
+    for _ in range(64):
+        if not np.isnan(z).any():
+            break
+        p = np.pad(z, 1, mode="edge")
+        nb = np.stack([p[:-2, 1:-1], p[2:, 1:-1], p[1:-1, :-2], p[1:-1, 2:]])
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            mean = np.nanmean(nb, axis=0)
+        z = np.where(np.isnan(z), mean, z)
+    return np.nan_to_num(z, nan=float(np.nanmedian(z))).astype(np.float32)

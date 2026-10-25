@@ -225,7 +225,7 @@ func _build_region() -> void:
 ## slides the painting along to Liberty Cap and the falls.
 const VISTA_ANCHOR := Vector2(1584, 0)
 const VISTA_OFFSET := Vector2(400, 0)
-const VISTA_PARALLAX := Vector2(0.25, 0.2)
+const VISTA_PARALLAX := Vector2(0.25, 0.05)
 
 
 func _place_view() -> void:

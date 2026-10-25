@@ -105,6 +105,10 @@ class Wall:
     # of rock of their own (diorite, fresh scars)
     features: list = field(default_factory=list)
     blend: float = 64.0  # sprite pixels over which two looks dissolve into each other
+    # what grows on the slopes: "conifer" (the Valley's pine and fir forest)
+    # or "foothill" (the Merced canyon below the Valley: live oak, gray pine,
+    # chaparral and grass cured gold)
+    flora: str = "conifer"
 
 
 # El Capitan's Nose: its toe, found in the lidar (the prow's southernmost
@@ -198,6 +202,18 @@ WALLS: dict[str, Wall] = {
         [Look(WASHINGTON_COLUMN + (400.0,), toward=HALF_DOME + (1616.0,), eye_at=(37.7445, -119.5555), eye=30.0,
               turn="cw", depth=8000.0, fit_span=1200.0, near=300.0, res=4.0, fits=[(1000.0, 8.0)])],
         base_z=1240.0, seed=112, streaks=1.5),
+    # El Portal: the Merced canyon's north side over the town, steep brushy
+    # slopes and granite outcrops, then up the canyon to Arch Rock
+    "el_portal": Wall(
+        "assets/sprites/valley/el_portal_wall.png",
+        [Look((37.6760, -119.7836, 1680.0), azimuth=350.0, scale=1.6, x1=2700.0, back=700.0, fit=4.0),
+         Look((37.6890, -119.7296, 3408.0), azimuth=330.0, scale=1.6, x0=2700.0, back=700.0, fit=4.0, fit_span=900.0)],
+        base_z=600.0, seed=114, warm=0.45, streaks=0.5, flora="foothill"),
+    # Crow's Camp: the wall of Tenaya Canyon above the creek, past Mirror Lake
+    "crows_camp": Wall(
+        "assets/sprites/valley/crows_camp_wall.png",
+        [Look((37.7480, -119.5420, 1184.0), azimuth=345.0, scale=1.6, back=600.0)],
+        base_z=1260.0, seed=115, streaks=1.3),
     # Yosemite Village and Camp 4: the foot of the north wall, Lower Yosemite
     # Fall in its gully, the wall going on up out of sight
     "yosemite_village": Wall(
@@ -606,7 +622,10 @@ def _compose(view, fr: Frame, wall: Wall, dump: dict, W: int, H: int, line: np.n
     # the ground just in front of the cliff, where the sight line meets the
     # Valley floor: the forest at the foot
     front = hit & (view.dist < 250.0)
-    forest = hit & ((slope < 31 + 6 * (n_veg - 0.5)) | front)
+    # the foothill canyon's slopes hold soil and brush far steeper than the
+    # Valley's granite does: only its outcrops and cliffs are bare
+    veg_slope = 31.0 if wall.flora != "foothill" else 44.0
+    forest = hit & ((slope < veg_slope + 6 * (n_veg - 0.5)) | front)
     # the talus slopes under the walls: blocks of fallen granite with trees
     # growing among them, the trees in clumps and the boulders showing
     # between (the steeper, the more boulders)
@@ -836,6 +855,15 @@ def _forest(P: Painting, view, forest: np.ndarray, brush: np.ndarray, far: np.nd
     v = 0.18 + 0.5 * shade + 0.32 * lit * crown - 0.16 * (crown < 0.25)
     low = view.z < wall.base_z + 220.0
     oak = forest & low & (n_veg < 0.4) & (view.slope > 16)
+    if wall.flora == "foothill":
+        # live oak and chaparral, a gray pine here and there, and between them
+        # the grass of the foothills, cured gold by summer, in broad drifts
+        drift = stretched_noise(W, H, 16.0, 32.0, wall.seed + 70) * 0.7 + noise(W, H, 4, wall.seed + 72) * 0.3
+        grass = forest & (drift > 0.58) & (view.slope < 34)
+        P.put(grass, "straw", 0.35 + 0.5 * shade + (noise(W, H, 2, wall.seed + 71) - 0.5) * 0.2)
+        forest = forest & ~grass
+        oak = forest & (n_veg < 0.62)
+        brush = brush | (forest & ~oak)
     con = forest & ~oak
     P.put(con & ~far, "forest", v)
     P.put(con & far, "far", v * 0.85 + 0.12)

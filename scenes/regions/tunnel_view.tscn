@@ -316,8 +316,8 @@ shader_parameter/anchor = Vector2(592, 418)
 shader_parameter/offset = Vector2(0, 150)
 shader_parameter/parallax = Vector2(0, 0.2)
 shader_parameter/marker = null
-shader_parameter/falls = PackedVector4Array(874, 282, 858, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-shader_parameter/fall_widths = PackedVector2Array(5, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/falls = PackedVector4Array(763, 294, 743, 372)
+shader_parameter/fall_widths = PackedVector2Array(2, 2)
 shader_parameter/fall_count = 1
 
 [node name="TunnelView" type="Node2D" unique_id=1542420504]
