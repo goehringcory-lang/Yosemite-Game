@@ -232,7 +232,7 @@ Top out the Apron (or drive up Glacier Point Road once it's open) and you're on 
 Rebuild it with `tools/hubs/rebuild_glacier_point.sh` (its Python steps need Pillow and numpy; set `PYTHON=` to pick an interpreter). It runs the 16px builder (`res://tools/hubs/build_glacier_point.tscn`), upgrades the pictures it drew to the 32px art and moves the scene onto the 32px grid, like the Village's. The layout is in `tools/hubs/build_glacier_point.gd`, and the art (the buildings, the railing, the rim trees, and the view over the edge) is in `tools/hubs/glacier_art.gd`, written to `assets/sprites/glacier/`. The painting of the view goes through the 32px upgrade like the title painting (Scale2x, then the palette with a light dither). Story NPCs go in `scenes/story/content/glacier_point.tscn`, placed by marker name. The map generator skips Glacier Point now (`"hand_made"` in `tools/mapgen/hub_content.gd`).
 
 ![Glacier Point overlook, with Half Dome across the canyon](docs/glacier_point_overlook.png)
-![Washburn Point: Liberty Cap, Nevada and Vernal falls](docs/glacier_point_washburn.png)
+![Washburn Point: Half Dome from the south, over the Merced's canyon](docs/glacier_point_washburn.png)
 ![Glacier Point, the whole map](docs/glacier_point_overview.png)
 ![Through a viewer: Half Dome named, with Clouds Rest behind it](docs/glacier_point_binoculars.png)
 ![Through a viewer, tilted down: Curry Village 3,200 feet below](docs/glacier_point_binoculars_floor.png)
@@ -281,7 +281,7 @@ Rebuild them with `tools/hubs/rebuild_el_portal.sh`, `tools/hubs/rebuild_wawona.
 ![The Mariposa Grove](docs/wawona_grove.png)
 ![Tuolumne Meadows: Soda Springs and Parsons Lodge above the river](docs/tuolumne_soda_springs.png)
 ![Lembert Dome and Dog Lake](docs/tuolumne_lembert_dome.png)
-![Cathedral Peak and Fairview Dome](docs/tuolumne_cathedral_peak.png)
+![Cathedral Peak at the end of its trail](docs/tuolumne_cathedral_peak.png)
 ![The campground and the lodge](docs/tuolumne_lodge.png)
 ![The Tuolumne over its cobble bed, the footbridge, and the sod banks](docs/tuolumne_river.png)
 ![The Tioga Road at the visitor center, under the lodgepoles](docs/tuolumne_tioga_road.png)
