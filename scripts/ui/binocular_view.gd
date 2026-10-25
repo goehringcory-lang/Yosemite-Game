@@ -75,7 +75,8 @@ const FAINT := Color(0.937, 0.894, 0.784, 0.32)
 ## by ClimbLandscape (in layer "l", at scale "s"); "on" names the landmark a
 ## target is a part of; "floor" puts one on the Valley floor (at that height
 ## in the floor picture), "floor_river" on the river. "ax" is where across
-## its landmark the anchor (the brackets) goes, the summit if not given, and
+## its landmark the anchor (the brackets) goes, its fall (or arches, or
+## summit) as the real skyline from here has it if not given, and
 ## "ay" how far down from there. "stat" is the height (or the drop, for a
 ## fall), "mi" how far off, in miles. "text_fall" and "text_winter", when
 ## there, replace "text" in that season. "village" is where Curry Village
@@ -83,7 +84,7 @@ const FAINT := Color(0.937, 0.894, 0.784, 0.32)
 ## bearing.
 const VIEWS := {
 	"glacier_point": {
-		"title": "Glacier Point", "elevation": "7,214 ft",
+		"title": "Glacier Point", "elevation": "7,214 ft", "vantage": "glacier_point",
 		"from": 242.0, "to": 506.0, "ground": "curry", "village": 335,
 		"density": [[242, 7], [258, 8], [264, 15], [282, 15], [288, 3.5], [320, 3.5], [325, 10], [340, 10], [346, 4], [358, 4],
 			[366, 11], [378, 13], [392, 12], [398, 8], [406, 10], [418, 14], [428, 14], [432, 11], [440, 15], [450, 12],
@@ -96,12 +97,12 @@ const VIEWS := {
 				"text": "Three thousand feet of sheer granite down the Valley. Warren Harding's team topped out the Nose in 1958, after 47 days of work on the wall."},
 			{"id": "eagle_peak", "name": "Eagle Peak", "k": "three_brothers", "l": 1, "s": 0.75, "bearing": 280, "stat": "7,779 ft", "mi": 2.6,
 				"text": "The highest of the Three Brothers, three tilted blocks of granite stepped up the north wall, each broken off along the same set of joints."},
-			{"id": "yosemite_falls", "name": "Yosemite Falls", "k": "yosemite_falls", "l": 1, "s": 0.8, "bearing": 325, "stat": "2,425 ft drop", "mi": 2.2, "ax": 0.46, "ay": 0.25,
+			{"id": "yosemite_falls", "name": "Yosemite Falls", "k": "yosemite_falls", "l": 1, "s": 0.8, "bearing": 325, "stat": "2,425 ft drop", "mi": 2.2, "ay": 0.25,
 				"text": "Upper Fall, Middle Cascades and Lower Fall together drop 2,425 feet: one of the tallest waterfalls in North America. Loudest in May and June.",
 				"text_fall": "Upper Fall, Middle Cascades and Lower Fall together drop 2,425 feet. By fall the creek runs low or dry; the first big storms bring it back."},
 			{"id": "yosemite_point", "name": "Yosemite Point", "k": "north_rim", "l": 1, "s": 0.9, "bearing": 339, "stat": "6,936 ft", "mi": 2.2,
 				"text": "The rim just east of the falls. Below it, Lost Arrow Spire stands out from the wall like a blade, 200 feet clear of the cliff at its tip."},
-			{"id": "royal_arches", "name": "Royal Arches", "k": "royal_arches", "l": 2, "s": 1.0, "bearing": 4, "stat": "1,500 ft tall", "mi": 1.4, "ax": 0.5, "ay": 0.3,
+			{"id": "royal_arches", "name": "Royal Arches", "k": "royal_arches", "l": 2, "s": 1.0, "bearing": 4, "stat": "1,500 ft tall", "mi": 1.4, "ay": 0.3,
 				"text": "Great arcs of granite that peeled off the wall in sheets, like the layers of an onion. The Ahwahnee hotel sits in the trees at their foot."},
 			{"id": "north_dome", "name": "North Dome", "k": "north_dome", "l": 1, "s": 1.05, "bearing": 20, "stat": "7,542 ft", "mi": 2.1,
 				"text": "A rounded crown above the Royal Arches, shaped as the granite shed its outer shells one by one. The view of Half Dome from its top is famous."},
@@ -127,15 +128,15 @@ const VIEWS := {
 				"text": "In 1872 John Muir set stakes in the glacier on its flank and watched them move: proof that living ice still worked in the Sierra."},
 			{"id": "mt_lyell", "name": "Mount Lyell", "k": "mt_lyell", "l": 0, "s": 0.75, "bearing": 89, "stat": "13,114 ft", "mi": 16.5,
 				"text": "The highest peak in the park. The Lyell Glacier on its north side feeds the Tuolumne River."},
-			{"id": "vernal_fall", "name": "Vernal Fall", "k": "vernal_fall", "l": 2, "s": 1.0, "bearing": 97, "stat": "317 ft drop", "mi": 1.6, "ax": 0.5, "ay": 0.1,
+			{"id": "vernal_fall", "name": "Vernal Fall", "k": "vernal_fall", "l": 2, "s": 1.0, "bearing": 97, "stat": "317 ft drop", "mi": 1.6, "ay": 0.1,
 				"text": "The Merced drops 317 feet in a broad curtain. In spring its spray soaks everyone on the Mist Trail's granite stairs beside it."},
-			{"id": "nevada_fall", "name": "Nevada Fall", "k": "nevada_fall", "l": 1, "s": 1.0, "bearing": 100, "stat": "594 ft drop", "mi": 2.3, "ax": 0.52, "ay": 0.2,
+			{"id": "nevada_fall", "name": "Nevada Fall", "k": "nevada_fall", "l": 1, "s": 1.0, "bearing": 100, "stat": "594 ft drop", "mi": 2.3, "ay": 0.2,
 				"text": "The Merced pours 594 feet over a granite lip and twists as it falls. The John Muir Trail crosses the river just above it."},
 			{"id": "mt_clark", "name": "Mount Clark", "k": "mt_clark", "l": 0, "s": 0.75, "bearing": 106, "stat": "11,522 ft", "mi": 8.4,
 				"text": "A sharp fin of the Clark Range, named for Galen Clark, the first Guardian of Yosemite."},
-			{"id": "mt_starr_king", "name": "Mount Starr King", "k": "mt_starr_king", "l": 1, "s": 1.1, "bearing": 120, "stat": "9,092 ft", "mi": 4.7,
+			{"id": "mt_starr_king", "name": "Mount Starr King", "k": "mt_starr_king", "l": 1, "s": 1.45, "bearing": 120, "stat": "9,092 ft", "mi": 4.7,
 				"text": "A steep bald dome, named for Thomas Starr King, whose letters from Yosemite in 1860 helped draw the country's eye to it."},
-			{"id": "illilouette_fall", "name": "Illilouette Fall", "k": "illilouette_fall", "l": 2, "s": 1.3, "bearing": 123, "stat": "370 ft drop", "mi": 0.8, "ax": 0.5, "ay": 0.1,
+			{"id": "illilouette_fall", "name": "Illilouette Fall", "k": "illilouette_fall", "l": 2, "s": 1.3, "bearing": 123, "stat": "370 ft drop", "mi": 0.8, "ay": 0.1,
 				"text": "Illilouette Creek drops 370 feet into its own gorge, hidden from the Valley floor. This is one of the few places you can see it."},
 			{"id": "curry_village", "name": "Curry Village", "floor": 306, "bearing": 7, "stat": "3,200 ft below", "mi": 0.5,
 				"text": "Camp Curry, founded in 1899. On summer nights the Firefall poured off the cliff right where you're standing, to cheers from down there."},
@@ -365,11 +366,11 @@ static func paint(view: Dictionary, pal: Dictionary, hour: float, scale: PackedF
 		# Stand the landmark so its summit (or its anchor) is at its bearing.
 		var s: float = t.get("s", 1.0)
 		var w := int(ClimbLandscape.LANDMARKS[t.k].w * s)
-		var across: float = t.get("ax", summit_across(t.k))
+		var across: float = t.get("ax", ClimbLandscape.anchor_across(t.k, view.get("vantage", "")))
 		var cx := scale_x(scale, view, t.bearing) - (across - 0.5) * w
 		specs.append({"k": t.k, "x": roundi(cx), "s": s, "l": t.get("l", 1)})
 	var land := ClimbLandscape.build({"view": specs, "ground": view.get("ground", "valley_forest"),
-		"floor_x": floor_x}, pal, hash(view.title), width)
+		"floor_x": floor_x, "vantage": view.get("vantage", "")}, pal, hash(view.title), width)
 	var sky_x := func(b: float) -> float: return scale_x(scale, view, b)
 	return {"land": land, "sky": paint_sky(pal, width, hour, sky_x), "rim": paint_rim(pal, width)}
 
@@ -414,20 +415,6 @@ static func paint_rim(pal: Dictionary, width: int) -> Image:
 		else:
 			ClimbLandscape._conifer(im, x, y - 9, 9, c, true)
 	return im
-
-
-## How far across landmark [param kind] its summit is (0 left .. 1 right).
-static func summit_across(kind: String) -> float:
-	var rng := RandomNumberGenerator.new()
-	var best := -1.0
-	var at := 0.0
-	for k in 201:
-		var u := k / 100.0 - 1.0
-		var v := ClimbLandscape._profile(kind, u, k, rng)
-		if v > best:
-			best = v
-			at = u
-	return (at + 1.0) / 2.0
 
 
 ## The sky across the whole panorama: ClimbSky's banded colors, stars at
