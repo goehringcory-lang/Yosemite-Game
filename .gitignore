@@ -11,3 +11,6 @@
 # Claude Code agent worktrees
 /.claude/worktrees/
 __pycache__/
+
+# Cliff painter's elevation downloads (USGS 3DEP)
+/tools/art32/walls32/cache/
