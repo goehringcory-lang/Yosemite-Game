@@ -26,7 +26,8 @@ const CREDITS := [
 	]],
 	["Elevation", [
 		"USGS 3D Elevation Program (public domain),",
-		"from the AWS Terrain Tiles open dataset.",
+		"from the AWS Terrain Tiles open dataset",
+		"and The National Map's lidar elevation service.",
 	]],
 	["Art and sound", [
 		"Drawn and synthesized by the game's own generators",

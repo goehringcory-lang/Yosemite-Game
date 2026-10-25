@@ -35,6 +35,23 @@ func _ready() -> void:
 				kinds.append(layer.get_cell_atlas_coords(cell).y if layer.get_cell_source_id(cell) >= 0 else 0)
 		var sprites := []
 		_collect(region, region, sprites)
+		# the animated waterfalls hanging on the cliff walls (walls32 lines the
+		# real falls up under them)
+		var anims := []
+		for a in region.find_children("*", "AnimatedSprite2D", true, false):
+			var sp := a as AnimatedSprite2D
+			var tex: Texture2D = sp.sprite_frames.get_frame_texture(sp.animation, 0) if sp.sprite_frames else null
+			var ap := _pos(sp, region)
+			anims.append({
+				"name": String(sp.name),
+				"tex": tex.resource_path if tex else "",
+				"x": ap.x,
+				"y": ap.y,
+				"centered": sp.centered,
+				"w": tex.get_width() if tex else 0,
+				"h": tex.get_height() if tex else 0,
+				"z": sp.z_index,
+			})
 		var markers := {}
 		for m in region.find_children("*", "Marker2D", true, false):
 			var p := _pos(m, region)
@@ -47,6 +64,7 @@ func _ready() -> void:
 			"ground": art.texture.resource_path,
 			"kinds": kinds,
 			"sprites": sprites,
+			"anims": anims,
 			"markers": markers,
 		}
 		var f := FileAccess.open(out_dir.path_join(id + ".json"), FileAccess.WRITE)

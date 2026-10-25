@@ -55,11 +55,21 @@ and station code.
 ## The native finish outdoors
 
 The outdoor areas (all but Tuolumne Meadows) have their ground painted again
-natively by `tools/art32/ground32/`, their parked cars by
-`tools/art32/cars32.py`, and the speckle cleaned out of their granite walls by
-`tools/art32/rock32.py`; see the README's "native 32px finish". The ground
+natively by `tools/art32/ground32/` and their parked cars by
+`tools/art32/cars32.py`; see the README's "native 32px finish". The ground
 uses ramps of its own (`ground32/ramps.py`) that extend the palette's ramps
 with in-between steps, so a meadow or a river reads as one calm surface.
+
+## The real park
+
+The trees are painted natively at 32px as their real species by
+`tools/art32/trees32/`. The cliff walls, Glacier Point's vista, the title's
+Tunnel View, Tuolumne's domes and Cathedral Peak, and the landmarks on the
+climbing screen and through the binoculars are rendered from the USGS's 3DEP
+lidar heights with OpenStreetMap's land cover by `tools/art32/walls32/`
+(`paint.py`, `vista.py`, `masses.py`, `skylines.py`); see the README's "The
+real park". Their colors are ramps of their own, cool in the shadows and
+warm in the light like the rest of the 32px art (`walls32/ramps.py`).
 
 ## Known limits
 
@@ -72,7 +82,9 @@ with in-between steps, so a meadow or a river reads as one calm surface.
   Village (build, `upgrade.py --fresh` on what it drew, then
   `migrate_built.py` on the scene it wrote).
 - Detail is derived from the 16px drawings (smoothed, re-colored, shaded), not
-  redrawn by hand, so shapes are the originals' shapes.
+  redrawn by hand, so shapes are the originals' shapes (but the trees, the
+  cliffs, the vistas, the domes and the skylines, which are painted from the
+  real species and the real terrain).
   The exception is the interiors: the Ahwahnee's six rooms and their
   furniture are painted natively at 32px in the palette by
   `tools/hubs/ahwahnee32/`, and every other room, the Camp Curry Store, the

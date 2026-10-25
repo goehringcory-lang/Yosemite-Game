@@ -392,11 +392,13 @@ const PROFILES := {
 		"weather": "alpine",
 		"belayer": "john_muir",
 		"descent": "walk",
+		# As they stand from the summit, east round to south: Unicorn Peak,
+		# the Cockscomb with Matthes Crest beyond it, the Echo Peaks nearest.
 		"view": [
-			{"k": "cockscomb", "x": 395, "s": 1.2, "l": 0},
-			{"k": "unicorn_peak", "x": 330, "s": 1.0, "l": 0},
-			{"k": "echo_peaks", "x": 445, "s": 1.0, "l": 1},
-			{"k": "matthes_crest", "x": 270, "s": 1.0, "l": 1},
+			{"k": "matthes_crest", "x": 385, "s": 1.0, "l": 0},
+			{"k": "unicorn_peak", "x": 255, "s": 1.0, "l": 0},
+			{"k": "cockscomb", "x": 335, "s": 1.2, "l": 0},
+			{"k": "echo_peaks", "x": 450, "s": 1.0, "l": 1},
 			{"k": "sierra_crest", "x": 300, "s": 1.0, "l": 2},
 		],
 		"facts": [
@@ -421,10 +423,12 @@ const PROFILES := {
 		"weather": "alpine",
 		"belayer": "john_muir",
 		"descent": "walk",
+		# The Lyell group from Lyell Canyon: Donohue Pass to the east, Lyell,
+		# and Maclure just west of it and a little nearer.
 		"view": [
-			{"k": "mt_lyell", "x": 400, "s": 1.6, "l": 0},
-			{"k": "mt_maclure", "x": 330, "s": 1.2, "l": 0},
-			{"k": "donohue_pass", "x": 455, "s": 1.0, "l": 1},
+			{"k": "mt_lyell", "x": 350, "s": 1.6, "l": 0},
+			{"k": "mt_maclure", "x": 455, "s": 1.2, "l": 0},
+			{"k": "donohue_pass", "x": 200, "s": 1.0, "l": 1},
 			{"k": "sierra_crest", "x": 270, "s": 1.0, "l": 2},
 		],
 		"facts": [

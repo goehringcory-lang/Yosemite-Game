@@ -232,7 +232,7 @@ Top out the Apron (or drive up Glacier Point Road once it's open) and you're on 
 Rebuild it with `tools/hubs/rebuild_glacier_point.sh` (its Python steps need Pillow and numpy; set `PYTHON=` to pick an interpreter). It runs the 16px builder (`res://tools/hubs/build_glacier_point.tscn`), upgrades the pictures it drew to the 32px art and moves the scene onto the 32px grid, like the Village's. The layout is in `tools/hubs/build_glacier_point.gd`, and the art (the buildings, the railing, the rim trees, and the view over the edge) is in `tools/hubs/glacier_art.gd`, written to `assets/sprites/glacier/`. The painting of the view goes through the 32px upgrade like the title painting (Scale2x, then the palette with a light dither). Story NPCs go in `scenes/story/content/glacier_point.tscn`, placed by marker name. The map generator skips Glacier Point now (`"hand_made"` in `tools/mapgen/hub_content.gd`).
 
 ![Glacier Point overlook, with Half Dome across the canyon](docs/glacier_point_overlook.png)
-![Washburn Point: Liberty Cap, Nevada and Vernal falls](docs/glacier_point_washburn.png)
+![Washburn Point: Half Dome from the south, over the Merced's canyon](docs/glacier_point_washburn.png)
 ![Glacier Point, the whole map](docs/glacier_point_overview.png)
 ![Through a viewer: Half Dome named, with Clouds Rest behind it](docs/glacier_point_binoculars.png)
 ![Through a viewer, tilted down: Curry Village 3,200 feet below](docs/glacier_point_binoculars_floor.png)
@@ -281,7 +281,7 @@ Rebuild them with `tools/hubs/rebuild_el_portal.sh`, `tools/hubs/rebuild_wawona.
 ![The Mariposa Grove](docs/wawona_grove.png)
 ![Tuolumne Meadows: Soda Springs and Parsons Lodge above the river](docs/tuolumne_soda_springs.png)
 ![Lembert Dome and Dog Lake](docs/tuolumne_lembert_dome.png)
-![Cathedral Peak and Fairview Dome](docs/tuolumne_cathedral_peak.png)
+![Cathedral Peak at the end of its trail](docs/tuolumne_cathedral_peak.png)
 ![The campground and the lodge](docs/tuolumne_lodge.png)
 ![The Tuolumne over its cobble bed, the footbridge, and the sod banks](docs/tuolumne_river.png)
 ![The Tioga Road at the visitor center, under the lodgepoles](docs/tuolumne_tioga_road.png)
@@ -328,14 +328,38 @@ Every hand-made outdoor area except Tuolumne Meadows then gets a finish painted 
 - **Moving water.** `assets/shaders/seasonal_ground.gdshader` (already on every area's ground) drifts bands of brighter ripples along the painted water and winks glints on and off; `SeasonalDressing.STILL_WATER` lists the areas that don't get it (Tuolumne Meadows, whose river runs by its own `water_flow`). The fall and winter grades now recognize the Merced's teal and leave it alone.
 - **Light.** `scripts/world/atmosphere.gd` lays an outdoor grade over the picture (`assets/shaders/atmosphere.gdshader`): cool shadows, warm lights, a gentle S-curve and soft corners, read pixel for pixel so the art stays crisp. It's off indoors and in Tuolumne Meadows.
 - **Cars.** `python3 tools/art32/cars32.py` paints the twelve parked cars into `assets/sprites/cars/`: a sedan, a station wagon with a roof box, a pickup with a cooler and a duffel in the bed, a hatchback with a bike on the roof and a two-tone camper van, seen from above and behind (hood, windshield, roof sheen, rear window, tail lights, plate, bumper, tyres) in the muted paints of a real lot. `sheet OUT.png` lays them side by side (`docs/cars32.png`).
-- **Granite walls.** `python3 tools/art32/rock32.py FILE...` cleans the Valley's cliff walls (`assets/sprites/valley/*_wall.png`, the Royal Arches, the Village's and Curry Village's walls): speckle in the granite gives way to the tone around it, so the rock gathers into planes of light and shade, while cracks, outlines, ledge pines and falls stay as drawn. Run it again after a builder redraws a wall.
+- **Granite walls.** `python3 tools/art32/rock32.py FILE...` cleans the Valley's cliff walls (`assets/sprites/valley/*_wall.png`, the Royal Arches, the Village's and Curry Village's walls): speckle in the granite gives way to the tone around it, so the rock gathers into planes of light and shade, while cracks, outlines, ledge pines and falls stay as drawn. The walls are now painted from the real terrain instead (`walls32/paint.py`, below), so this is only for a wall a builder has redrawn and that isn't repainted.
 
 ![Yosemite Village: before and after](docs/ground32_yosemite_village.png)
 ![El Portal: before and after](docs/ground32_el_portal.png)
 ![Wawona: before and after](docs/ground32_wawona.png)
 ![Glacier Point: before and after](docs/ground32_glacier_point.png)
 
-To rebuild everything after changing a generator, run these in order: `ui_art.tscn`, `npcgen.gd`, `gear_icons.gd`, `paint_flora.tscn`, `rebuild_buildings.tscn -- paint`, `--import`, `build_ahwahnee.tscn`, `build_seasonal_art.gd`, `build_homestead.tscn`, `build_curry.tscn`, `build_hubs.tscn`, `rebuild_glacier_point.sh`, `rebuild_el_portal.sh`, `rebuild_wawona.sh`, `rebuild_tuolumne.sh`, `rebuild_interiors.sh`, `repaint_village_art.tscn`, `repaint_interiors.tscn`, `repaint_ground.tscn`, `rebuild_wild_dressing.sh`, `upgrade_hubs.tscn -- paint`, `--import`, `upgrade_hubs.tscn -- attach`, `--import`, then the native 32px finish above (`ground32/dump.tscn` and `paint.py`, `rock32.py` on the walls, `cars32.py`) and `--import`. The hub builders also rewrite the region scenes, plus `scenes/objects/shuttle_stop.tscn` and the shop and food data in `data/`. Only the node IDs differ in the scenes, but the data can lose hand edits, such as the Camp 4 trader's offers. So keep only the art: `git restore -- scenes/ data/`.
+#### The real park: trees, cliffs, vistas and skylines
+
+The trees, the cliffs and every distant view are then painted as the real things, from the real terrain:
+
+- **Trees** (`tools/art32/trees32/`). Every tree is its own species, painted natively at 32px: ponderosa pines in three ages (one an orange-barked old "yellow belly", one a young "blackjack"), Jeffrey pines, sugar pines with their long cones hanging from the tips of level limbs, lodgepoles in four forms, gray pines forked and see-through, white and red firs in whorled tiers, incense cedars, giant sequoias (the Grizzly Giant with its great elbow limb and dead top, the Tunnel Tree, the Fallen Monarch), snags, and the broadleaf trees from a branching skeleton: black, blue and live oaks, alders with catkins, dogwoods with white bracts, redbud, buckeye in its candles, willow thickets, apple trees. Each sprite keeps its canvas and anchor; the deciduous ones have a picture for each season that `SeasonalDressing` swaps in. `python3 tools/art32/trees32/paint.py` (`--list`, `--out DIR`, or names).
+- **Cliff walls** (`tools/art32/walls32/paint.py`). Each region's wall is a perspective rendering of the USGS 3D Elevation Program's lidar heights (two metres a sample) for the cliff that really stands there, seen from its foot: El Capitan with the Nose and the North America Wall's diorite, the Three Brothers, Sentinel Rock, Cathedral Rocks and Bridalveil, the Royal Arches and Washington Column, the Glacier Point Apron, Mirror Lake's walls, the Merced's foothill canyon at El Portal. The light comes from each pixel's real surface facing; over it go water streaks below the rim's notches, tan staining, fresh scars, cracks, exfoliation, forest on the benches and talus. Each picture keeps its size and the scene's cliff line (so collision is unchanged), with its falls lined up under the animated ones.
+- **Vistas** (`tools/art32/walls32/vista.py`). Glacier Point's backdrop and the title screen's Tunnel View are rendered from the terrain with OpenStreetMap's land cover (forest, meadow, scree, bare rock, water) placing each tree and talus slope; the falls' shimmers are placed where the map has them, and Horsetail Fall is painted dry.
+- **Tuolumne's domes** (`tools/art32/walls32/masses.py`). Lembert, Pothole and Fairview domes and Cathedral Peak, each from where people see it, with lodgepoles planted one by one where the map has woods and their outlines covering the granite tiles the scene was built with.
+- **Skylines** (`tools/art32/walls32/skylines.py`). The landmarks the climbing screen, the Glacier Point binoculars, the slackline and the story scenes paint past the wall's edge get their real silhouettes, as seen from where the game looks at them (Half Dome from down the Valley, El Capitan from the Cathedral Spires, Tuolumne's needles from Cathedral Peak; the binoculars from Glacier Point itself), with their true proportions drawn a little taller, the light on each face, the sheer walls that carry streaks, and where their falls and features stand. It writes `scripts/climb/art/landmark_shapes.gd`, which `ClimbLandscape` reads.
+
+The heights come from The National Map's 3DEP elevation service and the map from the OpenStreetMap API, fetched once and cached in `tools/art32/walls32/cache/` (git-ignored; a couple of gigabytes). `dem.py`, `osm.py` and `elevation.py` hold the fetching, the land-cover rasterizer and the ray-marched views. Rebuild:
+
+```bash
+python3 tools/art32/trees32/paint.py                                              # the trees
+godot --headless --path . res://tools/art32/ground32/dump.tscn -- /tmp/ground32   # terrain grids and falls
+python3 tools/art32/walls32/paint.py /tmp/ground32 [region ids]                  # the cliff walls
+python3 tools/art32/walls32/vista.py                                              # Glacier Point and Tunnel View
+python3 tools/art32/walls32/masses.py /tmp/ground32                               # Tuolumne's domes
+python3 tools/art32/walls32/skylines.py                                           # the landmarks' skylines
+godot --headless --path . --import
+```
+
+`paint.py`, `vista.py` and `masses.py` take `--out DIR` to write somewhere else first; `paint.py --preview DIR` shows a wall's bare render with its anchors marked; `skylines.py --preview DIR` draws every silhouette at its size in the climbing screen, and `--views DIR` renders the terrain round each landmark with its own rock tinted.
+
+To rebuild everything after changing a generator, run these in order: `ui_art.tscn`, `npcgen.gd`, `gear_icons.gd`, `paint_flora.tscn`, `rebuild_buildings.tscn -- paint`, `--import`, `build_ahwahnee.tscn`, `build_seasonal_art.gd`, `build_homestead.tscn`, `build_curry.tscn`, `build_hubs.tscn`, `rebuild_glacier_point.sh`, `rebuild_el_portal.sh`, `rebuild_wawona.sh`, `rebuild_tuolumne.sh`, `rebuild_interiors.sh`, `repaint_village_art.tscn`, `repaint_interiors.tscn`, `repaint_ground.tscn`, `rebuild_wild_dressing.sh`, `upgrade_hubs.tscn -- paint`, `--import`, `upgrade_hubs.tscn -- attach`, `--import`, then the native 32px finish above (`ground32/dump.tscn` and `paint.py`, `cars32.py`), the real park's trees, cliffs, vistas, domes and skylines (`trees32/paint.py`, `walls32/paint.py`, `vista.py`, `masses.py`, `skylines.py`) and `--import`. The hub builders also rewrite the region scenes, plus `scenes/objects/shuttle_stop.tscn` and the shop and food data in `data/`. Only the node IDs differ in the scenes, but the data can lose hand edits, such as the Camp 4 trader's offers. So keep only the art: `git restore -- scenes/ data/`.
 
 ![Pause menu](docs/ui_pause_menu.png)
 ![Settings](docs/ui_pause_settings.png)

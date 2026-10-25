@@ -60,7 +60,7 @@ const MOMENTS := {
 	},
 	"muir_glacier": {
 		"title": "A climber on the Lyell ice", "from": "with the sheepherders", "hour": 9.0, "alpine": true,
-		"view": [{"k": "mt_lyell", "x": 250, "s": 1.9, "l": 1}, {"k": "mt_maclure", "x": 90, "s": 1.0, "l": 0},
+		"view": [{"k": "mt_lyell", "x": 250, "s": 1.9, "l": 1}, {"k": "mt_maclure", "x": 420, "s": 1.0, "l": 0},
 			{"k": "sierra_crest", "x": 240, "s": 1.0, "l": 2}],
 		"ground": "moraine", "figure": {"x": 262, "down": 0.55, "l": 1}, "figure_kind": "stakes",
 	},

@@ -13,9 +13,9 @@ const SCREEN := Vector2(480, 270)
 const BACKGROUND := "res://assets/ui/title_background.png"
 ## Where Bridalveil Fall is in the background, for the shimmer: the middle of
 ## the water at its lip and where it meets the mist, and its half width there.
-const FALL_TOP := Vector2(437, 141)
-const FALL_BOTTOM := Vector2(429, 203)
-const FALL_HALF_WIDTH := Vector2(2.5, 4.0)
+const FALL_TOP := Vector2(381.5, 147)
+const FALL_BOTTOM := Vector2(371.5, 186)
+const FALL_HALF_WIDTH := Vector2(1, 1)
 
 enum Option { CONTINUE, NEW_GAME, SETTINGS, CREDITS, QUIT }
 const OPTION_NAMES := ["Continue", "New Game", "Settings", "Credits", "Quit"]

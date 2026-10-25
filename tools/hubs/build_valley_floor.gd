@@ -435,7 +435,7 @@ const TV_VISTA_OFFSET := Vector2(0, 150)
 const TV_VISTA_PARALLAX := Vector2(0.0, 0.2)
 ## Bridalveil Fall in the painting (scripts/ui/title_screen.gd's FALL_TOP and
 ## FALL_BOTTOM, on the painting's 960x540).
-const TV_VISTA_FALLS := [[Vector2(874, 282), Vector2(858, 406), Vector2(5, 8)]]
+const TV_VISTA_FALLS := [[Vector2(763, 294), Vector2(743, 372), Vector2(2, 2)]]
 
 var _tv_drop := PackedByteArray()
 

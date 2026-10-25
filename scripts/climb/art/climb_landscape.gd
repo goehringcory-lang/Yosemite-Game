@@ -12,6 +12,9 @@ extends RefCounted
 ## with conifer tops, and snow on the high peaks.
 
 const P := preload("res://scripts/climb/art/climb_paint.gd")
+## The landmarks' real skylines, measured from the USGS's lidar heights
+## (tools/art32/walls32/skylines.py).
+const Shapes := preload("res://scripts/climb/art/landmark_shapes.gd")
 const SCREEN := Vector2i(480, 270)
 ## Extra picture above each layer, so tall landmarks aren't cut off as the
 ## layers sink.
@@ -25,9 +28,13 @@ const LAYER_HAZE := [0.4, 0.24, 0.09]
 const GRANITE := ["f6e2b0", "dcb886", "b09478", "7f7ea0", "524f78"]
 ## How much of the sky's tint each tone takes.
 const GRANITE_TINT := [0.32, 0.22, 0.12, 0.08, 0.06]
+## How much taller than true a landmark with a real skyline is drawn (as
+## the cliff walls are), within its box in LANDMARKS.
+const EXAGGERATE := 1.7
 
-## width and height in pixels at scale 1, and the painter that shapes the
-## landmark. See _profile().
+## width and height in pixels at scale 1 (the most it's drawn), and the
+## painter that shapes the landmark. One with a real skyline in Shapes takes
+## that shape and its true proportions; see shape_of() and _profile().
 const LANDMARKS := {
 	"half_dome": {"w": 120, "h": 104, "trees": true, "lr": 1.0, "t0": 0.6, "flute": 0.3},
 	"north_dome": {"w": 110, "h": 58, "trees": true},
@@ -65,11 +72,69 @@ const LANDMARKS := {
 }
 
 
+## The real skyline of [param kind] as seen from [param vantage] (or from
+## the routes' side, when there's none from there), or {} for one drawn by
+## _profile().
+static func shape_of(kind: String, vantage := "") -> Dictionary:
+	if vantage != "" and Shapes.SHAPES.has(kind + "@" + vantage):
+		return Shapes.SHAPES[kind + "@" + vantage]
+	return Shapes.SHAPES.get(kind, {})
+
+
+## A shape's [param key] row (0..1 across) at [param f], eased between steps.
+static func sample(shape: Dictionary, key: String, f: float) -> float:
+	var row: Array = shape[key]
+	var x := clampf(f, 0.0, 1.0) * (row.size() - 1)
+	var i := mini(int(x), row.size() - 2)
+	return lerpf(row[i], row[i + 1], x - i)
+
+
+## The widest run across [param shape] (0..1) where [param key] is over
+## [param at_least], as [from, to]; [] if there's none.
+static func span_of(shape: Dictionary, key: String, at_least: float) -> Array:
+	var row: Array = shape[key]
+	var best := []
+	var start := -1
+	for i in row.size() + 1:
+		var on := i < row.size() and float(row[i]) > at_least
+		if on and start < 0:
+			start = i
+		elif not on and start >= 0:
+			if best.is_empty() or i - start > (best[1] - best[0]) * (row.size() - 1):
+				best = [start / float(row.size() - 1), (i - 1) / float(row.size() - 1)]
+			start = -1
+	return best
+
+
+## Where across [param kind] (0 left .. 1 right) the eye goes to it: a
+## waterfall's fall, the Royal Arches' arches, or its summit.
+static func anchor_across(kind: String, vantage := "") -> float:
+	var shape := shape_of(kind, vantage)
+	if not shape.is_empty():
+		var a_fall := kind.ends_with("_fall") or kind.ends_with("_falls") or kind == "bridalveil"
+		if a_fall and not (shape.falls as Array).is_empty():
+			return shape.falls[0]
+		if (shape.marks as Dictionary).has("arches"):
+			return shape.marks.arches
+	var rng := RandomNumberGenerator.new()
+	var best := -1.0
+	var at := 0.0
+	for k in 201:
+		var u := k / 100.0 - 1.0
+		var v := sample(shape, "top", (u + 1.0) / 2.0) if not shape.is_empty() else _profile(kind, u, k, rng)
+		if v > best:
+			best = v
+			at = u
+	return (at + 1.0) / 2.0
+
+
 ## The landscape for [param route_id]'s profile, as layers back to front:
 ## [{"image": Image, "sink": float}] (sink = pixels the layer drops over the
 ## whole climb) plus "falls": waterfalls to shimmer {"x", "y0", "y1", "layer"}
 ## and "peaks": where each landmark's summit was painted {"k", "x", "y",
 ## "x0", "x1", "layer"}. [param width] paints a panorama wider than the screen.
+## The profile's "vantage" (say "glacier_point") picks the landmarks' skylines
+## as seen from there.
 static func build(profile: Dictionary, pal: Dictionary, seed_value: int, width := SCREEN.x) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
@@ -100,7 +165,8 @@ static func build(profile: Dictionary, pal: Dictionary, seed_value: int, width :
 			continue
 		var into := 0 if kind == "sierra_crest" else l
 		var peak := {"k": kind, "layer": into}
-		var found := _paint_landmark(images[into], kind, info, int(spec.x), float(spec.get("s", 1.0)), l, into, pal, rng, peak)
+		var shape := shape_of(kind, profile.get("vantage", ""))
+		var found := _paint_landmark(images[into], kind, info, int(spec.x), float(spec.get("s", 1.0)), l, into, pal, rng, peak, shape)
 		peaks.append(peak)
 		for f: Dictionary in found:
 			f["layer"] = into
@@ -382,19 +448,23 @@ static func _ridge(im: Image, l: int, pal: Dictionary, rng: RandomNumberGenerato
 # --------------------------------------------------------------- landmarks
 
 ## [param peak] is filled with where the summit landed: {"x", "y", "x0", "x1"}.
-static func _paint_landmark(im: Image, kind: String, info: Dictionary, cx: int, s: float, l: int, into: int, pal: Dictionary, rng: RandomNumberGenerator, peak := {}) -> Array[Dictionary]:
+static func _paint_landmark(im: Image, kind: String, info: Dictionary, cx: int, s: float, l: int, into: int, pal: Dictionary, rng: RandomNumberGenerator, peak := {}, shape := {}) -> Array[Dictionary]:
 	var c := _body(pal, maxi(into, 0))
 	if kind == "sierra_crest":
 		c = _body(pal, 0)
 	var w := int(info.w * s)
 	var h := int(info.h * s)
+	if not shape.is_empty():
+		# its true proportions, a little taller, within its box
+		h = int(clampf(info.w / float(shape.aspect) * EXAGGERATE, info.h * 0.6, info.h) * s)
 	var base: int = LAYER_BASE[l] + 10 + PAD
 	var x0 := cx - w / 2
 	var tops := PackedInt32Array()
 	tops.resize(w)
 	for i in w:
 		var u := (float(i) / maxf(w - 1, 1)) * 2.0 - 1.0
-		tops[i] = base - int(_profile(kind, u, int(i / s), rng) * h)
+		var v := sample(shape, "top", (u + 1.0) / 2.0) if not shape.is_empty() else _profile(kind, u, int(i / s), rng)
+		tops[i] = base - int(v * h)
 	var summit := 0
 	for i in w:
 		if tops[i] < tops[summit]:
@@ -403,20 +473,21 @@ static func _paint_landmark(im: Image, kind: String, info: Dictionary, cx: int, 
 	var falls: Array[Dictionary] = []
 	var tree_h := 3 + int(s * 1.6) + (1 if l == 2 else 0)
 	var treeline := _treeline(tops, base, h, 0.14 if kind != "glacier_point" else 0.3)
-	_mass(im, kind, x0, w, h, tops, base, c, info, rng)
-	_details(im, kind, x0, w, h, tops, base, c, info, rng)
+	_mass(im, kind, x0, w, h, tops, base, c, info, rng, shape)
+	_details(im, kind, x0, w, h, tops, base, c, info, rng, shape)
 	if info.get("snow", false):
 		_snow(im, x0, w, tops, base, c, info.get("glacier", false), rng)
 	if info.get("trees", false):
 		_forest(im, x0, tops, treeline, base, c, tree_h, rng)
-	_after_trees(im, kind, x0, w, h, tops, base, c, info, rng, falls)
+	_after_trees(im, kind, x0, w, h, tops, base, c, info, rng, falls, shape)
 	return falls
 
 
-## Lights a landmark: tones from sunny left to shaded right, darker toward
-## the foot, lit and shaded flanks where the outline rises and falls, a rim
-## light on top and fluting down the face.
-static func _mass(im: Image, kind: String, x0: int, w: int, h: int, tops: PackedInt32Array, base: int, c: Dictionary, info: Dictionary, rng: RandomNumberGenerator) -> void:
+## Lights a landmark: tones from sunny left to shaded right (or, with a real
+## skyline, as its faces really take the light from the upper left), darker
+## toward the foot, lit and shaded flanks where the outline rises and falls,
+## a rim light on top and fluting down the face.
+static func _mass(im: Image, kind: String, x0: int, w: int, h: int, tops: PackedInt32Array, base: int, c: Dictionary, info: Dictionary, rng: RandomNumberGenerator, shape := {}) -> void:
 	var ramp: Array[Color] = c.ramp
 	var lr: float = info.get("lr", 1.9)
 	var t_start: float = info.get("t0", 0.85)
@@ -436,9 +507,12 @@ static func _mass(im: Image, kind: String, x0: int, w: int, h: int, tops: Packed
 			d = tops[i - 2] - tops[i + 2]
 		var hfrac := float(base - top) / maxf(h, 1)
 		var t0 := t_start + f * lr - clampf(d * 0.10, -1.0, 1.0)
+		if not shape.is_empty():
+			t0 = t_start + (0.62 - sample(shape, "tone", f)) * 3.0 - clampf(d * 0.06, -0.6, 0.6)
 		# Fluting: columns that catch the light or sink into shadow.
 		t0 += (P.noise(i / 3, 0, seed_value) - 0.5) * flute * 0.8 + (P.noise(i, 1, seed_value) - 0.5) * flute * 0.3
-		t0 += _extra_tone(kind, f, hfrac)
+		if shape.is_empty():
+			t0 += _extra_tone(kind, f, hfrac)
 		var dk := 1.15 if hfrac > 0.3 else 0.8
 		var t1 := t0 + dk * float(bottom - top) / maxf(base - top, 1)
 		_band_col(im, x, top, bottom, t0, minf(t1, 4.6), ramp)
@@ -473,22 +547,26 @@ static func _extra_tone(kind: String, f: float, hfrac: float) -> float:
 
 
 ## Strata, stains and other marks laid over the granite.
-static func _details(im: Image, kind: String, x0: int, w: int, h: int, tops: PackedInt32Array, base: int, c: Dictionary, info: Dictionary, rng: RandomNumberGenerator) -> void:
+static func _details(im: Image, kind: String, x0: int, w: int, h: int, tops: PackedInt32Array, base: int, c: Dictionary, info: Dictionary, rng: RandomNumberGenerator, shape := {}) -> void:
 	match kind:
 		"half_dome":
 			# Dark water streaks down the sheer face, from the lip.
-			var a := int(w * 0.55)
-			var b := int(w * 0.73)
-			_streaks(im, x0, tops, base, c, rng, a, b, 10, c.deep.darkened(0.25), 0.1, 0.6, true)
+			var face := [0.515, 0.73]
+			if not shape.is_empty():
+				var sheer := span_of(shape, "steep", 0.45)
+				face = sheer if not sheer.is_empty() else [0.3, 0.6]
+			var a := int(w * (face[0] + 0.035))
+			var b := int(w * face[1])
+			_streaks(im, x0, tops, base, c, rng, a, maxi(b, a + 2), 10, c.deep.darkened(0.25), 0.1, 0.6, true)
 			# A pale crack down the face edge, and gentle ledges on the back.
-			var edge := x0 + int(w * 0.515)
-			for y in range(base - int(h * 0.9), base - int(h * 0.2)):
+			var edge := x0 + int(w * face[0])
+			for y in range(maxi(base - int(h * 0.9), tops[clampi(edge - x0, 0, w - 1)] + 2), base - int(h * 0.2)):
 				if y % 4 != 0:
 					_px(im, edge + int(sin(y * 0.09) * 1.0), y, c.hi.lerp(c.lit, 0.4))
 			_ledges(im, x0, tops, base, h, c, rng, 5, 0.3, 0.8, 5, 14)
 			# Reflected light down the face's far edge.
-			var fe := x0 + int(w * 0.73) - 1
-			for y in range(tops[clampi(int(w * 0.72), 0, w - 1)] + 3, base):
+			var fe := x0 + int(w * face[1]) - 1
+			for y in range(tops[clampi(fe - x0 + 1, 0, w - 1)] + 3, base):
 				if y % 5 != 0:
 					_px(im, fe, y, c.shade.lerp(c.lit, 0.35))
 		"el_capitan":
@@ -497,8 +575,12 @@ static func _details(im: Image, kind: String, x0: int, w: int, h: int, tops: Pac
 			_streaks(im, x0, tops, base, c, rng, int(w * 0.2), w - 8, 8, c.shade, 0.2, 0.7, false)
 			_ledges(im, x0, tops, base, h, c, rng, 8, 0.25, 0.85, 6, 18)
 			# A bright edge down the prow, with its crack just inside.
-			for y in range(tops[int(w * 0.03)] + 1, base - 2):
-				_px(im, x0 + int(w * 0.047), y, c.hi if y % 9 != 0 else c.lit)
+			var prow := 0.047
+			if not shape.is_empty() and (shape.marks as Dictionary).has("prow"):
+				prow = shape.marks.prow
+			var px := clampi(int(w * prow), 0, w - 1)
+			for y in range(tops[px] + 1, base - 2):
+				_px(im, x0 + px, y, c.hi if y % 9 != 0 else c.lit)
 		"yosemite_falls", "bridalveil", "sentinel_rock", "washington_column", "glacier_point", "three_brothers", "cathedral_rocks", "royal_arches", "clouds_rest", "north_dome", "liberty_cap", "nevada_fall", "mt_watkins", "mt_starr_king", "vernal_fall", "illilouette_fall", "north_rim":
 			var n := 4 if kind != "north_dome" else 2
 			_ledges(im, x0, tops, base, h, c, rng, n, 0.25, 0.8, 5, 16)
@@ -508,7 +590,28 @@ static func _details(im: Image, kind: String, x0: int, w: int, h: int, tops: Pac
 			# Gullies and joints between the spires.
 			_streaks(im, x0, tops, base, c, rng, 4, w - 5, 7 + w / 30, c.deep, 0.1, 0.5, false)
 			_ledges(im, x0, tops, base, h, c, rng, 4, 0.2, 0.7, 4, 10)
-	if info.get("arches", false):
+	if info.get("arches", false) and not shape.is_empty():
+		# The Royal Arches: great curved overhangs nested one inside the next
+		# across the face, each a dark band of shade under a lit lip.
+		var ax := x0 + int(w * float((shape.marks as Dictionary).get("arches", 0.5)))
+		var ay := base - int(h * 0.12)
+		for k in 5:
+			var rx := w * (0.15 + 0.06 * k)
+			var ry := h * (0.2 + 0.07 * k)
+			var thick := 2 if k < 3 else 1
+			for a in range(30 + k * 3, 151 - k * 3, 1):
+				# each shell has come away in pieces: the arch is broken
+				if P.noise(a / 7, k, 47) < 0.22:
+					continue
+				var t := deg_to_rad(a)
+				var x := ax + int(cos(t) * rx)
+				var y := ay - int(sin(t) * ry)
+				if x < x0 or x >= x0 + w or y <= tops[clampi(x - x0, 0, w - 1)] + 2:
+					continue
+				_px(im, x, y - 1, c.hi.lerp(c.lit, 0.4))
+				for j in thick:
+					_px(im, x, y + j, c.deep if j == 0 else c.shade)
+	elif info.get("arches", false):
 		# Royal Arches: great stacked arches in the wall, each a recess with a
 		# lit lip and a dark inner curve.
 		for k in 3:
@@ -530,8 +633,11 @@ static func _details(im: Image, kind: String, x0: int, w: int, h: int, tops: Pac
 					_px(im, int(ax + cos(deg_to_rad(t)) * rx), int(ay - sin(deg_to_rad(t)) * rx) - 1, c.hi if j == 0 else c.lit)
 	if info.get("rail", false):
 		# Glacier Point's rim: a dark line, a lit lip and a tiny railing.
-		var i0 := int(w * 0.2)
-		for i in range(i0, int(w * 0.76)):
+		var point := 0.69
+		if not shape.is_empty() and (shape.marks as Dictionary).has("point"):
+			point = shape.marks.point
+		var i0 := int(w * maxf(point - 0.5, 0.02))
+		for i in range(i0, int(w * minf(point + 0.07, 0.98))):
 			var x := x0 + i
 			var top := tops[clampi(i, 0, w - 1)]
 			if top < base:
@@ -539,21 +645,25 @@ static func _details(im: Image, kind: String, x0: int, w: int, h: int, tops: Pac
 				if i % 3 != 2:
 					_px(im, x, top - 2, c.deep)
 		# The little hut on the point.
-		var hx := x0 + int(w * 0.66)
-		var hy := tops[clampi(int(w * 0.66), 0, w - 1)]
+		var hx := x0 + int(w * (point - 0.03))
+		var hy := tops[clampi(hx - x0, 0, w - 1)]
 		_rect(im, hx, hy - 4, 5, 3, c.shade)
 		_rect(im, hx - 1, hy - 5, 7, 1, c.deep)
 
 
 ## Forest-hiding finishing: water ribbons and anything that sits in front of
 ## the trees.
-static func _after_trees(im: Image, kind: String, x0: int, w: int, h: int, tops: PackedInt32Array, base: int, c: Dictionary, info: Dictionary, rng: RandomNumberGenerator, falls: Array[Dictionary]) -> void:
+static func _after_trees(im: Image, kind: String, x0: int, w: int, h: int, tops: PackedInt32Array, base: int, c: Dictionary, info: Dictionary, rng: RandomNumberGenerator, falls: Array[Dictionary], shape := {}) -> void:
 	if not info.get("fall", false):
 		return
+	# where the fall really leaves the rim, with a real skyline
+	var at := -1.0
+	if not shape.is_empty() and not (shape.falls as Array).is_empty():
+		at = shape.falls[0]
 	match kind:
 		"yosemite_falls":
 			# Upper fall from the rim, a run of cascades, then the lower fall.
-			var fx := x0 + int(w * 0.46)
+			var fx := x0 + int(w * (0.46 if at < 0.0 else at))
 			var rim := tops[clampi(fx - x0, 0, w - 1)]
 			var top := rim + int(h * 0.04)
 			var ledge := base - int(h * 0.42)
@@ -569,30 +679,30 @@ static func _after_trees(im: Image, kind: String, x0: int, w: int, h: int, tops:
 				_px(im, cx_ + 1, y, c.water_edge)
 			falls.append(_fall(im, cx_, low_top, base - int(h * 0.04), c, 0.0, 1, true))
 		"bridalveil":
-			var fx2 := x0 + int(w * 0.5)
+			var fx2 := x0 + int(w * (0.5 if at < 0.0 else at))
 			var ft := tops[clampi(fx2 - x0, 0, w - 1)] + int(h * 0.03)
 			# A single drop that the wind blows to the side, spreading as it falls.
 			_rect(im, fx2 - 1, ft - 1, 3, 2, c.shade)
 			falls.append(_fall(im, fx2, ft, base - int(h * 0.04), c, -2.0, 2, true))
 		"sentinel_rock":
-			var fx3 := x0 + int(w * 0.76)
+			var fx3 := x0 + int(w * (0.76 if at < 0.0 else at))
 			var ft3 := tops[clampi(fx3 - x0, 0, w - 1)] + int(h * 0.08)
 			falls.append(_fall(im, fx3, ft3, base - int(h * 0.06), c, 1.0, 1, true))
 		"nevada_fall":
-			var fx4 := x0 + int(w * 0.52)
+			var fx4 := x0 + int(w * (0.52 if at < 0.0 else at))
 			var lip := tops[clampi(fx4 - x0, 0, w - 1)]
 			# The river reaches the lip, then drops with a bend halfway.
 			_rect(im, fx4 - 10, lip - 1, 11, 1, c.water_edge)
 			falls.append(_fall(im, fx4, lip, base - int(h * 0.04), c, 2.0, 2, true))
 		"vernal_fall":
 			# A broad curtain over a square-cut lip.
-			var fx5 := x0 + int(w * 0.5)
+			var fx5 := x0 + int(w * (0.5 if at < 0.0 else at))
 			var lip5 := tops[clampi(fx5 - x0, 0, w - 1)]
 			_rect(im, fx5 - 6, lip5 - 1, 9, 1, c.water_edge)
 			falls.append(_fall(im, fx5 - 1, lip5, base - int(h * 0.06), c, 0.0, 3, true))
 		"illilouette_fall":
 			# Down the back of its cleft, half hidden by the gorge's walls.
-			var fx6 := x0 + int(w * 0.5)
+			var fx6 := x0 + int(w * (0.5 if at < 0.0 else at))
 			var ft6 := tops[clampi(fx6 - x0, 0, w - 1)] + 1
 			falls.append(_fall(im, fx6, ft6, base - int(h * 0.12), c, 1.0, 2, true))
 

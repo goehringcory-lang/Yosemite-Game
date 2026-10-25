@@ -27,9 +27,12 @@ const HIDDEN_IN_WINTER := [
 
 ## Ground grade per season: tint, tint strength, desaturation, frost, and the
 ## colour that covers the painted wildflower dots (transparent keeps them).
+## Spring is the fresh green of the snowmelt; by midsummer the Valley's
+## meadows are drying toward straw (the wet ones and the high country stay
+## greener, and the grade pulls grass hardest); fall is gold.
 const GROUND_LOOKS := [
 	{"tint": Color(0.62, 0.92, 0.45), "amount": 0.08, "desat": 0.0, "frost": 0.0, "fill": Color(0, 0, 0, 0)},
-	{"tint": Color(1.0, 1.0, 1.0), "amount": 0.0, "desat": 0.0, "frost": 0.0, "fill": Color(0, 0, 0, 0)},
+	{"tint": Color(0.88, 0.8, 0.48), "amount": 0.14, "desat": 0.05, "frost": 0.0, "fill": Color(0, 0, 0, 0)},
 	{"tint": Color(0.93, 0.74, 0.34), "amount": 0.5, "desat": 0.12, "frost": 0.0, "fill": Color(0.5, 0.45, 0.2, 1)},
 	{"tint": Color(0.62, 0.72, 0.86), "amount": 0.34, "desat": 0.5, "frost": 0.2, "fill": Color(0.42, 0.55, 0.45, 1)},
 ]
