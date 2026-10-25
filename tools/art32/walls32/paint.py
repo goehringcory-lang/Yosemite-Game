@@ -278,9 +278,20 @@ def inside(u: np.ndarray, z: np.ndarray, poly: list[tuple[float, float]]) -> np.
 def stretched_noise(w: int, h: int, cx: float, cy: float, seed: int) -> np.ndarray:
     """Smooth noise 0..1 with its lattice [param cx] apart across and
     [param cy] apart down: stains that run down the fall line."""
-    k = max(1, int(round(cy / cx)))
-    small = noise(w, h // k + 2, cx, seed)
-    return np.repeat(small, k, axis=0)[:h]
+    rng = np.random.default_rng(seed)
+    gh, gw = int(h / cy) + 3, int(w / cx) + 3
+    lat = rng.random((gh, gw)).astype(np.float32)
+    ys = np.arange(h) / cy
+    xs = np.arange(w) / cx
+    y0 = ys.astype(int)
+    x0 = xs.astype(int)
+    fy = ys - y0
+    fx = xs - x0
+    fy = (fy * fy * (3 - 2 * fy))[:, None]
+    fx = (fx * fx * (3 - 2 * fx))[None, :]
+    a = lat[y0][:, x0] * (1 - fx) + lat[y0][:, x0 + 1] * fx
+    b = lat[y0 + 1][:, x0] * (1 - fx) + lat[y0 + 1][:, x0 + 1] * fx
+    return (a * (1 - fy) + b * fy).astype(np.float32)
 
 
 def yy_rel(h: int, w: int) -> np.ndarray:
@@ -572,7 +583,15 @@ def _preview(view, wall: Wall, W: int, H: int, line: np.ndarray) -> np.ndarray:
     return out.repeat(2, 0).repeat(2, 1)
 
 
-def _compose(view, fr: Frame, wall: Wall, dump: dict, W: int, H: int, line: np.ndarray, soft: np.ndarray) -> np.ndarray:
+def _compose(view, fr: Frame, wall: Wall, dump: dict, W: int, H: int, line: np.ndarray, soft: np.ndarray,
+             keep: np.ndarray | None = None, masks=None, finish=None) -> np.ndarray:
+    """Paints the picture. With [param keep] (a freestanding rock: which
+    pixels are part of it), everything else is left transparent: no sky, no
+    skirt to a cliff line. [param masks] (forest, brush, talus) says where
+    each goes, rather than by slope. [param finish] (P, rock, shade) -> mask
+    paints the rock's own details and its trees in place of the walls'
+    exfoliation arcs and forest, and returns the pixels it drew outside
+    [param keep]."""
     rng = np.random.default_rng(wall.seed)
     P = Painting(W, H)
     hit = view.hit
@@ -635,6 +654,8 @@ def _compose(view, fr: Frame, wall: Wall, dump: dict, W: int, H: int, line: np.n
     # brush in clumps on the ledges and low-angle slabs, not a sprinkle
     clump = noise(W, H, 14, wall.seed + 6) * 0.6 + n_veg * 0.4
     brush = hit & ~forest & ~talus & (slope < 40) & (clump > 0.64 - (40 - slope) / 45)
+    if masks is not None:
+        forest, brush, talus = masks
     veg = forest | brush
     rock = hit & ~veg & ~talus
     # ---- the rock
@@ -659,7 +680,7 @@ def _compose(view, fr: Frame, wall: Wall, dump: dict, W: int, H: int, line: np.n
                 P.val[yi, xi - 1] += 0.05
     # exfoliation: the edges of sheets peeling off the faces, short curved
     # arcs lit above and dark below, following the curve of the rock
-    for _ in range(int(W / 14)):
+    for _ in range(int(W / 14) if finish is None else 0):
         x = rng.uniform(0, W)
         y = rng.uniform(4, H * 0.8)
         xi, yi = int(x), int(y)
@@ -680,10 +701,14 @@ def _compose(view, fr: Frame, wall: Wall, dump: dict, W: int, H: int, line: np.n
     _streaks(P, view, rock, slope, W, H, rng, wall, under)
     # ---- the talus, the forest and brush
     _talus(P, talus, shade, W, H, wall)
-    _forest(P, view, forest, brush, far, shade, n_veg, W, H, rng, wall)
+    extra = None
+    if finish is None:
+        _forest(P, view, forest, brush, far, shade, n_veg, W, H, rng, wall)
+    else:
+        extra = finish(P, rock, shade)
     # beyond what the sight lines reach: forest on the far rim, in the haze
     # and above the rim the sky, pale at the horizon
-    sky = ~hit
+    sky = ~hit if extra is None else ~hit & ~extra
     P.put(sky, "sky", 0.92 - 0.75 * (1 - yy_rel(H, W)) ** 0.9)
     P.dither["sky"] = 0.6
     # ---- a fall's gully, if one hangs here
@@ -691,7 +716,10 @@ def _compose(view, fr: Frame, wall: Wall, dump: dict, W: int, H: int, line: np.n
         if a["name"] == wall.fall and wall.fall:
             _gully(P, a, rock | veg, shade, W, H, rng)
     # ---- the talus skirt at the foot, and the cut to the scene's cliff line
-    out_mask = _skirt(P, view, line, soft, shade, W, H, rng, wall)
+    if keep is None:
+        out_mask = _skirt(P, view, line, soft, shade, W, H, rng, wall)
+    else:
+        out_mask = keep if extra is None else keep | extra
     P.dither["granite"] = 0.16
     P.dither["warm"] = 0.16
     img = P.render()
@@ -929,22 +957,11 @@ def crown_field(W: int, H: int, cw: float, ch: float, seed: int, pointed: bool =
 
 
 def _talus(P: Painting, talus: np.ndarray, shade: np.ndarray, W: int, H: int, wall: Wall) -> None:
-    """Fallen blocks of granite, each lit on its upper left with a dark seam
-    under it, packed into the slope."""
-    rr = np.random.default_rng(wall.seed + 60)
-    cw, ch = 4, 3
-    gw, gh = W // cw + 2, H // ch + 2
-    ox = rr.random((gh, gw)) * cw * 0.6
-    oy = rr.random((gh, gw)) * ch * 0.6
-    tone = rr.random((gh, gw))
-    yy, xx = np.mgrid[0:H, 0:W]
-    gx = xx // cw
-    gy = yy // ch
-    lx = (xx - gx * cw - ox[gy, gx]) / cw
-    ly = (yy - gy * ch - oy[gy, gx]) / ch
-    lit = np.clip(1.0 - lx - ly, -1, 1)
-    v = 0.2 + 0.55 * shade + 0.22 * lit + (tone[gy, gx] - 0.5) * 0.18
-    seam = (ly > 0.78) | (lx > 0.85)
+    """Fallen blocks of granite of every size, each lit on its upper left with
+    a dark seam under it, packed into the slope."""
+    blocks, lit, tone = crown_field(W, H, 4.0, 3.0, wall.seed + 60, pointed=False, size=(0.7, 1.4))
+    v = 0.2 + 0.55 * shade + 0.25 * lit + (tone - 0.5) * 0.2
+    seam = blocks < 0.18
     P.put(talus, "granite", np.where(seam, v - 0.32, v))
 
 
