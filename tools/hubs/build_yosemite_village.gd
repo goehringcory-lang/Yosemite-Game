@@ -703,9 +703,9 @@ func _place_exits() -> void:
 	var exits := [
 		["NorthsideWest", Vector2i(0, 38), "leidig_meadow", "east", "Northside Drive west", true],
 		["NorthsideEast", Vector2i(W - 1, 38), "ahwahnee_meadow", "west", "Northside Drive east", true],
-		["SentinelSouth", Vector2i(71, H - 1), "four_mile_trailhead", "east", "Southside Drive", false],
-		["SouthsideWest", Vector2i(0, 56), "four_mile_trailhead", "east", "Southside Drive west", true],
-		["SouthsideEast", Vector2i(W - 1, 56), "housekeeping_camp", "west", "Southside Drive east", true],
+		["SentinelSouth", Vector2i(84, H - 1), "four_mile_trailhead", "east", "Southside Drive", false],
+		["SouthsideWest", Vector2i(0, 60), "four_mile_trailhead", "east", "Southside Drive west", true],
+		["SouthsideEast", Vector2i(W - 1, 60), "housekeeping_camp", "west", "Southside Drive east", true],
 	]
 	for e: Array in exits:
 		var area := Area2D.new()

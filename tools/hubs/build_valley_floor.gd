@@ -505,7 +505,7 @@ func _tunnel_view() -> void:
 	place("El Capitan", 14, 9, 0)
 	place("Half Dome", 31, 3, 0)
 	place("Bridalveil Fall", 48, 12, 0)
-	region_exit("ToBridalveil", tile_pos(64.5, 32.5), Vector2(12, 48), "Wawona Road, down to the Valley", "bridalveil_fall", "west")
+	region_exit("ToBridalveil", tile_pos(63.5, 32.5), Vector2(12, 48), "Wawona Road, down to the Valley", "bridalveil_fall", "west")
 	_drive_exit("WawonaTunnel", tile_pos(4.5, TV_H - 0.5), Vector2(64, 12), "Wawona Tunnel: Wawona Road and Glacier Point Road", "wawona")
 	_finish("tunnel_view", 1.5)
 
