@@ -550,6 +550,22 @@ func _check_valley_links() -> void:
 				return e.target_region == id and e.position.distance_to(spot.position) < 200.0)
 			if back.is_empty():
 				broken.append("%s -> %s/%s (no way back)" % [id, exit.target_region, exit.target_spawn])
+	# Every trail up to Glacier Point (the Ledge Trail, the Four Mile Trail,
+	# the Mist Trail) waits for the Apron climb that opens the rim, and the
+	# hiking trails shut for snow in winter as the road does.
+	var trails_up := PackedStringArray()
+	var unguarded := PackedStringArray()
+	for id: String in scenes:
+		for door in (scenes[id] as Region).find_children("*", "RegionDoor", true, false):
+			if door.target_region != "glacier_point":
+				continue
+			trails_up.append(door.name)
+			if door.needs_hub != "glacier_point" or door.locked_text == "":
+				unguarded.append("%s/%s (no lock)" % [id, door.name])
+			elif door.name != "LedgeTrail" and not Park.SEASONAL.has(door.closure):
+				unguarded.append("%s/%s (no winter closure)" % [id, door.name])
+	check(trails_up.size() >= 3 and unguarded.is_empty(), "the trails up to Glacier Point (%s) open with the rim (%s)"
+		% [", ".join(trails_up), ", ".join(unguarded)])
 	for region: Region in scenes.values():
 		region.free()
 	check(count >= 30 and broken.is_empty(), "%d roads between Valley scenes all lead back the way they came (%s)" % [count, ", ".join(broken)])

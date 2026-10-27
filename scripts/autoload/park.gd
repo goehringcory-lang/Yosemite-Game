@@ -35,6 +35,13 @@ const SEASONAL := {
 		"reopens": "spring",
 		"why": "The upper Four Mile Trail is closed for snow and ice. It usually reopens in spring.",
 	},
+	"mist_trail": {
+		"name": "Mist Trail",
+		"open": [0, 19],
+		"close": [2, 28],
+		"reopens": "spring",
+		"why": "The Mist Trail above Vernal Fall and the Panorama Trail are closed for snow and ice. They usually reopen in spring.",
+	},
 }
 
 signal hub_unlocked(id: String)
