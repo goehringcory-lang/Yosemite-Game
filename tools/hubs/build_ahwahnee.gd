@@ -282,7 +282,8 @@ func _layout_grounds() -> void:
 	_ellipse(56.0, 45.0, 28.0, 13.5, Terrain.LAWN, 0.18)
 	_ellipse(29.0, 41.0, 10.0, 8.0, Terrain.LAWN, 0.25)
 	fill(61, 36, 77, 49, Terrain.LAWN)
-	# The Ahwahnee Meadow, east of the hotel.
+	# The East Lawn, a meadow east of the hotel (Ahwahnee Meadow proper is west
+	# of it, a scene of its own on Northside Drive).
 	_ellipse(89.0, 42.0, 9.5, 20.0, Terrain.MEADOW, 0.3)
 	# The hotel's stone terrace along its front, and the forecourt.
 	fill(int(_hotel_pos.x / T) + 1, HOTEL_BASE_ROW, int((_hotel_pos.x + size.x) / T) - 1, HOTEL_BASE_ROW + 1, Terrain.PAVED)
@@ -467,8 +468,8 @@ func _grounds_gardens() -> void:
 		"The cliff behind the hotel is the Royal Arches, a stack of huge curved steps in the granite. Long routes climb up the Arches, and Camp 4 climbers speak of them with respect. To the right, the smooth wall is Washington Column.")
 	_info_sign("CascadeSign", tile_pos(15, 19) + Vector2(0, 6), "Royal Arch Cascade",
 		"Royal Arch Creek slides down the cliff in spring and early summer. By late summer it dries to a dark streak on the granite.")
-	_info_sign("AhwahneeMeadowSign", tile_pos(81, 40) + Vector2(0, 6), "Ahwahnee Meadow",
-		"The meadow east of the hotel is one of the best places in the Valley to watch the light change on the cliffs. Please stay on the trail.")
+	_info_sign("AhwahneeMeadowSign", tile_pos(81, 40) + Vector2(0, 6), "The East Lawn",
+		"The hotel's east lawn is one of the best places in the Valley to watch the light change on the cliffs. Ahwahnee Meadow itself lies west of the hotel, along Northside Drive toward the Village. Please stay on the trail.")
 
 
 func _tex_h(sprite_name: String) -> int:
@@ -523,7 +524,7 @@ func _grounds_markers_and_exits() -> void:
 	place("Entrance Circle", _cx, 42, 8, false)
 	place("Rose Garden", 69, 42, 8)
 	place("Tea Lawn", 28, 41, 7, false)
-	place("Ahwahnee Meadow", 89, 42, 12)
+	place("East Lawn", 89, 42, 12)
 	place("Royal Arch Cascade", int(_land_consts.get("POOL_POS", Vector2i(416, 210)).x / T), 17, 9)
 	place("Royal Arches", 58, 8, 30)
 	region_exit("ToStonemanBridge", tile_pos(_cx + 0.5, GH - 0.5), Vector2(64, 12), "Stoneman Bridge", "ahwahnee_trail", "north_entry")

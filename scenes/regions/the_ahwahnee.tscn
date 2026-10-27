@@ -1783,8 +1783,8 @@ shape = SubResource("RectangleShape2D_obqib")
 position = Vector2(2608, 1308)
 collision_mask = 0
 script = ExtResource("6_8c22c")
-title = "Ahwahnee Meadow"
-text = "The meadow east of the hotel is one of the best places in the Valley to watch the light change on the cliffs. Please stay on the trail."
+title = "The East Lawn"
+text = "The hotel's east lawn is one of the best places in the Valley to watch the light change on the cliffs. Ahwahnee Meadow itself lies west of the hotel, along Northside Drive toward the Village. Please stay on the trail."
 
 [node name="Sprite" type="Sprite2D" parent="Entities/AhwahneeMeadowSign" unique_id=175516431]
 texture = ExtResource("24_6mlt6")
@@ -6635,7 +6635,7 @@ radius = 224
 [node name="AhwahneeMeadow" type="Marker2D" parent="Places" unique_id=1282558819]
 position = Vector2(2864, 1360)
 script = ExtResource("60_1aq8c")
-display_name = "Ahwahnee Meadow"
+display_name = "East Lawn"
 radius = 384
 show_on_map = true
 

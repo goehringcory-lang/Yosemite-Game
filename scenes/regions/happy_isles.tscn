@@ -439,6 +439,9 @@ label = "Mist Trail and Panorama Trail, up to Glacier Point"
 target_region = "glacier_point"
 target_spawn = "panorama_trailhead"
 minutes = 300
+closure = "mist_trail"
+needs_hub = "glacier_point"
+locked_text = "The Mist Trail climbs past Vernal and Nevada Falls, and the Panorama Trail runs on along the rim to Glacier Point. The rim is still ahead of you: climb the Glacier Point Apron first, and the way up opens."
 
 [node name="HappyIslesSign" type="StaticBody2D" parent="Entities" unique_id=1401535473]
 position = Vector2(784, 1184)

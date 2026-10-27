@@ -420,6 +420,9 @@ label = "Four Mile Trail, up to Glacier Point"
 target_region = "glacier_point"
 target_spawn = "four_mile_trailhead"
 minutes = 180
+closure = "four_mile_trail"
+needs_hub = "glacier_point"
+locked_text = "The Four Mile Trail climbs 3,200 feet in switchbacks up the wall to Glacier Point. The rim is still ahead of you: climb the Glacier Point Apron first, and the way up opens."
 
 [node name="FourMileSign" type="StaticBody2D" parent="Entities" unique_id=911271798]
 position = Vector2(912, 608)

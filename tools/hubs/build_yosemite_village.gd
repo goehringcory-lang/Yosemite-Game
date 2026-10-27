@@ -227,7 +227,7 @@ func _layout() -> void:
 	var paths := [
 		[Terrain.ROAD, 0, 38, W - 1, 38], # Northside Drive
 		[Terrain.ROAD, 0, 60, W - 1, 60], # Southside Drive
-		[Terrain.ROAD, 84, 39, 84, H - 1], # Sentinel Drive and Sentinel Bridge
+		[Terrain.ROAD, 84, 39, 84, 60], # Sentinel Drive and Sentinel Bridge, ending at Southside Drive
 		[Terrain.ROAD, 26, 37, 27, 37], # Camp 4 parking
 		[Terrain.ROAD, 28, 39, 29, 39], # Lodge parking
 		[Terrain.ROAD, 51, 26, 52, 37], # Village Drive to the Welcome Center stop
@@ -679,7 +679,6 @@ func _place_markers_and_places() -> void:
 	_marker("valley_lodge", 38, 46)
 	_marker("west_road", 2, 38)
 	_marker("east_road", W - 3, 38)
-	_marker("south_road", 84, H - 2)
 	_marker("southside_west", 2, 60)
 	_marker("southside_east", W - 3, 60)
 	_place("Camp 4", 18, 20, 16)
@@ -703,7 +702,6 @@ func _place_exits() -> void:
 	var exits := [
 		["NorthsideWest", Vector2i(0, 38), "leidig_meadow", "east", "Northside Drive west", true],
 		["NorthsideEast", Vector2i(W - 1, 38), "ahwahnee_meadow", "west", "Northside Drive east", true],
-		["SentinelSouth", Vector2i(84, H - 1), "four_mile_trailhead", "east", "Southside Drive", false],
 		["SouthsideWest", Vector2i(0, 60), "four_mile_trailhead", "east", "Southside Drive west", true],
 		["SouthsideEast", Vector2i(W - 1, 60), "housekeeping_camp", "west", "Southside Drive east", true],
 	]
