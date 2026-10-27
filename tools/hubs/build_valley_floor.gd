@@ -24,7 +24,9 @@ extends AhwahneeStyle
 ## in at the east edge of the next. The wall of the Valley is always at the
 ## top of a scene ("behind"), as in Curry Village, whichever side of the
 ## Valley it really is; so El Capitan Bridge, which crosses the Merced
-## between the two, leaves each of its scenes by the bottom edge. Run tools/hubs/rebuild_valley_floor.sh, which runs
+## between the two, is at the bottom of both. It is walked over in El Capitan
+## Meadow only, leaving by the bottom edge: in Bridalveil Fall the deck is
+## drawn, but its exit is at the south end, so the river is crossed once. Run tools/hubs/rebuild_valley_floor.sh, which runs
 ##
 ##   godot --headless --path . res://tools/hubs/build_valley_floor.tscn
 ##
@@ -420,7 +422,8 @@ func _bridalveil_fall() -> void:
 	fill(28, 17, 36, 19, Terrain.PARKING)
 	_path([Vector2(29, 17), Vector2(26, 13), Vector2(fall_x + 2, 11)], 1, Terrain.TRAIL, 0.5)
 	_path([Vector2(48, 20), Vector2(50, _foot_of_wall(50))], 1, Terrain.TRAIL, 0.4)
-	# El Capitan Bridge, over the Merced to Northside Drive.
+	# El Capitan Bridge, over the Merced to Northside Drive. You cross it in
+	# El Capitan Meadow: here its exit is at the south end of the deck.
 	_road_bridge(54, 23)
 	_mark_open()
 
@@ -439,11 +442,11 @@ func _bridalveil_fall() -> void:
 	marker("west", 2, 21.5)
 	marker("fall_base", fall_x + 2, 12)
 	marker("cathedral_spire", 50, _foot_of_wall(50))
-	marker("el_cap_bridge", 55, 34)
+	marker("el_cap_bridge", 55, 28)
 	place("Bridalveil Fall", fall_x, 14, 9)
 	place("Cathedral Rocks", 46, 3, 0)
 	region_exit("ToFourMile", tile_pos(63.5, 21.5), Vector2(12, 48), "Southside Drive east", "four_mile_trailhead", "west")
-	region_exit("ToElCapBridge", tile_pos(54.5, 35.5), Vector2(48, 12), "El Capitan Bridge, to Northside Drive", "el_capitan_meadow", "el_cap_bridge")
+	region_exit("ToElCapBridge", tile_pos(54.5, 31), Vector2(48, 12), "El Capitan Bridge, to Northside Drive", "el_capitan_meadow", "el_cap_bridge")
 	region_exit("ToTunnelView", tile_pos(-0.5, 21.5), Vector2(12, 48), "Wawona Road, up to Tunnel View", "tunnel_view", "east")
 	_finish("bridalveil_fall", 2.0)
 
