@@ -169,7 +169,7 @@ Rebuild it with `godot --headless --path . res://tools/hubs/build_curry.tscn`. T
 
 ### The Valley floor: one scene for each place, and trails between
 
-Every place in the Valley is in one scene only. There is no big Valley overworld: the areas are joined by short trail scenes you walk through, like the Stoneman Meadow trail. Leave a scene by its west edge and you come in at the east edge of the next, so a road keeps its heading. The wall of the Valley is always at the top of a scene, as in Curry Village, whichever side of the Valley it really stands on, so El Capitan Bridge, which crosses the Merced between El Capitan Meadow and Bridalveil Fall, is at the bottom of both. You walk over it in El Capitan Meadow, off the bottom edge; in Bridalveil Fall its exit is at the south end of the deck, so you cross the river once.
+Every place in the Valley is in one scene only. There is no big Valley overworld: the areas are joined by short trail scenes you walk through, like the Stoneman Meadow trail. Leave a scene by its west edge and you come in at the east edge of the next, so a road keeps its heading. The wall of the Valley is always at the top of a scene, as in Curry Village, whichever side of the Valley it really stands on, so El Capitan Bridge, which crosses the Merced between El Capitan Meadow and Bridalveil Fall, is at the bottom of both. The bridge itself is in El Capitan Meadow only, and you walk over it off the bottom edge; in Bridalveil Fall the road down to it ends at the river's bank, so there is one bridge and you cross it once.
 
 ```
                     [drive: El Portal, Tuolumne]
