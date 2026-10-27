@@ -442,11 +442,12 @@ func _bridalveil_fall() -> void:
 	marker("west", 2, 21.5)
 	marker("fall_base", fall_x + 2, 12)
 	marker("cathedral_spire", 50, _foot_of_wall(50))
-	marker("el_cap_bridge", 55, 27.5)
+	# Off the bridge you come out on Southside Drive, clear of the road down to it.
+	marker("el_cap_bridge", 55, 21.5)
 	place("Bridalveil Fall", fall_x, 14, 9)
 	place("Cathedral Rocks", 46, 3, 0)
 	region_exit("ToFourMile", tile_pos(63.5, 21.5), Vector2(12, 48), "Southside Drive east", "four_mile_trailhead", "west")
-	region_exit("ToElCapBridge", tile_pos(54.5, 30), Vector2(48, 12), "El Capitan Bridge, to Northside Drive", "el_capitan_meadow", "el_cap_bridge")
+	region_exit("ToElCapBridge", tile_pos(54.5, 27), Vector2(48, 12), "El Capitan Bridge, to Northside Drive", "el_capitan_meadow", "el_cap_bridge")
 	region_exit("ToTunnelView", tile_pos(-0.5, 21.5), Vector2(12, 48), "Wawona Road, up to Tunnel View", "tunnel_view", "east")
 	_finish("bridalveil_fall", 2.0)
 
