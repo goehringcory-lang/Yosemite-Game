@@ -2534,7 +2534,7 @@ position = Vector2(784, 400)
 position = Vector2(1616, 368)
 
 [node name="el_cap_bridge" type="Marker2D" parent="Markers" unique_id=401916066]
-position = Vector2(1776, 896)
+position = Vector2(1776, 704)
 
 [node name="Places" type="Node2D" parent="." unique_id=1836322459]
 
@@ -2565,7 +2565,7 @@ target_spawn = "west"
 shape = SubResource("RectangleShape2D_nuygj")
 
 [node name="ToElCapBridge" type="Area2D" parent="Exits" unique_id=662147261]
-position = Vector2(1760, 976)
+position = Vector2(1760, 880)
 script = ExtResource("36_1ljn7")
 label = "El Capitan Bridge, to Northside Drive"
 target_region = "el_capitan_meadow"
