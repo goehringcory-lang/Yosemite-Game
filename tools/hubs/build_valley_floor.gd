@@ -8,8 +8,9 @@ extends AhwahneeStyle
 ##                         [drive: El Portal, Tuolumne]
 ##                                     |
 ##   [drive: Wawona] - Tunnel View     El Capitan Meadow
-##                          |                 |
-##                   Bridalveil Fall     Leidig Meadow
+##                          |            :    |
+##                   Bridalveil Fall ....:  Leidig Meadow
+##                          |   (El Capitan Bridge)
 ##                          |                 |
 ##                   Four Mile Trailhead - Yosemite Village - Ahwahnee Meadow - The Ahwahnee
 ##                                            |
@@ -22,7 +23,8 @@ extends AhwahneeStyle
 ## Every road keeps its heading: leave a scene by its west edge and you come
 ## in at the east edge of the next. The wall of the Valley is always at the
 ## top of a scene ("behind"), as in Curry Village, whichever side of the
-## Valley it really is. Run tools/hubs/rebuild_valley_floor.sh, which runs
+## Valley it really is; so El Capitan Bridge, which crosses the Merced
+## between the two, leaves each of its scenes by the bottom edge. Run tools/hubs/rebuild_valley_floor.sh, which runs
 ##
 ##   godot --headless --path . res://tools/hubs/build_valley_floor.tscn
 ##
@@ -129,6 +131,14 @@ func _bridge(x: int, y0: int, y1: int, width := 2) -> void:
 		for dx in width:
 			if at(x + dx, y) in [Terrain.RIVER, Terrain.CREEK, Terrain.SAND, Terrain.LAKE]:
 				put(x + dx, y, Terrain.BRIDGE)
+
+
+## A two-lane road down column [param x] from row [param y0] to the bottom
+## edge, laid as a bridge deck wherever it crosses water.
+func _road_bridge(x: int, y0: int) -> void:
+	for y in range(y0, h):
+		for dx in 2:
+			put(x + dx, y, Terrain.BRIDGE if at(x + dx, y) in [Terrain.RIVER, Terrain.SAND] else Terrain.ROAD)
 
 
 ## Keeps trees off water, roads, walls and anything built.
@@ -260,6 +270,8 @@ func _el_capitan_meadow() -> void:
 	_path([Vector2(64, 20), Vector2(66, 17), Vector2(66, _foot_of_wall(66))], 1, Terrain.TRAIL, 0.4)
 	# A path out into the meadow, to the river.
 	_path([Vector2(48, 22), Vector2(47, 30), Vector2(45, 37)], 1, Terrain.TRAIL, 0.6)
+	# El Capitan Bridge, over the Merced to Southside Drive.
+	_road_bridge(72, 23)
 	_mark_open()
 
 	start_region("ElCapitanMeadow", "el_capitan_meadow", "El Capitan Meadow", Vector2(-119.6370, 37.7230))
@@ -281,9 +293,11 @@ func _el_capitan_meadow() -> void:
 	marker("meadow", 46, 30)
 	marker("the_nose", 40, _foot_of_wall(40))
 	marker("nutcracker", 66, _foot_of_wall(66))
+	marker("el_cap_bridge", 73, 44)
 	place("El Capitan Meadow", 42, 30, 20)
 	place("El Capitan", 40, 5, 0)
 	region_exit("ToLeidigMeadow", tile_pos(79.5, 21.5), Vector2(12, 48), "Northside Drive east", "leidig_meadow", "west")
+	region_exit("ToElCapBridge", tile_pos(72.5, 45.5), Vector2(48, 12), "El Capitan Bridge, to Southside Drive", "bridalveil_fall", "el_cap_bridge")
 	_drive_exit("NorthsideDriveWest", tile_pos(-0.5, 21.5), Vector2(12, 48), "Northside Drive west: El Portal Road and Big Oak Flat Road", "el_portal")
 	_finish("el_capitan_meadow", 2.0)
 
@@ -397,6 +411,8 @@ func _bridalveil_fall() -> void:
 	fill(28, 17, 36, 19, Terrain.PARKING)
 	_path([Vector2(29, 17), Vector2(26, 13), Vector2(fall_x + 2, 11)], 1, Terrain.TRAIL, 0.5)
 	_path([Vector2(48, 20), Vector2(50, _foot_of_wall(50))], 1, Terrain.TRAIL, 0.4)
+	# El Capitan Bridge, over the Merced to Northside Drive.
+	_road_bridge(54, 23)
 	_mark_open()
 
 	start_region("BridalveilFall", "bridalveil_fall", "Bridalveil Fall", Vector2(-119.6490, 37.7170))
@@ -414,9 +430,11 @@ func _bridalveil_fall() -> void:
 	marker("west", 2, 21.5)
 	marker("fall_base", fall_x + 2, 12)
 	marker("cathedral_spire", 50, _foot_of_wall(50))
+	marker("el_cap_bridge", 55, 34)
 	place("Bridalveil Fall", fall_x, 14, 9)
 	place("Cathedral Rocks", 46, 3, 0)
 	region_exit("ToFourMile", tile_pos(63.5, 21.5), Vector2(12, 48), "Southside Drive east", "four_mile_trailhead", "west")
+	region_exit("ToElCapBridge", tile_pos(54.5, 35.5), Vector2(48, 12), "El Capitan Bridge, to Northside Drive", "el_capitan_meadow", "el_cap_bridge")
 	region_exit("ToTunnelView", tile_pos(-0.5, 21.5), Vector2(12, 48), "Wawona Road, up to Tunnel View", "tunnel_view", "east")
 	_finish("bridalveil_fall", 2.0)
 

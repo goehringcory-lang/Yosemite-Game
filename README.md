@@ -169,15 +169,15 @@ Rebuild it with `godot --headless --path . res://tools/hubs/build_curry.tscn`. T
 
 ### The Valley floor: one scene for each place, and trails between
 
-Every place in the Valley is in one scene only. There is no big Valley overworld: the areas are joined by short trail scenes you walk through, like the Stoneman Meadow trail. Leave a scene by its west edge and you come in at the east edge of the next, so a road keeps its heading. The wall of the Valley is always at the top of a scene, as in Curry Village, whichever side of the Valley it really stands on.
+Every place in the Valley is in one scene only. There is no big Valley overworld: the areas are joined by short trail scenes you walk through, like the Stoneman Meadow trail. Leave a scene by its west edge and you come in at the east edge of the next, so a road keeps its heading. The wall of the Valley is always at the top of a scene, as in Curry Village, whichever side of the Valley it really stands on, so El Capitan Bridge, which crosses the Merced between El Capitan Meadow and Bridalveil Fall, leaves both scenes by their bottom edge.
 
 ```
                     [drive: El Portal, Tuolumne]
                                 |
 [drive: Wawona] - Tunnel View   El Capitan Meadow
-                     |                 |
-              Bridalveil Fall     Leidig Meadow
-                     |                 |
+                     |          :      |
+              Bridalveil Fall ..:   Leidig Meadow
+                     |   (El Capitan Bridge)   |
               Four Mile Trailhead - Yosemite Village - Ahwahnee Meadow - The Ahwahnee
                                          |                                  |
                                 Housekeeping Camp - Curry Village - Homestead (Stoneman Meadow trail)
@@ -185,7 +185,7 @@ Every place in the Valley is in one scene only. There is no big Valley overworld
                                 Upper Pines - Happy Isles - Tenaya Creek - Mirror Lake
 ```
 
-- **El Capitan Meadow**: El Capitan over its meadow, with the Nose at the toe of the buttress and the Nutcracker on Manure Pile Buttress; Warren Harding and Beverly Johnson; a shuttle stop. Northside Drive west leaves the Valley (the park map, for El Portal and Big Oak Flat Road).
+- **El Capitan Meadow**: El Capitan over its meadow, with the Nose at the toe of the buttress and the Nutcracker on Manure Pile Buttress; Warren Harding and Beverly Johnson; a shuttle stop. Northside Drive west leaves the Valley (the park map, for El Portal and Big Oak Flat Road); El Capitan Bridge, at the east end, crosses the Merced to Bridalveil Fall.
 - **Tunnel View**: the overlook at the Wawona Tunnel, with El Capitan, Half Dome far up the Valley, and Cathedral Rocks with Bridalveil Fall across the view: the title painting itself, seen through the drop (see the overlook views under Glacier Point); the lot and its map kiosk; Separate Reality above the road. The tunnel leaves for Wawona and Glacier Point Road.
 - **Happy Isles**: the Merced splitting round its islands under footbridges; the John Muir Trail sign; the Mist Trail up to Glacier Point (the Panorama Trail comes down here); Snake Dike; George Anderson; a shuttle stop.
 - **Mirror Lake**: the lake filling in under the wall, Tenaya, Astroman on Washington Column, a shuttle stop.
