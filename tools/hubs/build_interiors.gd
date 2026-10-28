@@ -273,11 +273,15 @@ func _build_doors(specs: Array) -> void:
 				d.set("open_hour", hours.x)
 				d.set("close_hour", hours.y)
 				root.add_child(d)
-				if i == 0:
-					var m := Marker2D.new()
-					m.name = spec.id + "_door"
-					m.position = at + Vector2(0, o.get("out", 40.0))
-					root.add_child(m)
+				# A spot outside each door. The room's way out leads to the
+				# first; a second door remembers its own, so you come back out
+				# the door you went in.
+				var m := Marker2D.new()
+				m.name = spec.id + "_door" + ("" if i == 0 else str(i + 1))
+				m.position = at + Vector2(0, o.get("out", 40.0))
+				if i > 0:
+					d.set("exit_spawn", m.name)
+				root.add_child(m)
 		region.free()
 		for child in root.get_children():
 			_own(child, root)

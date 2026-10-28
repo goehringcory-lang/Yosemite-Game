@@ -3033,7 +3033,7 @@ label = "Sentinel Dome Trailhead"
 position = Vector2(112, 640)
 label = "Four Mile Trail, down to the Valley"
 target_region = "four_mile_trailhead"
-target_spawn = "trailhead"
+target_spawn = "four_mile_trail"
 minutes = 120
 
 [node name="PanoramaTrail" parent="Entities" unique_id=1606411524 instance=ExtResource("31_ebuve")]

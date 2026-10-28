@@ -42,6 +42,9 @@ var _preloading := ""
 var _preloaded: Dictionary = {}
 var _busy := false
 var _place_check := 0.0
+## The door the player last went through into a room, when it was a second
+## door (see remember_door): {into, from, spawn}, or empty.
+var _door_back := {}
 ## The clock hit the pass-out hour while World or a dialogue was busy; the
 ## player passes out as soon as both are done.
 var _curfew_pending := false
@@ -176,6 +179,15 @@ func _on_shuttle_requested(stop: Dictionary) -> void:
 	go_to_region(stop.region, stop.spawn, ShuttleStop.RIDE_MINUTES)
 
 
+## Called by a BuildingDoor the player is going through. A second door into
+## the same room (BuildingDoor.exit_spawn) is remembered, so walking back out
+## of the room comes out at that door, not the building's first one.
+func remember_door(door: BuildingDoor) -> void:
+	_door_back = {}
+	if door.exit_spawn != "" and region:
+		_door_back = {"into": door.target_region, "from": region.region_id, "spawn": door.exit_spawn}
+
+
 ## Called by a RegionExit the player walked into.
 func use_exit(exit: RegionExit) -> void:
 	if _busy or not player.can_act:
@@ -184,7 +196,11 @@ func use_exit(exit: RegionExit) -> void:
 		hud.show_message(exit.closed_message())
 		return
 	if exit.target_region != "":
-		go_to_region(exit.target_region, exit.target_spawn)
+		var spawn := exit.target_spawn
+		if _door_back.get("into", "") == region.region_id and _door_back.get("from", "") == exit.target_region:
+			spawn = str(_door_back.spawn)
+		_door_back = {}
+		go_to_region(exit.target_region, spawn)
 	elif exit.travel_to != "":
 		open_travel_map(exit.travel_to)
 	elif exit.message != "":

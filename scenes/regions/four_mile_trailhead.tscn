@@ -2954,6 +2954,9 @@ position = Vector2(80, 736)
 [node name="trailhead" type="Marker2D" parent="Markers" unique_id=1176424009]
 position = Vector2(976, 624)
 
+[node name="four_mile_trail" type="Marker2D" parent="Markers" unique_id=684045178]
+position = Vector2(1040, 368)
+
 [node name="steck_salathe" type="Marker2D" parent="Markers" unique_id=256309427]
 position = Vector2(1488, 336)
 

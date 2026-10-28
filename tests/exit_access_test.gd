@@ -5,6 +5,10 @@ extends Node
 ## into the region lands on. So no road or doorway ends at an edge of the map
 ## with its exit off to one side, no trail marker stands where you can't get
 ## to it, and no way in drops you somewhere you can't get out of.
+## Then it fits the regions together like puzzle pieces: every region has a
+## way in and a way out, and from every region you can get to every other one
+## by its roads, trails and doors, the Valley shuttle, the park map's drives
+## and the climbs that top out somewhere new.
 ## Run: godot --headless --path . res://tests/exit_access_test.tscn
 ## Exit code is the number of failed checks.
 
@@ -32,6 +36,7 @@ func check(cond: bool, what: String) -> void:
 func _ready() -> void:
 	_read_player()
 	var landings := _landing_spots()
+	var ways := {}
 	for file in DirAccess.get_files_at(REGIONS_DIR):
 		if not file.ends_with(".tscn"):
 			continue
@@ -43,6 +48,7 @@ func _ready() -> void:
 		var exits: Array = region.find_children("*", "RegionExit", true, false)
 		var uses: Array = region.find_children("*", "", true, false).filter(func(n: Node) -> bool:
 			return n is RegionDoor or n is ShuttleStop or n is TravelPoint)
+		ways[region_id] = _ways_out(region)
 		var start := _start(region)
 		check(start != null, "%s: has a spot to start from" % region_id)
 		check(not exits.is_empty() or not uses.is_empty(), "%s: has a way out" % region_id)
@@ -63,8 +69,58 @@ func _ready() -> void:
 					"%s: the way in to %s lands where the exits can be walked to" % [region_id, spot_name])
 		remove_child(region)
 		region.free()
+	_check_park_joins_up(ways)
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
+
+
+## The regions you can get to straight from [param region]: through its exits
+## and doors, by the shuttle, by driving from a kiosk or a road out of the hub,
+## and up a climb that tops out in another hub.
+func _ways_out(region: Region) -> Dictionary:
+	var out := {}
+	for node in region.find_children("*", "", true, false):
+		if (node is RegionExit or node is RegionDoor) and node.target_region != "":
+			out[node.target_region] = true
+		elif (node is RegionExit and node.travel_to != "") or node is TravelPoint:
+			for leg in Park.legs_from(region.hub_id):
+				var hub := Park.get_hub(leg.to)
+				out[hub.arrival_region if hub.arrival_region != "" else hub.id] = true
+		elif node is ShuttleStop:
+			for stop: Dictionary in node.destinations():
+				out[stop.region] = true
+		elif node is ClimbStart and node.route and node.route.destination_hub != "":
+			out[node.route.destination_hub] = true
+	return out
+
+
+## Every region has a way in and a way out, and every region can be reached
+## from every other (with the locked hubs open and the roads clear).
+func _check_park_joins_up(ways: Dictionary) -> void:
+	var ins := {}
+	for from: String in ways:
+		for to: String in ways[from]:
+			check(ways.has(to), "%s: a way out leads to %s, which is a region" % [from, to])
+			if to != from:
+				ins[to] = true
+	for id: String in ways:
+		check(ins.has(id), "%s: has a way in from another region" % id)
+		check(not (ways[id] as Dictionary).is_empty(), "%s: has a way out to another region" % id)
+	var cut_off := PackedStringArray()
+	for id: String in ways:
+		var reached := {id: true}
+		var queue: Array[String] = [id]
+		while not queue.is_empty():
+			var at: String = queue.pop_back()
+			for next: String in ways.get(at, {}):
+				if not reached.has(next):
+					reached[next] = true
+					queue.append(next)
+		var missing := (ways.keys() as Array).filter(func(other: String) -> bool: return not reached.has(other))
+		if not missing.is_empty():
+			cut_off.append("%s can't reach %s" % [id, ", ".join(PackedStringArray(missing))])
+	check(cut_off.is_empty(), "all %d regions join up: from each one you can get to every other (%s)"
+		% [ways.size(), "; ".join(cut_off)])
 
 
 ## The player's collision box and interaction area, from the player scene.
@@ -99,6 +155,9 @@ func _landing_spots() -> Dictionary:
 			for node in scene.find_children("*", "", true, false):
 				if (node is RegionExit or node is RegionDoor) and node.target_region != "":
 					add.call(node.target_region, node.target_spawn)
+				# a building's second door: coming back out lands beside it
+				if node is BuildingDoor and node.exit_spawn != "":
+					add.call(region_id, node.exit_spawn)
 			scene.free()
 	for stop: Dictionary in ShuttleStop.STOPS:
 		add.call(stop.region, stop.spawn)
