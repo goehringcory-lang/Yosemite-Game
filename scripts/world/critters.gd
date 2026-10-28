@@ -16,6 +16,10 @@ const MAX_BUTTERFLIES := 4
 const SPAWN_EVERY := 2.5
 ## How close the player can come before a bird takes off.
 const FLEE_DISTANCE := 60.0
+## Walk (not run) this close to a bird, or a butterfly, and it goes in your
+## field log (FieldLog).
+const SPOT_DISTANCE := 110.0
+const SPOT_BUTTERFLY := 80.0
 ## Birds keep this far from the player when they land.
 const SPAWN_CLEAR := 140.0
 const FLY_SPEED := 180.0
@@ -125,11 +129,29 @@ func _process(delta: float) -> void:
 		_update_bird(bird, delta, player)
 	for fly in _flies:
 		_update_butterfly(fly, delta, active)
+	if active and not _running():
+		_spot(player)
 	_birds = _birds.filter(func(b: Dictionary) -> bool: return view.has_point(b.pos) or b.state != "fly")
 	_flies = _flies.filter(func(f: Dictionary) -> bool: return view.grow(80.0).has_point(f.pos))
 	# birds left behind off screen go quietly
 	_birds = _birds.filter(func(b: Dictionary) -> bool: return view.grow(160.0).has_point(b.pos))
 	queue_redraw()
+
+
+func _running() -> bool:
+	var world := _world()
+	var walker: Player = world.player if world and "player" in world else null
+	return walker != null and walker.velocity != Vector2.ZERO and Input.is_action_pressed("run")
+
+
+## Logs the birds and butterflies close enough to get a good look at.
+func _spot(player: Vector2) -> void:
+	for bird in _birds:
+		if bird.state != "fly" and bird.pos.distance_to(player) < SPOT_DISTANCE:
+			FieldLog.spot(bird.kind)
+	for fly in _flies:
+		if fly.pos.distance_to(player) < SPOT_BUTTERFLY:
+			FieldLog.spot("butterfly_%d" % fly.wings)
 
 
 func _try_spawn() -> void:

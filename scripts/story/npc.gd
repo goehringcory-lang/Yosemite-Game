@@ -530,7 +530,10 @@ func interact(player: Player) -> void:
 		var line := character.idle_lines[_rng.randi() % character.idle_lines.size()] if not character.idle_lines.is_empty() else ""
 		await DialogueBox.say_to(player, [{"speaker": character.display_name, "text": line}])
 	else:
-		await DialogueBox.say_to(player, QuestLog.talk_to(character.id))
+		var lines := Festivals.talk_to(character.id)
+		lines.append_array(BoardRequests.deliver(character.id))
+		lines.append_array(QuestLog.talk_to(character.id))
+		await DialogueBox.say_to(player, lines)
 		if QuestLog.final_entry_pending() and character.id == "galen_clark":
 			await _write_last_page(player)
 	_talking = false

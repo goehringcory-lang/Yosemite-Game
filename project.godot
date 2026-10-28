@@ -33,6 +33,9 @@ Larder="*res://scripts/story/larder.gd"
 Perks="*res://scripts/story/perks.gd"
 Friendship="*res://scripts/story/friendship.gd"
 Herbarium="*res://scripts/story/herbarium.gd"
+BoardRequests="*res://scripts/story/board_requests.gd"
+FieldLog="*res://scripts/story/field_log.gd"
+Festivals="*res://scripts/story/festivals.gd"
 Sound="*res://scripts/autoload/sound.gd"
 
 [display]

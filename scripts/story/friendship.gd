@@ -112,7 +112,7 @@ func note_talk(character_id: String) -> void:
 	if talked.get(character_id, -1) == today():
 		return
 	talked[character_id] = today()
-	add(character_id, TALK_POINTS)
+	add(character_id, Festivals.talk_points(TALK_POINTS))
 
 
 ## True if you can give this person something today (once a week).

@@ -66,6 +66,8 @@ const INGREDIENTS := {
 	"pine_nuts": {"energy": 24, "kind": "nut", "effect": "hearty", "potency": 1},
 	"cheddar_wedge": {"energy": 30, "kind": "savory"},
 	"beef_jerky": {"energy": 34, "kind": "savory"},
+	"brown_trout": {"energy": 32, "kind": "savory"},
+	"brook_trout": {"energy": 28, "kind": "savory"},
 	"chocolate_bar": {"energy": 26, "kind": "sweet", "effect": "keen", "potency": 1},
 	# Still full of tannins: they spoil whatever they're cooked with.
 	"black_oak_acorn": {"energy": 0, "kind": "bitter"},

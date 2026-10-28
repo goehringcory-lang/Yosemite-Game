@@ -268,9 +268,9 @@ func overhead(prop_name: String, tex_path: String, at_pos: Vector2) -> Sprite2D:
 
 
 ## A prop you can read: interact to see its title and text.
-func sign_prop(prop_name: String, tex_path: String, at_pos: Vector2, footprint: Vector2, title: String, text: String) -> StaticBody2D:
+func sign_prop(prop_name: String, tex_path: String, at_pos: Vector2, footprint: Vector2, title: String, text: String, script_path := "res://scripts/objects/info_sign.gd") -> StaticBody2D:
 	var body := prop_body(prop_name, tex_path, [base_rect(footprint)], Vector2(footprint.x + 6, footprint.y + 10))
-	body.set_script(load("res://scripts/objects/info_sign.gd"))
+	body.set_script(load(script_path))
 	body.set("title", title)
 	body.set("text", text)
 	body.position = at_pos

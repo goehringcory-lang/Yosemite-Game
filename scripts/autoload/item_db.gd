@@ -26,6 +26,10 @@ const ITEMS := [
 	preload("res://data/items/chanterelle.tres"),
 	preload("res://data/items/king_bolete.tres"),
 	preload("res://data/items/coyote_mint.tres"),
+	# Caught on a fly rod (Fishing), and picked up on Facelift day (Festivals)
+	preload("res://data/items/brown_trout.tres"),
+	preload("res://data/items/brook_trout.tres"),
+	preload("res://data/items/litter.tres"),
 	# Prepared food (see Recipes)
 	preload("res://data/food/acorn_flour.tres"),
 	preload("res://data/food/leached_acorn_meal.tres"),

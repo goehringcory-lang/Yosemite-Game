@@ -90,6 +90,9 @@ func _ready() -> void:
 		Perks.start_new_game()
 		Friendship.start_new_game()
 		Herbarium.start_new_game()
+		BoardRequests.start_new_game()
+		FieldLog.start_new_game()
+		Festivals.start_new_game()
 		if forage:
 			forage.respawn()
 	hud.bind_player(player)
@@ -302,6 +305,9 @@ func _show_bear_tracks() -> void:
 	await get_tree().create_timer(BEAR_TRACKS_DELAY).timeout
 	if is_inside_tree():
 		hud.show_message(BEAR_TRACKS_MESSAGE)
+		await get_tree().create_timer(BEAR_TRACKS_DELAY).timeout
+		if is_inside_tree():
+			FieldLog.spot("black_bear")
 
 
 ## Swaps regions right away (no fade). The player lands on [param spawn_name]

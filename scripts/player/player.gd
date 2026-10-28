@@ -12,17 +12,21 @@ var can_act := true
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var interaction_area: Area2D = $InteractionArea
+## Casting from the bank, the thing to use when you face water with a rod.
+var fishing := Fishing.new()
 
 
 func _ready() -> void:
 	add_to_group("persist")
 	add_child(Footfall.new())
+	add_child(fishing)
 
 
 ## The interactable in front of the player, or null. One with a higher
 ## interact_priority wins (a building's door over the building's sign); among
 ## equals (a person by a sign), the one nearest the middle of the reach wins,
 ## so the prompt names what you're facing rather than whichever came first.
+## With nothing there, facing water with a fly rod, it's the water (Fishing).
 func get_target() -> Node:
 	var best: Node = null
 	var best_priority := -1
@@ -38,6 +42,8 @@ func get_target() -> Node:
 			best = target
 			best_priority = priority
 			best_distance = distance
+	if best == null and Fishing.can_fish(self):
+		return fishing
 	return best
 
 

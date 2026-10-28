@@ -350,6 +350,8 @@ func _journal_page() -> void:
 	_missing_guardian()
 	_keepers()
 	_friends()
+	_calendar()
+	_field_log()
 	if QuestLog.final_entry >= 0:
 		_heading("The last page")
 		var entry: String = QuestLog.FINAL_ENTRIES[QuestLog.final_entry].entry
@@ -439,6 +441,33 @@ func _friends() -> void:
 		_body.add_child(row)
 
 
+## The festivals (Festivals), soonest first.
+func _calendar() -> void:
+	_heading("Valley calendar")
+	var festivals: Array = Festivals.FESTIVALS.duplicate()
+	festivals.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Festivals.days_until(a) < Festivals.days_until(b))
+	for festival: Dictionary in festivals:
+		var days := Festivals.days_until(festival)
+		var soon := "Today!" if days == 0 else ("Tomorrow" if days == 1 else "In %d days" % days)
+		var host := QuestLog.get_character(festival.host)
+		_check_line(Festivals.went_this_year(festival.id), "%s · %s" % [festival.name, soon],
+			HEADING if days == 0 else Color.WHITE)
+		_line("     %s. Hosted by %s." % [Festivals.when_text(festival), host.display_name if host else festival.host], DIM)
+
+
+## The birds and animals you've seen or heard (FieldLog), and how to find
+## the rest.
+func _field_log() -> void:
+	_heading("Field log: %d of %d animals" % [FieldLog.count(), FieldLog.total()])
+	for animal: Dictionary in FieldLog.ANIMALS:
+		if FieldLog.has(animal.id):
+			var where: String = FieldLog.seen[animal.id].get("where", "")
+			_check_line(true, "%s (%s)%s" % [animal.name, animal.latin, " · %s" % where if where != "" else ""], Color(0.827, 0.894, 0.541))
+			_line("     " + animal.note, DIM)
+		else:
+			_check_line(false, "%s · %s. %s" % [animal.name, FieldLog.seasons_text(animal.seasons), animal.hint], DIM)
+
+
 ## The guidebook's tick list: every route, its grade, the gear it needs, and
 ## whether you've topped it out. A * marks the routes the main story needs.
 func _guidebook() -> void:
@@ -518,6 +547,13 @@ func _quests_page() -> void:
 	for quest in open:
 		_quest_card(quest, QuestLog.objective_text(quest))
 
+	# The notes you took down from the Camp 4 bulletin board.
+	var notes := BoardRequests.open_notes()
+	if not notes.is_empty():
+		_heading("Notes from the Camp 4 board (%d)" % notes.size())
+		for entry: Dictionary in notes:
+			_note_card(entry)
+
 	# Who has something for you, as on a help-wanted board.
 	var asking: Array[CharacterData] = []
 	for character: CharacterData in QuestLog.CHARACTERS:
@@ -542,6 +578,33 @@ func _quests_page() -> void:
 			who.add_child(name_label)
 			flow.add_child(who)
 		_body.add_child(flow)
+
+
+## A board note as a card, like a quest's: who pinned it up, what it says,
+## and how you're getting on.
+func _note_card(entry: Dictionary) -> void:
+	var note: Dictionary = entry.note
+	var giver := QuestLog.get_character(note.giver)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	row.add_child(_face(giver.display_name if giver else "", 32))
+	var words := VBoxContainer.new()
+	words.add_theme_constant_override("separation", 0)
+	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var title := Label.new()
+	title.text = "\"%s\"" % note.text
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.custom_minimum_size.x = LINE_WIDTH - 40
+	title.add_theme_color_override("font_color", HEADING)
+	words.add_child(title)
+	var objective := Label.new()
+	objective.text = BoardRequests.objective(entry)
+	objective.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	objective.custom_minimum_size.x = LINE_WIDTH - 40
+	objective.add_theme_color_override("font_color", Color(0.827, 0.894, 0.541) if entry.have >= int(note.count) else DIM)
+	words.add_child(objective)
+	row.add_child(words)
+	_body.add_child(row)
 
 
 ## A quest as a card: the face of whoever gave it, its title, and what to do

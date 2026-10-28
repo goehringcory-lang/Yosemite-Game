@@ -512,7 +512,8 @@ func _place_camp_4() -> void:
 
 	# Notes for partners and rides where the walk-in path arrives, and the sign.
 	sign_prop("RouteBoard", B + "camp4_board.png", foot(13.5, 30), Vector2(36, 6), "Camp 4 bulletin board",
-		"Notes pinned three deep: partners wanted for Royal Arches, a rack for trade, rides to the Tuolumne, and a weather report for the week. Climbers have found partners on this board for generations.")
+		"Notes pinned three deep: partners wanted for Royal Arches, a rack for trade, rides to the Tuolumne, and a weather report for the week. Climbers have found partners on this board for generations.",
+		"res://scripts/objects/bulletin_board.gd")
 	sign_prop("Camp4Sign", B + "camp4_sign.png", _tile_pos(31, 21), Vector2(36, 5), "Camp 4",
 		"Climbers have camped here since the 1950s, the golden age of big-wall climbing, when Royal Robbins, Warren Harding and their friends lived here for whole seasons. In the late 1990s climbers fought a plan to build lodging on the site, and Camp 4 was added to the National Register of Historic Places in 2003.")
 	_info("OldCanvasTent", foot(5, 20) + Vector2(-14, -22), Vector2(36, 14), "Canvas wall tent",
