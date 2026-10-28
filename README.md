@@ -640,6 +640,12 @@ godot --headless --path . res://tests/travel_test.tscn
 It loads every hub and checks that spawn points are walkable. It also walks through the homestead gate, drives between hubs, and checks locks, seasonal closures, the late-night cutoff, saving the current region, and passing out away from home.
 
 ```bash
+godot --headless --path . res://tests/exit_access_test.tscn
+```
+
+It walks every region with the player's real body, from its arrival spot, and checks that every road and doorway out can be walked into, every trail sign, building door, shuttle stop and map kiosk can be walked up to and used, and every spot a way in lands on (a road, trail, door, shuttle, climb or drive) is connected to the rest, so no way in strands you. Then it fits the regions together like puzzle pieces: every region has a way in and a way out, and from every region you can get to every other one by its roads, trails and doors, the Valley shuttle, the park map's drives and the climbs that top out somewhere new.
+
+```bash
 godot --headless --path . res://tests/ahwahnee_test.tscn
 ```
 

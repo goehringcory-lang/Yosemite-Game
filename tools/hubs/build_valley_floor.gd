@@ -393,6 +393,8 @@ func _four_mile_trailhead() -> void:
 	marker("east", 61, 22.5)
 	marker("west", 2, 22.5)
 	marker("trailhead", 30, 19)
+	# Down from Glacier Point you come out by the trail's sign at the foot of the wall.
+	marker("four_mile_trail", 32, _foot_of_wall(32) + 2)
 	marker("steck_salathe", 46, _foot_of_wall(46))
 	marker("beach", 50, 27)
 	place("Four Mile Trailhead", 30, 18, 8)

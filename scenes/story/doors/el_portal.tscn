@@ -91,6 +91,7 @@ script = ExtResource("1_vay6g")
 label = "Yosemite View Lodge"
 target_region = "yosemite_view_lodge"
 target_spawn = "door"
+exit_spawn = "yosemite_view_lodge_door2"
 
 [node name="Hitbox" type="Area2D" parent="DoorToYosemiteViewLodge2" unique_id=416692368]
 collision_layer = 4
@@ -100,3 +101,6 @@ monitoring = false
 [node name="Shape" type="CollisionShape2D" parent="DoorToYosemiteViewLodge2/Hitbox" unique_id=1884034740]
 position = Vector2(0, -20)
 shape = SubResource("RectangleShape2D_uiiyy")
+
+[node name="yosemite_view_lodge_door2" type="Marker2D" parent="." unique_id=615617339]
+position = Vector2(720, 1096)

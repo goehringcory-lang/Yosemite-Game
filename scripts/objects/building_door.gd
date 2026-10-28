@@ -10,6 +10,10 @@ extends RegionDoor
 ## including) [member close_hour]. The defaults never close.
 @export_range(0, 24) var open_hour := 0
 @export_range(0, 24) var close_hour := 24
+## The spot outside this door, when it isn't the one the room's way out leads
+## to (a building's second door into the same lobby): leaving the room puts
+## you back here, by the door you came in.
+@export var exit_spawn := ""
 
 ## Standing in front of a door, the door wins over the building's own sign
 ## (see Player.get_target).
@@ -31,4 +35,6 @@ func interact(player: Player) -> void:
 		get_tree().call_group("hud", "show_message", "%s is closed. It's open from %s to %s." % [label,
 			RegionExit._clock_text(open_hour), RegionExit._clock_text(close_hour)])
 		return
+	if is_unlocked():
+		get_tree().call_group("world", "remember_door", self)
 	super.interact(player)

@@ -9304,7 +9304,7 @@ position = Vector2(1872, 976)
 position = Vector2(2448, 1936)
 
 [node name="valley_lodge" type="Marker2D" parent="Markers" unique_id=221206821]
-position = Vector2(1232, 1488)
+position = Vector2(1328, 1488)
 
 [node name="west_road" type="Marker2D" parent="Markers" unique_id=617092193]
 position = Vector2(80, 1232)

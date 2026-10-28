@@ -220,15 +220,16 @@ func _node_name(id: String) -> String:
 
 
 ## The region a room's building stands in, and where.
-func _outside(spec: Dictionary) -> Dictionary:
+func _outside(spec: Dictionary, seen := {}) -> Dictionary:
 	var o: Dictionary = spec.get("outside", {})
 	if o.is_empty():
-		# an inner room: the same place as the room its front door leads to
+		# an inner room: the same place as the rooms its doors lead to (a side
+		# door counts, so the Wawona Hotel's dining room is in Wawona)
+		seen[spec.id] = true
 		for door: Dictionary in spec.doors:
-			if door.side == "front":
-				for other: Dictionary in rooms():
-					if other.id == door.to:
-						return _outside(other)
+			for other: Dictionary in rooms():
+				if other.id == door.to and not seen.has(other.id):
+					return _outside(other, seen)
 		return {"hub": "yosemite_valley", "geo": Vector2.ZERO}
 	var region: Region = load("res://scenes/regions/%s.tscn" % o.region).instantiate()
 	var out := {"hub": region.hub_id, "geo": region.geo_anchor}
@@ -272,11 +273,15 @@ func _build_doors(specs: Array) -> void:
 				d.set("open_hour", hours.x)
 				d.set("close_hour", hours.y)
 				root.add_child(d)
-				if i == 0:
-					var m := Marker2D.new()
-					m.name = spec.id + "_door"
-					m.position = at + Vector2(0, o.get("out", 40.0))
-					root.add_child(m)
+				# A spot outside each door. The room's way out leads to the
+				# first; a second door remembers its own, so you come back out
+				# the door you went in.
+				var m := Marker2D.new()
+				m.name = spec.id + "_door" + ("" if i == 0 else str(i + 1))
+				m.position = at + Vector2(0, o.get("out", 40.0))
+				if i > 0:
+					d.set("exit_spawn", m.name)
+				root.add_child(m)
 		region.free()
 		for child in root.get_children():
 			_own(child, root)

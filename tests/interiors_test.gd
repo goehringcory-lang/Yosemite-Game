@@ -47,7 +47,8 @@ func _ready() -> void:
 		_check_room_scene(spec)
 	for spec: Dictionary in specs:
 		if spec.has("outside"):
-			await _walk_in_and_out(world, spec)
+			for i in (spec.outside.get("nodes", [spec.outside.node]) as Array).size():
+				await _walk_in_and_out(world, spec, i)
 	await _check_links(world, specs)
 	await _check_readables(world, specs)
 	await _check_hours(world, by_id)
@@ -74,15 +75,18 @@ func _check_room_scene(spec: Dictionary) -> void:
 
 
 ## Outside, face the door: it's what the button uses. Go in, arrive in the
-## doorway, walk out the front, and land on the doorstep again.
-func _walk_in_and_out(world: Node, spec: Dictionary) -> void:
+## doorway, walk out the front, and land on the doorstep again. A building
+## with a second door ([param index] 1) is walked through that door too, and
+## you come back out of the door you went in.
+func _walk_in_and_out(world: Node, spec: Dictionary, index := 0) -> void:
 	var outside: String = spec.outside.region
 	var player: Player = world.player
 	world._enter_region(outside, "")
-	var door: BuildingDoor = world.region.find_child("DoorTo" + spec.id.to_pascal_case(), true, false)
-	var step: Marker2D = world.region.get_spawn(spec.id + "_door")
+	var suffix := "" if index == 0 else str(index + 1)
+	var door: BuildingDoor = world.region.find_child("DoorTo" + spec.id.to_pascal_case() + suffix, true, false)
+	var step: Marker2D = world.region.get_spawn(spec.id + "_door" + suffix)
 	if door == null or step == null:
-		check(false, "%s has a door and a doorstep in %s" % [spec.name, outside])
+		check(false, "%s has a door and a doorstep in %s (%s)" % [spec.name, outside, "DoorTo" + spec.id.to_pascal_case() + suffix])
 		return
 	player.global_position = step.global_position
 	player.facing = Vector2i.UP
@@ -113,7 +117,8 @@ func _walk_in_and_out(world: Node, spec: Dictionary) -> void:
 	Input.action_release("move_down")
 	await _settle(world)
 	check(world.region.region_id == outside and player.global_position.distance_to(step.global_position) < 40.0,
-		"%s: walking out the front door lands you on its doorstep in %s" % [spec.name, world.region.region_id])
+		"%s: walking out the front door lands you on the doorstep of the door you went in (%s) in %s"
+			% [spec.name, door.name, world.region.region_id])
 
 
 ## Rooms joined to rooms (the Ahwahnee, the Wawona Hotel): each way through

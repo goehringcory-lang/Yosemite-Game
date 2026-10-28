@@ -676,7 +676,8 @@ func _place_markers_and_places() -> void:
 	_marker("post_office", 86, 23)
 	_marker("cemetery", 58, 30)
 	_marker("chapel", 76, 60)
-	_marker("valley_lodge", 38, 46)
+	# Beside the lodge door, not on its step: three visitors start the day here.
+	_marker("valley_lodge", 41, 46)
 	_marker("west_road", 2, 38)
 	_marker("east_road", W - 3, 38)
 	_marker("southside_west", 2, 60)
