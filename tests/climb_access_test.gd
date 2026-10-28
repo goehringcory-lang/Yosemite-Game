@@ -9,16 +9,17 @@ const Terrain = preload("res://tools/mapgen/terrain.gd")
 const CONTENT_DIR := "res://scenes/story/content/"
 ## The walk is tried on a grid this fine, so a one-tile gap still counts.
 const STEP := 8.0
-## The player's body and reach (scenes/player/player.tscn) and a climb's
-## hitbox (scenes/climb/climb_start.tscn).
-const BODY := Rect2(-5, -6, 10, 6)
-const REACH := 12.0
-const REACH_SIZE := Vector2(12, 12)
+## A climb's hitbox (scenes/climb/climb_start.tscn).
 const HITBOX := Rect2(-8, -11, 16, 14)
 ## Routes with no wall to stand under: the Lyell Glacier is a walk up Lyell
 ## Canyon, and its sign is at the trailhead by the Tuolumne lodge.
 const NO_WALL := ["lyell_glacier"]
 
+## The player's body and the reach of the interact button, read from
+## scenes/player/player.tscn in _ready().
+var body := Rect2()
+var reach := 0.0
+var reach_size := Vector2()
 var failures := 0
 
 
@@ -29,6 +30,7 @@ func check(cond: bool, what: String) -> void:
 
 
 func _ready() -> void:
+	_read_player()
 	var seen := {}
 	for file in DirAccess.get_files_at(CONTENT_DIR):
 		if not file.ends_with(".tscn"):
@@ -62,12 +64,24 @@ func _ready() -> void:
 	get_tree().quit(failures)
 
 
+## The player's collision box and interaction area, from the player scene.
+func _read_player() -> void:
+	var player: Player = load("res://scenes/player/player.tscn").instantiate()
+	var collision := player.get_node("Collision") as CollisionShape2D
+	var size: Vector2 = (collision.shape as RectangleShape2D).size
+	body = Rect2(collision.position - size / 2.0, size)
+	var area := player.get_node("InteractionArea") as Area2D
+	reach = area.position.length()
+	reach_size = ((area.get_node("Shape") as CollisionShape2D).shape as RectangleShape2D).size
+	player.free()
+
+
 ## Everywhere the player's body fits that can be walked to from the region's
 ## arrival spot, as grid points STEP apart.
 func _walk(region: Region) -> Dictionary:
 	var space := region.get_world_2d().direct_space_state
 	var shape := RectangleShape2D.new()
-	shape.size = BODY.size
+	shape.size = body.size
 	var query := PhysicsShapeQueryParameters2D.new()
 	query.shape = shape
 	query.collision_mask = 1
@@ -85,7 +99,7 @@ func _walk(region: Region) -> Dictionary:
 			var pos := Vector2(next) * STEP
 			if walked.has(next) or not bounds.has_point(pos):
 				continue
-			query.transform = Transform2D(0.0, pos + BODY.get_center())
+			query.transform = Transform2D(0.0, pos + body.get_center())
 			if space.intersect_shape(query, 1).is_empty():
 				walked[next] = true
 				queue.append(next)
@@ -103,7 +117,7 @@ func _can_use(climb: ClimbStart, walked: Dictionary) -> bool:
 			if not walked.has(at):
 				continue
 			for facing in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
-				if Rect2(Vector2(at) * STEP + facing * REACH - REACH_SIZE / 2.0, REACH_SIZE).intersects(hitbox):
+				if Rect2(Vector2(at) * STEP + facing * reach - reach_size / 2.0, reach_size).intersects(hitbox):
 					return true
 	return false
 

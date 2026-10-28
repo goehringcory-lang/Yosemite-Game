@@ -84,6 +84,7 @@ script = ExtResource("1_s71ju")
 region_id = "ahwahnee_dining_room"
 hub_id = "yosemite_valley"
 display_name = "The Ahwahnee: Dining Room"
+geo_anchor = Vector2(-119.5745, 37.7465)
 indoors = true
 
 [node name="Ground" type="TileMapLayer" parent="." unique_id=843741505]

@@ -78,8 +78,9 @@ size = Vector2(16, 60)
 y_sort_enabled = true
 script = ExtResource("1_v1mdj")
 region_id = "wawona_hotel_dining"
-hub_id = "yosemite_valley"
+hub_id = "wawona"
 display_name = "Wawona Hotel: Dining Room"
+geo_anchor = Vector2(-119.6555, 37.5366)
 indoors = true
 
 [node name="Ground" type="TileMapLayer" parent="." unique_id=1245148138]

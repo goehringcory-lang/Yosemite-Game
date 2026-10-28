@@ -58,6 +58,7 @@ script = ExtResource("1_wale3")
 region_id = "ahwahnee_solarium"
 hub_id = "yosemite_valley"
 display_name = "The Ahwahnee: Solarium"
+geo_anchor = Vector2(-119.5745, 37.7465)
 indoors = true
 
 [node name="Ground" type="TileMapLayer" parent="." unique_id=745319566]

@@ -220,15 +220,16 @@ func _node_name(id: String) -> String:
 
 
 ## The region a room's building stands in, and where.
-func _outside(spec: Dictionary) -> Dictionary:
+func _outside(spec: Dictionary, seen := {}) -> Dictionary:
 	var o: Dictionary = spec.get("outside", {})
 	if o.is_empty():
-		# an inner room: the same place as the room its front door leads to
+		# an inner room: the same place as the rooms its doors lead to (a side
+		# door counts, so the Wawona Hotel's dining room is in Wawona)
+		seen[spec.id] = true
 		for door: Dictionary in spec.doors:
-			if door.side == "front":
-				for other: Dictionary in rooms():
-					if other.id == door.to:
-						return _outside(other)
+			for other: Dictionary in rooms():
+				if other.id == door.to and not seen.has(other.id):
+					return _outside(other, seen)
 		return {"hub": "yosemite_valley", "geo": Vector2.ZERO}
 	var region: Region = load("res://scenes/regions/%s.tscn" % o.region).instantiate()
 	var out := {"hub": region.hub_id, "geo": region.geo_anchor}
