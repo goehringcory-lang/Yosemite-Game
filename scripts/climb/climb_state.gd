@@ -150,6 +150,14 @@ const ESTIMATE_PER_PITCH := 20
 const ESTIMATE_PER_GRADE := 6
 ## A Keen meal (see Cooking) widens the crux meter's green this much.
 const KEEN_WINDOW := 0.06
+## Boulder problems: tries in a session before your fingertips are done.
+const BOULDER_TRIES := 5
+## Each fall onto the pad leaves you this much short of full stamina for the
+## next try, and more for one off the top moves (a high, hard landing).
+const BOULDER_FATIGUE := 8
+const BOULDER_HIGH_FALL := 6
+## Minutes on the pad between tries: brush the holds, chalk, breathe.
+const MINUTES_BETWEEN_TRIES := 6
 
 var route: RouteData
 var status := Status.CLIMBING
@@ -236,8 +244,8 @@ var _has_fixed := -1
 ## and glacier gear.
 func _init(p_route: RouteData, cams: int, seed := -1, kit := {}) -> void:
 	route = p_route
-	cams_per_pitch = 99 if route.top_rope else cams
-	quickdraws_per_pitch = 99 if route.top_rope else int(kit.get("quickdraw", 0))
+	cams_per_pitch = 99 if route.top_rope else (0 if route.boulder else cams)
+	quickdraws_per_pitch = 99 if route.top_rope else (0 if route.boulder else int(kit.get("quickdraw", 0)))
 	has_shoes = int(kit.get("climbing_shoes", 0)) > 0
 	has_chalk = int(kit.get("chalk_bag", 0)) > 0
 	has_device = int(kit.get("belay_device", 0)) > 0
@@ -548,14 +556,16 @@ func _step(dx: int, cost: int, mins: int, safe := false) -> void:
 		pending = {
 			"kind": crux.kind,
 			"name": crux.name,
-			"window": crux_window(),
 			"row": row,
 			"cell": Vector2i(col, row),
 			"index": crux_rows().find(row) + 1,
 			"count": crux_rows().size(),
 			"tries": 0,
 			"pumped": false,
+			"narrow": -float(crux.get("narrow", 0.0)),
+			"need": int(crux.get("need", 0)),
 		}
+		pending["window"] = crux_window()
 		if not interactive:
 			resolve_crux("good")
 		return
@@ -587,6 +597,7 @@ func crux_window() -> float:
 		window += KEEN_WINDOW
 	window += CRUX_MERCY_WINDOW * _crux_mercy()
 	window -= PUMP_WINDOW * pump
+	window += float(pending.get("narrow", 0.0))
 	return clampf(window, 0.1, 0.5)
 
 
@@ -627,6 +638,13 @@ func resolve_crux(result: String) -> void:
 		var cost := PUMP_BASE + PUMP_PER_GRADE * diff
 		stamina -= cost
 		slipped_cruxes += 1
+		if route.boulder:
+			# No hanging on to eat a snack: miss the move and you're off.
+			pending = {}
+			_fall()
+			if status == Status.CLIMBING:
+				message = "You miss %s and come off. " % name.to_lower() + message
+			return
 		if stamina > 0 and _has_spare_food():
 			pending.tries = int(pending.get("tries", 0)) + 1
 			pending.pumped = true
@@ -652,7 +670,7 @@ func resolve_crux(result: String) -> void:
 
 
 func can_place_cam() -> bool:
-	return status == Status.CLIMBING and pending.is_empty() and not route.top_rope and cams_left > 0 \
+	return not route.boulder and status == Status.CLIMBING and pending.is_empty() and not route.top_rope and cams_left > 0 \
 		and hold_at(row, col).get("crack", false) and protection_row < row
 
 
@@ -719,6 +737,9 @@ func _protect_message(done: String) -> String:
 
 ## The protect button: clips a bolt within reach, or places a cam in a crack.
 func protect() -> bool:
+	if route.boulder:
+		message = "No rope on a boulder. The pad and your spotter are your protection."
+		return false
 	return clip_bolt() if is_bolted() or can_clip() else place_cam()
 
 
@@ -726,7 +747,7 @@ func protect() -> bool:
 ## ledge. (Chalk does nothing on snow and ice.)
 func can_chalk() -> bool:
 	return status == Status.CLIMBING and pending.is_empty() and has_chalk and not chalked_this_pitch \
-		and not is_at_belay() and not is_snow()
+		and (not is_at_belay() or route.boulder) and not is_snow()
 
 
 ## Dips your hands in the chalk bag: the next CHALK_MOVES moves cost less.
@@ -870,6 +891,8 @@ func retreat(reason := "") -> void:
 	status = Status.RETREATED
 	pending = {}
 	minutes += 15 + 10 * pitch
+	if reason == "" and route.boulder:
+		reason = "You pick up the pad and call it a session."
 	if reason == "":
 		reason = "You rappel down and head back." if has_device and pitch > 0 else "You lower off and head back down."
 	message = reason
@@ -879,6 +902,8 @@ func retreat(reason := "") -> void:
 ## How the climb went: "Onsight" (no falls, no aid), "Hard-won" (falls but
 ## free), or "Aided" (pulled on gear).
 func style_rating() -> String:
+	if route.boulder:
+		return "Flash" if falls == 0 else "Sent on try %d" % (falls + 1)
 	if aid_moves > 0:
 		return "Aided"
 	if falls == 0:
@@ -892,6 +917,9 @@ func is_free() -> bool:
 
 
 func _fall() -> void:
+	if route.boulder:
+		_fall_on_pad()
+		return
 	falls += 1
 	falls_this_pitch += 1
 	minutes += MINUTES_PER_FALL
@@ -929,6 +957,41 @@ func _fall() -> void:
 		var last: Dictionary = protection.back()
 		catcher = "quickdraw" if last.kind == "draw" else "cam"
 	message = "You fall, and your %s catches you. Shake it out and try again." % catcher
+
+
+## Tries left on a boulder problem, counting the one you're on.
+func tries_left() -> int:
+	return maxi(BOULDER_TRIES - falls, 0)
+
+
+## Off a boulder problem: you land on the pad, your spotter steadies you, and
+## the next try starts from the ground with a little less in your arms. Run out
+## of tries and the session is over.
+func _fall_on_pad() -> void:
+	var high := row >= top_row - 2
+	falls += 1
+	falls_this_pitch += 1
+	minutes += MINUTES_BETWEEN_TRIES
+	events.append({"type": "fall", "pad": true, "high": high})
+	if falls >= BOULDER_TRIES:
+		retreat("That's %d tries. Your fingertips are raw and your arms are done. Come back another day." % falls)
+		return
+	var fresh := MAX_STAMINA - BOULDER_FATIGUE * falls - (BOULDER_HIGH_FALL if high else 0)
+	row = 0
+	col = COLUMNS / 2
+	last_dx = 0
+	pump = 0
+	chalk_moves = 0
+	chalked_this_pitch = false
+	pending = {}
+	_rested_rows = {}
+	_shaken_rows = {}
+	stamina = fresh
+	var left := tries_left()
+	if high:
+		message = "You come off the top and land hard on the pad. The spotter keeps you off the rocks. %d %s left." % [left, "try" if left == 1 else "tries"]
+	else:
+		message = "You drop onto the pad. Brush the holds, chalk up, go again. %d %s left." % [left, "try" if left == 1 else "tries"]
 
 
 func _finish_pitch() -> void:
@@ -1087,6 +1150,9 @@ func _generate_holds() -> void:
 		ledge[c] = {"cost": 0, "crack": false}
 	holds[0] = ledge
 	holds[top_row] = ledge.duplicate(true)
+	if spec.has("problem"):
+		_authored_holds(difficulty)
+		return
 	var path_col := clampi(COLUMNS / 2, cols.min(), cols.max())
 	var st := style()
 	for r in range(1, top_row):
@@ -1137,6 +1203,26 @@ func _generate_holds() -> void:
 			hold.erase("hard")
 	if _crack_chance() > 0.0 and not is_snow():
 		_ensure_cracks(path)
+
+
+## A boulder problem's holds are the real ones, the same every time: the
+## spec's "problem" lists each row's holds, lowest first, as column ->
+## {"grip", "cost", and maybe "name"}. Crux points and stances are marked on
+## top as usual.
+func _authored_holds(difficulty: int) -> void:
+	var rows: Array = spec.problem
+	for i in rows.size():
+		var rowd := {}
+		for c: int in rows[i]:
+			var h: Dictionary = rows[i][c]
+			var hold := {"cost": int(h.cost), "crack": false, "grip": h.get("grip", "edge")}
+			if h.has("name"):
+				hold["name"] = h.name
+			if hold.grip == "crimp":
+				hold["hard"] = true
+			rowd[c] = hold
+		holds[i + 1] = rowd
+	_apply_features({}, difficulty)
 
 
 ## Gives every hold at least one hold within reach above it, so the player
@@ -1213,6 +1299,7 @@ func _apply_features(path: Dictionary, difficulty: int) -> void:
 	# your timing more than your arms.
 	for crux: int in crux_rows():
 		var extra := 3 + difficulty if crux == crux_row() else CRUX_POINT_COST
+		extra = int(ClimbProfiles.crux_at(spec, crux).get("extra", extra))
 		for c: int in holds[crux]:
 			var hold: Dictionary = holds[crux][c]
 			hold.cost = int(hold.cost) + extra

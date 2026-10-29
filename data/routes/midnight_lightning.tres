@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RouteData" format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+id = "midnight_lightning"
+display_name = "Midnight Lightning"
+grade = "V8, boulder"
+description = "The boulder problem up the overhanging face of Columbia Boulder, under the chalk lightning bolt. No rope: a crash pad, a spotter, and the most famous mantel in climbing, almost 16 feet off the ground."
+first_ascent = "Ron Kauk, 1978"
+required_gear = {
+"chalk_bag": 1,
+"climbing_shoes": 1
+}
+pitches = Array[int]([5])
+moves_per_pitch = 8
+boulder = true
+guide_chapter = "Valley floor"
+guide_order = 16
+guide_tip = "Five tries a session. Fresh arms for the swing, then press the mantel out fast. Chongo spots."
+height_ft = 25

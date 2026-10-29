@@ -4,6 +4,7 @@
 [ext_resource type="Resource" path="res://data/characters/dick_leonard.tres" id="2_r"]
 [ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="3_r"]
 [ext_resource type="Resource" path="res://data/routes/swan_slab.tres" id="4_r"]
+[ext_resource type="Resource" path="res://data/routes/midnight_lightning.tres" id="5_r"]
 [ext_resource type="Resource" path="res://data/characters/john_salathe.tres" id="8_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_dirtbag.tres" id="9_r"]
 [ext_resource type="Resource" path="res://data/characters/bridget_degnan.tres" id="10_r"]
@@ -29,6 +30,10 @@ offset = Vector2(32, -48)
 [node name="SwanSlab" parent="." instance=ExtResource("3_r")]
 position = Vector2(432, 240)
 route = ExtResource("4_r")
+
+[node name="MidnightLightningStart" parent="." instance=ExtResource("3_r")]
+position = Vector2(356, 500)
+route = ExtResource("5_r")
 
 [node name="JohnSalathe" parent="." instance=ExtResource("1_r")]
 character = ExtResource("8_r")

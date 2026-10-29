@@ -39,6 +39,9 @@ extends Resource
 ## the rock, which take a quickdraw each. A bolted pitch has one bolt every
 ## [constant ClimbState.BOLT_SPACING] moves, so it needs that many draws.
 @export_enum("cams", "bolts") var protection := "cams"
+## A boulder problem: no rope and no gear. Falls land on the crash pad under a
+## spotter, and you get [constant ClimbState.BOULDER_TRIES] tries a session.
+@export var boulder := false
 ## Height of the whole climb in feet, for the climbing screen's altimeter.
 ## 0 guesses 150 feet a pitch.
 @export var height_ft := 0

@@ -18,7 +18,7 @@ func _draw() -> void:
 	# A trail sign with a grade plate (green easy, red hard, blue for ice) and
 	# a coil of rope at its foot.
 	var yds := Guidebook.yds(route.grade) if route else 0.0
-	var plate := Color("3a86a8")
+	var plate := Color("15141c") if route and route.boulder else Color("3a86a8")
 	if yds > 0.0:
 		plate = Color("84b04a") if yds < 7.5 else (Color("d8a63b") if yds < 10.5 else (Color("d9772a") if yds < 12.5 else Color("b3362b")))
 	var wood := Color("6b4829")

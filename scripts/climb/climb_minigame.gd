@@ -264,7 +264,8 @@ func _climb_input(event: InputEvent) -> void:
 			_act_t = 0.0
 			_act_kind = "protect"
 	elif event.is_action_pressed("interact"):
-		if state.is_at_belay():
+		# On a boulder's pad, E chalks up once you're fed.
+		if state.is_at_belay() and (not route.boulder or state.can_eat()):
 			eat_next()
 		elif state.can_shake():
 			state.shake_out()
@@ -431,7 +432,7 @@ func _start_crux() -> void:
 			_crux = {"kind": kind, "need": 8, "done": 0, "left_next": true,
 				"time_total": state.crux_seconds(kind), "time_left": state.crux_seconds(kind)}
 		_:
-			_crux = {"kind": "mash", "need": 9, "done": 0, "left_next": true,
+			_crux = {"kind": "mash", "need": int(state.pending.get("need", 0)) if int(state.pending.get("need", 0)) > 0 else 9, "done": 0, "left_next": true,
 				"time_total": state.crux_seconds("mash"), "time_left": state.crux_seconds("mash")}
 	_crux["name"] = _crux_title()
 
@@ -644,6 +645,9 @@ func _belay_spot() -> Vector2:
 		return Vector2(_img_x() + float(_roof_info.wall_x) + 34.0, _ledge_y(0) + 2.0)
 	if route.top_rope:
 		return Vector2(_screen(0, ClimbState.COLUMNS / 2).x + 10, _ledge_y(state.top_row))
+	if route.boulder:
+		# The spotter stands beside the pad, under your hips.
+		return Vector2(clampf(_torso().x - 22.0, L.GRID_X - 10.0, L.GRID_X + 4.0 * L.COL_W), _ledge_y(0))
 	return Vector2(_screen(0, 0).x - 26, _ledge_y(0))
 
 
@@ -801,6 +805,8 @@ func _rope_point(piece: Dictionary) -> Vector2:
 ## The rope: from the belayer up through every piece to the climber's harness
 ## (a top rope runs up to the anchor and back), with a little sag between.
 func _draw_rope() -> void:
+	if route.boulder:
+		return
 	var points: Array[Vector2] = [_belay_spot() + Vector2(8, -22)]
 	if route.top_rope:
 		var anchor := Vector2(_screen(0, ClimbState.COLUMNS / 2).x + 6, _ledge_y(state.top_row) - 6)
@@ -861,6 +867,8 @@ func _draw_belayer() -> void:
 		mode = "anchor"
 	elif state.row > 0 and state.status == ClimbState.Status.CLIMBING:
 		mode = "look_up"
+	if route.boulder:
+		mode = "spot"
 	# A pay-out hop when you move, a quick take-in on a catch.
 	var frame := 0
 	if _belay_frame_t > 0.0:
@@ -942,7 +950,8 @@ func _pose() -> Dictionary:
 			a = ClimbSprites.fall_pose()
 			a["hr"] += Vector2(0, sin(_time * 30.0) * 2.0)
 			if _move_t >= 1.0:
-				_pose_mode = "hang"
+				# Off a boulder you land on your feet on the pad.
+				_pose_mode = "wall" if route.boulder else "hang"
 		"hang":
 			a = ClimbSprites.hang_pose()
 			if _move_t >= 1.0 and fmod(_time, 2.5) > 2.45:
@@ -977,7 +986,7 @@ func _hint() -> String:
 		parts.append("Space: clip the bolt" if state.bolt_kinds.get(state.row, "bolt") == "bolt" else "Space: clip the old piton")
 	elif state.can_place_cam():
 		parts.append("Space: place a cam")
-	if state.is_at_belay():
+	if state.is_at_belay() and (not route.boulder or state.can_eat()):
 		if state.can_eat():
 			parts.append("E: eat")
 	elif state.can_shake():

@@ -54,6 +54,7 @@ func _ready() -> void:
 	test_late_starts()
 	test_snow_rules()
 	test_fixed_ropes()
+	test_boulder()
 	await test_climb_ending_past_the_curfew()
 	print("\nOK: %d failure(s)" % failures)
 	get_tree().quit(failures)
@@ -303,7 +304,7 @@ func test_pump() -> void:
 func test_safe_lines() -> void:
 	var bad := []
 	for r in Guidebook.routes():
-		if r.top_rope:
+		if r.top_rope or r.boulder:
 			continue
 		for seed in 10:
 			var state := ClimbState.new(r, int(kit_for(r).get("cam", 0)), seed, kit_for(r))
@@ -624,6 +625,49 @@ func test_snow_rules() -> void:
 	check(rock.can_chalk() and rock.chalk_up(), "chalk works on rock")
 	var firefall := ClimbState.new(route("firefall_slab"), 0, 1, kit_for(route("firefall_slab")))
 	check(not rock.route_has_fixed_pieces() and firefall.route_has_fixed_pieces(), "only routes with bolts or pitons show the quickdraw slot")
+
+
+## Midnight Lightning: no rope, the real holds every time, a miss means the
+## pad, and a session is a handful of tries.
+func test_boulder() -> void:
+	var r := route("midnight_lightning")
+	var kit := kit_for(r)
+	var a := ClimbState.new(r, 4, 1, kit)
+	var b := ClimbState.new(r, 4, 99, kit)
+	check(str(a.holds) == str(b.holds), "a boulder problem's holds are the same every time")
+	check(a.cams_per_pitch == 0 and a.quickdraws_per_pitch == 0 and not a.protect(), "no rope and no gear on a boulder")
+	check(a.can_chalk(), "you can chalk up on the pad before a try")
+	check(a.crux_rows() == [3, 5, 7] and ClimbProfiles.crux_at(a.spec, 7).kind == "mash", "the bolt hold, the swing and the mantel are the cruxes")
+	# Climb to the first crux and miss it: you land on the pad.
+	a.interactive = true
+	var guard := 0
+	while a.pending.is_empty() and guard < 10:
+		guard += 1
+		a.move(_up(a))
+	a.resolve_crux("slip")
+	check(a.row == 0 and a.falls == 1 and a.status == ClimbState.Status.CLIMBING and a.tries_left() == ClimbState.BOULDER_TRIES - 1, "miss a crux and you drop onto the pad, one try down")
+	check(a.stamina < ClimbState.MAX_STAMINA, "...a little more tired for the next try")
+	for i in ClimbState.BOULDER_TRIES - 1:
+		guard = 0
+		while a.pending.is_empty() and a.status == ClimbState.Status.CLIMBING and guard < 10:
+			guard += 1
+			a.move(_up(a))
+		a.resolve_crux("slip")
+	check(a.status == ClimbState.Status.RETREATED and a.falls == ClimbState.BOULDER_TRIES, "after %d tries the session is over" % ClimbState.BOULDER_TRIES)
+	# Reading the line matters: the careful climber shakes out on the ledge
+	# before the swing; the greedy one runs out of arms on the mantel.
+	food_for(r)
+	var careful := ClimbState.new(r, 0, 2, kit)
+	ClimbBot.new().play(careful)
+	check(careful.status == ClimbState.Status.TOPPED_OUT and careful.style_rating() == "Flash", "a careful climber flashes it with good timing (%d stamina to spare)" % careful.stamina)
+	check(careful.stamina <= 15, "...but only just: it's a hard problem (%d to spare)" % careful.stamina)
+	food_for(r)
+	var greedy := ClimbState.new(r, 0, 2, kit)
+	var bot := ClimbBot.new()
+	bot.greedy = true
+	bot.play(greedy)
+	check(greedy.status != ClimbState.Status.TOPPED_OUT, "grabbing the cheapest hold and never shaking out doesn't get up it")
+	Inventory.items.clear()
 
 
 func test_fixed_ropes() -> void:

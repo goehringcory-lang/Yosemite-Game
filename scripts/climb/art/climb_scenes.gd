@@ -118,6 +118,8 @@ static func paint_base(im: Image, kind: String, state: ClimbState, pal: Dictiona
 			_talus(im, y0, pal, rng, rc, false)
 		"mist_wall":
 			_talus(im, y0, pal, rng, rc, true)
+	if state.route.boulder:
+		_crash_pads(im, y0, pal)
 
 
 ## Darkens the rock just above the ground a little: contact shadow.
@@ -317,6 +319,31 @@ static func _camp4(im: Image, y0: int, pal: Dictionary, rng: RandomNumberGenerat
 	for i in 4:
 		ClimbProps.fern(im, 30 + i * 60, y0 + 64 + (i % 2) * 5, 6, pal)
 	ClimbProps.grass_row(im, 0, _xr, y0 + 4, rng, pal, 5, true, 2)
+
+
+## Two crash pads laid edge to edge under a boulder problem, with a brush and
+## a chalk bucket at the side.
+static func _crash_pads(im: Image, y0: int, pal: Dictionary) -> void:
+	var x0 := int(L.GRID_X) + 6
+	var colors: Array[String] = ["235679", "b3362b"]
+	for i in 2:
+		var x := x0 + i * 64
+		var body := _lit(Color(colors[i]), pal)
+		P.rect(im, x - 1, y0 - 1, 64, 10, DARK)
+		P.rect(im, x, y0, 62, 8, body)
+		P.rect(im, x, y0, 62, 2, body.lightened(0.25))
+		P.rect(im, x, y0 + 6, 62, 2, body.darkened(0.3))
+		# The seams of the foam and a carry strap.
+		P.rect(im, x + 20, y0, 1, 8, body.darkened(0.2))
+		P.rect(im, x + 41, y0, 1, 8, body.darkened(0.2))
+		P.rect(im, x + 8, y0 + 3, 10, 1, _lit(Color("2b2a30"), pal))
+	# A chalk bucket and a brush on a stick.
+	var bx := x0 + 134
+	P.rect(im, bx - 1, y0 - 1, 9, 9, DARK)
+	P.rect(im, bx, y0, 7, 7, _lit(Color("d8a63b"), pal))
+	P.rect(im, bx, y0, 7, 1, _lit(Color("f5eee0"), pal))
+	P.line(im, Vector2(bx + 12, y0 + 7), Vector2(bx + 18, y0 - 8), _lit(Color("6b4829"), pal))
+	P.rect(im, bx + 17, y0 - 10, 3, 3, _lit(Color("d6bd88"), pal))
 
 
 static func _chalk(im: Image, x: int, y: int, pal: Dictionary, rng: RandomNumberGenerator) -> void:
@@ -754,6 +781,8 @@ static func paint_finish(im: Image, kind: String, state: ClimbState, pal: Dictio
 			_ridge(im, top, y_top, cx, pal, rng, c, e)
 		"roof_lip":
 			_terrace(im, top, pal, rng, c, e, "roof")
+		"boulder_top":
+			_boulder_top(im, top, pal, rng, c, e)
 	var _unused := sx
 
 
@@ -769,6 +798,10 @@ static func _profile(kind: String, y_top: int, cx: int, w: int, seed_value: int)
 		match kind:
 			"tree_ledge", "anchor", "chimney_top", "arches_top":
 				y = y_top - 22 + int(roundf(n * 4.0 + n2 * 6.0))
+			"boulder_top":
+				# A rounded top, highest over the line, the sky behind it.
+				var u := (x - cx) / 150.0
+				y = y_top - 4 - int(14.0 * maxf(1.0 - u * u, 0.0)) + int(roundf(n * 2.0))
 			"column_top":
 				y = y_top - 24 + int(roundf(n2 * 22.0 + n * 3.0))
 			"el_cap_top":
@@ -963,6 +996,21 @@ static func _tree_ledge(im: Image, top: PackedInt32Array, pal: Dictionary, rng: 
 	for i in 4:
 		ClimbProps.flowers(im, 130 + i * 20, _ytop(top, 130 + i * 20) + 1, rng, pal)
 	_rim_turf(im, top, 0, e, pal, rng)
+
+
+static func _boulder_top(im: Image, top: PackedInt32Array, pal: Dictionary, rng: RandomNumberGenerator, c: Dictionary, e: int) -> void:
+	# Columbia Boulder's top: chalked slopers at the lip, a little moss and
+	# lichen, and the pines of Camp 4 behind.
+	ClimbProps.pine(im, 26, _ytop(top, 26) + 2, 70, rng, c)
+	ClimbProps.oak(im, e - 40, _ytop(top, e - 40) + 2, 50, rng, c)
+	var ch := _lit(Color("f5eee0"), pal)
+	for i in 18:
+		var x := int(L.GRID_X + 1.2 * L.COL_W) + rng.randi_range(0, 60)
+		P.px(im, x, _ytop(top, x) + rng.randi_range(1, 4), ch)
+	for i in 5:
+		var x := rng.randi_range(40, maxi(e - 20, 41))
+		P.px(im, x, _ytop(top, x) + 1, _lit(Color("437f45"), pal))
+		P.px(im, x + 1, _ytop(top, x) + 1, _lit(Color("84b04a"), pal))
 
 
 static func _anchor(im: Image, top: PackedInt32Array, y_top: int, pal: Dictionary, rng: RandomNumberGenerator, c: Dictionary, e: int) -> void:
