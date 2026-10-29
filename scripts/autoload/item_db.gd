@@ -26,6 +26,14 @@ const ITEMS := [
 	preload("res://data/items/chanterelle.tres"),
 	preload("res://data/items/king_bolete.tres"),
 	preload("res://data/items/coyote_mint.tres"),
+	preload("res://data/items/hazelnut.tres"),
+	preload("res://data/items/whitebark_pine_nuts.tres"),
+	preload("res://data/items/hedgehog_mushroom.tres"),
+	preload("res://data/items/cattail_root.tres"),
+	preload("res://data/items/blue_dicks_corm.tres"),
+	preload("res://data/items/cow_clover.tres"),
+	preload("res://data/items/sierra_plum.tres"),
+	preload("res://data/items/chokecherry.tres"),
 	# Caught on a fly rod (Fishing), and picked up on Facelift day (Festivals)
 	preload("res://data/items/brown_trout.tres"),
 	preload("res://data/items/brook_trout.tres"),
@@ -85,7 +93,7 @@ func get_item(id: String) -> ItemData:
 
 
 ## Words that don't take an "s": "3 Trail Mix", "2 Pilot Bread".
-const MASS_NOUNS := ["Mix", "Jerky", "Tea", "Mush", "Flour", "Meal", "Cider", "Sauce", "Lettuce", "Yampah", "Buena", "Toyon", "Pilot Bread", "Mint", "Fruit"]
+const MASS_NOUNS := ["Mix", "Jerky", "Tea", "Mush", "Flour", "Meal", "Cider", "Sauce", "Lettuce", "Yampah", "Buena", "Toyon", "Pilot Bread", "Mint", "Fruit", "Clover"]
 ## Names with their own plural.
 const PLURALS := {"Degnan's Bread": "loaves of Degnan's Bread"}
 

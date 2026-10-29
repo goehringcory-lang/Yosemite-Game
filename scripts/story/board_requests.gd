@@ -25,7 +25,8 @@ const POINTS := 20
 
 ## Every note that can go up: who wrote it, what and how many they want, the
 ## seasons (GameClock.Season) it can go up in, what it says, the thanks, and
-## what you're given.
+## what you're given. A note for something that grows in only one hub names
+## it ("hub"), and goes up only once you can travel there.
 const NOTES := [
 	{"id": "degnan_strawberries", "giver": "bridget_degnan", "item": "wild_strawberry", "count": 3, "seasons": [0, 1],
 		"text": "Wanted: wild strawberries for the morning tarts. Bring them to Degnan's.",
@@ -72,12 +73,24 @@ const NOTES := [
 	{"id": "salathe_greens", "giver": "john_salathe", "item": "miners_lettuce", "count": 4, "seasons": [0],
 		"text": "Wild greens wanted. A man cannot live on pitons alone. -J.S., Camp 4",
 		"thanks": "Good greens. My doctor said eat what grows. I listened.", "reward": {"cheddar_wedge": 1}},
-	{"id": "robbins_bilberries", "giver": "royal_robbins", "item": "sierra_bilberry", "count": 3, "seasons": [1, 2],
+	{"id": "robbins_bilberries", "giver": "royal_robbins", "item": "sierra_bilberry", "count": 3, "seasons": [1, 2], "hub": "tuolumne_meadows",
 		"text": "Bilberries from the high country, for a long day on the wall. -R.R.",
 		"thanks": "These will ride in the haul bag. Thank you.", "reward": {"dried_apricots": 2}},
 	{"id": "hodges_gooseberries", "giver": "clare_hodges", "item": "sierra_gooseberry", "count": 3, "seasons": [1],
 		"text": "Ranger station: gooseberries wanted for jam. Mind the spines.",
 		"thanks": "Not a scratch on you? You're better at this than I am.", "reward": {"pilot_bread": 2}},
+	{"id": "degnan_plums", "giver": "bridget_degnan", "item": "sierra_plum", "count": 4, "seasons": [1],
+		"text": "Wild plums wanted for jam. The thorny thickets under the oaks have them in summer.",
+		"thanks": "Tart as anything. With enough sugar they'll be lovely on toast.", "reward": {"pilot_bread": 2}},
+	{"id": "curry_hazelnuts", "giver": "jennie_curry", "item": "hazelnut", "count": 4, "seasons": [2],
+		"text": "Hazelnuts wanted for the Pavilion's holiday cakes. Try the thickets in the shady woods.",
+		"thanks": "Every one sound. The cakes will be the talk of the camp.", "reward": {"chocolate_bar": 1}},
+	{"id": "clark_hedgehogs", "giver": "galen_clark", "item": "hedgehog_mushroom", "count": 2, "seasons": [3],
+		"text": "Hedgehog mushrooms wanted for supper. Little teeth under the cap, in the pine woods after the snow.",
+		"thanks": "Teeth and all. Fried in a little fat, that's a winter supper fit for anyone.", "reward": {"beef_jerky": 1}},
+	{"id": "muir_pine_nuts", "giver": "john_muir", "item": "whitebark_pine_nuts", "count": 3, "seasons": [2], "hub": "tuolumne_meadows",
+		"text": "Whitebark pine nuts from timberline, if the nutcrackers have spared any. J.M.",
+		"thanks": "Mountain bread! I have lived a week on less, and been the happier for it.", "reward": {"dry_crusts": 2}},
 ]
 
 ## Note ids on the board, waiting to be read.
@@ -123,7 +136,8 @@ func refresh() -> void:
 	var room := mini(PER_DAY, MAX_OPEN - taken.size())
 	var choices: Array[Dictionary] = []
 	for note: Dictionary in NOTES:
-		if GameClock.season in note.seasons and not taken.has(note.id) and int(Friendship.points.get(note.giver, 0)) > 0:
+		if GameClock.season in note.seasons and not taken.has(note.id) and int(Friendship.points.get(note.giver, 0)) > 0 \
+				and (not note.has("hub") or Park.is_hub_unlocked(note.hub)):
 			choices.append(note)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("board:%d" % today)

@@ -84,7 +84,7 @@ func respawn() -> void:
 		var cells: Array = habitats.get(item.habitat, [])
 		if cells.is_empty():
 			continue
-		for i in maxi(1, roundi(item.forage_per_day * amount_scale)):
+		for i in item.forage_count(GameClock.season, amount_scale):
 			for attempt in PLACE_TRIES:
 				var cell: Vector2i = cells[_rng.randi_range(0, cells.size() - 1)]
 				if not taken.has(cell) and _is_unblocked(cell):

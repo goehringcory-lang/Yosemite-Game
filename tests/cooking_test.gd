@@ -9,7 +9,9 @@ extends Node
 
 const APRON := preload("res://data/routes/glacier_point_apron.tres")
 const NEW_FORAGE := ["california_blackberry", "whitebark_raspberry", "thimbleberry", "sierra_gooseberry",
-	"sierra_bilberry", "wood_rose_hips", "chanterelle", "king_bolete", "coyote_mint"]
+	"sierra_bilberry", "wood_rose_hips", "chanterelle", "king_bolete", "coyote_mint",
+	"hazelnut", "whitebark_pine_nuts", "hedgehog_mushroom", "cattail_root", "blue_dicks_corm",
+	"cow_clover", "sierra_plum", "chokecherry"]
 
 var failures := 0
 
@@ -25,6 +27,7 @@ func _ready() -> void:
 	_empty_pack()
 	Cooking.start_new_game()
 	test_new_forage()
+	test_balance()
 	test_ingredients()
 	test_dishes()
 	test_effects()
@@ -54,6 +57,35 @@ func test_new_forage() -> void:
 	check(ItemDB.get_item("wood_rose_hips").is_forageable_in(GameClock.Season.WINTER), "rose hips hang on into winter")
 	check(FoodDB.is_edible("california_blackberry") and not FoodDB.is_edible("king_bolete"), "berries are good raw, boletes need cooking")
 	check(ItemDB.count_name(2, "California Blackberry") == "2 California Blackberries", "two blackberries")
+
+	for id: String in NEW_FORAGE:
+		check(Cooking.can_cook_with(id), "%s can go in the pot" % id)
+	check(ItemDB.count_name(3, "Cow Clover") == "3 Cow Clover" and ItemDB.count_name(2, "Chokecherry") == "2 Chokecherries", "clover and chokecherries count right")
+
+
+## Forage against what quests, board notes and the winter ask for.
+func test_balance() -> void:
+	var acorn := ItemDB.get_item("black_oak_acorn")
+	check(acorn.forage_count(GameClock.Season.FALL) == 4 and acorn.forage_count(GameClock.Season.WINTER) == 2
+		and acorn.forage_count(GameClock.Season.SPRING) == 0, "acorns drop in fall, and a few are left under the oaks in winter")
+	check(ItemDB.get_item("manzanita_berries").is_forageable_in(GameClock.Season.FALL), "manzanita berries hang on into fall (James Lamon's winter stores)")
+	var winter := ItemDB.forage_items().filter(func(item: ItemData) -> bool:
+		return item.is_forageable_in(GameClock.Season.WINTER) and item.habitat in [ItemData.Habitat.FOREST, ItemData.Habitat.RIVERSIDE])
+	check(winter.size() >= 2, "the Valley's woods and riverbanks have something to find in winter (%d)" % winter.size())
+	# Harding's Nose prep: 4 batches of acorn cakes (32 acorns) and 20 stored,
+	# all from one chuckah outside the fall.
+	var harding := QuestLog.get_quest("harding_summit")
+	var stored := 0
+	for step: Dictionary in harding.steps:
+		if step.type == "stored":
+			stored = int(step.count)
+	check(stored + 4 * 2 * 4 <= Granary.CAPACITY_PER_CHUCKAH, "one chuckah holds enough acorns for Harding's cakes and reserve")
+	for note: Dictionary in BoardRequests.NOTES:
+		var item := ItemDB.get_item(note.item)
+		var grows: bool = note.seasons.all(func(season: int) -> bool: return item.is_forageable_in(season))
+		check(item != null and grows, "board note %s asks for something in season" % note.id)
+		if item.habitat == ItemData.Habitat.HIGH_COUNTRY:
+			check(note.get("hub", "") == "tuolumne_meadows", "board note %s waits until Tuolumne is open" % note.id)
 
 
 func test_ingredients() -> void:

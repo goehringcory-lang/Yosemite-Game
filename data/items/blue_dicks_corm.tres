@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/wild_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(416, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "blue_dicks_corm"
+display_name = "Blue Dicks Corm"
+description = "A crisp little corm dug from under a violet flower head. Sweet raw, sweeter roasted in the ashes."
+icon = SubResource("icon")
+forage_seasons = 1
+habitat = 1
+forage_per_day = 2

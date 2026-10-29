@@ -16,3 +16,4 @@ icon = SubResource("AtlasTexture_wqtia")
 forage_seasons = 2
 habitat = 3
 forage_per_day = 3
+lean_seasons = 4

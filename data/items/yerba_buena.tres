@@ -16,3 +16,4 @@ icon = SubResource("AtlasTexture_j2qwg")
 forage_seasons = 3
 habitat = 4
 forage_per_day = 2
+lean_seasons = 4
