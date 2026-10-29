@@ -50,6 +50,7 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, ".."))
 
 import field as F  # noqa: E402
+import roads as RD  # noqa: E402
 import shadows  # noqa: E402
 from pixel32 import scale2x  # noqa: E402
 from ramps import COLORS, RAMPS  # noqa: E402
@@ -200,8 +201,7 @@ class Painter:
         pave_m, self.pave_b = self._smooth_mask(pave_tiles, 6)
         pave_kind = self._fill_nearest(pave_tiles, g, 3)
         K = np.where(pave_m, F.upsample(np.maximum(pave_kind, 0), T), K)
-        road_m, self.road_b = self._smooth_mask(g == ROAD, 14)
-        K = np.where(road_m, ROAD, K)
+        K = np.where(self._road_layout(), ROAD, K)
         wet_tiles = np.isin(g, WATER_SET)
         wet_m, self.wet_b = self._smooth_mask(wet_tiles, 10, (self.Nl - 0.5) * 0.36 + (self.Nm - 0.5) * 0.2)
         wet_kind = self._fill_nearest(wet_tiles, g, 3)
@@ -218,6 +218,55 @@ class Painter:
         # Flow runs along the channel: horizontal unless its banks run up and down.
         gy, gx = np.gradient(d2)
         self.flow_v = np.abs(gx) > np.abs(gy) * 1.4
+
+    def _road_layout(self) -> np.ndarray:
+        """Traces the roads (see roads.py) and returns where the asphalt goes:
+        each road at its steady width, the aprons of road tiles the roads
+        don't cover (driveways, pull-outs), and small rounds in the corners."""
+        H, W, T = self.H, self.W, self.T
+        g = self.grid
+        carriage = g == ROAD
+        for y0, y1, x0, x1, _vertical, road, _beside in self._bridge_spans():
+            if road:
+                carriage[y0:y1, x0:x1] = True
+        # A walk or trail laid across a road (a tile or two wide) doesn't cut it.
+        P = np.pad(carriage, 2)
+        h, w = carriage.shape
+        up = P[1:h + 1, 2:-2] | P[0:h, 2:-2]
+        down = P[3:h + 3, 2:-2] | P[4:h + 4, 2:-2]
+        left = P[2:-2, 1:w + 1] | P[2:-2, 0:w]
+        right = P[2:-2, 3:w + 3] | P[2:-2, 4:w + 4]
+        across = (up & down) | (left & right)
+        carriage |= across & np.isin(g, (PAVED, BUILT, TRAIL))
+        lots = np.isin(g, (PARKING, PAVED, BUILT))
+        lot_px = F.upsample(lots, T).astype(bool)
+        # Traced twice: the second time without the driveways and pull-outs
+        # the first found, which pull the line off the road's middle.
+        for _ in range(2):
+            self.roads = RD.trace(carriage, T)
+            for r in self.roads:
+                RD.reach_lots(r, lot_px, T)
+            clean = np.zeros((H, W), bool)
+            for r in self.roads:
+                clean |= RD.stamp_disks((H, W), r.pts, r.width * T / 2.0)
+            # Road tiles the traced road (mostly) misses are a driveway or
+            # pull-out when they touch a lot or a walk; otherwise they're only
+            # the corners of a stair-stepped road, and grow over.
+            cover = clean.reshape(self.th, T, self.tw, T).mean(axis=(1, 3))
+            left = (g == ROAD) & (cover < 0.25)
+            P = np.pad(lots, 1)
+            apron_t = left & (P[:-2, 1:-1] | P[2:, 1:-1] | P[1:-1, :-2] | P[1:-1, 2:])
+            carriage &= ~apron_t
+        apron = F.upsample(apron_t, T).astype(bool)
+        union = (clean & ~lot_px) | apron
+        # rounds in the corners, and no sliver of ground left between a road
+        # and the lot it runs along
+        road = union | ((F.blur((union | lot_px).astype(np.float32), 6) > 0.5) & ~lot_px)
+        self.road_clean = clean
+        # asphalt beyond the traced roads' edges, where fog lines stop
+        beyond = road & ~(F.box_blur(clean.astype(np.float32), 1) > 0)
+        self.road_beyond = F.box_blur(beyond.astype(np.float32), 1) > 0.999
+        return road
 
     # ------------------------------------------------------------ materials
 
@@ -444,7 +493,8 @@ class Painter:
         patch = (hp < 0.13) & (lx_ >= 0) & (lx_ < pw_) & (ly_ >= 0) & (ly_ < ph_)
         tone[asp & patch] -= 1.0
         # The edges are sun-faded where no tires run.
-        tone[asp & (self.road_b < 0.7) & (K == ROAD)] += 1.0
+        inner = F.box_blur((K == ROAD).astype(np.float32), 5) > 0.999
+        tone[asp & ~inner & (K == ROAD)] += 1.0
 
         # ---- concrete walks and plazas, or the Ahwahnee's cut stone
         co = m("concrete")
@@ -527,12 +577,12 @@ class Painter:
         over_m |= lo
 
         # Road shoulders: gravel along the asphalt; then the lines.
-        rd = K == ROAD
-        shoulder = ~rd & ~np.isin(K, WATER_SET + PAVE_SET) & (self.road_b > 0.3)
+        rd = (K == ROAD).astype(np.float32)
+        shoulder = (F.box_blur(rd, 5) > 0) & (K != ROAD) & ~np.isin(K, WATER_SET + PAVE_SET)
         M[shoulder] = MAT["trail"]
-        tone[shoulder] = (2.0 + (self.road_b > 0.4) + (R > 0.8))[shoulder]
+        tone[shoulder] = (2.0 + (F.box_blur(rd, 2) > 0) + (R > 0.8))[shoulder]
         dots(2, 0.35, 161, shoulder, PEBBLE)
-        self._road_lines(over, over_m)
+        self._road_lines(over, over_m, M)
         self._parking_lines(over, over_m, tone)
 
         # Curbs where paving meets the ground, with a shadow outside them.
@@ -589,45 +639,43 @@ class Painter:
 
     # ------------------------------------------------------------ roads and lots
 
-    def _road_lines(self, over, over_m) -> None:
-        """A double yellow center line down every road, found as the ridge of
-        the road's blurred mask (so it follows bends and diagonals smoothly),
-        and worn white fog lines just inside its edges."""
-        H, W = self.H, self.W
+    def _road_lines(self, over, over_m, M) -> None:
+        """A double yellow line down the middle of every traced road, across
+        its bridges too, stopping at the edge of the road it runs into and a
+        tile short of a dead end; and worn white fog lines just inside each
+        edge, broken where a driveway, lot or bridge opens off the road."""
+        H, W, T = self.H, self.W, self.T
         Kr = self.K == ROAD
-        rb = F.blur(Kr.astype(np.float32), 20)
-        # Which way the road runs: across it the mask curves most.
-        dyy = np.zeros_like(rb)
-        dxx = np.zeros_like(rb)
-        dyy[1:-1] = rb[2:] - 2 * rb[1:-1] + rb[:-2]
-        dxx[:, 1:-1] = rb[:, 2:] - 2 * rb[:, 1:-1] + rb[:, :-2]
-        across_y = np.abs(dyy) >= np.abs(dxx)
-        up = np.roll(rb, 1, axis=0)
-        dn = np.roll(rb, -1, axis=0)
-        lf = np.roll(rb, 1, axis=1)
-        rt = np.roll(rb, -1, axis=1)
-        ridge_y = (rb >= up) & (rb > dn)
-        ridge_x = (rb >= lf) & (rb > rt)
-        # Only on roads wide enough for two lanes: well inside the mask.
-        inner = Kr & (self.road_b > 0.75) & (rb > 0.5)
-        ay, ax = np.abs(dyy), np.abs(dxx)
-        diag = (ay < ax * 1.8) & (ax < ay * 1.8)
-        ridge = inner & np.where(diag, ridge_y, np.where(across_y, ridge_y, ridge_x))
-        ys, xs = np.nonzero(ridge)
-        vert = (across_y | diag)[ys, xs]
+        deck = (self.K == BRIDGE) & (M == MAT["asphalt"])
         yel = C["yellow"]
-        for dy, dx in ((-2, 0), (1, 0)):
-            yy = np.where(vert, ys + dy, ys)
-            xx = np.where(vert, xs, xs + dy)
-            ok = (yy >= 0) & (yy < H) & (xx >= 0) & (xx < W)
-            yy, xx = yy[ok], xx[ok]
-            ok = Kr[yy, xx] & (self.R[yy, xx] > 0.04)
-            over[yy[ok], xx[ok]] = yel
-            over_m[yy[ok], xx[ok]] = True
-        # Fog lines: a worn white line just inside each edge.
-        k2 = F.box_blur(Kr.astype(np.float32), 2) > 0.999
-        k3 = F.box_blur(Kr.astype(np.float32), 3) > 0.999
-        fog = k2 & ~k3 & (self.Ns > 0.25) & (self.R > 0.12)
+        for r in self.roads:
+            s = RD.arc_length(r.pts)
+            cut = []
+            for k in (0, 1):
+                cut.append({"join": r.meet[k] + 3.0, "dead": float(T), "lot": 0.0, "edge": 0.0}[r.ends[k]])
+            sel = (s >= cut[0]) & (s <= s[-1] - cut[1])
+            if sel.sum() < 4:
+                continue
+            mid = RD._resample(r.pts[sel], 0.5)
+            for d in (-1.5, 1.5):
+                q = np.unique(np.floor(RD.offset_line(mid, d)).astype(np.int32), axis=0)
+                xs, ys = q[:, 0], q[:, 1]
+                ok = (ys >= 0) & (ys < H) & (xs >= 0) & (xs < W)
+                xs, ys = xs[ok], ys[ok]
+                ok = (Kr[ys, xs] | deck[ys, xs]) & (self.R[ys, xs] > 0.04)
+                over[ys[ok], xs[ok]] = yel
+                over_m[ys[ok], xs[ok]] = True
+        # Fog lines: a worn white line just inside each edge of the traced road.
+        cl = self.road_clean.astype(np.float32)
+        k2 = F.box_blur(cl, 2) > 0.999
+        k3 = F.box_blur(cl, 3) > 0.999
+        other = self.road_beyond | np.isin(self.K, (PARKING, BRIDGE))
+        fog = Kr & k2 & ~k3 & ~(F.box_blur(other.astype(np.float32), 4) > 0)
+        for r in self.roads:
+            for k in (0, 1):
+                if r.ends[k] == "dead":
+                    fog &= ~RD.stamp_disks((H, W), r.pts[[-1 if k else 0]], r.width * T / 2.0 + 4)
+        fog &= (self.Ns > 0.25) & (self.R > 0.12)
         over[fog] = np.where((self.R[fog] > 0.4)[:, None], C["white"], C["white_dk"])
         over_m |= fog
 
@@ -678,16 +726,13 @@ class Painter:
 
     # ------------------------------------------------------------ bridges
 
-    def _bridges(self, tone, M, over, over_m) -> None:
-        """Bridges with no sprite of their own: a plank footbridge with rails,
-        or, where a road crosses, an asphalt deck between concrete parapets.
-        Each casts a shadow on the water beside it."""
-        if any("bridge" in sp["tex"].lower() for sp in self.d["sprites"]):
-            return
+    def _bridge_spans(self):
+        """Each bridge in the grid: its tile rectangle (y0, y1, x0, x1), whether
+        its deck runs north-south, whether a road crosses it (road at both
+        ends), and whether it stands beside a road (a parapet)."""
         g = self.grid
-        T = self.T
-        H, W = self.H, self.W
         seen = np.zeros(g.shape, bool)
+        out = []
         for ty, tx in zip(*np.nonzero(g == BRIDGE)):
             if seen[ty, tx]:
                 continue
@@ -714,8 +759,19 @@ class Painter:
                 ends = (g[max(y0 - 1, 0), x0:x1] == ROAD).any() and (g[min(y1, self.th - 1), x0:x1] == ROAD).any()
             else:
                 ends = (g[y0:y1, max(x0 - 1, 0)] == ROAD).any() and (g[y0:y1, min(x1, self.tw - 1)] == ROAD).any()
-            road = bool(ends)
             beside_road = np.isin(g[max(y0 - 1, 0):y1 + 1, max(x0 - 1, 0):x1 + 1], (ROAD,)).any()
+            out.append((y0, y1, x0, x1, vertical, bool(ends), beside_road))
+        return out
+
+    def _bridges(self, tone, M, over, over_m) -> None:
+        """Bridges with no sprite of their own: a plank footbridge with rails,
+        or, where a road crosses, an asphalt deck between concrete parapets.
+        Each casts a shadow on the water beside it."""
+        if any("bridge" in sp["tex"].lower() for sp in self.d["sprites"]):
+            return
+        T = self.T
+        H, W = self.H, self.W
+        for y0, y1, x0, x1, vertical, road, beside_road in self._bridge_spans():
             if not road and beside_road:
                 # A parapet beside a road bridge: a granite wall, lit on top.
                 py0, py1, px0, px1 = y0 * T, y1 * T, x0 * T, x1 * T
