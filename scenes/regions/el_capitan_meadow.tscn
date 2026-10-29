@@ -3817,8 +3817,9 @@ shape = SubResource("RectangleShape2D_u0s0s")
 [node name="NorthsideDriveWest" type="Area2D" parent="Exits" unique_id=1780227960]
 position = Vector2(0, 704)
 script = ExtResource("45_pdm1w")
-label = "Northside Drive west: El Portal Road and Big Oak Flat Road"
-travel_to = "el_portal"
+label = "Northside Drive west, to the Big Oak Flat Road junction"
+target_region = "big_oak_flat_junction"
+target_spawn = "east"
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/NorthsideDriveWest" unique_id=1539248180]
 shape = SubResource("RectangleShape2D_c5ag4")

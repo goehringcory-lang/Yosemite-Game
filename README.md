@@ -118,12 +118,12 @@ The game has five **hubs**, each its own map:
 | Hub | Elevation | Reached by |
 |---|---|---|
 | **Yosemite Valley** (main hub) | 4,000 ft | Start. Your camp is the Lamon Homestead, through the gate by Curry Village. The Valley is many small hand-made areas joined by trail scenes (see below). |
-| **El Portal** | 2,000 ft | El Portal Road (Hwy 140), 30 min |
+| **El Portal** | 2,000 ft | El Portal Road (Hwy 140), 30 min. Or walk Northside Drive west to the Big Oak Flat Road junction and keep straight on (15 min from there). |
 | **Wawona** | 4,000 ft | Wawona Road (Hwy 41), 1 hr |
 | **Glacier Point** | 7,214 ft | Glacier Point Road, 1 hr. Locked until the player climbs the Glacier Point Apron. Road open about May to November. |
-| **Tuolumne Meadows** | 8,600 ft | Big Oak Flat and Tioga roads, 1.5 hr. Locked until you climb the Nose for Warren Harding. Road open about June to November. |
+| **Tuolumne Meadows** | 8,600 ft | Big Oak Flat and Tioga roads, 1.5 hr. Locked until you climb the Nose for Warren Harding. Road open about June to November. Or turn right at the Big Oak Flat Road junction, up Highway 120 to Crane Flat (20 min), and take the Tioga Road east from there (70 min). |
 
-To travel, use a map kiosk at a parking area or walk off the edge of a hub on a road. Pick a destination on the park map. Drive times come from the real road distances and match the park's published estimates. Travel advances the clock, and you can't set out if you'd arrive after 1 AM. Press **M** anywhere to see the park map, or press **Tab** for a detailed map of the area you're in. Interpretive signs mark real landmarks; interact to read them. If you pass out away from home, a ranger drives you back to camp.
+To travel, use a map kiosk at a parking area or walk off the edge of a hub on a road. Pick a destination on the park map. A few roads drive straight on without the map, where the way you turn is the choice: at the Big Oak Flat Road junction straight on is El Portal, and the Tioga Road out of Crane Flat goes to Tuolumne (`RegionExit.drive_to`, with the minutes and miles left from there; its closures and locks hold as on the map). A road some way to the next scene, like Big Oak Flat Road up to Crane Flat, moves the clock on by its `minutes`. Drive times come from the real road distances and match the park's published estimates. Travel advances the clock, and you can't set out if you'd arrive after 1 AM. Press **M** anywhere to see the park map, or press **Tab** for a detailed map of the area you're in. Interpretive signs mark real landmarks; interact to read them. If you pass out away from home, a ranger drives you back to camp.
 
 Road closures are in `Park.SEASONAL` (`scripts/autoload/park.gd`). Hub locks come from `starts_locked` on each hub's `.tres` in `data/park/hubs/`. Call `Park.unlock_hub("glacier_point")` to open one.
 
@@ -188,7 +188,9 @@ Rebuild it with `godot --headless --path . res://tools/hubs/build_curry.tscn`. T
 Every place in the Valley is in one scene only. There is no big Valley overworld: the areas are joined by short trail scenes you walk through, like the Stoneman Meadow trail. Leave a scene by its west edge and you come in at the east edge of the next, so a road keeps its heading. The wall of the Valley is always at the top of a scene, as in Curry Village, whichever side of the Valley it really stands on, so El Capitan Bridge, which crosses the Merced between El Capitan Meadow and Bridalveil Fall, is at the bottom of both. The bridge itself is in El Capitan Meadow only, and you walk over it off the bottom edge; in Bridalveil Fall the road down to it ends at the river's bank, so there is one bridge and you cross it once.
 
 ```
-                    [drive: El Portal, Tuolumne]
+[drive: Tuolumne] - Crane Flat
+                         |  (Big Oak Flat Road, Hwy 120, 20 min)
+[drive: El Portal] - Big Oak Flat Road Junction
                                 |
 [drive: Wawona] - Tunnel View   El Capitan Meadow
                      |          :      |
@@ -201,7 +203,9 @@ Every place in the Valley is in one scene only. There is no big Valley overworld
                                 Upper Pines - Happy Isles - Tenaya Creek - Mirror Lake
 ```
 
-- **El Capitan Meadow**: El Capitan over its meadow, with the Nose at the toe of the buttress and the Nutcracker on Manure Pile Buttress; Warren Harding and Beverly Johnson; a shuttle stop. Northside Drive west leaves the Valley (the park map, for El Portal and Big Oak Flat Road); El Capitan Bridge, at the east end, crosses the Merced to Bridalveil Fall.
+- **El Capitan Meadow**: El Capitan over its meadow, with the Nose at the toe of the buttress and the Nutcracker on Manure Pile Buttress; Warren Harding and Beverly Johnson; a shuttle stop. Northside Drive west leaves the Valley, down to the Big Oak Flat Road junction; El Capitan Bridge, at the east end, crosses the Merced to Bridalveil Fall.
+- **Big Oak Flat Road Junction**: a fork in the road below the Valley, in the Merced's canyon. Straight on, El Portal Road (Highway 140) drives on down the river to El Portal; turn right and Big Oak Flat Road (Highway 120) climbs up a ravine in the canyon wall to Crane Flat. Signs at the fork, on Big Oak Flat Road (the 1874 wagon road and the 1940 tunnels) and on the All-Year Highway; a turnout; the Merced for fishing.
+- **Crane Flat**: a meadow in the fir forest at about 6,200 feet, where Big Oak Flat Road meets the Tioga Road. Back down Big Oak Flat Road to the junction; the Tioga Road east drives on to Tuolumne Meadows, locked until the Nose and shut in winter as on the map; Big Oak Flat Road west leaves the park for Groveland. Out here, past the edge of the illustrated Valley map, **M** opens the park map instead.
 - **Tunnel View**: the overlook at the Wawona Tunnel, with El Capitan, Half Dome far up the Valley, and Cathedral Rocks with Bridalveil Fall across the view: the title painting itself, seen through the drop (see the overlook views under Glacier Point); the lot and its map kiosk; Separate Reality above the road. The tunnel leaves for Wawona and Glacier Point Road.
 - **Happy Isles**: the Merced splitting round its islands under footbridges; the John Muir Trail sign; the Mist Trail up to Glacier Point (open once you've climbed the Apron, and shut for snow in winter; the Panorama Trail comes down here); Snake Dike; George Anderson; a shuttle stop.
 - **Mirror Lake**: the lake filling in under the wall, Tenaya, Astroman on Washington Column, a shuttle stop.

@@ -131,8 +131,36 @@ func _ready() -> void:
 	check(world.region.region_id == "el_capitan_meadow", "no 90-minute drive at 11:40 PM")
 	GameClock.minutes = 9 * 60
 
-	# Road exits open the travel map with the right destination picked.
-	var exit: RegionExit = world.region.get_node("Exits/NorthsideDriveWest")
+	# Northside Drive west comes to a fork in the road. Turn right and Big Oak
+	# Flat Road climbs to Crane Flat, where the Tioga Road drives on to
+	# Tuolumne; straight on is El Portal. The way you turn is the choice: no map.
+	var west: RegionExit = world.region.get_node("Exits/NorthsideDriveWest")
+	await world.go_to_region(west.target_region, west.target_spawn)
+	check(world.region.region_id == "big_oak_flat_junction", "Northside Drive west comes to the Big Oak Flat Road junction")
+	var clock := GameClock.minutes
+	world.use_exit(world.region.get_node("Exits/BigOakFlatRoad"))
+	await _settle(world)
+	check(world.region.region_id == "crane_flat" and GameClock.minutes == clock + 20,
+		"turning right up Big Oak Flat Road drives to Crane Flat (%d min)" % (GameClock.minutes - clock))
+	GameClock.season = GameClock.Season.WINTER
+	world.use_exit(world.region.get_node("Exits/TiogaRoad"))
+	await _settle(world)
+	check(world.region.region_id == "crane_flat" and not world.park_map.visible, "the Tioga Road is shut at Crane Flat in winter")
+	GameClock.season = GameClock.Season.SUMMER
+	clock = GameClock.minutes
+	world.use_exit(world.region.get_node("Exits/TiogaRoad"))
+	await _settle(world)
+	check(world.region.region_id == "tuolumne_meadows" and GameClock.minutes == clock + 70,
+		"the Tioga Road drives on from Crane Flat to Tuolumne Meadows (%d min)" % (GameClock.minutes - clock))
+	await world.go_to_region("big_oak_flat_junction", "east")
+	clock = GameClock.minutes
+	world.use_exit(world.region.get_node("Exits/ElPortalRoad"))
+	await _settle(world)
+	check(world.region.region_id == "el_portal" and not world.park_map.visible and GameClock.minutes == clock + 15,
+		"straight on at the junction drives to El Portal (%d min)" % (GameClock.minutes - clock))
+
+	# Road exits out of a hub open the travel map with the right destination picked.
+	var exit: RegionExit = world.region.get_node("Exits/ElPortalRoad")
 	world.use_exit(exit)
 	check(world.park_map.visible and world.park_map._selected == exit.travel_to, "a road exit opens the map to %s" % exit.travel_to)
 	world.park_map.close()
@@ -569,6 +597,13 @@ func _check_valley_links() -> void:
 	for region: Region in scenes.values():
 		region.free()
 	check(count >= 30 and broken.is_empty(), "%d roads between Valley scenes all lead back the way they came (%s)" % [count, ", ".join(broken)])
+
+
+## Waits out a drive or a walk to the next region.
+func _settle(world: Node) -> void:
+	await get_tree().process_frame
+	while world._busy:
+		await get_tree().process_frame
 
 
 ## How far the player gets in a few physics frames of holding [param action].

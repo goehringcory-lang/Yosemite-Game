@@ -1,14 +1,24 @@
 class_name RegionExit
 extends Area2D
 ## Walking into this area leaves the region. Depending on what's set, it
-## goes to another region, opens the park map to travel (roads leaving a
-## hub), or just shows a message (roads leaving the park).
+## goes to another region, drives straight on to another hub, opens the park
+## map to travel (roads leaving a hub), or just shows a message (roads
+## leaving the park).
 
 @export var label := ""
 @export var target_region := ""
 @export var target_spawn := ""
 ## Hub to preselect on the travel map.
 @export var travel_to := ""
+## Hub the road drives straight on to, without the map (as from a fork in the
+## road, where the way you turn is the choice). The drive's closures and
+## locks still hold.
+@export var drive_to := ""
+## A road some way to the next place: the minutes and miles of the drive.
+## For [member drive_to] they are what is left of it from here; for
+## [member target_region] the clock moves on by them.
+@export var minutes := 0
+@export var miles := 0.0
 @export_multiline var message := ""
 ## Shop hours: the doorway only opens from [member open_hour] up to (not
 ## including) [member close_hour], in 24-hour time. The defaults never close.

@@ -203,11 +203,43 @@ func use_exit(exit: RegionExit) -> void:
 		if _door_back.get("into", "") == region.region_id and _door_back.get("from", "") == exit.target_region:
 			spawn = str(_door_back.spawn)
 		_door_back = {}
-		go_to_region(exit.target_region, spawn)
+		if exit.minutes > 0:
+			_drive_road(exit, spawn)
+		else:
+			go_to_region(exit.target_region, spawn)
+	elif exit.drive_to != "":
+		_drive_on(exit)
 	elif exit.travel_to != "":
 		open_travel_map(exit.travel_to)
 	elif exit.message != "":
 		hud.show_message(exit.message)
+
+
+## A road some way to the next region, like Big Oak Flat Road up to Crane
+## Flat: the clock moves on by the drive.
+func _drive_road(exit: RegionExit, spawn: String) -> void:
+	if GameClock.is_too_late_for(exit.minutes):
+		hud.show_message("It's too late to set out on %s tonight." % exit.label)
+		return
+	await go_to_region(exit.target_region, spawn, exit.minutes)
+	hud.show_message("You drove %s miles to %s (%s)." % [str(exit.miles), region.display_name, Park.format_minutes(exit.minutes)])
+
+
+## A road that carries straight on to another hub, without the map: the
+## leg's closures and locks hold as they do on the map, and the exit's
+## minutes and miles are what is left of the drive from here.
+func _drive_on(exit: RegionExit) -> void:
+	var leg := Park.best_leg(region.hub_id, exit.drive_to, "drive")
+	if leg.is_empty():
+		open_travel_map(exit.drive_to)
+		return
+	if not leg.open:
+		hud.show_message(leg.closed_reason)
+		return
+	if exit.minutes > 0:
+		leg.minutes = exit.minutes
+		leg.miles = exit.miles
+	travel(leg)
 
 
 ## Moves the player to a spawn point in another region, with a fade. Use this

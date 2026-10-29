@@ -5,8 +5,10 @@ extends AhwahneeStyle
 ## neighbors. Each place is in one scene only; the trails between them are
 ## for walking, like the Stoneman Meadow trail.
 ##
-##                         [drive: El Portal, Tuolumne]
-##                                     |
+##        [drive: Tuolumne] - Crane Flat
+##                                 |  (Big Oak Flat Road, Highway 120)
+##       [drive: El Portal] - Big Oak Flat Road Junction
+##                                         |
 ##   [drive: Wawona] - Tunnel View     El Capitan Meadow
 ##                          |            :    |
 ##                   Bridalveil Fall ....:  Leidig Meadow
@@ -55,7 +57,8 @@ const G := "res://assets/sprites/glacier/"
 const C := "res://assets/sprites/curry/"
 const DIR := "res://scenes/regions/"
 const SCENES := ["el_capitan_meadow", "tunnel_view", "happy_isles", "mirror_lake", "leidig_meadow",
-	"four_mile_trailhead", "bridalveil_fall", "housekeeping_camp", "ahwahnee_meadow", "upper_pines", "tenaya_creek", "crows_camp"]
+	"four_mile_trailhead", "bridalveil_fall", "housekeeping_camp", "ahwahnee_meadow", "upper_pines", "tenaya_creek", "crows_camp",
+	"big_oak_flat_junction", "crane_flat"]
 
 const FOREST_TABLE := [["tree_ponderosa", 4.0], ["tree_incense_cedar", 3.5], ["tree_black_oak", 2.5], ["tree_white_fir", 1.2], ["tree_dogwood", 1.0]]
 
@@ -78,6 +81,7 @@ func _ready() -> void:
 		"housekeeping_camp": _housekeeping_camp, "upper_pines": _upper_pines,
 		"happy_isles": _happy_isles, "tenaya_creek": _tenaya_creek,
 		"mirror_lake": _mirror_lake, "crows_camp": _crows_camp,
+		"big_oak_flat_junction": _big_oak_flat_junction, "crane_flat": _crane_flat,
 	}
 	var only := OS.get_environment("ONLY").split(",", false)
 	for id: String in builds:
@@ -184,6 +188,24 @@ func _drive_exit(exit_name: String, at_pos: Vector2, size: Vector2, label: Strin
 	region_exit(exit_name, at_pos, size, label, "", "").set("travel_to", travel_to)
 
 
+## A road that drives straight on to another hub, without the map: a fork in
+## the road, where the way you turn is the choice. [param minutes] and
+## [param miles] are what is left of the drive from here.
+func _drive_on(exit_name: String, at_pos: Vector2, size: Vector2, label: String, drive_to: String, minutes: int, miles: float) -> void:
+	var exit := region_exit(exit_name, at_pos, size, label, "", "")
+	exit.set("drive_to", drive_to)
+	exit.set("minutes", minutes)
+	exit.set("miles", miles)
+
+
+## A road some way to the next region: the clock moves on by the drive.
+func _long_road(exit_name: String, at_pos: Vector2, size: Vector2, label: String, target_region: String, target_spawn: String,
+		minutes: int, miles: float) -> void:
+	var exit := region_exit(exit_name, at_pos, size, label, target_region, target_spawn)
+	exit.set("minutes", minutes)
+	exit.set("miles", miles)
+
+
 ## A trail into another region, with its trailhead sign: interact to walk it.
 ## A trail up out of the Valley. One up to Glacier Point opens with the hub
 ## (once you've climbed the Apron, like the Ledge Trail) and shuts in winter
@@ -259,7 +281,8 @@ func _finish(region_id: String, forage_scale: float) -> void:
 
 ## El Capitan over its meadow, Northside Drive along its foot, and the
 ## Merced. The Nose starts at the toe of the buttress; the Nutcracker is on
-## Manure Pile Buttress to the east. The road west leaves the Valley.
+## Manure Pile Buttress to the east. The road west leaves the Valley, down to
+## the fork at the Big Oak Flat Road junction.
 func _el_capitan_meadow() -> void:
 	_begin(80, 46, 1958)
 	_wall(10.0, 1.5, 3)
@@ -308,8 +331,101 @@ func _el_capitan_meadow() -> void:
 	place("El Capitan", 40, 5, 0)
 	region_exit("ToLeidigMeadow", tile_pos(79.5, 21.5), Vector2(12, 48), "Northside Drive east", "leidig_meadow", "west")
 	region_exit("ToElCapBridge", tile_pos(72.5, 45.5), Vector2(48, 12), "El Capitan Bridge, to Southside Drive", "bridalveil_fall", "el_cap_bridge")
-	_drive_exit("NorthsideDriveWest", tile_pos(-0.5, 21.5), Vector2(12, 48), "Northside Drive west: El Portal Road and Big Oak Flat Road", "el_portal")
+	region_exit("NorthsideDriveWest", tile_pos(-0.5, 21.5), Vector2(12, 48), "Northside Drive west, to the Big Oak Flat Road junction",
+		"big_oak_flat_junction", "east")
 	_finish("el_capitan_meadow", 2.0)
+
+
+# ================================================================ Big Oak Flat Road Junction
+
+## A fork in the road below the Valley, in the Merced's canyon: El Portal
+## Road (Highway 140) goes straight on west down the river to El Portal, and
+## Big Oak Flat Road (Highway 120) turns right and climbs up out of the
+## canyon to Crane Flat. Each way is a road on, not the map: the way you
+## turn is the choice.
+func _big_oak_flat_junction() -> void:
+	_begin(64, 36, 1874)
+	_wall(7.0, 2.0, 2)
+	# The ravine Big Oak Flat Road climbs up the north wall in.
+	for x in range(34, 52):
+		var keep := int(absf(x - 42.5) * 1.1)
+		for y in range(keep, _foot_of_wall(x)):
+			put(x, y, Terrain.FOREST)
+		if keep > 0 and keep < 9:
+			fill(x, keep, x, keep + 1, Terrain.TALUS)
+	var river := [Vector2(-1, 31), Vector2(18, 32), Vector2(40, 30), Vector2(65, 31)]
+	_water(river, 3)
+	_path([Vector2(-1, 23), Vector2(20, 23), Vector2(40, 22), Vector2(65, 21)], 2, Terrain.ROAD)
+	_path([Vector2(40, 22), Vector2(41, 16), Vector2(42, 9), Vector2(42, -1)], 2, Terrain.ROAD)
+	# A turnout at the fork, by the signs.
+	fill(46, 23, 53, 24, Terrain.PARKING)
+	_ellipse(14.0, 27.0, 8.0, 2.5, Terrain.MEADOW, 0.3)
+	_mark_open()
+
+	start_region("BigOakFlatJunction", "big_oak_flat_junction", "Big Oak Flat Road Junction", Vector2(-119.6690, 37.7213))
+	paint_ground()
+	_save_ground_art("ground_big_oak_flat_junction", 1874)
+	_place_wall("merced_canyon", 112)
+	_info_sign("JunctionSign", foot(47, 22), "Big Oak Flat Road Junction",
+		"Straight on, El Portal Road (Highway 140) follows the Merced down its canyon to El Portal. Turn right for Big Oak Flat Road (Highway 120): up the canyon wall to Crane Flat, where the Tioga Road leaves for Tuolumne Meadows.")
+	_info_sign("BigOakFlatSign", foot(44, 17), "Big Oak Flat Road",
+		"A wagon road from the gold country reached the Valley this way in 1874. The road you drive today was built in 1940, through three tunnels blasted in the canyon wall.")
+	_info_sign("ElPortalRoadSign", foot(10, 24), "El Portal Road",
+		"Highway 140, the All-Year Highway, opened in 1926 along the old railroad grade beside the Merced. It runs lowest and warmest of the roads into the park, so it stays open all winter.")
+	decor("Car50", C + "car_6.png", foot(50, 24), Vector2(24, 12))
+	_dress(40, 60)
+	_river_rocks(river, 5)
+	marker("arrival", 30, 22.5)
+	marker("east", 61, 21.5)
+	marker("west", 2, 23.5)
+	marker("north", 42.5, 2)
+	place("Big Oak Flat Road Junction", 40, 22, 10)
+	place("Merced River Canyon", 30, 3, 0)
+	region_exit("ToElCapitan", tile_pos(63.5, 21.5), Vector2(12, 48), "Northside Drive, back into the Valley", "el_capitan_meadow", "west")
+	_long_road("BigOakFlatRoad", tile_pos(42.5, -0.5), Vector2(48, 12), "Big Oak Flat Road", "crane_flat", "south", 20, 9.2)
+	_drive_on("ElPortalRoad", tile_pos(-0.5, 23.5), Vector2(12, 48), "El Portal Road", "el_portal", 15, 8.0)
+	_finish("big_oak_flat_junction", 2.0)
+
+
+# ================================================================ Crane Flat
+
+## A meadow in the red fir and white fir at 6,200 feet, at the top of Big
+## Oak Flat Road, where the Tioga Road leaves for the high country. Big Oak
+## Flat Road goes on west out of the park.
+func _crane_flat() -> void:
+	_begin(64, 36, 1961)
+	_ellipse(30.0, 11.0, 17.0, 5.0, Terrain.MEADOW, 0.3)
+	_ellipse(27.0, 11.0, 7.0, 2.5, Terrain.WET_MEADOW, 0.3, [Terrain.MEADOW])
+	_path([Vector2(32, 37), Vector2(32, 28), Vector2(31, 22)], 2, Terrain.ROAD)
+	_path([Vector2(-1, 23), Vector2(16, 22), Vector2(31, 22), Vector2(48, 21), Vector2(65, 20)], 2, Terrain.ROAD)
+	# A turnout at the corner, where drivers stop before the high country.
+	fill(36, 23, 44, 25, Terrain.PARKING)
+	_path([Vector2(24, 21), Vector2(26, 16), Vector2(28, 13)], 1, Terrain.TRAIL, 0.5)
+	_mark_open()
+
+	start_region("CraneFlat", "crane_flat", "Crane Flat", Vector2(-119.7987, 37.7536))
+	paint_ground()
+	_save_ground_art("ground_crane_flat", 1961)
+	_info_sign("CraneFlatSign", foot(26, 15), "Crane Flat",
+		"A meadow at about 6,200 feet, named for the sandhill cranes that once stopped here on their migrations. Snow lies deep here in winter, when the meadow is a place to ski and snowshoe.")
+	_info_sign("TiogaRoadSign", foot(52, 21), "Tioga Road",
+		"Highway 120 east: 39 miles across the high country to Tuolumne Meadows, then over Tioga Pass at nearly 10,000 feet. Snow closes it from about November until late May or June. The Tuolumne Grove of giant sequoias is just up the road.")
+	_info_sign("BigOakFlatWestSign", foot(8, 22), "Big Oak Flat Road",
+		"Highway 120 goes on west past the Big Oak Flat Entrance, out of the park to Groveland and the gold country.")
+	for car: Array in [[38, 25, 2], [43, 25, 9]]:
+		decor("Car%d" % car[0], C + "car_%d.png" % car[2], foot(car[0], car[1]), Vector2(24, 12))
+	_dress(70, 70)
+	marker("arrival", 31, 22.5)
+	marker("south", 32.5, 34)
+	marker("east", 61, 20.5)
+	marker("west", 2, 22.5)
+	marker("meadow", 30, 11)
+	place("Crane Flat", 30, 14, 14)
+	_long_road("BigOakFlatRoadDown", tile_pos(32.5, 35.5), Vector2(48, 12), "Big Oak Flat Road", "big_oak_flat_junction", "north", 20, 9.2)
+	region_exit("BigOakFlatRoadWest", tile_pos(-0.5, 22.5), Vector2(12, 48), "Big Oak Flat Road", "", "") \
+		.set("message", "Big Oak Flat Road goes on west out of the park, past the Big Oak Flat Entrance to Groveland.")
+	_drive_on("TiogaRoad", tile_pos(63.5, 20.5), Vector2(12, 48), "Tioga Road", "tuolumne_meadows", 70, 38.1)
+	_finish("crane_flat", 2.0)
 
 
 # ================================================================ Leidig Meadow

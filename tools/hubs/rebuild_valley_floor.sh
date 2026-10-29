@@ -15,7 +15,7 @@ cd "$(dirname "$0")/../.."
 GODOT="${GODOT:-godot}"
 PYTHON="${PYTHON:-python3}"
 SCENES=(el_capitan_meadow tunnel_view happy_isles mirror_lake leidig_meadow four_mile_trailhead
-	bridalveil_fall housekeeping_camp ahwahnee_meadow upper_pines tenaya_creek crows_camp)
+	bridalveil_fall housekeeping_camp ahwahnee_meadow upper_pines tenaya_creek crows_camp big_oak_flat_junction crane_flat)
 stamp="$(mktemp)"
 trap 'rm -f "$stamp"' EXIT
 sleep 1
