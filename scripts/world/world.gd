@@ -67,6 +67,8 @@ func _ready() -> void:
 	day_log = DayLog.new()
 	add_child(day_log)
 	add_child(Critters.new())
+	add_child(Bears.new())
+	add_child(Deer.new())
 	add_child(Rustle.new())
 	add_child(StringLights.new())
 	# before the save loads, so it gets back which moments were seen
@@ -339,7 +341,7 @@ func _show_bear_tracks() -> void:
 		hud.show_message(BEAR_TRACKS_MESSAGE)
 		await get_tree().create_timer(BEAR_TRACKS_DELAY).timeout
 		if is_inside_tree():
-			FieldLog.spot("black_bear")
+			FieldLog.spot("black_bear", false, "tracks")
 
 
 ## Swaps regions right away (no fade). The player lands on [param spawn_name]
