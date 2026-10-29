@@ -27,6 +27,14 @@ const FOODS := {
 	"chanterelle": {"energy": 0, "shelf_life": 3}, # cook first
 	"king_bolete": {"energy": 0, "shelf_life": 3}, # cook first
 	"coyote_mint": {"energy": 2, "shelf_life": 3},
+	"hazelnut": {"energy": 12, "shelf_life": 30}, # nuts keep: food to lay by for winter
+	"whitebark_pine_nuts": {"energy": 14, "shelf_life": 30},
+	"hedgehog_mushroom": {"energy": 0, "shelf_life": 4}, # cook first
+	"cattail_root": {"energy": 0, "shelf_life": 10}, # roast it
+	"blue_dicks_corm": {"energy": 7, "shelf_life": 7},
+	"cow_clover": {"energy": 5, "shelf_life": 1},
+	"sierra_plum": {"energy": 11, "shelf_life": 4},
+	"chokecherry": {"energy": 4, "shelf_life": 3}, # better cooked
 	# Fish from the rivers (Fishing): cook them first
 	"brown_trout": {"energy": 0, "shelf_life": 2},
 	"brook_trout": {"energy": 0, "shelf_life": 2},

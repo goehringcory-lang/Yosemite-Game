@@ -1,5 +1,5 @@
 extends SceneTree
-## Draws the 16x16 icons for the summer berries, fall mushrooms and herbs
+## Draws the 16x16 icons for the summer berries, nuts, mushrooms, roots and herbs
 ## (assets/sprites/wild_items.png) and for every dish the cooking pot makes
 ## (assets/sprites/meal_items.png, frames in Cooking.DISHES order), in the
 ## forage icons' style: three-tone shading lit from the upper left and a dark
@@ -16,6 +16,8 @@ const MEAL_OUT := "res://assets/sprites/meal_items.png"
 const FORAGE := [
 	"california_blackberry", "whitebark_raspberry", "thimbleberry", "sierra_gooseberry",
 	"sierra_bilberry", "wood_rose_hips", "chanterelle", "king_bolete", "coyote_mint",
+	"hazelnut", "whitebark_pine_nuts", "hedgehog_mushroom", "cattail_root", "blue_dicks_corm",
+	"cow_clover", "sierra_plum", "chokecherry",
 ]
 const MEALS := [
 	"simmered_berries", "berry_medley", "baked_fruit", "wilted_greens", "root_hash",
@@ -221,6 +223,96 @@ func _coyote_mint(im: Image, ox: int) -> void:
 	art.blob(im, ox + 7.5, 4.5, 4.2, 3.6, c("6f5aa6"), c("9a8ac8"), c("d4c8ec"))
 	for p in [[5, 2], [9, 3], [7, 6], [4, 5], [10, 6]]:
 		art.px(im, ox + p[0], p[1], c("f5eee0"))
+
+
+func _hazelnut(im: Image, ox: int) -> void:
+	# two round brown nuts, one still in its frilly green husk
+	art.blob(im, ox + 5, 10, 3.6, 3.4, c("6a3e1c"), c("a0662e"), c("d49a5a"))
+	art.rect(im, ox + 4, 6, 3, 1, c("c8b088"))
+	art.blob(im, ox + 11, 7, 3.0, 2.8, c("6a3e1c"), c("a0662e"), c("d49a5a"))
+	for p in [[8, 4], [9, 3], [11, 3], [13, 3], [14, 4], [8, 6], [14, 6]]:
+		art.px(im, ox + p[0], p[1], c("84b04a"))
+	art.rect(im, ox + 9, 2, 5, 2, c("5c8f3c"))
+	art.px(im, ox + 11, 1, c("437f45"))
+
+
+func _whitebark_pine_nuts(im: Image, ox: int) -> void:
+	# a purple-brown cone, and the fat seeds shaken out of it
+	art.blob(im, ox + 6, 6, 4.0, 4.6, c("3a2438"), c("6a4a5a"), c("9a7a8a"))
+	for p in [[4, 4], [7, 3], [5, 7], [8, 6], [6, 9]]:
+		art.px(im, ox + p[0], p[1], c("2a1828"))
+	for p in [[10, 11], [13, 12], [11, 13], [8, 13]]:
+		art.ellipse(im, ox + p[0] + 0.5, p[1] + 0.5, 1.5, 1.1, c("8a5a2c"))
+		art.px(im, ox + p[0], p[1], c("d8b47a"))
+
+
+func _hedgehog_mushroom(im: Image, ox: int) -> void:
+	# a buff, lumpy cap with little teeth under it, on a pale stalk
+	art.rect(im, ox + 6, 8, 4, 6, c("efe6d2"))
+	art.rect(im, ox + 9, 8, 1, 6, c("cbbfa4"))
+	art.blob(im, ox + 8, 5, 6.4, 3.4, c("b07a3a"), c("dca868"), c("f4d49a"))
+	for x in range(3, 14, 2):
+		art.px(im, ox + x, 8, c("e8c890"))
+		art.px(im, ox + x + 1, 9, c("c89a5a"))
+
+
+func _cattail_root(im: Image, ox: int) -> void:
+	# a jointed pale rhizome with a green shoot and a few rootlets
+	for x in range(2, 14):
+		art.rect(im, ox + x, 9 + int(x % 3 == 0), 1, 3, c("e4d4b0"))
+		art.px(im, ox + x, 12, c("b09a72"))
+	for x in [5, 9]:
+		art.rect(im, ox + x, 9, 1, 4, c("a08a64"))
+	for p in [[3, 13], [7, 14], [11, 14], [13, 13]]:
+		art.px(im, ox + p[0], p[1], c("8a7458"))
+	for y in range(1, 9):
+		art.px(im, ox + 11 - y / 4, y, c("5c8f3c"))
+		art.px(im, ox + 12 - y / 4, y + 1, c("2c5c37"))
+
+
+func _blue_dicks_corm(im: Image, ox: int) -> void:
+	# a round brown corm with its violet flower head still on the stalk
+	art.blob(im, ox + 7, 11, 4.0, 3.2, c("5e3a1c"), c("8a5a2c"), c("c8946a"))
+	art.px(im, ox + 5, 13, c("e8d8b8"))
+	art.px(im, ox + 8, 14, c("e8d8b8"))
+	for y in range(3, 8):
+		art.px(im, ox + 9 + y / 4, y, c("5c8f3c"))
+	art.blob(im, ox + 11, 3, 2.6, 2.2, c("5a3a98"), c("8a6ad0"), c("c0a8f0"))
+
+
+func _cow_clover(im: Image, ox: int) -> void:
+	# three-part leaves and a rose-purple clover head
+	for p in [[3, 9], [6, 11], [4, 12]]:
+		art.ellipse(im, ox + p[0] + 0.5, p[1] + 0.5, 1.8, 1.4, c("437f45"))
+		art.px(im, ox + p[0], p[1], c("84b04a"))
+	for p in [[11, 11], [13, 12], [12, 13]]:
+		art.ellipse(im, ox + p[0] + 0.5, p[1] + 0.5, 1.6, 1.3, c("2c5c37"))
+	for y in range(6, 14):
+		art.px(im, ox + 8, y, c("5c8f3c"))
+	art.blob(im, ox + 8, 4.5, 3.6, 3.4, c("7a2a5a"), c("b84a8a"), c("e8a0c8"))
+	for p in [[7, 2], [9, 3], [6, 5], [10, 5]]:
+		art.px(im, ox + p[0], p[1], c("f4d0e4"))
+
+
+func _sierra_plum(im: Image, ox: int) -> void:
+	# two small red plums on a thorny twig
+	for x in range(2, 14):
+		art.px(im, ox + x, 3 + x / 5, c("5a3a2a"))
+	art.px(im, ox + 4, 2, c("5a3a2a"))
+	art.px(im, ox + 12, 4, c("5a3a2a"))
+	_leaf(im, ox + 8, 0, 6, 3, "2c5c37", "5c8f3c")
+	for b in [[5, 9], [11, 10]]:
+		art.blob(im, ox + b[0], b[1], 3.2, 3.4, c("6a1a1a"), c("c0302a"), c("f07a5a"))
+		art.px(im, ox + b[0], b[1] - 4, c("5a3a2a"))
+
+
+func _chokecherry(im: Image, ox: int) -> void:
+	# a hanging string of dark, shiny cherries
+	for y in range(1, 13):
+		art.px(im, ox + 8, y, c("6a4a2a"))
+	_leaf(im, ox + 1, 1, 6, 3, "2c5c37", "5c8f3c")
+	for b in [[6, 5], [10, 6], [6, 9], [10, 10], [8, 13]]:
+		_berry(im, ox + b[0], b[1], 1.8, "1a0a14", "4a1a2a", "a04a5a")
 
 
 # ------------------------------------------------------------ the dishes

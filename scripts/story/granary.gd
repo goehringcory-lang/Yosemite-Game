@@ -7,7 +7,7 @@ extends Node
 signal changed
 
 ## Acorns one chuckah holds.
-const CAPACITY_PER_CHUCKAH := 40
+const CAPACITY_PER_CHUCKAH := 60
 const ACORN := "black_oak_acorn"
 
 var chuckahs_built := 0

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/wild_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(384, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "cattail_root"
+display_name = "Cattail Root"
+description = "A starchy root dug from the cattail marsh after the tops die back. Too stringy to eat raw: roast it."
+icon = SubResource("icon")
+forage_seasons = 12
+habitat = 4
+forage_per_day = 1

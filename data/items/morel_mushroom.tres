@@ -15,4 +15,4 @@ description = "A spring prize, most common where fire burned the year before."
 icon = SubResource("AtlasTexture_07ryh")
 forage_seasons = 1
 habitat = 2
-forage_per_day = 1
+forage_per_day = 2

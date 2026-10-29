@@ -15,4 +15,4 @@ description = "Spiny and tart. A hot pot softens the prickles."
 icon = SubResource("icon")
 forage_seasons = 2
 habitat = 3
-forage_per_day = 1
+forage_per_day = 2

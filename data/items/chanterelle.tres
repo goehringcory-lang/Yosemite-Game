@@ -15,4 +15,4 @@ description = "Golden and smelling of apricots, it comes up under the oaks after
 icon = SubResource("icon")
 forage_seasons = 12
 habitat = 2
-forage_per_day = 1
+forage_per_day = 2

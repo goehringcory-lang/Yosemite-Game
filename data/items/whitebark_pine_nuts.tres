@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/wild_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(320, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "whitebark_pine_nuts"
+display_name = "Whitebark Pine Nut"
+description = "Fat seeds pried from a purple cone at timberline, if the nutcrackers have left you any."
+icon = SubResource("icon")
+forage_seasons = 4
+habitat = 6
+forage_per_day = 1
+lean_seasons = 2

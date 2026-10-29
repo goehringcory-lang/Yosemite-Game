@@ -38,7 +38,8 @@ func _ready() -> void:
 	GameClock.season = GameClock.Season.SPRING
 	await forage.respawn()
 	var spring_ids := _forage_ids(world)
-	check(spring_ids == ["miners_lettuce", "miners_lettuce", "miners_lettuce", "morel_mushroom", "sierra_onion", "sierra_onion",
+	check(spring_ids == ["blue_dicks_corm", "blue_dicks_corm", "cow_clover", "cow_clover", "miners_lettuce", "miners_lettuce",
+			"miners_lettuce", "morel_mushroom", "morel_mushroom", "sierra_onion", "sierra_onion",
 			"wild_strawberry", "wild_strawberry", "yerba_buena", "yerba_buena"], "spring forage (%s)" % [spring_ids])
 	for f: Forageable in forage.get_children():
 		match f.item.id:

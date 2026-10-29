@@ -948,6 +948,51 @@ func _leichtlins_mariposa() -> Image:
 	return _lily(Color("f6f4ee"), Color("2a2020"), Color("8a9a6a"), Color("8a9a6a"), [[5, 5], [11, 4]])
 
 
+func _miners_lettuce() -> Image:
+	var im := _rosette(Color("5aa048"), Color("6aa848"), Color(0, 0, 0, 0), 3)
+	return _dots(im, Color("f4f0e4"), [Vector2i(4, 8), Vector2i(8, 10), Vector2i(12, 8)]) # flowers in the saucers
+
+
+func _mountain_strawberry() -> Image:
+	var im := _rosette(Color("4f8a3c"), Color("f4f0e4"), Color("f0d040"), 2)
+	return _dots(im, Color("e02a30"), [Vector2i(7, 11), Vector2i(10, 12)])
+
+
+func _sierra_onion() -> Image:
+	var im := _tuft(Color("6a9a4a"), Color(0, 0, 0, 0), Vector2.ONE, 4)
+	_seg(im, 8, 15, 8, 4, Color("6a9a4a"))
+	K.ellipse(im, 8.5, 3.5, 2.4, 2.0, Color("e8a0c0"))
+	return _dots(im, Color("f8d0e0"), [Vector2i(7, 2), Vector2i(9, 4)])
+
+
+func _yampah() -> Image:
+	return _umbel(Color("f4f0e4"), [[5, 4, 2.0], [11, 5, 1.8], [8, 6, 1.4]], Color("6a8a4a"), Color("6a9a50"))
+
+
+func _yerba_buena() -> Image:
+	var im := _mound(Color("4f8a3c"), Color("6a8a4a"), 4.0)
+	return _dots(im, Color("f4f0e4"), [Vector2i(5, 11), Vector2i(10, 12)])
+
+
+func _coyote_mint() -> Image:
+	return _flower(Color("b8a0d8"), [[5, 5, 2.0], [11, 4, 2.0], [8, 7, 1.6]], Color("7a8a6a"), Color("8aa070"), Color("f4f0e4"))
+
+
+func _california_blackberry() -> Image:
+	var im := _broadleaf(Color("4f8a3c"), Vector2(1.8, 1.3), Color("6a4a3a"))
+	return _dots(im, Color("2a1a30"), [Vector2i(4, 9), Vector2i(11, 9), Vector2i(8, 5)])
+
+
+func _whitebark_raspberry() -> Image:
+	var im := _broadleaf(Color("5a9048"), Vector2(2.0, 1.4), Color("e0dcd0"))
+	return _dots(im, Color("4a2a68"), [Vector2i(5, 10), Vector2i(12, 9)])
+
+
+func _cow_clover() -> Image:
+	var im := _flower(Color("c0508a"), [[5, 5, 2.0], [11, 6, 2.0]], Color("6a9a4a"), Color("4f8a3c"))
+	return _dots(im, Color("e8a0c8"), [Vector2i(5, 4), Vector2i(11, 5)])
+
+
 func _whitebark_pine() -> Image:
 	var im := _conifer(Color("4a7a50"), 2.8, 0.0, Color("6a4a5a"), Vector2(1.6, 1.8))
 	return im
