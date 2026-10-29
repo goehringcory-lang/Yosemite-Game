@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "wren_lightning"
+title = "Midnight Lightning"
+giver = "wren_alvarez"
+requires = PackedStringArray("wren_apron")
+intro = PackedStringArray("Have you seen the lightning bolt chalked on Columbia Boulder, back by the talus at Camp 4? That's Midnight Lightning. V8. Ron Kauk did it first, in 1978, after he and John Bachar fell off the top over and over.", "No rope, no gear. Just shoes, chalk, a crash pad and somebody to spot you. Chongo's always under it anyway, explaining the physics of whoever just fell off.", "Three hard moves: the bolt hold, the swing, and the mantel, almost sixteen feet up. Miss one and you're on the pad. I've never even gotten to the swing. Do it, and I'll buy you a candy bar every day for a month. Okay, two candy bars.")
+steps = [{"type": "climbed", "route": "midnight_lightning", "objective": "Climb Midnight Lightning, V8, on Columbia Boulder in Camp 4", "reminder": "Shake out on the ledge before the swing, and press the mantel out fast. You get five tries a session, so bring a snack for the pad.", "done": ["You did the MANTEL? Chongo came into the shop yelling about impulse and nobody knew what he meant.", "Nobody does Midnight Lightning. Well. Almost nobody."]}]
+outro = PackedStringArray("Two candy bars, as promised. Don't tell Marty they came off the shelf again.")
+reward_items = {"chocolate_bar": 2}

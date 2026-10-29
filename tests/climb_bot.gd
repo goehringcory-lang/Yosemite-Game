@@ -184,7 +184,7 @@ func _solve(state: ClimbState, r: int, c: int, pump: int, runout: int, cams: int
 			if next.is_empty():
 				continue
 			var k := runout + 1
-			if state.route.top_rope or state.is_snow() or r + 1 >= state.top_row:
+			if state.route.top_rope or state.route.boulder or state.is_snow() or r + 1 >= state.top_row:
 				k = 0
 			if k >= ClimbState.DANGEROUS_RUNOUT:
 				continue

@@ -30,6 +30,11 @@ extends RefCounted
 ##   bivy        "ledge" or "hanging": where you sleep if the night falls here
 ##   deco        decoration hints for the painter
 ##   beta        one line of advice, shown at the pitch start
+##   problem     a boulder problem's real holds, row by row from row 1:
+##               column -> {"grip", "cost", "name"} (see ClimbState)
+##   crux_points every hard move of a boulder problem: {"row", "kind",
+##               "name", "extra" (stamina on top of the hold), "narrow"
+##               (green taken off the meter), "need" (taps for a mash)}
 ##
 ## Route keys: food (energy worth bringing; tests check a careful climber
 ## tops out with it), place, rock, ground, finish, weather, belayer, descent,
@@ -61,6 +66,7 @@ const BELAYERS := {
 	"warren_harding": {"name": "Warren Harding", "skin": "e0ac7e", "hair": "2a2018", "hat": "", "top": "a83a2a", "bottom": "4a5068", "beard": "2a2018", "pack": "5a6a3a"},
 	"george_anderson": {"name": "George Anderson", "skin": "e0ac7e", "hair": "8a5a2a", "hat": "2a3040", "hat_kind": "cap", "top": "7a2a2a", "bottom": "3a3a48", "beard": "8a5a2a"},
 	"john_muir": {"name": "John Muir", "skin": "e0ac7e", "hair": "8a6040", "hat": "", "top": "6a5a48", "bottom": "5a5040", "beard": "9a7050", "long_beard": true},
+	"chongo": {"name": "Chongo", "skin": "d8a070", "hair": "4a3020", "long": true, "hat": "7a4a5a", "hat_kind": "bandana", "top": "7a4a5a", "bottom": "5a5a48", "beard": "4a3020"},
 }
 
 ## What a belayer says now and then. Keys are the events ClimbState reports.
@@ -74,6 +80,7 @@ const BANTER := {
 	"beverly_johnson": {"start": "On belay. Climb like you're alone up there.", "clip": "Good.", "fall": "I've got you. Get back on it.", "crux": "Be bold!", "top": "That's the way.", "rest": "Rest, then go."},
 	"warren_harding": {"start": "Belay's on. Sure you don't want a drink first?", "clip": "Bolt? Beautiful.", "fall": "Whoa, got you! Hang there.", "crux": "Send it, you crazy kid!", "top": "You freed it. I'll be damned.", "rest": "Hang in there. Literally."},
 	"george_anderson": {"start": "I've drilled holes steeper than this. Go on.", "clip": "Solid.", "fall": "Held. Mind the runout.", "crux": "One move at a time.", "top": "Top of the dome, near enough.", "rest": "Take a breath."},
+	"chongo": {"start": "Spotting! Hands up. Fall like a cat, not like a piano.", "clip": "", "fall": "Got you. Pad did its job. Impulse!", "crux": "Go, go, go!", "top": "You did the mantel! Nobody does the mantel!", "rest": "Breathe. Gravity's patient."},
 	"john_muir": {"start": "Go up, and the mountains will show you things.", "clip": "", "fall": "Steady! The mountain isn't going anywhere.", "crux": "Mind your feet.", "top": "Ah! What a temple.", "rest": "Look around. Look!"},
 }
 
@@ -293,6 +300,51 @@ const PROFILES := {
 			{"name": "The Roof", "style": "roof", "rows": 9, "cracks": 0.9, "crux": 7, "crux_name": "The lip", "deco": ["roof"], "beta": "Hang under the roof and jam out. Don't look down until you've turned the lip."},
 		],
 	},
+	"midnight_lightning": {
+		"food": 30,
+		"place": "Columbia Boulder, Camp 4",
+		"rock": "columbia",
+		"ground": "camp4",
+		"finish": "boulder_top",
+		"weather": "valley",
+		"belayer": "chongo",
+		"view": [
+			{"k": "sentinel_rock", "x": 360, "s": 1.4, "l": 0},
+			{"k": "cathedral_rocks", "x": 250, "s": 1.0, "l": 1},
+			{"k": "sierra_crest", "x": 320, "s": 1.0, "l": 2},
+		],
+		"facts": [
+			"Ron Kauk made the first ascent in May 1978, after he and John Bachar fell off the mantel again and again.",
+			"John \"Yabo\" Yablonski spotted the line; Kauk and Bachar doubted it would go. Bachar did the second ascent.",
+			"It was the first V8 in North America, and nobody repeated it for five years.",
+			"Lynn Hill made the first female ascent in 1998.",
+			"In 2013 someone scrubbed off the chalk bolt. Climbers redrew it within days.",
+		],
+		"pitches": [
+			{
+				"name": "The overhanging face", "style": "crack", "deco": ["streaks", "lightning_bolt"],
+				"beta": "No rope. Three hard moves: the bolt hold, the swing, and the mantel. Miss one and you're on the pad.",
+				# The line up the overhanging face. Costs are before shoes; the
+				# start holds are polished from every climber in Camp 4 pawing
+				# them, the ledge is the one good hold, and the top is the
+				# mantel over the lip, almost 16 feet up.
+				"problem": [
+					{1: {"grip": "crimp", "cost": 11}, 2: {"grip": "edge", "cost": 9, "name": "Polished start"}, 3: {"grip": "jug", "cost": 8}},
+					{1: {"grip": "edge", "cost": 10}, 2: {"grip": "crimp", "cost": 10, "name": "Sidepull"}, 3: {"grip": "crimp", "cost": 13}, 4: {"grip": "edge", "cost": 11}},
+					{2: {"grip": "edge", "cost": 10, "name": "Lightning bolt hold"}, 3: {"grip": "crimp", "cost": 13}, 4: {"grip": "crimp", "cost": 13}},
+					{1: {"grip": "jug", "cost": 8, "name": "The ledge"}, 2: {"grip": "crimp", "cost": 11}, 3: {"grip": "edge", "cost": 12}, 4: {"grip": "edge", "cost": 12}},
+					{0: {"grip": "crimp", "cost": 14}, 2: {"grip": "crimp", "cost": 12, "name": "Fingertip hold"}},
+					{1: {"grip": "edge", "cost": 11}, 2: {"grip": "edge", "cost": 11}, 3: {"grip": "crimp", "cost": 12}},
+					{1: {"grip": "edge", "cost": 11, "name": "The lip"}, 2: {"grip": "edge", "cost": 11, "name": "The lip"}},
+				],
+				"crux_points": [
+					{"row": 3, "kind": "timing", "name": "The lightning bolt", "extra": 4},
+					{"row": 5, "kind": "timing", "name": "The swing", "extra": 9, "narrow": 0.03},
+					{"row": 7, "kind": "mash", "name": "The mantel", "extra": 6, "need": 13},
+				],
+			},
+		],
+	},
 	"the_nose": {
 		"food": 300,
 		"place": "The Nose of El Capitan",
@@ -458,6 +510,8 @@ static func pitch_spec(route: RouteData, index: int) -> Dictionary:
 	var default_style := "slab" if route.protection == "bolts" else "crack"
 	spec["style"] = spec.get("style", default_style)
 	spec["rows"] = int(spec.get("rows", route.moves_per_pitch))
+	if spec.has("problem"):
+		spec.rows = spec.problem.size() + 1
 	if route.protection == "bolts" and not spec.has("bolts"):
 		spec["bolts"] = "line"
 	spec["diff"] = route.pitches[mini(index, route.pitches.size() - 1)]
@@ -472,6 +526,12 @@ static func pitch_spec(route: RouteData, index: int) -> Dictionary:
 static func _crux_rows(spec: Dictionary) -> Array[int]:
 	var rows: Array[int] = []
 	var top := int(spec.rows)
+	if spec.has("crux_points"):
+		# A boulder problem names every hard move itself.
+		for point: Dictionary in spec.crux_points:
+			rows.append(int(point.row))
+		rows.sort()
+		return rows
 	var authored := int(spec.get("crux", 0))
 	if authored > 0 and authored < top:
 		rows.append(authored)
@@ -508,6 +568,9 @@ static func _crux_rows(spec: Dictionary) -> Array[int]:
 
 ## What the crux at [param row] of a pitch is called, and how it's played.
 static func crux_at(spec: Dictionary, row: int) -> Dictionary:
+	for point: Dictionary in spec.get("crux_points", []):
+		if int(point.row) == row:
+			return point
 	if row == int(spec.get("crux", 0)):
 		return {"kind": spec.get("crux_kind", "timing"), "name": spec.get("crux_name", "The crux")}
 	return {"kind": "timing", "name": CRUX_NAMES.get(spec.get("style", "crack"), "The crux")}

@@ -25,6 +25,7 @@ const ROCKS := {
 	"arches": ["54505a", "787480", "a09c98", "ccc4b0", "ece2c6"],
 	"dome": ["68646a", "928e96", "bcb8bc", "e0dcd8", "f6f2ea"],
 	"knobby": ["564e44", "7e7662", "aca088", "d4c8a6", "f0e6c4"],
+	"columbia": ["363844", "5a5c68", "84868e", "aeaeb0", "dad8d0"],
 	"ice": ["4a6ca8", "7a9ccc", "b0cce6", "dcecf8", "f8fcff"],
 }
 
@@ -416,6 +417,8 @@ static func _features(im: Image, c: Dictionary, rng: RandomNumberGenerator, stat
 		_knobs(im, c, rng)
 	if "roof" in deco and style != "roof":
 		pass
+	if "lightning_bolt" in deco:
+		_lightning_bolt(im, c, state)
 	# Trees and shrubs growing from the rock at the ledges and cracks.
 	var ledge_y := int(L.wall_px(top, 0, 0).y) + 6
 	var top_y := int(L.wall_px(top, top, 0).y) + 6
@@ -424,6 +427,25 @@ static func _features(im: Image, c: Dictionary, rng: RandomNumberGenerator, stat
 			var x := rng.randi_range(6, int(edge[ledge_y]) - 34 if ledge_y < edge.size() else 200)
 			var y := ledge_y if i < 3 else top_y
 			ClimbProps.ledge_plant(im, x, y, deco, rng, c)
+
+
+## Midnight Lightning's chalk bolt, drawn on the face beside the bolt hold:
+## a fat white zigzag, smudged at the edges where it's been redrawn for
+## decades.
+static func _lightning_bolt(im: Image, c: Dictionary, state: ClimbState) -> void:
+	var top := state.top_row
+	# Up and right of the swing, clear of the holds (rows 5 and 6 have none there).
+	var o := L.wall_px(top, 6, 4) + Vector2(-2, -2)
+	var pts: Array[Vector2] = []
+	for v: Vector2 in [Vector2(0, 0), Vector2(-12, 22), Vector2(-2, 20), Vector2(-14, 46), Vector2(6, 16), Vector2(-4, 18), Vector2(8, 0)]:
+		pts.append(o + v * 0.8)
+	var chalk: Color = c.chalk
+	var smudge := chalk.lerp(tone(c, 3.0), 0.5)
+	for i in pts.size() - 1:
+		P.line(im, pts[i] + Vector2(1, 1), pts[i + 1] + Vector2(1, 1), smudge, 3)
+	for i in pts.size() - 1:
+		P.line(im, pts[i], pts[i + 1], chalk, 2)
+	P.line(im, pts[pts.size() - 1], pts[0], chalk, 2)
 
 
 ## Two planes meeting in an inside corner: lit on the left, shaded on the right,
@@ -822,7 +844,7 @@ static func _paint_holds(im: Image, c: Dictionary, rng: RandomNumberGenerator, s
 		var e := w
 		if y >= 0 and y < edge.size():
 			e = edge[y] + 4
-		_ledge(im, c, rng, y, e, r == top, style)
+		_ledge(im, c, rng, y, e, r == top and not state.route.boulder, style)
 	if style == "chimney":
 		# Footholds on alternating walls, one per row, and the odd chockstone.
 		var lx := int(L.CHIMNEY_X) - L.CHIMNEY_HALF

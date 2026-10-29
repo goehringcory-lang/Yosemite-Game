@@ -46,6 +46,16 @@ A climb is a short sequence of decisions: read the wall, choose a line, decide w
 | knobs | Big holds everywhere, a few cracks | Cathedral Peak |
 | snow, ice | Kicked steps and chipped holds; crevasses with snow bridges; slush after noon (it doesn't stack with the storm after 2:30 PM); no chalk; a fall slides 2 to 3 moves | Lyell Glacier |
 
+## Boulder problems
+
+`RouteData.boulder` makes a route a boulder problem. Midnight Lightning (V8, Columbia Boulder, Camp 4) is the only one so far.
+
+- **No rope.** There are no cams or quickdraws and nothing to protect with. The spotter (Chongo) stands under you with their hands up, over two crash pads.
+- **Real holds.** The pitch spec's `problem` lists every row's holds (grip and cost) lowest first, so the wall is the same every visit. `crux_points` names each hard move with its own kind, extra cost, narrower green (`narrow`) and mash taps (`need`). Midnight Lightning goes polished start, sidepull, **the lightning bolt** (timing), the ledge (the one jug, so shake out here), **the swing** to a fingertip hold (timing, 0.03 narrower), a move to the lip, and **the mantel** (mash, 13 taps).
+- **Falls.** Miss a crux and you come off, with no eating to try again. Running out of stamina does the same. You land on the pad and start again from the ground, `BOULDER_FATIGUE` (8) short of full for each fall so far, and 6 more after a fall off the top two moves. After `BOULDER_TRIES` (5) tries the session is over. You can eat on the pad, and chalk up there once a try.
+- **Tuning.** A careful climber who shakes out on the ledge reaches the top with 7 stamina to spare (perfect cruxes give some back). The greedy bot takes the cheap jug out right, never shakes out and comes off the mantel every try. `test_boulder` checks both, along with the rules above.
+- **Style.** *Flash* on the first try, otherwise *Sent on try N*.
+
 ## Crux checks
 
 | Kind | How | Where |

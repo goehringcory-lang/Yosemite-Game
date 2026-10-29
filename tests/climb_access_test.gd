@@ -51,7 +51,8 @@ func _ready() -> void:
 				seen[climb.route.id] = true
 				var label := "%s: %s" % [region_id, climb.route.display_name]
 				check(_can_use(climb, walked), "%s can be walked to and used, at %s" % [label, climb.position])
-				if climb.route.id not in NO_WALL:
+				# A boulder problem's sign stands by its boulder's pad.
+				if climb.route.id not in NO_WALL and not climb.route.boulder:
 					check(_at_wall(region, climb), "%s stands at the foot of a wall" % label)
 		remove_child(region)
 		region.free()

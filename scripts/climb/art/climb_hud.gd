@@ -21,6 +21,12 @@ static func route_plate(ci: CanvasItem, state: ClimbState, feet: int) -> void:
 	var a := Rect2(6, 43, 60, 18)
 	UI.panel(ci, a)
 	UI.ink(ci, Vector2(12, 56), "%d ft" % feet, UI.INK, 10)
+	if state.route.boulder:
+		# Tries left this session, beside the altimeter.
+		var t := Rect2(70, 43, 92, 18)
+		UI.panel(ci, t)
+		var left := state.tries_left()
+		UI.ink(ci, Vector2(76, 56), "Try %d of %d" % [mini(state.falls + 1, ClimbState.BOULDER_TRIES), ClimbState.BOULDER_TRIES], UI.WARN_DARK if left <= 1 else UI.INK, 10)
 
 
 static func topo_bar(ci: CanvasItem, state: ClimbState, progress: float) -> void:
@@ -286,14 +292,17 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 		facts.append(["%d nights out" % route.nights, UI.INK])
 		var meals := state.meals_in_pack()
 		facts.append(["Night meals: %d of %d" % [meals, route.nights], UI.GOOD_DARK if meals >= route.nights else UI.WARN_DARK])
-	if route.top_rope:
+	if route.boulder:
+		facts.append(["no rope: pad and spotter", UI.INK])
+		facts.append(["%d tries a session" % ClimbState.BOULDER_TRIES, UI.WARN_DARK])
+	elif route.top_rope:
 		facts.append(["top rope", UI.INK])
 	elif state.is_bolted() or route.protection == "bolts":
 		facts.append(["bolted", UI.INK])
 	else:
 		facts.append(["cams in cracks", UI.INK])
 	if belayer.get("name", "") != "":
-		facts.append(["belay: " + belayer.name.split(" ")[0], UI.INK])
+		facts.append(["%s: %s" % ["spot" if route.boulder else "belay", belayer.name.split(" ")[0]], UI.INK])
 	if profile.get("weather", "") == "alpine":
 		facts.append(["Start before %d AM" % ClimbState.ALPINE_START_BEFORE, UI.WARN_DARK])
 		facts.append(["Storms after %s" % ClimbState.storm_time_text(), UI.WARN_DARK])
@@ -414,7 +423,7 @@ static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, 
 	UI.panel(ci, r)
 	var x := r.position.x + 18
 	var y := r.position.y + 26
-	var title := "Topped out!" if won else "Back on the ground"
+	var title := ("Sent!" if state.route.boulder else "Topped out!") if won else "Back on the ground"
 	UI.ink(ci, Vector2(r.position.x + r.size.x * 0.5, y), title, UI.GOOD_DARK if won else UI.WARN_DARK, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 	UI.ink(ci, Vector2(r.position.x + r.size.x * 0.5, y + 14), "%s  ·  %s" % [state.route.display_name, state.route.grade.split(",")[0]], UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 	ci.draw_rect(Rect2(x, y + 20, r.size.x - 36, 1), UI.PAPER_DARK)
@@ -444,6 +453,10 @@ static func pause_card(ci: CanvasItem, state: ClimbState) -> void:
 	var r := Rect2(SCREEN.x * 0.5 - 100, 90, 200, 74)
 	UI.panel(ci, r)
 	var verb := "Rappel down?" if state.has_device and state.pitch > 0 else "Lower off?"
+	var note := "Your gear comes with you. The tick doesn't."
+	if state.route.boulder:
+		verb = "Call it a session?"
+		note = "The problem will still be here tomorrow."
 	UI.ink(ci, Vector2(r.position.x + 100, r.position.y + 22), verb, UI.INK, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
-	UI.ink(ci, Vector2(r.position.x + 100, r.position.y + 38), "Your gear comes with you. The tick doesn't.", UI.INK_SOFT, 10, 190.0, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.ink(ci, Vector2(r.position.x + 100, r.position.y + 38), note, UI.INK_SOFT, 10, 190.0, HORIZONTAL_ALIGNMENT_CENTER)
 	UI.ink(ci, Vector2(r.position.x + 100, r.position.y + 62), "E: yes, retreat     Esc: keep climbing", UI.WARN_DARK, 10, 190.0, HORIZONTAL_ALIGNMENT_CENTER)

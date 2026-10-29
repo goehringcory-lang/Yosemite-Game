@@ -20,7 +20,8 @@ extends RefCounted
 ## BELAYER modes: "belay" (standing, braced, device and rope; frames 0 neutral,
 ## 1 pay out, 2 take in), "look_up" (same, head tipped back to watch the
 ## leader), "sit" (relaxed, rope in the lap), "anchor" (seated and clipped to the
-## anchor, belaying; frames 0/1/2 like "belay"), "cheer" (arms up; frame 1 hops).
+## anchor, belaying; frames 0/1/2 like "belay"), "spot" (a boulderer's spotter,
+## no rope, both hands up), "cheer" (arms up; frame 1 hops).
 
 const P := preload("res://scripts/climb/art/climb_paint.gd")
 const SIZE := Vector2i(56, 64)
@@ -600,7 +601,8 @@ static func _paint_chimney(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 
 ## A person standing, seen from three-quarters behind, holding a rope.
 ## [param look] comes from ClimbProfiles.BELAYERS (its "id" picks the period
-## clothes). [param mode]: "belay", "look_up", "sit", "anchor" or "cheer", and
+## clothes). [param mode]: "belay", "look_up", "sit", "anchor", "spot" (a
+## boulderer's spotter, hands up) or "cheer", and
 ## [param frame] 0..2 (see the header).
 static func belayer(look: Dictionary, mode := "belay", frame := 0) -> Texture2D:
 	var key := "b|%s|%s|%d" % [str(look.get("id", "")), mode, frame]
@@ -710,7 +712,7 @@ static func _paint_belayer(look: Dictionary, mode: String, frame: int) -> Image:
 		P.hline(im, tx - 1, by2, tw + 2, Color("d6bd88"))
 		P.rect(im, tx + tw / 2 - 2, by2 + 1, 4, 3, ROPE_C)
 		P.rect(im, tx + tw / 2 - 2, by2 + 3, 4, 1, ROPE_D)
-	else:
+	elif id != "chongo":
 		P.rect(im, tx - 1, by2, tw + 2, 3, HARNESS)
 		P.hline(im, tx - 1, by2, tw + 2, HARNESS.lightened(0.35))
 		P.hline(im, tx - 1, by2 + 2, tw + 2, HARNESS.darkened(0.3))
@@ -962,6 +964,11 @@ static func _belayer_arms(im: Image, id: String, look: Dictionary, mode: String,
 		"sit":
 			guide = Vector2(tx - 3, ty + 8)
 			brake = Vector2(tx + 3, ty + 11)
+		"spot":
+			# Spotting a boulderer: both hands up, ready to steer a fall onto the pad.
+			var bob := 1.0 if frame == 1 else 0.0
+			guide = Vector2(tx - 3, ty - 9 + bob)
+			brake = Vector2(tx + tw + 3, ty - 9 + bob)
 		_:
 			# Belaying: the guide hand feeds rope up, the brake hand at the hip.
 			guide = Vector2(tx - 5, ty + 5)
@@ -973,7 +980,7 @@ static func _belayer_arms(im: Image, id: String, look: Dictionary, mode: String,
 				guide = Vector2(tx - 3, by2 - 1)
 				brake = Vector2(tx + 3, by2 + 7)
 	# Rope: hand to device and a tail swinging down from the brake hand.
-	if mode != "cheer":
+	if mode != "cheer" and mode != "spot":
 		var rc := ROPE_C
 		P.line(im, Vector2(guide.x, guide.y - 3), dev + Vector2(0, 1), rc, 1)
 		# Device and locking carabiner.
