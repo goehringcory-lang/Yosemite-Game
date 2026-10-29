@@ -548,10 +548,15 @@ func _check_getting_around(world: Node) -> void:
 	world._enter_region(Park.HOME_REGION, Park.HOME_SPAWN)
 
 
+## Roads with no way back. El Capitan Bridge is crossed north to south only.
+const ONE_WAY_ROADS := ["el_capitan_meadow -> bridalveil_fall/el_cap_bridge"]
+
+
 ## Each place in the Valley is one scene, joined to its neighbors by roads
 ## and trails. Every road between two Valley scenes lands on a spot that
 ## exists, and a road straight back starts right beside it (so turning round
-## takes you back where you came from, never somewhere else).
+## takes you back where you came from, never somewhere else), except the
+## ONE_WAY_ROADS.
 func _check_valley_links() -> void:
 	var scenes := {}
 	for file in DirAccess.get_files_at("res://scenes/regions"):
@@ -576,7 +581,7 @@ func _check_valley_links() -> void:
 				continue
 			var back := there.find_children("*", "RegionExit", true, false).filter(func(e: RegionExit) -> bool:
 				return e.target_region == id and e.position.distance_to(spot.position) < 200.0)
-			if back.is_empty():
+			if back.is_empty() and not ONE_WAY_ROADS.has("%s -> %s/%s" % [id, exit.target_region, exit.target_spawn]):
 				broken.append("%s -> %s/%s (no way back)" % [id, exit.target_region, exit.target_spawn])
 	# Every trail up to Glacier Point (the Ledge Trail, the Four Mile Trail,
 	# the Mist Trail) waits for the Apron climb that opens the rim, and the
