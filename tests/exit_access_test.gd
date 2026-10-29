@@ -75,13 +75,17 @@ func _ready() -> void:
 
 
 ## The regions you can get to straight from [param region]: through its exits
-## and doors, by the shuttle, by driving from a kiosk or a road out of the hub,
+## and doors, by the shuttle, by a road that drives on to another hub, by
+## driving from a kiosk or a road out of the hub,
 ## and up a climb that tops out in another hub.
 func _ways_out(region: Region) -> Dictionary:
 	var out := {}
 	for node in region.find_children("*", "", true, false):
 		if (node is RegionExit or node is RegionDoor) and node.target_region != "":
 			out[node.target_region] = true
+		elif node is RegionExit and node.drive_to != "":
+			var hub := Park.get_hub(node.drive_to)
+			out[hub.arrival_region if hub.arrival_region != "" else hub.id] = true
 		elif (node is RegionExit and node.travel_to != "") or node is TravelPoint:
 			for leg in Park.legs_from(region.hub_id):
 				var hub := Park.get_hub(leg.to)

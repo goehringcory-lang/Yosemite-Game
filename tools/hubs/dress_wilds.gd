@@ -41,7 +41,7 @@ const REGIONS := {
 	"el_capitan_meadow": 1958, "leidig_meadow": 1890, "four_mile_trailhead": 1872,
 	"bridalveil_fall": 1851, "tunnel_view": 1933, "ahwahnee_meadow": 1927,
 	"happy_isles": 1885, "mirror_lake": 1870, "tenaya_creek": 1852, "ahwahnee_trail": 1928,
-	"lamon_homestead": 1859, "crows_camp": 1960,
+	"lamon_homestead": 1859, "crows_camp": 1960, "big_oak_flat_junction": 1874, "crane_flat": 1961,
 }
 
 ## Terrain -> [chance a tile gets a flat thing, chance of an upright one,

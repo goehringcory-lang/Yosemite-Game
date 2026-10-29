@@ -169,7 +169,8 @@ func _show(region: Region, player_position: Vector2, travel: bool, preselect: St
 					break
 	_load_area_map()
 	# Looking around opens the illustrated hub map first; a kiosk opens the park map to travel.
-	_tab = Tab.AREA if not _view.is_empty() and not travel else Tab.PARK
+	# Out past the edge of the picture (up at Crane Flat, say), it opens on the park map.
+	_tab = Tab.AREA if not _view.is_empty() and not travel and _on_view(_here) else Tab.PARK
 	_start_cursor()
 	_refresh()
 	visible = true
@@ -567,6 +568,11 @@ func _area_point(hub: HubData, lonlat: Vector2) -> Vector2:
 	var mpd := ParkAtlas.meters_per_degree((hub.north + hub.south) / 2.0)
 	var tile := Vector2((lonlat.x - hub.west) * mpd.x, (hub.north - lonlat.y) * mpd.y) / hub.meters_per_tile
 	return (tile * _area_scale).floor()
+
+
+## Is this longitude/latitude on the illustrated map's picture?
+func _on_view(lonlat: Vector2) -> bool:
+	return Rect2(0, 0, float(_view.width), float(_view.height)).has_point(_view_point(lonlat))
 
 
 ## Lifts a longitude/latitude onto the illustrated map, which is drawn as seen
