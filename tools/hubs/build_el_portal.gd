@@ -88,6 +88,7 @@ func _layout() -> void:
 	_path([Vector2(68, 22), Vector2(88, 22)], 1, Terrain.TRAIL, 0.4)
 	_mark_open()
 	clear_trees(26, 14, 92, 25) # the town
+	clear_trees(49, 10, 56, 16) # the knoll behind the market (the house in the story overlay)
 	clear_trees(36, 28, 70, 38) # the railroad yard
 	clear_trees(2, 27, 32, 37) # the lodge
 	clear_trees(100, 6, 116, 26) # the entrance and Arch Rock
