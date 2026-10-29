@@ -3,6 +3,16 @@
 [ext_resource type="PackedScene" path="res://scenes/story/pickup.tscn" id="1_r"]
 [ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="2_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_rail_passenger.tres" id="3_r"]
+[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="4_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/el_portal/dev_house.png" id="5_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/el_portal/dev_house_glow.png" id="6_r"]
+[ext_resource type="Script" path="res://scripts/world/night_glow.gd" id="7_r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_house"]
+size = Vector2(188, 124)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_porch"]
+size = Vector2(196, 44)
 
 [node name="ElPortalStory" type="Node2D"]
 
@@ -21,3 +31,35 @@ wander_radius = 64
 position = Vector2(1900, 1074)
 item_id = "flour_sack"
 found_text = "It's stenciled DEGNAN, YOSEMITE, and it's been waiting by the tracks since the last train."
+
+[node name="DevHouse" type="StaticBody2D" parent="."]
+position = Vector2(1680, 520)
+collision_mask = 0
+script = ExtResource("4_r")
+title = "A house on the hill"
+text = "A little green house on the knoll above the market, with a brown picket fence and a bay window. Through the living room window someone in a flannel shirt is hunched over a laptop. On its screen is a tiny pixel valley: a granite wall, pines, the river, and somebody small walking the trail. A sticky note on the lid says VALLEY DAYS."
+extra_text = "It's late, and the laptop is still on. The mug has been empty for hours. \"One more fix,\" someone says inside, to nobody."
+extra_hours = Vector2i(22, 2)
+
+[node name="Sprite" type="Sprite2D" parent="DevHouse"]
+texture = ExtResource("5_r")
+offset = Vector2(0, -88)
+
+[node name="Glow" type="Sprite2D" parent="DevHouse"]
+z_index = 4
+texture = ExtResource("6_r")
+offset = Vector2(0, -88)
+script = ExtResource("7_r")
+
+[node name="Collision" type="CollisionShape2D" parent="DevHouse"]
+position = Vector2(0, -62)
+shape = SubResource("RectangleShape2D_house")
+
+[node name="Hitbox" type="Area2D" parent="DevHouse"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DevHouse/Hitbox"]
+position = Vector2(0, -14)
+shape = SubResource("RectangleShape2D_porch")

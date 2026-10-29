@@ -38,6 +38,7 @@ func _ready() -> void:
 	await test_firefall()
 	await test_village()
 	await test_wawona()
+	await test_dev_house()
 	await test_bear_tracks()
 	await test_crows_camp()
 	await test_chongo()
@@ -229,6 +230,33 @@ func test_wawona() -> void:
 	QuestLog.completed.append("tenaya_ahwahnee")
 	check("Write it at the front of the book" in clark.current_text() and clark.current_text().begins_with(clark.text), "the note is pinned in the window after Tenaya's story")
 	QuestLog.start_new_game()
+
+
+func test_dev_house() -> void:
+	world._enter_region("el_portal", "arrival")
+	await get_tree().process_frame
+	var house := world.region.entities.get_node_or_null("DevHouse") as InfoSign
+	check(house != null, "El Portal has the house on the hill")
+	if house == null:
+		return
+	var market := world.region.find_child("Market", true, false) as Node2D
+	check(market != null and absf(house.position.x - market.position.x) < 16.0 and house.position.y < market.position.y - 140.0,
+		"it stands right behind the market, clear of its roof")
+	check("laptop" in house.text and "VALLEY DAYS" in house.text, "its window looks in on someone making Valley Days")
+	var shape := (house.get_node("Collision") as CollisionShape2D).shape as RectangleShape2D
+	check(shape != null and shape.size.x > 150.0, "the knoll and house are solid")
+	set_time(SUMMER, 5, 12)
+	check(house.current_text() == house.text, "by day the sign says only what's in the window")
+	set_time(SUMMER, 5, 23)
+	check("One more fix" in house.current_text(), "late at night the laptop is still on")
+	set_time(SUMMER, 5, 12)
+	var player: Player = world.player
+	player.global_position = house.global_position + Vector2(0, 24)
+	player.facing = Vector2i.UP
+	player.interaction_area.position = Vector2(player.facing) * 24.0
+	for i in 3:
+		await get_tree().physics_frame
+	check(player.get_target() == house, "the player can read it from the foot of the steps")
 
 
 func test_bear_tracks() -> void:
