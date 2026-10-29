@@ -93,6 +93,7 @@ func respawn() -> void:
 					break
 	for i in int(Perks.bonus("enids_eye")):
 		_spawn_extra(habitats, taken)
+	_spawn_litter(habitats, taken)
 
 
 ## Enid's Eye (a perk): one more find of something in season, on a free spot.
@@ -111,6 +112,28 @@ func _spawn_extra(habitats: Dictionary, taken: Dictionary) -> void:
 			taken[cell] = true
 			spawn(item.id, cell)
 			return
+
+
+## Facelift day (Festivals): litter in the meadows, woods and riverbanks.
+func _spawn_litter(habitats: Dictionary, taken: Dictionary) -> void:
+	var region := get_parent()
+	while region and not region is Region:
+		region = region.get_parent()
+	var count := Festivals.litter_today(region.hub_id if region else "")
+	if count == 0:
+		return
+	var cells: Array = []
+	for habitat in [ItemData.Habitat.MEADOW, ItemData.Habitat.RIVERSIDE, ItemData.Habitat.FOREST, ItemData.Habitat.OAK_WOODLAND]:
+		cells.append_array(habitats.get(habitat, []))
+	if cells.is_empty():
+		return
+	for i in count:
+		for attempt in PLACE_TRIES:
+			var cell: Vector2i = cells[_rng.randi_range(0, cells.size() - 1)]
+			if not taken.has(cell) and _is_unblocked(cell):
+				taken[cell] = true
+				spawn(Festivals.LITTER, cell)
+				break
 
 
 func spawn(item_id: String, cell: Vector2i) -> void:

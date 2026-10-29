@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/valley_life_items.png" id="1_sheet"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_litter"]
+atlas = ExtResource("1_sheet")
+region = Rect2(64, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "litter"
+display_name = "Litter"
+description = "A crushed can and a candy wrapper. Bring it to Wren at the foot of Firefall Slab on Facelift day."
+icon = SubResource("AtlasTexture_litter")

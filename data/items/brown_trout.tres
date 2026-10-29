@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/valley_life_items.png" id="1_sheet"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_brown_trout"]
+atlas = ExtResource("1_sheet")
+region = Rect2(0, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "brown_trout"
+display_name = "Brown Trout"
+description = "Stocked from Europe long ago, and yours to keep. Cook it at a campfire."
+icon = SubResource("AtlasTexture_brown_trout")

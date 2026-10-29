@@ -5,6 +5,7 @@
 [ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="3_3wnbj"]
 [ext_resource type="Script" path="res://scripts/world/seasonal_canopy.gd" id="4_2aix4"]
 [ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="5_58pbq"]
+[ext_resource type="Script" path="res://scripts/objects/bulletin_board.gd" id="5_board"]
 [ext_resource type="Texture2D" path="res://assets/sprites/buildings/welcome_center.png" id="6_u8m40"]
 [ext_resource type="Texture2D" path="res://assets/sprites/buildings/museum.png" id="7_as1d0"]
 [ext_resource type="Texture2D" path="res://assets/sprites/buildings/bests_studio.png" id="8_s6pf7"]
@@ -2392,7 +2393,7 @@ shape = SubResource("RectangleShape2D_40a2g")
 [node name="RouteBoard" type="StaticBody2D" parent="Entities" unique_id=2106950055]
 position = Vector2(448, 992)
 collision_mask = 0
-script = ExtResource("5_58pbq")
+script = ExtResource("5_board")
 title = "Camp 4 bulletin board"
 text = "Notes pinned three deep: partners wanted for Royal Arches, a rack for trade, rides to the Tuolumne, and a weather report for the week. Climbers have found partners on this board for generations."
 

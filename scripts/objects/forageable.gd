@@ -19,7 +19,8 @@ func interact(player: Player) -> void:
 		return
 	PickupPop.spawn(sprite, player)
 	Inventory.add(item.id)
-	Perks.note("forage")
+	if FoodDB.is_food(item.id): # Facelift litter isn't a find
+		Perks.note("forage")
 	get_tree().call_group("hud", "show_message", "Found %s! %s" % [item.display_name, item.description])
 	get_parent().remove_child(self)
 	queue_free()

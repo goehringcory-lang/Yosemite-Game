@@ -27,6 +27,9 @@ const FOODS := {
 	"chanterelle": {"energy": 0, "shelf_life": 3}, # cook first
 	"king_bolete": {"energy": 0, "shelf_life": 3}, # cook first
 	"coyote_mint": {"energy": 2, "shelf_life": 3},
+	# Fish from the rivers (Fishing): cook them first
+	"brown_trout": {"energy": 0, "shelf_life": 2},
+	"brook_trout": {"energy": 0, "shelf_life": 2},
 	# The acorn chain
 	"black_oak_acorn": {"energy": 0, "shelf_life": 14},
 	"acorn_flour": {"energy": 0, "shelf_life": 5},

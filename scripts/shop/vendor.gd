@@ -131,7 +131,9 @@ func interact(player: Player) -> void:
 		_marker.refresh()
 	var box := DialogueBox.open(player)
 	if shop.talk_target != "":
-		var story := QuestLog.talk_to(shop.talk_target, shop.keeper)
+		var story := Festivals.talk_to(shop.talk_target)
+		story.append_array(BoardRequests.deliver(shop.talk_target))
+		story.append_array(QuestLog.talk_to(shop.talk_target, shop.keeper))
 		if not story.is_empty():
 			await box.say(story)
 	if shop.greeting != "":
