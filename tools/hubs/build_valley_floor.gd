@@ -541,7 +541,8 @@ func _bridalveil_fall() -> void:
 	_path([Vector2(29, 17), Vector2(26, 13), Vector2(fall_x + 2, 11)], 1, Terrain.TRAIL, 0.5)
 	_path([Vector2(48, 20), Vector2(50, _foot_of_wall(50))], 1, Terrain.TRAIL, 0.4)
 	# The road down to El Capitan Bridge. The bridge is in El Capitan Meadow:
-	# here the road ends at the south bank, where you walk onto it.
+	# here the road ends at the south bank. It is crossed one way only, from
+	# El Capitan Meadow, so there is no exit back over it from this side.
 	fill(54, 23, 55, 30, Terrain.ROAD)
 	_mark_open()
 
@@ -565,7 +566,6 @@ func _bridalveil_fall() -> void:
 	place("Bridalveil Fall", fall_x, 14, 9)
 	place("Cathedral Rocks", 46, 3, 0)
 	region_exit("ToFourMile", tile_pos(63.5, 21.5), Vector2(12, 48), "Southside Drive east", "four_mile_trailhead", "west")
-	region_exit("ToElCapBridge", tile_pos(54.5, 27), Vector2(48, 12), "El Capitan Bridge, to Northside Drive", "el_capitan_meadow", "el_cap_bridge")
 	region_exit("ToTunnelView", tile_pos(-0.5, 21.5), Vector2(12, 48), "Wawona Road, up to Tunnel View", "tunnel_view", "east")
 	_finish("bridalveil_fall", 2.0)
 

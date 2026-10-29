@@ -292,9 +292,6 @@ size = Vector2(28, 12)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nuygj"]
 size = Vector2(24, 96)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_16770"]
-size = Vector2(96, 24)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_joj1j"]
 size = Vector2(24, 96)
 
@@ -2563,16 +2560,6 @@ target_spawn = "west"
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/ToFourMile" unique_id=983812779]
 shape = SubResource("RectangleShape2D_nuygj")
-
-[node name="ToElCapBridge" type="Area2D" parent="Exits" unique_id=662147261]
-position = Vector2(1760, 880)
-script = ExtResource("36_1ljn7")
-label = "El Capitan Bridge, to Northside Drive"
-target_region = "el_capitan_meadow"
-target_spawn = "el_cap_bridge"
-
-[node name="Shape" type="CollisionShape2D" parent="Exits/ToElCapBridge" unique_id=805515374]
-shape = SubResource("RectangleShape2D_16770")
 
 [node name="ToTunnelView" type="Area2D" parent="Exits" unique_id=1673773828]
 position = Vector2(0, 704)
