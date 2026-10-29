@@ -7,7 +7,9 @@ extends Node
 ## get a good look before it flies off (Critters calls spot()). Some animals
 ## you only hear: stand still a few seconds outdoors and listen, by day for a
 ## mountain chickadee or at night for a great horned owl, the same calls the
-## ambience plays. Black bears you know by their tracks, and fish by
+## ambience plays. A mule deer (Deer) or a black bear (Bears) you log by
+## getting a look at one as it wanders by, a bear also by its tracks after a
+## night out, and fish by
 ## catching them on a fly rod (Fishing).
 
 signal changed
@@ -64,8 +66,11 @@ const ANIMALS := [
 	{"id": "brook_trout", "name": "Brook Trout", "latin": "Salvelinus fontinalis", "how": "caught", "seasons": [0, 1, 2],
 		"hint": "Fish the Tuolumne and the high-country creeks, spring to fall.",
 		"note": "Not a trout at all but a char from the eastern states. Most high Sierra waters had no fish until people packed these up in cans."},
-	{"id": "black_bear", "name": "American Black Bear", "latin": "Ursus americanus", "how": "tracks", "seasons": [0, 1, 2, 3],
-		"hint": "Stay out too late and a bear may come by while you sleep. Look for tracks the next morning.",
+	{"id": "mule_deer", "name": "Mule Deer", "latin": "Odocoileus hemionus", "how": "seen", "seasons": [0, 1, 2, 3],
+		"hint": "Grazing their way across the meadows and woods, most often at dawn and dusk. Fawns in summer, bucks in antlers in fall.",
+		"note": "Named for its big, mule-like ears. Startled, it bounds off on all four feet at once. Deer here seem tame, but they kick and gore: rangers say they hurt more visitors than bears do."},
+	{"id": "black_bear", "name": "American Black Bear", "latin": "Ursus americanus", "how": "seen", "seasons": [0, 1, 2, 3],
+		"hint": "One may wander by anywhere outdoors, most often at dawn and dusk, and in fall. Or stay out too late and look for tracks the next morning.",
 		"note": "Most of Yosemite's bears are brown or cinnamon, not black. There are no grizzlies left: the last one in Yosemite was killed in 1895."},
 ]
 
@@ -106,15 +111,16 @@ func total() -> int:
 
 
 ## Logs [param id] if it's new, with a note at the bottom of the screen
-## (unless [param quiet], when the caller says so itself). Returns true if
-## it was new.
-func spot(id: String, quiet := false) -> bool:
+## (unless [param quiet], when the caller says so itself). [param how]
+## overrides the animal's own "how" for the note (a bear's "tracks").
+## Returns true if it was new.
+func spot(id: String, quiet := false, how := "") -> bool:
 	var animal := get_animal(id)
 	if animal.is_empty() or seen.has(id):
 		return false
 	seen[id] = {"day": Friendship.today(), "where": _place()}
 	if not quiet:
-		var verb: String = {"seen": "Spotted", "heard": "Heard", "tracks": "Found tracks of"}.get(animal.how, "Logged")
+		var verb: String = {"seen": "Spotted", "heard": "Heard", "tracks": "Found tracks of"}.get(how if how != "" else animal.how, "Logged")
 		get_tree().call_group("hud", "show_message", "%s: %s. It's in your field log (J)." % [verb, animal.name])
 		Sound.play("item_get", -6.0, 0.0)
 	logged.emit(id)

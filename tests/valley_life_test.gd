@@ -1,6 +1,7 @@
 extends Node
 ## Headless test of the Valley's daily life: the Camp 4 bulletin board's
 ## notes (BoardRequests), the field log of birds and animals (FieldLog),
+## the bears and deer that wander by (Bears, Deer),
 ## fishing (Fishing, FishingMinigame), the festivals (Festivals), with their Journal and Quests
 ## sections, the day's page, and saving.
 ## Run: godot --headless --path . res://tests/valley_life_test.tscn
@@ -30,6 +31,8 @@ func _ready() -> void:
 	await test_board_object(world)
 	test_field_log_definitions()
 	await test_field_log_spotting(world)
+	await test_bears(world)
+	await test_deer(world)
 	test_field_log_listening(world)
 	test_fish_definitions()
 	await test_minigame()
@@ -177,6 +180,112 @@ func test_field_log_spotting(world: Node) -> void:
 	check(not FieldLog.spot("robin"), "a second robin isn't new")
 
 
+func test_bears(world: Node) -> void:
+	var bears: Bears = world.find_children("*", "Bears", true, false)[0]
+	var player: Player = world.player
+	check(not world.region.indoors, "the bear test starts outdoors (%s)" % world.region.region_id)
+	_fair_weather()
+	GameClock.minutes = 10 * 60
+	GameClock.season = GameClock.Season.SUMMER
+	var summer := bears.chance()
+	check(summer > 0.0, "a bear may come by on a summer day")
+	GameClock.season = GameClock.Season.FALL
+	check(bears.chance() > summer, "...more often in fall, fattening up for winter")
+	GameClock.season = GameClock.Season.WINTER
+	check(bears.chance() < summer * 0.2, "...and hardly ever in winter")
+	GameClock.season = GameClock.Season.SUMMER
+	GameClock.minutes = 18 * 60
+	check(bears.chance() > summer, "...and more at dusk than midday")
+	GameClock.minutes = 23 * 60
+	check(bears.chance() == 0.0 and not bears.active(), "none out in the dark of night")
+	GameClock.minutes = 10 * 60
+	var weights := 0.0
+	for w: float in Bears.COAT_WEIGHTS:
+		weights += w
+	check(Bears.COATS.size() == Bears.COAT_WEIGHTS.size() and is_equal_approx(weights, 1.0), "every coat has a share")
+	check(Bears.COAT_WEIGHTS[Bears.COATS.find("black")] < Bears.COAT_WEIGHTS[Bears.COATS.find("brown")] + Bears.COAT_WEIGHTS[Bears.COATS.find("cinnamon")],
+		"most of Yosemite's black bears are brown or cinnamon")
+	check(Bear.SHEET.get_height() == int(Bear.FRAME.y) * Bears.COATS.size(), "a row of sprites for each coat")
+
+	# one walks by far off: it's in the field log once you get a look
+	FieldLog.seen.erase("black_bear")
+	var from := player.global_position + Vector2(-(Bears.SPOT_DISTANCE + 200.0), 0)
+	var mom := bears.add_group(from, from + Vector2(600, 0), 1, 1)
+	check(mom is Bear and bears.animals().size() == 2 and bears.animals()[1].young and bears.animals()[1].leader == mom, "a mother can bring a cub")
+	check(mom.get_parent() == world.region.entities, "bears stand among the region's people and trees")
+	bears._process(0.016)
+	check(not FieldLog.has("black_bear"), "a bear well off isn't logged")
+	mom.global_position = player.global_position + Vector2(Bears.NOTICE_DISTANCE + 60.0, 0)
+	mom.target = mom.global_position + Vector2(400, 200)
+	bears._process(0.016)
+	check(FieldLog.has("black_bear"), "a bear in plain sight is logged")
+	check(mom.state != "watch" and mom.state != "leave", "it goes on about its business while you keep your distance")
+	# come close and it looks up, then goes off away from you
+	mom.global_position = player.global_position + Vector2(Bears.NOTICE_DISTANCE - 30.0, 0)
+	bears.animals()[1].global_position = mom.global_position + Vector2(24, 4)
+	bears._process(0.016)
+	check(mom.state == "watch" and mom.facing == -1, "close up, it stops and looks at you")
+	check(world.hud.message_label.text == Bears.NOTICE_MESSAGE, "...and you're told to give it room")
+	for i in 120:
+		bears._process(0.016)
+	check(mom.state == "leave" and mom.global_position.x > player.global_position.x + Bears.NOTICE_DISTANCE - 30.0, "then it ambles off away from you")
+	var cub: Wanderer = bears.animals()[1]
+	check(cub.global_position.distance_to(mom.global_position) < 60.0, "its cub keeps up")
+	# out of sight, it's gone, and none comes along again right away
+	mom.global_position = player.global_position + Vector2(4000, 0)
+	bears._process(0.016)
+	await get_tree().process_frame
+	check(bears.animals().is_empty() and not is_instance_valid(cub), "a bear gone off out of sight is gone for good")
+	check(bears._cooldown > 0.0, "...and the next one waits a while")
+	# leaving the area takes the bears with it
+	bears.add_group(player.global_position + Vector2(300, 0), player.global_position + Vector2(900, 0))
+	bears._last_region = null
+	bears._process(0.016)
+	check(bears.animals().is_empty(), "a new area starts with no bears")
+	bears._cooldown = 0.0
+	FieldLog.seen.erase("black_bear")
+	await get_tree().process_frame
+
+
+func test_deer(world: Node) -> void:
+	var deer: Deer = world.find_children("*", "Deer", true, false)[0]
+	var bears: Bears = world.find_children("*", "Bears", true, false)[0]
+	var player: Player = world.player
+	_fair_weather()
+	GameClock.minutes = 10 * 60
+	for season in 4:
+		GameClock.season = season
+		check(deer.chance() > 0.0, "mule deer are about in season %d" % season)
+	GameClock.season = GameClock.Season.WINTER
+	check(deer.chance() > bears.chance() * 5.0, "...and in winter, when the bears are asleep")
+	GameClock.season = GameClock.Season.SUMMER
+	check(deer.chance() > bears.chance(), "deer come by more often than bears")
+	GameClock.minutes = 22 * 60
+	check(deer.chance() == 0.0, "none out at night")
+	GameClock.minutes = 10 * 60
+	check(Deer.look_for(false, GameClock.Season.SUMMER) == Deer.LOOKS.find("doe_summer") and Deer.look_for(true, GameClock.Season.WINTER) == Deer.LOOKS.find("buck_winter"),
+		"reddish summer coats, gray winter ones, and bucks with antlers")
+	check(MuleDeer.SHEET.get_height() == int(MuleDeer.FRAME.y) * Deer.LOOKS.size(), "a row of sprites for each look")
+
+	FieldLog.seen.erase("mule_deer")
+	var at := player.global_position + Vector2(Deer.NOTICE_DISTANCE + 50.0, 0)
+	var doe := deer.add_group(at, at + Vector2(500, 0), 0, 2)
+	check(doe is MuleDeer and deer.animals().size() == 3, "a doe with two fawns")
+	deer._process(0.016)
+	check(FieldLog.has("mule_deer"), "a deer in sight goes in the field log")
+	doe.global_position = player.global_position + Vector2(Deer.NOTICE_DISTANCE - 20.0, 0)
+	deer._process(0.016)
+	check(doe.state == "watch", "close up, she stops and stares")
+	for i in 90:
+		deer._process(0.016)
+	check(doe.state == "leave" and (doe as MuleDeer).bounding(), "then she bounds off")
+	check((deer.animals()[1] as MuleDeer).speed > MuleDeer.BOUND_SPEED, "...and her fawns go with her")
+	deer._last_region = null
+	deer._process(0.016)
+	deer._cooldown = 0.0
+	await get_tree().process_frame
+
+
 func test_field_log_listening(world: Node) -> void:
 	GameClock.season = GameClock.Season.SUMMER
 	GameClock.minutes = 10 * 60
@@ -192,8 +301,9 @@ func test_field_log_listening(world: Node) -> void:
 	_fair_weather()
 	check(FieldLog.listen() == "great_horned_owl", "a summer night logs the owl")
 	check(FieldLog.listen() == "", "nothing new to hear after that")
-	FieldLog.spot("black_bear")
+	FieldLog.spot("black_bear", false, "tracks")
 	check(FieldLog.has("black_bear"), "bear tracks log a black bear")
+	check(world.hud.message_label.text.begins_with("Found tracks of: American Black Bear"), "...and say they were tracks (%s)" % world.hud.message_label.text)
 
 
 func test_fish_definitions() -> void:
