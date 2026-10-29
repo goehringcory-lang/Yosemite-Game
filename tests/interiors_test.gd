@@ -191,6 +191,10 @@ func _check_hours(world: Node, by_id: Dictionary) -> void:
 	world._enter_region("yosemite_village", "degnans_door")
 	var degnans: BuildingDoor = world.region.find_child("DoorToDegnans", true, false)
 	GameClock.minutes = 23 * 60
+	# Standing still at night hears the owl, whose field log message would
+	# cover the door's on a slow machine: count it heard already.
+	for id in FieldLog.audible():
+		FieldLog.seen[id] = {"day": 0, "where": ""}
 	check(not degnans.is_open_now(), "Degnan's is closed at 11 PM")
 	degnans.interact(player)
 	await _settle(world)
