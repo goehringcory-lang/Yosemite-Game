@@ -352,6 +352,7 @@ func _journal_page() -> void:
 	_friends()
 	_calendar()
 	_field_log()
+	_rescue_log()
 	if QuestLog.final_entry >= 0:
 		_heading("The last page")
 		var entry: String = QuestLog.FINAL_ENTRIES[QuestLog.final_entry].entry
@@ -468,6 +469,23 @@ func _field_log() -> void:
 			_check_line(false, "%s · %s. %s" % [animal.name, FieldLog.seasons_text(animal.seasons), animal.hint], DIM)
 
 
+## Everyone you've helped on a rescue call (Rescues), newest first.
+func _rescue_log() -> void:
+	if not Rescues.on_team() and Rescues.count() == 0:
+		return
+	_heading("Rescue log: %d %s helped" % [Rescues.count(), "person" if Rescues.count() == 1 else "people"])
+	if Rescues.count() == 0:
+		_line("Talk to Jo at the Camp 4 rescue site in the mornings. Some days the radio calls for help.", DIM)
+		return
+	for i in range(Rescues.history.size() - 1, -1, -1):
+		var entry: Dictionary = Rescues.history[i]
+		var call := Rescues.get_call(entry.id)
+		if call.is_empty():
+			continue
+		_check_line(true, "%s · %s" % [call.title, call.who], Color(0.827, 0.894, 0.541))
+		_line("     " + call.done, DIM)
+
+
 ## The guidebook's tick list: every route, its grade, the gear it needs, and
 ## whether you've topped it out. A * marks the routes the main story needs.
 func _guidebook() -> void:
@@ -564,6 +582,13 @@ func _quests_page() -> void:
 		for entry: Dictionary in notes:
 			_note_card(entry)
 
+	# A rescue call underway, from the Camp 4 rescue site (Jo's first one
+	# is her quest, above).
+	var call := Rescues.active_call()
+	if not call.is_empty() and not QuestLog.active.has(Rescues.FIRST_QUEST):
+		_heading("Rescue call")
+		_rescue_card(call)
+
 	# Who has something for you, as on a help-wanted board.
 	var asking: Array[CharacterData] = []
 	for character: CharacterData in QuestLog.CHARACTERS:
@@ -621,6 +646,29 @@ func _note_card(entry: Dictionary) -> void:
 func _seasons_of_work() -> int:
 	return QuestLog.QUESTS.filter(func(q: QuestData) -> bool:
 		return q.guardian_line and q.id != QuestLog.GUARDIAN_YEAR_QUEST and QuestLog.is_completed(q.id)).size()
+
+
+## The rescue call underway, as a card with Jo's face: what came over the
+## radio, and what to do next.
+func _rescue_card(call: Dictionary) -> void:
+	var lead := QuestLog.get_character(Rescues.LEAD)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	row.add_child(_face(lead.display_name if lead else "", 32))
+	var words := VBoxContainer.new()
+	words.add_theme_constant_override("separation", 0)
+	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var title := Label.new()
+	title.text = "%s  · %s" % [call.title, call.place]
+	title.add_theme_color_override("font_color", Color(1, 0.831, 0.541))
+	words.add_child(title)
+	var step := Label.new()
+	step.text = Rescues.objective() + " The team takes over at %d PM." % (Rescues.NIGHTFALL - 12)
+	step.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	step.custom_minimum_size.x = LINE_WIDTH - 40
+	words.add_child(step)
+	row.add_child(words)
+	_body.add_child(row)
 
 
 ## A quest as a card: the face of whoever gave it, its title, and what to do

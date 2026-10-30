@@ -92,6 +92,7 @@ Perks are small things the valley teaches you: knowledge from the people you mee
 | **Steady Breath** | Climb 5 crux moves perfectly | The crux green zone is 0.03 wider | `climb_state.gd` `crux_window()` |
 | **Light Rack** | Tick 6 routes | A move on the wall takes 5 minutes, not 6 | `climb_state.gd` `move()` |
 | **Slackliner's Feet** | Walk a Camp 4 slackline end to end 5 times | Moves on a friction slab cost 1 less stamina (never below 1) | `climb_state.gd` `move_cost()` |
+| **Long Carry** | Answer 5 rescue calls from the Camp 4 rescue site | Carrying someone out, you walk at 80% speed instead of 60% | `rescues.gd` `speed_factor()` |
 
 Each effect is smaller than a piece of gear's (climbing shoes widen the crux zone by 0.05 and take a whole stamina off every move), so gear still sets the pace of the story and the climbing tests' gear curve holds without perks. Tabuce's Patience is Native content and carries the same tribal-review placeholder as her dialogue.
 

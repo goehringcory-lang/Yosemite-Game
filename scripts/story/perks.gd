@@ -17,6 +17,7 @@ extends Node
 ##   Crux green zone     climb_state.gd        steady_breath
 ##   Minutes per move    climb_state.gd move() light_rack
 ##   Slab moves          climb_state.gd move_cost() slackliners_feet
+##   Carrying someone    rescues.gd speed_factor() long_carry
 ##
 ## Experience that no other system keeps a count of (wild forage picked up,
 ## mornings, perfect cruxes, slackline crossings) is counted here with
@@ -79,6 +80,11 @@ const PERKS: Array[Dictionary] = [
 		"how": "Walk a Camp 4 slackline end to end 5 times.",
 		"effect": "Moves on a friction slab cost 1 less stamina.",
 		"flavor": "Camp 4 climbers took up slacklining on rest days in the early 1980s. Walking webbing trains the quiet, trusting feet a slab asks for."},
+	{"id": "long_carry", "name": "Long Carry", "amount": 0.2,
+		"unlock": {"stat": "rescues", "count": 5},
+		"how": "Answer 5 rescue calls from the Camp 4 rescue site.",
+		"effect": "You walk faster while carrying someone out.",
+		"flavor": "Since the 1970s, climbers camped at the Camp 4 rescue site have helped the park's search and rescue team, hauling litters down trails and lowering people off the walls."},
 ]
 
 ## How long the HUD must be free before a "New perk" message shows, so it

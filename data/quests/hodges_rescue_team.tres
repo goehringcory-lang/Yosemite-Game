@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hodges_rescue_team"
+title = "The Rescue Site"
+giver = "clare_hodges"
+requires = PackedStringArray("leonard_belay")
+intro = PackedStringArray("You can hold a rope now, Dick Leonard tells me. Good. I have a use for people who can hold a rope.", "My rangers can't be on every trail at once. When somebody's lost or hurt, the climbers at Camp 4 go out with us. They keep a rescue cache in the camp, by the radio.", "Go and see Jo Tolliver there. Tell her I sent you. And take some pilot bread from the station stores: rescues run long, and nobody ever packs enough.")
+steps = [{"type": "talk", "target": "jo_tolliver", "objective": "Talk to Jo Tolliver at the Camp 4 rescue site", "reminder": "Jo Tolliver, at the rescue site in Camp 4. Orange jacket, red helmet, a radio that never stops talking.", "done": ["Hodges sent you? Then you can belay, and you know your way around. That's most of it.", "The rest you learn by doing. Funny you should come by now, too."]}]
+outro = PackedStringArray()
+reward_items = {
+"pilot_bread": 2
+}

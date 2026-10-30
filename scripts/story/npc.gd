@@ -536,6 +536,7 @@ func interact(player: Player) -> void:
 	else:
 		var lines := Festivals.talk_to(character.id)
 		lines.append_array(BoardRequests.deliver(character.id))
+		lines.append_array(Rescues.talk_to(character.id))
 		lines.append_array(QuestLog.talk_to(character.id))
 		if shop and not Vendor.offers_open(shop).is_empty():
 			player.can_act = false
