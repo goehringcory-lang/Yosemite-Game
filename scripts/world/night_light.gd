@@ -16,6 +16,8 @@ extends PointLight2D
 ## like light caught in the night air. Its size follows [member radius].
 ## Only on Low graphics: on High, AirGlow makes real glow instead.
 @export var halo := 1.0
+## Stays off indoors, where a room's own lamps come up at night (RoomLight).
+@export var outdoor_only := false
 
 static var _glow: GradientTexture2D
 static var _halo_tex: GradientTexture2D
@@ -60,6 +62,8 @@ func _process(delta: float) -> void:
 	if _tint.visible:
 		var lum := (_tint.color.r + _tint.color.g + _tint.color.b) / 3.0
 		dark = clampf((0.9 - lum) / 0.45, 0.0, 1.0)
+	elif not outdoor_only:
+		dark = RoomLight.level
 	var level := strength * dark
 	if lit_hours.x >= 0 and not GameClock.hour_in_range(lit_hours.x, lit_hours.y):
 		level = 0.0

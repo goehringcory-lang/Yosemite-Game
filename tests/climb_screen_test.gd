@@ -18,10 +18,41 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await test_controls()
 	await test_weather_on_screen()
+	await test_light()
 	for r in Guidebook.routes():
 		await play_route(r)
 	print("\nOK: %d failure(s)" % failures)
 	get_tree().quit(failures)
+
+
+## On High graphics real light falls on the wall: the sun by day, the
+## headlamp after dark. On Low the wall is drawn with everything else.
+func test_light() -> void:
+	var route: RouteData = load("res://data/routes/the_nose.tres")
+	var game: ClimbMinigame = load("res://scenes/climb/climb_minigame.tscn").instantiate()
+	game.setup(route, 6)
+	game.state.conditions = WallWeather.CALM.duplicate()
+	add_child(game)
+	await get_tree().process_frame
+	if not LitSprites.active():
+		check(game._wall_view == null and game._light == null, "on Low the wall keeps its painted look")
+		game.queue_free()
+		return
+	check(game._wall_view != null and game._wall_view.material is ShaderMaterial, "the wall is drawn with real light")
+	check(game._wall_view.light_mask == LitSprites.LIT_LAYER, "only the wall is on the light layer")
+	game._start_minutes = 8 * 60
+	game._paint_scenery()
+	await get_tree().process_frame
+	check(game._light.sun_on and not game._light.headlamp.enabled, "the morning sun lights the wall, the headlamp is off")
+	check(game._light.sun_travel.x < 0.0, "the morning sun comes from the east (the right)")
+	game._start_minutes = 23 * 60
+	game._paint_scenery()
+	await get_tree().process_frame
+	check(game._light.headlamp.enabled and not game._light.sun_on, "after dark the headlamp lights the wall")
+	check(game._light.headlamp.position.distance_to(game._torso()) < 30.0, "the headlamp is on the climber")
+	check(game._light.headlamp.range_layer_min == game.layer and game._light.headlamp.range_layer_max == game.layer, "the headlamp reaches the climbing screen's canvas layer")
+	game.queue_free()
+	await get_tree().process_frame
 
 
 ## The keys do what they say: arrows climb, Space protects, Shift + arrow jugs

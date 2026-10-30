@@ -12,6 +12,7 @@ func _ready() -> void:
 	radius = 88.0
 	flicker = 0.08
 	halo = 0.0
+	outdoor_only = true
 	super()
 	position = Vector2(5, -12)
 	color = Color(1.0, 0.8, 0.55)

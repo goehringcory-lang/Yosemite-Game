@@ -238,17 +238,36 @@ func test_lit_park() -> void:
 
 
 func test_indoors() -> void:
+	set_date(SUMMER, 14, 12)
 	await world.go_to_region("curry_store", "door")
 	await _frames(3)
 	check(world.region.get_node_or_null("SunShadows") == null, "no sun shadows indoors")
 	var sun := world.get_node_or_null("SunLight") as SunLight
-	check(sun != null and not sun.enabled, "the sun's light is off indoors")
 	var lantern := world.player.get_node_or_null("Lantern") as NightLight
 	check(lantern != null and lantern.energy < 0.05, "the lantern stays out indoors")
-	GameClock.minutes = 23 * 60
-	await _frames(2)
-	check(not (world.get_node("AirGlow") as AirGlow).environment.glow_enabled, "no night glow indoors")
-	GameClock.minutes = 12 * 60
+	var room := world.get_node("RoomLight") as RoomLight
+	var stove: NightLight = null
+	for node in world.region.find_children("NightLight", "PointLight2D", true, false):
+		stove = node as NightLight
+	check(stove != null, "the store's stove has a real light")
+	if not LitSprites.active():
+		check(sun != null and not sun.enabled and not room.visible, "on Low the room stays lit as painted")
+		GameClock.minutes = 12 * 60
+		return
+	check(sun != null and sun.enabled, "daylight comes in through the windows")
+	check(Vector2.DOWN.rotated(sun.rotation).y > 0.9, "...from the back of the room")
+	check(not room.visible and RoomLight.level < 0.01, "the room isn't dimmed by day")
+	set_date(SUMMER, 14, 23)
+	await _frames(3)
+	check(not sun.enabled, "no window light at night")
+	check(room.visible and RoomLight.level > 0.9, "the room dims at night (%.2f)" % RoomLight.level)
+	check(stove != null and stove.energy > 0.5, "the stove lights the room at night")
+	check(lantern.energy < 0.05, "the lantern still stays out indoors at night")
+	check((world.get_node("AirGlow") as AirGlow).environment.glow_enabled, "the firelight glows indoors at night")
+	await world.go_to_region("curry_village", "store_door")
+	await _frames(3)
+	check(not room.visible and RoomLight.level == 0.0, "back outside, the room's dimming is gone")
+	set_date(SUMMER, 14, 12)
 
 
 func _frames(n: int) -> void:

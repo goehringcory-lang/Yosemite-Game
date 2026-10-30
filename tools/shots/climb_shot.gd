@@ -8,6 +8,7 @@ extends Node
 ##   SHOT_INTRO   1 to shoot the route card instead of the climb
 ##   SHOT_SPECIAL cards to shoot instead: "crux", "pumped", "result", "pause", "night"
 ##   SHOT_DIR     folder for the PNGs (default user://)
+##   SHOT_UNLIT   1 to leave the wall unlit (ClimbLight off), as on Low
 ## The screenshot is the window's own size (3x the 480 x 270 screen).
 ## Run: SHOT_ROUTE=firefall_slab SHOT_HOURS=7,19 godot --path . res://tools/shots/climb_shot.tscn
 
@@ -17,6 +18,7 @@ func _env(key: String, fallback: String) -> String:
 
 
 func _ready() -> void:
+	LitSprites.enabled = OS.get_environment("SHOT_UNLIT") != "1"
 	var route: RouteData = load("res://data/routes/%s.tres" % _env("SHOT_ROUTE", "firefall_slab"))
 	var dir := _env("SHOT_DIR", "user://")
 	Gear.owned = {"climbing_shoes": 1, "chalk_bag": 1, "harness": 1, "quickdraw": 6, "rope": 1, "cam": 6}
