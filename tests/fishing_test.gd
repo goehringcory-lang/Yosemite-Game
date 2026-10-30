@@ -195,6 +195,7 @@ func test_flies() -> void:
 	check(Fishing.weight_for(brown, tied) == brown.waters.run * 2 and Fishing.weight_for(brown, {}) == brown.waters.run, "the bugger brings up browns twice as often")
 	var rod := Fishing.new()
 	add_child(rod)
+	# a fixed seed, so 400 picks can't land on an unlucky run
 	rod._rng.seed = 77
 	var browns := 0
 	for i in 400:
