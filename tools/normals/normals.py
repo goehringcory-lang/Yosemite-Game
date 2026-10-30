@@ -13,6 +13,7 @@ the sprites in the regions it lights.
     python3 tools/normals/normals.py FILE...         # these sprites
     python3 tools/normals/normals.py --region curry_village
                                                      # every sprite that region uses
+    python3 tools/normals/normals.py --outdoors      # every region under the sky
     python3 tools/normals/normals.py --preview OUT.png FILE
                                                      # the sprite lit three ways
 
@@ -223,10 +224,17 @@ def region_sprites(region: str) -> list[str]:
             if os.path.exists(os.path.join(ROOT, folder, name)):
                 scenes.append(f"{folder}/{name}")
     found: set[str] = set()
-    for scene in scenes:
+    seen: set[str] = set()
+    while scenes:
+        scene = scenes.pop()
+        if scene in seen or not os.path.exists(os.path.join(ROOT, scene)):
+            continue
+        seen.add(scene)
         text = open(os.path.join(ROOT, scene)).read()
         for rel in re.findall(r'path="res://(assets/sprites/[^"]+\.png)"', text):
             found.add(rel)
+        # the props it places (shuttle stops, signs, doors) bring their own art
+        scenes += re.findall(r'path="res://(scenes/objects/[^"]+\.tscn)"', text)
     seasons = os.path.join(ROOT, SPRITES, "ahwahnee", "seasons")
     for rel in list(found):
         if rel.startswith(SPRITES + "ahwahnee/") and os.path.isdir(seasons):
@@ -237,10 +245,18 @@ def region_sprites(region: str) -> list[str]:
     return sorted(os.path.join(ROOT, rel) for rel in found)
 
 
+def outdoor_regions() -> list[str]:
+    """The regions under the sky (scenes without indoors = true)."""
+    folder = os.path.join(ROOT, "scenes/regions")
+    return sorted(f[:-5] for f in os.listdir(folder)
+                  if f.endswith(".tscn") and "\nindoors = true" not in open(os.path.join(folder, f)).read())
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("files", nargs="*")
     ap.add_argument("--region", action="append", default=[])
+    ap.add_argument("--outdoors", action="store_true", help="every outdoor region")
     ap.add_argument("--preview")
     args = ap.parse_args()
     if args.preview:
@@ -257,6 +273,8 @@ def main() -> None:
         bg.save(args.preview)
         return
     files = [os.path.abspath(f) for f in args.files]
+    if args.outdoors:
+        args.region += outdoor_regions()
     for region in args.region:
         files += region_sprites(region)
     made = 0

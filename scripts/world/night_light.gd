@@ -14,6 +14,7 @@ extends PointLight2D
 @export var lit_hours := Vector2i(-1, -1)
 ## How bright the soft halo in the air round the lamp itself is (0 for none),
 ## like light caught in the night air. Its size follows [member radius].
+## Only on Low graphics: on High, AirGlow makes real glow instead.
 @export var halo := 1.0
 
 static var _glow: GradientTexture2D
@@ -69,6 +70,8 @@ func _process(delta: float) -> void:
 	energy = level * 1.25
 	visible = level > 0.01
 	if _halo:
+		# On High graphics the real glow (AirGlow) does this instead.
+		_halo.visible = not AirGlow.active()
 		# Drawn bright, since the night tint dims it with everything else.
 		_halo.modulate = Color(color.r, color.g, color.b, 1.0) * Color(2.2, 2.2, 2.2, minf(level * halo * 0.5, 1.0))
 
