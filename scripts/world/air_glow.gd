@@ -9,7 +9,7 @@ extends WorldEnvironment
 ## room's lamps (RoomLight).
 
 ## How strong the glow is at full night.
-const STRENGTH := 0.9
+const STRENGTH := 1.2
 ## Only pixels brighter than this glow. At night, under the tint, only the
 ## lights themselves and the ground right under them get that bright.
 const THRESHOLD := 0.72
