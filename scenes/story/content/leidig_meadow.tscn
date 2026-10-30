@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_angler.tres" id="2_r"]
+[ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
 
 [node name="LeidigMeadowStory" type="Node2D"]
 
@@ -10,3 +11,10 @@ character = ExtResource("2_r")
 spot = "river_bank"
 offset = Vector2(-12, -16)
 wander_radius = 48
+
+[node name="LeidigHole" type="Node2D" parent="."]
+position = Vector2(1370, 986)
+script = ExtResource("fw_script")
+kind = "hole"
+size = Vector2(300, 124)
+title = "Leidig Hole"
