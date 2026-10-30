@@ -497,6 +497,8 @@ func _guidebook() -> void:
 	var hardest := Guidebook.hardest_tick()
 	_line("Hardest grade: %s (%s). The Nose, climbed free, is 5.13." % [Guidebook.yds_label(hardest.grade), hardest.display_name] if hardest
 		else "Grades run from 5.5 (a ladder with good holds) to 5.13 (the Nose, climbed free).", DIM)
+	for line in WallWeather.guidebook_lines():
+		_line(line, DIM)
 	var chapter := ""
 	for entry in Guidebook.entries():
 		var route: RouteData = entry.route

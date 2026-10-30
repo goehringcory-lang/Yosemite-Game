@@ -303,9 +303,11 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 		facts.append(["cams in cracks", UI.INK])
 	if belayer.get("name", "") != "":
 		facts.append(["%s: %s" % ["spot" if route.boulder else "belay", belayer.name.split(" ")[0]], UI.INK])
-	if profile.get("weather", "") == "alpine":
+	# Today's weather on the wall: what the day will do to the climb.
+	if profile.get("weather", "") == "alpine" and float(state.conditions.get("storm_hour", -1.0)) >= 0.0:
 		facts.append(["Start before %d AM" % ClimbState.ALPINE_START_BEFORE, UI.WARN_DARK])
-		facts.append(["Storms after %s" % ClimbState.storm_time_text(), UI.WARN_DARK])
+	for line: Array in WallWeather.forecast(route, state.conditions):
+		facts.append([line[0], UI.WARN_DARK if line[1] else UI.GOOD_DARK])
 	if too_late:
 		facts.append(["You'd still be on the wall at 2 AM.", UI.WARN_DARK])
 		facts.append(["Start in the morning.", UI.WARN_DARK])

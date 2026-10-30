@@ -17,6 +17,7 @@ func check(cond: bool, what: String) -> void:
 func _ready() -> void:
 	await get_tree().process_frame
 	await test_controls()
+	await test_weather_on_screen()
 	for r in Guidebook.routes():
 		await play_route(r)
 	print("\nOK: %d failure(s)" % failures)
@@ -33,6 +34,7 @@ func test_controls() -> void:
 	GameClock.paused = true
 	var game: ClimbMinigame = load("res://scenes/climb/climb_minigame.tscn").instantiate()
 	game.setup(nose, 6)
+	game.state.conditions = WallWeather.CALM.duplicate()
 	add_child(game)
 	await get_tree().process_frame
 	check(game._phase == ClimbMinigame.Phase.INTRO, "the route card comes first")
@@ -102,6 +104,7 @@ func test_screen_details() -> void:
 	GameClock.minutes = 8 * 60
 	var game: ClimbMinigame = load("res://scenes/climb/climb_minigame.tscn").instantiate()
 	game.setup(firefall, 3)
+	game.state.conditions = WallWeather.CALM.duplicate()
 	add_child(game)
 	await get_tree().process_frame
 	press(game, "use_tool")
@@ -139,10 +142,63 @@ func test_screen_details() -> void:
 	GameClock.minutes = 23 * 60 + 30
 	game = load("res://scenes/climb/climb_minigame.tscn").instantiate()
 	game.setup(firefall, 3)
+	game.state.conditions = WallWeather.CALM.duplicate()
 	add_child(game)
 	await get_tree().process_frame
 	press(game, "interact")
 	check(game._phase == ClimbMinigame.Phase.INTRO, "a climb that would run past 2 AM doesn't start")
+	game.queue_free()
+	await get_tree().process_frame
+	GameClock.minutes = 8 * 60
+
+
+## A wet, windy, hot day and a high-country storm all draw, and the
+## lightning ends the climb with the result card.
+func test_weather_on_screen() -> void:
+	var peak: RouteData = load("res://data/routes/cathedral_peak.tres")
+	Gear.owned = {"climbing_shoes": 1, "chalk_bag": 1, "harness": 1, "quickdraw": 6, "rope": 1, "cam": 6}
+	Inventory.items.clear()
+	GameClock.paused = true
+	GameClock.minutes = 14 * 60 + 40
+	var game: ClimbMinigame = load("res://scenes/climb/climb_minigame.tscn").instantiate()
+	game.setup(peak, 4)
+	game.state.conditions = WallWeather.CALM.duplicate()
+	game.state.conditions.merge({"storm_hour": 14.5, "lightning": true, "wind": true, "dry_hour": 24.0}, true)
+	add_child(game)
+	await get_tree().process_frame
+	check(game._wall_tex.get_size() == Vector2(ClimbLayout.WALL_W, ClimbLayout.wall_height(game.state.top_row)), "the 32px wall reports the menu-grid size (%s)" % game._wall_tex.get_size())
+	check(game._wall_tex.get_image().get_width() == ClimbLayout.WALL_W * 2, "...and holds twice the pixels")
+	press(game, "interact")
+	check(game.state.is_stormy() and game.state.is_windy() and game._wetness() == 1.0, "a stormy, windy day on the peak")
+	for i in 20:
+		await get_tree().process_frame
+	game.state.minutes += 60
+	var before := Vector3i(game.state.col, game.state.row, game.state.pitch)
+	game.state.interactive = false
+	game.state.move(0 if not game.state.hold_at(1, game.state.col).is_empty() else (-1 if not game.state.hold_at(1, game.state.col - 1).is_empty() else 1))
+	game._after_action(before)
+	check(game.state.status == ClimbState.Status.RETREATED, "the lightning sends you down on the screen")
+	for i in 10:
+		await get_tree().process_frame
+	game._result_delay = 0.0
+	for i in 3:
+		await get_tree().process_frame
+	check(game._phase == ClimbMinigame.Phase.RESULT, "...and the result card comes up")
+	game.queue_free()
+	await get_tree().process_frame
+	# A hot summer afternoon on the Apron, with yesterday's rain still drying.
+	var apron: RouteData = load("res://data/routes/glacier_point_apron.tres")
+	GameClock.minutes = 13 * 60
+	game = load("res://scenes/climb/climb_minigame.tscn").instantiate()
+	game.setup(apron, 4)
+	game.state.conditions = WallWeather.CALM.duplicate()
+	game.state.conditions.merge({"hot": true, "dry_hour": 13.5}, true)
+	add_child(game)
+	await get_tree().process_frame
+	press(game, "interact")
+	check(game.state.is_hot() and game.state.is_wet() and game._wetness() > 0.0 and game._wetness() < 1.0, "a drying, hot face draws")
+	for i in 20:
+		await get_tree().process_frame
 	game.queue_free()
 	await get_tree().process_frame
 	GameClock.minutes = 8 * 60
@@ -159,6 +215,7 @@ func play_route(r: RouteData) -> void:
 	GameClock.minutes = 8 * 60
 	var game: ClimbMinigame = load("res://scenes/climb/climb_minigame.tscn").instantiate()
 	game.setup(r, 2)
+	game.state.conditions = WallWeather.CALM.duplicate()
 	add_child(game)
 	var done := [false, false, 0]
 	game.finished.connect(func(ok, minutes): done[0] = true; done[1] = ok; done[2] = minutes)
