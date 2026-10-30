@@ -250,6 +250,7 @@ func test_indoors() -> void:
 	for node in world.region.find_children("NightLight", "PointLight2D", true, false):
 		stove = node as NightLight
 	check(stove != null, "the store's stove has a real light")
+	check(not (world.get_node("TiltShift") as TiltShift).visible, "no tilt-shift indoors")
 	if not LitSprites.active():
 		check(sun != null and not sun.enabled and not room.visible, "on Low the room stays lit as painted")
 		GameClock.minutes = 12 * 60
@@ -267,6 +268,7 @@ func test_indoors() -> void:
 	await world.go_to_region("curry_village", "store_door")
 	await _frames(3)
 	check(not room.visible and RoomLight.level == 0.0, "back outside, the room's dimming is gone")
+	check((world.get_node("TiltShift") as TiltShift).visible, "outdoors the top and bottom of the view soften (tilt-shift)")
 	set_date(SUMMER, 14, 12)
 
 

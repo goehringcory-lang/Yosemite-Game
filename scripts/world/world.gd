@@ -77,6 +77,10 @@ func _ready() -> void:
 	add_child(SunLight.new())
 	add_child(AirGlow.new())
 	add_child(RoomLight.new())
+	# over the world and the atmosphere pass, under the HUD
+	var tilt := TiltShift.new()
+	add_child(tilt)
+	move_child(tilt, $Atmosphere.get_index() + 1)
 	LitSprites.attach_sprite(player.sprite)
 	# before the save loads, so it gets back which moments were seen
 	add_child(StoryMoments.new())
