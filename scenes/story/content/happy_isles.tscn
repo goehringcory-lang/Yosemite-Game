@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="3_r"]
 [ext_resource type="Resource" path="res://data/routes/snake_dike.tres" id="4_r"]
 [ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="5_r"]
+[ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
 
 [node name="HappyIslesStory" type="Node2D"]
 
@@ -28,3 +29,10 @@ closure = "mist_trail"
 
 [node name="jmt" type="Marker2D" parent="."]
 position = Vector2(1360, 512)
+[node name="HappyIslesRapids" type="Node2D" parent="."]
+position = Vector2(64, 772)
+script = ExtResource("fw_script")
+kind = "rapids"
+size = Vector2(560, 56)
+title = "Happy Isles Rapids"
+flow = Vector2(-1, 0)

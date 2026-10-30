@@ -8,7 +8,7 @@ A climb is a short sequence of decisions: read the wall, choose a line, decide w
 
 ## Play loop
 
-1. **Route card.** A postcard of the view, the pitches (a `*` for each crux point), the gear you need and have, the food you carry and what's worth bringing, night meals for routes with nights, and when storms build. `E` or `Space` starts, `Esc` backs out without spending time. A day climb that would still be going at 2 AM can't be started, and the card says so.
+1. **Route card.** A postcard of the view, the pitches (a `*` for each crux point), the gear you need and have, the food you carry and what's worth bringing, night meals for routes with nights, and the day's weather on the wall (wet rock until when, wind, heat, the storm and the lightning). `E` or `Space` starts, `Esc` backs out without spending time. A day climb that would still be going at 2 AM can't be started, and the card says so.
 2. **Pitch banner.** Each pitch announces its name and a line of beta ("Chalk up before the bulge").
 3. **Read.** Every hold is a jug (drawn big), an edge, or a crimp (small). Rings mark the holds within reach with what each move costs now (shoes, chalk, pump, chimney rhythm, weather and slush included). Jugs, crimps, rests and cruxes are labelled.
 4. **Move.** Up, up-left, up-right. A move costs stamina and six game minutes. Run out and you fall.
@@ -44,7 +44,25 @@ A climb is a short sequence of decisions: read the wall, choose a line, decide w
 | roof | The picture runs sideways under a ceiling, cams all along the crack, the lip is the crux | Separate Reality, the Great Roof |
 | dike | Stay on the dike (cheap); off it it's blank; bolts are 3 moves apart | Snake Dike |
 | knobs | Big holds everywhere, a few cracks | Cathedral Peak |
-| snow, ice | Kicked steps and chipped holds; crevasses with snow bridges; slush after noon (it doesn't stack with the storm after 2:30 PM); no chalk; a fall slides 2 to 3 moves | Lyell Glacier |
+| snow, ice | Kicked steps and chipped holds; crevasses with snow bridges; slush after noon (it doesn't stack with the afternoon storm); no chalk; a fall slides 2 to 3 moves | Lyell Glacier |
+
+## Weather on the wall
+
+`WallWeather.today(route_id)` turns the day's weather (`Weather.today()`, and yesterday's from `Weather.on_day`) into one Dictionary of conditions, which the screen gives `ClimbState.conditions`. Tests and bots climb in `WallWeather.CALM` (dry, still, the old 2:30 PM storm on high-country routes, no lightning), so the tuning above doesn't move with the calendar.
+
+| Weather | When | In the climb |
+|---|---|---|
+| Rain | A rainy day (or snow, melting down the face) | Rain all day: the storm's +1 a move (`STORM_PENALTY`), and wet rock |
+| Wet rock | Rain, a storm, or the morning after rain until the face has had 2.5 hours of sun (`sun` in the profile; a face that never sees it is dry at 3 PM; between 9:30 AM and 4 PM) | Crux green 0.04 narrower (`WET_WINDOW`); slab, dike and knob moves +1 (`WET_FRICTION`, not on top of the storm's); the wall drawn dark with water streaks, and drips |
+| Wind | 30 % of spring and fall days, 15 % in summer, 45 % in winter | From pitch 3 of routes with 4 or more pitches, and on every high-country pitch: crux green 0.03 narrower (`WIND_WINDOW`), the marker gusts (same speed on average), the climber and rope sway |
+| Heat | Summer, noon to 4 PM, while the face is in the sun | +1 a move (`HEAT_PENALTY`); a warm glare and heat rising off the rock |
+| High-country storm | 75 % of summer afternoons, 35 % in spring, 25 % in fall, at 1:30 to 3:30 PM on the half hour | From the storm hour: rain, +1 a move, wet rock, thunder and a warning. An hour later (`LIGHTNING_AFTER`) the lightning sends you down: the climb ends as a retreat, wherever you are |
+
+The route card lists the forecast (`WallWeather.forecast`) beside the pitches, the sign at the foot of a route adds it to the line it reads out, and the guidebook's tick list opens with the day's conditions in the Valley and the high country.
+
+## The 32px finish
+
+The painters in `scripts/climb/art/` draw on the 480 x 270 menu grid. `ClimbHiRes` doubles each picture on its way to the screen (Scale2x, in bands on the worker threads), and the wall gets its granite back at full resolution: dark flecks and light specks per formation (`ClimbHiRes.GRAIN`: El Capitan's salt and pepper, smooth polished slab, Cathedral Peak's weathering crystals, glints in the ice) and, on a wet day, darker rock with water streaks. The textures report their menu-grid size (`ImageTexture.set_size_override`), so layout and drawing code is unchanged while each texel is one screen pixel. The rope, the climber's sway, rain, drips and other small effects are placed on half-pixel steps, which are screen pixels.
 
 ## Boulder problems
 
@@ -84,8 +102,8 @@ With `base = 2 + grade` (grade is the pitch's 1-5 difficulty), a jug costs `base
 
 ## Verification
 
-- `tests/climb_test.tscn`: every route has a profile and authored pitches, every pitch has a line (and one you can protect all the way), a careful bot tops every route and a greedy one does clearly worse on the hard ones, pump and shaking out, each piece of gear does its job, cruxes (the spent rule, crux points and meter speed by grade), weather, nights.
-- `tests/climb_screen_test.tscn` (needs a window): plays every route on the real screen, through crux checks, nights and the result card.
+- `tests/climb_test.tscn`: every route has a profile and authored pitches, every pitch has a line (and one you can protect all the way), a careful bot tops every route and a greedy one does clearly worse on the hard ones, pump and shaking out, each piece of gear does its job, cruxes (the spent rule, crux points and meter speed by grade), weather, wall weather (wet rock, wind, heat, the storm's warning and the lightning, the forecast), nights.
+- `tests/climb_screen_test.tscn` (needs a window): plays every route on the real screen, through crux checks, nights and the result card, and draws a stormy, windy day (the lightning ending the climb) and a hot, drying one.
 - Screenshots: see the README.
 
 ## Not done yet

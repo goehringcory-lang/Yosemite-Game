@@ -48,6 +48,8 @@ func _ready() -> void:
 	test_safe_lines()
 	test_crux()
 	test_weather_and_snow()
+	test_wall_weather()
+	test_wall_forecast()
 	test_nights()
 	test_eating()
 	test_nights_by_the_clock()
@@ -453,6 +455,113 @@ func test_weather_and_snow() -> void:
 	morning.stamina = 1
 	morning.move(_up(morning))
 	check(morning.status == ClimbState.Status.CLIMBING and morning.falls == 1 and "self-arrest" in morning.message, "an ice axe stops a slide on the glacier")
+
+
+## Wall weather (WallWeather): wet rock, wind, heat and the lightning that
+## sends you down in the high country.
+func test_wall_weather() -> void:
+	var slab := route("firefall_slab")
+	var dry := ClimbState.new(slab, 0, 3, kit_for(slab))
+	var wet := ClimbState.new(slab, 0, 3, kit_for(slab))
+	wet.conditions = WallWeather.CALM.duplicate()
+	wet.conditions.dry_hour = 11.0
+	check(wet.is_wet() and not dry.is_wet(), "rock wet from yesterday's rain is wet at 8 AM")
+	var c: int = dry.holds[1].keys()[0]
+	check(wet.move_cost(1, c) == dry.move_cost(1, c) + ClimbState.WET_FRICTION, "wet slab costs more (%d against %d)" % [wet.move_cost(1, c), dry.move_cost(1, c)])
+	check(is_equal_approx(dry.crux_window() - wet.crux_window(), ClimbState.WET_WINDOW), "wet rock narrows the crux meter's green")
+	wet.start_minutes = 12 * 60
+	check(not wet.is_wet() and wet.move_cost(1, c) == dry.move_cost(1, c), "...and it's dry once the sun has been on it")
+	var rain := ClimbState.new(route("nutcracker"), 4, 1, kit_for(route("nutcracker")))
+	rain.conditions = WallWeather.CALM.duplicate()
+	rain.conditions.rain = 0.8
+	rain.conditions.dry_hour = 24.0
+	rain.start_minutes = 15 * 60
+	check(rain.is_stormy() and rain.is_wet() and not rain.is_alpine_storm(), "a rainy day rains on the valley's walls")
+	# Wind blows on the upper pitches of a long route, not on a short one.
+	var nose := route("the_nose")
+	var windy := ClimbState.new(nose, 10, 1, kit_for(nose))
+	windy.conditions = WallWeather.CALM.duplicate()
+	windy.conditions.wind = true
+	check(not windy.is_windy(), "no wind at the foot of the Nose")
+	windy.pitch = ClimbState.WIND_FROM_PITCH
+	windy._start_pitch()
+	var calm := ClimbState.new(nose, 10, 1, kit_for(nose))
+	calm.pitch = ClimbState.WIND_FROM_PITCH
+	calm._start_pitch()
+	check(windy.is_windy() and is_equal_approx(calm.crux_window() - windy.crux_window(), ClimbState.WIND_WINDOW), "wind up high narrows the green")
+	var swan := ClimbState.new(route("swan_slab"), 0, 1, kit_for(route("swan_slab")))
+	swan.conditions = windy.conditions.duplicate()
+	check(not swan.is_windy(), "a one-pitch climb is out of the wind")
+	# Heat: the midday sun on a sunny face, in summer.
+	var hot := ClimbState.new(nose, 10, 1, kit_for(nose))
+	hot.conditions = WallWeather.CALM.duplicate()
+	hot.conditions.hot = true
+	hot.start_minutes = 13 * 60
+	var cool := ClimbState.new(nose, 10, 1, kit_for(nose))
+	cool.start_minutes = 13 * 60
+	var hc: int = hot.holds[1].keys()[0]
+	check(hot.is_hot() and hot.move_cost(1, hc) == cool.move_cost(1, hc) + ClimbState.HEAT_PENALTY, "El Cap in the summer sun at 1 PM costs more each move")
+	hot.start_minutes = 9 * 60
+	check(not hot.is_hot(), "...but not in the cool of the morning")
+	var shady := ClimbState.new(route("steck_salathe"), 4, 1, kit_for(route("steck_salathe")))
+	shady.conditions = hot.conditions.duplicate()
+	shady.start_minutes = 13 * 60
+	check(not shady.is_hot(), "Sentinel's north face never sees the sun")
+	# The high-country storm: a warning, then the lightning sends you down.
+	var peak := route("cathedral_peak")
+	var calm_peak := ClimbState.new(peak, 4, 1, kit_for(peak))
+	calm_peak.start_minutes = 16 * 60
+	calm_peak.move(_up(calm_peak))
+	check(calm_peak.status == ClimbState.Status.CLIMBING, "in calm conditions the lightning never sends you down")
+	var stormy := ClimbState.new(peak, 4, 1, kit_for(peak))
+	stormy.conditions = WallWeather.CALM.duplicate()
+	stormy.conditions.storm_hour = 14.0
+	stormy.conditions.lightning = true
+	stormy.start_minutes = 14 * 60 + 10
+	stormy.take_events()
+	stormy.move(_up(stormy))
+	var types := stormy.take_events().map(func(e): return e.type)
+	check(stormy.status == ClimbState.Status.CLIMBING and "storm" in types and "Thunder" in stormy.message, "thunder warns you when the storm builds (%s)" % stormy.message)
+	stormy.minutes += 60
+	stormy.move(_up(stormy))
+	types = stormy.take_events().map(func(e): return e.type)
+	check(stormy.status == ClimbState.Status.RETREATED and "lightning" in types, "an hour later the lightning sends you down")
+	check(not stormy.is_wet() or stormy.is_stormy(), "the storm wets the rock")
+
+
+## The day's conditions come from the date and the route's place, and the
+## route card's forecast says what they'll do.
+func test_wall_forecast() -> void:
+	var a := WallWeather.on_day("the_nose", 1, GameClock.Season.SPRING, 5)
+	check(a == WallWeather.on_day("the_nose", 1, GameClock.Season.SPRING, 5), "a day's wall weather is the same every time")
+	var rain_day := -1
+	for d in range(1, GameClock.DAYS_PER_SEASON):
+		if Weather.on_day(1, GameClock.Season.SPRING, d).rain > 0.0 and Weather.on_day(1, GameClock.Season.SPRING, d + 1).rain <= 0.0:
+			rain_day = d
+			break
+	check(rain_day > 0, "spring has a rainy day followed by a dry one")
+	if rain_day > 0:
+		var soaked := WallWeather.on_day("the_nose", 1, GameClock.Season.SPRING, rain_day)
+		var after := WallWeather.on_day("the_nose", 1, GameClock.Season.SPRING, rain_day + 1)
+		var shade := WallWeather.on_day("steck_salathe", 1, GameClock.Season.SPRING, rain_day + 1)
+		check(soaked.dry_hour >= 24.0 and soaked.rain > 0.0, "it rains on the wall on a rainy day")
+		check(after.dry_hour >= WallWeather.DRY_EARLIEST and after.dry_hour < shade.dry_hour, "the next morning the sunny face dries first (%.1f, the shady one %.1f)" % [after.dry_hour, shade.dry_hour])
+		check(WallWeather.forecast(route("the_nose"), after)[0][0].begins_with("Wet rock until"), "the forecast says when it dries")
+	var storms := 0
+	var valley_storms := 0
+	for d in range(1, GameClock.DAYS_PER_SEASON + 1):
+		if WallWeather.on_day("cathedral_peak", 1, GameClock.Season.SUMMER, d).storm_hour >= 0.0:
+			storms += 1
+		if WallWeather.on_day("the_nose", 1, GameClock.Season.SUMMER, d).storm_hour >= 0.0:
+			valley_storms += 1
+	check(storms >= 14 and storms < GameClock.DAYS_PER_SEASON and valley_storms == 0, "most summer afternoons storm in the high country, never in the Valley (%d of %d)" % [storms, GameClock.DAYS_PER_SEASON])
+	var peak := WallWeather.CALM.duplicate()
+	peak.storm_hour = 14.0
+	peak.lightning = true
+	var lines := WallWeather.forecast(route("cathedral_peak"), peak).map(func(l): return l[0])
+	check("Storms after 2 PM" in lines and "Lightning by 3 PM: go down" in lines, "the high-country forecast names the storm and the lightning (%s)" % ", ".join(lines))
+	check(WallWeather.forecast(route("swan_slab"), WallWeather.CALM)[0][0] == "Dry rock, light winds", "a calm day in the Valley says so")
+	check(WallWeather.guidebook_lines().size() == 2, "the guidebook has today's conditions")
 
 
 func test_nights() -> void:

@@ -1,8 +1,9 @@
 class_name ClimbFx
 extends RefCounted
 ## Little effects for the climbing screen: chalk puffs, rock dust, sparks off
-## steel, sweat drops, falling leaves and snow, rain. Particles are tiny
-## squares or short streaks, spawned in screen space and drawn on top.
+## steel, sweat drops, falling leaves and snow, rain, drips, blown grit.
+## Particles are tiny squares or short streaks, spawned in screen space and
+## drawn on top.
 
 class Bit:
 	var pos: Vector2
@@ -79,12 +80,16 @@ func update(delta: float) -> void:
 		i -= 1
 
 
+## Bits sit on the screen's own pixels (half a menu pixel): rain is a one
+## pixel streak, and size 0 is a single screen pixel (drips, grit, heat).
 func draw(ci: CanvasItem) -> void:
 	for b in bits:
 		var a := clampf(b.life / b.max_life, 0.0, 1.0)
 		var col := Color(b.color, b.color.a * minf(a * 2.0, 1.0))
-		var p := b.pos.round()
+		var p := (b.pos * 2.0).round() / 2.0
 		if b.streak:
-			ci.draw_rect(Rect2(p, Vector2(1, 3)), col)
+			ci.draw_rect(Rect2(p, Vector2(0.5, 3.5)), col)
+		elif b.size <= 0:
+			ci.draw_rect(Rect2(p, Vector2(0.5, 0.5)), col)
 		else:
 			ci.draw_rect(Rect2(p, Vector2(b.size, b.size)), col)

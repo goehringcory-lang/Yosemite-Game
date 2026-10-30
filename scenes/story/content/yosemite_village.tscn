@@ -18,6 +18,7 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_postmaster.tres" id="tt_visitor_postmaster"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_baker.tres" id="tt_visitor_baker"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_photographer.tres" id="tt_visitor_photographer"]
+[ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
 
 [node name="YosemiteVillageStory" type="Node2D"]
 
@@ -110,3 +111,10 @@ timetable = PackedStringArray("7:00 east_road", "7:20 degnans_bakery", "11:30 vi
 character = ExtResource("tt_visitor_photographer")
 wander_radius = 64
 timetable = PackedStringArray("7:00 valley_lodge", "7:30 cooks_meadow", "9:30 lower_yosemite_fall", "12:00 degnans_bakery", "13:00 bests_studio", "15:00 yosemite_museum", "17:00 cooks_meadow", "19:00 welcome_center")
+
+[node name="SentinelHole" type="Node2D" parent="."]
+position = Vector2(1158, 1618)
+script = ExtResource("fw_script")
+kind = "hole"
+size = Vector2(340, 140)
+title = "Sentinel Hole"
