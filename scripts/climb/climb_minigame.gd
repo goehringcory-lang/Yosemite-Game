@@ -682,6 +682,7 @@ func _draw_screen() -> void:
 	var shake := Vector2(roundf(sin(_time * 80.0) * _shake * 0.35), roundf(cos(_time * 63.0) * _shake * 0.25))
 	_canvas.draw_set_transform(shake)
 	_canvas.draw_texture(_sky_tex, Vector2.ZERO)
+	NightSky.draw(_canvas, _time, ClimbSky.stars(_pal))
 	_draw_clouds(height)
 	_draw_layers(0.5 if _roof else height)
 	_draw_birds()

@@ -18,6 +18,7 @@ func interact(player: Player) -> void:
 	if not is_inside_tree() or is_queued_for_deletion():
 		return
 	PickupPop.spawn(sprite, player)
+	player.pose("crouch", Player.PICK_TIME)
 	Inventory.add(item.id)
 	if FoodDB.is_food(item.id): # Facelift litter isn't a find
 		Perks.note("forage")

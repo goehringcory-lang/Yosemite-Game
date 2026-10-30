@@ -8,7 +8,10 @@ extends SceneTree
 ##
 ## One row per look (Deer.LOOKS order), facing right: five 40x40 frames of a
 ## grown deer (walking, the other step, grazing, head up and looking at you,
-## bounding), then two 24x40 frames of a spotted fawn walking. A mule deer
+## bounding), then two 24x40 frames of a spotted fawn walking; then three
+## more of the deer (legs passing mid-stride, chewing with an ear flicked
+## back, and the tail flicked up in alarm) and the fawn's passing step. A
+## mule deer
 ## has the big ears it's named for, a white rump patch, a thin white tail
 ## with a black tip, a white throat and a dark brow; a buck's antlers fork,
 ## and fork again. Their coats are reddish in summer and gray in winter.
@@ -35,12 +38,15 @@ var im: Image
 
 
 func _init() -> void:
-	im = Image.create_empty(W * 5 + FAWN_W * 2, H * LOOKS.size(), false, Image.FORMAT_RGBA8)
+	im = Image.create_empty(W * 8 + FAWN_W * 3, H * LOOKS.size(), false, Image.FORMAT_RGBA8)
 	for row in LOOKS.size():
 		for frame in 5:
 			_deer(LOOKS[row], frame, Vector2i(frame * W, row * H))
 		for frame in 2:
 			_fawn(frame, Vector2i(W * 5 + frame * FAWN_W, row * H))
+		for frame in [5, 6, 7]:
+			_deer(LOOKS[row], frame, Vector2i(W * 5 + FAWN_W * 2 + (frame - 5) * W, row * H))
+		_fawn(2, Vector2i(W * 8 + FAWN_W * 2, row * H))
 	im.save_png(OUT)
 	var preview := Image.create_empty(im.get_width(), im.get_height(), false, Image.FORMAT_RGBA8)
 	preview.fill(Color("5a9a3e"))
@@ -103,7 +109,9 @@ func outline(o: Vector2i, size: Vector2i) -> void:
 		im.set_pixel(o.x + p.x, o.y + p.y, OUTLINE)
 
 
-## Frames: 0 and 1 walking, 2 grazing, 3 head up looking at you, 4 bounding.
+## Frames: 0 and 1 walking, 2 grazing, 3 head up looking at you, 4 bounding,
+## 5 legs passing mid-stride, 6 grazing with an ear flicked back (chewing),
+## 7 head up with the tail flicked up.
 func _deer(look: Dictionary, frame: int, o: Vector2i) -> void:
 	var coat := Color(look.coat)
 	var legs := coat.darkened(0.12)
@@ -125,6 +133,11 @@ func _deer(look: Dictionary, frame: int, o: Vector2i) -> void:
 	px(o, int(body.x) - 11, int(body.y) - 2, WHITE)
 	px(o, int(body.x) - 11, int(body.y) - 1, WHITE)
 	px(o, int(body.x) - 11, int(body.y), EYE)
+	if frame == 7:
+		# the tail flagged up, black tip high
+		for i in 4:
+			px(o, int(body.x) - 11 - (1 if i > 1 else 0), int(body.y) - 3 - i, WHITE)
+		px(o, int(body.x) - 12, int(body.y) - 7, EYE)
 	# near legs
 	if frame == 4:
 		leg(o, Vector2(12, body.y + 3), Vector2(15, foot - lift), legs)
@@ -139,6 +152,12 @@ func _deer(look: Dictionary, frame: int, o: Vector2i) -> void:
 			head = Vector2(33.0, foot - 4.0)
 		3:
 			head = Vector2(30.0, foot - 28.0)
+		5:
+			head = Vector2(31.0, foot - 25.0)
+		6:
+			head = Vector2(33.5, foot - 4.5)
+		7:
+			head = Vector2(30.5, foot - 28.0)
 	var neck_base := Vector2(body.x + 7.0, body.y - 2.0)
 	for i in 5:
 		var t := i / 4.0
@@ -153,9 +172,12 @@ func _deer(look: Dictionary, frame: int, o: Vector2i) -> void:
 	else:
 		blob(o, head.x, head.y, 3.2, 2.5, coat)
 		blob(o, head.x + 3.0, head.y + 0.8, 2.0, 1.6, coat.lightened(0.08))
-		# the big ears, up and back
-		blob(o, head.x - 2.6, head.y - 3.2, 1.6, 2.6, coat)
-		if frame != 2:
+		# the big ears, up and back (one flicked back further, chewing)
+		if frame == 6:
+			blob(o, head.x - 3.6, head.y - 2.4, 2.4, 1.4, coat)
+		else:
+			blob(o, head.x - 2.6, head.y - 3.2, 1.6, 2.6, coat)
+		if frame != 2 and frame != 6:
 			blob(o, head.x - 1.0 + (0.5 if frame == 1 else 0.0), head.y - 3.6, 1.4, 2.4, coat.darkened(0.1))
 			blob(o, head.x - 0.5, head.y + 3.0, 1.4, 1.0, WHITE)
 	if look.buck:
@@ -189,12 +211,13 @@ func _antlers(o: Vector2i, head: Vector2, facing_you: bool) -> void:
 		line(o, fork_b, fork_b + Vector2(side * 2.0 if facing_you else 2.0, 0.0), ANTLER)
 
 
-## A fawn: reddish, white-spotted, all legs and ears.
+## A fawn: reddish, white-spotted, all legs and ears. Frames 0 and 1 are its
+## steps, 2 its legs passing between them.
 func _fawn(frame: int, o: Vector2i) -> void:
 	var size := Vector2i(FAWN_W, H)
 	var coat := Color("b0703e")
 	var foot := H - 2
-	var s := 1 if frame == 0 else -1
+	var s: int = [1, -1, 0][frame]
 	var body := Vector2(10.0, foot - 10.0)
 	leg(o, Vector2(6, body.y + 2), Vector2(6 - s, foot), coat.darkened(0.3), size)
 	leg(o, Vector2(14, body.y + 2), Vector2(14 + s, foot), coat.darkened(0.3), size)

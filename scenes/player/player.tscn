@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1_dovo2"]
-[ext_resource type="SpriteFrames" path="res://assets/sprites/player_frames.tres" id="2_gmlin"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player.png" id="2_gmlin"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lvxji"]
 size = Vector2(20, 12)
@@ -14,10 +14,11 @@ collision_layer = 2
 motion_mode = 1
 script = ExtResource("1_dovo2")
 
-[node name="Sprite" type="AnimatedSprite2D" parent="." unique_id=1727705912]
-sprite_frames = ExtResource("2_gmlin")
-animation = &"idle_down"
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1727705912]
+texture = ExtResource("2_gmlin")
 offset = Vector2(0, -22)
+hframes = 13
+vframes = 4
 
 [node name="Collision" type="CollisionShape2D" parent="." unique_id=1789725718]
 position = Vector2(0, -6)

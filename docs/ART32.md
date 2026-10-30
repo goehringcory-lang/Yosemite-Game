@@ -80,6 +80,11 @@ warm in the light like the rest of the 32px art (`walls32/ramps.py`).
   weathering crystals, glints) and wet rock painted at full resolution, with
   the rope, rain and small effects drawn on screen pixels. The sky and the
   night scene are still drawn at the old density.
+- People's sheets have more columns than their 16px originals (a column per
+  pose, see `CharacterSheet`), so `build.py characters` alone would cut them
+  back to three: redraw them with `tools/npcgen/npcgen.gd`, then
+  `upgrade.py --fresh` on the sheets and `keep_old_columns.py` to keep the
+  standing and walking frames exactly as they were.
 - The pixel-art generators under `tools/` (npcgen, hubs, mapgen, plants, ui)
   still draw at the old 16px scale. Their output goes through `build.py`'s
   passes, not straight into the game.

@@ -37,6 +37,8 @@ var _falls: Array[AnimatedSprite2D] = []
 var _mists: Array[AnimatedSprite2D] = []
 var _mist_alpha: Array[float] = []
 var _spray: Array[AmbientFx] = []
+## The droplets and rainbow beside each spray (FallSpray).
+var _bows: Array[FallSpray] = []
 var _key := ""
 var _dry_area := {}
 var _ground: ShaderMaterial
@@ -67,6 +69,14 @@ func _ready() -> void:
 	for node in region.find_children("*", "CPUParticles2D", true, false):
 		if node is AmbientFx and (node as AmbientFx).effect == "mist":
 			_spray.append(node)
+	for spray in _spray:
+		var bow := FallSpray.new()
+		bow.name = "FallSpray"
+		bow.area = spray.area
+		bow.kind = kind
+		bow.position = spray.position
+		spray.add_sibling.call_deferred(bow)
+		_bows.append(bow)
 	apply()
 
 
@@ -100,6 +110,10 @@ func apply() -> void:
 				# Heard in proportion to the water coming down.
 				(child as SoundEmitter).flow_kind = kind
 				(child as SoundEmitter)._refresh_level()
+	for bow in _bows:
+		bow.flow = flow
+		bow.visible = not dry
+		bow.apply()
 	if _ground:
 		_ground.set_shader_parameter("dry_amount", 1.0 - clampf(flow / float(_dry_area["from"]), 0.0, 1.0))
 

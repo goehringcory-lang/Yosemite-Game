@@ -10,7 +10,9 @@ extends SceneTree
 ## One row per coat (Bears.COATS order), facing right: four 40x28 frames of a
 ## grown bear (walking, the other step, nose down at the ground, head up and
 ## looking round at you), then two 24x18 frames of a cub walking, set at the
-## foot of a 24x28 cell. A black bear has no shoulder hump (a grizzly does),
+## foot of a 24x28 cell; then two more of the bear (its legs passing under
+## it mid-stride, and its nose shoved along the ground, rooting) and the
+## cub's passing step. A black bear has no shoulder hump (a grizzly does),
 ## its rump stands a little higher than its shoulders, its ears are big and
 ## round, and its muzzle is tan whatever color the rest of it is.
 
@@ -36,12 +38,15 @@ var im: Image
 
 
 func _init() -> void:
-	im = Image.create_empty(W * 4 + CUB.x * 2, H * COATS.size(), false, Image.FORMAT_RGBA8)
+	im = Image.create_empty(W * 6 + CUB.x * 3, H * COATS.size(), false, Image.FORMAT_RGBA8)
 	for row in COATS.size():
 		for frame in 4:
 			_bear(COATS[row], frame, Vector2i(frame * W, row * H))
 		for frame in 2:
 			_cub(COATS[row], frame, Vector2i(W * 4 + frame * CUB.x, row * H + H - CUB.y))
+		for frame in [4, 5]:
+			_bear(COATS[row], frame, Vector2i(W * 4 + CUB.x * 2 + (frame - 4) * W, row * H))
+		_cub(COATS[row], 2, Vector2i(W * 6 + CUB.x * 2, row * H + H - CUB.y))
 	im.save_png(OUT)
 	var preview := Image.create_empty(im.get_width(), im.get_height(), false, Image.FORMAT_RGBA8)
 	preview.fill(Color("5a9a3e"))
@@ -100,7 +105,8 @@ func outline(o: Vector2i, size: Vector2i) -> void:
 		im.set_pixel(o.x + p.x, o.y + p.y, OUTLINE)
 
 
-## Frame 0 and 1 walking, 2 nose down, 3 head up and turned to look at you.
+## Frame 0 and 1 walking, 2 nose down, 3 head up and turned to look at you,
+## 4 the legs passing mid-stride, 5 rooting (nose down, shoved forward).
 func _bear(look: Dictionary, frame: int, o: Vector2i) -> void:
 	var coat := Color(look.coat)
 	var legs := Color(look.legs)
@@ -128,6 +134,10 @@ func _bear(look: Dictionary, frame: int, o: Vector2i) -> void:
 			head = Vector2(34.5, 20.0)
 		3:
 			head = Vector2(33.0, 11.0)
+		4:
+			head = Vector2(34.5, 13.0)
+		5:
+			head = Vector2(35.0, 19.0)
 	blob(o, head.x - 1.0, head.y, 4.6, 4.3, coat)
 	# a darker ruff of fur where the head meets the shoulders
 	if frame != 3:
@@ -160,12 +170,13 @@ func _bear(look: Dictionary, frame: int, o: Vector2i) -> void:
 	px(o, 31 - stride, foot, CLAW)
 
 
-## A cub: round, big-eared, all head and fluff. Frames 0 and 1 are its steps.
+## A cub: round, big-eared, all head and fluff. Frames 0 and 1 are its steps,
+## 2 its legs passing between them.
 func _cub(look: Dictionary, frame: int, o: Vector2i) -> void:
 	var coat := Color(look.coat)
 	var legs := Color(look.legs)
 	var foot := CUB.y - 2
-	var stride := 1 if frame == 0 else -1
+	var stride: int = [1, -1, 0][frame]
 	leg(o, 6 - stride, 10, foot, 3, legs.darkened(0.2), CUB)
 	leg(o, 15 + stride, 10, foot, 3, legs.darkened(0.2), CUB)
 	blob(o, 10.0, 9.0, 7.0, 4.8, coat, CUB)

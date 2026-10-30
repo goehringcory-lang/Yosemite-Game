@@ -68,12 +68,9 @@ static func sky(pal: Dictionary) -> Image:
 	for x in range(0, SCREEN.x, 4):
 		im.blit_rect(strip, Rect2i(0, 0, 4, SCREEN.y), Vector2i(x, 0))
 	var hour: float = pal.hour
+	# The Milky Way and the stars come out as the light goes (NightSky).
+	NightSky.paint(im, stars(pal))
 	if pal.night:
-		var rng := RandomNumberGenerator.new()
-		rng.seed = 77
-		for i in 90:
-			var p := Vector2i(rng.randi_range(0, SCREEN.x - 1), rng.randi_range(0, 150))
-			im.set_pixelv(p, Color(1, 1, 0.95, rng.randf_range(0.4, 1.0)))
 		_disc(im, Vector2i(410, 46), 7, Color("d6f1ee"), Color("bdb8ae"))
 	else:
 		# The sun climbs out of the east in the morning and drops west at night.
@@ -82,6 +79,12 @@ static func sky(pal: Dictionary) -> Image:
 		_glow(im, sun, 26, pal.sun)
 		_disc(im, sun, 6, pal.sun, (pal.sun as Color).darkened(0.08))
 	return im
+
+
+## How much of the night sky shows for [param pal]: none by day, the first
+## stars at dusk, all of it at full dark.
+static func stars(pal: Dictionary) -> float:
+	return clampf((ClimbProps.night_amount(pal) - 0.35) / 0.6, 0.0, 1.0)
 
 
 static func _sky_at(pal: Dictionary, t: float) -> Color:

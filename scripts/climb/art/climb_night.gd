@@ -77,33 +77,11 @@ static func _sky(ci: CanvasItem, time: float) -> void:
 				if n < 0.5:
 					q = c.darkened(0.04)
 				im.set_pixel(x, y, q)
+		NightSky.paint(im, 1.0, 230, 91)
 		_sky_tex = ImageTexture.create_from_image(im)
 	ci.draw_texture(_sky_tex, Vector2.ZERO)
-	# The Milky Way: a faint pale band across the sky.
-	for i in 40:
-		var t := i / 39.0
-		var px := 60.0 + t * 360.0
-		var py := 120.0 - t * 90.0 + sin(t * 6.0) * 6.0
-		ci.draw_circle(Vector2(px, py), 22.0, Color(0.388, 0.702, 0.776, 0.012))
-	# Stars, twinkling, a few brighter ones with a cross.
-	for i in 130:
-		var x := floorf(P.noise(i, 1, 4) * 480.0)
-		var y := floorf(P.noise(i, 2, 4) * 160.0)
-		var tw := 0.5 + 0.5 * sin(time * (0.8 + P.noise(i, 3, 4) * 3.0) + i)
-		var warm := P.noise(i, 4, 4)
-		var col := Color(0.961, 0.933, 0.878) if warm < 0.6 else (Color(0.839, 0.741, 0.533) if warm < 0.8 else Color(0.839, 0.945, 0.933))
-		col.a = 0.3 + 0.7 * tw
-		ci.draw_rect(Rect2(x, y, 1, 1), col)
-		if i % 13 == 0:
-			var a := col.a * 0.55
-			ci.draw_rect(Rect2(x - 1, y, 3, 1), Color(col.r, col.g, col.b, a))
-			ci.draw_rect(Rect2(x, y - 1, 1, 3), Color(col.r, col.g, col.b, a))
-	# A shooting star now and then.
-	var ph := fposmod(time, 11.0)
-	if ph < 0.7:
-		var p := ph / 0.7
-		var from := Vector2(380, 18) + Vector2(-70, 30) * p
-		ci.draw_line(from, from + Vector2(14, -6), Color(1, 1, 0.9, 0.8 * (1.0 - p)), 1.0)
+	# Twinkling stars and the odd shooting star over the painted Milky Way.
+	NightSky.draw(ci, time, 1.0, 200, 91)
 	# The moon, with a soft halo and a few craters.
 	var mc := Vector2(398, 44)
 	for i in 4:

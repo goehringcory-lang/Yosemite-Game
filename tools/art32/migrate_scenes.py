@@ -21,7 +21,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SCENE_GLOBS = [
     "scenes/regions/*.tscn", "scenes/regions/generated/*.tscn", "scenes/objects/*.tscn",
     "scenes/story/*.tscn", "scenes/story/content/*.tscn", "scenes/player/*.tscn",
-    "scenes/world/*.tscn", "assets/sprites/player_frames.tres",
+    "scenes/world/*.tscn",
 ]
 # Data resources that hold atlas regions of sheets that were doubled.
 DATA_GLOBS = ["data/**/*.tres"]

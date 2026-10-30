@@ -73,6 +73,7 @@ func _ready() -> void:
 	add_child(Rustle.new())
 	add_child(StringLights.new())
 	player.add_child(Lantern.new())
+	add_child(WaterSurface.new())
 	# before the save loads, so it gets back which moments were seen
 	add_child(StoryMoments.new())
 	var saved := SaveManager.peek_node(name)
@@ -297,6 +298,9 @@ func sleep(passed_out := false, camp_spawn := "") -> void:
 	_busy = true
 	_curfew_pending = false
 	_set_paused(true)
+	# Down you go, eyes shut, as the screen goes dark.
+	player.lie_down(true)
+	Emote.pop(player, "sleep")
 	await hud.fade_to_black()
 	await show_day_summary()
 
@@ -319,6 +323,7 @@ func sleep(passed_out := false, camp_spawn := "") -> void:
 	if plants:
 		await plants.refresh()
 	player.global_position = region.get_spawn(wake_spawn).global_position
+	player.lie_down(false)
 	player.facing = Vector2i.DOWN
 	player.interaction_area.position = Vector2(player.facing) * 24.0
 	await _unstick_player()
@@ -326,6 +331,7 @@ func sleep(passed_out := false, camp_spawn := "") -> void:
 	SaveManager.save_game()
 
 	await hud.fade_from_black()
+	player.pose("arms_up", 1.0) # a morning stretch
 	var message := "Good morning! Your game was saved."
 	if night_out != "":
 		message = "Good morning in %s! Your game was saved.\n%s" % [region.display_name, night_out]
