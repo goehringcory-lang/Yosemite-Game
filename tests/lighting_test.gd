@@ -218,7 +218,7 @@ func test_lit_sprites() -> void:
 	check(halos == 0, "the real glow takes over from the halo sprites (%d still shown)" % halos)
 	set_date(SUMMER, 14, 12)
 	await _frames(2)
-	check(not glow.environment.glow_enabled, "nothing glows by day")
+	check(glow.environment == null, "nothing glows by day, and the 2D picture skips the 3D pipeline")
 
 
 ## Every region under the sky is lit like Curry Village.

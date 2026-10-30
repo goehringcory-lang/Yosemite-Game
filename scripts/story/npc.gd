@@ -148,6 +148,8 @@ func _ready() -> void:
 	var feet := Footfall.new()
 	feet.quiet = true
 	add_child(feet)
+	# drawn gliding between physics ticks, like the player
+	add_child(SmoothMotion.new())
 	if character and character.sprite_sheet:
 		_sprite = Sprite2D.new()
 		CharacterSheet.setup(_sprite, character.sprite_sheet)
