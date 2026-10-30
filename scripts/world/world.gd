@@ -95,6 +95,7 @@ func _ready() -> void:
 		BoardRequests.start_new_game()
 		FieldLog.start_new_game()
 		Festivals.start_new_game()
+		Stewardship.start_new_game()
 		if forage:
 			forage.respawn()
 	hud.bind_player(player)

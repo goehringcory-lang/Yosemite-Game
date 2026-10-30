@@ -113,6 +113,17 @@ const PAGES: Array[Dictionary] = [
 		"text": "From the Diving Board, a red filter, and the sky gone black behind the face. The first time a picture looked the way it felt."},
 	{"quest": "lost_guardian", "by": "The lost Guardian",
 		"text": "The last sheet from the press. Where the plant should be, a looking-glass."},
+	# The Guardian's Year: a page a season, and the player's own at the end.
+	{"quest": "anderson_mist_steps", "by": "George Anderson",
+		"text": "Spring: four granite steps at the foot of the Mist Trail, set again after the snowmelt. A trail is made of steps, and so is a day's work."},
+	{"quest": "enid_cooks_meadow", "by": "Enid Michael",
+		"text": "Summer: blackberry, thistle and velvet grass pulled from Cook's Meadow, and three shortcuts roped off. A meadow heals if you let it."},
+	{"quest": "clark_grove_fire", "by": "Galen Clark",
+		"text": "Fall: a slow fire through the Mariposa Grove, the first one I didn't put out. In 1857 I wrote that few young trees come up. Now I know why."},
+	{"quest": "hodges_bear_boxes", "by": "Clare Marie Hodges",
+		"text": "Winter: steel lockers at Camp 4, Curry Village, Upper Pines and Housekeeping Camp. Store it or lose it, and the bear loses more."},
+	{"quest": "clark_guardian_year", "by": "The Guardian (you)",
+		"text": "A year of it. None of it stays done, and none of it was mine alone."},
 ]
 
 
@@ -160,6 +171,11 @@ const HISTORY := {
 	"clark_grove_sprigs": "Documented: Galen Clark chose his own grave in the Yosemite Valley cemetery and planted giant sequoia seedlings around it, years before he died in 1910. Dramatized: the tin box under the Royal Arches.",
 	"muir_cassiope": "Documented: Muir wrote of hunting for Cassiope, the white mountain heather, in his first Sierra summer (1869), and of meeting it in bloom on a later trip into the high country. Dramatized: the errand, and his words here.",
 	"lost_guardian": "Invented for the game: there was no missing Guardian, no cave, and no mirror, and the sightings people pass on are the game's. Documented: the Guardian's office ended in 1906, and this valley has been looked after by a great many people before, during, and since, the seven traditionally associated tribes first among them.",
+	"anderson_mist_steps": "Documented: the Civilian Conservation Corps ran camps in Yosemite from 1933 to 1942, and its crews built and rebuilt many of the park's trails, bridges and campgrounds. Trail crews still set the Mist Trail's granite steps by hand with rock bars, and high water and rockfall still wash sections out. Dramatized: George Anderson, who died in 1884, on the crew, and these four steps.",
+	"enid_cooks_meadow": "Documented: Himalayan blackberry, bull thistle and velvet grass are among the non-native plants that the park's crews and volunteers pull from Yosemite Valley's meadows, and boardwalks and fences in Cook's Meadow keep walkers off the wet ground so trampled paths can grow back. Dramatized: Enid Michael directing the work, which came long after her time.",
+	"clark_grove_fire": "Documented: giant sequoias need fire. Its heat opens their cones and a burn clears the litter down to the bare mineral soil their seedlings need, which studies in the 1960s showed, and the Park Service has set prescribed fires in the Mariposa Grove since the early 1970s. For most of Clark's life fires were put out wherever they could be. Dramatized: Clark at a burn. The people who lived here burned these woods and meadows long before the park; how the game tells that history waits on tribal review.",
+	"hodges_bear_boxes": "Documented: Yosemite's black bears den in winter but can wake and forage on warm days. Steel food lockers now stand at campsites across the park, and after the park's bear program took hold, bear incidents fell sharply from their peak in the late 1990s. Dramatized: Hodges, a ranger in 1918, putting them in.",
+	"clark_guardian_year": "Invented for the game: the Guardian's Year. Documented: trail crews, restoration crews, fire crews and wildlife staff do this work in Yosemite every year, with volunteers and partners, the traditionally associated tribes among them.",
 }
 
 

@@ -36,6 +36,7 @@ Herbarium="*res://scripts/story/herbarium.gd"
 BoardRequests="*res://scripts/story/board_requests.gd"
 FieldLog="*res://scripts/story/field_log.gd"
 Festivals="*res://scripts/story/festivals.gd"
+Stewardship="*res://scripts/story/stewardship.gd"
 Sound="*res://scripts/autoload/sound.gd"
 
 [display]

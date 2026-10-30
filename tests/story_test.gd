@@ -296,8 +296,9 @@ func test_register_notes() -> void:
 func test_story_beats() -> void:
 	for character: CharacterData in QuestLog.CHARACTERS + QuestLog.STAFF:
 		for beat: Dictionary in character.story_beats:
-			check(QuestLog.get_quest(beat.after) != null and QuestLog.get_quest(beat.after).main_line and not beat.lines.is_empty(),
-				"%s's beat after %s follows a main-line quest" % [character.id, beat.after])
+			var after := QuestLog.get_quest(beat.after)
+			check(after != null and (after.main_line or after.guardian_line) and not beat.lines.is_empty(),
+				"%s's beat after %s follows a main-line or Guardian's Year quest" % [character.id, beat.after])
 		check(not (character.needs_tribal_review and not character.story_beats.is_empty()), "%s has no unreviewed story beats" % character.id)
 	new_game()
 	var clark := QuestLog.get_character("galen_clark")

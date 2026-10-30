@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "clark_grove_fire"
+title = "Fire in the Big Trees"
+guardian_line = true
+giver = "galen_clark"
+requires = PackedStringArray("lost_guardian")
+offered_in = 4
+intro = PackedStringArray("I counted the big trees in 1857, and I wrote that few young ones came up. I never could say why.", "The rangers can. A sequoia needs fire: the heat opens its cones, and the burn takes the litter down to the bare earth its seeds want. I spent years putting fires out in that grove. Other people here knew better, long before I came.", "There's to be a slow burn in the grove this fall. Go down to Wawona and clear the dead stuff back from round the Grizzly Giant, so the fire stays low. Then light it, when the crew calls it.")
+steps = [{"type": "work", "task": "grove_fuel", "count": 4, "objective": "Clear the fuel from round 4 sequoias by the Grizzly Giant (Mariposa Grove, Wawona)", "reminder": "Take the Wawona Road south to the grove. Rake the branches and the deep litter back from the trunks, so the fire creeps instead of climbs.", "done": ["Cleared. A low fire, then, not one in the crowns. The trees can stand a low one. They've stood a thousand."]}, {"type": "work", "task": "grove_burn", "count": 1, "objective": "Light the burn below the Grizzly Giant with the drip torch", "reminder": "The drip torch is ready below the Grizzly Giant. Walk it slowly along the line.", "done": ["You lit it? And the old trees stood in it like men wading a creek. I'd have given a good deal to see that when I was young."]}]
+outro = PackedStringArray("Now we wait, which I'm good at. Go back to the grove in the spring and look in the ash.", "If there are seedlings, you'll have answered the oldest question in my book. Take these for the road.")
+reward_items = {"dried_apples": 2, "pilot_bread": 1}
