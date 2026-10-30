@@ -4,7 +4,8 @@ extends RefCounted
 ## pixel scale (a person is about 40 px tall, like the farmers in the games
 ## this art takes after): warm colors, a dark brown outline, light from the
 ## upper left. Figures are posed with two-bone limbs, so any hand or foot
-## target gives a clean pose; frames are cached by pose.
+## target gives a clean pose; frames are cached by pose, and doubled to the
+## screen's 32px finish by ClimbHiRes.
 ##
 ## The climber shows what you own: red climbing shoes, a chalk bag, a harness
 ## with a rack of cams (colored by size) and quickdraws, a belay device, aiders,
@@ -15,7 +16,8 @@ extends RefCounted
 ## default, "chimney" paints a face-on back-and-feet chimney climber). Use the
 ## factory functions: stance(step), fall_pose(), hang_pose(), cheer_pose(),
 ## chalk_pose(step), protect_pose(step), eat_pose(), rest_pose(), roof_pose(step),
-## chimney_pose(side), stand_pose(). Blend two poses with blend_pose().
+## chimney_pose(side), stand_pose(), style_pose(style, step) (jams and laybacks)
+## and mantle_pose(). Blend two poses with blend_pose().
 ##
 ## BELAYER modes: "belay" (standing, braced, device and rope; frames 0 neutral,
 ## 1 pay out, 2 take in), "look_up" (same, head tipped back to watch the
@@ -67,6 +69,37 @@ static func stance(step: int) -> Dictionary:
 		"fl": Vector2(-7, 22) if a else Vector2(-7, 17),
 		"lean": 0,
 	}
+
+
+## The stance for a pitch's style: hand jams stacked in a crack, a layback
+## up a flake (hands pulling on its edge, feet pushing against the wall
+## beside it), or the plain [method stance] on face climbing.
+static func style_pose(style: String, step: int) -> Dictionary:
+	var a := (step % 2) == 0
+	match style:
+		"crack":
+			return {
+				"hr": Vector2(2, -21) if a else Vector2(1, -10),
+				"hl": Vector2(-1, -10) if a else Vector2(-2, -21),
+				"fr": Vector2(3, 16) if a else Vector2(3, 22),
+				"fl": Vector2(-3, 22) if a else Vector2(-3, 16),
+				"lean": 0,
+			}
+		"flake":
+			return {
+				"hr": Vector2(11, -18) if a else Vector2(11, -9),
+				"hl": Vector2(10, -9) if a else Vector2(10, -19),
+				"fr": Vector2(12, 11) if a else Vector2(9, 15),
+				"fl": Vector2(6, 17) if a else Vector2(10, 10),
+				"lean": -2,
+			}
+	return stance(step)
+
+
+## Pressing out a mantel onto a ledge: both hands down on the lip, a foot
+## coming up.
+static func mantle_pose() -> Dictionary:
+	return {"hr": Vector2(8, -3), "hl": Vector2(-8, -3), "fr": Vector2(6, 9), "fl": Vector2(-5, 22), "lean": 0}
 
 
 ## Standing on a ledge, arms relaxed.
@@ -163,7 +196,7 @@ static func climber(pose: Dictionary, kit: Dictionary, flags := {}) -> Texture2D
 		im = _paint_chimney(pose, kit, flags)
 	else:
 		im = _paint_climber(pose, kit, flags)
-	var tex := ImageTexture.create_from_image(im)
+	var tex := ClimbHiRes.texture(im)
 	_cache[key] = tex
 	return tex
 
@@ -609,7 +642,7 @@ static func belayer(look: Dictionary, mode := "belay", frame := 0) -> Texture2D:
 	if _cache.has(key):
 		return _cache[key]
 	var im := _paint_belayer(look, mode, frame)
-	var tex := ImageTexture.create_from_image(im)
+	var tex := ClimbHiRes.texture(im)
 	_cache[key] = tex
 	return tex
 
@@ -1047,7 +1080,7 @@ static func hardware(kind: String, color_index := 0) -> Texture2D:
 			P.rect(im, 5, 1, 2, 1, STEEL_DARK)
 			P.rect(im, 5, 3, 2, 2, STEEL_DARK)
 	_outline(im)
-	var tex := ImageTexture.create_from_image(im)
+	var tex := ClimbHiRes.texture(im)
 	_cache[key] = tex
 	return tex
 

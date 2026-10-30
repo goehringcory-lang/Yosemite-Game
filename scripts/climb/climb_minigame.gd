@@ -111,6 +111,7 @@ func setup(p_route: RouteData, seed := -1) -> void:
 	_kit = Gear.owned.duplicate()
 	state = ClimbState.new(route, Gear.count("cam"), seed, Gear.owned)
 	state.interactive = true
+	state.conditions = WallWeather.today(route.id)
 
 
 func _ready() -> void:
@@ -403,6 +404,13 @@ func _events() -> void:
 				_result_delay = 1.6
 				_won_line = ClimbProfiles.banter(route, "top")
 				_speak("top")
+			"storm":
+				_lightning = 0.8
+				_next_lightning = randf_range(3.0, 6.0)
+				_shake = 2.0
+			"lightning":
+				_lightning = 1.0
+				_shake = 8.0
 			"retreat":
 				_result_delay = 0.9
 
@@ -464,7 +472,9 @@ func _update_crux(delta: float) -> void:
 		"pumped":
 			pass
 		"timing":
-			_crux.pos += _crux.dir * _crux.speed * delta
+			# In the wind the marker gusts: faster, then slower, the same on average.
+			var gust := 1.0 + (0.35 * sin(_time * 2.3) * sin(_time * 0.9 + 1.0) if state.is_windy() else 0.0)
+			_crux.pos += _crux.dir * _crux.speed * gust * delta
 			if _crux.pos >= 1.0:
 				_crux.pos = 1.0
 				_crux.dir = -1.0
@@ -562,11 +572,11 @@ func _paint_scenery() -> void:
 	WorkerThreadPool.wait_for_task_completion(land_task)
 	_layers.clear()
 	for layer: Dictionary in land.layers:
-		_layers.append({"tex": ImageTexture.create_from_image(layer.image), "sink": layer.sink, "pad": layer.pad})
+		_layers.append({"tex": ClimbHiRes.texture(layer.image), "sink": layer.sink, "pad": layer.pad})
 	_falls = land.falls
 	_clouds.clear()
 	for i in 4:
-		_clouds.append(ImageTexture.create_from_image(ClimbSky.cloud(_pal, seed_value + i)))
+		_clouds.append(ClimbHiRes.texture(ClimbSky.cloud(_pal, seed_value + i)))
 
 
 ## Paints this pitch's wall (or roof) for the current light.
@@ -575,7 +585,7 @@ func _paint_wall(seed_value: int) -> void:
 	_roof = state.style() == "roof"
 	if _roof:
 		_roof_info = ClimbRock.paint_roof(state, rock, _pal, seed_value + state.pitch * 97)
-		_wall_tex = ImageTexture.create_from_image(_roof_info.image)
+		_wall_tex = ClimbHiRes.wall_texture(_roof_info.image, rock, _wetness(), seed_value + state.pitch * 97)
 		_wall_pitch = state.pitch
 		return
 	var wall := ClimbRock.paint(state, rock, _pal, seed_value + state.pitch * 97)
@@ -586,8 +596,19 @@ func _paint_wall(seed_value: int) -> void:
 		ClimbScenes.paint_base(im, profile.get("ground", ""), state, _pal, _wall_edge, seed_value)
 	if state.pitch == route.pitches.size() - 1:
 		ClimbScenes.paint_finish(im, profile.get("finish", ""), state, _pal, _wall_edge, seed_value)
-	_wall_tex = ImageTexture.create_from_image(im)
+	_wall_tex = ClimbHiRes.wall_texture(im, rock, _wetness(), seed_value + state.pitch * 97)
 	_wall_pitch = state.pitch
+
+
+## How wet this pitch's rock looks, 0..1: soaked in the rain, wet after it,
+## and only the streaks left in the last hour before it's dry.
+func _wetness() -> float:
+	if not state.is_wet():
+		return 0.0
+	if state.is_stormy():
+		return 1.0
+	var left := float(state.conditions.get("dry_hour", 0.0)) - state.hour()
+	return clampf(left, 0.0, 1.0)
 
 
 ## Screen position of a (possibly fractional) row and column's hold.
@@ -827,19 +848,27 @@ func _draw_rope() -> void:
 			_coil(points[0] + Vector2(-4, 22))
 
 
+## One span of rope between two points, hanging in a curve that sways (more
+## in the wind). Drawn at screen resolution: a 3 px rope with a dark edge and
+## a lit thread, its sheath flecked every few pixels.
 func _sag(a: Vector2, b: Vector2, amount: float) -> void:
 	var length := a.distance_to(b)
-	var sway := sin(_time * 1.6 + a.y * 0.02) * 1.5
+	var sway := sin(_time * 1.6 + a.y * 0.02) * (4.0 if state.is_windy() else 1.5)
 	var mid := (a + b) / 2.0 + Vector2(length * amount * 0.5 + sway, length * amount * 0.6)
 	var pts := PackedVector2Array()
-	for i in 17:
-		var t := i / 16.0
-		pts.append(a.lerp(mid, t).lerp(mid.lerp(b, t), t).round())
-	_canvas.draw_polyline(pts, ROPE_DARK, 3.0)
-	_canvas.draw_polyline(pts, ROPE, 2.0)
+	var n := clampi(int(length / 3.0), 8, 48)
+	for i in n + 1:
+		var t := i / float(n)
+		pts.append((a.lerp(mid, t).lerp(mid.lerp(b, t), t) * 2.0).round() / 2.0)
+	_canvas.draw_polyline(pts, OUTLINE, 2.0)
+	_canvas.draw_polyline(pts, ROPE, 1.5)
 	# A lit thread and the sheath's pattern.
-	for i in range(0, pts.size(), 2):
-		_canvas.draw_rect(Rect2(pts[i] + Vector2(0, -1), Vector2(1, 1)), ROPE_LIT)
+	var lit := PackedVector2Array()
+	for p in pts:
+		lit.append(p + Vector2(-0.25, -0.5))
+	_canvas.draw_polyline(lit, ROPE_LIT, 0.5)
+	for i in range(1, pts.size(), 3):
+		_canvas.draw_rect(Rect2(pts[i], Vector2(0.5, 0.5)), ROPE_DARK.darkened(0.3))
 
 
 func _coil(p: Vector2) -> void:
@@ -896,8 +925,9 @@ func _draw_climber() -> void:
 	var torso := _torso()
 	if pose.get("mode", "") == "chimney":
 		torso.x = roundf(L.CHIMNEY_X + int(pose.side) * 6.0)
-	var pos := torso - o
-	_canvas.draw_texture(tex, pos.round())
+	var pos := torso - o + Vector2(_wind_sway(), 0)
+	# Half a menu pixel is one screen pixel: the climber sways that finely.
+	_canvas.draw_texture(tex, (pos * 2.0).round() / 2.0)
 	# The haul bag swings below on a big wall.
 	if route.nights > 0 and state.has_haul_bag and _shown.y > 0.5:
 		var hp := torso + Vector2(-14, 46 + sin(_time * 1.3) * 2.0)
@@ -914,13 +944,13 @@ func _draw_climber() -> void:
 ## roof, chimney) from ClimbSprites.
 func _pose() -> Dictionary:
 	var step := _step
-	var a := ClimbSprites.stance(step)
+	var a := ClimbSprites.style_pose(state.style(), step)
 	if _roof:
 		a = ClimbSprites.roof_pose(step)
 	elif state.style() == "chimney":
 		a = ClimbSprites.chimney_pose(-1 if step % 2 == 0 else 1)
 	if _move_t < 1.0:
-		var b: Dictionary = ClimbSprites.stance(step - 1)
+		var b: Dictionary = ClimbSprites.style_pose(state.style(), step - 1)
 		if _roof:
 			b = ClimbSprites.roof_pose(step - 1)
 		elif state.style() == "chimney":
@@ -940,6 +970,9 @@ func _pose() -> Dictionary:
 	elif a.get("mode", "") != "chimney":
 		a["lean"] = float(a.get("lean", 0)) + roundf(sin(_time * 2.0) * 0.6) + (1.0 if state.stamina <= 25 and fmod(_time, 1.2) < 0.15 else 0.0)
 	var mode := _pose_mode
+	# The last move onto a ledge is a mantel.
+	if not _roof and a.get("mode", "") != "chimney" and _move_t < 1.0 and state.row == state.top_row and _pose_mode == "wall":
+		a = ClimbSprites.blend_pose(a, ClimbSprites.mantle_pose(), sin(_move_t * PI))
 	var on_ledge := _shown.y < 0.45 or _shown.y > state.top_row - 0.45
 	if on_ledge and mode == "wall" and state.status == ClimbState.Status.CLIMBING:
 		mode = "stand"
@@ -1093,20 +1126,48 @@ func _cost_color(cost: int) -> Color:
 	return UI.GOOD if cost <= base else (UI.GOLD if cost <= base + 2 else UI.WARN)
 
 
-## Weather and the dark: rain, a gray cast, lightning, a night vignette.
+## How far the wind pushes the climber sideways now, in menu pixels.
+func _wind_sway() -> float:
+	if not state.is_windy() or _phase == Phase.NIGHT:
+		return 0.0
+	return sin(_time * 1.7) * 1.2 + sin(_time * 4.3 + 0.7) * 0.5
+
+
+## Weather and the dark: rain, wind, drips off wet rock, lightning.
 func _weather(delta: float) -> void:
-	if state.is_stormy() and _phase in [Phase.CLIMB, Phase.CRUX]:
+	if _phase not in [Phase.CLIMB, Phase.CRUX]:
+		return
+	var wind := -90.0 if state.is_windy() else -50.0
+	if state.is_stormy():
 		for i in 5:
-			_fx.spawn(Vector2(randf_range(0, SCREEN.x + 60), -4), Vector2(-50, 240), 1.2, Color(0.839, 0.945, 0.933, 0.85), 1, 0.0, true)
+			_fx.spawn(Vector2(randf_range(0, SCREEN.x + 90), -4), Vector2(wind, 240), 1.2, Color(0.839, 0.945, 0.933, 0.85), 1, 0.0, true)
+		# The storm's own lightning: in the high country only once it has
+		# built, and a long way off on a rainy day in the Valley.
 		_next_lightning -= delta
-		if _next_lightning <= 0.0:
-			_lightning = 1.0
+		if _next_lightning <= 0.0 and (state.is_alpine_storm() or randf() < 0.3):
+			_lightning = 1.0 if state.is_alpine_storm() else 0.4
 			_next_lightning = randf_range(5.0, 11.0)
+		elif _next_lightning <= 0.0:
+			_next_lightning = randf_range(5.0, 11.0)
+	elif state.is_wet() and randf() < delta * 6.0:
+		# Water still running off the rock: a drop falls from a ledge or a crack.
+		var x := randf_range(L.GRID_X - 60.0, L.GRID_X + L.WALL_W - 140.0)
+		_fx.spawn(Vector2(x, randf_range(10.0, 160.0)), Vector2(0, 30), 1.0, Color(0.78, 0.86, 0.98, 0.8), 0, 160.0)
+	if state.is_windy() and randf() < delta * 10.0:
+		# Grit and a pine needle or two blown across the face.
+		_fx.spawn(Vector2(SCREEN.x + 4, randf_range(20.0, SCREEN.y - 40.0)), Vector2(randf_range(-260.0, -180.0), randf_range(-12.0, 12.0)),
+			2.4, Color(0.961, 0.933, 0.878, 0.45), 0, 0.0)
+	if state.is_hot() and randf() < delta * 5.0:
+		# Heat coming off the rock.
+		_fx.spawn(Vector2(randf_range(L.GRID_X, L.GRID_X + 200.0), randf_range(120.0, 230.0)), Vector2(0, -14), 1.6, Color(1.0, 0.93, 0.75, 0.35), 0, -4.0)
 
 
 func _draw_atmosphere() -> void:
 	if state.is_stormy():
-		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.082, 0.078, 0.11, 0.36))
+		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.082, 0.078, 0.11, 0.36 if state.is_alpine_storm() else 0.24))
+	elif state.is_hot():
+		# The midday glare off a sunny face.
+		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(1.0, 0.86, 0.55, 0.07))
 	if _lightning > 0.0:
 		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(1, 1, 1, 0.5 * _lightning))
 	if _pal.night:

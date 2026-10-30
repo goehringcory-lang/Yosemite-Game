@@ -73,7 +73,13 @@ warm in the light like the rest of the 32px art (`walls32/ramps.py`).
 
 ## Known limits
 
-- The climbing screen is still painted at 480x270 density (palette-snapped, not redrawn at 32px).
+- The climbing screen's painters still work on the 480x270 grid. Their pictures
+  (the wall, the skyline layers, clouds, the climber, belayers and hardware) are
+  brought to 32px at run time by `scripts/climb/art/climb_hires.gd`: Scale2x
+  like the art32 pass, then each formation's granite grain (flecks, specks,
+  weathering crystals, glints) and wet rock painted at full resolution, with
+  the rope, rain and small effects drawn on screen pixels. The sky and the
+  night scene are still drawn at the old density.
 - The pixel-art generators under `tools/` (npcgen, hubs, mapgen, plants, ui)
   still draw at the old 16px scale. Their output goes through `build.py`'s
   passes, not straight into the game.

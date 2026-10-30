@@ -45,14 +45,22 @@ static func today() -> Dictionary:
 	var key := "weather:%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day]
 	if key == _today_key:
 		return _today
+	_today_key = key
+	_today = on_day(GameClock.year, GameClock.season, GameClock.day)
+	return _today
+
+
+## The weather on any date, worked out the way [method today] does (the
+## climbing screen asks about yesterday: rock stays wet after rain).
+static func on_day(year: int, season: int, day: int) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
-	rng.seed = hash(key)
+	rng.seed = hash("weather:%d:%d:%d" % [year, season, day])
 	var roll := rng.randf()
 	var strength := rng.randf_range(0.45, 1.0)
 	var clouds := rng.randf_range(0.15, 0.6)
 	var snow := 0.0
 	var rain := 0.0
-	match GameClock.season:
+	match season:
 		GameClock.Season.SPRING:
 			if roll < 0.18:
 				rain = strength
@@ -66,9 +74,7 @@ static func today() -> Dictionary:
 				snow = strength
 	if snow > 0.0 or rain > 0.0:
 		clouds = 1.0
-	_today_key = key
-	_today = {"snow": snow, "rain": rain, "clouds": clouds}
-	return _today
+	return {"snow": snow, "rain": rain, "clouds": clouds}
 
 
 func _ready() -> void:

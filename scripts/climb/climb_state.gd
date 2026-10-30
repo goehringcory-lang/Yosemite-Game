@@ -141,6 +141,22 @@ const CHIMNEY_PENALTY := 2
 const STORM_PENALTY := 1
 const STORM_HOUR := 14.5
 const SLUSH_HOUR := 12.0
+## Wall weather (see WallWeather and [member conditions]). Wet rock narrows
+## the crux meter's green and makes friction cost more; wind narrows the green
+## on the upper pitches of long routes; the midday sun on a hot face costs a
+## little more each move; an hour after a high-country storm builds, lightning
+## sends you down.
+const WET_WINDOW := 0.04
+const WET_FRICTION := 1
+const FRICTION_STYLES := ["slab", "dike", "knobs"]
+const WIND_WINDOW := 0.03
+## Wind blows from this pitch (counting from 0) on routes this long.
+const WIND_FROM_PITCH := 2
+const WIND_MIN_PITCHES := 4
+const HEAT_PENALTY := 1
+const HEAT_FROM := 12.0
+const HEAT_TO := 16.0
+const LIGHTNING_AFTER := 1.0
 ## The route card tells you to start high-country routes before this hour.
 const ALPINE_START_BEFORE := 10
 ## For the route card's late-start warning: extra minutes a pitch takes beyond
@@ -226,6 +242,9 @@ var interactive := false
 var pending: Dictionary = {}
 ## The in-game hour the climb started, for weather and snow.
 var start_minutes := 8 * 60
+## The day's weather on the wall (see WallWeather). Tests and bots climb in
+## [constant WallWeather.CALM]; the screen sets today's.
+var conditions: Dictionary = WallWeather.CALM.duplicate()
 ## Things that happened since the screen last looked: {"type": String, ...}.
 var events: Array[Dictionary] = []
 var top_row := 8
@@ -236,6 +255,7 @@ var _rested_rows := {}
 var _shaken_rows := {}
 ## 1 once [method route_has_fixed_pieces] has found some, 0 if none, -1 unasked.
 var _has_fixed := -1
+var _storm_warned := false
 
 
 ## [param seed] makes the wall the same every time (tests use this).
@@ -292,25 +312,64 @@ func is_snow() -> bool:
 	return style() == "snow" or style() == "ice"
 
 
-## When storms build, as the route card says it: "2:30 PM".
-static func storm_time_text() -> String:
-	var h := int(STORM_HOUR)
-	var m := roundi((STORM_HOUR - h) * 60.0)
-	var clock := "%d" % (h % 12 if h % 12 != 0 else 12)
-	if m > 0:
-		clock += ":%02d" % m
-	return "%s %s" % [clock, "AM" if h < 12 else "PM"]
-
-
 ## The in-game hour right now.
 func hour() -> float:
 	return fposmod((start_minutes + minutes) / 60.0, 24.0)
 
 
-## True when it's raining on the high country, or the snow has gone slushy.
+## True when it's raining on you: a rainy day, or a storm over the high
+## country in the afternoon.
 func is_stormy() -> bool:
-	var weather: String = ClimbProfiles.get_profile(route.id).get("weather", "valley")
-	return weather == "alpine" and hour() >= STORM_HOUR and hour() < 20.0
+	return is_raining() or is_alpine_storm()
+
+
+## True on a rainy day.
+func is_raining() -> bool:
+	return float(conditions.get("rain", 0.0)) > 0.0
+
+
+func is_alpine() -> bool:
+	return ClimbProfiles.get_profile(route.id).get("weather", "valley") == "alpine"
+
+
+## True while the afternoon storm is over a high-country route.
+func is_alpine_storm() -> bool:
+	var storm := float(conditions.get("storm_hour", -1.0))
+	return is_alpine() and storm >= 0.0 and hour() >= storm and hour() < 20.0
+
+
+## True once the storm has been building for [constant LIGHTNING_AFTER] hours:
+## lightning, and you go down.
+func lightning_due() -> bool:
+	return conditions.get("lightning", false) and is_alpine_storm() \
+		and hour() >= float(conditions.storm_hour) + LIGHTNING_AFTER
+
+
+## True while the rock is wet: rain, a storm, or yesterday's rain not dried
+## off yet. Snow and ice are their own thing (see slush).
+func is_wet() -> bool:
+	if is_snow():
+		return false
+	return is_stormy() or hour() < float(conditions.get("dry_hour", 0.0))
+
+
+## True when the wind blows on this pitch.
+func is_windy() -> bool:
+	if not conditions.get("wind", false) or route.boulder:
+		return false
+	return is_alpine() or (route.pitches.size() >= WIND_MIN_PITCHES and pitch >= WIND_FROM_PITCH)
+
+
+## True when the face is in the sun now ("sun" in the route's profile).
+func in_sun() -> bool:
+	var sun: Array = ClimbProfiles.get_profile(route.id).get("sun", [10, 16])
+	return sun.size() >= 2 and hour() >= float(sun[0]) and hour() < float(sun[1])
+
+
+## True when the midday sun is on a hot face.
+func is_hot() -> bool:
+	return conditions.get("hot", false) and not is_snow() and not is_stormy() and in_sun() \
+		and hour() >= HEAT_FROM and hour() < HEAT_TO
 
 
 func pitch_name() -> String:
@@ -355,6 +414,10 @@ func move_cost(r: int, c: int) -> int:
 	var warm := boosts.has("warming")
 	if is_stormy() and not warm:
 		cost += STORM_PENALTY
+	elif is_wet() and style() in FRICTION_STYLES:
+		cost += WET_FRICTION
+	if is_hot():
+		cost += HEAT_PENALTY
 	cost += pump_cost()
 	# Slush and storms don't stack: a storm already makes the snow wet.
 	if is_snow() and not is_stormy() and hour() >= SLUSH_HOUR and hour() < 20.0 and not warm:
@@ -572,12 +635,28 @@ func _step(dx: int, cost: int, mins: int, safe := false) -> void:
 	_settle()
 
 
-## After a move: fall, finish the pitch, or carry on.
+## After a move: fall, finish the pitch, or carry on. Then the weather has
+## its say.
 func _settle() -> void:
 	if stamina <= 0:
 		_fall()
 	elif row == top_row:
 		_finish_pitch()
+	_check_storm()
+
+
+## Warns once when a high-country storm builds, and sends you down when the
+## lightning comes.
+func _check_storm() -> void:
+	if status != Status.CLIMBING or not conditions.get("lightning", false):
+		return
+	if lightning_due():
+		events.append({"type": "lightning"})
+		retreat("Lightning hits the ridge, close. You and your partner rappel off in the rain. The summit will wait for a clear morning.")
+	elif is_alpine_storm() and not _storm_warned:
+		_storm_warned = true
+		events.append({"type": "storm"})
+		message = "Thunder over the peaks. The lightning comes in about an hour: top out or get down."
 
 
 ## How wide the green zone of the crux meter is, 0..1 of the bar. The
@@ -598,6 +677,10 @@ func crux_window() -> float:
 	window += CRUX_MERCY_WINDOW * _crux_mercy()
 	window -= PUMP_WINDOW * pump
 	window += float(pending.get("narrow", 0.0))
+	if is_wet():
+		window -= WET_WINDOW
+	if is_windy():
+		window -= WIND_WINDOW
 	return clampf(window, 0.1, 0.5)
 
 
