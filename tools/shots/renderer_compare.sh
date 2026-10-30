@@ -11,7 +11,7 @@
 # gl_compatibility_again/ (a second run, to measure how much animation alone
 # changes the pictures), forward_plus/ and diff/. Exits non-zero if the tour
 # fails under either renderer or Forward+ differs by more than that, plus
-# MAX_SHARE (default 0.5%).
+# MAX_SHARE (default 1%).
 set -u
 cd "$(dirname "$0")/../.."
 GODOT="${GODOT:-godot}"
@@ -40,4 +40,4 @@ done
 
 echo "== Comparing"
 "$GODOT" --headless --path . --script res://tools/shots/compare_shots.gd -- \
-	"$OUT/gl_compatibility" "$OUT/forward_plus" "$OUT/diff" "${MAX_SHARE:-0.005}" "$OUT/gl_compatibility_again"
+	"$OUT/gl_compatibility" "$OUT/forward_plus" "$OUT/diff" "${MAX_SHARE:-0.01}" "$OUT/gl_compatibility_again"

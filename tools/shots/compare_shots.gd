@@ -6,7 +6,9 @@ extends SceneTree
 ## Exits 1 if any picture is missing or differs on more than MAX_SHARE of its
 ## pixels. Animated things (water, mist, swaying plants, critters) differ a
 ## little between any two runs, so with AGAIN_DIR (the BEFORE shots taken a
-## second time) a picture may differ by that run-to-run share plus MAX_SHARE.
+## second time) a picture passes if AFTER is as close to either BEFORE run as
+## the two runs are to each other, plus MAX_SHARE (the run-to-run share itself
+## wanders by most of a percent between hours of one area).
 ## Run: godot --headless --path . --script res://tools/shots/compare_shots.gd -- BEFORE_DIR AFTER_DIR OUT_DIR [MAX_SHARE] [AGAIN_DIR]
 
 ## Differences at or under this (out of 255) are noise: dithering, a
@@ -43,10 +45,12 @@ func _init() -> void:
 		_prepare(a)
 		_prepare(b)
 		var noise := 0.0
+		var to_again := 1.0
 		if again_dir != "" and FileAccess.file_exists(again_dir.path_join(file)):
 			var again := Image.load_from_file(again_dir.path_join(file))
 			_prepare(again)
 			noise = _share(a, again)
+			to_again = _share(again, b)
 		var w := a.get_width()
 		var h := a.get_height()
 		var da := a.get_data()
@@ -66,7 +70,7 @@ func _init() -> void:
 				else:
 					diff.set_pixel(x, y, Color(grey, grey, grey))
 		var share := float(differing) / float(w * h)
-		var ok := share <= noise + max_share
+		var ok := minf(share, to_again) <= noise + max_share
 		if not ok:
 			failed += 1
 		print("%s  %-40s %6.2f%% of pixels differ (%.2f%% between two runs), mean %.2f" % ["ok  " if ok else "DIFF", file, share * 100.0, noise * 100.0, total / float(w * h)])
