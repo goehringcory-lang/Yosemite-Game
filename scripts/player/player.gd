@@ -44,6 +44,7 @@ func _ready() -> void:
 	add_to_group("persist")
 	add_child(Footfall.new())
 	add_child(fishing)
+	add_child(SmoothMotion.new())
 
 
 ## The interactable in front of the player, or null. One with a higher
