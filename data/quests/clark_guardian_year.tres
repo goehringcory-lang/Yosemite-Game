@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "clark_guardian_year"
+title = "The Guardian's Year"
+guardian_line = true
+giver = "galen_clark"
+requires = PackedStringArray("anderson_mist_steps", "enid_cooks_meadow", "clark_grove_fire", "hodges_bear_boxes")
+intro = PackedStringArray("Sit a minute. You've been at it a whole year now.", "Steps on the Mist Trail, a meadow given back, fire in my grove, a box at every camp. Nobody told the Guardian to do any of it. You just went and did it.")
+steps = [{"type": "return", "objective": "Tell Galen Clark how the year went", "reminder": "Tell me about it, then. All of it.", "done": ["Ha. I'd have written half as much and called it a report."]}]
+outro = PackedStringArray("That's the job, Guardian. None of it stays done. The steps wash out, the blackberry comes back, the needles pile up, and next winter somebody leaves a cooler out.", "So you do it again, and you teach somebody else. And when they read the book, tell them to start at the front.")
+reward_items = {"bread_pudding": 2}
+reward_unlocks = PackedStringArray("guardian_year")

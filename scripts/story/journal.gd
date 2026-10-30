@@ -522,6 +522,8 @@ func _quests_page() -> void:
 		_line("Pick up a climbing guidebook at the Mountain Shop in Curry Village.")
 	elif QuestLog.final_entry_pending():
 		_line("The Last Page: talk to Galen Clark and write your entry.")
+	elif QuestLog.is_completed(QuestLog.GUARDIAN_YEAR_QUEST):
+		_line("You found the lost Guardian, and gave the valley a year of work. It's still open.", DIM)
 	elif QuestLog.is_completed(QuestLog.FINALE_QUEST):
 		_line("You found the lost Guardian. The valley is still open.", DIM)
 	elif QuestLog.final_entry >= 0:
@@ -535,8 +537,14 @@ func _quests_page() -> void:
 		_heading("The press book (%d of %d plants)" % [Herbarium.count(), Herbarium.total()])
 		_quest_card(press.quest, press.objective)
 
+	# After the finale, the Guardian's Year: a season's work at a time.
+	var year := QuestLog.guardian_objective()
+	if not year.is_empty():
+		_heading("The Guardian's Year (%d of 4 seasons)" % _seasons_of_work())
+		_quest_card(year.quest, year.objective)
+
 	var shown: Array[QuestData] = []
-	for card: Dictionary in [main, press]:
+	for card: Dictionary in [main, press, year]:
 		if not card.is_empty():
 			shown.append(card.quest)
 	var open: Array[QuestData] = []
@@ -607,6 +615,12 @@ func _note_card(entry: Dictionary) -> void:
 	words.add_child(objective)
 	row.add_child(words)
 	_body.add_child(row)
+
+
+## How many of the Guardian's Year's four seasons of work are done.
+func _seasons_of_work() -> int:
+	return QuestLog.QUESTS.filter(func(q: QuestData) -> bool:
+		return q.guardian_line and q.id != QuestLog.GUARDIAN_YEAR_QUEST and QuestLog.is_completed(q.id)).size()
 
 
 ## A quest as a card: the face of whoever gave it, its title, and what to do

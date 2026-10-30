@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "anderson_mist_steps"
+title = "The Steps Below Vernal Fall"
+guardian_line = true
+giver = "george_anderson"
+requires = PackedStringArray("lost_guardian")
+offered_in = 1
+intro = PackedStringArray("There you are. Guardian now, is it? Good. Then you'll not mind getting your hands dirty.", "The snowmelt came down the Merced like a freight train this spring and took the lowest steps of the Mist Trail with it. Four of them are lying in the mud at the foot of the trail.", "A trail's only as good as the step you're standing on. Here, a rock bar. Get it under the low side, heave the block over, and drop it square on its bed.")
+start_unlocks = PackedStringArray("rock_bar")
+steps = [{"type": "work", "task": "mist_steps", "count": 4, "objective": "Reset the 4 washed-out granite steps at the foot of the Mist Trail (Happy Isles)", "reminder": "The steps are just past the Mist Trail sign, here at Happy Isles. Bar under the low side, and heave when it feels right, not before.", "done": ["Four steps, and not one of them rocks. I stood on every one.", "I drilled my way up the Dome one hole at a time. This is the same job, only lying down."]}]
+outro = PackedStringArray("Thousands of boots on those steps every summer, and not one of them will know your name.", "That's how you know it's done right. Keep the bar. And here, a bite for the walk home.")
+reward_items = {"pilot_bread": 2, "beef_jerky": 1}
