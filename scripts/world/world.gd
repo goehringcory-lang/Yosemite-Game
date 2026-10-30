@@ -72,6 +72,7 @@ func _ready() -> void:
 	add_child(RescueField.new())
 	add_child(Rustle.new())
 	add_child(StringLights.new())
+	add_child(WaterSurface.new())
 	# before the save loads, so it gets back which moments were seen
 	add_child(StoryMoments.new())
 	var saved := SaveManager.peek_node(name)
