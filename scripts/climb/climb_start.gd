@@ -41,6 +41,10 @@ func _draw() -> void:
 
 
 func interact(player: Player) -> void:
+	# A rescue call on this route: climb to the stuck party and lower them.
+	if Rescues.wants_climb(route.id):
+		await Rescues.climb_to_party(player, self)
+		return
 	if not Guidebook.has_book():
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s. You don't know this route yet. Pick up a climbing guidebook at the Mountain Shop in Curry Village, so you have a tick list to log it in." % route.display_name}])
 		return
@@ -78,7 +82,9 @@ func interact(player: Player) -> void:
 	await climb(player)
 
 
-func climb(player: Player) -> void:
+## Runs the climb. Returns true if you topped out. [param top_out] false
+## (a rescue) keeps you at the route's foot rather than at its destination.
+func climb(player: Player, top_out := true) -> bool:
 	# Cached now: if the climb ends past the curfew the player is sent home and
 	# this node leaves the tree before the climb is over.
 	var tree := player.get_tree()
@@ -100,13 +106,14 @@ func climb(player: Player) -> void:
 	climb_finished.emit(route, success)
 	if not report.is_empty():
 		await DialogueBox.say_to(player, report)
-	if success and route.destination_hub != "":
+	if success and top_out and route.destination_hub != "":
 		Park.unlock_hub(route.destination_hub)
 	# The nights on the wall are new days. Time passes last: a climb that ran
 	# past 2 AM ends with the player passed out and sent home, not at the top.
 	var passed_out := GameClock.advance_through_nights(result[1], state.nights_spent)
-	if success and route.destination_hub != "" and not passed_out:
+	if success and top_out and route.destination_hub != "" and not passed_out:
 		tree.call_group("world", "go_to_region", route.destination_hub, route.destination_spawn)
+	return success and not passed_out
 
 
 ## True if the route needs no partner, or your partner's quest is underway or done.

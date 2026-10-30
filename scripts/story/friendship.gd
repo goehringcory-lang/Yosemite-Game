@@ -52,6 +52,7 @@ const LOVES := {
 	"ahwahnee_chef": ["roasted_morels", "elderberry_sauce"],
 	"mountain_shop": ["beef_jerky", "pilot_bread"],
 	"greg": ["beef_jerky", "manzanita_cider"],
+	"jo_tolliver": ["chocolate_bar", "pilot_bread"],
 }
 const LOVED_LINES := [
 	"Oh! For me? I love these. Thank you!",

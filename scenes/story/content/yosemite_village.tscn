@@ -18,6 +18,9 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_postmaster.tres" id="tt_visitor_postmaster"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_baker.tres" id="tt_visitor_baker"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_photographer.tres" id="tt_visitor_photographer"]
+[ext_resource type="Resource" path="res://data/characters/staff/jo_tolliver.tres" id="18_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/info_sign.tscn" id="19_r"]
+[ext_resource type="Script" path="res://scripts/objects/rescue_site_sign.gd" id="20_r"]
 
 [node name="YosemiteVillageStory" type="Node2D"]
 
@@ -110,3 +113,15 @@ timetable = PackedStringArray("7:00 east_road", "7:20 degnans_bakery", "11:30 vi
 character = ExtResource("tt_visitor_photographer")
 wander_radius = 64
 timetable = PackedStringArray("7:00 valley_lodge", "7:30 cooks_meadow", "9:30 lower_yosemite_fall", "12:00 degnans_bakery", "13:00 bests_studio", "15:00 yosemite_museum", "17:00 cooks_meadow", "19:00 welcome_center")
+
+[node name="JoTolliver" parent="." instance=ExtResource("1_r")]
+character = ExtResource("18_r")
+spot = "camp_4"
+offset = Vector2(144, 72)
+wander_radius = 24
+
+[node name="RescueSiteSign" parent="." instance=ExtResource("19_r")]
+position = Vector2(848, 704)
+script = ExtResource("20_r")
+title = "Camp 4 Rescue Site"
+text = "Search and rescue cache. Climbers camped here answer the park's rescue calls: lost hikers, injuries on the trails, and parties stuck on the walls. Litters, ropes and the radio are kept here. In an emergency, find a ranger or call for help."

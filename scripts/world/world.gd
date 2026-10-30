@@ -69,6 +69,7 @@ func _ready() -> void:
 	add_child(Critters.new())
 	add_child(Bears.new())
 	add_child(Deer.new())
+	add_child(RescueField.new())
 	add_child(Rustle.new())
 	add_child(StringLights.new())
 	# before the save loads, so it gets back which moments were seen
@@ -93,6 +94,7 @@ func _ready() -> void:
 		Friendship.start_new_game()
 		Herbarium.start_new_game()
 		BoardRequests.start_new_game()
+		Rescues.start_new_game()
 		FieldLog.start_new_game()
 		Festivals.start_new_game()
 		if forage:

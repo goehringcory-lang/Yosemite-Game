@@ -74,6 +74,10 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/enid_rim.tres"),
 	preload("res://data/quests/muir_cassiope.tres"),
 	preload("res://data/quests/enid_full_press.tres"),
+	# Search and rescue from Camp 4 (Rescues). After the press book, so
+	# Hodges offers her press quests before this one.
+	preload("res://data/quests/hodges_rescue_team.tres"),
+	preload("res://data/quests/jo_first_call.tres"),
 	# The finale: it needs the last page written and the press book full.
 	preload("res://data/quests/lost_guardian.tres"),
 ]
@@ -104,7 +108,8 @@ const CHARACTERS: Array[CharacterData] = [
 ]
 
 ## Invented staff (CharacterData.staff): the Mountain Shop's two, the
-## Ahwahnee's head chef and Greg, Curry Village's fishing guide. They give
+## Ahwahnee's head chef, Greg, Curry Village's fishing guide, and Jo
+## Tolliver, who runs the Camp 4 rescue site (Rescues). They give
 ## quests (and Wren partners on climbs, and Greg trades flies), but
 ## they aren't in the Register's cast above. The clerk's id is the shop's
 ## talk_target, so talking at the counter reaches them.
@@ -113,6 +118,7 @@ const STAFF: Array[CharacterData] = [
 	preload("res://data/characters/staff/wren_alvarez.tres"),
 	preload("res://data/characters/staff/ahwahnee_chef.tres"),
 	preload("res://data/characters/staff/greg.tres"),
+	preload("res://data/characters/staff/jo_tolliver.tres"),
 ]
 
 ## What the player can write on the Register's last page, after The Last Page.

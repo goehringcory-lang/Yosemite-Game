@@ -235,6 +235,12 @@ const LOOKS := {
 		"top": "c8b88a", "top_style": "vest", "top2": "4a6a8a", "bottom": "5a6a4a", "shoes": "4a5a3a",
 		"carry": ["rod"],
 	},
+	# ------------------------------------------------ The Camp 4 rescue site (invented, not historical)
+	"jo_tolliver": {
+		"skin": SKIN_BROWN, "hair": "2a1a14", "hair_style": "short", "hat": "helmet", "hat_color": "d84a2a",
+		"top": "d86a2a", "top_style": "jacket", "top2": "a8481e", "bottom": "4a5a6a", "bottom_style": "pants",
+		"shoes": "3a2a20", "pack": "pack", "pack_color": "3a5a8a", "carry": ["rope"],
+	},
 	# ------------------------------------------------ Ahwahnee staff (invented, not historical)
 	"ahwahnee_chef": {
 		"skin": SKIN_FAIR, "hair": "4a3a2e", "beard": "mustache", "beard_color": "4a3a2e",

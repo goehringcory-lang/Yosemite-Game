@@ -92,6 +92,7 @@ func _build(log: DayLog) -> void:
 			return [piece.icon, piece.display_name] if piece else [null, id])
 		_list("First ascents", log.ticks)
 		_list("Quests finished", log.quests)
+		_list("Rescues", log.rescues)
 		_list("Perks learned", log.perks)
 		_list("Recipes learned", log.recipes)
 		_list("Friendships", log.friends)
