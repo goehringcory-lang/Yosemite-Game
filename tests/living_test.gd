@@ -151,18 +151,18 @@ func test_emotes(world: Node) -> void:
 	check(shown != null and shown.kind == "heart", "a line in the dialogue box pops its emote over the speaker (%s)" % (shown.kind if shown else "none"))
 	box.close()
 	degnan._talking = false
-	# Life while standing about: a breath, a glance round, a wave to a friend.
+	# Life while standing about: a blink, a glance round, a wave to a friend.
 	for child in degnan.get_children():
 		if child is Emote:
 			child.free()
 	degnan.velocity = Vector2.ZERO
 	degnan._route = PackedVector2Array()
-	var base: float = degnan._base_offset_y
-	var offsets := {}
-	for i in 30:
+	var sheet := degnan._sprite.texture
+	var columns := {}
+	for i in 60:
 		degnan._idle_life(0.1)
-		offsets[degnan._sprite.offset.y] = true
-	check(offsets.has(base) and offsets.has(base - 2.0), "standing about, they breathe (the sprite rises and settles)")
+		columns[degnan._sprite.frame % CharacterSheet.columns(sheet)] = true
+	check(columns.has(CharacterSheet.Col.STAND) and columns.has(CharacterSheet.Col.BLINK), "standing about, they blink (%s)" % [columns.keys()])
 	var facings := {}
 	degnan._glance = 0.0
 	for i in 40:
@@ -181,6 +181,7 @@ func test_emotes(world: Node) -> void:
 			child.free()
 	degnan._idle_life(0.016)
 	check(degnan.get_node_or_null("Emote") == null, "only once a day")
+	check(degnan._sprite.frame % CharacterSheet.columns(sheet) == CharacterSheet.Col.ARMS_UP, "waving with an arm up")
 	Friendship.points.erase("bridget_degnan")
 	world.player.global_position = world.region.get_spawn("degnans_bakery").global_position
 

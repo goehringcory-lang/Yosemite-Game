@@ -86,10 +86,111 @@ const MISSES := {
 
 var _rng := RandomNumberGenerator.new()
 var _busy := false
+## The cast underway, while it's on screen: the angler in the world swings
+## the rod with it (see _pose_angler and _draw), and where the fly lands.
+var _game: FishingMinigame
+var _fly_at := Vector2.ZERO
+var _time := 0.0
+
+const ROD_COLOR := Color("8a5a2e")
+const ROD_TIP := Color("c8a060")
+const LINE := Color(0.93, 0.9, 0.8, 0.85)
+const ROD_LENGTH := 26.0
+## Where the rod hand is (from the angler's feet) with the rod back over the
+## shoulder and held out in front, by facing (CharacterSheet's poses).
+const HAND_UP := {Vector2i.LEFT: Vector2(4, -40), Vector2i.RIGHT: Vector2(-6, -40), Vector2i.DOWN: Vector2(8, -40), Vector2i.UP: Vector2(-10, -40)}
+## Which way the rod points from the hand, by facing: up over your
+## shoulder on the back cast, and out over the water (off to one side when
+## you face the screen, so it shows).
+const ROD_BACK := {Vector2i.LEFT: Vector2(0.45, -1), Vector2i.RIGHT: Vector2(-0.45, -1), Vector2i.DOWN: Vector2(0.4, -1), Vector2i.UP: Vector2(-0.3, -1)}
+const ROD_OUT := {Vector2i.LEFT: Vector2(-1, -0.5), Vector2i.RIGHT: Vector2(1, -0.5), Vector2i.DOWN: Vector2(0.7, 0.55), Vector2i.UP: Vector2(0.45, -1)}
+const HAND_OUT := {Vector2i.LEFT: Vector2(-12, -22), Vector2i.RIGHT: Vector2(10, -22), Vector2i.DOWN: Vector2(2, -18), Vector2i.UP: Vector2(4, -26)}
 
 
 func _ready() -> void:
 	_rng.randomize()
+
+
+func _process(delta: float) -> void:
+	if not is_instance_valid(_game):
+		_game = null
+		return
+	_time += delta
+	_pose_angler()
+	queue_redraw()
+
+
+## The angler follows the cast: rod back over the shoulder on the back cast,
+## out in front on the forward cast and while the fly drifts, and leaning
+## back into it on the reel.
+func _pose_angler() -> void:
+	var player := get_parent() as Player
+	if player == null:
+		return
+	match _game.phase:
+		FishingMinigame.Phase.BACK_CAST:
+			player.pose("arms_up")
+		FishingMinigame.Phase.DONE:
+			player.clear_pose()
+		_:
+			player.pose("reach")
+
+
+## The rod and the line, while a cast is on: the line loops out behind on
+## the back cast, unrolls toward the water on the forward cast, lies on the
+## water while you wait, and runs taut (the rod bending) on the reel.
+func _draw() -> void:
+	if _game == null:
+		return
+	var player := get_parent() as Player
+	var facing: Vector2i = player.facing if player else Vector2i.DOWN
+	var phase := _game.phase
+	var back := phase == FishingMinigame.Phase.BACK_CAST
+	var hand: Vector2 = (HAND_UP if back else HAND_OUT)[facing]
+	var ahead := Vector2(facing)
+	var sweep := _game.meter_pos if _game.meter_dir > 0.0 else 1.0 - _game.meter_pos
+	var rod_dir: Vector2 = (ROD_BACK if back else ROD_OUT)[facing].normalized()
+	var tip := hand + rod_dir * ROD_LENGTH
+	var reeling := phase == FishingMinigame.Phase.REEL
+	if reeling:
+		# the rod bows toward the fish and shivers as it pulls
+		tip += (_fly_at - tip).normalized() * (4.0 + sin(_time * 22.0) * 1.5)
+	_pixel_line(hand, tip, ROD_COLOR)
+	_pixel_line(tip - rod_dir * 3.0, tip, ROD_TIP)
+	match phase:
+		FishingMinigame.Phase.BACK_CAST:
+			var loop := tip - ahead * (10.0 + 26.0 * sweep) + Vector2(0, -6.0 + 10.0 * sweep)
+			_curve(tip, loop, tip + (loop - tip) * 0.5 + Vector2(0, -8))
+		FishingMinigame.Phase.FORWARD_CAST:
+			var out := tip.lerp(_fly_at, 0.25 + 0.6 * sweep)
+			_curve(tip, out, tip.lerp(out, 0.5) + Vector2(0, -10.0 * (1.0 - sweep)))
+		FishingMinigame.Phase.WAIT, FishingMinigame.Phase.REEL:
+			var sag := 1.0 if reeling else 10.0
+			_curve(tip, _fly_at, tip.lerp(_fly_at, 0.5) + Vector2(0, sag))
+			# rings spreading where the fly sits
+			var ring := fmod(_time * 1.4, 1.0)
+			var c := Color(1, 1, 1, 0.5 * (1.0 - ring))
+			var r := 2.0 + ring * 6.0
+			draw_rect(Rect2((_fly_at + Vector2(-r, -1)).floor(), Vector2(2, 2)), c)
+			draw_rect(Rect2((_fly_at + Vector2(r - 2, -1)).floor(), Vector2(2, 2)), c)
+			if reeling:
+				draw_rect(Rect2((_fly_at + Vector2(-1, -3 + sin(_time * 18.0) * 1.0)).floor(), Vector2(2, 2)), Color(1, 1, 1, 0.8))
+
+
+## A line of whole pixels from [param a] to [param b].
+func _pixel_line(a: Vector2, b: Vector2, c: Color) -> void:
+	var steps := maxi(1, int(maxf(absf(b.x - a.x), absf(b.y - a.y)) / 2.0))
+	for i in steps + 1:
+		draw_rect(Rect2(a.lerp(b, float(i) / steps).floor(), Vector2(2, 2)), c)
+
+
+## The fly line from [param a] to [param b], bellied through [param via].
+func _curve(a: Vector2, b: Vector2, via: Vector2) -> void:
+	var steps := maxi(2, int(a.distance_to(b) / 2.0))
+	for i in steps + 1:
+		var t := float(i) / steps
+		var p := a.lerp(via, t).lerp(via.lerp(b, t), t)
+		draw_rect(Rect2(p.floor(), Vector2(1, 1)), LINE)
 
 
 func get_prompt() -> String:
@@ -234,8 +335,15 @@ func interact(player: Player) -> void:
 	var game := FishingMinigame.new()
 	get_tree().root.add_child(game)
 	game.start(fish, -1, fly)
+	_game = game
+	_fly_at = to_local(cast_point(player))
 	var caught: bool = await game.finished
 	var outcome := game.outcome
+	_game = null
+	player.clear_pose()
+	if caught:
+		player.pose("arms_up", 0.9) # holding it up
+	queue_redraw()
 	game.queue_free()
 	GameClock.advance_minutes(CAST_MINUTES)
 	if caught:

@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tools/shots/anim_shot.gd" id="1_an"]
+
+[node name="AnimShot" type="Node"]
+script = ExtResource("1_an")

@@ -72,6 +72,7 @@ func interact(player: Player) -> void:
 	var plant := Herbarium.get_plant(plant_id)
 	if plant.is_empty():
 		return
+	player.pose("crouch", Player.PICK_TIME)
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud == null:
 		return

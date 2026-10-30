@@ -57,9 +57,11 @@ func _ready() -> void:
 	var lower := RescueLower.new()
 	add_child(lower)
 	lower.set_process(false)
-	lower.start(load("res://data/routes/swan_slab.tres"))
+	lower.start(load("res://data/routes/swan_slab.tres"), load("res://assets/sprites/npcs/visitor_tourist.png"))
 	for i in 160:
 		lower.step(1.0 / 60.0, true)
+	lower._time = 1.0
+	lower._canvas.queue_redraw()
 	await _snap(dir, "lower")
 	lower.queue_free()
 	# The Quests tab, with the call underway.

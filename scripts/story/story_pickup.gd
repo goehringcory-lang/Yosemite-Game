@@ -26,6 +26,7 @@ func interact(player: Player) -> void:
 	if taken:
 		return
 	PickupPop.spawn(sprite, player)
+	player.pose("crouch", Player.PICK_TIME)
 	var item := ItemDB.get_item(item_id)
 	Inventory.add(item_id)
 	taken = true

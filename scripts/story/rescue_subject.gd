@@ -1,10 +1,11 @@
 class_name RescueSubject
 extends Node2D
 ## The person you're looking for on a rescue call (Rescues), waiting where
-## the prints end (RescueField places them), sitting tight with a little
-## wave now and then. Walk up and talk to them to reach them.
+## the prints end (RescueField places them), sitting tight with a wave now
+## and then (both arms up, twice). Walk up and talk to them to reach them.
 
 const WAVE_EVERY := 2.4
+const WAVE_TIME := 0.6
 
 var call: Dictionary = {}
 var _sprite: Sprite2D
@@ -15,9 +16,7 @@ func setup(rescue_call: Dictionary, look: CharacterData) -> void:
 	call = rescue_call
 	if look and look.sprite_sheet:
 		_sprite = Sprite2D.new()
-		_sprite.texture = look.sprite_sheet
-		_sprite.hframes = 3
-		_sprite.vframes = 4
+		CharacterSheet.setup(_sprite, look.sprite_sheet)
 		_sprite.offset = Vector2(0, -22)
 		var size := float(call.get("scale", 1.0))
 		_sprite.scale = Vector2(size, size)
@@ -48,11 +47,16 @@ func interact(player: Player) -> void:
 func _process(delta: float) -> void:
 	if _sprite == null:
 		return
-	# a hand up now and then: a quick turn toward you and back
+	# arms up and waving now and then, and blinking between
 	_wave -= delta
 	if _wave <= 0.0:
 		_wave = WAVE_EVERY
-	_sprite.frame = 1 if _wave < 0.3 else 0
+	var col: int = CharacterSheet.Col.STAND
+	if _wave < WAVE_TIME:
+		col = CharacterSheet.Col.ARMS_UP if int(_wave / (WAVE_TIME / 4.0)) % 2 == 0 else CharacterSheet.Col.STAND
+	elif CharacterSheet.blinking(Time.get_ticks_msec() / 1000.0, 3):
+		col = CharacterSheet.Col.BLINK
+	_sprite.frame = CharacterSheet.frame(_sprite.texture, Vector2i.DOWN, col)
 
 
 func _draw() -> void:

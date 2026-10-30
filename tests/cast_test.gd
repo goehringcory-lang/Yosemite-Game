@@ -45,21 +45,26 @@ func _check_characters() -> void:
 	var missing_sources: Array[String] = []
 	for character: CharacterData in QuestLog.CHARACTERS:
 		var sheet := character.sprite_sheet
-		if sheet == null or sheet.get_size() != Vector2(96, 192):
+		if not _full_sheet(sheet):
 			missing_art.append(character.id)
 		if character.sources.strip_edges() == "":
 			missing_sources.append(character.id)
 		check(not character.visitor, "%s is a historical person, not a visitor" % character.id)
 	for character: CharacterData in QuestLog.STAFF:
 		var sheet := character.sprite_sheet
-		check(character.staff and not character.visitor and sheet != null and sheet.get_size() == Vector2(96, 192),
+		check(character.staff and not character.visitor and _full_sheet(sheet),
 			"%s is invented Mountain Shop staff, with art" % character.id)
 		check(not QuestLog.CHARACTERS.has(character), "%s isn't in the Register's cast" % character.id)
-	check(missing_art.is_empty(), "every character has a 96×192 sprite sheet %s" % [missing_art])
+	check(missing_art.is_empty(), "every character has a sprite sheet with every pose %s" % [missing_art])
 	check(missing_sources.is_empty(), "every character lists sources %s" % [missing_sources])
 	for id: String in NATIVE_IDS:
 		var character := QuestLog.get_character(id)
 		check(character != null and not character.needs_tribal_review, "%s has been through tribal review" % id)
+
+
+## A sheet of 32x48 frames, four rows, with every pose (CharacterSheet).
+static func _full_sheet(sheet: Texture2D) -> bool:
+	return sheet != null and sheet.get_height() == CharacterSheet.FRAME.y * 4 and CharacterSheet.has_poses(sheet)
 
 
 func _check_visitors() -> void:

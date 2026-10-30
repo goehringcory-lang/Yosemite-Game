@@ -65,7 +65,7 @@ func _fresh() -> void:
 func test_data() -> void:
 	var jo := QuestLog.get_character(JO)
 	check(jo != null and jo.staff and not jo.visitor and jo in QuestLog.STAFF, "Jo Tolliver is invented staff, not in the Register")
-	check(jo != null and jo.sprite_sheet != null and jo.sprite_sheet.get_size() == Vector2(96, 192), "she has a 32px sprite sheet")
+	check(jo != null and jo.sprite_sheet != null and jo.sprite_sheet.get_height() == 192 and CharacterSheet.has_poses(jo.sprite_sheet), "she has a 32px sprite sheet with every pose")
 	check(Portraits.for_speaker("Jo Tolliver") != null, "and a portrait")
 	check(Friendship.LOVES.has(JO) and GuardianMirror.GATHERING.any(func(e: Array) -> bool: return e[0] == JO), "she has favorite gifts and a line in the cave")
 	var join := QuestLog.get_quest(Rescues.JOIN_QUEST)

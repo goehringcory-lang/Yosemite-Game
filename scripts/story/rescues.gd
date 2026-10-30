@@ -384,7 +384,9 @@ func climb_to_party(player: Player, start: ClimbStart) -> void:
 	player.can_act = false
 	var lower := RescueLower.new()
 	player.get_tree().root.add_child(lower)
-	lower.start(route)
+	var visitor_path := RescueField.VISITOR_DIR % call.get("look", "")
+	var visitor: CharacterData = load(visitor_path) if ResourceLoader.exists(visitor_path) else null
+	lower.start(route, visitor.sprite_sheet if visitor else null)
 	GameClock.paused = true
 	await lower.finished
 	GameClock.paused = false
