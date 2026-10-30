@@ -228,6 +228,13 @@ const LOOKS := {
 		"top": "4a8a8a", "top_style": "shirt", "top2": "2f6464", "bottom": "7a6a52", "bottom_style": "knickers",
 		"socks": "c8402e", "shoes": "c8502e", "pack": "pack", "pack_color": "8a5a3a", "carry": ["rope"],
 	},
+	# ------------------------------------------------ Curry Village's fishing guide (invented, not historical)
+	"greg": {
+		"skin": SKIN_FAIR, "hair": "8a5a2a", "hat": "cap", "hat_color": "c8a030",
+		"beard": "short", "beard_color": "8a5a2a",
+		"top": "c8b88a", "top_style": "vest", "top2": "4a6a8a", "bottom": "5a6a4a", "shoes": "4a5a3a",
+		"carry": ["rod"],
+	},
 	# ------------------------------------------------ Ahwahnee staff (invented, not historical)
 	"ahwahnee_chef": {
 		"skin": SKIN_FAIR, "hair": "4a3a2e", "beard": "mustache", "beard_color": "4a3a2e",

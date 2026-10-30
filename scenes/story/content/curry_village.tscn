@@ -16,6 +16,8 @@
 [ext_resource type="Resource" path="res://data/routes/glacier_point_apron.tres" id="14_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_lifeguard.tres" id="tt_visitor_lifeguard"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_housekeeper.tres" id="tt_visitor_housekeeper"]
+[ext_resource type="Resource" path="res://data/characters/staff/greg.tres" id="15_r"]
+[ext_resource type="Resource" path="res://data/shops/greg_flies.tres" id="16_r"]
 
 [node name="CurryVillageStory" type="Node2D"]
 
@@ -96,3 +98,20 @@ timetable = PackedStringArray("7:00 campsite_west", "9:30 pool_side", "12:30 pav
 character = ExtResource("tt_visitor_housekeeper")
 wander_radius = 40
 timetable = PackedStringArray("7:00 campsite_center", "7:30 campsite_west", "9:30 campsite_center", "11:30 campsite_east", "13:00 pavilion_door", "14:30 store_door", "16:00 registration_porch", "18:30 plaza")
+
+[node name="river_bank" type="Marker2D" parent="."]
+position = Vector2(1456, 1888)
+
+[node name="Greg" parent="." instance=ExtResource("1_r")]
+character = ExtResource("15_r")
+spot = "plaza"
+offset = Vector2(72, -20)
+wander_radius = 120
+walk_speed = 44.0
+timetable = PackedStringArray("5:30 plaza", "6:00 river_bank", "8:30 store_door", "9:30 plaza", "12:00 pavilion_door", "13:00 shop_door", "13:45 plaza", "16:00 pool_side", "17:30 river_bank", "20:00 amphitheater", "21:30 plaza")
+shop = ExtResource("16_r")
+
+[node name="GregFlyBox" parent="." instance=ExtResource("12_r")]
+position = Vector2(1968, 1904)
+item_id = "greg_fly_box"
+found_text = "A dented aluminum fly box in the grass by the water, GREG scratched in the lid. Greg will want this back."

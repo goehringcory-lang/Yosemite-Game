@@ -1,8 +1,13 @@
 class_name Fishing
 extends Node2D
-## Fishing with a fly rod, in Stardew Valley's way: face a river, creek or
-## lake with the rod in your pack and press use to cast. After a wait a fish
-## takes the fly, and you play it in on FishingMinigame's bar.
+## Fly fishing: face a river, creek or lake with the rod in your pack and
+## press use to cast. FishingMinigame runs the cast (a back cast and a
+## forward cast, each stopped on a timing meter) and, if a fish rises to it,
+## the fight on its bar.
+##
+## Greg, the fishing guide who's all over Curry Village, gives you your first
+## rod (his quest "greg_first_rod") and trades you better flies (FLIES) for
+## food and fish. The best fly you own is the one tied on.
 ##
 ## The fish are the park's real ones, by water: rainbow trout (native) and
 ## brown trout (stocked from Europe) in the Merced through the Valley, El
@@ -36,6 +41,27 @@ const FISH := [
 	{"id": "brook_trout", "hubs": ["tuolumne_meadows"], "seasons": [0, 1, 2], "weight": 5,
 		"fight": 0.45, "keep": "brook_trout", "release": ""},
 ]
+
+## The flies Greg trades, plainest first. Each is a piece of gear; the last
+## one you own is tied on. "window" widens the green on the cast meter,
+## "bite" adds to the chance something rises to a cast that wasn't perfect,
+## "hook" sets the hook harder (more line out when the fight starts), and
+## "favors" names a fish that takes it twice as often.
+const FLIES := [
+	{"id": "elk_hair_caddis", "window": 0.04, "bite": 0.1, "hook": 0.0, "favors": "rainbow_trout"},
+	{"id": "parachute_adams", "window": 0.06, "bite": 0.15, "hook": 0.05, "favors": ""},
+	{"id": "woolly_bugger", "window": 0.06, "bite": 0.2, "hook": 0.1, "favors": "brown_trout"},
+	{"id": "royal_wulff", "window": 0.08, "bite": 0.25, "hook": 0.15, "favors": "brook_trout"},
+]
+
+## What the HUD says when a cast comes to nothing, by FishingMinigame.outcome.
+const MISSES := {
+	"snagged": "Your back cast caught the willows behind you. By the time you've picked the fly loose, the pool has had a good look at you.",
+	"spooked": "The forward cast slapped down in a heap, and every fish in the pool bolted.",
+	"no_rise": "A fair cast, but nothing rose to it. A cleaner loop might do it.",
+	"lost": "It threw the hook and was gone.",
+	"gave_up": "You reel in your line.",
+}
 
 var _rng := RandomNumberGenerator.new()
 var _busy := false
@@ -101,15 +127,34 @@ static func _ground(world: Node) -> TileMapLayer:
 	return world.region.find_child("Ground", true, false) as TileMapLayer
 
 
-## Picks what takes the fly, weighted by how common each fish is.
-func pick(hub_id: String, season: int) -> Dictionary:
+## The fly tied on: the best of FLIES you own, with its "name", or {} for
+## the plain fly that comes with the rod.
+static func tied_fly() -> Dictionary:
+	for i in range(FLIES.size() - 1, -1, -1):
+		var fly: Dictionary = FLIES[i]
+		if Gear.count(fly.id) > 0:
+			var tied := fly.duplicate()
+			tied["name"] = Gear.get_gear(fly.id).display_name
+			return tied
+	return {}
+
+
+## How often [param fish] takes [param fly] compared with the others: its
+## weight, doubled if the fly favors it.
+static func weight_for(fish: Dictionary, fly: Dictionary) -> int:
+	return int(fish.weight) * (2 if fly.get("favors", "") == fish.id else 1)
+
+
+## Picks what will rise to a good cast, weighted by how common each fish is
+## and the fly tied on.
+func pick(hub_id: String, season: int, fly := {}) -> Dictionary:
 	var fish := fish_in(hub_id, season)
 	var total := 0
 	for one in fish:
-		total += int(one.weight)
+		total += weight_for(one, fly)
 	var roll := _rng.randi_range(1, total)
 	for one in fish:
-		roll -= int(one.weight)
+		roll -= weight_for(one, fly)
 		if roll <= 0:
 			return one
 	return fish[0]
@@ -121,17 +166,19 @@ func interact(player: Player) -> void:
 	_busy = true
 	player.can_act = false
 	var world := get_tree().get_first_node_in_group("world")
-	var fish := pick(world.region.hub_id, GameClock.season)
+	var fly := tied_fly()
+	var fish := pick(world.region.hub_id, GameClock.season, fly)
 	var game := FishingMinigame.new()
 	get_tree().root.add_child(game)
-	game.start(fish)
+	game.start(fish, -1, fly)
 	var caught: bool = await game.finished
+	var outcome := game.outcome
 	game.queue_free()
 	GameClock.advance_minutes(CAST_MINUTES)
 	if caught:
 		land(fish)
 	else:
-		get_tree().call_group("hud", "show_message", "It threw the hook and was gone.")
+		get_tree().call_group("hud", "show_message", MISSES.get(outcome, MISSES.lost))
 		Sound.play("ui_back", -4.0, 0.05)
 	player.can_act = true
 	_busy = false

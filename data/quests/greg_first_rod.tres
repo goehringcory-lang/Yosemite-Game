@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "greg_first_rod"
+title = "Tight Lines"
+giver = "greg"
+intro = PackedStringArray("Hey! You! You haven't seen a fly box, have you? Silver, dented, about yea big? GREG on the lid?", "I was down on the Merced at first light, below Stoneman Meadow, and somewhere between the river and my second coffee it walked off. Every fly I've tied since spring is in there.", "Find it and I'll set you up. I've got an old cane rod in my tent that's caught more trout than I have. It's yours.")
+steps = [{"type": "have", "item": "greg_fly_box", "count": 1, "consume": true, "objective": "Find Greg's fly box on the Merced's bank below Stoneman Meadow", "reminder": "Down on the Merced, south of the cabins, below Stoneman Meadow. Look along the bank where the grass meets the water.", "done": ["That's it! Oh, they're all here. Look at these little guys.", "Okay. A deal's a deal. Here's the rod. Now listen, because this is the whole secret.", "Back cast first. Let the line straighten out behind you. Then the forward cast, and stop the rod right there. Two clean stops, and the fly lands like a bug. Hit both perfect and something always comes up for it.", "Rush either one and you're picking your fly out of a willow, or you've slapped the water and every fish in the pool has left for Mariposa."], "gear": {"fly_rod": 1}}, {"type": "have", "item": "brown_trout", "count": 1, "consume": true, "objective": "Catch a brown trout in the Merced and bring it to Greg", "reminder": "A brown. The rainbows go back in the river, so don't bring me one of those. The browns hang under the cut banks. Two good stops on your cast, and be patient.", "done": ["Look at the spots on that! That's a fish.", "Your first one's always the best one. I'll cook it tonight, if you don't mind. Least I can do is feed you."]}]
+outro = PackedStringArray("Here, take this too. Elk hair caddis. I tie them myself. Ties on just like the plain one, but the rainbows can't leave it alone.", "I've got better flies than that in the box, too. You bring me food, or fish, and we'll talk. I'm all over this camp. You'll find me.")
+reward_gear = {
+"elk_hair_caddis": 1
+}

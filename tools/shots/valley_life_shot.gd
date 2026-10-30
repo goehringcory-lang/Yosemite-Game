@@ -1,6 +1,7 @@
 extends Node
-## Screenshots of the valley life features: reeling in a trout on the
-## Merced, the Camp 4 bulletin board's notes, the Journal's calendar and
+## Screenshots of the valley life features: the back and forward casts on
+## the cast meter and reeling in a trout on the Merced, Greg in Curry
+## Village, the Camp 4 bulletin board's notes, the Journal's calendar and
 ## field log, and the Quests tab's board notes.
 ## Needs a window (not --headless):
 ##   SHOT_DIR=/tmp/shots xvfb-run -a godot --path . res://tools/shots/valley_life_shot.tscn
@@ -36,13 +37,34 @@ func _ready() -> void:
 	var game := FishingMinigame.new()
 	add_child(game)
 	game.set_process(false)
-	game.start(Fishing.get_fish("brown_trout"), 3)
+	game.start(Fishing.get_fish("brown_trout"), 3, {})
+	# the back cast, the marker sweeping toward the green
+	game.step(FishingMinigame.GRACE + 0.01, false)
+	game.meter_pos = game.meter_center - game.window()
+	game.step(0.01, false)
+	await _snap(dir, "back_cast")
+	game.meter_pos = game.meter_center
+	game.press()
+	game.step(FishingMinigame.UNROLL + 0.01, false)
+	game.meter_pos = game.meter_center + game.window() * 0.9
+	game.meter_dir = -1.0
+	game.step(0.01, false)
+	await _snap(dir, "forward_cast")
+	game.meter_pos = game.meter_center
+	game.press()
 	while game.phase == FishingMinigame.Phase.WAIT:
 		game.step(0.1, false)
 	for i in 50:
 		game.step(1.0 / 60.0, game.band + FishingMinigame.BAND / 2.0 < game.fish_at)
 	await _snap(dir, "reel")
 	game.queue_free()
+	# Greg on the plaza, with his flies to trade.
+	await world.go_to_region("curry_village", "arrival")
+	for node in world.region.find_children("*", "NPC", true, false):
+		if node.character and node.character.id == "greg":
+			world.player.global_position = node.global_position + Vector2(0, 40)
+			world.player.facing = Vector2i.UP
+	await _snap(dir, "greg", 20)
 	# Notes on the board, the calendar and field log, and the Quests tab.
 	for id in ["bridget_degnan", "john_muir", "wren_alvarez"]:
 		Friendship.note_talk(id)

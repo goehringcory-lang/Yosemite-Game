@@ -7,6 +7,6 @@
 script = ExtResource("1_gear")
 id = "fly_rod"
 display_name = "Fly Rod"
-description = "A light cane rod and a box of flies. Face a river, creek or lake and press use to cast."
+description = "Greg's old cane rod, with a plain fly tied on. Face a river, creek or lake and press use to cast: stop the meter in the green for the back cast, then again for the forward cast. Two perfect casts always bring a fish up."
 icon = ExtResource("2_icon")
 tier = 0
