@@ -30,17 +30,38 @@ const CAST_MINUTES := 15
 const Terrain := preload("res://tools/mapgen/terrain.gd")
 
 ## Each fish: its field log id, the hubs it's in, the seasons it bites, how
-## hard it fights (0 to 1), and the item you keep, or "" to let it go.
+## often it takes the fly in each kind of water (FishingWater: "run", the
+## plain river; "rapids"; "hole", the deep pools), how hard it fights (0 to
+## 1), its length in inches (smallest and largest you'll catch), and the
+## item you keep, or "" to let it go.
+##
+## The Merced's fish are the park's real ones. Rainbow trout are native, hold
+## in the fast water and take a fly anywhere; brown trout were stocked from
+## Europe and lie deep in the holes; Sacramento suckers, native too, graze the
+## bottom of the slow pools in the warmer months. Brook trout were packed up
+## to Tuolumne, which had no fish at all.
 const FISH := [
-	{"id": "rainbow_trout", "hubs": ["yosemite_valley", "el_portal", "wawona"], "seasons": [0, 1, 2, 3], "weight": 4,
-		"fight": 0.55, "keep": "", "release": "Native to the Merced, and catch and release here. You wet your hands and ease it back into the current."},
-	{"id": "brown_trout", "hubs": ["yosemite_valley", "el_portal", "wawona"], "seasons": [0, 1, 2, 3], "weight": 3,
-		"fight": 0.75, "keep": "brown_trout", "release": ""},
-	{"id": "sacramento_sucker", "hubs": ["el_portal", "wawona"], "seasons": [0, 1, 2], "weight": 2,
-		"fight": 0.3, "keep": "", "release": "A native bottom feeder, all lips and patience. Back it goes."},
-	{"id": "brook_trout", "hubs": ["tuolumne_meadows"], "seasons": [0, 1, 2], "weight": 5,
-		"fight": 0.45, "keep": "brook_trout", "release": ""},
+	{"id": "rainbow_trout", "hubs": ["yosemite_valley", "el_portal", "wawona"], "seasons": [0, 1, 2, 3],
+		"waters": {"run": 4, "rapids": 9, "hole": 2}, "fight": 0.55, "inches": [7, 18],
+		"keep": "", "release": "Native to the Merced, and catch and release here. You wet your hands and ease it back into the current."},
+	{"id": "brown_trout", "hubs": ["yosemite_valley", "el_portal", "wawona"], "seasons": [0, 1, 2, 3],
+		"waters": {"run": 3, "rapids": 1, "hole": 6}, "fight": 0.75, "inches": [9, 24],
+		"keep": "brown_trout", "release": ""},
+	{"id": "sacramento_sucker", "hubs": ["yosemite_valley", "el_portal", "wawona"], "seasons": [0, 1, 2],
+		"waters": {"run": 1, "rapids": 0, "hole": 4}, "fight": 0.3, "inches": [10, 20],
+		"keep": "", "release": "A native bottom feeder, all lips and patience. Back it goes."},
+	{"id": "brook_trout", "hubs": ["tuolumne_meadows"], "seasons": [0, 1, 2],
+		"waters": {"run": 5, "rapids": 5, "hole": 5}, "fight": 0.45, "inches": [6, 13],
+		"keep": "brook_trout", "release": ""},
 ]
+
+## How the water changes a fish on the line: rapids add this to its fight,
+## and holes grow bigger fish (the length is drawn nearer the top of its
+## range: the power below, lower is bigger). A fish in the top TROPHY of its
+## range is a trophy.
+const RAPIDS_FIGHT := 0.15
+const SIZE_POWER := {"run": 1.6, "rapids": 1.3, "hole": 0.6}
+const TROPHY := 0.85
 
 ## The flies Greg trades, plainest first. Each is a piece of gear; the last
 ## one you own is tied on. "window" widens the green on the cast meter,
@@ -72,7 +93,9 @@ func _ready() -> void:
 
 
 func get_prompt() -> String:
-	return "Fish"
+	var player := get_parent() as Player
+	var water := water_ahead(player) if player else null
+	return "Fish %s" % water.title if water and water.title != "" else "Fish"
 
 
 ## The fish that bite in [param hub_id] in [param season].
@@ -110,6 +133,23 @@ static func can_fish(player: Player) -> bool:
 	return false
 
 
+## Where the fly lands from where [param player] stands: the nearest of
+## REACH in front of them that's water, or their feet if none is.
+static func cast_point(player: Player) -> Vector2:
+	var world := player.get_tree().get_first_node_in_group("world")
+	var ground := _ground(world) if world else null
+	for reach: float in REACH:
+		var at := player.global_position + Vector2(player.facing) * reach
+		if ground and is_water(ground, at):
+			return at
+	return player.global_position
+
+
+## The rapids or hole the fly would land in, or null on a plain run.
+static func water_ahead(player: Player) -> FishingWater:
+	return FishingWater.at(player.get_tree(), cast_point(player))
+
+
 ## True if the ground at [param at] is a river, lake or creek.
 static func is_water(ground: TileMapLayer, at: Vector2) -> bool:
 	var cell := ground.local_to_map(ground.to_local(at))
@@ -140,25 +180,45 @@ static func tied_fly() -> Dictionary:
 	return {}
 
 
-## How often [param fish] takes [param fly] compared with the others: its
-## weight, doubled if the fly favors it.
-static func weight_for(fish: Dictionary, fly: Dictionary) -> int:
-	return int(fish.weight) * (2 if fly.get("favors", "") == fish.id else 1)
+## How often [param fish] takes [param fly] in [param water] compared with
+## the others: its weight there, doubled if the fly favors it.
+static func weight_for(fish: Dictionary, fly: Dictionary, water := FishingWater.RUN) -> int:
+	return int(fish.waters.get(water, 0)) * (2 if fly.get("favors", "") == fish.id else 1)
 
 
-## Picks what will rise to a good cast, weighted by how common each fish is
-## and the fly tied on.
-func pick(hub_id: String, season: int, fly := {}) -> Dictionary:
-	var fish := fish_in(hub_id, season)
+## Picks what will rise to a good cast in [param water], weighted by how
+## common each fish is there and the fly tied on. The fish comes with its
+## "inches" drawn ("length") and its fight for the water. {} if nothing
+## lives there.
+func pick(hub_id: String, season: int, fly := {}, water := FishingWater.RUN) -> Dictionary:
+	var fish := fish_in(hub_id, season).filter(func(one: Dictionary) -> bool: return weight_for(one, fly, water) > 0)
+	if fish.is_empty():
+		return {}
 	var total := 0
 	for one in fish:
-		total += weight_for(one, fly)
+		total += weight_for(one, fly, water)
 	var roll := _rng.randi_range(1, total)
+	var chosen: Dictionary = fish[0]
 	for one in fish:
-		roll -= weight_for(one, fly)
+		roll -= weight_for(one, fly, water)
 		if roll <= 0:
-			return one
-	return fish[0]
+			chosen = one
+			break
+	return hooked(chosen, water, _rng.randf())
+
+
+## [param fish] as it comes out of [param water]: a "length" in inches,
+## drawn by [param roll] (0 to 1) across its range, bigger in a hole; a
+## "trophy" flag; and its fight, harder in the rapids and for a big fish.
+static func hooked(fish: Dictionary, water: String, roll: float) -> Dictionary:
+	var out := fish.duplicate()
+	var share := pow(clampf(roll, 0.0, 1.0), float(SIZE_POWER.get(water, 1.6)))
+	var inches: Array = fish.inches
+	out["length"] = int(round(lerpf(inches[0], inches[1], share)))
+	out["trophy"] = share >= TROPHY
+	out["fight"] = clampf(float(fish.fight) + (RAPIDS_FIGHT if water == "rapids" else 0.0) + 0.1 * share, 0.0, 0.95)
+	out["water"] = water
+	return out
 
 
 func interact(player: Player) -> void:
@@ -168,7 +228,9 @@ func interact(player: Player) -> void:
 	player.can_act = false
 	var world := get_tree().get_first_node_in_group("world")
 	var fly := tied_fly()
-	var fish := pick(world.region.hub_id, GameClock.season, fly)
+	var fish := pick(world.region.hub_id, GameClock.season, fly, FishingWater.kind_at(get_tree(), cast_point(player)))
+	if fish.is_empty():
+		fish = pick(world.region.hub_id, GameClock.season, fly)
 	var game := FishingMinigame.new()
 	get_tree().root.add_child(game)
 	game.start(fish, -1, fly)
@@ -190,7 +252,10 @@ func interact(player: Player) -> void:
 func land(fish: Dictionary) -> String:
 	var fish_name: String = FieldLog.get_animal(fish.id).get("name", fish.id)
 	var first := FieldLog.spot(fish.id, true)
-	var text := "Caught a %s%s!" % [fish_name, " (new in your field log)" if first else ""]
+	var size := "%d-inch " % fish.length if fish.has("length") else ""
+	var text := "Caught a %s%s%s!" % [size, fish_name, " (new in your field log)" if first else ""]
+	if fish.get("trophy", false):
+		text += " A trophy!"
 	if fish.keep != "":
 		Inventory.add(fish.keep)
 		text += " It goes in your pack for the pot."

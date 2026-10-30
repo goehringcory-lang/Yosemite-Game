@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
+
+[node name="BigOakFlatJunctionStory" type="Node2D"]
+
+[node name="JunctionRapids" type="Node2D" parent="."]
+position = Vector2(320, 996)
+script = ExtResource("fw_script")
+kind = "rapids"
+size = Vector2(1200, 56)
+title = "Junction Rapids"
+flow = Vector2(-1, 0)

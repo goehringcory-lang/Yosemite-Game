@@ -46,14 +46,14 @@ static func today() -> Dictionary:
 	if key == _today_key:
 		return _today
 	_today_key = key
-	_today = on(GameClock.year, GameClock.season, GameClock.day)
+	_today = on_day(GameClock.year, GameClock.season, GameClock.day)
 	return _today
 
 
-## The weather on any date, worked out the same way as [method today] (which
-## keeps one answer a day; tests can set it). Seasons reads back through the
-## winter's days to see how much snow has built up.
-static func on(year: int, season: int, day: int) -> Dictionary:
+## The weather on any date, worked out the way [method today] does (the
+## climbing screen asks about yesterday: rock stays wet after rain, and
+## Seasons reads back through the winter to see how much snow has built up).
+static func on_day(year: int, season: int, day: int) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("weather:%d:%d:%d" % [year, season, day])
 	var roll := rng.randf()

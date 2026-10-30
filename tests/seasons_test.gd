@@ -59,7 +59,7 @@ func test_snow_cover() -> void:
 		var cover := Seasons.snow_cover(2, WINTER, d)
 		if cover < 0.0 or cover > 1.0:
 			check(false, "snow cover stays between 0 and 1 (winter %d)" % d)
-		if Weather.on(2, WINTER, d).snow > 0.0:
+		if Weather.on_day(2, WINTER, d).snow > 0.0:
 			any_snow = true
 			if d > 1:
 				check(cover > Seasons.snow_cover(2, WINTER, d - 1) or cover == 1.0, "a snowy day adds to the snow (winter %d)" % d)
@@ -209,7 +209,7 @@ func test_horsetail() -> void:
 	var clear := -1
 	var snowy := -1
 	for d in range(GameClock.HORSETAIL_DAYS.x, GameClock.HORSETAIL_DAYS.y + 1):
-		var weather := Weather.on(GameClock.year, WINTER, d)
+		var weather := Weather.on_day(GameClock.year, WINTER, d)
 		if weather.snow == 0.0 and clear < 0:
 			clear = d
 		elif weather.snow > 0.0 and snowy < 0:

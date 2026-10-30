@@ -72,7 +72,7 @@ static func _winter_snow(year: int, day: int) -> float:
 	var depth := 0.0
 	var snowed := false
 	for d in range(1, day + 1):
-		var weather := Weather.on(year, GameClock.Season.WINTER, d)
+		var weather := Weather.on_day(year, GameClock.Season.WINTER, d)
 		if weather.snow > 0.0:
 			snowed = true
 			depth = minf(depth + lerpf(SNOWFALL.x, SNOWFALL.y, weather.snow), 1.0)

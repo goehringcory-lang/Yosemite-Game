@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="4_r"]
 [ext_resource type="Resource" path="res://data/routes/the_nose.tres" id="5_r"]
 [ext_resource type="Resource" path="res://data/routes/nutcracker.tres" id="6_r"]
+[ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
 [ext_resource type="Script" path="res://scripts/world/horsetail_fall.gd" id="7_r"]
 
 [node name="ElCapitanMeadowStory" type="Node2D"]
@@ -31,6 +32,12 @@ route = ExtResource("5_r")
 position = Vector2(2128, 400)
 route = ExtResource("6_r")
 
+[node name="ElCapitanHole" type="Node2D" parent="."]
+position = Vector2(966, 1266)
+script = ExtResource("fw_script")
+kind = "hole"
+size = Vector2(340, 140)
+title = "El Capitan Hole"
 
 [node name="HorsetailFall" type="Node2D" parent="."]
 position = Vector2(1838, 150)

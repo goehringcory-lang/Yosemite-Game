@@ -67,7 +67,10 @@ func interact(player: Player) -> void:
 		info += ", %s on belay" % partner
 	if QuestLog.has_climbed(route.id):
 		info += " (already ticked)"
-	info += ". You're carrying %d energy of food." % FoodDB.carried_energy()
+	var today: Array[String] = []
+	for line: Array in WallWeather.forecast(route, WallWeather.today(route.id)):
+		today.append(line[0])
+	info += ". Today: %s. You're carrying %d energy of food." % [", ".join(today).to_lower(), FoodDB.carried_energy()]
 	player.can_act = false
 	var box := DialogueBox.open(player)
 	var choice := await box.choose(info, ["Climb", "Not yet"])
