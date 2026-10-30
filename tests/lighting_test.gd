@@ -45,6 +45,7 @@ func _ready() -> void:
 	await test_shadows()
 	await test_lamps()
 	await test_lit_sprites()
+	await test_lit_park()
 	await test_indoors()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
@@ -207,6 +208,32 @@ func test_lit_sprites() -> void:
 	set_date(SUMMER, 14, 23)
 	await _frames(2)
 	check(not sun.enabled, "the sun's light is out at night")
+	var glow := world.get_node("AirGlow") as AirGlow
+	check(glow.environment.glow_enabled and glow.environment.glow_intensity > 0.5, "the lamps glow in the night air (%.2f)" % glow.environment.glow_intensity)
+	var halos := 0
+	for node in world.region.find_children("Halo", "Sprite2D", true, false):
+		if (node as Sprite2D).visible:
+			halos += 1
+	check(halos == 0, "the real glow takes over from the halo sprites (%d still shown)" % halos)
+	set_date(SUMMER, 14, 12)
+	await _frames(2)
+	check(not glow.environment.glow_enabled, "nothing glows by day")
+
+
+## Every region under the sky is lit like Curry Village.
+func test_lit_park() -> void:
+	set_date(SUMMER, 14, 8)
+	for region_id: String in ["wawona", "glacier_point", "tuolumne_meadows", "el_capitan_meadow", "mirror_lake"]:
+		await world.go_to_region(region_id, "")
+		await _frames(2)
+		var lit := 0
+		for node in world.region.find_children("*", "Sprite2D", true, false):
+			if node.has_meta("lit"):
+				lit += 1
+		check(lit > 20, "%s is lit by real light (%d sprites)" % [region_id, lit])
+		var ground := world.region.get_node_or_null("GroundArt") as Sprite2D
+		if ground and ground.material is ShaderMaterial:
+			check((ground.material as ShaderMaterial).get_shader_parameter("normal_map") != null, "%s's painted ground has its normal map" % region_id)
 	set_date(SUMMER, 14, 12)
 
 
@@ -218,6 +245,9 @@ func test_indoors() -> void:
 	check(sun != null and not sun.enabled, "the sun's light is off indoors")
 	var lantern := world.player.get_node_or_null("Lantern") as NightLight
 	check(lantern != null and lantern.energy < 0.05, "the lantern stays out indoors")
+	GameClock.minutes = 23 * 60
+	await _frames(2)
+	check(not (world.get_node("AirGlow") as AirGlow).environment.glow_enabled, "no night glow indoors")
 	GameClock.minutes = 12 * 60
 
 
