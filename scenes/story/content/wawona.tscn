@@ -4,6 +4,7 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_stage_lady.tres" id="2_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_stage_gent.tres" id="3_r"]
 [ext_resource type="PackedScene" path="res://scenes/story/pickup.tscn" id="4_r"]
+[ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
 
 [node name="WawonaStory" type="Node2D"]
 
@@ -23,3 +24,10 @@ wander_radius = 48
 position = Vector2(3200, 2836)
 item_id = "sequoia_cone"
 found_text = "It lay among the duff at the foot of the Grizzly Giant, one of the thousands of cones the old tree carries. Galen Clark asked for one."
+
+[node name="SouthForkHole" type="Node2D" parent="."]
+position = Vector2(838, 786)
+script = ExtResource("fw_script")
+kind = "hole"
+size = Vector2(340, 140)
+title = "South Fork Hole"

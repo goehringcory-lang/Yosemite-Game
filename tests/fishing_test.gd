@@ -34,10 +34,12 @@ func _ready() -> void:
 	test_meter()
 	test_casts()
 	test_flies()
+	test_waters()
 	test_greg_data()
 	test_greg_quest()
 	test_greg_trades()
 	await test_greg_in_camp(world)
+	await test_holes_and_rapids()
 	SaveManager.delete_save()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
@@ -190,7 +192,7 @@ func test_flies() -> void:
 		check(bugger.line > FishingMinigame.HOOK_SET[3], "and sets the hook harder")
 	bugger.free()
 	var brown := Fishing.get_fish("brown_trout")
-	check(Fishing.weight_for(brown, tied) == brown.weight * 2 and Fishing.weight_for(brown, {}) == brown.weight, "the bugger brings up browns twice as often")
+	check(Fishing.weight_for(brown, tied) == brown.waters.run * 2 and Fishing.weight_for(brown, {}) == brown.waters.run, "the bugger brings up browns twice as often")
 	var rod := Fishing.new()
 	add_child(rod)
 	var browns := 0
@@ -204,6 +206,45 @@ func test_flies() -> void:
 	check(browns > plain_browns + 40, "more browns on the bugger than on the plain fly (%d against %d)" % [browns, plain_browns])
 	rod.free()
 	Gear.start_new_game()
+
+
+## The fish follow the water: rainbows in the rapids, browns and suckers
+## in the holes, and bigger fish in the holes.
+func test_waters() -> void:
+	for fish: Dictionary in Fishing.FISH:
+		check(fish.waters.has("run") and fish.waters.has("rapids") and fish.waters.has("hole") and fish.inches[0] < fish.inches[1],
+			"%s lives in some water and has a size" % fish.id)
+	check(Fishing.get_fish("sacramento_sucker").hubs.has("yosemite_valley"), "suckers live in the Valley's Merced too")
+	var rod := Fishing.new()
+	add_child(rod)
+	var tally := {}
+	for water: String in ["run", "rapids", "hole"]:
+		var counts := {}
+		var inches := 0
+		for i in 600:
+			var fish := rod.pick("yosemite_valley", GameClock.Season.SUMMER, {}, water)
+			counts[fish.id] = counts.get(fish.id, 0) + 1
+			inches += fish.length
+		counts["inches"] = inches / 600.0
+		tally[water] = counts
+	check(tally.rapids.get("rainbow_trout", 0) > tally.run.get("rainbow_trout", 0) and tally.rapids.get("rainbow_trout", 0) > 400,
+		"the rapids are rainbow water (%d of 600)" % tally.rapids.get("rainbow_trout", 0))
+	check(tally.rapids.get("sacramento_sucker", 0) == 0, "no sucker sits in the rapids")
+	check(tally.hole.get("brown_trout", 0) > tally.run.get("brown_trout", 0) and tally.hole.get("sacramento_sucker", 0) > tally.run.get("sacramento_sucker", 0),
+		"browns and suckers lie in the holes (%d browns, %d suckers)" % [tally.hole.get("brown_trout", 0), tally.hole.get("sacramento_sucker", 0)])
+	check(tally.hole.inches > tally.run.inches + 1.5, "and the fish run bigger there (%.1f against %.1f inches)" % [tally.hole.inches, tally.run.inches])
+	check(rod.pick("yosemite_valley", GameClock.Season.WINTER, {}, "hole").id != "sacramento_sucker", "suckers don't bite in winter")
+	rod.free()
+	var brown := Fishing.get_fish("brown_trout")
+	var big := Fishing.hooked(brown, "hole", 0.99)
+	var small := Fishing.hooked(brown, "run", 0.05)
+	check(big.trophy and not small.trophy and big.length > small.length and big.length <= brown.inches[1], "a big one is a trophy (%d inches)" % big.length)
+	check(Fishing.hooked(brown, "rapids", 0.5).fight > Fishing.hooked(brown, "run", 0.5).fight, "a fish in the rapids fights harder")
+	var land := Fishing.new()
+	add_child(land)
+	var text := land.land(big)
+	check(("%d-inch Brown Trout" % big.length) in text and "trophy" in text, "and the catch says how big (%s)" % text)
+	land.free()
 
 
 func test_greg_data() -> void:
@@ -295,5 +336,57 @@ func test_greg_in_camp(world: Node) -> void:
 		for reach in [32.0, 48.0, 64.0, 96.0]:
 			near = near or Fishing.is_water(ground, bank + d * reach)
 	check(near and not Fishing.is_water(ground, bank) and WalkGrid.of(world.region).is_open(bank), "his spot on the bank is dry ground beside the Merced")
+	var player: Player = world.player
+	player.global_position = bank
+	player.facing = Vector2i.DOWN
+	Gear.add(Fishing.ROD)
+	var hole := Fishing.water_ahead(player)
+	check(hole != null and hole.kind == "hole" and player.fishing.get_prompt() == "Fish Stoneman Hole", "and from it you cast into Stoneman Hole (%s)" % player.fishing.get_prompt())
 	var box: StoryPickup = world.region.find_child("GregFlyBox", true, false)
 	check(box != null and box.item_id == "greg_fly_box" and not Fishing.is_water(ground, box.global_position), "his fly box lies on the bank")
+
+
+## Every hole and rapids in the overlays sits on the river: a hole's middle
+## and the bank it was cut into are water you can't walk on, painted as
+## water; the rapids run along the river's middle.
+func test_holes_and_rapids() -> void:
+	var holes := 0
+	var rapids := 0
+	for file in DirAccess.get_files_at("res://scenes/story/content/"):
+		var overlay: Node = load("res://scenes/story/content/" + file).instantiate()
+		var waters := overlay.get_children().filter(func(n: Node) -> bool: return n is FishingWater)
+		overlay.free()
+		if waters.is_empty():
+			continue
+		var area := file.get_basename()
+		var region: Region = load("res://scenes/regions/%s.tscn" % area).instantiate()
+		add_child(region)
+		StoryContent.attach(region)
+		var ground := region.get_ground()
+		var blocker: TileMapLayer = region.get_node("Blocker")
+		var art: Image = (region.get_node("GroundArt") as Sprite2D).texture.get_image()
+		for node in region.entities.get_children():
+			var water := node as FishingWater
+			if water == null:
+				continue
+			var middle := water.global_position + water.size / 2.0
+			var ok := Fishing.is_water(ground, middle) and water.title != "" and water.contains(middle)
+			if water.kind == "hole":
+				holes += 1
+				# the bank side of the oval, both above and below the middle: one was cut
+				var cut := 0
+				for side in [-0.6, 0.6]:
+					var at := middle + Vector2(0, water.size.y / 2.0 * side)
+					var cell := blocker.local_to_map(blocker.to_local(at))
+					var px := art.get_pixelv(Vector2i(at))
+					if Fishing.is_water(ground, at) and blocker.get_cell_source_id(cell) != -1 and px.b > px.r + 0.08:
+						cut += 1
+				ok = ok and cut == 2
+			else:
+				rapids += 1
+				for t in [0.1, 0.5, 0.9]:
+					ok = ok and Fishing.is_water(ground, water.global_position + Vector2(water.size.x * t, water.size.y / 2.0))
+			check(ok, "%s: %s is on the river, and is water all through" % [area, water.title])
+			check(FishingWater.kind_at(get_tree(), middle) == water.kind, "%s: a fly landing in %s fishes it" % [area, water.title])
+		region.free()
+	check(holes >= 6 and rapids >= 3, "the rivers have their holes (%d) and rapids (%d)" % [holes, rapids])

@@ -211,12 +211,6 @@ position = Vector2(1992, 1205)
 texture = ExtResource("2_hor0f")
 flip_h = true
 
-[node name="WildTwigs5" type="Sprite2D" parent="GroundDetail" unique_id=1327254830]
-use_parent_material = true
-position = Vector2(1095, 1400)
-texture = ExtResource("5_565wq")
-flip_h = true
-
 [node name="WildCones8" type="Sprite2D" parent="GroundDetail" unique_id=1904182391]
 use_parent_material = true
 position = Vector2(338, 1437)

@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/el_portal/dev_house.png" id="5_r"]
 [ext_resource type="Texture2D" path="res://assets/sprites/el_portal/dev_house_glow.png" id="6_r"]
 [ext_resource type="Script" path="res://scripts/world/night_glow.gd" id="7_r"]
+[ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_house"]
 size = Vector2(188, 124)
@@ -63,3 +64,18 @@ monitoring = false
 [node name="Shape" type="CollisionShape2D" parent="DevHouse/Hitbox"]
 position = Vector2(0, -14)
 shape = SubResource("RectangleShape2D_porch")
+
+[node name="ElPortalHole" type="Node2D" parent="."]
+position = Vector2(1190, 1250)
+script = ExtResource("fw_script")
+kind = "hole"
+size = Vector2(340, 140)
+title = "El Portal Hole"
+
+[node name="MercedCanyonRapids" type="Node2D" parent="."]
+position = Vector2(128, 1316)
+script = ExtResource("fw_script")
+kind = "rapids"
+size = Vector2(832, 116)
+title = "Merced Canyon Rapids"
+flow = Vector2(-1, 0)
