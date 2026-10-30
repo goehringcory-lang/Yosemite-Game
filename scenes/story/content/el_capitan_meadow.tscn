@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="4_r"]
 [ext_resource type="Resource" path="res://data/routes/the_nose.tres" id="5_r"]
 [ext_resource type="Resource" path="res://data/routes/nutcracker.tres" id="6_r"]
+[ext_resource type="Script" path="res://scripts/world/horsetail_fall.gd" id="7_r"]
 
 [node name="ElCapitanMeadowStory" type="Node2D"]
 
@@ -29,3 +30,8 @@ route = ExtResource("5_r")
 [node name="Nutcracker" parent="." instance=ExtResource("4_r")]
 position = Vector2(2128, 400)
 route = ExtResource("6_r")
+
+
+[node name="HorsetailFall" type="Node2D" parent="."]
+position = Vector2(1838, 150)
+script = ExtResource("7_r")

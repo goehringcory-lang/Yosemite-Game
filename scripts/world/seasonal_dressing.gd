@@ -7,13 +7,24 @@ extends Node
 ## spring, wildflowers dry out in fall and vanish in winter, the garden beds
 ## and meadow grass turn, and the conifers pick up snow. It also grades the
 ## painted ground (GroundArt) with a small shader: dry and golden in fall,
-## cool and frosted in winter. Only sprites change. Collision and foraging
-## don't.
+## cool and frosted in winter. As the winter's snow builds up
+## (Seasons.snow_cover) it lies on the ground in drifts and on the tops of
+## roofs, cars, rocks, logs and signs (a small shader on each), and it melts
+## away in early spring. Only sprites change. Collision and foraging don't.
 
 const SPRITE_DIR := "res://assets/sprites/ahwahnee/"
 const SEASON_DIR := SPRITE_DIR + "seasons/"
 const SEASON_NAMES := ["spring", "summer", "fall", "winter"]
 const GROUND_SHADER := preload("res://assets/shaders/seasonal_ground.gdshader")
+const SNOW_CAP_SHADER := preload("res://assets/shaders/snow_cap.gdshader")
+
+## Sprite folders whose pictures can hold snow on top: buildings, cars, camp
+## gear, rocks and logs. Trees and plants have their own winter drawings.
+const CAP_DIRS := ["buildings", "cars", "curry", "wawona", "el_portal", "glacier", "tuolumne", "ahwahnee", "lamon"]
+## Pictures that never hold snow: lit windows, shadows, the falls and walls,
+## the painted ground, and the trees and plants.
+const NO_CAP := ["glow", "shadow", "light", "window", "_fall_", "_mist_", "_wall", "ground_", "water", "pool", "rink"]
+const NO_CAP_PREFIX := ["tree_", "plant_", "garden_"]
 
 ## Regions that don't get the shimmer on their water (Tuolumne's river runs by
 ## its own "water_flow" instead; see the shader).
@@ -41,7 +52,11 @@ const GROUND_LOOKS := [
 static var _looks := {}
 
 var _season := -1
+var _key := ""
 var _sprites: Array[Sprite2D] = []
+## Sprites that take a snow cap, all sharing one material.
+var _caps: Array[Sprite2D] = []
+static var _cap_material: ShaderMaterial
 var _names: Array[String] = []
 var _grounds: Array[CanvasItem] = []
 
@@ -58,6 +73,9 @@ func _ready() -> void:
 			if not _look_for(tex_name).is_empty():
 				_sprites.append(sprite)
 				_names.append(tex_name)
+				continue
+		if sprite.material == null and not sprite is SeasonalSprite and _holds_snow(path):
+			_caps.append(sprite)
 	for ground_name in ["GroundArt", "GroundPainting"]:
 		var ground := region.get_node_or_null(ground_name) as Sprite2D
 		if ground:
@@ -80,12 +98,17 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if GameClock.season != _season:
+	if _date_key() != _key:
 		apply()
 
 
-## Dresses everything for the clock's current season.
+func _date_key() -> String:
+	return "%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day]
+
+
+## Dresses everything for the clock's current season and today's snow.
 func apply() -> void:
+	_key = _date_key()
 	_season = clampi(GameClock.season, 0, 3)
 	for i in _sprites.size():
 		var sprite := _sprites[i]
@@ -102,6 +125,33 @@ func apply() -> void:
 		mat.set_shader_parameter("desaturate", g["desat"])
 		mat.set_shader_parameter("frost", g["frost"])
 		mat.set_shader_parameter("flower_fill", g["fill"])
+	var snow := Seasons.snow_cover()
+	for ground in _grounds:
+		(ground.material as ShaderMaterial).set_shader_parameter("snow", snow)
+	if _cap_material == null:
+		_cap_material = ShaderMaterial.new()
+		_cap_material.shader = SNOW_CAP_SHADER
+	_cap_material.set_shader_parameter("snow", snow)
+	# No shader at all on a bare day.
+	for sprite in _caps:
+		sprite.material = _cap_material if snow > 0.0 else null
+
+
+## True if a sprite drawn from [param path] can hold snow on top.
+static func _holds_snow(path: String) -> bool:
+	if path == "res://assets/sprites/info_sign.png":
+		return true
+	var parts := path.trim_prefix("res://assets/sprites/").split("/")
+	if parts.size() != 2 or not parts[0] in CAP_DIRS:
+		return false
+	var file := parts[1]
+	for word: String in NO_CAP:
+		if file.contains(word):
+			return false
+	for prefix: String in NO_CAP_PREFIX:
+		if file.begins_with(prefix):
+			return false
+	return true
 
 
 ## The four textures for a base sprite, or [] if it has no seasonal versions.

@@ -9,6 +9,10 @@ extends AudioStreamPlayer2D
 @export var sound := "campfire"
 ## Level at the source, before distance and the waterfall season.
 @export var level := 1.0
+## A waterfall's roar rises and falls with the season (Sound.waterfall_level),
+## or, for a fall you can see, with that fall's own flow: SeasonalFalls sets
+## this to its Seasons.FALLS kind, so a dry fall is silent.
+var flow_kind := ""
 
 var _check := 0.0
 
@@ -104,7 +108,10 @@ func _process(delta: float) -> void:
 
 
 func _refresh_level() -> void:
-	volume_linear = level * (Sound.waterfall_level() if sound == "waterfall" else 1.0)
+	var season := 1.0
+	if sound == "waterfall":
+		season = Seasons.waterfall_flow(flow_kind) if flow_kind != "" else Sound.waterfall_level()
+	volume_linear = level * season
 	_resume()
 
 
