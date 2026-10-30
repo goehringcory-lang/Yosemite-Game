@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
+
+[node name="HousekeepingCampStory" type="Node2D"]
+
+[node name="HousekeepingHole" type="Node2D" parent="."]
+position = Vector2(1222, 978)
+script = ExtResource("fw_script")
+kind = "hole"
+size = Vector2(340, 140)
+title = "Housekeeping Hole"

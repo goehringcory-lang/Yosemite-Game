@@ -21,6 +21,7 @@
 [ext_resource type="Resource" path="res://data/characters/staff/jo_tolliver.tres" id="18_r"]
 [ext_resource type="PackedScene" path="res://scenes/objects/info_sign.tscn" id="19_r"]
 [ext_resource type="Script" path="res://scripts/objects/rescue_site_sign.gd" id="20_r"]
+[ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
 
 [node name="YosemiteVillageStory" type="Node2D"]
 
@@ -125,3 +126,9 @@ position = Vector2(848, 704)
 script = ExtResource("20_r")
 title = "Camp 4 Rescue Site"
 text = "Search and rescue cache. Climbers camped here answer the park's rescue calls: lost hikers, injuries on the trails, and parties stuck on the walls. Litters, ropes and the radio are kept here. In an emergency, find a ranger or call for help."
+[node name="SentinelHole" type="Node2D" parent="."]
+position = Vector2(1158, 1618)
+script = ExtResource("fw_script")
+kind = "hole"
+size = Vector2(340, 140)
+title = "Sentinel Hole"

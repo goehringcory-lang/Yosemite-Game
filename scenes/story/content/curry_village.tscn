@@ -18,6 +18,7 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_housekeeper.tres" id="tt_visitor_housekeeper"]
 [ext_resource type="Resource" path="res://data/characters/staff/greg.tres" id="15_r"]
 [ext_resource type="Resource" path="res://data/shops/greg_flies.tres" id="16_r"]
+[ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
 
 [node name="CurryVillageStory" type="Node2D"]
 
@@ -100,7 +101,7 @@ wander_radius = 40
 timetable = PackedStringArray("7:00 campsite_center", "7:30 campsite_west", "9:30 campsite_center", "11:30 campsite_east", "13:00 pavilion_door", "14:30 store_door", "16:00 registration_porch", "18:30 plaza")
 
 [node name="river_bank" type="Marker2D" parent="."]
-position = Vector2(1456, 1888)
+position = Vector2(2288, 1848)
 
 [node name="Greg" parent="." instance=ExtResource("1_r")]
 character = ExtResource("15_r")
@@ -115,3 +116,10 @@ shop = ExtResource("16_r")
 position = Vector2(1968, 1904)
 item_id = "greg_fly_box"
 found_text = "A dented aluminum fly box in the grass by the water, GREG scratched in the lid. Greg will want this back."
+
+[node name="StonemanHole" type="Node2D" parent="."]
+position = Vector2(2118, 1890)
+script = ExtResource("fw_script")
+kind = "hole"
+size = Vector2(340, 140)
+title = "Stoneman Hole"
