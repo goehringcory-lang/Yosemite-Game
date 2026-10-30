@@ -127,8 +127,7 @@ func _build_shops() -> void:
 		_offer("gear", "cam", 48, {"cam": 2}, 10),
 		_offer("gear", "haul_bag", 76, {"aiders": 1}, 1),
 		_offer("gear", "ascenders", 60, {"aiders": 1}, 1),
-		_offer("gear", "portaledge", 130, {"haul_bag": 1, "ascenders": 1}, 1),
-		_offer("gear", "fly_rod", 40, {"climbing_shoes": 1}, 1)], "mountain_shop"),
+		_offer("gear", "portaledge", 130, {"haul_bag": 1, "ascenders": 1}, 1)], "mountain_shop"),
 		"res://data/shops/curry_mountain_shop.tres")
 
 

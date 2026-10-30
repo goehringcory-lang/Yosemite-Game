@@ -319,13 +319,18 @@ func test_fish_definitions() -> void:
 	check(Fishing.fish_in("glacier_point", GameClock.Season.SUMMER).is_empty(), "nothing to fish for on Glacier Point")
 	check(Cooking.dish_for(["brown_trout"]) == "camp_stew", "a trout in the pot makes a camp stew")
 	var shop: ShopData = load("res://data/shops/curry_mountain_shop.tres")
-	check(shop.offers.any(func(o: ShopOffer) -> bool: return o.id == "fly_rod" and o.requires.keys() == ["climbing_shoes"]), "the Mountain Shop trades a fly rod")
+	check(not shop.offers.any(func(o: ShopOffer) -> bool: return o.id == "fly_rod"), "the Mountain Shop doesn't trade the fly rod: Greg gives you his")
 
 
-## Plays the reel with a hand that holds whenever the band is below the fish.
+## Two perfect casts, then the reel, with a hand that holds whenever the
+## band is below the fish (see tests/fishing_test.gd for the cast itself).
 func _play(game: FishingMinigame, smart: bool) -> bool:
 	var result: Array[bool] = []
 	game.finished.connect(func(caught: bool) -> void: result.append(caught))
+	for cast in 2:
+		game.step(FishingMinigame.UNROLL + 0.01, false)
+		game.meter_pos = game.meter_center
+		game.press()
 	for i in 3000:
 		var hold := smart and game.band + FishingMinigame.BAND / 2.0 < game.fish_at
 		if game.step(1.0 / 60.0, hold) == FishingMinigame.Phase.DONE:
@@ -357,11 +362,11 @@ func test_minigame() -> void:
 	add_child(game)
 	game.set_process(false)
 	game.start(Fishing.get_fish("brown_trout"), 1)
-	check(game.step(0.1, false) == FishingMinigame.Phase.WAIT, "you wait for a bite first")
+	check(game.step(0.1, false) == FishingMinigame.Phase.BACK_CAST, "you cast first")
 	var gave_up := []
 	game.finished.connect(func(c: bool) -> void: gave_up.append(c))
 	game.give_up()
-	check(gave_up == [false] and game.phase == FishingMinigame.Phase.DONE, "cancel gives up")
+	check(gave_up == [false] and game.phase == FishingMinigame.Phase.DONE and game.outcome == "gave_up", "cancel gives up")
 	game.free()
 	await get_tree().process_frame
 

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/parachute_adams.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "parachute_adams"
+display_name = "Parachute Adams"
+description = "Grey body, white post, a hackle wound flat round it. You can see it on the water in any light, and so can every trout. Widens the green and brings more fish up."
+icon = ExtResource("2_icon")
+tier = 2

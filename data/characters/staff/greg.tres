@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/greg.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "greg"
+display_name = "Greg"
+years = "1970s"
+affiliation = "Curry Village fishing guide"
+bio = "Guides anglers on the Merced from a tent cabin in Curry Village, ties his own flies, and is never in one place for long. He'll trade flies for food or fish. An invented character, not a historical figure."
+idle_lines = PackedStringArray("Back cast, stop. Forward cast, stop. That's the whole thing. That and about ten thousand practice casts.", "Fish at dawn and dusk. Middle of the day the trout are under the banks, same as me.", "The rainbows are native here, so they go back in the river. The browns came over from Europe a long time ago. Those you can eat.", "Ever watch the caddis come off the water at sunset? That's the real show in this valley. Never mind the Firefall.", "Brook trout up at Tuolumne would eat a cigarette butt if you cast it right. Bring me a couple and I'll make it worth your while.")
+rare_lines = PackedStringArray("I lost a fish under the Stoneman Bridge in '71 that I still dream about. Big brown. Ate a Royal Wulff and laughed at me.")
+rare_after_quest = "greg_first_rod"
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.784, 0.722, 0.541, 1)
+home = "Curry Village, all over it (the plaza by day, the Merced at dawn and dusk)"
+staff = true
+sources = "Invented for the game. The fish follow the park's rules: rainbow trout are native and catch and release in Yosemite Valley; brown and brook trout were stocked."

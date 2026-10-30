@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/royal_wulff.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "royal_wulff"
+display_name = "Royal Wulff"
+description = "Red silk, peacock herl and white calf-tail wings. Greg's own favorite, and the brook trout up at Tuolumne go crazy for it. The best fly in his box."
+icon = ExtResource("2_icon")
+tier = 4

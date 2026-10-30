@@ -41,6 +41,10 @@ const ROWS := {Vector2i.DOWN: 0, Vector2i.UP: 1, Vector2i.LEFT: 2, Vector2i.RIGH
 ## through the middle of the day so the Journal's "where to find them" holds.
 ## Empty keeps them about [member spot] all day.
 @export var timetable: PackedStringArray
+## Someone who trades as well as talks (Greg, with his flies): after what
+## they have to say, their offers come up, as a Vendor's do. Only while
+## there's something on offer.
+@export var shop: ShopData
 
 var facing := Vector2i.DOWN
 var _home := Vector2.ZERO
@@ -533,7 +537,15 @@ func interact(player: Player) -> void:
 		var lines := Festivals.talk_to(character.id)
 		lines.append_array(BoardRequests.deliver(character.id))
 		lines.append_array(QuestLog.talk_to(character.id))
-		await DialogueBox.say_to(player, lines)
+		if shop and not Vendor.offers_open(shop).is_empty():
+			player.can_act = false
+			var box := DialogueBox.open(player)
+			await box.say(lines)
+			await Vendor.trade_menu(box, shop, character.display_name, true)
+			box.close()
+			player.can_act = true
+		else:
+			await DialogueBox.say_to(player, lines)
 		if QuestLog.final_entry_pending() and character.id == "galen_clark":
 			await _write_last_page(player)
 	_talking = false

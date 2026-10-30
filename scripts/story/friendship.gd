@@ -51,6 +51,7 @@ const LOVES := {
 	"wren_alvarez": ["trail_mix", "chocolate_bar"],
 	"ahwahnee_chef": ["roasted_morels", "elderberry_sauce"],
 	"mountain_shop": ["beef_jerky", "pilot_bread"],
+	"greg": ["beef_jerky", "manzanita_cider"],
 }
 const LOVED_LINES := [
 	"Oh! For me? I love these. Thank you!",

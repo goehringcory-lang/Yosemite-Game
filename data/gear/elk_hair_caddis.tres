@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/elk_hair_caddis.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "elk_hair_caddis"
+display_name = "Elk Hair Caddis"
+description = "A tan caddis with a wing of elk hair, tied by Greg. It floats high and the Merced's rainbows can't leave it alone. Widens the green on your cast a little."
+icon = ExtResource("2_icon")
+tier = 1

@@ -12,6 +12,10 @@ extends Resource
 @export var amount := 1
 ## Food energy the vendor wants for it.
 @export var price := 30
+## A straight swap instead: items the vendor wants for it, as item id ->
+## count (Greg takes fish for his best flies). When set, [member price] is
+## ignored.
+@export var trade: Dictionary = {}
 ## Gear you must already own for this offer to show up, as gear id -> count.
 ## Trades round out a rack; the piece that opens a new tier comes from quests.
 @export var requires: Dictionary = {}

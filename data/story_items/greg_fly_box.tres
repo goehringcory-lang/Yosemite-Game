@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/fishing_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(0, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "greg_fly_box"
+display_name = "Greg's Fly Box"
+description = "A dented aluminum fly box with GREG scratched in the lid. Something's rattling around inside."
+icon = SubResource("AtlasTexture_icon")

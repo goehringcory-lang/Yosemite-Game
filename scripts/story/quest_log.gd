@@ -64,6 +64,7 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/ahwahnee_chef_larder.tres"),
 	preload("res://data/quests/wren_slackline.tres"),
 	preload("res://data/quests/wren_lightning.tres"),
+	preload("res://data/quests/greg_first_rod.tres"),
 	# The press book (QuestData.press_line): plants for the naturalists and
 	# rangers, beside the tick list. See Herbarium.
 	preload("res://data/quests/enid_press.tres"),
@@ -102,14 +103,16 @@ const CHARACTERS: Array[CharacterData] = [
 	preload("res://data/characters/carrie_bethel.tres"),
 ]
 
-## Invented staff (CharacterData.staff): the Mountain Shop's two and the
-## Ahwahnee's head chef. They give quests (and Wren partners on climbs), but
+## Invented staff (CharacterData.staff): the Mountain Shop's two, the
+## Ahwahnee's head chef and Greg, Curry Village's fishing guide. They give
+## quests (and Wren partners on climbs, and Greg trades flies), but
 ## they aren't in the Register's cast above. The clerk's id is the shop's
 ## talk_target, so talking at the counter reaches them.
 const STAFF: Array[CharacterData] = [
 	preload("res://data/characters/staff/mountain_shop_clerk.tres"),
 	preload("res://data/characters/staff/wren_alvarez.tres"),
 	preload("res://data/characters/staff/ahwahnee_chef.tres"),
+	preload("res://data/characters/staff/greg.tres"),
 ]
 
 ## What the player can write on the Register's last page, after The Last Page.

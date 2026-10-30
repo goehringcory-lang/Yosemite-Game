@@ -23,8 +23,12 @@ const GEAR: Array[GearData] = [
 	preload("res://data/gear/portaledge.tres"),
 	preload("res://data/gear/ice_axe.tres"),
 	preload("res://data/gear/crampons.tres"),
-	# Not climbing gear: a rod for the rivers (Fishing).
+	# Not climbing gear: a rod for the rivers, and Greg's flies (Fishing).
 	preload("res://data/gear/fly_rod.tres"),
+	preload("res://data/gear/elk_hair_caddis.tres"),
+	preload("res://data/gear/parachute_adams.tres"),
+	preload("res://data/gear/woolly_bugger.tres"),
+	preload("res://data/gear/royal_wulff.tres"),
 ]
 
 ## You arrive with approach shoes. The Mountain Shop fits you with your

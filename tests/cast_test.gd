@@ -132,6 +132,10 @@ func _obtainable_items() -> Dictionary:
 	for quest: QuestData in QuestLog.QUESTS:
 		for id in quest.reward_items:
 			result[id] = true
+	# fish you keep, caught on a fly rod
+	for fish: Dictionary in Fishing.FISH:
+		if fish.keep != "":
+			result[fish.keep] = true
 	for overlay in _overlays():
 		for pickup in overlay.find_children("*", "StoryPickup", true, false):
 			result[pickup.item_id] = true
