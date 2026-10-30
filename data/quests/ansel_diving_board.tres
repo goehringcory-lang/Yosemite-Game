@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "ansel_diving_board"
+title = "The Diving Board"
+giver = "ansel_adams"
+requires = PackedStringArray("ansel_monolith", "hodges_first_night")
+intro = PackedStringArray("You've seen Half Dome from the rim. Now go and see it the way I did, from the Diving Board.", "It's a prow of granite on the Dome's own shoulder, out west of the saddle where the cables start. From there the face stands right in front of you, 2,000 feet of it.", "The light only comes round onto the face in the afternoon, for about an hour. Be there between three and five, and then tell me what you saw.")
+steps = [{"type": "unlocked", "ability": "diving_board_light", "objective": "Look at Half Dome's face from the Diving Board in the afternoon light (3 to 5 PM)", "reminder": "The Diving Board is out on Half Dome's shoulder, west of the foot of the cables. The light is on the face between three and five in the afternoon.", "done": []}, {"type": "return", "objective": "Tell Ansel Adams what you saw from the Diving Board", "reminder": "Come find me at Best's Studio once you've seen the face in the light.", "done": ["Bright rock and a black sky. Yes. I put a red filter on the camera to make the sky go dark, and that was the first picture that looked the way it felt."]}]
+outro = PackedStringArray("Take this cam. I swapped a print for it, and it's done nothing but hold my darkroom door open since.")
+reward_gear = {"cam": 1}

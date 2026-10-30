@@ -108,8 +108,8 @@ func climb(player: Player) -> void:
 	# The nights on the wall are new days. Time passes last: a climb that ran
 	# past 2 AM ends with the player passed out and sent home, not at the top.
 	var passed_out := GameClock.advance_through_nights(result[1], state.nights_spent)
-	if success and route.destination_hub != "" and not passed_out:
-		tree.call_group("world", "go_to_region", route.destination_hub, route.destination_spawn)
+	if success and route.destination() != "" and not passed_out:
+		tree.call_group("world", "go_to_region", route.destination(), route.destination_spawn)
 
 
 ## True if the route needs no partner, or your partner's quest is underway or done.

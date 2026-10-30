@@ -1,0 +1,398 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/wild_pebbles.png" id="1_caqha"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/wild_twigs.png" id="2_yf8fu"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/wild_leaves.png" id="3_k8wbe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/wild_needles_a.png" id="4_j6du5"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/wild_needles_b.png" id="5_ou6nr"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/wild_cones.png" id="6_iie5l"]
+[ext_resource type="Texture2D" path="res://assets/sprites/clutter/wild_seedling.png" id="7_ykx3o"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/plant_mushrooms.png" id="10_wq5om"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/plant_fern_b.png" id="11_ly6av"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/plant_bracken.png" id="12_bscc7"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/plant_wildflowers_c.png" id="14_yf8fu"]
+
+[node name="WildDressing" type="Node2D" unique_id=413049908]
+y_sort_enabled = true
+
+[node name="GroundDetail" type="Node2D" parent="." unique_id=1715348599]
+z_index = -8
+
+[node name="WildPebbles1" type="Sprite2D" parent="GroundDetail" unique_id=2067099384]
+use_parent_material = true
+position = Vector2(551, 345)
+texture = ExtResource("1_caqha")
+flip_h = true
+
+[node name="WildTwigs1" type="Sprite2D" parent="GroundDetail" unique_id=1241712265]
+use_parent_material = true
+position = Vector2(1264, 369)
+texture = ExtResource("2_yf8fu")
+flip_h = true
+
+[node name="WildPebbles2" type="Sprite2D" parent="GroundDetail" unique_id=1086741536]
+use_parent_material = true
+position = Vector2(623, 395)
+texture = ExtResource("1_caqha")
+
+[node name="WildNeedlesA1" type="Sprite2D" parent="GroundDetail" unique_id=177742844]
+use_parent_material = true
+position = Vector2(1079, 398)
+texture = ExtResource("4_j6du5")
+flip_h = true
+
+[node name="WildCones1" type="Sprite2D" parent="GroundDetail" unique_id=494690652]
+use_parent_material = true
+position = Vector2(1328, 402)
+texture = ExtResource("6_iie5l")
+flip_h = true
+
+[node name="WildPebbles3" type="Sprite2D" parent="GroundDetail" unique_id=2002755864]
+use_parent_material = true
+position = Vector2(1558, 407)
+texture = ExtResource("1_caqha")
+
+[node name="WildTwigs2" type="Sprite2D" parent="GroundDetail" unique_id=721855344]
+use_parent_material = true
+position = Vector2(1588, 443)
+texture = ExtResource("2_yf8fu")
+
+[node name="WildNeedlesA2" type="Sprite2D" parent="GroundDetail" unique_id=540941987]
+use_parent_material = true
+position = Vector2(151, 501)
+texture = ExtResource("4_j6du5")
+flip_h = true
+
+[node name="WildNeedlesB1" type="Sprite2D" parent="GroundDetail" unique_id=847650224]
+use_parent_material = true
+position = Vector2(681, 492)
+texture = ExtResource("5_ou6nr")
+flip_h = true
+
+[node name="WildNeedlesA3" type="Sprite2D" parent="GroundDetail" unique_id=638477086]
+use_parent_material = true
+position = Vector2(807, 508)
+texture = ExtResource("4_j6du5")
+
+[node name="WildPebbles4" type="Sprite2D" parent="GroundDetail" unique_id=250734141]
+use_parent_material = true
+position = Vector2(1014, 492)
+texture = ExtResource("1_caqha")
+flip_h = true
+
+[node name="WildTwigs3" type="Sprite2D" parent="GroundDetail" unique_id=1864490822]
+use_parent_material = true
+position = Vector2(888, 527)
+texture = ExtResource("2_yf8fu")
+
+[node name="WildCones2" type="Sprite2D" parent="GroundDetail" unique_id=988269124]
+use_parent_material = true
+position = Vector2(1711, 533)
+texture = ExtResource("6_iie5l")
+
+[node name="WildNeedlesA4" type="Sprite2D" parent="GroundDetail" unique_id=44096976]
+use_parent_material = true
+position = Vector2(567, 554)
+texture = ExtResource("4_j6du5")
+flip_h = true
+
+[node name="WildNeedlesA5" type="Sprite2D" parent="GroundDetail" unique_id=538910023]
+use_parent_material = true
+position = Vector2(856, 556)
+texture = ExtResource("4_j6du5")
+flip_h = true
+
+[node name="WildNeedlesA6" type="Sprite2D" parent="GroundDetail" unique_id=1231892712]
+use_parent_material = true
+position = Vector2(338, 604)
+texture = ExtResource("4_j6du5")
+flip_h = true
+
+[node name="WildNeedlesA7" type="Sprite2D" parent="GroundDetail" unique_id=489822953]
+use_parent_material = true
+position = Vector2(462, 596)
+texture = ExtResource("4_j6du5")
+flip_h = true
+
+[node name="WildNeedlesB2" type="Sprite2D" parent="GroundDetail" unique_id=517170441]
+use_parent_material = true
+position = Vector2(1874, 620)
+texture = ExtResource("5_ou6nr")
+flip_h = true
+
+[node name="WildLeaves1" type="Sprite2D" parent="GroundDetail" unique_id=768965383]
+use_parent_material = true
+position = Vector2(41, 662)
+texture = ExtResource("3_k8wbe")
+
+[node name="WildLeaves2" type="Sprite2D" parent="GroundDetail" unique_id=1624831739]
+use_parent_material = true
+position = Vector2(345, 655)
+texture = ExtResource("3_k8wbe")
+
+[node name="WildPebbles5" type="Sprite2D" parent="GroundDetail" unique_id=722571856]
+use_parent_material = true
+position = Vector2(459, 668)
+texture = ExtResource("1_caqha")
+
+[node name="WildCones3" type="Sprite2D" parent="GroundDetail" unique_id=471125094]
+use_parent_material = true
+position = Vector2(597, 651)
+texture = ExtResource("6_iie5l")
+
+[node name="WildLeaves3" type="Sprite2D" parent="GroundDetail" unique_id=1011295597]
+use_parent_material = true
+position = Vector2(116, 698)
+texture = ExtResource("3_k8wbe")
+
+[node name="WildTwigs4" type="Sprite2D" parent="GroundDetail" unique_id=1374140047]
+use_parent_material = true
+position = Vector2(150, 700)
+texture = ExtResource("2_yf8fu")
+
+[node name="WildNeedlesA8" type="Sprite2D" parent="GroundDetail" unique_id=698410481]
+use_parent_material = true
+position = Vector2(487, 685)
+texture = ExtResource("4_j6du5")
+
+[node name="WildLeaves4" type="Sprite2D" parent="GroundDetail" unique_id=877500051]
+use_parent_material = true
+position = Vector2(558, 686)
+texture = ExtResource("3_k8wbe")
+flip_h = true
+
+[node name="WildCones4" type="Sprite2D" parent="GroundDetail" unique_id=545133126]
+use_parent_material = true
+position = Vector2(1492, 700)
+texture = ExtResource("6_iie5l")
+flip_h = true
+
+[node name="WildNeedlesA9" type="Sprite2D" parent="GroundDetail" unique_id=2055201821]
+use_parent_material = true
+position = Vector2(1586, 693)
+texture = ExtResource("4_j6du5")
+flip_h = true
+
+[node name="WildTwigs5" type="Sprite2D" parent="GroundDetail" unique_id=140736706]
+use_parent_material = true
+position = Vector2(1895, 700)
+texture = ExtResource("2_yf8fu")
+
+[node name="WildLeaves5" type="Sprite2D" parent="GroundDetail" unique_id=2140164873]
+use_parent_material = true
+position = Vector2(1305, 752)
+texture = ExtResource("3_k8wbe")
+
+[node name="WildPebbles6" type="Sprite2D" parent="GroundDetail" unique_id=819903800]
+use_parent_material = true
+position = Vector2(1495, 750)
+texture = ExtResource("1_caqha")
+
+[node name="WildTwigs6" type="Sprite2D" parent="GroundDetail" unique_id=1933450334]
+use_parent_material = true
+position = Vector2(1529, 754)
+texture = ExtResource("2_yf8fu")
+
+[node name="WildNeedlesB3" type="Sprite2D" parent="GroundDetail" unique_id=1896269510]
+use_parent_material = true
+position = Vector2(1614, 754)
+texture = ExtResource("5_ou6nr")
+flip_h = true
+
+[node name="WildPebbles7" type="Sprite2D" parent="GroundDetail" unique_id=1919970449]
+use_parent_material = true
+position = Vector2(1743, 757)
+texture = ExtResource("1_caqha")
+
+[node name="WildCones5" type="Sprite2D" parent="GroundDetail" unique_id=1365567331]
+use_parent_material = true
+position = Vector2(1930, 761)
+texture = ExtResource("6_iie5l")
+flip_h = true
+
+[node name="WildLeaves6" type="Sprite2D" parent="GroundDetail" unique_id=1803497050]
+use_parent_material = true
+position = Vector2(1965, 755)
+texture = ExtResource("3_k8wbe")
+flip_h = true
+
+[node name="WildNeedlesA10" type="Sprite2D" parent="GroundDetail" unique_id=818416909]
+use_parent_material = true
+position = Vector2(1544, 785)
+texture = ExtResource("4_j6du5")
+
+[node name="WildPebbles8" type="Sprite2D" parent="GroundDetail" unique_id=1018651986]
+use_parent_material = true
+position = Vector2(1898, 780)
+texture = ExtResource("1_caqha")
+
+[node name="WildPebbles9" type="Sprite2D" parent="GroundDetail" unique_id=1733677533]
+use_parent_material = true
+position = Vector2(688, 811)
+texture = ExtResource("1_caqha")
+
+[node name="WildPebbles10" type="Sprite2D" parent="GroundDetail" unique_id=2052626431]
+use_parent_material = true
+position = Vector2(1233, 815)
+texture = ExtResource("1_caqha")
+
+[node name="WildCones6" type="Sprite2D" parent="GroundDetail" unique_id=1976132414]
+use_parent_material = true
+position = Vector2(1928, 816)
+texture = ExtResource("6_iie5l")
+flip_h = true
+
+[node name="WildLeaves7" type="Sprite2D" parent="GroundDetail" unique_id=2131832077]
+use_parent_material = true
+position = Vector2(750, 860)
+texture = ExtResource("3_k8wbe")
+
+[node name="WildTwigs7" type="Sprite2D" parent="GroundDetail" unique_id=864174161]
+use_parent_material = true
+position = Vector2(619, 881)
+texture = ExtResource("2_yf8fu")
+flip_h = true
+
+[node name="WildCones7" type="Sprite2D" parent="GroundDetail" unique_id=1004048720]
+use_parent_material = true
+position = Vector2(1940, 889)
+texture = ExtResource("6_iie5l")
+flip_h = true
+
+[node name="WildPebbles11" type="Sprite2D" parent="GroundDetail" unique_id=1687430474]
+use_parent_material = true
+position = Vector2(680, 917)
+texture = ExtResource("1_caqha")
+flip_h = true
+
+[node name="WildNeedlesA11" type="Sprite2D" parent="GroundDetail" unique_id=1402947973]
+use_parent_material = true
+position = Vector2(776, 911)
+texture = ExtResource("4_j6du5")
+
+[node name="WildLeaves8" type="Sprite2D" parent="GroundDetail" unique_id=1241518004]
+use_parent_material = true
+position = Vector2(845, 953)
+texture = ExtResource("3_k8wbe")
+flip_h = true
+
+[node name="WildPebbles12" type="Sprite2D" parent="GroundDetail" unique_id=1157774474]
+use_parent_material = true
+position = Vector2(1644, 945)
+texture = ExtResource("1_caqha")
+flip_h = true
+
+[node name="WildTwigs8" type="Sprite2D" parent="GroundDetail" unique_id=689775690]
+use_parent_material = true
+position = Vector2(1970, 948)
+texture = ExtResource("2_yf8fu")
+
+[node name="WildNeedlesB4" type="Sprite2D" parent="GroundDetail" unique_id=1509972195]
+use_parent_material = true
+position = Vector2(649, 970)
+texture = ExtResource("5_ou6nr")
+
+[node name="WildLeaves9" type="Sprite2D" parent="GroundDetail" unique_id=956092247]
+use_parent_material = true
+position = Vector2(1639, 976)
+texture = ExtResource("3_k8wbe")
+flip_h = true
+
+[node name="WildCones8" type="Sprite2D" parent="GroundDetail" unique_id=500139476]
+use_parent_material = true
+position = Vector2(494, 1005)
+texture = ExtResource("6_iie5l")
+flip_h = true
+
+[node name="WildCones9" type="Sprite2D" parent="GroundDetail" unique_id=1722814403]
+use_parent_material = true
+position = Vector2(919, 1179)
+texture = ExtResource("6_iie5l")
+
+[node name="WildLeaves10" type="Sprite2D" parent="GroundDetail" unique_id=25470657]
+use_parent_material = true
+position = Vector2(979, 1176)
+texture = ExtResource("3_k8wbe")
+flip_h = true
+
+[node name="WildNeedlesA12" type="Sprite2D" parent="GroundDetail" unique_id=946123815]
+use_parent_material = true
+position = Vector2(1902, 1168)
+texture = ExtResource("4_j6du5")
+
+[node name="WildCones10" type="Sprite2D" parent="GroundDetail" unique_id=638174902]
+use_parent_material = true
+position = Vector2(1172, 1195)
+texture = ExtResource("6_iie5l")
+flip_h = true
+
+[node name="WildNeedlesB5" type="Sprite2D" parent="GroundDetail" unique_id=1972001506]
+use_parent_material = true
+position = Vector2(1267, 1200)
+texture = ExtResource("5_ou6nr")
+
+[node name="WildCones11" type="Sprite2D" parent="GroundDetail" unique_id=212747793]
+use_parent_material = true
+position = Vector2(1461, 1197)
+texture = ExtResource("6_iie5l")
+flip_h = true
+
+[node name="WildTwigs9" type="Sprite2D" parent="GroundDetail" unique_id=1882601765]
+use_parent_material = true
+position = Vector2(110, 1229)
+texture = ExtResource("2_yf8fu")
+
+[node name="WildTwigs10" type="Sprite2D" parent="GroundDetail" unique_id=1828631548]
+use_parent_material = true
+position = Vector2(1422, 1239)
+texture = ExtResource("2_yf8fu")
+flip_h = true
+
+[node name="WildTwigs11" type="Sprite2D" parent="GroundDetail" unique_id=294602898]
+use_parent_material = true
+position = Vector2(1527, 1231)
+texture = ExtResource("2_yf8fu")
+
+[node name="WildSeedling1" type="Sprite2D" parent="." unique_id=1331954081]
+position = Vector2(599, 373)
+texture = ExtResource("7_ykx3o")
+offset = Vector2(0, -11)
+
+[node name="WildSeedling2" type="Sprite2D" parent="." unique_id=1944740952]
+position = Vector2(911, 444)
+texture = ExtResource("7_ykx3o")
+offset = Vector2(0, -11)
+
+[node name="PlantMushrooms1" type="Sprite2D" parent="." unique_id=1481248445]
+position = Vector2(240, 469)
+texture = ExtResource("10_wq5om")
+offset = Vector2(0, -12)
+flip_h = true
+
+[node name="PlantFernB1" type="Sprite2D" parent="." unique_id=1412014719]
+position = Vector2(1037, 557)
+texture = ExtResource("11_ly6av")
+offset = Vector2(0, -30)
+flip_h = true
+
+[node name="PlantBracken1" type="Sprite2D" parent="." unique_id=369923352]
+position = Vector2(588, 882)
+texture = ExtResource("12_bscc7")
+offset = Vector2(0, -28)
+flip_h = true
+
+[node name="PlantMushrooms2" type="Sprite2D" parent="." unique_id=758301740]
+position = Vector2(1129, 891)
+texture = ExtResource("10_wq5om")
+offset = Vector2(0, -12)
+
+[node name="PlantWildflowersC1" type="Sprite2D" parent="." unique_id=1009385491]
+position = Vector2(1561, 909)
+texture = ExtResource("14_yf8fu")
+offset = Vector2(0, -16)
+
+[node name="PlantMushrooms3" type="Sprite2D" parent="." unique_id=1697353285]
+position = Vector2(239, 1199)
+texture = ExtResource("10_wq5om")
+offset = Vector2(0, -12)
+flip_h = true

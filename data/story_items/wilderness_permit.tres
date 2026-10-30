@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/backcountry_items.png" id="1_icons"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_icon"]
+atlas = ExtResource("1_icons")
+region = Rect2(0, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_item")
+id = "wilderness_permit"
+display_name = "Wilderness Permit"
+description = "Signed by Ranger Hodges: Happy Isles to Little Yosemite Valley, camping in the backcountry camp there, with Half Dome. Keep it with you on the trail, and show it at the foot of the cables."
+icon = SubResource("AtlasTexture_icon")

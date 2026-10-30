@@ -219,8 +219,8 @@ func _check_spawns_are_free(world: Node) -> void:
 	for stop: Dictionary in ShuttleStop.STOPS:
 		targets["%s/%s" % [stop.region, stop.spawn]] = [stop.region, stop.spawn]
 	for route in Guidebook.routes():
-		if route.destination_hub != "":
-			targets["%s/%s" % [route.destination_hub, route.destination_spawn]] = [route.destination_hub, route.destination_spawn]
+		if route.destination() != "":
+			targets["%s/%s" % [route.destination(), route.destination_spawn]] = [route.destination(), route.destination_spawn]
 	for file in DirAccess.get_files_at("res://scenes/regions"):
 		if not file.ends_with(".tscn"):
 			continue

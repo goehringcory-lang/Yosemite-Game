@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "anderson_cables"
+title = "Anderson's Cables"
+giver = "george_anderson"
+requires = PackedStringArray("anderson_half_dome", "hodges_first_night")
+intro = PackedStringArray("The ranger's given you a permit, I hear. Then you can walk up my side of the Dome.", "They've strung steel cables up it now, on posts, with boards to stand on. Following my holes, mostly. In my day it was a rope and an eyebolt and a prayer.", "Go up from the saddle above Little Yosemite. Pick your hour: there's nobody on the cables at first light, and half of California on them by noon.")
+steps = [{"type": "unlocked", "ability": "half_dome_cables", "objective": "Climb the cables up the back of Half Dome to the summit", "reminder": "The cables start at the saddle, up the Half Dome Trail from Little Yosemite Valley. Go up early, before the crowds, and never in the rain.", "done": []}, {"type": "return", "objective": "Tell George Anderson about the cables", "reminder": "Come back to Happy Isles when you've been up the cables.", "done": ["Boards to stand on! Steel you can hold with both hands! I'd have given a year's wages for that in '75.", "Still, it's my line they follow. Every one of those posts stands within spitting distance of a hole I drilled."]}]
+outro = PackedStringArray("Here, ship's biscuit for the next trip up. You'll want your strength for the last fifty feet; everybody does.")
+reward_items = {"pilot_bread": 3}

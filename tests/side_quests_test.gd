@@ -113,7 +113,8 @@ func _play_dawn_chorus() -> void:
 
 func _play_bear_season() -> void:
 	new_game(GameClock.Season.SUMMER)
-	QuestLog.completed.append_array(["eichorn_apron", "hodges_patrol", "tabuce_acorns", "tabuce_chuckah"])
+	# (her summer side story, the first night out, done already)
+	QuestLog.completed.append_array(["eichorn_apron", "hodges_patrol", "tabuce_acorns", "tabuce_chuckah", "hodges_first_night"])
 	var lines := QuestLog.talk_to("clare_hodges")
 	check(not QuestLog.active.has("hodges_bear_season") and said(lines, "fall"), "in summer Hodges says to come back in the fall")
 	set_clock(GameClock.Season.FALL, 10)
