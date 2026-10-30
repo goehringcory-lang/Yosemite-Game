@@ -7,9 +7,11 @@
 #   tools/shots/renderer_compare.sh [OUT_DIR]
 #   GODOT=/path/to/godot SHOT_REGIONS=curry_village tools/shots/renderer_compare.sh
 #
-# OUT_DIR (default /tmp/renderer_compare) gets compatibility/, forward_plus/
-# and diff/. Exits non-zero if the tour fails under either renderer or the
-# pictures differ.
+# OUT_DIR (default /tmp/renderer_compare) gets gl_compatibility/,
+# gl_compatibility_again/ (a second run, to measure how much animation alone
+# changes the pictures), forward_plus/ and diff/. Exits non-zero if the tour
+# fails under either renderer or Forward+ differs by more than that, plus
+# MAX_SHARE (default 0.5%).
 set -u
 cd "$(dirname "$0")/../.."
 GODOT="${GODOT:-godot}"
@@ -20,16 +22,17 @@ if [ -z "${DISPLAY:-}" ] && command -v xvfb-run > /dev/null; then
 fi
 
 status=0
-for method in gl_compatibility forward_plus; do
-	dir="$OUT/$method"
+for run in gl_compatibility gl_compatibility_again forward_plus; do
+	method="${run%_again}"
+	dir="$OUT/$run"
 	rm -rf "$dir"
 	mkdir -p "$dir"
-	echo "== Tour under $method"
+	echo "== Tour under $method ($run)"
 	SHOT_DIR="$dir" SHOT_RENDERER="$method" "${RUN[@]}" "$GODOT" --path . --rendering-method "$method" \
-		res://tools/shots/renderer_tour.tscn > "$OUT/$method.log" 2>&1
-	grep -E "^Renderer|ERROR" "$OUT/$method.log" | head -20
+		res://tools/shots/renderer_tour.tscn > "$OUT/$run.log" 2>&1
+	grep -E "^Renderer|ERROR" "$OUT/$run.log" | head -20
 	if [ "$(ls "$dir" | wc -l)" -eq 0 ]; then
-		echo "No pictures from the $method tour (log: $OUT/$method.log)"
+		echo "No pictures from the $run tour (log: $OUT/$run.log)"
 		status=1
 	fi
 done
@@ -37,4 +40,4 @@ done
 
 echo "== Comparing"
 "$GODOT" --headless --path . --script res://tools/shots/compare_shots.gd -- \
-	"$OUT/gl_compatibility" "$OUT/forward_plus" "$OUT/diff" "${MAX_SHARE:-0.02}"
+	"$OUT/gl_compatibility" "$OUT/forward_plus" "$OUT/diff" "${MAX_SHARE:-0.005}" "$OUT/gl_compatibility_again"

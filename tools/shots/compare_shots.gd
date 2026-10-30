@@ -4,8 +4,10 @@ extends SceneTree
 ## than THRESHOLD in any channel, and the mean difference. Writes a picture
 ## of the differences beside each pair (red where they differ) into OUT_DIR.
 ## Exits 1 if any picture is missing or differs on more than MAX_SHARE of its
-## pixels.
-## Run: godot --headless --path . --script res://tools/shots/compare_shots.gd -- BEFORE_DIR AFTER_DIR OUT_DIR [MAX_SHARE]
+## pixels. Animated things (water, mist, swaying plants, critters) differ a
+## little between any two runs, so with AGAIN_DIR (the BEFORE shots taken a
+## second time) a picture may differ by that run-to-run share plus MAX_SHARE.
+## Run: godot --headless --path . --script res://tools/shots/compare_shots.gd -- BEFORE_DIR AFTER_DIR OUT_DIR [MAX_SHARE] [AGAIN_DIR]
 
 ## Differences at or under this (out of 255) are noise: dithering, a
 ## shimmer's frame.
@@ -22,6 +24,7 @@ func _init() -> void:
 	var after_dir := args[1]
 	var out_dir := args[2]
 	var max_share := float(args[3]) if args.size() > 3 else 0.02
+	var again_dir := args[4] if args.size() > 4 else ""
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	var failed := 0
 	var names := Array(DirAccess.get_files_at(before_dir)).filter(func(n: String) -> bool: return n.ends_with(".png"))
@@ -37,12 +40,13 @@ func _init() -> void:
 			print("SIZE     %s  %s vs %s" % [file, a.get_size(), b.get_size()])
 			failed += 1
 			continue
-		a.convert(Image.FORMAT_RGB8)
-		b.convert(Image.FORMAT_RGB8)
-		# one sample per game pixel is enough, and keeps this quick
-		while a.get_width() > 960:
-			a.resize(a.get_width() / 2, a.get_height() / 2, Image.INTERPOLATE_NEAREST)
-			b.resize(b.get_width() / 2, b.get_height() / 2, Image.INTERPOLATE_NEAREST)
+		_prepare(a)
+		_prepare(b)
+		var noise := 0.0
+		if again_dir != "" and FileAccess.file_exists(again_dir.path_join(file)):
+			var again := Image.load_from_file(again_dir.path_join(file))
+			_prepare(again)
+			noise = _share(a, again)
 		var w := a.get_width()
 		var h := a.get_height()
 		var da := a.get_data()
@@ -62,10 +66,29 @@ func _init() -> void:
 				else:
 					diff.set_pixel(x, y, Color(grey, grey, grey))
 		var share := float(differing) / float(w * h)
-		var ok := share <= max_share
+		var ok := share <= noise + max_share
 		if not ok:
 			failed += 1
-		print("%s  %-40s %6.2f%% of pixels differ, mean %.2f" % ["ok  " if ok else "DIFF", file, share * 100.0, total / float(w * h)])
+		print("%s  %-40s %6.2f%% of pixels differ (%.2f%% between two runs), mean %.2f" % ["ok  " if ok else "DIFF", file, share * 100.0, noise * 100.0, total / float(w * h)])
 		diff.save_png(out_dir.path_join(file.get_basename() + "_diff.png"))
 	print("%d of %d pictures match" % [names.size() - failed, names.size()])
 	quit(1 if failed > 0 or names.is_empty() else 0)
+
+
+## RGB, one sample per game pixel: enough to compare, and quick.
+func _prepare(image: Image) -> void:
+	image.convert(Image.FORMAT_RGB8)
+	while image.get_width() > 960:
+		image.resize(image.get_width() / 2, image.get_height() / 2, Image.INTERPOLATE_NEAREST)
+
+
+## The share of pixels that differ by more than THRESHOLD between two
+## pictures of one size.
+func _share(a: Image, b: Image) -> float:
+	var da := a.get_data()
+	var db := b.get_data()
+	var differing := 0
+	for i in range(0, da.size(), 3):
+		if maxi(maxi(absi(da[i] - db[i]), absi(da[i + 1] - db[i + 1])), absi(da[i + 2] - db[i + 2])) > THRESHOLD:
+			differing += 1
+	return float(differing) / float(da.size() / 3)
