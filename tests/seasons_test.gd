@@ -44,6 +44,7 @@ func _ready() -> void:
 	await test_falls()
 	await test_mirror_lake()
 	await test_horsetail()
+	await test_rainbow_and_water()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
 
@@ -253,3 +254,29 @@ func test_horsetail() -> void:
 	check(sign != null and not sign.extra_active(), "the El Capitan sign reads as usual in summer")
 	set_date(WINTER, 3, 12)
 	check(sign != null and "Horsetail Fall" in sign.current_text(), "and tells you about Horsetail Fall in winter")
+
+
+func test_rainbow_and_water() -> void:
+	set_date(SPRING, 28, 16, 30)
+	world._enter_region("bridalveil_fall", "arrival")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var bows: Array[Node] = world.region.find_children("*", "FallSpray", true, false)
+	check(not bows.is_empty(), "Bridalveil's spray gets droplets and a rainbow")
+	if bows.is_empty():
+		return
+	var bow: FallSpray = bows[0]
+	Weather.today()
+	Weather._today = {"snow": 0.0, "rain": 0.0, "clouds": 0.2}
+	check(bow.rainbow_time(), "a rainbow on a clear spring afternoon")
+	GameClock.minutes = 10 * 60
+	check(not bow.rainbow_time(), "not in the morning at Bridalveil")
+	GameClock.minutes = 16 * 60 + 30
+	Weather._today = {"snow": 0.0, "rain": 0.7, "clouds": 1.0}
+	check(not bow.rainbow_time(), "not in the rain")
+	Weather._today_key = ""
+	var surface: WaterSurface
+	for node in world.get_children():
+		if node is WaterSurface:
+			surface = node
+	check(surface != null and surface.visible, "the water's surface is drawn outdoors")
