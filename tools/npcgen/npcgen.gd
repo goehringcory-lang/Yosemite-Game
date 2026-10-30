@@ -1,8 +1,11 @@
 extends SceneTree
-## Draws the placeholder pixel art for every person in the game: one 48×96
+## Draws the placeholder pixel art for every person in the game: one 208×96
 ## sheet per character, in the same layout as assets/sprites/player.png
-## (16×24 frames; columns stand / step A / step B, rows down / up / left /
-## right). Also draws the player sheet (assets/sprites/player.png), the icons
+## (16×24 frames; rows down / up / left / right, and a column per pose in
+## COLUMNS: stand, the two walking steps, a blink, two running strides,
+## crouching, arms up, reaching out, carrying someone on your back (standing
+## and two steps) and talking). The first three columns are the original
+## stand / step A / step B, so a sheet cut down to them still works. Also draws the player sheet (assets/sprites/player.png), the icons
 ## for story items (assets/sprites/story_items.png) and a preview lineup of the
 ## whole cast (docs/cast_lineup.png).
 ##
@@ -34,6 +37,15 @@ const BLUSH := Color("e07a70")
 const MOUTH := Color("9a4a44")
 const GLINT := Color("fbf6ea")
 const NEIGHBOURS := [Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(1, 0)]
+## The sheet's columns, left to right, as [pose, step]. The game reads them by
+## index (CharacterSheet.Col), so add new poses at the end.
+const COLUMNS := [
+	["walk", 0], ["walk", 1], ["walk", 2], ["blink", 0], ["run", 1], ["run", 2],
+	["crouch", 0], ["arms_up", 0], ["reach", 0], ["carry", 0], ["carry", 1], ["carry", 2],
+	["talk", 0],
+]
+## What stays on in poses that use both hands: worn things, not held ones.
+const WORN := ["rope", "chalk_bag"]
 
 enum Facing { DOWN, UP, LEFT, RIGHT }
 
@@ -43,6 +55,9 @@ var ox := 0
 var oy := 0
 ## Vertical offset of the upper body inside the frame: -1 on a step, so the body bobs.
 var dy := 0
+## Sideways offset of the upper body, toward the way a side view faces when
+## negative: leaning into a run, a crouch or a load.
+var dx := 0
 ## True while drawing a right-facing frame: geometry is mirrored, shading is not.
 var mirror := false
 var skin_c := Color("e0ac7e")
@@ -76,6 +91,7 @@ func is_side(facing: int) -> bool:
 
 ## Fills a rect in frame coordinates (upper-body rects follow the bob).
 func rect(x: int, y: int, w: int, h: int, c) -> void:
+	x += dx
 	var xx := FW - x - w if mirror else x
 	var r := Rect2i(ox + xx, oy + dy + y, w, h).intersection(Rect2i(ox, oy, FW, FH))
 	if r.size.x > 0 and r.size.y > 0:
@@ -83,6 +99,7 @@ func rect(x: int, y: int, w: int, h: int, c) -> void:
 
 
 func px(x: int, y: int, c) -> void:
+	x += dx
 	var xx := FW - 1 - x if mirror else x
 	var yy := y + dy
 	if xx >= 0 and yy >= 0 and xx < FW and yy < FH:
@@ -194,19 +211,22 @@ func ground_shadow() -> void:
 # ---------------------------------------------------------------- sheet
 
 func draw_sheet(look: Dictionary) -> Image:
-	im = Image.create_empty(FW * 3, FH * 4, false, Image.FORMAT_RGBA8)
-	for step in 3:
+	im = Image.create_empty(FW * COLUMNS.size(), FH * 4, false, Image.FORMAT_RGBA8)
+	for column in COLUMNS.size():
 		for facing in [Facing.DOWN, Facing.UP, Facing.LEFT, Facing.RIGHT]:
-			ox = step * FW
+			ox = column * FW
 			oy = facing * FH
-			draw_figure(look, facing, step)
+			draw_figure(look, facing, COLUMNS[column][1], COLUMNS[column][0])
 			shade_frame()
 			outline_frame()
 			ground_shadow()
 	return im
 
 
-func draw_figure(look: Dictionary, facing: int, step: int) -> void:
+## One frame of [param look] facing [param facing]. [param pose] is "walk"
+## (step 0 standing, 1 and 2 the steps), "blink", "talk", "run", "crouch",
+## "arms_up", "reach" or "carry" (see COLUMNS).
+func draw_figure(look: Dictionary, facing: int, step: int, pose := "walk") -> void:
 	var side := is_side(facing)
 	var back := facing == Facing.UP
 	mirror = facing == Facing.RIGHT
@@ -218,14 +238,29 @@ func draw_figure(look: Dictionary, facing: int, step: int) -> void:
 	var shoes := col(look.get("shoes", SHOE))
 	var hair := col(look.get("hair", "4a3020"))
 	var accessories: Array = look.get("carry", [])
+	if pose in ["crouch", "arms_up", "reach", "carry"]:
+		# Both hands are busy: only what's worn stays on.
+		accessories = accessories.filter(func(item: String) -> bool: return item in WORN)
 	# Arm swing: on step A the left arm leads, on step B the right.
 	var swing_l := 1 if step == 1 else 0
 	var swing_r := 1 if step == 2 else 0
 	# The upper body rises a pixel on each step; the feet stay on the ground.
 	var bob := -1 if step != 0 else 0
+	# Leaning: into a run, down into a crouch, under someone on your back.
+	var lean := 0
+	match pose:
+		"run":
+			lean = -1 if side else 0
+		"crouch":
+			bob = 2
+			lean = -1 if side else 0
+		"carry":
+			bob = 1 if step == 0 else 0
+			lean = -1 if side else 0
 
 	# ---- back items and long hair, behind the body
 	dy = bob
+	dx = lean
 	if facing != Facing.UP:
 		_back_items(look, facing, true)
 	if look.get("hair_style", "short") in ["long", "braid"] and not back:
@@ -238,8 +273,13 @@ func draw_figure(look: Dictionary, facing: int, step: int) -> void:
 
 	# ---- legs and skirt (dy 0: the feet do not bob)
 	dy = 0
+	dx = 0
 	var skirt := bottom_style in ["dress", "skirt", "coat_long"]
-	if side:
+	if pose == "crouch":
+		_crouch_legs(look, facing, bottom, shoes)
+	elif pose == "run":
+		_run_legs(look, facing, step, bottom, shoes)
+	elif side:
 		var back_leg := tone(bottom, -0.4)
 		if step == 0:
 			rect(6, 17, 4, 4, bottom)
@@ -266,7 +306,13 @@ func draw_figure(look: Dictionary, facing: int, step: int) -> void:
 			var socks = look.get("socks", "8a8a7a")
 			rect(5, 19 - lift_l, 3, 2, socks)
 			rect(8, 19 - lift_r, 3, 2, socks)
-	if skirt:
+	if skirt and pose == "crouch":
+		# Gathered over the knees.
+		var skirt_col := top if bottom_style == "dress" else bottom
+		rect(3, 18, 10 if not side else 8, 3, skirt_col)
+		rect(3, 18, 1, 3, tone(skirt_col, 0.15))
+		rect(12 if not side else 10, 18, 1, 3, tone(skirt_col, -0.3))
+	elif skirt:
 		var skirt_col := top if bottom_style == "dress" else bottom
 		if side:
 			rect(5, 17, 6, 4, skirt_col)
@@ -282,6 +328,7 @@ func draw_figure(look: Dictionary, facing: int, step: int) -> void:
 
 	# ---- torso: lit left, base, shaded right, darker belt at the bottom
 	dy = bob
+	dx = lean
 	if side:
 		rect(5, 12, 6, 6, top)
 	else:
@@ -294,7 +341,9 @@ func draw_figure(look: Dictionary, facing: int, step: int) -> void:
 
 	# ---- arms: darker sleeve, skin hands
 	var sleeve := tone(top, -0.2) if not look.has("sleeve") else col(look.sleeve)
-	if side:
+	if pose in ["run", "crouch", "arms_up", "reach", "carry"]:
+		_pose_arms(look, facing, step, pose, sleeve, skin)
+	elif side:
 		rect(7, 12 + swing_l, 2, 5, sleeve)
 		rect(7, 17 + swing_l, 2, 1, skin)
 	else:
@@ -302,7 +351,7 @@ func draw_figure(look: Dictionary, facing: int, step: int) -> void:
 		rect(12, 12 + swing_r, 1, 5, tone(sleeve, -0.3))
 		px(3, 17 + swing_l, skin)
 		px(12, 17 + swing_r, tone(skin, -0.12))
-	if look.has("tattoos"):
+	if look.has("tattoos") and pose in ["walk", "blink", "talk"]:
 		var ink := col(look.tattoos)
 		if side:
 			px(7, 13 + swing_l, ink)
@@ -346,7 +395,7 @@ func draw_figure(look: Dictionary, facing: int, step: int) -> void:
 		px(10, 11, skin_shade)
 	_hair(look, facing)
 	if not back:
-		_face(look, facing, skin, skin_shade)
+		_face(look, facing, skin, skin_shade, pose)
 	_beard(look, facing)
 	_hat(look, facing)
 
@@ -355,28 +404,179 @@ func draw_figure(look: Dictionary, facing: int, step: int) -> void:
 	if back:
 		_back_items(look, facing, false)
 	_carry(accessories, facing, swing_r, swing_l, skin)
+	if pose == "arms_up":
+		# Hands up beside the hat brim, in front of everything.
+		_pose_arms(look, facing, step, "hands_up", sleeve, skin)
 	dy = 0
+	dx = 0
 	mirror = false
 
 
+## Running legs: a long stride with the trailing foot kicked up off the
+## ground (front and back views lift a foot higher than a walk does).
+func _run_legs(look: Dictionary, facing: int, step: int, bottom: Color, shoes: Color) -> void:
+	if is_side(facing):
+		var fwd := -2 if step == 1 else 2
+		var back_leg := tone(bottom, -0.4)
+		# the trailing leg bends, its foot up behind
+		rect(7 - fwd, 17, 2, 3, back_leg)
+		rect(6 - fwd, 20, 3, 1, shoes)
+		rect(7 + fwd, 17, 2, 4, bottom)
+		rect(6 + fwd, 21, 3, 1, shoes)
+		return
+	var lift_l := 2 if step == 1 else 0
+	var lift_r := 2 if step == 2 else 0
+	rect(5, 17, 1, 4 - lift_l, tone(bottom, 0.12))
+	rect(6, 17, 1, 4 - lift_l, bottom)
+	rect(7, 17, 1, 4 - lift_l, tone(bottom, -0.35))
+	rect(8, 17, 2, 4 - lift_r, bottom)
+	rect(10, 17, 1, 4 - lift_r, tone(bottom, -0.35))
+	rect(5, 21 - lift_l, 3, 1, shoes)
+	rect(8, 21 - lift_r, 3, 1, shoes)
+	if look.get("bottom_style", "pants") == "knickers":
+		var socks = look.get("socks", "8a8a7a")
+		rect(5, 19 - lift_l, 3, 2, socks)
+		rect(8, 19 - lift_r, 3, 2, socks)
+
+
+## Crouching to the ground: knees bent out in front (or to either side, seen
+## from the front or behind), the upper body two pixels lower.
+func _crouch_legs(look: Dictionary, facing: int, bottom: Color, shoes: Color) -> void:
+	if is_side(facing):
+		var back_leg := tone(bottom, -0.4)
+		# the back knee down, the front thigh level and its shin upright
+		rect(8, 19, 3, 2, back_leg)
+		rect(10, 21, 3, 1, shoes)
+		rect(4, 18, 5, 2, bottom)
+		rect(4, 20, 2, 1, bottom)
+		rect(3, 21, 3, 1, shoes)
+		return
+	rect(4, 19, 3, 2, tone(bottom, 0.12))
+	rect(9, 19, 3, 2, tone(bottom, -0.2))
+	rect(6, 19, 4, 1, bottom)
+	rect(4, 21, 3, 1, shoes)
+	rect(9, 21, 3, 1, shoes)
+	if look.get("bottom_style", "pants") == "knickers":
+		var socks = look.get("socks", "8a8a7a")
+		rect(4, 20, 3, 1, socks)
+		rect(9, 20, 3, 1, socks)
+
+
+## The arms for the poses that aren't a walk: pumping in a run, reaching to
+## the ground, raised overhead, held out in front, or holding someone on your
+## back. "hands_up" is the front view's raised hands, drawn last.
+func _pose_arms(_look: Dictionary, facing: int, step: int, pose: String, sleeve: Color, skin: Color) -> void:
+	var side := is_side(facing)
+	var lit := tone(sleeve, 0.1)
+	var shade := tone(sleeve, -0.3)
+	var skin_dark := tone(skin, -0.12)
+	match pose:
+		"run":
+			if side:
+				if step == 1:
+					# the near arm pumps forward, bent up at the elbow
+					rect(6, 12, 2, 3, sleeve)
+					rect(4, 13, 2, 2, sleeve)
+					px(3, 13, skin)
+				else:
+					rect(8, 12, 2, 3, sleeve)
+					rect(10, 14, 2, 2, sleeve)
+					px(12, 15, skin)
+			else:
+				var up_l := 3 if step == 1 else 0
+				var up_r := 3 if step == 2 else 0
+				rect(3, 12, 1, 5 - up_l, lit)
+				rect(12, 12, 1, 5 - up_r, shade)
+				px(3, 17 - up_l, skin)
+				px(12, 17 - up_r, skin_dark)
+		"crouch":
+			if side:
+				# reaching down to the ground in front
+				rect(5, 12, 2, 3, sleeve)
+				rect(3, 14, 2, 3, sleeve)
+				rect(3, 17, 2, 1, skin)
+			else:
+				rect(3, 12, 1, 3, lit)
+				rect(12, 12, 1, 3, shade)
+				rect(4, 15, 1, 2, lit)
+				rect(11, 15, 1, 2, shade)
+				if facing == Facing.DOWN:
+					px(5, 17, skin)
+					px(10, 17, skin_dark)
+		"arms_up":
+			# raised after the head is drawn (see "hands_up")
+			pass
+		"hands_up":
+			if side:
+				# one arm up behind the head (a back cast, a stretch)
+				rect(10, 4, 2, 9, sleeve)
+				rect(11, 4, 1, 9, shade)
+				rect(10, 3, 2, 1, skin)
+				return
+			rect(3, 4, 1, 8, lit)
+			rect(12, 4, 1, 8, shade)
+			px(3, 3, skin)
+			px(12, 3, skin_dark)
+		"reach":
+			if side:
+				# held straight out in front at the shoulder
+				rect(3, 12, 5, 2, sleeve)
+				rect(2, 12, 1, 2, skin)
+			elif facing == Facing.DOWN:
+				# both hands out toward you
+				rect(3, 12, 1, 2, lit)
+				rect(12, 12, 1, 2, shade)
+				rect(4, 14, 2, 1, sleeve)
+				rect(10, 14, 2, 1, sleeve)
+				px(6, 14, skin)
+				px(9, 14, skin_dark)
+			else:
+				rect(3, 11, 1, 3, lit)
+				rect(12, 11, 1, 3, shade)
+		"carry":
+			if side:
+				# bent back to hold the legs of whoever rides on you
+				rect(8, 12, 2, 3, sleeve)
+				rect(10, 14, 2, 1, sleeve)
+				px(12, 14, skin)
+			elif facing == Facing.DOWN:
+				rect(3, 12, 1, 4, lit)
+				rect(12, 12, 1, 4, shade)
+				px(3, 16, skin)
+				px(12, 16, skin_dark)
+			else:
+				rect(3, 12, 1, 3, lit)
+				rect(12, 12, 1, 3, shade)
+				px(4, 15, skin)
+				px(11, 15, skin_dark)
+
+
 ## Eyes with a light glint, blush, nose and mouth, and optional glasses.
-func _face(look: Dictionary, facing: int, skin: Color, skin_shade: Color) -> void:
+## Eyes closed on a "blink" frame, the mouth open on a "talk" frame.
+func _face(look: Dictionary, facing: int, skin: Color, skin_shade: Color, pose := "walk") -> void:
 	var eye := col(look.get("eyes", "2a1f1a"))
 	var blush := skin.lerp(BLUSH, 0.45)
 	var mouth := skin.lerp(MOUTH, 0.6)
+	var shut := pose == "blink"
+	var lid := tone(skin, -0.45)
+	var open_mouth := mouth.darkened(0.45)
 	if is_side(facing):
-		px(6, 7, GLINT)
-		px(6, 8, eye)
+		px(6, 7, skin if shut else GLINT)
+		px(6, 8, lid if shut else eye)
 		px(6, 9, blush)
-		px(5, 10, mouth)
+		px(5, 10, open_mouth if pose == "talk" else mouth)
+		if pose == "talk":
+			px(6, 10, mouth)
 	else:
 		for ex in [6, 9]:
-			px(ex, 7, GLINT)
-			px(ex, 8, eye)
+			px(ex, 7, skin if shut else GLINT)
+			px(ex, 8, lid if shut else eye)
 		px(5, 9, blush)
 		px(10, 9, blush)
 		px(7, 9, skin_shade)
-		px(7, 10, mouth)
+		px(7, 10, open_mouth if pose == "talk" else mouth)
+		if pose == "talk":
+			px(8, 10, mouth)
 	if look.get("glasses", false):
 		var g := Color("c8c8c8")
 		if is_side(facing):

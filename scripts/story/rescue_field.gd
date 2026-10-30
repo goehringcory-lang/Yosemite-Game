@@ -144,10 +144,9 @@ func _update_rider() -> void:
 		return
 	_rider = Sprite2D.new()
 	_rider.name = "RescueRider"
-	_rider.texture = visitor.sprite_sheet
-	_rider.hframes = 3
-	_rider.vframes = 4
-	_rider.frame = 3 # facing up: their back, over your shoulders
+	CharacterSheet.setup(_rider, visitor.sprite_sheet)
+	# their back, over your shoulders, arms up round your neck
+	_rider.frame = CharacterSheet.frame(visitor.sprite_sheet, Vector2i.UP, CharacterSheet.Col.CARRY)
 	_rider.offset = Vector2(0, -22)
 	_rider.position = Vector2(0, -22)
 	_rider.scale = Vector2(0.75, 0.75)

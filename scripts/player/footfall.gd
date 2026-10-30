@@ -6,8 +6,9 @@ extends Node2D
 ## front of their face. Pixel puffs in a small pool, drawn in world space so
 ## they stay where they were made. Where snow lies on the ground
 ## (Seasons.snow_cover), each step also leaves a boot print that stays for
-## the rest of the day, unless fresh snow fills it in. Player adds one as a
-## child.
+## the rest of the day, unless fresh snow fills it in. Running kicks up a
+## bigger spray. Player adds one as a child, and so does everyone walking
+## about (NPC), [member quiet]: their steps make no sound.
 
 ## Pixels walked between steps (the walk cycle's footfalls).
 const STEP_DISTANCE := 20.0
@@ -21,7 +22,8 @@ const MAX_PRINTS := 240
 const PRINT_SNOW := 0.3
 const PRINT_FILL := 90.0
 
-## Each puff: [position, age, kind (0 dust, 1 breath), color, direction].
+## Each puff: [position, age, kind (0 dust, 1 breath, 2 a running kick),
+## color, direction].
 var _puffs: Array = []
 var _walked := 0.0
 var _left := false
@@ -32,6 +34,11 @@ var _breath: Node2D
 var _prints: Array = []
 var _prints_day := ""
 var _print_layer: Node2D
+## No footstep sounds (for other people's feet).
+var quiet := false
+## Faster than this (pixels a second), the feet kick up a spray.
+const RUN_SPEED := 220.0
+var _running := false
 
 
 func _ready() -> void:
@@ -67,6 +74,7 @@ func _process(delta: float) -> void:
 	var feet := body.global_position
 	var moved := feet.distance_to(_last)
 	_last = feet
+	_running = delta > 0.0 and moved / delta > RUN_SPEED
 	# A jump (a door, a spawn) is not a step.
 	if moved > 0.0 and moved < 16.0:
 		_walked += moved
@@ -98,7 +106,8 @@ func _process(delta: float) -> void:
 
 
 func _step(at: Vector2) -> void:
-	_step_sound()
+	if not quiet:
+		_step_sound()
 	if _indoors():
 		return
 	if Seasons.snow_cover() >= PRINT_SNOW:
@@ -116,7 +125,10 @@ func _step(at: Vector2) -> void:
 		return # frozen ground: no dust
 	elif GameClock.season == GameClock.Season.SPRING:
 		color.a = 0.4 # damp spring earth
-	_add([at, 0.0, 0, color, Vector2.ZERO])
+	var behind := Vector2.ZERO
+	if _running and _body() and "facing" in _body():
+		behind = -Vector2(_body().get("facing"))
+	_add([at, 0.0, 2 if _running else 0, color, behind])
 
 
 ## A footstep: boards indoors, a crunch in snow or on winter ground, a squelch
@@ -197,12 +209,19 @@ func _draw_prints() -> void:
 
 func _draw() -> void:
 	for puff: Array in _puffs:
-		if puff[2] != 0:
+		if puff[2] == 1:
 			continue
 		var t: float = puff[1] / PUFF_LIFE
 		var p: Vector2 = (puff[0] as Vector2).floor()
 		var c: Color = puff[3]
 		c.a *= 1.0 - t
+		if puff[2] == 2:
+			# a running kick: a spray flung back off the toe, arcing down
+			var back: Vector2 = puff[4]
+			for i in 4:
+				var fly := back * (4.0 + i * 3.0) * (0.4 + t) + Vector2((i - 1.5) * 3.0, -8.0 * t * (1.0 - t) * (2.0 + i))
+				draw_rect(Rect2((p + fly).floor(), Vector2(2, 2)), c)
+			continue
 		# Three motes spreading out from the heel and settling.
 		var spread := floorf(1.0 + t * 3.0) * 2.0
 		var lift := floorf(t * 2.0) * 2.0

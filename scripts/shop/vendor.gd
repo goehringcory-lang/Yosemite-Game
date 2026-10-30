@@ -6,8 +6,9 @@ extends StaticBody2D
 @export var shop: ShopData
 ## Placeholder clothing color until real sprites exist.
 @export var color := Color(0.55, 0.35, 0.25)
-## A 96x192 character sheet (see tools/npcgen). When set, the vendor is drawn
-## from it, facing [member facing] (0 down, 1 up, 2 left, 3 right).
+## A character sheet (see tools/npcgen, CharacterSheet). When set, the
+## vendor is drawn from it, facing [member facing] (0 down, 1 up, 2 left,
+## 3 right).
 @export var sprite_sheet: Texture2D
 @export_range(0, 3) var facing := 0
 
@@ -16,6 +17,8 @@ var _marker: QuestMarker
 ## While trading: their lines show emotes over their head (on_line).
 var _talking := false
 var _last_emote := ""
+## Their mouth moves until then (seconds, on Time's clock).
+var _speaking_until := 0.0
 
 
 func _ready() -> void:
@@ -34,9 +37,15 @@ func _process(_delta: float) -> void:
 func _draw() -> void:
 	GroundShadow.draw_under(self)
 	if sprite_sheet:
-		# A slow breath so the shopkeeper isn't a statue.
-		var bob := -2.0 if int(Time.get_ticks_msec() / 700) % 2 == 1 else 0.0
-		draw_texture_rect_region(sprite_sheet, Rect2(-16, -48 + bob, 32, 48), Rect2(0, facing * 48, 32, 48))
+		# Blinking, and talking while their lines are up, so the shopkeeper
+		# isn't a statue.
+		var col: int = CharacterSheet.Col.STAND
+		var now := Time.get_ticks_msec() / 1000.0
+		if now < _speaking_until:
+			col = CharacterSheet.Col.TALK if int(now * 7.0) % 2 == 0 else CharacterSheet.Col.STAND
+		elif CharacterSheet.blinking(now, hash(name)):
+			col = CharacterSheet.Col.BLINK
+		draw_texture_rect_region(sprite_sheet, Rect2(-16, -48, 32, 48), CharacterSheet.region(sprite_sheet, CharacterSheet.FACINGS[facing], col))
 		return
 	draw_rect(Rect2(-8, -28, 16, 22), color)
 	draw_circle(Vector2(0, -34), 7.0, Color(0.8, 0.62, 0.48))
@@ -50,6 +59,7 @@ func _draw() -> void:
 func on_line(speaker: String, text: String, mood: String) -> void:
 	if not _talking or shop == null or speaker != shop.keeper:
 		return
+	_speaking_until = Time.get_ticks_msec() / 1000.0 + clampf(text.length() * 0.04, 0.6, 2.6)
 	var kind := Emote.for_line(text, mood)
 	if kind != "" and kind != _last_emote:
 		Emote.pop(self, kind)

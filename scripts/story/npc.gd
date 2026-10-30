@@ -7,9 +7,8 @@ extends CharacterBody2D
 ## [member spot] to a marker name so they follow the map if it's regenerated,
 ## and [member wander_radius] to let them stroll around it.
 
+## Seconds a walking step takes (CharacterSheet.WALK shows two frames a step).
 const FRAME_TIME := 0.18
-## Sheet rows, matching the player's sheet.
-const ROWS := {Vector2i.DOWN: 0, Vector2i.UP: 1, Vector2i.LEFT: 2, Vector2i.RIGHT: 3}
 
 @export var character: CharacterData
 ## Named spot in the region (a Marker2D in Markers or the generated Spawns) to
@@ -72,11 +71,18 @@ var travel_speed := TRAVEL_SPEED
 ## conversation, the day a friend was last greeted, a breath, a glance about.
 var _last_emote := ""
 var _greeted_day := -1
-var _breath := 0.0
 var _glance := 0.0
 var _glance_back := Vector2i.ZERO
 var _doze := 0.0
-var _base_offset_y := 0.0
+## What the sprite shows (see _show_frame): walking or not, a wave held for
+## a moment, their mouth going while their line is up, eyes shut dozing,
+## and the seconds they've been about (for blinking).
+var _walking := false
+var _pose_col := -1
+var _pose_left := 0.0
+var _speaking := 0.0
+var _dozing := false
+var _clock := 0.0
 
 ## Visitors head home between these hours (each at their own time) and come
 ## back out in the morning; on a rainy day about half of them stay in.
@@ -95,14 +101,21 @@ const TRAVEL_SPEED := 56.0
 ## from within GREET_REACH px.
 const GREET_HEARTS := 1
 const GREET_REACH := 88.0
-## Standing about: a breath every BREATH seconds (the sprite rises 2 px), and
+## Standing about: a blink every few seconds (CharacterSheet.blinking), and
 ## a look round every GLANCE_MIN to GLANCE_MAX seconds for GLANCE_HOLD.
-const BREATH := 0.9
 const GLANCE_MIN := 5.0
 const GLANCE_MAX := 11.0
 const GLANCE_HOLD := 1.4
 ## People with quests doze on their feet late at night: "Zzz" every DOZE s.
 const DOZE := 6.0
+## A friend's wave lasts this long; their mouth moves this long a letter of
+## their line (within TALK_MIN and TALK_MAX), opening and closing TALK_FPS
+## times a second.
+const WAVE_TIME := 0.8
+const TALK_PER_LETTER := 0.04
+const TALK_MIN := 0.6
+const TALK_MAX := 2.6
+const TALK_FPS := 7.0
 
 
 func _ready() -> void:
@@ -131,13 +144,14 @@ func _ready() -> void:
 	# Wanderers (and quest givers, who stroll by day) bump into the map
 	# (layer 1) and the player (layer 2).
 	collision_mask = 3 if wander_radius > 0.0 or not _stops.is_empty() or (character and not character.visitor) else 0
+	# dust (and prints in the snow) under their feet as they go
+	var feet := Footfall.new()
+	feet.quiet = true
+	add_child(feet)
 	if character and character.sprite_sheet:
 		_sprite = Sprite2D.new()
-		_sprite.texture = character.sprite_sheet
-		_sprite.hframes = 3
-		_sprite.vframes = 4
+		CharacterSheet.setup(_sprite, character.sprite_sheet)
 		_sprite.offset = Vector2(0, -22)
-		_base_offset_y = _sprite.offset.y
 		add_child(_sprite)
 	_update_frame(false)
 	queue_redraw()
@@ -160,20 +174,28 @@ func _ready() -> void:
 func on_line(speaker: String, text: String, mood: String) -> void:
 	if not _talking or character == null or speaker != character.display_name:
 		return
+	_speaking = clampf(text.length() * TALK_PER_LETTER, TALK_MIN, TALK_MAX)
 	var kind := Emote.for_line(text, mood)
 	if kind != "" and kind != _last_emote:
 		Emote.pop(self, kind)
 		_last_emote = kind
 
 
-## Standing about, people aren't statues: they breathe, glance round now and
+## Standing about, people aren't statues: they blink, glance round now and
 ## then, wave to a friend walking up (once a day), and doze late at night.
 func _idle_life(delta: float) -> void:
-	if _sprite == null or not visible or _talking:
+	_clock += delta
+	_speaking = maxf(_speaking - delta, 0.0)
+	_pose_left = maxf(_pose_left - delta, 0.0)
+	if _sprite == null or not visible:
 		return
 	var standing := velocity == Vector2.ZERO and _route.is_empty()
-	_breath += delta
-	_sprite.offset.y = _base_offset_y - (2.0 if standing and int(_breath / BREATH) % 2 == 1 else 0.0)
+	if standing:
+		_walking = false
+	_show_frame()
+	if _talking:
+		return
+	_dozing = standing and character != null and not character.visitor and not stands_still and is_dozing_hour()
 	if not standing:
 		_glance_back = Vector2i.ZERO
 		return
@@ -220,6 +242,8 @@ func _greet_friend() -> bool:
 	_greeted_day = today
 	_face(player.global_position - global_position)
 	_update_frame(false)
+	_pose_col = CharacterSheet.Col.ARMS_UP
+	_pose_left = WAVE_TIME
 	Emote.pop(self, "heart" if Friendship.hearts(character.id) >= 3 else "glad")
 	return true
 
@@ -509,12 +533,25 @@ func _face(direction: Vector2) -> void:
 
 
 func _update_frame(walking: bool) -> void:
+	_walking = walking
+	_show_frame()
+
+
+## The frame for now: the walk (a step, standing tall, the other step), or
+## standing about with a wave, their mouth going, a blink or dozing eyes.
+func _show_frame() -> void:
 	if not _sprite:
 		return
-	var column := 0
-	if walking:
-		column = 1 + int(_walk_time / FRAME_TIME) % 2
-	_sprite.frame = ROWS[facing] * 3 + column
+	var col: int = CharacterSheet.Col.STAND
+	if _walking:
+		col = CharacterSheet.WALK[int(_walk_time / (FRAME_TIME / 2.0)) % CharacterSheet.WALK.size()]
+	elif _pose_left > 0.0:
+		col = _pose_col
+	elif _speaking > 0.0:
+		col = CharacterSheet.Col.TALK if int(_speaking * TALK_FPS) % 2 == 0 else CharacterSheet.Col.STAND
+	elif _dozing or CharacterSheet.blinking(_clock, hash(name)):
+		col = CharacterSheet.Col.BLINK
+	_sprite.frame = CharacterSheet.frame(_sprite.texture, facing, col)
 
 
 func interact(player: Player) -> void:

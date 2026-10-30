@@ -13,7 +13,9 @@ _RIMS = tuple(K._RAMP_SPAN[i, 0] for i in range(len(P.COLORS)))
 
 def characters(path: str, a: np.ndarray) -> np.ndarray:
     big = K.remap(K.scale2x(a))
-    if a.shape[1] == 48 and a.shape[0] == 96:  # a 3x4 sheet of 16x24 frames
+    # a sheet of 16x24 frames, four rows: the first three columns (stand and
+    # two steps), or the full set of poses tools/npcgen draws
+    if a.shape[0] == 96 and a.shape[1] in (48, 208):
         return K.per_cell(big, 32, 48, K.outline)
     return big
 
