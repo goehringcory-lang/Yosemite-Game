@@ -13,8 +13,8 @@ extends RefCounted
 const LIGHTS := {
 	"res://assets/sprites/ahwahnee/lamp_wrought.png": {"head": 9, "radius": 72.0, "strength": 0.95, "flicker": 0.0, "color": Color(1.0, 0.8, 0.52)},
 	"res://assets/sprites/clutter/camp_lantern.png": {"head": 12, "radius": 46.0, "strength": 0.85, "flicker": 0.12, "color": Color(1.0, 0.78, 0.45)},
-	"res://assets/sprites/lamon/campfire.png": {"head": -10, "radius": 84.0, "strength": 1.15, "flicker": 0.4, "color": Color(1.0, 0.66, 0.34)},
-	"res://assets/sprites/buildings/camp4_fire_ring.png": {"head": -10, "radius": 84.0, "strength": 1.15, "flicker": 0.4, "color": Color(1.0, 0.66, 0.34)},
+	"res://assets/sprites/lamon/campfire.png": {"head": -10, "radius": 112.0, "strength": 1.5, "flicker": 0.4, "color": Color(1.0, 0.66, 0.34)},
+	"res://assets/sprites/buildings/camp4_fire_ring.png": {"head": -10, "radius": 112.0, "strength": 1.5, "flicker": 0.4, "color": Color(1.0, 0.66, 0.34)},
 	# Indoors: they come up as the room dims at night (RoomLight, High graphics).
 	"res://assets/sprites/interiors/props/table_lamp.png": {"head": 8, "radius": 70.0, "strength": 0.8, "flicker": 0.0, "color": Color(1.0, 0.82, 0.55)},
 	"res://assets/sprites/interiors/props/lamp.png": {"head": 10, "radius": 80.0, "strength": 0.85, "flicker": 0.0, "color": Color(1.0, 0.82, 0.55)},

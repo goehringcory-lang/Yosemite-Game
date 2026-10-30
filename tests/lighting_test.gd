@@ -46,6 +46,7 @@ func _ready() -> void:
 	await test_lamps()
 	await test_lit_sprites()
 	await test_lit_park()
+	test_fire_outshines_lamps()
 	await test_indoors()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
@@ -235,6 +236,13 @@ func test_lit_park() -> void:
 		if ground and ground.material is ShaderMaterial:
 			check((ground.material as ShaderMaterial).get_shader_parameter("normal_map") != null, "%s's painted ground has its normal map" % region_id)
 	set_date(SUMMER, 14, 12)
+
+
+## A fire is the brightest light in the night, brighter and wider than a lamp.
+func test_fire_outshines_lamps() -> void:
+	var fire: Dictionary = LampLights.LIGHTS["res://assets/sprites/lamon/campfire.png"]
+	var lamp: Dictionary = LampLights.LIGHTS["res://assets/sprites/ahwahnee/lamp_wrought.png"]
+	check(fire.strength > lamp.strength and fire.radius > lamp.radius, "a campfire outshines a street lamp")
 
 
 func test_indoors() -> void:
