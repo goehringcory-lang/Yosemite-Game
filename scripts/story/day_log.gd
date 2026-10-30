@@ -17,6 +17,8 @@ var recipes: PackedStringArray = []
 var friends: PackedStringArray = []
 ## Animals new to the field log today.
 var animals: PackedStringArray = []
+## Rescue calls you saw through today (Rescues), as "title (who)".
+var rescues: PackedStringArray = []
 var dishes := 0
 
 
@@ -31,6 +33,7 @@ func _ready() -> void:
 	Recipes.learned.connect(func(recipe: RecipeData) -> void: recipes.append(recipe.display_name))
 	Recipes.made.connect(func(_recipe: RecipeData) -> void: dishes += 1)
 	Friendship.heart_gained.connect(_on_heart)
+	Rescues.rescued.connect(func(call: Dictionary) -> void: rescues.append("%s (%s)" % [call.title, call.who]))
 	FieldLog.logged.connect(func(id: String) -> void: animals.append(str(FieldLog.get_animal(id).get("name", id))))
 	GameClock.day_started.connect(clear.unbind(3))
 
@@ -62,18 +65,19 @@ func clear() -> void:
 	recipes = []
 	friends = []
 	animals = []
+	rescues = []
 	dishes = 0
 
 
 ## True when nothing worth a line happened.
 func is_empty() -> bool:
 	return items.is_empty() and gear.is_empty() and ticks.is_empty() and quests.is_empty() \
-		and perks.is_empty() and recipes.is_empty() and friends.is_empty() and animals.is_empty() and dishes == 0
+		and perks.is_empty() and recipes.is_empty() and friends.is_empty() and animals.is_empty() and rescues.is_empty() and dishes == 0
 
 
 func save_data() -> Dictionary:
 	return {"items": items, "gear": gear, "ticks": ticks, "quests": quests, "perks": perks,
-		"recipes": recipes, "friends": friends, "animals": animals, "dishes": dishes}
+		"recipes": recipes, "friends": friends, "animals": animals, "rescues": rescues, "dishes": dishes}
 
 
 func load_data(data: Dictionary) -> void:
@@ -85,4 +89,5 @@ func load_data(data: Dictionary) -> void:
 	recipes = PackedStringArray(data.get("recipes", []))
 	friends = PackedStringArray(data.get("friends", []))
 	animals = PackedStringArray(data.get("animals", []))
+	rescues = PackedStringArray(data.get("rescues", []))
 	dishes = int(data.get("dishes", 0))

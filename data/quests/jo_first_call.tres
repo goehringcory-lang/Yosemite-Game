@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "jo_first_call"
+title = "First Call"
+giver = "jo_tolliver"
+requires = PackedStringArray("hodges_rescue_team")
+intro = PackedStringArray("Radio just went. Family at the Cook's Meadow boardwalk lost their boy. Nine years old, chased a deer, and he's been gone an hour.", "He'll have left prints in the soft ground. Start where he was last seen and read them. They'll take you right to him.", "When you find him, bring him back here. Carry him if you have to. Go on, I'll call the family.")
+steps = [{"type": "unlocked", "ability": "first_rescue", "objective": "Follow the boy's prints from Cook's Meadow, find him, and carry him back to Jo at Camp 4", "reminder": "Prints from the Cook's Meadow boardwalk. Read the ground close in front of you, and follow them. Then bring him here.", "done": ["That's a rescue. Your first one.", "He'll be telling that story for the rest of his life, and you're in it."]}]
+outro = PackedStringArray("Some mornings the radio goes off. Come by the rescue site, and if there's a call, it's yours.", "Lost hikers, hurt ankles, people stuck on a climb they shouldn't have started. Everybody gets found. That's the job.")
+reward_items = {
+"trail_mix": 2
+}
