@@ -58,7 +58,8 @@ func finish_the_story() -> void:
 	for quest: QuestData in QuestLog.QUESTS:
 		if not quest.guardian_line:
 			QuestLog.completed.append(quest.id)
-	QuestLog.unlocks.append_array([Guidebook.ABILITY, QuestLog.GUARDIAN_FOUND])
+	QuestLog.unlocks.append(Guidebook.ABILITY)
+	QuestLog.unlocks.append(QuestLog.GUARDIAN_FOUND)
 	QuestLog.final_entry = 0
 
 
@@ -95,7 +96,7 @@ func _check_data() -> void:
 			check(Stewardship.TASKS.has(step.task) and Stewardship.spots_for(step.task).size() >= int(step.count),
 				"%s: there are %d %s spots to do" % [quest.id, int(step.count), step.task])
 	for id: String in ARCS:
-		var quest := QuestLog.get_quest(id)
+		var quest: QuestData = QuestLog.get_quest(id)
 		var only := [0, 1, 2, 3].filter(func(s: int) -> bool: return quest.is_offered_in(s))
 		check(only == [ARCS[id]], "%s is offered in %s only" % [id, GameClock.SEASON_NAMES[ARCS[id]]])
 	check(QuestLog.get_quest(QuestLog.GUARDIAN_YEAR_QUEST).requires.size() == 4, "the year closes once all four arcs are done")
@@ -160,7 +161,7 @@ func _play_spring() -> void:
 	check(not hint.is_empty() and hint.quest.id == "anderson_mist_steps" and "George Anderson" in hint.objective,
 		"in spring, the journal sends you to George Anderson (%s)" % hint.get("objective", ""))
 	check("George Anderson" in HUD.objective_text(), "and so does the pause menu")
-	var lines := QuestLog.talk_to("george_anderson")
+	var lines: Array[Dictionary] = QuestLog.talk_to("george_anderson")
 	check(QuestLog.active.has("anderson_mist_steps") and said(lines, "rock bar") and QuestLog.is_unlocked("rock_bar"),
 		"Anderson hands you a rock bar for the Mist Trail")
 	var step := spot_node("mist_step_1")
@@ -194,7 +195,7 @@ func _play_summer() -> void:
 	check("Rope off" in QuestLog.objective_text(QuestLog.get_quest("enid_cooks_meadow")), "and the journal says so")
 	do_all("meadow_paths")
 	check(not Stewardship.grown_back("meadow_path_1"), "the meadow doesn't heal the same season")
-	var lines := QuestLog.talk_to("enid_michael")
+	var lines: Array[Dictionary] = QuestLog.talk_to("enid_michael")
 	check(QuestLog.is_completed("enid_cooks_meadow") and said(lines, "given one back"), "Enid thanks you for the meadow")
 	set_season(GameClock.Season.FALL)
 	check(Stewardship.grown_back("meadow_path_1") and Stewardship.grown_back("meadow_weed_1"), "a season later, the paths and the weed patches are green")
@@ -204,7 +205,7 @@ func _play_summer() -> void:
 func _play_fall() -> void:
 	new_game(GameClock.Season.FALL)
 	finish_the_story()
-	var lines := QuestLog.talk_to("galen_clark")
+	var lines: Array[Dictionary] = QuestLog.talk_to("galen_clark")
 	check(QuestLog.active.has("clark_grove_fire") and said(lines, "sequoia needs fire"), "in fall Clark asks you to burn his grove")
 	check(not Stewardship.is_wanted("grove_burn"), "no burn until the fuel's cleared")
 	do_all("grove_fuel")
@@ -241,12 +242,12 @@ func _play_the_year() -> void:
 	new_game(GameClock.Season.SUMMER)
 	finish_the_story()
 	QuestLog.completed.append_array(["anderson_mist_steps", "enid_cooks_meadow", "clark_grove_fire"])
-	var hint := QuestLog.guardian_objective()
+	var hint: Dictionary = QuestLog.guardian_objective()
 	check(hint.quest.id == "hodges_bear_boxes" and "Come winter" in hint.objective, "between arcs, the journal says whose work is next (%s)" % hint.objective)
 	QuestLog.completed.append("hodges_bear_boxes")
 	QuestLog.talk_to("galen_clark")
 	check(QuestLog.active.has(QuestLog.GUARDIAN_YEAR_QUEST), "with a year's work done, Clark has a last word")
-	var lines := QuestLog.talk_to("galen_clark")
+	var lines: Array[Dictionary] = QuestLog.talk_to("galen_clark")
 	check(QuestLog.is_completed(QuestLog.GUARDIAN_YEAR_QUEST) and QuestLog.is_unlocked("guardian_year"), "and the Guardian's Year is done")
 	check(said(lines, "None of it stays done"), "the work never stays done")
 	check(RegisterPages.written().any(func(p: Dictionary) -> bool: return p.by == "The Guardian (you)"), "your own page goes in the Register")
@@ -256,7 +257,7 @@ func _play_the_year() -> void:
 func _check_save() -> void:
 	new_game(GameClock.Season.FALL)
 	Stewardship.finish("grove_fuel_1")
-	var saved := JSON.parse_string(JSON.stringify(Stewardship.save_data()))
+	var saved: Dictionary = JSON.parse_string(JSON.stringify(Stewardship.save_data()))
 	Stewardship.start_new_game()
 	check(not Stewardship.is_done("grove_fuel_1"), "a new game starts with nothing done")
 	Stewardship.load_data(saved)
