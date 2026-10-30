@@ -448,7 +448,16 @@ Rebuild them with `tools/hubs/rebuild_interiors.sh` (Pillow and numpy; `ONLY_ROO
 ![A night on El Capitan](docs/climb_night_on_the_wall.png)
 ![Lyell Glacier](docs/climb_lyell_glacier.png)
 
-Each of the 14 routes is its own little game, set where the real climb is. Before you start, a **route card** shows a postcard of the view, the pitches (marked where there's a crux), the gear you need (and what you have) and how much food to bring. Then you climb: a granite wall with its ragged edge against the sky, the real skyline behind it (Half Dome from the Apron, El Capitan and Bridalveil from the Nose, the Cockscomb from Cathedral Peak, Mount Lyell from the glacier), the valley floor far below sinking as you gain height, and clouds drifting past. The light follows the game clock: pink at dawn, blue at midday, orange at dusk, stars and a headlamp at night. Afternoon thunderstorms build over the high country after 2:30 pm, and the glacier's snow goes to slush after noon, so the route card says to start before 10 am.
+Each of the 14 routes is its own little game, set where the real climb is. Before you start, a **route card** shows a postcard of the view, the pitches (marked where there's a crux), the gear you need (and what you have) and how much food to bring. Then you climb: a granite wall with its ragged edge against the sky, the real skyline behind it (Half Dome from the Apron, El Capitan and Bridalveil from the Nose, the Cockscomb from Cathedral Peak, Mount Lyell from the glacier), the valley floor far below sinking as you gain height, and clouds drifting past. The light follows the game clock: pink at dawn, blue at midday, orange at dusk, stars and a headlamp at night. The whole screen has the game's 32px finish: every picture is doubled the way the rest of the art was, and each formation's granite gets its own grain at full resolution (see "Weather on the wall" and the art table below).
+
+**Weather on the wall.** Each day's weather (`Weather.today()`) reaches the wall (`scripts/climb/wall_weather.gd`), and the route card, the sign at the foot of the route and the guidebook's tick list all give the day's forecast:
+
+- **Wet rock.** On a rainy day it rains on the wall. The morning after, the rock stays wet until the sun has been on it for a couple of hours (each route's profile knows when its face gets the sun: Astroman's east face in the morning, the Apron in the afternoon, Sentinel's north face never, so it stays wet until 3 pm). Wet rock looks dark and streaked, drips, narrows the crux meter's green, and makes slab, dike and knob moves cost 1 more.
+- **Wind.** Some days are windy up high: on the upper pitches of the long routes and on the high-country ones. The climber and the rope sway, grit blows across the face, the crux marker gusts, and the green narrows.
+- **Heat.** In summer, a face in the midday sun (noon to 4 pm) is hot: every move costs 1 more. Start early or pick a shady wall.
+- **High-country storms.** On most summer afternoons (and some in spring and fall) thunderheads build over Tuolumne, some time between 1:30 and 3:30. When the storm comes, thunder warns you, it rains, and every move costs more; an hour later the lightning sends you down wherever you are. The route card names the hour, so start before 10 am.
+
+The glacier's snow still goes to slush after noon.
 
 Your climber works up the face on a rope that runs through every quickdraw, cam or old piton to your belayer, who is the person from the story who sent you (Wren, Dick Leonard, Jules Eichorn, Royal Robbins, John Salathé, Beverly Johnson, Warren Harding, George Anderson, John Muir...). The climber shows what you own: red climbing shoes, a chalk bag, a harness with your cams (colored by size) and quickdraws, a belay device, aiders, a portaledge roll, an ice axe and crampons.
 
@@ -488,7 +497,8 @@ Where things are:
 | Rules (stamina, protection, cruxes, aid, nights, weather) | `scripts/climb/climb_state.gd` |
 | Each route's place, rock, skyline, belayer, facts and pitches | `scripts/climb/climb_profiles.gd` |
 | The screen (input, phases, effects) | `scripts/climb/climb_minigame.gd` |
-| Pictures | `scripts/climb/art/`: `climb_rock.gd` (granite, cracks, dikes, roofs, ice), `climb_landscape.gd` (the skyline), `climb_scenes.gd` and `climb_props.gd` (bases and summits), `climb_sprites.gd` (climber, belayers, hardware), `climb_hud.gd`, `climb_ui.gd`, `climb_night.gd` |
+| The day's weather on the wall and the forecast | `scripts/climb/wall_weather.gd` |
+| Pictures | `scripts/climb/art/`: `climb_rock.gd` (granite, cracks, dikes, roofs, ice), `climb_landscape.gd` (the skyline), `climb_scenes.gd` and `climb_props.gd` (bases and summits), `climb_sprites.gd` (climber, belayers, hardware: jams in cracks, laybacks up flakes, a mantel onto the top), `climb_hud.gd`, `climb_ui.gd`, `climb_night.gd`, and `climb_hires.gd` (the 32px finish: Scale2x, each formation's granite grain, wet rock) |
 
 The font is Noto Sans (SIL Open Font License, `assets/fonts/`). To photograph a route: `SHOT_ROUTE=the_nose SHOT_PITCH=6 SHOT_HOURS=7,19 godot --path . res://tools/shots/climb_shot.tscn` (needs a window; `SHOT_INTRO=1` shoots the route card, `SHOT_SPECIAL=crux|result|pause|night` the others). `tools/shots/climb_walls.tscn`, `climb_landmarks.tscn` and `climb_figures.tscn` show the rock, the skyline and the people on their own. More in [docs/CLIMBING_MINIGAME.md](docs/CLIMBING_MINIGAME.md).
 
