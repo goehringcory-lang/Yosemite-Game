@@ -19,3 +19,5 @@ nights = 0
 guide_chapter = "Half Dome"
 guide_order = 33
 guide_tip = "Runout. Place gear when the dike lets you."
+destination_region = "half_dome"
+destination_spawn = "snake_dike_top"

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/bear_canister.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "bear_canister"
+display_name = "Bear Canister"
+description = "A hard plastic drum with a lid a bear's claws can't open, lent by the ranger station. On a night out in the backcountry, everything you carry to eat goes in it, and it sits away from your tent."
+icon = ExtResource("2_icon")
+tier = 0

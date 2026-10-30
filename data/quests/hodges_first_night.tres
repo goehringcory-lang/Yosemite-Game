@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hodges_first_night"
+title = "The First Night Out"
+giver = "clare_hodges"
+requires = PackedStringArray("hodges_patrol")
+intro = PackedStringArray("You've been sleeping in the same tent every night since you got here. Ever spent a night out past the trailhead?", "Up the Mist Trail, past Vernal and Nevada Falls, the river runs flat through Little Yosemite Valley. There's a camp there, and the back of Half Dome right over it.", "I'll write you a wilderness permit. But you'll carry your food in a bear canister, or you won't go at all. The bears up there have had more practice with packs than you have.", "Pack enough to eat for two days, and show me before you set out.")
+steps = [{"type": "have_food", "energy": 40, "objective": "Pack food worth 40 energy for two days on the trail, and show Clare Hodges", "reminder": "Two days' food, at least. Something that keeps. Come back when your pack's full.", "done": ["That'll do. Here's your permit, signed, and a canister from the station stores.", "Everything you eat goes in the canister at night, and the canister goes well away from your tent. It holds a dozen things. Whatever doesn't fit is the bear's business, not mine."], "items": {"wilderness_permit": 1}, "gear": {"bear_canister": 1}}, {"type": "unlocked", "ability": "night_out", "objective": "Hike the Mist Trail from Happy Isles to Little Yosemite Valley, and sleep a night in the backcountry camp", "reminder": "The Mist Trail starts at Happy Isles. Pitch your tent in the camp at Little Yosemite Valley and sleep there with your food in the canister.", "done": []}, {"type": "return", "objective": "Tell Clare Hodges how the night went", "reminder": "Come and find me at the ranger station when you're back down.", "done": ["Back with all your fingers and most of your food. Did you hear him in the night? They always come round. A canister just gives them nothing to learn."]}]
+outro = PackedStringArray("Keep the permit. It's good for the camp, and for the cables up the Dome, if Mr. Anderson's been talking to you about his iron.", "And keep the canister. You've earned the loan of it.")
+reward_items = {"beef_jerky": 2}

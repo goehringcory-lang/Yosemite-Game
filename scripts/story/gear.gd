@@ -29,6 +29,8 @@ const GEAR: Array[GearData] = [
 	preload("res://data/gear/parachute_adams.tres"),
 	preload("res://data/gear/woolly_bugger.tres"),
 	preload("res://data/gear/royal_wulff.tres"),
+	# For nights out in the backcountry (Backcountry).
+	preload("res://data/gear/bear_canister.tres"),
 ]
 
 ## You arrive with approach shoes. The Mountain Shop fits you with your

@@ -4,6 +4,7 @@
 [ext_resource type="Resource" path="res://data/characters/george_anderson.tres" id="2_r"]
 [ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="3_r"]
 [ext_resource type="Resource" path="res://data/routes/snake_dike.tres" id="4_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="5_r"]
 
 [node name="HappyIslesStory" type="Node2D"]
 
@@ -16,3 +17,14 @@ offset = Vector2(-76, 0)
 [node name="SnakeDike" parent="." instance=ExtResource("3_r")]
 position = Vector2(1936, 368)
 route = ExtResource("4_r")
+
+[node name="LittleYosemiteTrail" parent="." instance=ExtResource("5_r")]
+position = Vector2(1360, 464)
+label = "Mist Trail, up past Vernal and Nevada Falls to Little Yosemite Valley"
+target_region = "little_yosemite_valley"
+target_spawn = "jmt"
+minutes = 180
+closure = "mist_trail"
+
+[node name="jmt" type="Marker2D" parent="."]
+position = Vector2(1360, 512)
