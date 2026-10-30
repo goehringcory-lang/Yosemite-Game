@@ -126,6 +126,17 @@ How this sits with the rest of the story: the player finds out they are the Guar
 
 Afterwards the valley stays open: the tick list and the press book can still be finished, Clark calls the player Guardian, and the people they met still have things to say.
 
+### 8. The Guardian's Year (after the ending)
+
+"Looking after the valley doesn't end" is a line the game can play, not only say. After the mirror comes a second year in which the player does the Guardian's work, one arc a season, and each one ends with a change on the map that stays. The work is the kind the park's crews and volunteers really do, and the people who ask for it are the ones whose own work it echoes:
+
+- **Spring, trail crew.** George Anderson, who drilled his way up Half Dome, hands over a rock bar: the snowmelt has washed out the lowest steps of the Mist Trail. Resetting them is a short timing minigame (pry, lever, drop it square). The Register note is about the Civilian Conservation Corps, whose crews built and rebuilt many of the park's trails in the 1930s, and the trail crews who still set those steps by hand.
+- **Summer, Cook's Meadow.** Enid Michael has the player pull Himalayan blackberry, bull thistle and velvet grass, telling each from the native plant the press book taught them, and rope off the shortcuts walkers have worn across the wet ground. The meadow greens up the next season.
+- **Fall, fire in the big trees.** Clark's own Register page from 1857 says few young sequoias come up in the Mariposa Grove, and he could never say why. Now he can: they need fire. He spent years putting fires out there, and says that other people here knew better long before he came. The player clears the fuel from round the giants and lights a slow burn, and the next spring sequoia seedlings come up in the ash. The people who lived here burned these woods and meadows long before the park; the Register note says so, and that how the game tells that history waits on tribal review. The game doesn't speak for them here.
+- **Winter, the bear boxes.** Ranger Hodges sets steel food lockers at the Valley's campgrounds, where the last campers of the year leave coolers out. It builds on her fall Bear Season and the bears that wander the map.
+
+With the four done, Clark has one more talk ("None of it stays done"), and the player's own page goes in the Register. Wren, Ansel Adams, Muir and Jennie Curry each notice one of the arcs. Nobody Native has new lines in the year: the same rule as the rest of the game.
+
 ### Between the chapters: story beats
 
 People don't only speak when they have a quest. As the main line moves on, the people the player keeps passing react to it, once each, before going back to their usual lines (`CharacterData.story_beats`; only the latest piece of news is told, so someone who rushes ahead never hears stale news). Galen Clark, at the homestead gate, carries most of these: he reacts to the guidebook, the first tick, Glacier Point, Robbins's "leave no mark" (his own name is on Mount Clark, though every peak had a name before the surveyors), Salathé's steel, the Nose, and the return from the glacier, where he reminds the player that not everybody walks up to the gate. The climbing mentors, Wren, Marty, Lamon, Jennie Curry, Bridget Degnan, Hodges, Ansel Adams, and Muir also have beats, among them the sightings of the missing Guardian (see "The missing Guardian" above), and after the last page everyone who isn't waiting on tribal review says goodbye in their own voice (the naturalists, Ansel Adams, Anderson and McCauley included), so the whole valley acknowledges the ending. After the finale, the people closest to the press book (Enid Michael, Ranger Hodges, Muir, and Wren) react to the mirror. Native characters have no story beats yet: any new lines for them wait on tribal review.
@@ -168,6 +179,7 @@ The game doesn't invent Native characters. Present-day tribal voices come throug
 
 - The press book: that the Yosemite Museum's herbarium holds specimens Enid Michael collected; the list of State Guardians between 1866 and 1906 (Clark, Hutchings, Dennison, and their successors) and their dates; Clark's sequoia seedlings at his grave in the Yosemite cemetery; Muir's search for Cassiope in 1869 and where he first found it; and each plant's name, range, and season in `Herbarium.PLANTS` against a current Yosemite flora (the Sentinel Dome Jeffrey pine, the snow plant's protected status, the alpine shooting star's current Latin name).
 
+- The Guardian's Year: the Civilian Conservation Corps in Yosemite (1933 to 1942) and its trail work; how the Mist Trail's steps are built and rebuilt; which invasive plants the park pulls from Cook's Meadow, and its restoration and boardwalks; when prescribed fire began in the Mariposa Grove; the history of the park's bear lockers and the late-1990s peak in bear incidents.
 - Galen Clark appointed Guardian (1866), the Yosemite Grant (1864), Clark's Station at Wawona.
 - James Lamon's arrival date and his orchard at what's now Curry Village.
 - The Mariposa Battalion (1851) and Tenaya's later life. Use sources reviewed with tribal advisors.

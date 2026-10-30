@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "enid_cooks_meadow"
+title = "Give the Meadow Back"
+guardian_line = true
+giver = "enid_michael"
+requires = PackedStringArray("lost_guardian")
+offered_in = 2
+intro = PackedStringArray("You've seen Cook's Meadow from the boardwalk. Now look closer. There's Himalayan blackberry in it, and bull thistle, and velvet grass: plants that came in with people, and with hay for the horses.", "Your press book will help. You know our own blackberry, our lupine and our deergrass. These are the ones that crowd them out.", "And the shortcuts. Every walker who cuts across wears a path, and every path drains the wet ground. Pull six of the weeds, then rope off the three worst shortcuts, and come and tell me.")
+steps = [{"type": "work", "task": "meadow_weeds", "count": 6, "objective": "Pull 6 invasive plants from Cook's Meadow (Yosemite Village)", "reminder": "Out in Cook's Meadow, off the boardwalk where the ground is trampled. Pull them whole, roots and all, or they'll be back by fall.", "done": ["Six, roots and all. Blackberry comes back from a scrap of root, so I'm glad you were thorough."]}, {"type": "work", "task": "meadow_paths", "count": 3, "objective": "Rope off 3 shortcuts worn across Cook's Meadow", "reminder": "The bare strips across the meadow, where people cut between the boardwalks. Stakes, rope, and a card so they know why.", "done": ["Roped off. People will grumble, and then they'll go round. Give it a season and you won't find the paths."]}]
+outro = PackedStringArray("A meadow is a slow thing. You won't see it change this week. Come back next season and look from the boardwalk.", "Here, from my garden. Most people only look at a meadow, Guardian. You've given one back.")
+reward_items = {"yerba_buena_tea": 2, "spring_greens": 1}

@@ -199,6 +199,24 @@ The plants (`Herbarium.PLANTS`), by where they grow:
 
 Evergreens can be pressed all year, so no quest is ever stuck behind a season; the wildflowers are up in spring and summer only. To add a plant, add it to `Herbarium.PLANTS` with a drawing in `tools/plants/plant_art.gd`.
 
+### The Guardian's Year
+
+After the finale, a year of the Guardian's work (`QuestData.guardian_line`), one arc a season, each offered only in its season and each leaving the map changed (`Stewardship`, `WorkSpot`). Quests ask for the work with `work` steps; a run of them opens one after another without a trip back to the giver. `tests/guardian_year_test.tscn` plays it.
+
+```
+Y1 The Steps Below Vernal Fall  George Anderson, Happy Isles ... spring. ROCK BAR; reset 4 Mist Trail steps on the rock-work meter
+                                 → bread, jerky. The steps stay set.
+Y2 Give the Meadow Back ........ Enid Michael, Sentinel Dome .... summer. Pull 6 weeds in Cook's Meadow, then rope off 3 shortcuts
+                                 → tea, spring greens. The meadow greens up the season after.
+Y3 Fire in the Big Trees ....... Galen Clark .................... fall. Clear fuel round 4 sequoias by the Grizzly Giant, then light
+                                 the burn → dried apples, bread. Ash, then seedlings the spring after.
+Y4 A Steel Box at Every Camp ... Ranger Hodges .................. winter. Set bear boxes at Camp 4, Curry Village, Upper Pines and
+                                 Housekeeping Camp → jerky, chocolate. The boxes stay, and can be read.
+Y5 The Guardian's Year ......... Galen Clark .................... after Y1 to Y4, any season → bread pudding, your page in the Register.
+```
+
+Wren, Ansel Adams, Muir and Jennie Curry each react to one arc (story beats). No Native character has lines in the year; the fire arc's Register note says that the people who lived here burned these woods long before the park, and that how the game tells it waits on tribal review.
+
 ### Side stories
 
 These stay available alongside the main line, and every chapter opens at least two (`tests/cast_test.tscn` checks this). The seasonal and hour-of-day ones are played through in `tests/side_quests_test.tscn`. The ones that start at the rim (McCauley, Enid Michael, Hodges) open after the Apron.

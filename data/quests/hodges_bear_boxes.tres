@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hodges_bear_boxes"
+title = "A Steel Box at Every Camp"
+guardian_line = true
+giver = "clare_hodges"
+requires = PackedStringArray("lost_guardian")
+offered_in = 8
+intro = PackedStringArray("Winter. The campgrounds are half empty, and the folks still in them think the bears are all asleep.", "Most are. Not all. A warm week and they're up and hungry, and a cooler on a picnic table is supper on a plate.", "Four new steel lockers came up on the truck. Set one at Camp 4, one at Curry Village, one at Upper Pines and one at Housekeeping Camp, and stow whatever's been left out.")
+steps = [{"type": "work", "task": "bear_boxes", "count": 4, "objective": "Set a new bear box at Camp 4, Curry Village, Upper Pines and Housekeeping Camp", "reminder": "Look for the coolers left out by the campsites. Bolt the box down beside them, food in, latch shut.", "done": ["All four in, and latched. That's a box by the sites that never had one."]}]
+outro = PackedStringArray("A fed bear is a dead bear, they say, and it's true more often than I'd like. You've kept a few alive this winter.", "Take some jerky from the patrol stores. In a tin. You know why.")
+reward_items = {"beef_jerky": 3, "chocolate_bar": 1}

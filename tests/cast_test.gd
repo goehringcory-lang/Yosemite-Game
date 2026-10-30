@@ -213,7 +213,7 @@ func _check_placements() -> void:
 			blocker = region.get_node_or_null("Blocker")
 		var blocked: Array[String] = []
 		for node in region.entities.get_children():
-			if not (node is NPC or node is ClimbStart or node is StoryPickup or node is RegionDoor):
+			if not (node is NPC or node is ClimbStart or node is StoryPickup or node is RegionDoor or node is WorkSpot):
 				continue
 			if node is NPC and node.character:
 				placed[node.character.id] = true

@@ -22,6 +22,8 @@ static func attach(region: Region) -> void:
 		return
 	region.set_meta("story_attached", true)
 	EasterEggs.dress(region)
+	# The Guardian's Year's work spots, and what the work leaves behind.
+	Stewardship.dress(region)
 	# Wren's slackline can be rigged between trees in any outdoor region.
 	if not region.indoors:
 		region.add_child(TravelSlackline.new())
