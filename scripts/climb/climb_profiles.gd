@@ -37,8 +37,9 @@ extends RefCounted
 ##               (green taken off the meter), "need" (taps for a mash)}
 ##
 ## Route keys: food (energy worth bringing; tests check a careful climber
-## tops out with it), place, rock, ground, finish, weather, belayer, descent,
-## view (skyline landmarks), facts, pitches.
+## tops out with it), place, rock, ground, finish, weather, sun (the hours the
+## face is in the sun, [from, to]; [0, 0] for a face that never sees it; see
+## WallWeather), belayer, descent, view (skyline landmarks), facts, pitches.
 
 ## Crux points on a pitch of each difficulty, 1 to 5. An authored crux always
 ## counts, so an easy pitch can still have its one hard move.
@@ -92,6 +93,7 @@ const PROFILES := {
 		"ground": "curry",
 		"finish": "tree_ledge",
 		"weather": "valley",
+		"sun": [12, 18],
 		"belayer": "wren_alvarez",
 		"view": [
 			{"k": "half_dome", "x": 430, "s": 1.25, "l": 0},
@@ -117,6 +119,7 @@ const PROFILES := {
 		"ground": "camp4",
 		"finish": "anchor",
 		"weather": "valley",
+		"sun": [9, 17],
 		"belayer": "dick_leonard",
 		"view": [
 			{"k": "glacier_point", "x": 410, "s": 1.3, "l": 0},
@@ -140,6 +143,7 @@ const PROFILES := {
 		"ground": "curry",
 		"finish": "rim",
 		"weather": "valley",
+		"sun": [12, 18],
 		"belayer": "jules_eichorn",
 		"view": [
 			{"k": "half_dome", "x": 405, "s": 1.5, "l": 0},
@@ -166,6 +170,7 @@ const PROFILES := {
 		"ground": "valley_forest",
 		"finish": "tree_ledge",
 		"weather": "valley",
+		"sun": [9, 17],
 		"belayer": "royal_robbins",
 		"view": [
 			{"k": "glacier_point", "x": 425, "s": 1.35, "l": 0},
@@ -194,6 +199,7 @@ const PROFILES := {
 		"ground": "bridalveil_talus",
 		"finish": "spire_top",
 		"weather": "valley",
+		"sun": [12, 16],
 		"belayer": "jules_eichorn",
 		"descent": "rappel",
 		"view": [
@@ -223,6 +229,7 @@ const PROFILES := {
 		"ground": "valley_forest",
 		"finish": "chimney_top",
 		"weather": "valley",
+		"sun": [0, 0],
 		"belayer": "john_salathe",
 		"descent": "rappel",
 		"view": [
@@ -254,6 +261,7 @@ const PROFILES := {
 		"ground": "valley_forest",
 		"finish": "column_top",
 		"weather": "valley",
+		"sun": [7, 12],
 		"belayer": "beverly_johnson",
 		"descent": "rappel",
 		"view": [
@@ -285,6 +293,7 @@ const PROFILES := {
 		"ground": "mist_wall",
 		"finish": "roof_lip",
 		"weather": "valley",
+		"sun": [10, 15],
 		"belayer": "royal_robbins",
 		"view": [
 			{"k": "el_capitan", "x": 360, "s": 1.7, "l": 0},
@@ -307,6 +316,7 @@ const PROFILES := {
 		"ground": "camp4",
 		"finish": "boulder_top",
 		"weather": "valley",
+		"sun": [11, 14],
 		"belayer": "chongo",
 		"view": [
 			{"k": "sentinel_rock", "x": 360, "s": 1.4, "l": 0},
@@ -352,6 +362,7 @@ const PROFILES := {
 		"ground": "el_cap_meadow",
 		"finish": "el_cap_top",
 		"weather": "valley",
+		"sun": [10, 18],
 		"belayer": "warren_harding",
 		"descent": "walk",
 		"view": [
@@ -384,6 +395,7 @@ const PROFILES := {
 		"ground": "ahwahnee",
 		"finish": "arches_top",
 		"weather": "valley",
+		"sun": [9, 17],
 		"belayer": "bestor_robinson",
 		"descent": "rappel",
 		"view": [
@@ -413,6 +425,7 @@ const PROFILES := {
 		"ground": "half_dome_forest",
 		"finish": "dome_top",
 		"weather": "valley",
+		"sun": [11, 18],
 		"belayer": "george_anderson",
 		"descent": "cables",
 		"view": [
@@ -442,6 +455,7 @@ const PROFILES := {
 		"ground": "tuolumne",
 		"finish": "peak_summit",
 		"weather": "alpine",
+		"sun": [8, 15],
 		"belayer": "john_muir",
 		"descent": "walk",
 		# As they stand from the summit, east round to south: Unicorn Peak,
@@ -473,6 +487,7 @@ const PROFILES := {
 		"ground": "moraine",
 		"finish": "glacier_ridge",
 		"weather": "alpine",
+		"sun": [10, 15],
 		"belayer": "john_muir",
 		"descent": "walk",
 		# The Lyell group from Lyell Canyon: Donohue Pass to the east, Lyell,
