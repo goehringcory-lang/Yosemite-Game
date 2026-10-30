@@ -284,7 +284,11 @@ func travel(leg: Dictionary) -> void:
 	_busy = false
 
 
-func sleep(passed_out := false) -> void:
+## Ends the day. You wake up at home, unless [param camp_spawn] names a
+## spot in this region where you pitched your tent for a night out in the
+## backcountry (BackcountryCamp): then you wake up there, and the morning
+## says what became of your food.
+func sleep(passed_out := false, camp_spawn := "") -> void:
 	if _busy:
 		return
 	_busy = true
@@ -294,8 +298,15 @@ func sleep(passed_out := false) -> void:
 	await show_day_summary()
 
 	var fell_asleep_at := ""
-	if region.region_id != Park.HOME_REGION:
+	var wake_spawn := Park.HOME_SPAWN
+	var night_out := ""
+	if camp_spawn != "" and not passed_out:
+		wake_spawn = camp_spawn
+		night_out = Backcountry.night_out()
+	elif region.region_id != Park.HOME_REGION:
 		fell_asleep_at = _location_name()
+		if passed_out and Backcountry.is_backcountry(region.region_id):
+			fell_asleep_at = "backcountry:" + fell_asleep_at
 		_enter_region(Park.HOME_REGION, Park.HOME_SPAWN)
 	GameClock.start_new_day()
 	if forage:
@@ -304,7 +315,7 @@ func sleep(passed_out := false) -> void:
 	var plants := PlantSpawner.attach(region)
 	if plants:
 		await plants.refresh()
-	player.global_position = region.get_spawn(Park.HOME_SPAWN).global_position
+	player.global_position = region.get_spawn(wake_spawn).global_position
 	player.facing = Vector2i.DOWN
 	player.interaction_area.position = Vector2(player.facing) * 24.0
 	await _unstick_player()
@@ -313,7 +324,11 @@ func sleep(passed_out := false) -> void:
 
 	await hud.fade_from_black()
 	var message := "Good morning! Your game was saved."
-	if passed_out and fell_asleep_at != "":
+	if night_out != "":
+		message = "Good morning in %s! Your game was saved.\n%s" % [region.display_name, night_out]
+	elif passed_out and fell_asleep_at.begins_with("backcountry:"):
+		message = "You fell asleep on the trail at %s. A ranger on patrol walked you down and drove you back to camp." % fell_asleep_at.trim_prefix("backcountry:")
+	elif passed_out and fell_asleep_at != "":
 		message = "You fell asleep at %s. A ranger drove you back to camp." % fell_asleep_at
 	elif passed_out:
 		message = "You stayed out too late and passed out..."

@@ -64,6 +64,7 @@ const ITEMS := [
 	preload("res://data/story_items/chongo_book.tres"),
 	preload("res://data/story_items/travel_slackline.tres"),
 	preload("res://data/story_items/greg_fly_box.tres"),
+	preload("res://data/story_items/wilderness_permit.tres"),
 	# Village Store trail food (see data/shops/village_store.tres)
 	preload("res://data/food/trail_mix.tres"),
 	preload("res://data/food/dried_apples.tres"),

@@ -65,6 +65,10 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/wren_slackline.tres"),
 	preload("res://data/quests/wren_lightning.tres"),
 	preload("res://data/quests/greg_first_rod.tres"),
+	# The first night out, and Half Dome from the back (Backcountry).
+	preload("res://data/quests/hodges_first_night.tres"),
+	preload("res://data/quests/anderson_cables.tres"),
+	preload("res://data/quests/ansel_diving_board.tres"),
 	# The press book (QuestData.press_line): plants for the naturalists and
 	# rangers, beside the tick list. See Herbarium.
 	preload("res://data/quests/enid_press.tres"),

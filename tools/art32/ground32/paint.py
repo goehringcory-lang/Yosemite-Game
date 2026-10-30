@@ -70,6 +70,9 @@ REGIONS: dict[str, dict] = {
     "el_portal": {"forest": "oakwood"},
     "curry_village": {"lawn": (26, 28, 53, 23)},
     "the_ahwahnee": {"hotel": True, "flagstone": True},
+    # The back of Half Dome: steep rock round the summit and the saddle, and
+    # the drop off the northwest face beyond the top two rows.
+    "half_dome": {"steep": True, "drop": 2},
 }
 
 C = {k: F.hexrgb(v) for k, v in COLORS.items()}
@@ -449,6 +452,24 @@ class Painter:
         crack = (np.abs(F.value_noise(H, W, 20, s + 111) - 0.5) < 0.014) & (self.Np > 0.45)
         tone[slab & crack] -= 2.0
         dots(4, np.where(self.Np > 0.55, 0.4, 0.05).astype(np.float32), 112, slab, LICHEN)
+        if self.cfg.get("steep"):
+            # Steep granite (the cliff tiles) falls away from the rock you can
+            # walk on: a shade darker, with dark water streaks down the fall
+            # line, and a shadowed band below the edge of the walkable rock.
+            cl = slab & (K == CLIFF)
+            tone[cl] -= 1.5
+            col = F.hash2(xx // 3 + 0 * yy, yy // 60 + 0 * xx, s + 181)
+            tone[cl & (col > 0.88) & (self.Nm > 0.42)] -= 1.5
+            walk = F.blur((K == GRANITE).astype(np.float32), 5)
+            tone[cl & (walk > 0.04)] -= 1.0
+            drop = int(self.cfg.get("drop", 0)) * self.T
+            if drop:
+                # Over the lip: nothing but haze, and the Valley far below.
+                d = (yy < drop + (self.Nm - 0.5) * 10) & (K == CLIFF)
+                t = np.clip((yy / max(drop, 1)) + 0.0 * xx, 0.0, 1.0)
+                haze = np.array([118, 140, 170], np.float32) * (1.0 - t[..., None]) + np.array([66, 80, 108], np.float32) * t[..., None]
+                over[d] = haze[d].astype(np.uint8)
+                over_m |= d
         tal = gr & np.isin(K, (TALUS, SCREE))
         if tal.any():
             # Talus: angular blocks of every size lying on grey grit, each lit

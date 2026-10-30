@@ -19,8 +19,10 @@ extends AhwahneeStyle
 ##                                     Housekeeping Camp - Curry Village
 ##                                                              |
 ##                                Upper Pines - Happy Isles - Tenaya Creek - Mirror Lake
-##                                                                                 :
-##                                                                (a cairn, a use trail) Crow's Camp
+##                                                  |                              :
+##             (Mist Trail, John Muir Trail) Little Yosemite Valley    (a cairn) Crow's Camp
+##                                                  |
+##                               (Half Dome Trail)  Half Dome: Sub Dome, the cables, the summit
 ##
 ## Every road keeps its heading: leave a scene by its west edge and you come
 ## in at the east edge of the next. The wall of the Valley is always at the
@@ -58,9 +60,12 @@ const C := "res://assets/sprites/curry/"
 const DIR := "res://scenes/regions/"
 const SCENES := ["el_capitan_meadow", "tunnel_view", "happy_isles", "mirror_lake", "leidig_meadow",
 	"four_mile_trailhead", "bridalveil_fall", "housekeeping_camp", "ahwahnee_meadow", "upper_pines", "tenaya_creek", "crows_camp",
-	"big_oak_flat_junction", "crane_flat"]
+	"big_oak_flat_junction", "crane_flat", "little_yosemite_valley", "half_dome"]
 
 const FOREST_TABLE := [["tree_ponderosa", 4.0], ["tree_incense_cedar", 3.5], ["tree_black_oak", 2.5], ["tree_white_fir", 1.2], ["tree_dogwood", 1.0]]
+## The forest above Nevada Fall, at 6,000 to 7,000 feet: white fir, sugar
+## pine, incense cedar and Jeffrey pine (drawn as ponderosa), a few lodgepole.
+const HIGH_FOREST_TABLE := [["tree_white_fir", 4.0], ["tree_sugar_pine", 2.0], ["tree_incense_cedar", 2.0], ["tree_ponderosa", 1.5], ["tree_lodgepole", 1.0]]
 
 ## The fall's center in pixels (16px scale), or NO_FALL.
 const NO_FALL := -10000
@@ -82,6 +87,7 @@ func _ready() -> void:
 		"happy_isles": _happy_isles, "tenaya_creek": _tenaya_creek,
 		"mirror_lake": _mirror_lake, "crows_camp": _crows_camp,
 		"big_oak_flat_junction": _big_oak_flat_junction, "crane_flat": _crane_flat,
+		"little_yosemite_valley": _little_yosemite_valley, "half_dome": _half_dome,
 	}
 	var only := OS.get_environment("ONLY").split(",", false)
 	for id: String in builds:
@@ -225,10 +231,10 @@ func _trail_door(node_name: String, at_pos: Vector2, label: String, target_regio
 
 ## The forest, the meadows, the water's edge and the talus, dressed like the
 ## Ahwahnee grounds.
-func _dress(meadow_flowers := 60, forest_floor := 60) -> void:
+func _dress(meadow_flowers := 60, forest_floor := 60, forest_table: Array = FOREST_TABLE) -> void:
 	_reserve_entities(1, 3)
 	var all := Rect2i(0, 0, w, h)
-	_fringe_trees([Terrain.FOREST], 3, 0.7, FOREST_TABLE, 2, 22.0)
+	_fringe_trees([Terrain.FOREST], 3, 0.7, forest_table, 2, 22.0)
 	_fringe_trees([Terrain.MEADOW, Terrain.WET_MEADOW], 8, 0.3, [["tree_black_oak", 3.0], ["tree_dogwood", 1.0], ["tree_ponderosa", 0.8]], 3, 60.0)
 	_fringe_trees([Terrain.TALUS], 5, 0.4, [["tree_incense_cedar", 2.0], ["tree_snag", 0.6], ["tree_white_fir", 1.0]], 0, 30.0)
 	_fringe_trees([Terrain.SAND], 6, 0.5, [["tree_willow", 1.0]], 0, 44.0)
@@ -987,3 +993,120 @@ func _crows_camp() -> void:
 	place("Crow's Camp", 37, 13, 8, false)
 	region_exit("ToMirrorLake", tile_pos(-0.5, 25.5), Vector2(12, 48), "Back down to Mirror Lake", "mirror_lake", "cairn")
 	_finish("crows_camp", 1.0)
+
+
+# ================================================================ Little Yosemite Valley
+
+## Above Nevada Fall the Merced runs slow and sandy through a flat valley in
+## the fir forest, under the granite back of Half Dome and Liberty Cap: the
+## backcountry camp at the end of the first day out. The Mist Trail comes in
+## from the west, beside the river; the Half Dome Trail leaves from the
+## north-east, up through the forest.
+func _little_yosemite_valley() -> void:
+	_begin(64, 40, 1875)
+	_wall(6.0, 2.0, 3)
+	var river := [Vector2(65, 31), Vector2(50, 33), Vector2(34, 31), Vector2(18, 34), Vector2(-1, 33)]
+	_water(river, 3, Terrain.RIVER, 0.7)
+	_ellipse(46.0, 27.0, 9.0, 2.5, Terrain.MEADOW, 0.3)
+	_ellipse(14.0, 15.0, 6.0, 2.0, Terrain.MEADOW, 0.3)
+	# The camp: a clearing of sand and duff, and the trail through it.
+	_ellipse(30.0, 22.0, 8.0, 3.5, Terrain.CAMP, 0.2)
+	_path([Vector2(-1, 27), Vector2(10, 26), Vector2(22, 23), Vector2(38, 21), Vector2(50, 17), Vector2(56, _foot_of_wall(56) + 1)], 1, Terrain.TRAIL, 0.5)
+	_mark_open()
+	# No trees in the clearing round the fire ring and the tent site.
+	for y in range(16, 30):
+		for x in range(20, 41):
+			no_trees[y * w + x] = 1
+
+	start_region("LittleYosemiteValley", "little_yosemite_valley", "Little Yosemite Valley", Vector2(-119.5135, 37.7317))
+	paint_ground()
+	_save_ground_art("ground_little_yosemite_valley", 1875)
+	_place_wall("little_yosemite", 112)
+	_trail_door("MistTrailDown", foot(4, 26), "Mist Trail, down past Nevada and Vernal Falls to Happy Isles", "happy_isles", "jmt", 150)
+	_trail_door("HalfDomeTrail", foot(57, _foot_of_wall(57) + 1), "Half Dome Trail, up through the forest to Sub Dome", "half_dome", "trailhead", 90)
+	_info_sign("LittleYosemiteSign", foot(24, 21), "Little Yosemite Valley",
+		"6,100 feet. Above Nevada Fall the Merced runs slow and sandy through a little valley of its own, carved by the same glaciers as the big one below. Half Dome's back rises over the north side. Backpackers camp here on the way to the Dome and the high country.")
+	_info_sign("FoodStorageSign", foot(36, 21), "Bears and your food",
+		"Black bears know this camp. Every scrap of food, trash and anything that smells (toothpaste too) goes in a bear canister at night, set well away from your tent. A bear that gets people's food once keeps coming back for it.")
+	_info_sign("NevadaFallSign", foot(8, 29), "Nevada Fall",
+		"Just downstream the Merced pours 594 feet over a granite lip. Liberty Cap stands over the fall on the north side, smooth and bare.")
+	var fire := instance_scene("res://scenes/story/station.tscn", foot(28, 22), "CampFireRing")
+	fire.set("station", "campfire")
+	fire.set("display_name", "Backcountry fire ring")
+	fire.set("texture", texture(B + "camp4_fire_ring.png"))
+	fire.set("frames", Camp4Art.FIRE_FRAMES)
+	fire.set("fps", 8.0)
+	fire.set("ground_inset", Camp4Art.FIRE_INSET)
+	fire.set("body_size", Vector2(24, 8))
+	fire.set("reach_size", Vector2(28, 16))
+	ambient(fire, "smoke", Vector2(0, -16), Vector2(2, 1))
+	for stump in [Vector2(-24, 2), Vector2(24, 6)]:
+		_prop("log_stump", foot(28, 22) + stump)
+	var camp := instance_scene("res://scenes/objects/backcountry_camp.tscn", foot(34, 22), "BackcountryCamp")
+	camp.set("wake_spot", "camp")
+	_dress(40, 60, HIGH_FOREST_TABLE)
+	_river_rocks(river, 8)
+	marker("arrival", 6, 26.5)
+	marker("jmt", 6, 26.5)
+	marker("camp", 32, 23.5)
+	marker("half_dome_trail", 55, _foot_of_wall(55) + 2.5)
+	marker("river", 30, 29)
+	place("Little Yosemite Valley", 30, 22, 14)
+	place("Liberty Cap", 10, 3, 0)
+	place("Half Dome", 46, 3, 0)
+	_finish("little_yosemite_valley", 1.5)
+
+
+# ================================================================ Half Dome
+
+## The back of Half Dome, from Sub Dome to the summit, top to bottom: the
+## lip of the northwest face along the top edge, the summit (big, and nearly
+## flat), the steep granite back with the cables up it, the saddle at their
+## foot, the bare granite steps of Sub Dome, and the forest the trail comes
+## up through from Little Yosemite Valley. The cables are the only way
+## between the saddle and the summit (HalfDomeCables, in the story overlay).
+## The Diving Board juts out from the shoulder on the west; Snake Dike tops
+## out on the summit's west side.
+func _half_dome() -> void:
+	_begin(56, 64, 1875 + 8842)
+	# Granite everywhere above the forest, steep (cliff) except where it's
+	# walked on: the summit and the saddle and Sub Dome below the cables.
+	fill(0, 0, w - 1, 44, Terrain.CLIFF)
+	_ellipse(28.0, 9.0, 21.0, 7.5, Terrain.GRANITE, 0.15, [Terrain.CLIFF])
+	fill(0, 0, w - 1, 1, Terrain.CLIFF)
+	_ellipse(28.0, 42.0, 15.0, 5.0, Terrain.GRANITE, 0.2, [Terrain.CLIFF])
+	_ellipse(28.0, 47.0, 11.0, 4.0, Terrain.GRANITE, 0.2)
+	# The shoulder out west to the Diving Board.
+	_path([Vector2(16, 42), Vector2(10, 40), Vector2(5, 38)], 3, Terrain.GRANITE, 0.2)
+	# The trail up through the forest and the switchbacks up Sub Dome.
+	_path([Vector2(31, 65), Vector2(32, 58), Vector2(27, 54), Vector2(31, 50), Vector2(26, 47), Vector2(30, 44), Vector2(28, 41)], 1, Terrain.TRAIL, 0.3)
+	_mark_open()
+	for y in h:
+		for x in w:
+			if at(x, y) == Terrain.GRANITE:
+				no_trees[y * w + x] = 1
+
+	start_region("HalfDome", "half_dome", "Half Dome", Vector2(-119.5332, 37.7459))
+	paint_ground()
+	_save_ground_art("ground_half_dome", 8842)
+	_trail_door("TrailDown", foot(33, 61), "Half Dome Trail, down to Little Yosemite Valley", "little_yosemite_valley", "half_dome_trail", 75)
+	_info_sign("SummitSign", foot(34, 8), "Half Dome",
+		"8,842 feet, and nearly flat on top: about 13 acres of bare granite. The northwest face drops 2,000 feet from the lip, straight down to Tenaya Canyon. George Anderson stood here first, in October 1875, at the top of the eyebolts he drilled up the back.")
+	_info_sign("VisorSign", foot(22, 3), "The Visor",
+		"The lip of the face juts out over the drop here like the brim of a cap. Stay back from the edge: there's nothing below it for 2,000 feet.")
+	_info_sign("CablesSign", foot(33, 41), "The cables",
+		"Two steel cables on posts, 400 feet up the back of the Dome at about 45 degrees, with a wooden board across the rock at each pair of posts. The Sierra Club put up the first cables in 1919, following the line of George Anderson's eyebolts. Rangers put the posts up in late May and take them down in October. Never go up in a storm: the cables draw lightning.")
+	_info_sign("SubDomeSign", foot(20, 47), "Sub Dome",
+		"Granite steps cut and stacked up the bare back of Sub Dome, the last climb before the cables. A ranger checks permits at its foot in summer.")
+	_scatter_decor("rock_granite", [Terrain.GRANITE], 18, Rect2i(0, 0, w, h), 1)
+	_dress(10, 50, HIGH_FOREST_TABLE)
+	marker("arrival", 31, 60)
+	marker("trailhead", 31, 60)
+	marker("cables_foot", 28, 40)
+	marker("summit", 28, 15)
+	marker("snake_dike_top", 12, 10)
+	marker("diving_board", 7, 39.5)
+	place("Half Dome", 28, 9, 18)
+	place("Sub Dome", 28, 46, 8)
+	place("The Diving Board", 7, 39, 5)
+	_finish("half_dome", 0.5)

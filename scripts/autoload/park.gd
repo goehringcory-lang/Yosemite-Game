@@ -42,6 +42,13 @@ const SEASONAL := {
 		"reopens": "spring",
 		"why": "The Mist Trail above Vernal Fall and the Panorama Trail are closed for snow and ice. They usually reopen in spring.",
 	},
+	"half_dome_cables": {
+		"name": "Half Dome cables",
+		"open": [0, 24],
+		"close": [2, 12],
+		"reopens": "late May",
+		"why": "The cables are down for the winter: the posts are pulled and the cables lie flat on the rock. Rangers put them up again in late May.",
+	},
 }
 
 signal hub_unlocked(id: String)

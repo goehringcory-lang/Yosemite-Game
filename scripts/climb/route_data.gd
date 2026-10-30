@@ -54,8 +54,16 @@ extends Resource
 @export_group("Destination")
 ## Hub to unlock and travel to at the top. Empty for climbs you walk off.
 @export var destination_hub: String
-## Spawn marker in that hub.
+## A region to top out in that isn't a hub of its own, such as Half Dome's
+## summit in the Valley. Nothing is unlocked; you're just there at the top.
+@export var destination_region: String
+## Spawn marker in that hub or region.
 @export var destination_spawn: String
+
+
+## The region the top of the climb is in, or "" for climbs you walk off.
+func destination() -> String:
+	return destination_region if destination_region != "" else destination_hub
 
 
 ## "9 pitches", or "31 pitches, climbed here in 9" when the game shortens
