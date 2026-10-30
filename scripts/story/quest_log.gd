@@ -76,6 +76,13 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/enid_full_press.tres"),
 	# The finale: it needs the last page written and the press book full.
 	preload("res://data/quests/lost_guardian.tres"),
+	# The Guardian's Year (QuestData.guardian_line): after the finale, one arc
+	# of stewardship a season, each leaving the map changed. See Stewardship.
+	preload("res://data/quests/anderson_mist_steps.tres"),
+	preload("res://data/quests/enid_cooks_meadow.tres"),
+	preload("res://data/quests/clark_grove_fire.tres"),
+	preload("res://data/quests/hodges_bear_boxes.tres"),
+	preload("res://data/quests/clark_guardian_year.tres"),
 ]
 
 const CHARACTERS: Array[CharacterData] = [
@@ -157,8 +164,10 @@ const AFTER_LAST_PAGE := [
 ## What he says once the lost Guardian is found.
 const AFTER_FINALE := [
 	"Guardian. It suits you better than it ever suited me.",
-	"The valley keeps going. So should you: there's always a plant you haven't pressed, and someone new on the trail with a story.",
+	"The valley keeps going. So should you: there's work in every season, and someone in each one who could use your hands.",
 ]
+## The Guardian's Year ends with Clark's quest of that name.
+const GUARDIAN_YEAR_QUEST := "clark_guardian_year"
 
 ## Quest id -> index of the current step. Missing = not started.
 var active: Dictionary = {}
@@ -311,6 +320,40 @@ func press_objective() -> Dictionary:
 			return {"quest": quest, "objective": "%s has plants to ask for once you've finished %s" % [
 				_who_and_where(quest.giver), gate.title]}
 	return {}
+
+
+## The Guardian's Year's next step, once the lost Guardian is found:
+## {"quest", "objective"}, or {} before the finale and once the year's done.
+## Between arcs it names the next season's work and who has it.
+func guardian_objective() -> Dictionary:
+	if not is_completed(FINALE_QUEST):
+		return {}
+	for quest: QuestData in QUESTS:
+		if quest.guardian_line and active.has(quest.id):
+			return {"quest": quest, "objective": objective_text(quest)}
+	var next: QuestData = null
+	var wait := 99
+	for quest: QuestData in QUESTS:
+		if not quest.guardian_line or is_completed(quest.id) or not Array(quest.requires).all(is_completed):
+			continue
+		var seasons := _seasons_until(quest)
+		if seasons < wait:
+			next = quest
+			wait = seasons
+	if next == null:
+		return {}
+	if wait == 0:
+		return {"quest": next, "objective": "Talk to %s" % _who_and_where(next.giver)}
+	var season: String = GameClock.SEASON_NAMES[(GameClock.season + wait) % 4]
+	return {"quest": next, "objective": "Come %s, %s has work for you" % [season.to_lower(), _who_and_where(next.giver)]}
+
+
+## Seasons until [param quest] is offered: 0 if it is now, or 99 if never.
+func _seasons_until(quest: QuestData) -> int:
+	for wait in 4:
+		if quest.is_offered_in((GameClock.season + wait) % 4):
+			return wait
+	return 99
 
 
 ## "Enid Michael (Museum garden)": a person and where they are now.
@@ -470,6 +513,8 @@ func is_step_done(step: Dictionary) -> bool:
 			return Herbarium.has_all(step.get("plants", [])) and Herbarium.count(step.get("hub", "")) >= int(step.get("count", 0))
 		"unlocked":
 			return is_unlocked(step.ability)
+		"work":
+			return Stewardship.count(step.task) >= int(step.get("count", 1))
 	push_error("Unknown quest step type: %s" % step.get("type", ""))
 	return false
 
@@ -492,6 +537,13 @@ func objective_text(quest: QuestData) -> String:
 		return "Ticked! Tell %s" % (giver.display_name if giver else quest.giver)
 	if step.get("type") == "pressed":
 		return step.get("objective", "") + _pressed_progress(step)
+	if step.get("type") == "work":
+		# a run of work steps goes on to the next one without a talk between
+		var work := Stewardship.next_work_step(quest)
+		if work.is_empty():
+			var giver := get_character(quest.giver)
+			return "All done. Tell %s" % (giver.display_name if giver else quest.giver)
+		return "%s (%d of %d done)" % [work.get("objective", ""), Stewardship.count(work.task), int(work.get("count", 1))]
 	return step.get("objective", "")
 
 

@@ -27,6 +27,9 @@ extends Resource
 ##                grow in that hub, if one is named; see Herbarium)
 ##   "unlocked"   ability: have this ability (set by something in the world,
 ##                like the mirror in the Guardian's cave)
+##   "work"       task, count: have done this many of the task's work spots
+##                around the park (Stewardship.SPOTS), like resetting steps
+##                on the Mist Trail
 ## Every step except "talk" is turned in by talking to the quest giver.
 ##
 ## Any step can also hand the player something the moment it's done:
@@ -44,6 +47,10 @@ extends Resource
 ## Part of the press book's storyline, which runs beside the tick list: the
 ## naturalists and rangers who ask for plants. The finale needs both.
 @export var press_line := false
+## Part of the Guardian's Year, the year of stewardship after the finale:
+## one arc a season, each ending in a change you can see on the map (see
+## Stewardship).
+@export var guardian_line := false
 ## Character id of the person who gives the quest.
 @export var giver: String
 ## Quest ids that must be finished before this one is offered.

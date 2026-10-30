@@ -360,6 +360,9 @@ static func objective_text() -> String:
 		return "Pick up a climbing guidebook at the Mountain Shop in Curry Village."
 	if QuestLog.final_entry_pending():
 		return "Talk to Galen Clark and write your last page."
+	var year := QuestLog.guardian_objective()
+	if not year.is_empty():
+		return year.objective
 	return ""
 
 
