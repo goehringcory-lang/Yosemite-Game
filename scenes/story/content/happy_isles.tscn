@@ -29,6 +29,7 @@ closure = "mist_trail"
 
 [node name="jmt" type="Marker2D" parent="."]
 position = Vector2(1360, 512)
+
 [node name="HappyIslesRapids" type="Node2D" parent="."]
 position = Vector2(64, 772)
 script = ExtResource("fw_script")
