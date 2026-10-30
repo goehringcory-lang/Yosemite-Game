@@ -127,7 +127,8 @@ static func can_fish(player: Player) -> bool:
 	if ground == null:
 		return false
 	for reach: float in REACH:
-		if is_water(ground, player.global_position + Vector2(player.facing) * reach):
+		var at := player.global_position + Vector2(player.facing) * reach
+		if is_water(ground, at) and not SeasonalFalls.dried_up(region, at):
 			return true
 	return false
 

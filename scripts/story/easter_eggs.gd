@@ -2,8 +2,8 @@ class_name EasterEggs
 extends RefCounted
 ## Small hidden touches added to regions when they first load. They need no
 ## edits to the generated hub scenes, so a map rebuild keeps them. The moving
-## ones (the Firefall and the moonbow) are placed by the story overlays; this
-## class handles the conditional sign text, the readable bear boxes, the
+## ones (the Firefall, the moonbow and Horsetail Fall) are placed by the
+## story overlays; this class handles the conditional sign text, the readable bear boxes, the
 ## Camp 4 headlamp, and the walkable Camp 4 slackline. Described for developers in docs/DESIGN.md ("Easter eggs").
 
 const BEAR_BOX_TEXT := "Bear box. Food, coolers, and anything with a smell go in here, day and night. Black bears in Yosemite learned to open cars for food."
@@ -11,6 +11,7 @@ const FIREFALL_TEXT := "The call is going up from the rim: 'Let the fire fall!' 
 const MOONBOW_TEXT := "Full moon in spring. The spray at the base catches the light, and a faint white arc forms in the mist: a moonbow."
 const MIDNIGHT_TEXT := "Past midnight. The bolt is freshly chalked, and a headlamp sits on the ledge."
 const CROW_BEAR_BOX_TEXT := "Crow's bear box. Inside: peanut butter, a stack of tortillas, a paperback with no cover, and a coffee can with DON'T written on the lid in Sharpie."
+const HORSETAIL_TEXT := "In winter, look up at El Capitan's east shoulder: Horsetail Fall runs there only on snowmelt. On a few clear evenings late in winter, around 5:30, the setting sun lights it orange from top to bottom. Photographers call it the natural firefall."
 const CLARK_NOTE_TEXT := "A note is pinned inside the window, in Clark's hand: 'Write it at the front of the book, not the back.'"
 
 
@@ -41,6 +42,11 @@ static func dress(region: Region) -> void:
 				lamp.position = Vector2(12, -52)
 				boulder.add_child(lamp)
 			_slackline(region)
+		"el_capitan_meadow":
+			var el_cap := _sign(region, "ElCapitanSign")
+			if el_cap:
+				el_cap.extra_text = HORSETAIL_TEXT
+				el_cap.extra_season = GameClock.Season.WINTER
 		"crows_camp":
 			var box := region.entities.get_node_or_null("BearBox") as StaticBody2D
 			if box and not box is InfoSign:

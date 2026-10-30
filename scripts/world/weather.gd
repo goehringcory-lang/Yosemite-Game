@@ -51,7 +51,8 @@ static func today() -> Dictionary:
 
 
 ## The weather on any date, worked out the way [method today] does (the
-## climbing screen asks about yesterday: rock stays wet after rain).
+## climbing screen asks about yesterday: rock stays wet after rain, and
+## Seasons reads back through the winter to see how much snow has built up).
 static func on_day(year: int, season: int, day: int) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("weather:%d:%d:%d" % [year, season, day])
