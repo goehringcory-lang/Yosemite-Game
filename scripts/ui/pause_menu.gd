@@ -30,14 +30,15 @@ enum Option { RESUME, SAVE, SETTINGS, CONTROLS, QUIT }
 const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Quit to desktop"]
 const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again to quit."
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, FONT, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Font", "Volume", "Music", "Sound effects", "Ambience", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, FONT, GRAPHICS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Font", "Graphics", "Volume", "Music", "Sound effects", "Ambience", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill the screen. The picture stays sharp in whole-pixel steps.",
 	"The window's size, in whole steps of 960 x 540.",
 	"Which buttons hints name. Auto follows the last device you used.",
 	"Smooth letters are easiest to read; pixel letters match the art.",
+	"Low uses a simpler renderer for older computers. A change takes effect when you next start the game.",
 	"How loud the whole game is.",
 	"The songs for each season, the night, and the title screen.",
 	"Footsteps, climbing, and menus.",
@@ -240,7 +241,7 @@ func _build_settings() -> Control:
 	var both := HBoxContainer.new()
 	both.add_theme_constant_override("separation", 8)
 	var page := VBoxContainer.new()
-	# Rows sit close so all ten settings and the hint line fit.
+	# Rows sit close so all eleven settings and the hint line fit.
 	page.add_theme_constant_override("separation", 0)
 	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	both.add_child(page)
@@ -470,6 +471,8 @@ func change_setting(which: int, step: int) -> void:
 		Setting.FONT:
 			Settings.pixel_font = not Settings.pixel_font
 			Settings.apply_font()
+		Setting.GRAPHICS:
+			Settings.graphics = wrapi(Settings.graphics + step, 0, Settings.Graphics.size()) as Settings.Graphics
 		Setting.FULLSCREEN:
 			Settings.fullscreen = not Settings.fullscreen
 		Setting.WINDOW_SIZE:
@@ -554,6 +557,10 @@ func _setting_value(which: int) -> String:
 			value = Settings.TEXT_SPEED_NAMES[Settings.text_speed]
 		Setting.FONT:
 			value = "Pixel" if Settings.pixel_font else "Smooth"
+		Setting.GRAPHICS:
+			value = Settings.GRAPHICS_NAMES[Settings.graphics]
+			if Settings.graphics_pending():
+				value += " (on restart)"
 		Setting.FULLSCREEN:
 			value = "On" if Settings.fullscreen else "Off"
 		Setting.WINDOW_SIZE:

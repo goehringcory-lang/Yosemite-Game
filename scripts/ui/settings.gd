@@ -11,12 +11,21 @@ extends RefCounted
 
 enum TextSpeed { SLOW, NORMAL, FAST, INSTANT }
 enum Prompts { AUTO, KEYBOARD, GAMEPAD }
+enum Graphics { HIGH, LOW }
 
 const DEFAULT_PATH := "user://settings.cfg"
 const TEXT_SPEED_NAMES := ["Slow", "Normal", "Fast", "Instant"]
 ## Letters a second the dialogue box reveals at each speed (0: all at once).
 const TEXT_SPEED_CPS := [30.0, 60.0, 120.0, 0.0]
 const PROMPT_NAMES := ["Auto", "Keyboard", "Gamepad"]
+const GRAPHICS_NAMES := ["High", "Low"]
+## The renderer each graphics level runs on. Low is the simpler Compatibility
+## renderer (OpenGL), for older computers.
+const GRAPHICS_RENDERERS := ["forward_plus", "gl_compatibility"]
+## The file project.godot reads over its own settings at start-up
+## (application/config/project_settings_override), so Low can pick the
+## renderer before the window opens.
+const GRAPHICS_OVERRIDE := "user://graphics.cfg"
 const MIN_SCALE := 1
 const MAX_SCALE := 3
 const BASE_SIZE := Vector2i(960, 540)
@@ -43,6 +52,11 @@ static var ambience_volume := MAX_VOLUME
 ## pixel art as in Stardew Valley and keeps every letter distinct, or smooth
 ## Noto Sans.
 static var pixel_font := true
+## High (Forward+) or Low (Compatibility); a change takes effect the next time
+## the game starts.
+static var graphics := Graphics.HIGH
+## The graphics level the game started with (-1 until settings first load).
+static var _started_graphics := -1
 const SMOOTH_FONT := "res://assets/fonts/NotoSans-Regular.ttf"
 const PIXEL_FONT := "res://assets/fonts/DotGothic16Prop-Regular.ttf"
 static var _fonts: Dictionary = {}
@@ -58,6 +72,8 @@ static func ensure_loaded() -> void:
 	if not _loaded:
 		load_settings()
 		apply_font()
+		if _started_graphics < 0:
+			_started_graphics = graphics
 
 
 ## The font for the UI, as chosen: DotGothic16 or Noto Sans.
@@ -120,6 +136,7 @@ static func load_settings() -> void:
 	music_volume = clampi(int(config.get_value("audio", "music", music_volume)), 0, MAX_VOLUME)
 	ambience_volume = clampi(int(config.get_value("audio", "ambience", ambience_volume)), 0, MAX_VOLUME)
 	pixel_font = bool(config.get_value("display", "pixel_font", pixel_font))
+	graphics = clampi(int(config.get_value("display", "graphics", graphics)), 0, Graphics.size() - 1) as Graphics
 
 
 static func save() -> Error:
@@ -135,7 +152,34 @@ static func save() -> Error:
 	config.set_value("audio", "music", music_volume)
 	config.set_value("audio", "ambience", ambience_volume)
 	config.set_value("display", "pixel_font", pixel_font)
+	config.set_value("display", "graphics", int(graphics))
+	_save_graphics_override()
 	return config.save(path)
+
+
+## The override file beside the settings: the game's own, or a test's.
+static func graphics_override_path() -> String:
+	return GRAPHICS_OVERRIDE if path == DEFAULT_PATH else path.get_basename() + "_graphics.cfg"
+
+
+## Writes the renderer for Low into the override file, or removes the file for
+## High so the project's own renderer (Forward+) stands.
+static func _save_graphics_override() -> void:
+	var file := graphics_override_path()
+	if graphics == Graphics.HIGH:
+		if FileAccess.file_exists(file):
+			DirAccess.remove_absolute(file)
+		return
+	var config := ConfigFile.new()
+	config.set_value("rendering", "renderer/rendering_method", GRAPHICS_RENDERERS[graphics])
+	config.save(file)
+
+
+## True when the graphics level was changed since the game started, so it
+## waits for a restart.
+static func graphics_pending() -> bool:
+	ensure_loaded()
+	return _started_graphics >= 0 and graphics != _started_graphics
 
 
 static func reset_defaults() -> void:
@@ -148,6 +192,7 @@ static func reset_defaults() -> void:
 	music_volume = 8
 	ambience_volume = MAX_VOLUME
 	pixel_font = true
+	graphics = Graphics.HIGH
 	_customized = false
 
 

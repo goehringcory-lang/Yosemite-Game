@@ -25,6 +25,8 @@ func _ready() -> void:
 	test_persistence()
 	test_bad_values()
 	Settings.path = TEST_PATH
+	test_graphics()
+	Settings.path = TEST_PATH
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_PATH))
 	Settings.load_settings()
 	SaveManager.save_path = "user://settings_test_save.json"
@@ -35,6 +37,7 @@ func _ready() -> void:
 	await get_tree().process_frame
 	GameClock.paused = true
 	await test_pause_settings()
+	test_pause_graphics()
 	test_prompts()
 	await test_book()
 	await test_dialogue_reveal()
@@ -64,6 +67,45 @@ func test_persistence() -> void:
 	check(Settings.chars_per_second() == 120.0, "Fast reveals 120 letters a second")
 	Settings.text_speed = Settings.TextSpeed.INSTANT
 	check(Settings.chars_per_second() == 0.0, "Instant shows a page at once")
+
+
+## Graphics: Low writes the Compatibility renderer into the override file the
+## project reads at start-up, High removes it, and the pause menu says a change
+## waits for a restart.
+func test_graphics() -> void:
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_PATH))
+	Settings.load_settings()
+	var override := Settings.graphics_override_path()
+	check(override != Settings.GRAPHICS_OVERRIDE, "a test keeps its own override file (%s)" % override)
+	check(Settings.graphics == Settings.Graphics.HIGH, "graphics default to High")
+	check(ProjectSettings.get_setting("rendering/renderer/rendering_method") == "forward_plus", "the project runs on Forward+")
+	check(ProjectSettings.get_setting("application/config/project_settings_override") == Settings.GRAPHICS_OVERRIDE,
+		"the project reads the graphics override file")
+	Settings.graphics = Settings.Graphics.LOW
+	Settings.save()
+	var config := ConfigFile.new()
+	check(config.load(override) == OK and config.get_value("rendering", "renderer/rendering_method", "") == "gl_compatibility",
+		"Low writes the Compatibility renderer to the override file")
+	Settings.reset_defaults()
+	Settings.load_settings()
+	check(Settings.graphics == Settings.Graphics.LOW, "Low loads back")
+	Settings.graphics = Settings.Graphics.HIGH
+	Settings.save()
+	check(not FileAccess.file_exists(override), "High removes the override file")
+
+
+## The pause menu's Graphics row steps between High and Low and says a change
+## waits for a restart.
+func test_pause_graphics() -> void:
+	var pause: PauseMenu = get_tree().get_first_node_in_group("pause_menu")
+	Settings._started_graphics = Settings.graphics
+	check(pause._setting_value(PauseMenu.Setting.GRAPHICS) == "‹  High  ›", "the pause menu shows High")
+	pause.change_setting(PauseMenu.Setting.GRAPHICS, 1)
+	check(Settings.graphics == Settings.Graphics.LOW and pause._setting_value(PauseMenu.Setting.GRAPHICS) == "‹  Low (on restart)  ›",
+		"a change shows it waits for a restart")
+	pause.change_setting(PauseMenu.Setting.GRAPHICS, 1)
+	check(Settings.graphics == Settings.Graphics.HIGH and not FileAccess.file_exists(Settings.graphics_override_path()),
+		"and steps back to High, removing the override")
 
 
 func test_bad_values() -> void:
