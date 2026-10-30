@@ -50,6 +50,7 @@ func test_light() -> void:
 	await get_tree().process_frame
 	check(game._light.headlamp.enabled and not game._light.sun.enabled, "after dark the headlamp lights the wall")
 	check(game._light.headlamp.position.distance_to(game._torso()) < 30.0, "the headlamp is on the climber")
+	check(game._light.headlamp.range_layer_min == game.layer and game._light.headlamp.range_layer_max == game.layer, "the headlamp reaches the climbing screen's canvas layer")
 	game.queue_free()
 	await get_tree().process_frame
 

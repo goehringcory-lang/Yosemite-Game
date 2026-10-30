@@ -22,11 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The climbing screen test needs a window; xvfb gives it one.
+      # The climbing screen test needs a window; xvfb gives it one, and
+      # software Vulkan (lavapipe) runs it on Forward+, lit as on High.
       - name: Install xvfb
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri
+          sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri mesa-vulkan-drivers libvulkan1
 
       - name: Cache Godot
         id: cache-godot

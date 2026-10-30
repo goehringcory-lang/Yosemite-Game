@@ -76,3 +76,16 @@ func update(hour: float, night: bool, head: Vector2, cloud := 0.0) -> void:
 		sun.energy = SUN_STRENGTH * level
 	headlamp.enabled = night
 	headlamp.position = head
+	# 2D lights only reach canvas layers in their layer range, which is 0
+	# unless set: the climbing screen sits well above the world.
+	var screen := _layer()
+	for light: Light2D in [sun, headlamp]:
+		light.range_layer_min = screen
+		light.range_layer_max = screen
+
+
+func _layer() -> int:
+	var node := get_parent()
+	while node and not node is CanvasLayer:
+		node = node.get_parent()
+	return (node as CanvasLayer).layer if node else 0
