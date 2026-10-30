@@ -6,10 +6,10 @@ shader_type canvas_item;
 
 uniform sampler2D screen : hint_screen_texture, filter_linear_mipmap;
 // how far into the soft bands the blur reaches at most (mip levels)
-uniform float strength : hint_range(0.0, 3.0) = 1.4;
+uniform float strength : hint_range(0.0, 3.0) = 1.1;
 // the sharp band: from this far down the screen to this far down
-uniform float focus_top : hint_range(0.0, 1.0) = 0.24;
-uniform float focus_bottom : hint_range(0.0, 1.0) = 0.8;
+uniform float focus_top : hint_range(0.0, 1.0) = 0.2;
+uniform float focus_bottom : hint_range(0.0, 1.0) = 0.84;
 
 void fragment() {
 	float y = SCREEN_UV.y;
