@@ -9,6 +9,12 @@ shader_type canvas_item;
 
 // pixels of height from full black to full white
 uniform float bump = 2.5;
+// The sun, worked out here rather than by a light: the way its light
+// travels across the picture (+y down), its colour and strength. Slopes
+// facing it brighten and slopes facing away dim, as lit.gdshaderinc does.
+uniform vec2 sun_travel = vec2(0.0, 1.0);
+uniform vec3 sun_color : source_color = vec3(1.0);
+uniform float sun_strength = 0.0;
 
 float shade_at(sampler2D tex, vec2 uv) {
 	return dot(texture(tex, uv).rgb, vec3(0.299, 0.587, 0.114));
@@ -24,6 +30,9 @@ void fragment() {
 	// red right, green up the picture, as the normal maps store them
 	vec3 n = normalize(vec3((left - right) * bump * 0.5, (below - above) * bump * 0.5, 1.0));
 	NORMAL_MAP = n * 0.5 + 0.5;
+	// facing the sun: a normal pointing back along its light (+y down here)
+	float tilt = dot(vec2(n.x, -n.y), -normalize(sun_travel));
+	COLOR.rgb += COLOR.rgb * sun_color * tilt * SUN_GAIN * relief * sun_strength;
 }
 
 void light() {

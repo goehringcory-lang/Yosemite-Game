@@ -126,13 +126,13 @@ func _ready() -> void:
 	profile = ClimbProfiles.get_profile(route.id)
 	belayer_look = ClimbProfiles.belayer_look(route)
 	if LitSprites.active():
+		_light = ClimbLight.new()
 		_back = _screen_item(_draw_back)
 		_wall_view = _screen_item(_draw_wall_view)
-		_wall_view.material = ClimbLight.wall_material()
+		_wall_view.material = _light.wall_material
 		_wall_view.light_mask = LitSprites.LIT_LAYER
 	_canvas = _screen_item(_draw_screen)
-	if _wall_view:
-		_light = ClimbLight.new()
+	if _light:
 		_canvas.add_child(_light)
 	# The climbing art is painted in code; this keeps all of it on the palette.
 	var snap := ColorRect.new()

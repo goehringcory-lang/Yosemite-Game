@@ -43,12 +43,12 @@ func test_light() -> void:
 	game._start_minutes = 8 * 60
 	game._paint_scenery()
 	await get_tree().process_frame
-	check(game._light.sun.enabled and not game._light.headlamp.enabled, "the morning sun lights the wall, the headlamp is off")
-	check(Vector2.DOWN.rotated(game._light.sun.rotation).x < 0.0, "the morning sun comes from the east (the right)")
+	check(game._light.sun_on and not game._light.headlamp.enabled, "the morning sun lights the wall, the headlamp is off")
+	check(game._light.sun_travel.x < 0.0, "the morning sun comes from the east (the right)")
 	game._start_minutes = 23 * 60
 	game._paint_scenery()
 	await get_tree().process_frame
-	check(game._light.headlamp.enabled and not game._light.sun.enabled, "after dark the headlamp lights the wall")
+	check(game._light.headlamp.enabled and not game._light.sun_on, "after dark the headlamp lights the wall")
 	check(game._light.headlamp.position.distance_to(game._torso()) < 30.0, "the headlamp is on the climber")
 	check(game._light.headlamp.range_layer_min == game.layer and game._light.headlamp.range_layer_max == game.layer, "the headlamp reaches the climbing screen's canvas layer")
 	game.queue_free()

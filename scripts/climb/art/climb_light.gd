@@ -19,24 +19,22 @@ const LAMP_RADIUS := 70.0
 const LAMP_ENERGY := 1.1
 const LAMP_HEIGHT := 10.0
 
-var sun: DirectionalLight2D
+## The wall's material: the sun is worked out in its shader (a 2D
+## directional light would also light the sky and the HUD on this screen).
+var wall_material: ShaderMaterial
+## Whether the sun lights the wall, and the way its light travels across it.
+var sun_on := false
+var sun_travel := Vector2.ZERO
 var headlamp: PointLight2D
 
 
-## The material for the wall's canvas item.
-static func wall_material() -> ShaderMaterial:
-	var mat := ShaderMaterial.new()
-	mat.shader = SHADER
-	return mat
+func _init() -> void:
+	wall_material = ShaderMaterial.new()
+	wall_material.shader = SHADER
 
 
 func _ready() -> void:
 	name = "ClimbLight"
-	sun = DirectionalLight2D.new()
-	sun.blend_mode = Light2D.BLEND_MODE_ADD
-	sun.range_item_cull_mask = LitSprites.LIT_LAYER
-	sun.enabled = false
-	add_child(sun)
 	var gradient := Gradient.new()
 	gradient.offsets = PackedFloat32Array([0.0, 0.25, 0.6, 1.0])
 	gradient.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.6), Color(1, 1, 1, 0.18), Color(1, 1, 1, 0)])
@@ -62,26 +60,20 @@ func _ready() -> void:
 ## screen's palette has it) and puts the headlamp at [param head].
 func update(hour: float, night: bool, head: Vector2, cloud := 0.0) -> void:
 	var level := Sun.daylight(hour) * (1.0 - cloud * 0.7)
-	sun.enabled = not night and level > 0.01
-	if sun.enabled:
-		# The wall faces the valley: the sun in the east lights it from the
-		# right, in the west from the left, and always a little from above.
-		var toward := Sun.direction(hour)
-		var travel := Vector2(-toward.x, 0.45).normalized()
-		sun.rotation = travel.angle() - PI / 2.0
-		sun.height = clampf(sin(deg_to_rad(Sun.height(hour))), 0.12, 0.9)
-		var c := NOON.lerp(GOLDEN, Sun.golden(hour))
-		c.a = 1.0
-		sun.color = c
-		sun.energy = SUN_STRENGTH * level
+	sun_on = not night and level > 0.01
+	# The wall faces the valley: the sun in the east lights it from the
+	# right, in the west from the left, and always a little from above.
+	var toward := Sun.direction(hour)
+	sun_travel = Vector2(-toward.x, 0.45).normalized()
+	wall_material.set_shader_parameter("sun_travel", sun_travel)
+	wall_material.set_shader_parameter("sun_color", NOON.lerp(GOLDEN, Sun.golden(hour)))
+	wall_material.set_shader_parameter("sun_strength", SUN_STRENGTH * level if sun_on else 0.0)
 	headlamp.enabled = night
 	headlamp.position = head
 	# 2D lights only reach canvas layers in their layer range, which is 0
 	# unless set: the climbing screen sits well above the world.
-	var screen := _layer()
-	for light: Light2D in [sun, headlamp]:
-		light.range_layer_min = screen
-		light.range_layer_max = screen
+	headlamp.range_layer_min = _layer()
+	headlamp.range_layer_max = _layer()
 
 
 func _layer() -> int:
