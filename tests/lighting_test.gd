@@ -3,7 +3,8 @@ extends Node
 ## evenings, short winter days), its height and the way shadows fall, the day
 ## and night tint following it, things casting shadows that swing with the
 ## sun, the painted street lamps and fires giving real light after dark, the
-## player's lantern, and the morning mist burning off.
+## player's lantern, the morning mist burning off, and the real light on the
+## sprites with normal maps (LitSprites, SunLight).
 ## Run: godot --headless --path . res://tests/lighting_test.tscn
 ## Exit code is the number of failed checks. Uses its own save file.
 
@@ -43,6 +44,7 @@ func _ready() -> void:
 	GameClock.paused = true
 	await test_shadows()
 	await test_lamps()
+	await test_lit_sprites()
 	await test_indoors()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
@@ -163,10 +165,57 @@ func test_lamps() -> void:
 	check(lantern != null and lantern.energy > 0.3, "the lantern is lit at 11 PM")
 
 
+## Curry Village's art has normal maps: its cabins, trees and ground are
+## shaded by the sun's real light, which comes from the east in the morning
+## and the west in the evening and is out at night; art without one is left
+## alone.
+func test_lit_sprites() -> void:
+	set_date(SUMMER, 14, 8)
+	await world.go_to_region("curry_village", "arrival")
+	await _frames(3)
+	var lit := 0
+	var unlit_with_normals := 0
+	for node in world.region.find_children("*", "Sprite2D", true, false):
+		var sprite := node as Sprite2D
+		if sprite.has_meta("lit"):
+			lit += 1
+			if lit == 1:
+				check((sprite.light_mask & LitSprites.LIT_LAYER) != 0, "a lit sprite is on the sun's light layer")
+		elif sprite.material == null and sprite.texture and LitSprites.normal_for(sprite.texture.resource_path) != null:
+			unlit_with_normals += 1
+	check(lit > 300, "Curry Village's cabins, trees and plants are lit by real light (%d)" % lit)
+	check(unlit_with_normals == 0, "every sprite with a normal map and no other shader gets it (%d left)" % unlit_with_normals)
+	var ground := world.region.get_node("GroundArt") as Sprite2D
+	check((ground.material as ShaderMaterial).get_shader_parameter("normal_map") != null, "the painted ground has its normal map")
+	check(world.player.sprite.has_meta("lit"), "the player is lit too")
+	check(LitSprites.material_for("res://assets/sprites/curry/cabin_a.png") == LitSprites.material_for("res://assets/sprites/curry/cabin_a.png"),
+		"sprites drawn from the same art share one material")
+	check(LitSprites.material_for("res://assets/sprites/ahwahnee/lamp_wrought_glow.png") == null, "glows get no normal map")
+	var sun := world.get_node("SunLight") as SunLight
+	check(sun.enabled and sun.energy > 0.2, "the morning sun shines (%.2f)" % sun.energy)
+	# The light travels away from the sun: west (left) in the morning.
+	var travel := Vector2.DOWN.rotated(sun.rotation)
+	check(travel.x < -0.5, "the morning sun comes from the east (%s)" % travel)
+	var morning_height := sun.height
+	set_date(SUMMER, 14, 13)
+	await _frames(2)
+	check(sun.height > morning_height + 0.3, "the noon sun stands higher (%.2f, %.2f)" % [morning_height, sun.height])
+	set_date(SUMMER, 14, 19)
+	await _frames(2)
+	travel = Vector2.DOWN.rotated(sun.rotation)
+	check(travel.x > 0.5, "the evening sun comes from the west (%s)" % travel)
+	set_date(SUMMER, 14, 23)
+	await _frames(2)
+	check(not sun.enabled, "the sun's light is out at night")
+	set_date(SUMMER, 14, 12)
+
+
 func test_indoors() -> void:
 	await world.go_to_region("curry_store", "door")
 	await _frames(3)
 	check(world.region.get_node_or_null("SunShadows") == null, "no sun shadows indoors")
+	var sun := world.get_node_or_null("SunLight") as SunLight
+	check(sun != null and not sun.enabled, "the sun's light is off indoors")
 	var lantern := world.player.get_node_or_null("Lantern") as NightLight
 	check(lantern != null and lantern.energy < 0.05, "the lantern stays out indoors")
 	GameClock.minutes = 12 * 60

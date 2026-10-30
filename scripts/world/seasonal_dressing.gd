@@ -115,8 +115,10 @@ func apply() -> void:
 		var look: Array = _look_for(_names[i])
 		var tex: Texture2D = look[_season]
 		sprite.visible = tex != null
-		if tex:
+		if tex and sprite.texture != tex:
 			sprite.texture = tex
+			if sprite.has_meta("lit"):
+				LitSprites.attach_sprite(sprite)
 	var g: Dictionary = GROUND_LOOKS[_season]
 	for ground in _grounds:
 		var mat := ground.material as ShaderMaterial
@@ -132,9 +134,16 @@ func apply() -> void:
 		_cap_material = ShaderMaterial.new()
 		_cap_material.shader = SNOW_CAP_SHADER
 	_cap_material.set_shader_parameter("snow", snow)
-	# No shader at all on a bare day.
+	# No snow shader at all on a bare day: the sprite goes back to being lit
+	# by real light (LitSprites), or to no shader.
 	for sprite in _caps:
-		sprite.material = _cap_material if snow > 0.0 else null
+		if snow > 0.0:
+			LitSprites.detach_sprite(sprite)
+			sprite.material = _cap_material
+		else:
+			if sprite.material == _cap_material:
+				sprite.material = null
+			LitSprites.attach_sprite(sprite)
 
 
 ## True if a sprite drawn from [param path] can hold snow on top.

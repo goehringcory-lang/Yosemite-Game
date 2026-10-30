@@ -13,6 +13,11 @@ shader_type canvas_item;
 // tools/hubs/tuolumne_ground.gd paints there, replacing the still lines it
 // painted, a pale blue one art pixel tall) and its sun glints twinkle.
 
+// With a normal map (tools/normals), real lights shade the painted ground's
+// relief too (see lit.gdshaderinc). Without one the normal is flat and the
+// ground is lit as before.
+#include "res://assets/shaders/lit.gdshaderinc"
+
 uniform vec3 tint : source_color = vec3(1.0);
 uniform float tint_amount : hint_range(0.0, 1.0) = 0.0;
 uniform float desaturate : hint_range(0.0, 1.0) = 0.0;
@@ -88,6 +93,7 @@ float waterness(vec3 c) {
 }
 
 void fragment() {
+	NORMAL_MAP = texture(normal_map, UV).rgb;
 	vec4 c = texture(TEXTURE, UV);
 	if (dry_amount > 0.0) {
 		vec2 tpx = UV / TEXTURE_PIXEL_SIZE;
@@ -209,4 +215,9 @@ void fragment() {
 		rgb = flower_fill.rgb * (0.9 + 0.2 * hash(px));
 	}
 	COLOR = vec4(rgb, c.a);
+}
+
+
+void light() {
+	LIGHT = lit_light(NORMAL, LIGHT_DIRECTION, LIGHT_IS_DIRECTIONAL, LIGHT_COLOR, LIGHT_ENERGY, COLOR);
 }
