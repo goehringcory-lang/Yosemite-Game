@@ -25,6 +25,13 @@ const FIREFALL_MINUTES := 15
 ## The moonbow at Lower Yosemite Fall: spring full-moon nights, 9 PM until 2 AM.
 const MOONBOW_FROM_HOUR := 21
 const MOONBOW_TO_HOUR := 2
+## Horsetail Fall's natural firefall: the low sun lights the fall orange for a
+## few minutes at sunset, on clear evenings in the second half of winter
+## (February: the game's winter runs December to February in 28 days).
+const HORSETAIL_DAYS := Vector2i(17, 28)
+const HORSETAIL_HOUR := 17
+const HORSETAIL_MINUTE := 20
+const HORSETAIL_MINUTES := 30
 ## Drives and rides can't arrive later than this many hours before the pass-out time.
 const TRAVEL_CUTOFF_HOURS := 1
 
@@ -146,6 +153,19 @@ func is_firefall_time() -> bool:
 ## True when a moonbow can form at Lower Yosemite Fall (spring, full moon, late evening).
 func is_moonbow_time() -> bool:
 	return season == Season.SPRING and is_full_moon() and hour_in_range(MOONBOW_FROM_HOUR, MOONBOW_TO_HOUR)
+
+
+## True while the setting sun lights Horsetail Fall: winter days
+## [constant HORSETAIL_DAYS], 5:20 to 5:50 PM, and only when the sky is clear
+## enough for the sun to reach the wall.
+func is_horsetail_time() -> bool:
+	if season != Season.WINTER or day < HORSETAIL_DAYS.x or day > HORSETAIL_DAYS.y:
+		return false
+	var weather := Weather.today()
+	if weather.snow > 0.0 or weather.rain > 0.0 or weather.clouds > 0.7:
+		return false
+	var start := HORSETAIL_HOUR * 60 + HORSETAIL_MINUTE
+	return minutes >= start and minutes < start + HORSETAIL_MINUTES
 
 
 func save_data() -> Dictionary:

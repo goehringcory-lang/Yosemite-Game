@@ -195,6 +195,7 @@ func test_flies() -> void:
 	check(Fishing.weight_for(brown, tied) == brown.waters.run * 2 and Fishing.weight_for(brown, {}) == brown.waters.run, "the bugger brings up browns twice as often")
 	var rod := Fishing.new()
 	add_child(rod)
+	rod._rng.seed = 77
 	var browns := 0
 	for i in 400:
 		if rod.pick("yosemite_valley", GameClock.Season.SUMMER, tied).id == "brown_trout":

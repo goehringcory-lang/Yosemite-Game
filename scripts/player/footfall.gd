@@ -4,7 +4,10 @@ extends Node2D
 ## each step (kicked-up snow on snowy days, a splash when it rains, boards and
 ## no dust indoors), and on cold mornings and all winter, a breath of fog in
 ## front of their face. Pixel puffs in a small pool, drawn in world space so
-## they stay where they were made. Player adds one as a child.
+## they stay where they were made. Where snow lies on the ground
+## (Seasons.snow_cover), each step also leaves a boot print that stays for
+## the rest of the day, unless fresh snow fills it in. Player adds one as a
+## child.
 
 ## Pixels walked between steps (the walk cycle's footfalls).
 const STEP_DISTANCE := 20.0
@@ -12,6 +15,11 @@ const PUFF_LIFE := 0.45
 const BREATH_LIFE := 1.1
 const BREATH_EVERY := 2.4
 const MAX_PUFFS := 12
+## Boot prints kept at once (the oldest go first), the snow it takes to hold
+## them, and how long fresh snow takes to fill one in, in seconds.
+const MAX_PRINTS := 240
+const PRINT_SNOW := 0.3
+const PRINT_FILL := 90.0
 
 ## Each puff: [position, age, kind (0 dust, 1 breath), color, direction].
 var _puffs: Array = []
@@ -20,6 +28,10 @@ var _left := false
 var _breath_timer := 1.0
 var _last := Vector2.ZERO
 var _breath: Node2D
+## Each print: [position, region id, left foot, age in seconds].
+var _prints: Array = []
+var _prints_day := ""
+var _print_layer: Node2D
 
 
 func _ready() -> void:
@@ -34,6 +46,13 @@ func _ready() -> void:
 	_breath.z_as_relative = false
 	_breath.draw.connect(_draw_breath)
 	add_child(_breath)
+	# Prints sit flat in the snow, under the puffs.
+	_print_layer = Node2D.new()
+	_print_layer.name = "Prints"
+	_print_layer.z_index = -6
+	_print_layer.z_as_relative = false
+	_print_layer.draw.connect(_draw_prints)
+	add_child(_print_layer)
 	_last = _body().global_position if _body() else Vector2.ZERO
 
 
@@ -70,16 +89,23 @@ func _process(delta: float) -> void:
 			_puffs.remove_at(i)
 		else:
 			i += 1
-	visible = not _puffs.is_empty()
+	_age_prints(delta)
+	visible = not _puffs.is_empty() or not _prints.is_empty()
 	if visible:
 		queue_redraw()
 		_breath.queue_redraw()
+		_print_layer.queue_redraw()
 
 
 func _step(at: Vector2) -> void:
 	_step_sound()
 	if _indoors():
 		return
+	if Seasons.snow_cover() >= PRINT_SNOW:
+		var region := _region()
+		_prints.append([at.floor(), region.region_id if region else "", _left, 0.0])
+		if _prints.size() > MAX_PRINTS:
+			_prints.pop_front()
 	var color := Color(0.8, 0.72, 0.56, 0.6)
 	var weather := Weather.today()
 	if weather.rain > 0.0:
@@ -127,10 +153,46 @@ func _cold() -> bool:
 
 
 func _indoors() -> bool:
+	var region := _region()
+	return region != null and region.indoors
+
+
+func _region() -> Region:
 	var node := get_parent()
 	while node and not node is Region:
 		node = node.get_parent()
-	return node != null and (node as Region).indoors
+	return node as Region
+
+
+## Prints last the day; falling snow fills them in.
+func _age_prints(delta: float) -> void:
+	var today := "%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day]
+	if today != _prints_day:
+		_prints_day = today
+		_prints.clear()
+	if _prints.is_empty() or Weather.today().snow <= 0.0:
+		return
+	var i := 0
+	while i < _prints.size():
+		_prints[i][3] += delta
+		if _prints[i][3] >= PRINT_FILL:
+			_prints.remove_at(i)
+		else:
+			i += 1
+
+
+## Each boot print: a sole and a heel pressed into the snow, in shadow blue.
+func _draw_prints() -> void:
+	var region := _region()
+	var here := region.region_id if region else ""
+	for mark: Array in _prints:
+		if mark[1] != here:
+			continue
+		var p: Vector2 = mark[0]
+		var c := Color(0.62, 0.71, 0.86, 0.75 * (1.0 - mark[3] / PRINT_FILL))
+		var x := -2.0 if mark[2] else 0.0
+		_print_layer.draw_rect(Rect2(p + Vector2(x, -6), Vector2(4, 4)), c)
+		_print_layer.draw_rect(Rect2(p + Vector2(x, 0), Vector2(4, 2)), c)
 
 
 func _draw() -> void:

@@ -159,17 +159,11 @@ func loop_stream(id: String) -> AudioStreamWAV:
 	return looped
 
 
-## How loud the waterfalls are this season, 0 to 1: full with spring snowmelt,
-## a trickle by fall (Yosemite Falls often dries up by late summer).
+## How loud the waterfalls are this season, 0 to 1: full with the late spring
+## snowmelt, a whisper by fall (Yosemite Falls often dries up by late summer).
+## Falls you can see set their own level from their flow (SeasonalFalls).
 static func waterfall_level() -> float:
-	match GameClock.season:
-		GameClock.Season.SPRING:
-			return 1.0
-		GameClock.Season.SUMMER:
-			return 0.7
-		GameClock.Season.FALL:
-			return 0.25
-	return 0.45
+	return lerpf(0.15, 1.0, Seasons.snowmelt())
 
 
 ## How loud each bed should be now, by name (0 to 1).

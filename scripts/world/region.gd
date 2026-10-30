@@ -35,6 +35,7 @@ func _ready() -> void:
 	if not indoors:
 		_add_wild_dressing()
 		add_child(SeasonalDressing.new())
+		add_child(SeasonalFalls.new())
 
 
 ## The ground clutter laid out by tools/hubs/dress_wilds.gd (needles, cones,
