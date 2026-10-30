@@ -74,6 +74,8 @@ func _ready() -> void:
 	add_child(StringLights.new())
 	player.add_child(Lantern.new())
 	add_child(WaterSurface.new())
+	add_child(SunLight.new())
+	LitSprites.attach_sprite(player.sprite)
 	# before the save loads, so it gets back which moments were seen
 	add_child(StoryMoments.new())
 	var saved := SaveManager.peek_node(name)
@@ -392,6 +394,7 @@ func _enter_region(id: String, spawn_name := "") -> void:
 		SoundEmitter.attach_rivers(region)
 		SunShadows.attach(region)
 		LampLights.attach(region)
+		LitSprites.attach(region)
 	region.entities.add_child(player)
 	var spawn: Marker2D = region.get_spawn(spawn_name) if spawn_name != "" else null
 	if spawn:

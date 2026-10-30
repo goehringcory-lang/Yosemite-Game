@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Takes the renderer tour (tools/shots/renderer_tour.tscn) under the
-# Compatibility renderer and under Forward+, then compares them picture by
-# picture (tools/shots/compare_shots.gd). Needs a display (or xvfb-run) and
+# Compatibility renderer and under Forward+, with the sprites unlit (the real
+# light LitSprites adds on Forward+ is meant to change the look), then
+# compares them picture by picture (tools/shots/compare_shots.gd). Needs a display (or xvfb-run) and
 # a Vulkan driver for Forward+ (lavapipe will do: mesa-vulkan-drivers).
 #
 #   tools/shots/renderer_compare.sh [OUT_DIR]
@@ -28,7 +29,7 @@ for run in gl_compatibility gl_compatibility_again forward_plus; do
 	rm -rf "$dir"
 	mkdir -p "$dir"
 	echo "== Tour under $method ($run)"
-	SHOT_DIR="$dir" SHOT_RENDERER="$method" "${RUN[@]}" "$GODOT" --path . --rendering-method "$method" \
+	SHOT_DIR="$dir" SHOT_RENDERER="$method" SHOT_UNLIT=1 "${RUN[@]}" "$GODOT" --path . --rendering-method "$method" \
 		res://tools/shots/renderer_tour.tscn > "$OUT/$run.log" 2>&1
 	grep -E "^Renderer|ERROR" "$OUT/$run.log" | head -20
 	if [ "$(ls "$dir" | wc -l)" -eq 0 ]; then

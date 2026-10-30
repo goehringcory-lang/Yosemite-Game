@@ -7,6 +7,11 @@ extends Node
 ##   SHOT_REGIONS   comma-separated region ids (default: the tour below)
 ##   SHOT_HOURS     comma-separated game hours (default 10,19.5,22)
 ##   SHOT_SEASON    0 spring, 1 summer, 2 fall, 3 winter (default 1)
+##   SHOT_SPAWNS    comma-separated spawns to shoot from in each region
+##                  (default: the region's arrival); names get the spawn
+##   SHOT_UNLIT     1 to leave the sprites unlit (LitSprites off), as on
+##                  the Compatibility renderer
+##   SHOT_PREFIX    put before every file name (default none)
 ##   SHOT_RENDERER  if set, quit with an error unless this renderer is the
 ##                  one running (forward_plus, mobile or gl_compatibility)
 ## Run: SHOT_DIR=/tmp/shots xvfb-run -a godot --path . --rendering-method forward_plus res://tools/shots/renderer_tour.tscn
@@ -31,6 +36,7 @@ func _ready() -> void:
 		push_error("Expected the %s renderer but %s is running" % [expected, running])
 		get_tree().quit(1)
 		return
+	LitSprites.enabled = OS.get_environment("SHOT_UNLIT") != "1"
 	SaveManager.save_path = "user://renderer_tour_save.json"
 	SaveManager.delete_save()
 	var world: Node = load("res://scenes/world/world.tscn").instantiate()
@@ -42,14 +48,18 @@ func _ready() -> void:
 	var dir := _env("SHOT_DIR", "user://")
 	var regions: PackedStringArray = _env("SHOT_REGIONS", ",".join(TOUR)).split(",", false)
 	var hours: PackedStringArray = _env("SHOT_HOURS", "10,19.5,22").split(",", false)
+	var spawns: PackedStringArray = OS.get_environment("SHOT_SPAWNS").split(",", false)
+	var prefix := OS.get_environment("SHOT_PREFIX")
 	for region_id in regions:
-		await world.go_to_region(region_id)
-		world.hud.visible = false
-		for hour in hours:
-			GameClock.minutes = roundi(float(hour) * 60.0)
-			GameClock.paused = true
-			for i in 12:
-				await get_tree().process_frame
-			var image := get_viewport().get_texture().get_image()
-			image.save_png("%s/%s_%s.png" % [dir, region_id, hour.replace(".", "_")])
+		for spawn in (spawns if not spawns.is_empty() else PackedStringArray(["arrival"])):
+			await world.go_to_region(region_id, spawn)
+			world.hud.visible = false
+			var place := region_id if spawns.is_empty() else "%s_%s" % [region_id, spawn]
+			for hour in hours:
+				GameClock.minutes = roundi(float(hour) * 60.0)
+				GameClock.paused = true
+				for i in 12:
+					await get_tree().process_frame
+				var image := get_viewport().get_texture().get_image()
+				image.save_png("%s/%s%s_%s.png" % [dir, prefix, place, hour.replace(".", "_")])
 	get_tree().quit()

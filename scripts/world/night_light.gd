@@ -41,6 +41,9 @@ func _ready() -> void:
 	texture_scale = radius / 64.0
 	color = Color(1.0, 0.82, 0.5)
 	shadow_enabled = false
+	# how high the lamp hangs over the ground, for sprites with normal maps
+	# (LitSprites): the sides of things facing it catch its light
+	height = 24.0
 	_phase = randf() * TAU
 	energy = 0.0
 	if halo > 0.0:

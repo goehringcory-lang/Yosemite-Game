@@ -17,6 +17,10 @@ if [ ! -d .godot/imported ]; then
 	"$GODOT" --headless --path . --import > /dev/null 2>&1
 fi
 
+# A test that hangs (a script that fails to compile can leave one waiting
+# forever) is stopped after this many seconds, so the rest still run.
+TEST_TIMEOUT="${TEST_TIMEOUT:-300}"
+
 failed=()
 run() {
 	local name="$1"
@@ -24,11 +28,15 @@ run() {
 	local start=$SECONDS
 	# A script that fails to compile can leave every check passing, so a
 	# SCRIPT ERROR anywhere in the log fails the test too.
-	if "$@" > "/tmp/yosemite_${name}.log" 2>&1 && ! grep -q "SCRIPT ERROR" "/tmp/yosemite_${name}.log"; then
+	if timeout "$TEST_TIMEOUT" "$@" > "/tmp/yosemite_${name}.log" 2>&1 && ! grep -q "SCRIPT ERROR" "/tmp/yosemite_${name}.log"; then
 		printf 'PASS  %-16s %4ss\n' "$name" $((SECONDS - start))
 	else
 		printf 'FAIL  %-16s %4ss  (log: /tmp/yosemite_%s.log)\n' "$name" $((SECONDS - start)) "$name"
-		grep -E '^FAIL|SCRIPT ERROR' "/tmp/yosemite_${name}.log" | head -20 | sed 's/^/      /'
+		if [ $((SECONDS - start)) -ge "$TEST_TIMEOUT" ]; then
+			echo "      timed out; the log ends:"
+			tail -15 "/tmp/yosemite_${name}.log" | sed 's/^/      /'
+		fi
+		grep -E '^FAIL|SCRIPT ERROR|ERROR' "/tmp/yosemite_${name}.log" | head -20 | sed 's/^/      /'
 		failed+=("$name")
 	fi
 }
