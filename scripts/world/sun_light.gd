@@ -30,7 +30,7 @@ func _process(_delta: float) -> void:
 		_tint = get_parent().get_node_or_null("DayNight") as CanvasModulate
 	var outdoors := _tint != null and _tint.visible
 	var weather := Weather.today()
-	var level := Sun.daylight() * (1.0 - weather.clouds * 0.6) * (1.0 - maxf(weather.rain, weather.snow) * 0.7)
+	var level: float = Sun.daylight() * (1.0 - weather.clouds * 0.6) * (1.0 - maxf(weather.rain, weather.snow) * 0.7)
 	enabled = LitSprites.active() and outdoors and level > 0.01
 	if not enabled:
 		return
