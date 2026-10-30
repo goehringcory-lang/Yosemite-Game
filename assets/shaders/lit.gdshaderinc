@@ -14,16 +14,21 @@
 uniform sampler2D normal_map : hint_normal, filter_nearest;
 // 0 shades like an unlit sprite, 1 is the full relief
 uniform float relief : hint_range(0.0, 1.0) = 1.0;
-// how much a full tilt toward the light brightens (and away darkens)
-const float LIT_GAIN = 1.6;
+// how much a full tilt toward the light brightens (and away darkens): the
+// sun strongly, to model the day; lamps gently, since their light is already
+// near white where it is brightest and would wash out painted detail
+const float SUN_GAIN = 1.6;
+const float LAMP_GAIN = 0.7;
 
 vec4 lit_light(vec3 normal, vec3 light_dir, bool directional, vec4 light_color, float light_energy, vec4 albedo) {
 	vec2 across = light_dir.xy;
 	float reach = length(across);
 	float tilt = reach > 0.0001 ? dot(normal.xy, across / reach) : 0.0;
-	float shade = tilt * LIT_GAIN * relief;
-	if (!directional) {
-		shade = max(1.0 + shade, 0.0);
+	if (directional) {
+		// Godot carries a directional light's energy in its alpha, which the
+		// blend multiplies by, so it isn't applied here a second time.
+		return vec4(light_color.rgb * albedo.rgb * tilt * SUN_GAIN * relief, light_color.a);
 	}
+	float shade = max(1.0 + tilt * LAMP_GAIN * relief, 0.0);
 	return vec4(light_color.rgb * albedo.rgb * light_energy * shade, light_color.a);
 }
