@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/backcountry_camp.gd" id="1_camp"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_tent_dome_1.png" id="2_tent"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(60, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
+size = Vector2(96, 48)
+
+[node name="BackcountryCamp" type="StaticBody2D"]
+collision_mask = 0
+script = ExtResource("1_camp")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_tent")
+offset = Vector2(0, -24)
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+position = Vector2(0, -8)
+shape = SubResource("RectangleShape2D_body")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_reach")

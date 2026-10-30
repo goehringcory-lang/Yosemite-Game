@@ -57,6 +57,17 @@ func _ready() -> void:
 			await get_tree().physics_frame
 			await get_tree().physics_frame
 			var walked := _walk(region, start)
+			# A way between two parts of one region (the cables up Half Dome)
+			# joins them: walk on from where it comes out.
+			var joined := true
+			while joined:
+				joined = false
+				for door: Node2D in uses:
+					if door is RegionDoor and door.target_region == region_id and _can_use(door, walked):
+						var there := region.get_spawn(door.target_spawn)
+						if there and not _near_walked(there.global_position, walked):
+							walked.merge(_walk(region, there))
+							joined = true
 			for exit: RegionExit in exits:
 				check(_can_reach(exit, walked), "%s: %s (%s) can be walked into, at %s"
 					% [region_id, exit.name, exit.label, exit.position])
@@ -93,8 +104,8 @@ func _ways_out(region: Region) -> Dictionary:
 		elif node is ShuttleStop:
 			for stop: Dictionary in node.destinations():
 				out[stop.region] = true
-		elif node is ClimbStart and node.route and node.route.destination_hub != "":
-			out[node.route.destination_hub] = true
+		elif node is ClimbStart and node.route and node.route.destination() != "":
+			out[node.route.destination()] = true
 	return out
 
 
@@ -166,8 +177,8 @@ func _landing_spots() -> Dictionary:
 	for stop: Dictionary in ShuttleStop.STOPS:
 		add.call(stop.region, stop.spawn)
 	for route in Guidebook.routes():
-		if route.destination_hub != "":
-			add.call(route.destination_hub, route.destination_spawn)
+		if route.destination() != "":
+			add.call(route.destination(), route.destination_spawn)
 	for hub in ParkAtlas.HUBS:
 		for leg in Park.legs_from(hub.id):
 			var there := Park.get_hub(leg.to)

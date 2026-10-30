@@ -91,7 +91,7 @@ The full cast (who lives where, with sprites) and every quest chain, with the ge
 - **Higher Cathedral Spire** (5.9), the Rock Climbing Section's 1934 route.
 - **John Salathé's** own route, the **Steck-Salathé** on Sentinel Rock (5.10b).
 - **Royal Arches** and **Snake Dike** are side stories: long, easy classics off the ladder.
-- **George Anderson** drilled his way up Half Dome in 1875. His story is about the marks people leave: bolts, cables, trails, and place names.
+- **George Anderson** drilled his way up Half Dome in 1875. His story is about the marks people leave: bolts, cables, trails, and place names. Snake Dike tops out on the summit itself, and once Ranger Hodges has sent you on **your first night out** in Little Yosemite Valley (a wilderness permit, a bear canister, and a bear in the night), Anderson sends you up the cables that follow his eyebolts, and Ansel Adams sends you to the Diving Board to see the face in the light he photographed.
 
 ### 4. The big walls: 5.11 to 5.13 (Tier 3, Summer into Fall)
 

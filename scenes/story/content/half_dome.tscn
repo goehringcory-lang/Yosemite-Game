@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/objects/half_dome_cables.tscn" id="1_r"]
+[ext_resource type="Script" path="res://scripts/objects/summit_moment.gd" id="2_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/diving_board.tscn" id="3_r"]
+
+[node name="HalfDomeStory" type="Node2D"]
+
+[node name="CablesUp" parent="." instance=ExtResource("1_r")]
+position = Vector2(912, 1240)
+label = "the cables"
+target_region = "half_dome"
+target_spawn = "summit"
+minutes = 45
+top = Vector2(0, -736)
+
+[node name="CablesDown" parent="." instance=ExtResource("1_r")]
+position = Vector2(912, 504)
+collision_layer = 0
+label = "the cables"
+target_region = "half_dome"
+target_spawn = "cables_foot"
+minutes = 30
+up = false
+
+[node name="SummitMoment" type="Node2D" parent="."]
+position = Vector2(912, 300)
+script = ExtResource("2_r")
+
+[node name="DivingBoard" parent="." instance=ExtResource("3_r")]
+position = Vector2(176, 1232)
