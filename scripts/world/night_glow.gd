@@ -13,7 +13,7 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	var t := GameClock.get_day_progress()
+	var t := Sun.gradient_progress()
 	var evening := smoothstep(0.66, 0.84, t)
 	var morning := 1.0 - smoothstep(0.2, 0.3, t)
 	var night := maxf(evening, morning)

@@ -12,11 +12,16 @@ extends PointLight2D
 ## Only lit during these hours, from (included) to (excluded), wrapping past
 ## midnight: (0, 4) is midnight until 4 AM. (-1, -1) means all night.
 @export var lit_hours := Vector2i(-1, -1)
+## How bright the soft halo in the air round the lamp itself is (0 for none),
+## like light caught in the night air. Its size follows [member radius].
+@export var halo := 1.0
 
 static var _glow: GradientTexture2D
+static var _halo_tex: GradientTexture2D
 
 var _tint: CanvasModulate
 var _phase := 0.0
+var _halo: Sprite2D
 
 
 func _ready() -> void:
@@ -38,6 +43,8 @@ func _ready() -> void:
 	shadow_enabled = false
 	_phase = randf() * TAU
 	energy = 0.0
+	if halo > 0.0:
+		_add_halo()
 
 
 func _process(delta: float) -> void:
@@ -58,3 +65,31 @@ func _process(delta: float) -> void:
 	# A touch over 1 so a lamp clearly lifts the blue night, not just a speck.
 	energy = level * 1.25
 	visible = level > 0.01
+	if _halo:
+		# Drawn bright, since the night tint dims it with everything else.
+		_halo.modulate = Color(color.r, color.g, color.b, 1.0) * Color(2.2, 2.2, 2.2, minf(level * halo * 0.5, 1.0))
+
+
+## A soft additive glow round the lamp head, over everything near it.
+func _add_halo() -> void:
+	if _halo_tex == null:
+		var gradient := Gradient.new()
+		gradient.offsets = PackedFloat32Array([0.0, 0.12, 0.4, 1.0])
+		gradient.colors = PackedColorArray([Color(1, 1, 1, 0.9), Color(1, 1, 1, 0.45), Color(1, 1, 1, 0.12), Color(1, 1, 1, 0)])
+		_halo_tex = GradientTexture2D.new()
+		_halo_tex.gradient = gradient
+		_halo_tex.fill = GradientTexture2D.FILL_RADIAL
+		_halo_tex.fill_from = Vector2(0.5, 0.5)
+		_halo_tex.fill_to = Vector2(1.0, 0.5)
+		_halo_tex.width = 64
+		_halo_tex.height = 64
+	_halo = Sprite2D.new()
+	_halo.name = "Halo"
+	_halo.texture = _halo_tex
+	_halo.scale = Vector2.ONE * clampf(radius * 0.4, 10.0, 34.0) / 32.0
+	_halo.z_index = 18
+	_halo.z_as_relative = false
+	var add := CanvasItemMaterial.new()
+	add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	_halo.material = add
+	add_child(_halo)
