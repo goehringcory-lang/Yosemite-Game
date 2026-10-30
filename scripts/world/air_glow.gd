@@ -5,7 +5,8 @@ extends WorldEnvironment
 ## round them. It takes over from the halo sprites NightLight draws on Low,
 ## where the renderer has no glow. Only the world glows: the HUD and menus
 ## sit on canvas layers above it. It fades in with the night (as DayNight's
-## tint darkens), so nothing pale blooms by day, and is off indoors.
+## tint darkens), so nothing pale blooms by day; indoors it follows the
+## room's lamps (RoomLight).
 
 ## How strong the glow is at full night.
 const STRENGTH := 0.9
@@ -43,5 +44,8 @@ func _process(_delta: float) -> void:
 	if active() and _tint != null and _tint.visible:
 		var lum := (_tint.color.r + _tint.color.g + _tint.color.b) / 3.0
 		dark = clampf((0.9 - lum) / 0.45, 0.0, 1.0)
+	elif active():
+		# a room at night: firelight and lamps glow, more gently
+		dark = RoomLight.level * 0.6
 	environment.glow_enabled = dark > 0.01
 	environment.glow_intensity = STRENGTH * dark

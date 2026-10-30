@@ -53,6 +53,16 @@ func _ready() -> void:
 	for region_id in regions:
 		for spawn in (spawns if not spawns.is_empty() else PackedStringArray(["arrival"])):
 			await world.go_to_region(region_id, spawn)
+			if world.region.get_spawn(spawn) == null:
+				# a room or an area without one: where the first spawn puts you
+				var first: Marker2D = null
+				for parent_path in ["Markers", "Map/Spawns", "Spawns"]:
+					var parent: Node = world.region.get_node_or_null(parent_path)
+					if first == null and parent and parent.get_child_count() > 0 and parent.get_child(0) is Marker2D:
+						first = parent.get_child(0)
+				if first:
+					world.player.global_position = first.global_position
+					world._camera().reset_smoothing()
 			world.hud.visible = false
 			var place := region_id if spawns.is_empty() else "%s_%s" % [region_id, spawn]
 			for hour in hours:

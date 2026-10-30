@@ -49,6 +49,11 @@ var profile: Dictionary
 var belayer_look: Dictionary
 
 var _canvas: Control
+## On High graphics the sky and the wall are drawn on canvas items of their
+## own under _canvas, so real light (ClimbLight) falls on the wall alone.
+var _back: Control
+var _wall_view: Control
+var _light: ClimbLight
 var _phase := Phase.INTRO
 var _pal: Dictionary
 var _sky_tex: Texture2D
@@ -120,11 +125,15 @@ func _ready() -> void:
 	add_to_group("climb_screen") # Sound plays the wind while it's up
 	profile = ClimbProfiles.get_profile(route.id)
 	belayer_look = ClimbProfiles.belayer_look(route)
-	_canvas = Control.new()
-	UiScale.fit(_canvas)
-	_canvas.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	_canvas.draw.connect(_draw_screen)
-	add_child(_canvas)
+	if LitSprites.active():
+		_back = _screen_item(_draw_back)
+		_wall_view = _screen_item(_draw_wall_view)
+		_wall_view.material = ClimbLight.wall_material()
+		_wall_view.light_mask = LitSprites.LIT_LAYER
+	_canvas = _screen_item(_draw_screen)
+	if _wall_view:
+		_light = ClimbLight.new()
+		_canvas.add_child(_light)
 	# The climbing art is painted in code; this keeps all of it on the palette.
 	var snap := ColorRect.new()
 	UiScale.fit(snap)
@@ -139,6 +148,16 @@ func _ready() -> void:
 	_from = _shown
 	_view_row = state.row
 	_events()
+
+
+func _screen_item(painter: Callable) -> Control:
+	var item := Control.new()
+	UiScale.fit(item)
+	item.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	item.draw.connect(painter)
+	add_child(item)
+	return item
 
 
 ## For tools and tests: go straight to the climb.
@@ -186,6 +205,10 @@ func _process(delta: float) -> void:
 	if _phase == Phase.CLIMB and state.stamina <= 25 and state.status == ClimbState.Status.CLIMBING and fmod(_time, 0.9) < delta:
 		_fx.sweat(_torso() + Vector2(4, -16))
 	_canvas.queue_redraw()
+	if _wall_view:
+		_back.queue_redraw()
+		_wall_view.queue_redraw()
+		_light.update(fmod(_hour(), 24.0), _pal.night and _phase != Phase.NIGHT, _torso() + Vector2(0, -14), 1.0 if state.is_stormy() else 0.0)
 
 
 # ---------------------------------------------------------------- input
@@ -679,13 +702,9 @@ func _draw_screen() -> void:
 		ClimbNight.draw(_canvas, _night, state, route, profile, _night_age, _time, _kit)
 		return
 	var height := _progress()
-	var shake := Vector2(roundf(sin(_time * 80.0) * _shake * 0.35), roundf(cos(_time * 63.0) * _shake * 0.25))
-	_canvas.draw_set_transform(shake)
-	_canvas.draw_texture(_sky_tex, Vector2.ZERO)
-	NightSky.draw(_canvas, _time, ClimbSky.stars(_pal))
-	_draw_clouds(height)
-	_draw_layers(0.5 if _roof else height)
-	_draw_birds()
+	_canvas.draw_set_transform(_shake_offset())
+	if _wall_view == null:
+		_draw_sky(height)
 	_draw_wall()
 	_draw_protection()
 	_draw_rope()
@@ -757,13 +776,50 @@ func _draw_birds() -> void:
 		_canvas.draw_rect(Rect2(x + 2, y - flap, 2, 1), col)
 
 
+func _shake_offset() -> Vector2:
+	return Vector2(roundf(sin(_time * 80.0) * _shake * 0.35), roundf(cos(_time * 63.0) * _shake * 0.25))
+
+
+func _draw_sky(height: float) -> void:
+	_canvas.draw_texture(_sky_tex, Vector2.ZERO)
+	NightSky.draw(_canvas, _time, ClimbSky.stars(_pal))
+	_draw_clouds(height)
+	_draw_layers(0.5 if _roof else height)
+	_draw_birds()
+
+
+## The sky behind the wall, on its own canvas item (High graphics).
+func _draw_back() -> void:
+	if _phase == Phase.NIGHT:
+		return
+	var front := _canvas
+	_canvas = _back
+	_canvas.draw_set_transform(_shake_offset())
+	_draw_sky(_progress())
+	_canvas = front
+
+
+## The wall's picture, on its own canvas item so real light falls on it.
+func _draw_wall_view() -> void:
+	if _phase == Phase.NIGHT:
+		return
+	_wall_view.draw_set_transform(_shake_offset())
+	_draw_wall_picture(_wall_view)
+
+
+func _draw_wall_picture(item: CanvasItem) -> void:
+	if _roof:
+		item.draw_texture(_wall_tex, Vector2(roundf(_img_x()), 0))
+	else:
+		item.draw_texture(_wall_tex, Vector2(0, roundf(_img_y())))
+
+
 func _draw_wall() -> void:
 	var top := _img_y()
+	if _wall_view == null:
+		_draw_wall_picture(_canvas)
 	if _roof:
-		_canvas.draw_texture(_wall_tex, Vector2(roundf(_img_x()), 0))
 		top = SCREEN.y
-	else:
-		_canvas.draw_texture(_wall_tex, Vector2(0, roundf(top)))
 	# Below the picture: more wall, or the forest floor at the foot of pitch one.
 	var bottom := top + (0 if _roof else _wall_tex.get_height())
 	if bottom < SCREEN.y and not _roof:
@@ -934,8 +990,8 @@ func _draw_climber() -> void:
 		var hp := torso + Vector2(-14, 46 + sin(_time * 1.3) * 2.0)
 		_canvas.draw_line(torso + Vector2(-2, 6), hp + Vector2(0, -4), ROPE_DARK, 2.0)
 		_canvas.draw_texture(UI.icon_texture("haul_bag"), (hp + Vector2(-6, -6)).round())
-	# Headlamp glow after dark.
-	if _pal.night:
+	# Headlamp glow after dark (on High, ClimbLight's real headlamp).
+	if _pal.night and _wall_view == null:
 		for i in 6:
 			_canvas.draw_circle(torso + Vector2(0, -14), 52.0 - i * 8.0, Color(1, 0.831, 0.541, 0.045))
 

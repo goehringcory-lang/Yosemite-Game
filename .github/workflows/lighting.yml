@@ -21,6 +21,10 @@ env:
   # every outdoor area, at dawn, noon, dusk and night
   REGIONS: ahwahnee_meadow,ahwahnee_trail,big_oak_flat_junction,bridalveil_fall,crane_flat,crows_camp,curry_village,el_capitan_meadow,el_portal,four_mile_trailhead,glacier_point,half_dome,happy_isles,housekeeping_camp,lamon_homestead,leidig_meadow,little_yosemite_valley,mirror_lake,tenaya_creek,the_ahwahnee,tunnel_view,tuolumne_meadows,upper_pines,wawona,yosemite_village
   HOURS: "6.75,12,19.5,22"
+  # a few rooms by day and at night, and the climbing wall through the day
+  ROOMS: ahwahnee_great_lounge,curry_store,degnans,yosemite_chapel,wawona_hotel_lobby,tuolumne_lodge,curry_mountain_shop,valley_lodge_lobby
+  ROOM_HOURS: "12,21.5"
+  CLIMB_HOURS: "8,12,18,22"
 
 jobs:
   shots:
@@ -62,6 +66,16 @@ jobs:
                 xvfb-run -a -s "-screen 0 1920x1080x24" ~/godot/godot --path . --rendering-method forward_plus \
                 res://tools/shots/renderer_tour.tscn 2>&1 | grep -E "^Renderer|ERROR|SCRIPT" | head -20
             done
+          done
+          for mode in lit unlit; do
+            unlit=$([ $mode = unlit ] && echo 1 || echo 0)
+            SHOT_DIR=/tmp/$mode SHOT_REGIONS=$ROOMS SHOT_HOURS=$ROOM_HOURS SHOT_SEASON=1 SHOT_PREFIX=room_ \
+              SHOT_UNLIT=$unlit SHOT_RENDERER=forward_plus \
+              xvfb-run -a -s "-screen 0 1920x1080x24" ~/godot/godot --path . --rendering-method forward_plus \
+              res://tools/shots/renderer_tour.tscn 2>&1 | grep -E "^Renderer|ERROR|SCRIPT" | head -20
+            SHOT_DIR=/tmp/$mode SHOT_ROUTE=firefall_slab SHOT_HOURS=$CLIMB_HOURS SHOT_UNLIT=$unlit \
+              xvfb-run -a -s "-screen 0 1920x1080x24" ~/godot/godot --path . --rendering-method forward_plus \
+              res://tools/shots/climb_shot.tscn 2>&1 | grep -E "ERROR|SCRIPT" | head -20
           done
           python3 tools/shots/side_by_side.py /tmp/unlit /tmp/lit /tmp/shots
 

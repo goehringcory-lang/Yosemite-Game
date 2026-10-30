@@ -14,6 +14,7 @@ the sprites in the regions it lights.
     python3 tools/normals/normals.py --region curry_village
                                                      # every sprite that region uses
     python3 tools/normals/normals.py --outdoors      # every region under the sky
+    python3 tools/normals/normals.py --indoors       # every room
     python3 tools/normals/normals.py --preview OUT.png FILE
                                                      # the sprite lit three ways
 
@@ -245,11 +246,11 @@ def region_sprites(region: str) -> list[str]:
     return sorted(os.path.join(ROOT, rel) for rel in found)
 
 
-def outdoor_regions() -> list[str]:
-    """The regions under the sky (scenes without indoors = true)."""
+def regions(indoors: bool) -> list[str]:
+    """The regions under the sky, or the rooms (scenes with indoors = true)."""
     folder = os.path.join(ROOT, "scenes/regions")
     return sorted(f[:-5] for f in os.listdir(folder)
-                  if f.endswith(".tscn") and "\nindoors = true" not in open(os.path.join(folder, f)).read())
+                  if f.endswith(".tscn") and ("\nindoors = true" in open(os.path.join(folder, f)).read()) == indoors)
 
 
 def main() -> None:
@@ -257,6 +258,7 @@ def main() -> None:
     ap.add_argument("files", nargs="*")
     ap.add_argument("--region", action="append", default=[])
     ap.add_argument("--outdoors", action="store_true", help="every outdoor region")
+    ap.add_argument("--indoors", action="store_true", help="every room")
     ap.add_argument("--preview")
     args = ap.parse_args()
     if args.preview:
@@ -274,7 +276,9 @@ def main() -> None:
         return
     files = [os.path.abspath(f) for f in args.files]
     if args.outdoors:
-        args.region += outdoor_regions()
+        args.region += regions(indoors=False)
+    if args.indoors:
+        args.region += regions(indoors=True)
     for region in args.region:
         files += region_sprites(region)
     made = 0
