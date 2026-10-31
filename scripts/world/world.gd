@@ -16,6 +16,10 @@ const BEAR_TRACKS_DELAY := 3.8
 ## Regions that are gone, and where a save made in one picks up instead.
 ## The big Valley map became separate areas joined by trail scenes.
 const RETIRED_REGIONS := {"yosemite_valley": "yosemite_village"}
+## The next region is laid beside this one once the player is this close (in
+## pixels) to a seam, and taken away again past SEAM_FAR.
+const SEAM_NEAR := 720.0
+const SEAM_FAR := 960.0
 
 ## The region the player is in.
 var region: Region
@@ -40,6 +44,12 @@ var _regions: Dictionary = {}
 var _preload_queue: Array[String] = []
 var _preloading := ""
 var _preloaded: Dictionary = {}
+## The region laid beside this one where a road runs off the map edge, while
+## the player is near that edge (see Seam), so they walk across with no fade.
+var seam: Seam
+## Seams found so far, by region id and then exit name: a Seam, or null where
+## the exit turned out not to meet the next map edge to edge.
+var _seams: Dictionary = {}
 var _busy := false
 var _place_check := 0.0
 ## The door the player last went through into a room, when it was a second
@@ -52,6 +62,10 @@ var _curfew_pending := false
 @onready var player: Player = $Player
 @onready var hud: HUD = $HUD
 @onready var park_map: ParkMap = $ParkMap
+## The forest past the map edges, seen only beside a seam.
+var backdrop := SeamBackdrop.new()
+## Tilts the camera up at the cliffs; also carries its lag over a seam.
+var framing := LandmarkFraming.new()
 ## Today's events, for the page at bedtime.
 var day_log: DayLog
 
@@ -77,7 +91,11 @@ func _ready() -> void:
 	add_child(SunLight.new())
 	add_child(AirGlow.new())
 	add_child(RoomLight.new())
-	add_child(LandmarkFraming.new())
+	add_child(framing)
+	add_child(backdrop)
+	# The camera eases to its limits, so when a seam opens the view over the
+	# edge (or closes it) it pans there instead of jumping.
+	_camera().limit_smoothed = true
 	LitSprites.attach_sprite(player.sprite)
 	# before the save loads, so it gets back which moments were seen
 	add_child(StoryMoments.new())
@@ -128,6 +146,7 @@ func _process(delta: float) -> void:
 	if _curfew_pending and not _busy and not _dialogue_open():
 		sleep(true)
 	_pump_preload()
+	_update_seam()
 	_place_check -= delta
 	if _place_check <= 0.0:
 		_place_check = 0.25
@@ -206,6 +225,11 @@ func remember_door(door: BuildingDoor) -> void:
 ## Called by a RegionExit the player walked into.
 func use_exit(exit: RegionExit) -> void:
 	if _busy or not player.can_act:
+		return
+	# The next region is laid out past this edge, or this is its own exit
+	# back: walk on across (see _physics_process).
+	if seam and (not region.is_ancestor_of(exit) or (exit.target_region == seam.neighbor.region_id \
+			and (region.to_local(exit.global_position) - seam.point).length() < Seam.CORRIDOR)):
 		return
 	if not exit.is_open_now():
 		hud.show_message(exit.closed_message())
@@ -377,35 +401,31 @@ func _show_bear_tracks() -> void:
 ## Swaps regions right away (no fade). The player lands on [param spawn_name]
 ## if that spot exists, and otherwise keeps their position.
 func _enter_region(id: String, spawn_name := "") -> void:
+	_drop_seam()
 	if player.get_parent():
 		player.get_parent().remove_child(player)
 	if region:
 		remove_child(region)
-	region = _regions.get(id)
-	var first_visit := region == null
-	if first_visit:
-		var scene := _load_region_scene(id)
-		region = scene.instantiate()
-		_regions[id] = region
+	region = _get_region(id)
 	add_child(region)
 	move_child(region, 0)
-	if first_visit:
-		StoryContent.attach(region)
-		SaveManager.restore(region)
-		_connect_tents(region)
-		SoundEmitter.attach_waterfalls(region)
-		SoundEmitter.attach_rivers(region)
-		SunShadows.attach(region)
-		LampLights.attach(region)
-		LitSprites.attach(region)
 	region.entities.add_child(player)
 	var spawn: Marker2D = region.get_spawn(spawn_name) if spawn_name != "" else null
 	if spawn:
 		player.global_position = spawn.global_position
 	elif spawn_name != "":
 		push_warning("Region %s has no spawn point named %s" % [id, spawn_name])
+	# Beside a seam, lay the next region out now, while the screen is dark,
+	# so the camera starts out looking over the edge.
+	_update_seam(true)
 	_fit_camera()
 	_camera().reset_smoothing()
+	_arrive()
+
+
+## Everything that follows the player into a region, by a door or a fade or
+## across a seam.
+func _arrive() -> void:
 	$DayNight.visible = not region.indoors
 	if forage:
 		forage.refresh()
@@ -417,6 +437,154 @@ func _enter_region(id: String, spawn_name := "") -> void:
 	region_changed.emit(region)
 	_update_location()
 	_preload_neighbors()
+
+
+## Region [param id], from those visited this session, or made now (with its
+## story, saved state, sounds and lights) on the first visit.
+func _get_region(id: String) -> Region:
+	if _regions.has(id):
+		return _regions[id]
+	var made: Region = _load_region_scene(id).instantiate()
+	_regions[id] = made
+	# The story and saved state need it in the tree (its Entities ready).
+	add_child(made)
+	StoryContent.attach(made)
+	SaveManager.restore(made)
+	_connect_tents(made)
+	SoundEmitter.attach_waterfalls(made)
+	SoundEmitter.attach_rivers(made)
+	SunShadows.attach(made)
+	LampLights.attach(made)
+	LitSprites.attach(made)
+	remove_child(made)
+	return made
+
+
+## Is region [param id] ready to show without waiting on the disk: visited
+## already, or loaded in the background?
+func _region_ready(id: String) -> bool:
+	var path := region_scene_path(id)
+	return _regions.has(id) or _preloaded.has(path) or ResourceLoader.has_cached(path)
+
+
+## Lays the next region beside this one while the player is near a seam
+## (the nearest one, within SEAM_NEAR), and takes it away again once they
+## have walked off. Walking about, a region set up for the first time waits
+## for the next frame; [param now] (arriving behind a fade) does it all at once.
+func _update_seam(now := false) -> void:
+	if region == null or (_busy and not now) or region.indoors:
+		return
+	var at := region.to_local(player.global_position)
+	if seam and (seam.point - at).length() < SEAM_FAR:
+		return
+	var best: Seam = null
+	var best_gap := SEAM_NEAR
+	var made := false
+	for exit in _seam_exits(region):
+		var gap := (region.to_local(exit.global_position) - at).length()
+		if gap >= best_gap or not (now or _region_ready(exit.target_region)):
+			continue
+		# Setting up a region for the first time takes a moment: one a frame.
+		if not _regions.has(exit.target_region) and not now:
+			if made:
+				continue
+			made = true
+		var found := _seam_for(exit)
+		if found:
+			best = found
+			best_gap = gap
+	if best == seam:
+		return
+	_drop_seam()
+	if best == null:
+		return
+	seam = best
+	seam.neighbor.position = seam.offset
+	add_child(seam.neighbor)
+	seam.open(region)
+	# behind the region the player is in, which draws over its own edges
+	move_child(seam.neighbor, 0)
+	_fit_camera()
+
+
+## The walking exits on this region's edges that may be seams.
+func _seam_exits(r: Region) -> Array:
+	if not r.has_meta("seam_exits"):
+		r.set_meta("seam_exits", Seam.candidates(r))
+	return r.get_meta("seam_exits")
+
+
+## The seam through [param exit], worked out once the region it leads to is
+## loaded; null if the two maps don't meet edge to edge there.
+func _seam_for(exit: RegionExit) -> Seam:
+	var known: Dictionary = _seams.get_or_add(region.region_id, {})
+	if not known.has(exit.name):
+		var neighbor := _get_region(exit.target_region)
+		known[exit.name] = Seam.make(region, exit, neighbor)
+	return known[exit.name]
+
+
+## Takes the neighbor away (it stays in memory with the other visited regions).
+func _drop_seam() -> void:
+	if seam == null:
+		return
+	seam.close()
+	if seam.neighbor.get_parent() == self:
+		remove_child(seam.neighbor)
+	seam.neighbor.position = Vector2.ZERO
+	seam = null
+	if region:
+		_fit_camera()
+
+
+func _physics_process(_delta: float) -> void:
+	if seam and not _busy and seam.is_across(region.to_local(player.global_position), region.get_bounds()):
+		_cross_seam()
+
+
+## The player has walked over the seam: the neighbor becomes the region they
+## are in, and this one the neighbor behind them. Both shift so the one the
+## player is in sits at the origin again, and the player and camera shift
+## with them, so nothing moves on screen.
+func _cross_seam() -> void:
+	var behind := region
+	var back := seam.reversed(behind)
+	# The rims stay open; the seam back is the one that closes them later.
+	back._opened = seam._opened
+	seam._opened = []
+	var shift := -seam.offset
+	var camera := _camera()
+	var lag := camera.get_screen_center_position() - camera.global_position
+	var at := player.global_position + shift
+	region = seam.neighbor
+	region.position = Vector2.ZERO
+	# before the player moves in, so the exit back they land on stays quiet
+	seam = back
+	_known_back(behind, back)
+	player.get_parent().remove_child(player)
+	region.entities.add_child(player)
+	player.global_position = at
+	(player.get_node("SmoothMotion") as SmoothMotion).shift(shift)
+	_fit_camera()
+	camera.reset_smoothing()
+	# Carry the camera's lag over, so it eases in as it would have. The lag
+	# is measured past the framing's tilt, which carries over by itself.
+	framing.crossed(region, shift)
+	framing.carry = lag - Vector2(0.0, roundf(framing.tilt))
+	camera.offset = Vector2(framing.carry.x, roundf(framing.tilt) + framing.carry.y)
+	create_tween().tween_property(framing, "carry", Vector2.ZERO, 1.0 / camera.position_smoothing_speed) \
+			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
+	_arrive()
+
+
+## Remembers the seam back the way the player came, so it lines up exactly.
+func _known_back(behind: Region, back: Seam) -> void:
+	if back.exit:
+		var known: Dictionary = _seams.get_or_add(region.region_id, {})
+		var seen: Seam = known.get(back.exit.name)
+		if seen == null or seen.offset != back.offset:
+			known[back.exit.name] = back
+	behind.position = back.offset
 
 
 ## The scene for region [param id]: one loaded in the background if it's ready
@@ -499,13 +667,21 @@ func _camera() -> Camera2D:
 	return player.get_node("Camera")
 
 
+## Keeps the camera on the map, or beside a seam on the map and the next
+## one. Where one is wider than the other, the SeamBackdrop forest fills in.
 func _fit_camera() -> void:
 	var camera := _camera()
 	var bounds := region.get_bounds()
+	if seam:
+		bounds = bounds.merge(seam.neighbor_bounds())
 	camera.limit_left = floori(bounds.position.x)
 	camera.limit_top = floori(bounds.position.y)
 	camera.limit_right = ceili(bounds.end.x)
 	camera.limit_bottom = ceili(bounds.end.y)
+	if seam:
+		backdrop.cover(bounds, [region.get_bounds(), seam.neighbor_bounds()] as Array[Rect2])
+	else:
+		backdrop.cover(Rect2())
 
 
 func _set_paused(paused: bool) -> void:

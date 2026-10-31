@@ -30,6 +30,9 @@ const JUMP := 48.0
 
 ## The camera's current tilt, in pixels (0 or less).
 var tilt := 0.0
+## Added to the camera's offset on top of the tilt: the camera's lag carried
+## over a seam between regions, which World eases back to zero.
+var carry := Vector2.ZERO
 
 var _region: Node = null
 var _walls: Array[float] = []
@@ -64,7 +67,17 @@ func _process(delta: float) -> void:
 	tilt = lerpf(tilt, target, 1.0 - exp(-SPEED * delta))
 	if absf(tilt - target) < 0.25:
 		tilt = target
-	camera.offset.y = roundf(tilt)
+	camera.offset = Vector2(carry.x, roundf(tilt) + carry.y)
+
+
+## The player walked over a seam into [param region] and everything shifted
+## by [param by] (see World._cross_seam): not an arrival, so the tilt keeps
+## easing from where it was instead of jumping.
+func crossed(region: Node, by: Vector2) -> void:
+	_region = region
+	_walls = _wall_feet(region)
+	if _last_at != Vector2.INF:
+		_last_at += by
 
 
 ## The tilt the camera is easing toward with the player at [param at].
