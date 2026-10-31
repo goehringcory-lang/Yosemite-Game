@@ -59,6 +59,9 @@ var seam: Seam
 ## the exit turned out not to meet the next map edge to edge.
 var _seams: Dictionary = {}
 var _busy := false
+## Seconds the place left behind takes to open away going through a door.
+const DOOR_TIME := 0.45
+const DOOR_WIPE := preload("res://assets/shaders/door_wipe.gdshader")
 var _place_check := 0.0
 ## The door the player last went through into a room, when it was a second
 ## door (see remember_door): {into, from, spawn}, or empty.
@@ -291,11 +294,16 @@ func _drive_on(exit: RegionExit) -> void:
 	travel(leg)
 
 
-## Moves the player to a spawn point in another region, with a fade. Use this
-## for doors between a hub and its smaller areas, and for climbs that end
-## somewhere new. [param minutes] advances the clock.
+## Moves the player to a spawn point in another region. Use this for doors
+## between a hub and its smaller areas, and for climbs that end somewhere
+## new. A way that takes no time (a door, a gate) steps straight through
+## (see _step_through); one that takes [param minutes] fades, and advances
+## the clock.
 func go_to_region(id: String, spawn_name := "arrival", minutes := 0) -> void:
 	if _busy:
+		return
+	if minutes == 0:
+		await _step_through(id, spawn_name)
 		return
 	_busy = true
 	_set_paused(true)
@@ -307,6 +315,69 @@ func go_to_region(id: String, spawn_name := "arrival", minutes := 0) -> void:
 	await hud.fade_from_black()
 	_set_paused(false)
 	_busy = false
+
+
+## Goes through a door, gate or short way that takes no time: the new place
+## is laid out under a picture of the last frame here, which then opens away
+## from where the player stands (door_wipe.gdshader). No dark screen, and
+## the player walks on as soon as they're through.
+func _step_through(id: String, spawn_name: String) -> void:
+	_busy = true
+	_set_paused(true)
+	var picture := await _snapshot()
+	var cover: CanvasLayer = null
+	if picture:
+		cover = _door_cover(picture)
+	_enter_region(id, spawn_name)
+	await _unstick_player()
+	_set_paused(false)
+	_busy = false
+	if cover == null:
+		return
+	var wipe := (cover.get_child(0) as CanvasItem).material as ShaderMaterial
+	var at := player.get_global_transform_with_canvas().origin / get_viewport().get_visible_rect().size
+	wipe.set_shader_parameter("center", at.clamp(Vector2.ZERO, Vector2.ONE))
+	var tween := create_tween()
+	tween.tween_method(func(t: float) -> void: wipe.set_shader_parameter("progress", t), 0.0, 1.0, DOOR_TIME) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	await tween.finished
+	cover.queue_free()
+
+
+## The last frame drawn, as a texture, once it is drawn, or null where
+## nothing is drawn (headless, in the tests).
+func _snapshot() -> Texture2D:
+	# Either way, wait for the frame to finish: a door is often walked into
+	# during physics, where the region can't be swapped.
+	if DisplayServer.get_name() == "headless":
+		await get_tree().process_frame
+		return null
+	await RenderingServer.frame_post_draw
+	var image := get_viewport().get_texture().get_image()
+	return ImageTexture.create_from_image(image) if image and not image.is_empty() else null
+
+
+## Lays [param picture] over the whole view, under the HUD.
+func _door_cover(picture: Texture2D) -> CanvasLayer:
+	var cover := CanvasLayer.new()
+	cover.name = "DoorCover"
+	cover.layer = hud.layer
+	var rect := TextureRect.new()
+	rect.texture = picture
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.stretch_mode = TextureRect.STRETCH_SCALE
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var view := get_viewport().get_visible_rect()
+	rect.position = view.position
+	rect.size = view.size
+	var wipe := ShaderMaterial.new()
+	wipe.shader = DOOR_WIPE
+	wipe.set_shader_parameter("rect_size", view.size)
+	rect.material = wipe
+	cover.add_child(rect)
+	add_child(cover)
+	move_child(cover, hud.get_index())
+	return cover
 
 
 ## Drives along one of the routes from Park.legs_from().
