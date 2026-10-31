@@ -8,6 +8,12 @@
 [ext_resource type="Resource" path="res://data/routes/nutcracker.tres" id="6_r"]
 [ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
 [ext_resource type="Script" path="res://scripts/world/horsetail_fall.gd" id="7_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/cars/car_2.png" id="po_car_a"]
+[ext_resource type="Texture2D" path="res://assets/sprites/cars/car_7.png" id="po_car_b"]
+[ext_resource type="Texture2D" path="res://assets/sprites/cars/car_10.png" id="po_car_c"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_po_car"]
+size = Vector2(48, 24)
 
 [node name="ElCapitanMeadowStory" type="Node2D"]
 
@@ -42,3 +48,39 @@ title = "El Capitan Hole"
 [node name="HorsetailFall" type="Node2D" parent="."]
 position = Vector2(1838, 150)
 script = ExtResource("7_r")
+
+[node name="PulloutCarA" type="StaticBody2D" parent="."]
+position = Vector2(808, 626)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="PulloutCarA"]
+texture = ExtResource("po_car_a")
+offset = Vector2(0, -40)
+
+[node name="Collision" type="CollisionShape2D" parent="PulloutCarA"]
+position = Vector2(0, -12)
+shape = SubResource("RectangleShape2D_po_car")
+
+[node name="PulloutCarB" type="StaticBody2D" parent="."]
+position = Vector2(872, 626)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="PulloutCarB"]
+texture = ExtResource("po_car_b")
+offset = Vector2(0, -40)
+
+[node name="Collision" type="CollisionShape2D" parent="PulloutCarB"]
+position = Vector2(0, -12)
+shape = SubResource("RectangleShape2D_po_car")
+
+[node name="PulloutCarC" type="StaticBody2D" parent="."]
+position = Vector2(1012, 626)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="PulloutCarC"]
+texture = ExtResource("po_car_c")
+offset = Vector2(0, -40)
+
+[node name="Collision" type="CollisionShape2D" parent="PulloutCarC"]
+position = Vector2(0, -12)
+shape = SubResource("RectangleShape2D_po_car")

@@ -268,6 +268,10 @@ Every place in the Valley is in one scene only. There is no big Valley overworld
 
 ![Yosemite Falls from the Lower Fall trail: before and after](docs/landmarks_yosemite_falls.png)
 
+**Two rough spots finished.** The Wawona Road now crosses the South Fork on a concrete bridge, its parapets and their shade on the water painted by `tools/hubs/wawona_road_bridge.py` and stood over the road by the Wawona overlay (before, the river foamed against the asphalt as if dammed). And the El Capitan pull-out on Northside Drive has cars parked nose-in, as it always does when climbers are on the wall.
+
+![The Wawona Road over the South Fork, before and after, and the El Capitan pull-out](docs/landmarks_rough_spots.png)
+
 #### The first night out and Half Dome
 
 Above Nevada Fall the Merced runs slow and sandy through **Little Yosemite Valley**, under the back of Half Dome and Liberty Cap: a fir forest with a backcountry camp (a tent site, a fire ring to cook at, the bear-storage sign) three hours up the Mist Trail from Happy Isles. The Half Dome Trail goes on from its north-east corner, an hour and a half up through the forest to **Half Dome**, which is one tall scene: the forest and the granite steps of Sub Dome at the bottom, the saddle where the cables start, the steep back of the Dome (darker rock, streaked down the fall line; no one walks on it), the summit, big and nearly flat, and the lip of the northwest face along the top with nothing beyond it but haze. **The Diving Board** juts out from the shoulder west of the saddle.

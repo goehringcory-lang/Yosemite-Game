@@ -5,6 +5,7 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_stage_gent.tres" id="3_r"]
 [ext_resource type="PackedScene" path="res://scenes/story/pickup.tscn" id="4_r"]
 [ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/wawona/road_bridge.png" id="rb_tex"]
 
 [node name="WawonaStory" type="Node2D"]
 
@@ -31,3 +32,9 @@ script = ExtResource("fw_script")
 kind = "hole"
 size = Vector2(340, 140)
 title = "South Fork Hole"
+
+[node name="RoadBridge" type="Sprite2D" parent="."]
+position = Vector2(1260, 904)
+texture = ExtResource("rb_tex")
+centered = false
+offset = Vector2(0, -144)
