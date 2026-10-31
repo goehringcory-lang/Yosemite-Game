@@ -59,6 +59,8 @@ const VOLUME_SETTINGS := [Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.E
 var _panel: PanelContainer
 var _title: Label
 var _footer: Label
+## True from open() to close(); the panel stays up a moment longer as it fades out.
+var _open := false
 var _pages: Array[Control] = []
 var _page := Page.MAIN
 var _option_labels: Array[Label] = []
@@ -319,7 +321,7 @@ func _build_controls() -> Control:
 
 
 func is_open() -> bool:
-	return _panel.visible
+	return _open
 
 
 func open() -> void:
@@ -333,6 +335,7 @@ func open() -> void:
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud and not hud.device_changed.is_connected(_refresh):
 		hud.device_changed.connect(_refresh)
+	_open = true
 	_show_page(Page.MAIN)
 	_panel.visible = true
 	MenuInput.pop_in(_panel)
@@ -351,7 +354,8 @@ func open_settings() -> void:
 func close() -> void:
 	if not is_open():
 		return
-	_panel.visible = false
+	_open = false
+	MenuInput.pop_out(_panel)
 	Sound.play("ui_close")
 	GameClock.paused = _was_paused
 	_set_player_can_act(true)
@@ -364,6 +368,8 @@ func page() -> Page:
 
 
 func _show_page(which: Page) -> void:
+	if which != _page and _open:
+		MenuInput.fade_page(_pages[which])
 	_page = which
 	for i in _pages.size():
 		_pages[i].visible = i == which

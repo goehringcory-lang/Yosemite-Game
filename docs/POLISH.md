@@ -13,7 +13,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | A card about the thing under the cursor | Beside the campfire and shop lists: a dish's ingredients with what you have of each (red when short), its energy, yield and time, and its note; a ware's price against the food you carry, how many you own, and what it's for | `DialogueBox.choose(..., details)`, `Station.menu_for`, `Vendor.offer_card` | test (one card per choice, short ingredients in red, fits the screen); shots `polish_campfire.png`, `polish_shop.png` |
 | The player's own page | The pause menu shows your portrait, the date, and a tally: food carried, gear, friends and hearts, quests done, climbs | `PauseMenu._build_card`, `card_text` | test (portrait present, tally lines) |
 | Menu sounds | Tick to move, knock to choose, swish to open and close (book, pause menu, conversations, the day's page) | `scripts/autoload/sound.gd`, `MenuInput.pop_in` | audio test (every sound played exists) |
-| Menus animate | The book, pause menu and conversation box fade and grow or rise into place | `MenuInput.pop_in`, `dialogue_box.gd` | by eye |
+| Menus animate | The book, pause menu and conversation box fade and grow or rise into place; the book and pause menu fade and shrink away as they close; a new tab or page fades in; the cursor arrow slides onto the line you move to | `MenuInput.pop_in`, `pop_out`, `fade_page`, `mark`, `dialogue_box.gd` | test (closed at once while the panel fades out) |
 | Text never collides | Long place names drop their leading parts so the banner never runs into the clock | `HUD.set_location` | test |
 | The place name shows as you arrive | The banner names where you are, then fades after four seconds, and comes back when you go somewhere new | `HUD.set_location` | by eye |
 | Interact prompt | A drawn E key and "Talk to Wren" over the player; the pad's A button on a gamepad | `hud.gd` (existing) | settings test |
@@ -51,7 +51,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | Night lighting | Windows, lamps, tents and fires glow; fireflies (existing) | `night_light.gd`, `night_glow.gd` | by eye (`docs/camp4_night.png`) |
 | String lights at night | The bulbs strung over Curry Village's plaza glow after dusk with the lit windows | `scripts/world/string_lights.gd` | shot `polish_clock_23.png` |
 | Weather | Rain, snow, cloud shadows, overcast tint (existing) | `weather.gd`, `cloud_shadows.gd` | `docs/weather_winter_snow.png` |
-| Smooth camera and fades | Camera smoothing, fades between places (existing) | `player.tscn`, `hud.gd` | travel test |
+| Smooth camera and scene wipes | Camera smoothing; between places the screen fills with pixel diamonds in a sweep from the top left, in the palette's night color, and they shrink away the same way | `player.tscn`, `assets/shaders/pixel_wipe.gdshader`, `HUD.fade_to_black` | travel test; shot `tools/shots/wipe_shot.tscn` |
 
 ## Sound and music
 
