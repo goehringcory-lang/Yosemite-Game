@@ -61,6 +61,8 @@ var _detail_name: Label
 var _detail_text: Label
 ## Controls hint and "more above/below" marks, under the page so they never scroll away.
 var _footer: Label
+## True from open() to close(); the panel stays up a moment longer as it fades out.
+var _open := false
 var _more: Label
 var _repeat := 0.0
 var _tab_style: StyleBoxTexture
@@ -166,7 +168,7 @@ func _build_styles() -> void:
 
 
 func is_open() -> bool:
-	return _panel.visible
+	return _open
 
 
 ## The tab showing now (Tab.JOURNAL, QUESTS, PRESS or BACKPACK).
@@ -181,6 +183,7 @@ func open(which := Tab.JOURNAL) -> void:
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud and not hud.device_changed.is_connected(_refresh_hints):
 		hud.device_changed.connect(_refresh_hints)
+	_open = true
 	_panel.visible = true
 	show_tab(which)
 	GameClock.paused = true
@@ -191,7 +194,8 @@ func open(which := Tab.JOURNAL) -> void:
 func close() -> void:
 	if not is_open():
 		return
-	_panel.visible = false
+	_open = false
+	MenuInput.pop_out(_panel)
 	Sound.play("ui_close")
 	GameClock.paused = false
 	_set_player_can_act(true)
@@ -199,6 +203,8 @@ func close() -> void:
 
 ## Turns to tab [param which], at the top of its page.
 func show_tab(which: Tab) -> void:
+	if _open and which != _tab:
+		MenuInput.fade_page(_scroll)
 	_tab = which
 	_cursor = 0
 	_refresh()

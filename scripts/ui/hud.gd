@@ -14,6 +14,10 @@ const LOCATION_SHOWN := 4.0
 ## Seconds the hint line naming the book's keys stays up after you arrive
 ## somewhere or close a menu, before it fades to leave the view clear.
 const HINTS_SHOWN := 8.0
+## Seconds the wipe between places takes each way.
+const WIPE_TIME := 0.5
+## The wipe's color: the deep night of the palette, not flat black.
+const WIPE_COLOR := Color(0.067, 0.059, 0.09)
 const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary"]
 
 var _player: Player
@@ -63,6 +67,11 @@ func _ready() -> void:
 	UiScale.layer(self)
 	_screen = UiScale.wrap_children(self)
 	message_label.modulate.a = 0.0
+	var wipe := ShaderMaterial.new()
+	wipe.shader = preload("res://assets/shaders/pixel_wipe.gdshader")
+	wipe.set_shader_parameter("rect_size", UiScale.SCREEN)
+	fade.material = wipe
+	fade.color = Color(WIPE_COLOR, fade.color.a)
 	GameClock.time_changed.connect(_refresh_clock.unbind(2))
 	GameClock.day_started.connect(_refresh_clock.unbind(3))
 	device_changed.connect(_refresh_status)
@@ -355,12 +364,14 @@ func _update_prompt() -> void:
 	prompt_panel.position = (screen + Vector2(-size.x / 2.0, -40)).clamp(Vector2(2, 2), UiScale.SCREEN - size - Vector2(2, 2)).round()
 
 
+## Covers the screen with the pixel-diamond wipe (see pixel_wipe.gdshader).
 func fade_to_black() -> void:
-	await create_tween().tween_property(fade, "color:a", 1.0, 0.6).finished
+	await create_tween().tween_property(fade, "color:a", 1.0, WIPE_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN).finished
 
 
+## Wipes the cover away the same way, a touch slower, so the new place opens up.
 func fade_from_black() -> void:
-	await create_tween().tween_property(fade, "color:a", 0.0, 0.6).finished
+	await create_tween().tween_property(fade, "color:a", 0.0, WIPE_TIME * 1.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT).finished
 
 
 func _refresh_food() -> void:

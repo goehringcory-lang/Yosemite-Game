@@ -53,13 +53,41 @@ static func horizontal(event: InputEvent) -> int:
 ## Opens [param panel] with a quick fade and grow and the page swish, so
 ## menus don't just blink into place.
 static func pop_in(panel: Control) -> void:
+	_stop(panel)
+	panel.visible = true
 	panel.pivot_offset = panel.size / 2.0
 	panel.modulate.a = 0.0
 	panel.scale = Vector2(0.96, 0.96)
 	var tween := panel.create_tween().set_parallel()
 	tween.tween_property(panel, "modulate:a", 1.0, 0.12)
 	tween.tween_property(panel, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	panel.set_meta("menu_tween", tween)
 	Sound.play("ui_open")
+
+
+## Closes [param panel] the way it opened, backwards: a quick fade and
+## shrink, then hidden. The menu counts as closed from the start (keep its
+## own open flag), so input and the HUD don't wait on the animation.
+static func pop_out(panel: Control) -> void:
+	_stop(panel)
+	panel.pivot_offset = panel.size / 2.0
+	var tween := panel.create_tween().set_parallel()
+	tween.tween_property(panel, "modulate:a", 0.0, 0.1)
+	tween.tween_property(panel, "scale", Vector2(0.97, 0.97), 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.chain().tween_callback(panel.hide)
+	panel.set_meta("menu_tween", tween)
+
+
+static func _stop(panel: Control) -> void:
+	var running: Tween = panel.get_meta("menu_tween", null)
+	if running and running.is_valid():
+		running.kill()
+
+
+## Fades a page's new content in, for a tab or page turned in place.
+static func fade_page(page: Control) -> void:
+	page.modulate.a = 0.0
+	page.create_tween().tween_property(page, "modulate:a", 1.0, 0.12)
 
 
 ## The pointer beside the chosen line of a menu: a small gold arrow with a
@@ -110,6 +138,13 @@ static func mark(label: Control, chosen: bool) -> void:
 		arrow.offset_top = -4.0
 		arrow.offset_bottom = 4.0
 		label.add_child(arrow)
+	# A newly chosen line's arrow slides in from the left, so moving the
+	# cursor reads as motion rather than a blink.
+	if chosen and (not arrow.visible or arrow.get_meta("fresh", true)):
+		arrow.set_meta("fresh", false)
+		arrow.create_tween().tween_method(func(x: float) -> void:
+			arrow.offset_left = roundf(x)
+			arrow.offset_right = roundf(x) + 5.0, -2.0, 1.0, 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	arrow.visible = chosen
 
 

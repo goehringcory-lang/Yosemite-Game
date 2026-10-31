@@ -163,6 +163,9 @@ func test_pause_settings() -> void:
 	await test_pause_save(pause)
 	_press("ui_cancel")
 	check(not pause.is_open() and world.player.can_act, "Esc on the main page resumes")
+	check(pause._panel.visible, "the menu is closed at once but fades out")
+	await get_tree().create_timer(0.4).timeout
+	check(not pause._panel.visible, "and is gone once it has faded")
 	await get_tree().process_frame
 
 
