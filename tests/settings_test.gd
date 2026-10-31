@@ -196,7 +196,7 @@ func test_prompts() -> void:
 	hud._input(InputEventKey.new())
 	Settings.prompts = Settings.Prompts.GAMEPAD
 	hud.refresh_settings()
-	check(hud.interact_button() == "A" and hud._status.text.contains("Y: Journal"), "Gamepad prompts name gamepad buttons with a keyboard in use")
+	check(hud.interact_button() == "A" and hud._status.text.contains("[Y] Journal"), "Gamepad prompts name gamepad buttons with a keyboard in use")
 	Settings.prompts = Settings.Prompts.KEYBOARD
 	hud._input(InputEventJoypadButton.new())
 	check(hud.interact_button() == "E", "Keyboard prompts stay on the keyboard with a gamepad in use")
@@ -209,7 +209,7 @@ func test_prompts() -> void:
 func test_book() -> void:
 	var hud: HUD = world.hud
 	await get_tree().process_frame
-	check(hud._status.text == "J: Journal  ·  Q: Quests  ·  B: Backpack", "the hint line names the three keys (%s)" % hud._status.text)
+	check(hud._status.text == "[J] Journal  ·  [Q] Quests  ·  [B] Backpack", "the hint line names the three keys (%s)" % hud._status.text)
 	check(get_viewport().get_visible_rect().encloses(hud.status_bar.get_global_rect()), "the hint line fits on screen")
 	var journal: Journal = get_tree().get_first_node_in_group("journal")
 	journal.open()
@@ -222,7 +222,7 @@ func test_book() -> void:
 	check(journal._footer.text.contains("[LB/RB] Next tab") and journal._tab_labels[Journal.Tab.QUESTS].text == "Quests", "its hints follow the Button prompts setting (%s)" % journal._footer.text)
 	Settings.prompts = Settings.Prompts.AUTO
 	hud.refresh_settings()
-	check(journal._tab_labels[Journal.Tab.QUESTS].text == "Q  Quests", "and name the keys on a keyboard")
+	check(journal._tab_labels[Journal.Tab.QUESTS].text == "[Q] Quests", "and name the keys on a keyboard")
 	journal.close()
 	await get_tree().process_frame
 	check(hud.status_bar.modulate.a == 1.0, "and comes back after")

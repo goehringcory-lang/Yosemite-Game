@@ -113,7 +113,7 @@ func _ready() -> void:
 	column.add_child(_text)
 	_fade_above = MenuInput.edge_fade(_text, true)
 	_fade_below = MenuInput.edge_fade(_text, false)
-	_footer = Label.new()
+	_footer = ButtonHints.new()
 	_footer.modulate = DIM
 	column.add_child(_footer)
 

@@ -186,7 +186,7 @@ func _ready() -> void:
 	filler.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	filler.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_child(filler)
-	_hint_label = Label.new()
+	_hint_label = ButtonHints.new()
 	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_hint_label.add_theme_color_override("font_color", HINT_COLOR)
 	column.add_child(_hint_label)
@@ -367,8 +367,7 @@ func _refresh_hint() -> void:
 		_hint_label.text = "[%s] Skip" % MenuInput.button(tree, "E", "A")
 	else:
 		_hint_label.text = "[%s] Next" % MenuInput.button(tree, "E", "A")
-	var font := _hint_label.get_theme_font("font")
-	_hint_text_width = font.get_string_size(_hint_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, _hint_label.get_theme_font_size("font_size")).x
+	_hint_text_width = (_hint_label as ButtonHints).content_width()
 	_arrow.visible = false
 
 

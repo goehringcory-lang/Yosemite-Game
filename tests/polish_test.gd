@@ -49,6 +49,7 @@ func _ready() -> void:
 	test_friendship(world)
 	await test_day_log(world)
 	test_panel_stretch()
+	await test_button_hints()
 	await test_nearest_target(world)
 	SaveManager.delete_save()
 	print("OK: %d failure(s)" % failures if failures == 0 else "FAILED: %d failure(s)" % failures)
@@ -565,6 +566,38 @@ func test_panel_stretch() -> void:
 				if not image.get_pixel(x, y).is_equal_approx(fill):
 					flat = false
 		check(flat, "the %s's stretched middle is one color" % name)
+
+
+## Hints draw their keys as buttons: the text stays plain, every hint is at
+## most a few pixels wider drawn than written (and the label grows to hold
+## them), and a "B"
+## is the pad's face button only while hints name the pad's buttons.
+func test_button_hints() -> void:
+	var hint := ButtonHints.new()
+	hint.text = "[Up/Down] Choose   [E] OK   [Esc] Cancel"
+	add_child(hint)
+	check(hint.text == "[Up/Down] Choose   [E] OK   [Esc] Cancel" and hint.visible_characters == 0, "a hint keeps its text and draws its own letters")
+	var line := ButtonHints.layout(hint.text, hint.get_theme_font("font"), 10, INF)[0] as Array
+	var keys := line.filter(func(item: Variant) -> bool: return item is Dictionary).map(func(item: Dictionary) -> String: return item.key)
+	check(keys == ["Up/Down", "E", "Esc"], "the keys are read from the brackets (%s)" % [keys])
+	check(hint.custom_minimum_size.y >= ButtonHints.CAP_HEIGHT + 1, "a line is at least a button tall")
+	var font := hint.get_theme_font("font")
+	var wider := []
+	for text in ["[Up/Down] Choose   [E] OK   [Esc] Cancel", "[D-pad] Choose   [A] OK   [B] Cancel", "[Arrows] Choose   [Tab] Next tab   [B/Esc] Close",
+			"[Stick] Scroll   [LB/RB] Next tab   [Y/B] Close", "[Left/Right] Change", "[D-pad L/R] Change", "[M] Close", "[Back] Close", "[E] Talk to Wren Alvarez   [G] Give a gift"]:
+		if ButtonHints.line_width(font, 10, text) > font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x + 4.0:
+			wider.append(text)
+	check(wider.is_empty(), "no hint is much wider drawn than written %s" % [wider])
+	hint.text = "[E] Talk to Wren Alvarez   [G] Give a gift"
+	await get_tree().process_frame
+	await get_tree().process_frame
+	check(hint.get_combined_minimum_size().x >= hint.content_width(), "a hint's box holds its buttons (%.0f of %.0f)" % [hint.get_combined_minimum_size().x, hint.content_width()])
+	Settings.prompts = Settings.Prompts.GAMEPAD
+	check(ButtonHints.gamepad(get_tree()), "gamepad prompts draw the pad's buttons")
+	Settings.prompts = Settings.Prompts.KEYBOARD
+	check(not ButtonHints.gamepad(get_tree()), "keyboard prompts draw keycaps")
+	Settings.prompts = Settings.Prompts.AUTO
+	hint.queue_free()
 
 
 ## With two things in reach, the prompt names the one you face squarely.
