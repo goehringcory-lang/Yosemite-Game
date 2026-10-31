@@ -70,6 +70,8 @@ ROAD, PARKING, BRIDGE, TRAIL, PAVED = 16, 17, 18, 19, 20
 SOLID = {CLIFF, TALUS, SCREE, RIVER, LAKE, FALLS}
 # What never moves: the walls and what falls from them.
 FIXED = {CLIFF, TALUS, SCREE, FALLS}
+## Bridges and roads stay dry: water bent across one runs under it.
+KEEP_DRY = {ROAD, BRIDGE, PAVED}
 # The features that bend, by class: a river with its sandy banks, a road, a
 # trail or path, a creek.
 CLASSES = {
@@ -327,7 +329,8 @@ def bend(area: Area, side, lo: int, hi: int, shift: int, meets: list, which: int
             for f in features(col):
                 if f[0] == own[0] and abs((f[1] + f[2]) / 2 - was) <= max(3, (f[2] - f[1])):
                     for i in range(f[1], f[2]):
-                        new[i] = None
+                        if col[i] != BRIDGE:
+                            new[i] = None
             mid = (start + end) / 2 * (1 - t) + (deep[1] + deep[2]) / 2 * t
             width = round((end - start) * (1 - t) + (deep[2] - deep[1]) * t)
             placed.append((round(mid - width / 2), resample(kinds if t < 0.5 else deep[3], width)))
@@ -338,7 +341,8 @@ def bend(area: Area, side, lo: int, hi: int, shift: int, meets: list, which: int
         for first, lay in placed:
             for i, k in enumerate(lay):
                 at = first + i
-                if 0 <= at < len(new) and col[at] is not None and col[at] not in FIXED:
+                if 0 <= at < len(new) and col[at] is not None and col[at] not in FIXED \
+                        and not (col[at] in KEEP_DRY and k not in CLASSES["way"]):
                     new[at] = k
         for i, k in enumerate(new):
             if k is not None and k != col[i]:
