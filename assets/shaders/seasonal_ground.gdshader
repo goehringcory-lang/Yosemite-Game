@@ -33,6 +33,21 @@ uniform float snow : hint_range(0.0, 1.0) = 0.0;
 uniform vec4 dry_rect = vec4(0.0);
 uniform float dry_amount : hint_range(0.0, 1.0) = 0.0;
 uniform int dry_kind = 0;
+// A seam with the next area (see scripts/world/seam.gd): the two maps overlap
+// in a band along the edge, and there each pixel of ground belongs to one map
+// or the other, by a blotchy dither that gives this map less of the band the
+// nearer its own edge, so the two grounds blend instead of meeting on a line.
+// seam_band: x the coordinate across the edge (texture pixels) of this map's
+// own edge, y of the band's inner side; seam_axis 0 for an east or west edge
+// (x across), 1 for north or south. seam_span: where along the edge the other
+// map has ground. seam_origin: one spot both maps agree on, so their dithers
+// line up; seam_flip: one map takes the dither as it is, the other inverted.
+uniform bool seam_on = false;
+uniform vec2 seam_band = vec2(0.0);
+uniform int seam_axis = 0;
+uniform vec2 seam_span = vec2(0.0);
+uniform vec2 seam_origin = vec2(0.0);
+uniform bool seam_flip = false;
 const vec3 SNOW = vec3(0.95, 0.97, 1.0);
 const vec3 SNOW_SHADE = vec3(0.76, 0.83, 0.93);
 // Moving light on the painted water: bands of brighter ripples drifting with
@@ -92,7 +107,23 @@ float waterness(vec3 c) {
 	return max(w, clamp((c.b / max(c.g, 0.001) - 0.8) * 8.0, 0.0, 1.0) * step(c.r + 0.06, c.g) * step(c.r + 0.04, c.b));
 }
 
+// Does this map keep this pixel of a seam's band (see the uniforms)?
+bool seam_keeps(vec2 tpx) {
+	float across = seam_axis == 0 ? tpx.x : tpx.y;
+	float along = seam_axis == 0 ? tpx.y : tpx.x;
+	if (along < seam_span.x || along >= seam_span.y) return true;
+	float f = (across - seam_band.x) / (seam_band.y - seam_band.x);
+	if (f >= 1.0) return true;
+	if (f < 0.0) return false;
+	vec2 ap = floor((tpx - seam_origin) * 0.5);
+	float t = clamp(vnoise(ap / 5.0) * 0.65 + hash(ap) * 0.35, 0.0, 0.999);
+	return (seam_flip ? 1.0 - t : t) < f;
+}
+
 void fragment() {
+	if (seam_on && !seam_keeps(UV / TEXTURE_PIXEL_SIZE)) {
+		discard;
+	}
 	NORMAL_MAP = texture(normal_map, UV).rgb;
 	vec4 c = texture(TEXTURE, UV);
 	if (dry_amount > 0.0) {

@@ -6,6 +6,8 @@ extends Node
 ##   PERF_SPAWN    spawn name (default arrival)
 ##   PERF_HOUR     game hour (default 12)
 ##   PERF_SECONDS  seconds of walking (default 8)
+##   PERF_WALK     walk this one way the whole time (move_left...), e.g.
+##                 over a seam, instead of round in a square
 ##   PERF_CSV      optional path for a per-frame CSV
 ##   PERF_SHOT     optional path for a screenshot taken mid-walk
 ##   PERF_OFF      comma-separated node names to switch off (hide and stop
@@ -90,7 +92,7 @@ func _process(delta: float) -> void:
 	if not _walking:
 		return
 	_t += delta
-	var dir: String = DIRS[int(_t / 1.5) % DIRS.size()]
+	var dir: String = _env("PERF_WALK", DIRS[int(_t / 1.5) % DIRS.size()])
 	for a in DIRS:
 		if a == dir:
 			Input.action_press(a)
@@ -123,6 +125,13 @@ func _sample() -> void:
 	]))
 	_last_usec = now
 	_physics_us = 0.0
+	var r := _rows[-1]
+	if _rows.size() > 2:
+		var view_step := Vector2(r[8] - _rows[-2][8], r[9] - _rows[-2][9]).length()
+		var prev_step := Vector2(_rows[-2][8] - _rows[-3][8], _rows[-2][9] - _rows[-3][9]).length()
+		if r[0] > 25.0 or absf(view_step - prev_step) > 3.0:
+			print("PERF frame %d/%d t=%.2f %s frame %.1f ms scripts %.1f physics %.1f view step %.1f (was %.1f)" % [
+				_rows.size(), Engine.get_process_frames(), _t, _world.region.region_id, r[0], r[1], r[2], view_step, prev_step])
 
 
 func _report(region_id: String) -> void:

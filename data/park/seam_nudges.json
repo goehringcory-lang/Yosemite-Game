@@ -1,0 +1,60 @@
+{
+	"ahwahnee_meadow": {
+		"ToAhwahnee": -36,
+		"ToVillage": -1
+	},
+	"ahwahnee_trail": {
+		"ToAhwahnee": -17
+	},
+	"bridalveil_fall": {
+		"ToFourMile": -1,
+		"ToTunnelView": 1
+	},
+	"curry_village": {
+		"EastRoad": 32,
+		"WestRoad": -6
+	},
+	"el_capitan_meadow": {
+		"ToLeidigMeadow": -1
+	},
+	"four_mile_trailhead": {
+		"ToBridalveil": 1,
+		"ToVillage": -32
+	},
+	"happy_isles": {
+		"ToTenayaCreek": -6,
+		"ToUpperPines": 35
+	},
+	"housekeeping_camp": {
+		"ToCurry": 6,
+		"ToVillage": -4
+	},
+	"leidig_meadow": {
+		"ToElCapitan": 1,
+		"ToVillage": -32
+	},
+	"mirror_lake": {
+		"ToTenayaCreek": -14
+	},
+	"tenaya_creek": {
+		"ToHappyIsles": 6,
+		"ToMirrorLake": 14
+	},
+	"the_ahwahnee": {
+		"NorthsideDriveWest": 36,
+		"ToStonemanBridge": 17
+	},
+	"tunnel_view": {
+		"ToBridalveil": -1
+	},
+	"upper_pines": {
+		"ToCurry": -32,
+		"ToHappyIsles": -35
+	},
+	"yosemite_village": {
+		"NorthsideEast": 1,
+		"NorthsideWest": 32,
+		"SouthsideEast": 4,
+		"SouthsideWest": 32
+	}
+}

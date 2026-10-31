@@ -264,16 +264,6 @@ use_parent_material = true
 position = Vector2(1705, 858)
 texture = ExtResource("1_jt2p7")
 
-[node name="WildPebbles9" type="Sprite2D" parent="GroundDetail" unique_id=278064449]
-use_parent_material = true
-position = Vector2(1877, 858)
-texture = ExtResource("4_ihpng")
-
-[node name="WildLeaves4" type="Sprite2D" parent="GroundDetail" unique_id=1684134952]
-use_parent_material = true
-position = Vector2(1975, 856)
-texture = ExtResource("6_icx0d")
-
 [node name="WildNeedlesA6" type="Sprite2D" parent="GroundDetail" unique_id=778920724]
 use_parent_material = true
 position = Vector2(184, 877)
@@ -291,12 +281,6 @@ use_parent_material = true
 position = Vector2(1773, 891)
 texture = ExtResource("5_58uo4")
 
-[node name="WildPebbles10" type="Sprite2D" parent="GroundDetail" unique_id=1611104595]
-use_parent_material = true
-position = Vector2(1840, 884)
-texture = ExtResource("4_ihpng")
-flip_h = true
-
 [node name="WildNeedlesB7" type="Sprite2D" parent="GroundDetail" unique_id=366844946]
 use_parent_material = true
 position = Vector2(83, 916)
@@ -307,12 +291,6 @@ flip_h = true
 use_parent_material = true
 position = Vector2(342, 924)
 texture = ExtResource("1_jt2p7")
-
-[node name="WildPebbles11" type="Sprite2D" parent="GroundDetail" unique_id=36958205]
-use_parent_material = true
-position = Vector2(1870, 915)
-texture = ExtResource("4_ihpng")
-flip_h = true
 
 [node name="WildTwigs18" type="Sprite2D" parent="GroundDetail" unique_id=2123034535]
 use_parent_material = true

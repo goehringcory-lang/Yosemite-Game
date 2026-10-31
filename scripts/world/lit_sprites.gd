@@ -84,6 +84,23 @@ static func material_for(art: String) -> ShaderMaterial:
 	return mat
 
 
+## The normal maps the sprites of the scene at [param scene_path] will want,
+## so World can load them in the background before the scene is set up
+## (loading them as it is set up stalls a frame for tens of milliseconds).
+static func normals_for_scene(scene_path: String) -> Array[String]:
+	var found: Array[String] = []
+	if not active():
+		return found
+	for dep in ResourceLoader.get_dependencies(scene_path):
+		var art: String = dep.get_slice("::", dep.get_slice_count("::") - 1)
+		if not art.begins_with(SPRITE_DIR) or _materials.has(art):
+			continue
+		var path := NORMAL_DIR + art.trim_prefix(SPRITE_DIR)
+		if not ResourceLoader.has_cached(path) and ResourceLoader.exists(path):
+			found.append(path)
+	return found
+
+
 ## The normal map painted for [param art], or null.
 static func normal_for(art: String) -> Texture2D:
 	if not art.begins_with(SPRITE_DIR):

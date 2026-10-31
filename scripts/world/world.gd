@@ -44,6 +44,14 @@ var _regions: Dictionary = {}
 var _preload_queue: Array[String] = []
 var _preloading := ""
 var _preloaded: Dictionary = {}
+## Normal maps loaded in the background, held until used (see LitSprites).
+var _warm: Array[Resource] = []
+## A seam crossed this tick, and where the camera's smoothing had got to,
+## in the new region's pixels (see _hand_camera_over).
+var _crossed := false
+var _crossed_view := Vector2.ZERO
+## Regions part way through their first set-up (see _set_up_step).
+var _setting_up: Dictionary = {}
 ## The region laid beside this one where a road runs off the map edge, while
 ## the player is near that edge (see Seam), so they walk across with no fade.
 var seam: Seam
@@ -71,6 +79,9 @@ var day_log: DayLog
 
 
 func _ready() -> void:
+	# Cross seams after the player's tick, not before it: a walker moved to
+	# another parent mid-tick misses its move that tick, and stutters.
+	process_physics_priority = 1000
 	add_to_group("world")
 	add_to_group("persist")
 	add_to_group("persist_provider")
@@ -137,12 +148,14 @@ func _notification(what: int) -> void:
 		# Collect a background load still running, so it doesn't outlive World.
 		if _preloading != "":
 			ResourceLoader.load_threaded_get(_preloading)
-		for cached: Region in _regions.values():
+		for cached: Region in _regions.values() + _setting_up.values():
 			if is_instance_valid(cached) and cached.get_parent() == null:
 				cached.free()
 
 
 func _process(delta: float) -> void:
+	if _crossed:
+		_hand_camera_over()
 	if _curfew_pending and not _busy and not _dialogue_open():
 		sleep(true)
 	_pump_preload()
@@ -442,22 +455,40 @@ func _arrive() -> void:
 ## Region [param id], from those visited this session, or made now (with its
 ## story, saved state, sounds and lights) on the first visit.
 func _get_region(id: String) -> Region:
-	if _regions.has(id):
-		return _regions[id]
-	var made: Region = _load_region_scene(id).instantiate()
-	_regions[id] = made
-	# The story and saved state need it in the tree (its Entities ready).
-	add_child(made)
-	StoryContent.attach(made)
-	SaveManager.restore(made)
-	_connect_tents(made)
-	SoundEmitter.attach_waterfalls(made)
-	SoundEmitter.attach_rivers(made)
-	SunShadows.attach(made)
-	LampLights.attach(made)
-	LitSprites.attach(made)
-	remove_child(made)
-	return made
+	while not _regions.has(id):
+		_set_up_step(id)
+	return _regions[id]
+
+
+## Sets region [param id] up for its first visit a step at a time, one step a
+## call, so walking up to a seam never stalls a frame on it: makes it, then
+## gives it its story, saved state and sounds, then its light. Once done it
+## is in [member _regions].
+func _set_up_step(id: String) -> void:
+	var made: Region = _setting_up.get(id)
+	var step: int = made.get_meta("set_up_step", 0) if made else 0
+	match step:
+		0:
+			made = _load_region_scene(id).instantiate()
+			_setting_up[id] = made
+		1:
+			# The story and saved state need it in the tree (its Entities ready).
+			add_child(made)
+			StoryContent.attach(made)
+			SaveManager.restore(made)
+			_connect_tents(made)
+			SoundEmitter.attach_waterfalls(made)
+			SoundEmitter.attach_rivers(made)
+			SunShadows.attach(made)
+			LampLights.attach(made)
+			remove_child(made)
+		_:
+			LitSprites.attach(made)
+			made.remove_meta("set_up_step")
+			_setting_up.erase(id)
+			_regions[id] = made
+			return
+	made.set_meta("set_up_step", step + 1)
 
 
 ## Is region [param id] ready to show without waiting on the disk: visited
@@ -484,11 +515,13 @@ func _update_seam(now := false) -> void:
 		var gap := (region.to_local(exit.global_position) - at).length()
 		if gap >= best_gap or not (now or _region_ready(exit.target_region)):
 			continue
-		# Setting up a region for the first time takes a moment: one a frame.
+		# Setting up a region for the first time takes a few frames: a
+		# step a frame, and it's laid out once it's ready.
 		if not _regions.has(exit.target_region) and not now:
-			if made:
-				continue
-			made = true
+			if not made:
+				made = true
+				_set_up_step(exit.target_region)
+			continue
 		var found := _seam_for(exit)
 		if found:
 			best = found
@@ -551,10 +584,17 @@ func _cross_seam() -> void:
 	var back := seam.reversed(behind)
 	# The rims stay open; the seam back is the one that closes them later.
 	back._opened = seam._opened
+	back._blended_a = seam._blended_a
+	back._blended_b = seam._blended_b
 	seam._opened = []
+	seam._blended_a = null
+	seam._blended_b = null
 	var shift := -seam.offset
 	var camera := _camera()
-	var lag := camera.get_screen_center_position() - camera.global_position
+	# Where the camera's smoothing had got to (the view, less its offset),
+	# for _hand_camera_over to carry on from this frame.
+	_crossed_view = camera.get_screen_center_position() - camera.offset + shift
+	_crossed = true
 	var at := player.global_position + shift
 	region = seam.neighbor
 	region.position = Vector2.ZERO
@@ -566,15 +606,23 @@ func _cross_seam() -> void:
 	player.global_position = at
 	(player.get_node("SmoothMotion") as SmoothMotion).shift(shift)
 	_fit_camera()
-	camera.reset_smoothing()
-	# Carry the camera's lag over, so it eases in as it would have. The lag
-	# is measured past the framing's tilt, which carries over by itself.
 	framing.crossed(region, shift)
-	framing.carry = lag - Vector2(0.0, roundf(framing.tilt))
-	camera.offset = Vector2(framing.carry.x, roundf(framing.tilt) + framing.carry.y)
-	create_tween().tween_property(framing, "carry", Vector2.ZERO, 1.0 / camera.position_smoothing_speed) \
-			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 	_arrive()
+
+
+## Just after crossing a seam, before the camera moves this frame (and after
+## SmoothMotion has placed it on the drawn player): the camera's smoothing
+## was in the old region's pixels, so start it afresh here and carry its lag
+## over through the offset (LandmarkFraming.carry), one frame's easing on,
+## as the camera would have moved. The view glides on as if nothing changed.
+func _hand_camera_over() -> void:
+	_crossed = false
+	var camera := _camera()
+	var target := camera.global_position
+	var eased := clampf(camera.position_smoothing_speed * get_process_delta_time(), 0.0, 1.0)
+	framing.carry = (_crossed_view - target) * (1.0 - eased)
+	camera.offset = Vector2(framing.carry.x, framing.tilt + framing.carry.y)
+	camera.reset_smoothing()
 
 
 ## Remembers the seam back the way the player came, so it lines up exactly.
@@ -632,7 +680,17 @@ func _pump_preload() -> void:
 			ResourceLoader.THREAD_LOAD_IN_PROGRESS:
 				return
 			ResourceLoader.THREAD_LOAD_LOADED:
-				_preloaded[_preloading] = ResourceLoader.load_threaded_get(_preloading)
+				var loaded := ResourceLoader.load_threaded_get(_preloading)
+				if loaded is PackedScene:
+					_preloaded[_preloading] = loaded
+					# its normal maps next, ahead of the other regions
+					var normals := LitSprites.normals_for_scene(_preloading)
+					normals.reverse()
+					for normal in normals:
+						if not normal in _preload_queue:
+							_preload_queue.push_front(normal)
+				else:
+					_warm.append(loaded)
 		_preloading = ""
 	while _preloading == "" and not _preload_queue.is_empty():
 		var path: String = _preload_queue.pop_front()
@@ -679,7 +737,8 @@ func _fit_camera() -> void:
 	camera.limit_right = ceili(bounds.end.x)
 	camera.limit_bottom = ceili(bounds.end.y)
 	if seam:
-		backdrop.cover(bounds, [region.get_bounds(), seam.neighbor_bounds()] as Array[Rect2])
+		var maps: Array[Rect2] = [region.get_bounds(), seam.neighbor_bounds()]
+		backdrop.cover(bounds, maps, [SeamBackdrop.skies_of(region, maps[0]), SeamBackdrop.skies_of(seam.neighbor, maps[1])])
 	else:
 		backdrop.cover(Rect2())
 
