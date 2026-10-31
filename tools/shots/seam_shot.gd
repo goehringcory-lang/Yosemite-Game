@@ -1,7 +1,7 @@
 extends Node
 ## Renders the seams between neighbouring outdoor regions: region A with
 ## region B laid beside it so A's exit lines up with B's spawn.
-## Env: SHOT_DIR. Needs a window.
+## Env: SHOT_DIR, SHOT_RAW, SHOT_ONLY, SHOT_ALONG. Needs a window.
 
 const PAIRS := [
 	["yosemite_village", "NorthsideWest"], ["yosemite_village", "SouthsideWest"],
@@ -45,7 +45,9 @@ func _ready() -> void:
 		b.position = seam.offset
 		if not raw:
 			seam.open(a)
-		camera.position = seam.point
+		# SHOT_ALONG moves the view along the edge from the road (pixels)
+		var along := float(OS.get_environment("SHOT_ALONG")) if OS.get_environment("SHOT_ALONG") != "" else 0.0
+		camera.position = seam.point + Vector2(absf(seam.side.y), absf(seam.side.x)) * along
 		for i in 6:
 			await get_tree().process_frame
 		viewport.get_texture().get_image().save_png("%s/%s_%s%s.png" % [dir, pair[0], pair[1], "_raw" if raw else ""])

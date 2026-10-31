@@ -157,12 +157,6 @@ use_parent_material = true
 position = Vector2(597, 1017)
 texture = ExtResource("1_lyklg")
 
-[node name="WildCones6" type="Sprite2D" parent="GroundDetail" unique_id=1318731512]
-use_parent_material = true
-position = Vector2(79, 1039)
-texture = ExtResource("6_n73vu")
-flip_h = true
-
 [node name="WildNeedlesB6" type="Sprite2D" parent="GroundDetail" unique_id=1358757690]
 use_parent_material = true
 position = Vector2(397, 1075)
@@ -173,11 +167,6 @@ use_parent_material = true
 position = Vector2(2447, 1075)
 texture = ExtResource("4_5cdhf")
 flip_h = true
-
-[node name="WildNeedlesA2" type="Sprite2D" parent="GroundDetail" unique_id=138569087]
-use_parent_material = true
-position = Vector2(167, 1105)
-texture = ExtResource("4_5cdhf")
 
 [node name="WildCones7" type="Sprite2D" parent="GroundDetail" unique_id=92638720]
 use_parent_material = true
@@ -293,11 +282,6 @@ position = Vector2(297, 1113)
 texture = ExtResource("8_g28kp")
 offset = Vector2(0, -12)
 flip_h = true
-
-[node name="PlantMushrooms4" type="Sprite2D" parent="." unique_id=1958043013]
-position = Vector2(152, 1162)
-texture = ExtResource("8_g28kp")
-offset = Vector2(0, -12)
 
 [node name="WildSeedling2" type="Sprite2D" parent="." unique_id=1957964306]
 position = Vector2(877, 1165)

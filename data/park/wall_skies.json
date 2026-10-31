@@ -1,0 +1,183 @@
+{
+	"res://assets/sprites/valley/royal_arches_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				0,
+				2048
+			]
+		]
+	},
+	"res://assets/sprites/valley/cathedral_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				912,
+				1072
+			],
+			[
+				1184,
+				1224
+			],
+			[
+				1324,
+				1352
+			],
+			[
+				1428,
+				2048
+			]
+		]
+	},
+	"res://assets/sprites/valley/crows_camp_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				0,
+				1536
+			]
+		]
+	},
+	"res://assets/sprites/curry/curry_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				2924,
+				3200
+			]
+		]
+	},
+	"res://assets/sprites/valley/el_capitan_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				0,
+				2560
+			]
+		]
+	},
+	"res://assets/sprites/valley/el_portal_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				0,
+				2672
+			],
+			[
+				2674,
+				2676
+			],
+			[
+				2678,
+				2680
+			],
+			[
+				2682,
+				2684
+			],
+			[
+				2686,
+				2688
+			],
+			[
+				2690,
+				2692
+			],
+			[
+				2694,
+				2696
+			],
+			[
+				2698,
+				2700
+			],
+			[
+				2702,
+				2704
+			]
+		]
+	},
+	"res://assets/sprites/valley/sentinel_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				326,
+				332
+			],
+			[
+				534,
+				752
+			],
+			[
+				956,
+				2048
+			]
+		]
+	},
+	"res://assets/sprites/valley/happy_isles_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				0,
+				2304
+			]
+		]
+	},
+	"res://assets/sprites/valley/housekeeping_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				0,
+				132
+			],
+			[
+				468,
+				632
+			],
+			[
+				1782,
+				2048
+			]
+		]
+	},
+	"res://assets/sprites/valley/three_brothers_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				26,
+				2048
+			]
+		]
+	},
+	"res://assets/sprites/valley/mirror_lake_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				0,
+				1564
+			],
+			[
+				1578,
+				1580
+			]
+		]
+	},
+	"res://assets/sprites/valley/tenaya_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				0,
+				2048
+			]
+		]
+	},
+	"res://assets/sprites/valley/upper_pines_wall.png": {
+		"color": "#4a80a5",
+		"spans": [
+			[
+				900,
+				1682
+			]
+		]
+	}
+}

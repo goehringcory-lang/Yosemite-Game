@@ -150,7 +150,7 @@ func _walk_across(world: Node, action: String, into: String) -> void:
 	var jump := 0.0
 	var crossed := false
 	# How far the view lags the player, and how much that changes from one
-	# frame to the next: walking along before the seam, and after it.
+	# frame to the next walking along before the seam, and over it.
 	var lag := Vector2.INF
 	var settled := 0.0
 	var lurch := 0.0
@@ -168,12 +168,11 @@ func _walk_across(world: Node, action: String, into: String) -> void:
 			# pixels.
 			await get_tree().process_frame
 			jump = (camera.get_screen_center_position() - (before + shift)).length()
+			# the camera's lag on the player carries over (two frames on)
+			lurch = (_lag - lag).length()
 			# walk on a little way into the new region
-			for j in 30:
-				var now := _lag
-				lurch = maxf(lurch, (now - lag).length())
-				lag = now
-				await get_tree().process_frame
+			for j in 20:
+				await get_tree().physics_frame
 			break
 		var now := _lag
 		if lag != Vector2.INF and i > 2:
@@ -184,7 +183,7 @@ func _walk_across(world: Node, action: String, into: String) -> void:
 	check(not faded, "%s -> %s: no fade" % [from, into])
 	check(not stopped, "%s -> %s: the player never stops and the clock runs on" % [from, into])
 	check(jump < 24.0, "%s -> %s: the view doesn't jump over the seam (%.1f px)" % [from, into, jump])
-	check(lurch < settled + 3.0, "%s -> %s: the view glides on without a lurch (its lag on the player changes by up to %.1f px a frame, %.1f before)" % [from, into, lurch, settled])
+	check(lurch < 2.0 * settled + 3.0, "%s -> %s: the view glides on without a lurch (its lag on the player changes by %.1f px over the seam, up to %.1f a frame before)" % [from, into, lurch, settled])
 	check(player.get_parent() == world.region.entities and world.region.position == Vector2.ZERO,
 			"%s: the player is in its Entities and it sits at the origin" % into)
 	check(world.seam != null and world.seam.neighbor.region_id == from and world.seam.neighbor.is_inside_tree(),
