@@ -19,9 +19,47 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_baker.tres" id="tt_visitor_baker"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_photographer.tres" id="tt_visitor_photographer"]
 [ext_resource type="Resource" path="res://data/characters/staff/jo_tolliver.tres" id="18_r"]
-[ext_resource type="PackedScene" path="res://scenes/objects/info_sign.tscn" id="19_r"]
 [ext_resource type="Script" path="res://scripts/objects/rescue_site_sign.gd" id="20_r"]
 [ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
+[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="sar_info"]
+[ext_resource type="Script" path="res://scripts/world/night_glow.gd" id="sar_glow"]
+[ext_resource type="Script" path="res://scripts/world/night_light.gd" id="sar_light"]
+[ext_resource type="Script" path="res://scripts/world/ambient_fx.gd" id="sar_fx"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_sar_cabin_0.png" id="sar_cabin_0"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_sar_cabin_0_glow.png" id="sar_cabin_0_glow"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_sar_cabin_1.png" id="sar_cabin_1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_sar_cabin_1_glow.png" id="sar_cabin_1_glow"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_sar_cabin_2.png" id="sar_cabin_2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_sar_cabin_2_glow.png" id="sar_cabin_2_glow"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_sar_cache.png" id="sar_cache"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_sar_cache_glow.png" id="sar_cache_glow"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_sar_litter.png" id="sar_litter"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_sar_shirts.png" id="sar_shirts"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_sar_sign.png" id="sar_sign"]
+[ext_resource type="Resource" path="res://data/characters/staff/mateo_reyes.tres" id="sar_mateo"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_sar_volunteer.tres" id="sar_volunteer"]
+[ext_resource type="Resource" path="res://data/characters/visitors/visitor_sar_hauler.tres" id="sar_hauler"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sar_cabin"]
+size = Vector2(80, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sar_cabin_reach"]
+size = Vector2(84, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sar_cache"]
+size = Vector2(96, 28)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sar_cache_reach"]
+size = Vector2(60, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sar_litter"]
+size = Vector2(80, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sar_sign"]
+size = Vector2(80, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sar_sign_reach"]
+size = Vector2(96, 40)
 
 [node name="YosemiteVillageStory" type="Node2D"]
 
@@ -117,15 +155,223 @@ timetable = PackedStringArray("7:00 valley_lodge", "7:30 cooks_meadow", "9:30 lo
 
 [node name="JoTolliver" parent="." instance=ExtResource("1_r")]
 character = ExtResource("18_r")
-spot = "camp_4"
-offset = Vector2(144, 72)
+spot = "sar_site"
+offset = Vector2(12, 76)
 wander_radius = 24
 
-[node name="RescueSiteSign" parent="." instance=ExtResource("19_r")]
-position = Vector2(848, 704)
+[node name="MateoReyes" parent="." instance=ExtResource("1_r")]
+character = ExtResource("sar_mateo")
+spot = "sar_site"
+offset = Vector2(204, 10)
+wander_radius = 16
+
+[node name="SarVolunteer" parent="." instance=ExtResource("1_r")]
+character = ExtResource("sar_volunteer")
+spot = "sar_site"
+offset = Vector2(-36, -26)
+wander_radius = 40
+
+[node name="SarHauler" parent="." instance=ExtResource("1_r")]
+character = ExtResource("sar_hauler")
+spot = "sar_site"
+offset = Vector2(128, -66)
+wander_radius = 40
+
+[node name="SarCabin3" type="StaticBody2D" parent="."]
+position = Vector2(500, 420)
+collision_mask = 0
+script = ExtResource("sar_info")
+title = "SAR tent cabin"
+text = "A canvas tent cabin on a plank platform, with a wood stove and a number by the door. Yosemite's search and rescue volunteers live in a row of these at the back of Camp 4 through the season, rent free, in return for being on call for the park's rescues."
+
+[node name="Sprite" type="Sprite2D" parent="SarCabin3"]
+texture = ExtResource("sar_cabin_0")
+offset = Vector2(0, -42)
+
+[node name="Glow" type="Sprite2D" parent="SarCabin3"]
+z_index = 4
+texture = ExtResource("sar_cabin_0_glow")
+offset = Vector2(0, -42)
+script = ExtResource("sar_glow")
+strength = 0.9
+
+[node name="Collision" type="CollisionShape2D" parent="SarCabin3"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_sar_cabin")
+
+[node name="Hitbox" type="Area2D" parent="SarCabin3"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="SarCabin3/Hitbox"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_sar_cabin_reach")
+
+[node name="Fx_smoke" type="CPUParticles2D" parent="SarCabin3"]
+position = Vector2(18, -88)
+script = ExtResource("sar_fx")
+area = Vector2(2, 1)
+
+[node name="SarCabin7" type="StaticBody2D" parent="."]
+position = Vector2(612, 430)
+collision_mask = 0
+script = ExtResource("sar_info")
+title = "SAR tent cabin"
+text = "A canvas tent cabin on a plank platform, with a wood stove and a number by the door. Yosemite's search and rescue volunteers live in a row of these at the back of Camp 4 through the season, rent free, in return for being on call for the park's rescues."
+
+[node name="Sprite" type="Sprite2D" parent="SarCabin7"]
+texture = ExtResource("sar_cabin_1")
+offset = Vector2(0, -42)
+
+[node name="Glow" type="Sprite2D" parent="SarCabin7"]
+z_index = 4
+texture = ExtResource("sar_cabin_1_glow")
+offset = Vector2(0, -42)
+script = ExtResource("sar_glow")
+strength = 0.9
+
+[node name="Collision" type="CollisionShape2D" parent="SarCabin7"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_sar_cabin")
+
+[node name="Hitbox" type="Area2D" parent="SarCabin7"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="SarCabin7/Hitbox"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_sar_cabin_reach")
+
+[node name="SarCabin5" type="StaticBody2D" parent="."]
+position = Vector2(500, 548)
+collision_mask = 0
+script = ExtResource("sar_info")
+title = "SAR tent cabin"
+text = "A canvas tent cabin on a plank platform, with a wood stove and a number by the door. Yosemite's search and rescue volunteers live in a row of these at the back of Camp 4 through the season, rent free, in return for being on call for the park's rescues."
+
+[node name="Sprite" type="Sprite2D" parent="SarCabin5"]
+texture = ExtResource("sar_cabin_2")
+offset = Vector2(0, -42)
+
+[node name="Glow" type="Sprite2D" parent="SarCabin5"]
+z_index = 4
+texture = ExtResource("sar_cabin_2_glow")
+offset = Vector2(0, -42)
+script = ExtResource("sar_glow")
+strength = 0.9
+
+[node name="Collision" type="CollisionShape2D" parent="SarCabin5"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_sar_cabin")
+
+[node name="Hitbox" type="Area2D" parent="SarCabin5"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="SarCabin5/Hitbox"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_sar_cabin_reach")
+
+[node name="Fx_smoke" type="CPUParticles2D" parent="SarCabin5"]
+position = Vector2(18, -88)
+script = ExtResource("sar_fx")
+area = Vector2(2, 1)
+
+[node name="RescueCache" type="StaticBody2D" parent="."]
+position = Vector2(604, 556)
+collision_mask = 0
+script = ExtResource("sar_info")
+title = "Rescue cache"
+text = "The search and rescue cache: ropes coiled on their pegs, helmets on the shelf, rope bags, first aid kits, and the radio, which is never switched off. Whoever is on call can be out the door with all of it in a few minutes."
+
+[node name="Sprite" type="Sprite2D" parent="RescueCache"]
+texture = ExtResource("sar_cache")
+offset = Vector2(0, -50)
+
+[node name="Glow" type="Sprite2D" parent="RescueCache"]
+z_index = 4
+texture = ExtResource("sar_cache_glow")
+offset = Vector2(0, -50)
+script = ExtResource("sar_glow")
+strength = 0.9
+
+[node name="Collision" type="CollisionShape2D" parent="RescueCache"]
+position = Vector2(0, -22)
+shape = SubResource("RectangleShape2D_sar_cache")
+
+[node name="Hitbox" type="Area2D" parent="RescueCache"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="RescueCache/Hitbox"]
+position = Vector2(0, -14)
+shape = SubResource("RectangleShape2D_sar_cache_reach")
+
+[node name="NightLight" type="PointLight2D" parent="RescueCache"]
+position = Vector2(33, -56)
+script = ExtResource("sar_light")
+radius = 64
+
+[node name="SarLitter" type="StaticBody2D" parent="."]
+position = Vector2(800, 470)
+collision_mask = 0
+script = ExtResource("sar_info")
+title = "Stokes litter"
+text = "An orange basket litter of steel tube and wire mesh, for carrying someone out who can't walk. The big wheel goes underneath for long trail carries, with the team on the handles; on a wall it's lowered on the rope."
+
+[node name="Sprite" type="Sprite2D" parent="SarLitter"]
+texture = ExtResource("sar_litter")
+offset = Vector2(0, -24)
+
+[node name="Collision" type="CollisionShape2D" parent="SarLitter"]
+position = Vector2(0, -8)
+shape = SubResource("RectangleShape2D_sar_litter")
+
+[node name="Hitbox" type="Area2D" parent="SarLitter"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="SarLitter/Hitbox"]
+position = Vector2(0, -14)
+shape = SubResource("RectangleShape2D_sar_cabin_reach")
+
+[node name="SarShirts" type="StaticBody2D" parent="."]
+position = Vector2(750, 410)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="SarShirts"]
+texture = ExtResource("sar_shirts")
+offset = Vector2(0, -30)
+
+[node name="RescueSiteSign" type="StaticBody2D" parent="."]
+position = Vector2(486, 626)
+collision_mask = 0
 script = ExtResource("20_r")
 title = "Camp 4 Rescue Site"
-text = "Search and rescue cache. Climbers camped here answer the park's rescue calls: lost hikers, injuries on the trails, and parties stuck on the walls. Litters, ropes and the radio are kept here. In an emergency, find a ranger or call for help."
+text = "SAR: the search and rescue site. The volunteers who live in these tent cabins answer the park's rescue calls: lost hikers, injuries on the trails, and parties stuck on the walls. They wear yellow team shirts in the field. Volunteers who can hold a rope are always wanted: ask Jo Tolliver at the cache."
+
+[node name="Sprite" type="Sprite2D" parent="RescueSiteSign"]
+texture = ExtResource("sar_sign")
+offset = Vector2(0, -36)
+
+[node name="Collision" type="CollisionShape2D" parent="RescueSiteSign"]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_sar_sign")
+
+[node name="Hitbox" type="Area2D" parent="RescueSiteSign"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="RescueSiteSign/Hitbox"]
+position = Vector2(0, -24)
+shape = SubResource("RectangleShape2D_sar_sign_reach")
+
 [node name="SentinelHole" type="Node2D" parent="."]
 position = Vector2(1158, 1618)
 script = ExtResource("fw_script")

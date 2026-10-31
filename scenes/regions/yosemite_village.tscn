@@ -330,18 +330,6 @@ size = Vector2(28, 12)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_isrr0"]
 size = Vector2(44, 12)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_bvxwm"]
-size = Vector2(76, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_28yfr"]
-size = Vector2(64, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_p0scq"]
-size = Vector2(28, 12)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_50cnt"]
-size = Vector2(44, 12)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lldc0"]
 size = Vector2(28, 12)
 
@@ -2251,61 +2239,6 @@ area = Vector2(6, 2)
 position = Vector2(0, -36)
 script = ExtResource("25_ll6oh")
 area = Vector2(4, 2)
-
-[node name="Site8TentCanvas" type="StaticBody2D" parent="Entities" unique_id=920077343]
-position = Vector2(496, 436)
-collision_mask = 0
-
-[node name="Sprite" type="Sprite2D" parent="Entities/Site8TentCanvas" unique_id=1077800174]
-texture = ExtResource("20_tnktm")
-offset = Vector2(0, -38)
-
-[node name="Collision" type="CollisionShape2D" parent="Entities/Site8TentCanvas" unique_id=60104158]
-position = Vector2(0, -8)
-shape = SubResource("RectangleShape2D_bvxwm")
-
-[node name="Site8Table" type="StaticBody2D" parent="Entities" unique_id=822740876]
-position = Vector2(544, 480)
-collision_mask = 0
-
-[node name="Sprite" type="Sprite2D" parent="Entities/Site8Table" unique_id=688563265]
-texture = ExtResource("21_uqltd")
-offset = Vector2(0, -26)
-
-[node name="Collision" type="CollisionShape2D" parent="Entities/Site8Table" unique_id=1229056363]
-position = Vector2(0, -8)
-shape = SubResource("RectangleShape2D_28yfr")
-
-[node name="NightLight" type="PointLight2D" parent="Entities/Site8Table" unique_id=360057125]
-position = Vector2(18, -36)
-script = ExtResource("22_m7ndg")
-strength = 0.8
-radius = 52
-flicker = 0.1
-
-[node name="Site8BearBox" type="StaticBody2D" parent="Entities" unique_id=1815223974]
-position = Vector2(596, 464)
-collision_mask = 0
-
-[node name="Sprite" type="Sprite2D" parent="Entities/Site8BearBox" unique_id=462898239]
-texture = ExtResource("23_86ph0")
-offset = Vector2(0, -12)
-
-[node name="Collision" type="CollisionShape2D" parent="Entities/Site8BearBox" unique_id=1016059303]
-position = Vector2(0, -6)
-shape = SubResource("RectangleShape2D_p0scq")
-
-[node name="Site8FireRing" type="StaticBody2D" parent="Entities" unique_id=193604427]
-position = Vector2(500, 536)
-collision_mask = 0
-
-[node name="Sprite" type="Sprite2D" parent="Entities/Site8FireRing" unique_id=2107313245]
-texture = ExtResource("29_3iu7e")
-offset = Vector2(0, -30)
-
-[node name="Collision" type="CollisionShape2D" parent="Entities/Site8FireRing" unique_id=489937419]
-position = Vector2(0, -6)
-shape = SubResource("RectangleShape2D_50cnt")
 
 [node name="Camp4FireRing" parent="Entities" unique_id=1712732314 instance=ExtResource("34_1sbm3")]
 position = Vector2(560, 688)
@@ -9262,6 +9195,9 @@ position = Vector2(656, 656)
 [node name="camp_4_fire" type="Marker2D" parent="Markers" unique_id=2007588743]
 position = Vector2(592, 720)
 
+[node name="sar_site" type="Marker2D" parent="Markers" unique_id=1416502731]
+position = Vector2(592, 496)
+
 [node name="shuttle_camp_4" type="Marker2D" parent="Markers" unique_id=750582825]
 position = Vector2(784, 1168)
 
@@ -9601,21 +9537,6 @@ texture = ExtResource("149_am6n4")
 centered = false
 script = ExtResource("135_ynupg")
 strength = 0.9
-
-[node name="@Sprite2D@19" type="Sprite2D" parent="." unique_id=1915628683]
-z_index = 4
-position = Vector2(448, 360)
-texture = ExtResource("146_u2ks2")
-centered = false
-script = ExtResource("135_ynupg")
-strength = 0.9
-
-[node name="@Sprite2D@20" type="Sprite2D" parent="." unique_id=1544296721]
-z_index = 4
-position = Vector2(508, 428)
-texture = ExtResource("144_qoql3")
-centered = false
-script = ExtResource("135_ynupg")
 
 [node name="Camp4Duff0" type="Sprite2D" parent="." unique_id=638867464]
 z_index = -8

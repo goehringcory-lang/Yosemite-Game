@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_sar_hauler.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_sar_hauler"
+display_name = "Rescue volunteer"
+years = "1970s"
+affiliation = "Camp 4 rescue site"
+bio = "A search and rescue volunteer from the Camp 4 site, good with a map and better on the end of a litter. Not a historical figure."
+idle_lines = PackedStringArray("Litter carries are the real work. Six people, one stretcher, three miles of switchbacks.", "Most of our calls are hikers on the trails, not climbers. Tired, thirsty, and a little lost.", "Map, headlamp, water, and something to eat. Everybody who goes out on a call carries those four.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Camp 4, at the rescue site"
+visitor = true

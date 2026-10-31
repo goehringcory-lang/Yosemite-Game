@@ -446,7 +446,8 @@ func _place_cemetery() -> void:
 ## Camp 4 as it is laid out on the ground: walk-in sites under the pines,
 ## each with its tents, a picnic table, a bear box and a steel fire ring,
 ## around a shared fire; Columbia Boulder at the back by the talus, with
-## Midnight Lightning chalked on its face; a slackline, the gear traders, the
+## Midnight Lightning chalked on its face, and the search and rescue site
+## beside it (in the story overlay); a slackline, the gear traders, the
 ## bulletin board where the walk-in path arrives, and a van in the lot.
 const CAMP4_SITES := [
 	# [tile x, tile y, tents [[kind, dx, dy]...], table, fire ring lit]
@@ -458,7 +459,9 @@ const CAMP4_SITES := [
 	[28, 26, [["canvas", -18, -26], ["dome_3", 18, -24]], "", false],
 	[31, 29, [["tarp", -12, -26]], "rack", false],
 	[31, 16, [["dome_0", -10, -24]], "", true],
-	[16, 14, [["canvas", -16, -26]], "cook", false],
+	# The back corner by the talus, east of Columbia Boulder, is the search
+	# and rescue site's tent cabins and cache (the Yosemite Village story
+	# overlay), so no walk-in site there.
 ]
 
 
@@ -663,6 +666,7 @@ func _place_markers_and_places() -> void:
 	_marker("arrival", 99, 43)
 	_marker("camp_4", 20, 20)
 	_marker("camp_4_fire", 18, 22)
+	_marker("sar_site", 18, 15)
 	_marker("shuttle_camp_4", 24, 36)
 	_marker("shuttle_village", 50, 25)
 	_marker("lower_yosemite_fall", 47, 12)

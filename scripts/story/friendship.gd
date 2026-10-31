@@ -53,6 +53,7 @@ const LOVES := {
 	"mountain_shop": ["beef_jerky", "pilot_bread"],
 	"greg": ["beef_jerky", "manzanita_cider"],
 	"jo_tolliver": ["chocolate_bar", "pilot_bread"],
+	"mateo_reyes": ["beef_jerky", "trail_mix"],
 }
 const LOVED_LINES := [
 	"Oh! For me? I love these. Thank you!",

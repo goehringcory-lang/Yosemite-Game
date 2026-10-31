@@ -120,9 +120,9 @@ const CHARACTERS: Array[CharacterData] = [
 
 ## Invented staff (CharacterData.staff): the Mountain Shop's two, the
 ## Ahwahnee's head chef, Greg, Curry Village's fishing guide, and Jo
-## Tolliver, who runs the Camp 4 rescue site (Rescues). They give
-## quests (and Wren partners on climbs, and Greg trades flies), but
-## they aren't in the Register's cast above. The clerk's id is the shop's
+## Tolliver, who runs the Camp 4 rescue site (Rescues), with Mateo Reyes,
+## who keeps its cache. They give quests (and Wren partners on climbs, and
+## Greg trades flies), but they aren't in the Register's cast above. The clerk's id is the shop's
 ## talk_target, so talking at the counter reaches them.
 const STAFF: Array[CharacterData] = [
 	preload("res://data/characters/staff/mountain_shop_clerk.tres"),
@@ -130,6 +130,7 @@ const STAFF: Array[CharacterData] = [
 	preload("res://data/characters/staff/ahwahnee_chef.tres"),
 	preload("res://data/characters/staff/greg.tres"),
 	preload("res://data/characters/staff/jo_tolliver.tres"),
+	preload("res://data/characters/staff/mateo_reyes.tres"),
 ]
 
 ## What the player can write on the Register's last page, after The Last Page.
