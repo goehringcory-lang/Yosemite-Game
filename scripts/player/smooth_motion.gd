@@ -28,6 +28,13 @@ func _ready() -> void:
 	process_priority = -100
 
 
+## The parent moved by [param by] along with everything around it (the world
+## shifted under it, as across a seam between regions): it keeps gliding.
+func shift(by: Vector2) -> void:
+	_prev += by
+	_cur += by
+
+
 ## Runs after the parent's own tick (a child ticks after its parent).
 func _physics_process(_delta: float) -> void:
 	_prev = _cur
