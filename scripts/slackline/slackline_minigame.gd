@@ -611,7 +611,7 @@ func _draw_screen() -> void:
 		HUD.popups(ci, _popups)
 	match _phase:
 		Phase.SELECT:
-			HUD.select_card(ci, _select_rows(), _chosen, _phase_age, "%s  Choose     %s  Walk     %s  Leave" % [_button("Up/Down", "D-pad"), _button("E", "A"), _button("Esc", "B")], QuestLog.is_unlocked(LEGEND))
+			HUD.select_card(ci, _select_rows(), _chosen, _phase_age, "[%s] Choose    [%s] Walk    [%s] Leave" % [_button("Up/Down", "D-pad"), _button("E", "A"), _button("Esc", "B")], QuestLog.is_unlocked(LEGEND))
 		Phase.READY:
 			_draw_walk_hud(ci)
 			HUD.countdown(ci, _phase_age, READY_TIME)
@@ -619,7 +619,7 @@ func _draw_screen() -> void:
 			_draw_walk_hud(ci)
 		Phase.RESULT:
 			_draw_walk_hud(ci)
-			var keys := "%s  %s     %s  %s" % [_button("E", "A"), "Walk again" if state.status == SlacklineState.Status.WALKED else "Try again", _button("Esc", "B"), "Leave" if is_travel() else "Lines"]
+			var keys := "[%s] %s    [%s] %s" % [_button("E", "A"), "Walk again" if state.status == SlacklineState.Status.WALKED else "Try again", _button("Esc", "B"), "Leave" if is_travel() else "Lines"]
 			HUD.result_card(ci, _result, _phase_age, keys)
 
 
@@ -629,7 +629,7 @@ func _draw_walk_hud(ci: CanvasItem) -> void:
 	HUD.score_box(ci, state, int(_shown_score), _score_pulse)
 	if _phase == Phase.WALK:
 		if attempts <= 1 and _phase_age < 6.0:
-			HUD.hint(ci, "%s  lean back against the tip     %s  step off" % [_button("Left/Right", "Stick"), _button("Esc", "B")], 58, clampf(6.0 - _phase_age, 0.0, 1.0))
+			HUD.hint(ci, "[%s] Lean back against the tip    [%s] Step off" % [_button("Left/Right", "Stick"), _button("Esc", "B")], 58, clampf(6.0 - _phase_age, 0.0, 1.0))
 		HUD.trick_prompt(ci, state, _button("E", "A"), _time)
 
 

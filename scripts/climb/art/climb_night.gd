@@ -311,4 +311,4 @@ static func _card(ci: CanvasItem, info: Dictionary, age: float, hanging: bool) -
 	for i in lines.size():
 		UI.ink(ci, Vector2(r.position.x + 10, r.position.y + 50 + i * 11), lines[i], UI.INK, 10)
 	if age > 0.8:
-		UI.ink(ci, Vector2(r.position.x + 85, r.end.y - 8), "E: sleep until dawn", UI.WARN_DARK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+		UI.keys(ci, Vector2(r.position.x + 85, r.end.y - 8), "[E] Sleep until dawn", UI.WARN_DARK, 10, HORIZONTAL_ALIGNMENT_CENTER)
