@@ -1,6 +1,7 @@
 extends SceneTree
 ## Draws the gear icons that aren't hand-painted: the climbing shoes and the
-## cam (assets/sprites/gear/climbing_shoes.png, cam.png). Icons are 64×64 with
+## cams (assets/sprites/gear/climbing_shoes.png; cam_075.png, cam.png, cam_2.png
+## and cam_3.png, one per size on the rack, see CamSizes). Icons are 64×64 with
 ## a dark rim like the painted ones. The shoes are drawn on a 32×32 grid and
 ## doubled; the cam needs the finer grid, so it's drawn at 64×64.
 ## Run: godot --headless --path . -s res://tools/npcgen/gear_icons.gd
@@ -14,8 +15,9 @@ var im: Image
 func _init() -> void:
 	climbing_shoes().save_png(ProjectSettings.globalize_path(OUT + "climbing_shoes.png"))
 	print("drew climbing_shoes")
-	cam().save_png(ProjectSettings.globalize_path(OUT + "cam.png"))
-	print("drew cam")
+	for size: Array in CAM_SIZES:
+		cam(size[1], size[2], size[3]).save_png(ProjectSettings.globalize_path(OUT + size[0]))
+		print("drew ", size[0])
 	quit()
 
 
@@ -85,21 +87,27 @@ func _outline() -> void:
 # double axle, a single flexible stem, a trigger bar with two finger ears and
 # its wires up to the lobes, then the thumb loop and the sewn sling, both in
 # the size color (red for #1). Drawn at 64×64; light from the upper left.
+# The other sizes are the same cam in their own colors (CAM_SIZES).
 
 const STEEL_HI := "d6f1ee"
 const STEEL_LT := "bdb8ae"
 const STEEL := "93918f"
 const STEEL_DK := "6a6a70"
 const STEEL_DEEP := "4e4e56"
-const SIZE_LT := "ec6a5e"
-const SIZE := "c8382e"
-const SIZE_DK := "8a2420"
+## File, then the size color's light, base and dark: #0.75 green, #1 red,
+## #2 yellow, #3 blue, as Black Diamond colors them (CamSizes.SIZES).
+const CAM_SIZES := [
+	["cam_075.png", "8fcf6a", "4f9a3a", "2f6526"],
+	["cam.png", "ec6a5e", "c8382e", "8a2420"],
+	["cam_2.png", "f6d873", "dcaa2c", "98701a"],
+	["cam_3.png", "6fa8e6", "2f6cc0", "1d437f"],
+]
 const TRIGGER_LT := "6a6a74"
 const TRIGGER := "3c3c44"
 const TRIGGER_DK := "2e2e34"
 
 
-func cam() -> Image:
+func cam(size_lt: String, size: String, size_dk: String) -> Image:
 	im = Image.create_empty(64, 64, false, Image.FORMAT_RGBA8)
 	# Back lobes first, fanned further open, in shade behind the front pair.
 	_part(_lobe(-1, -0.34), STEEL_DK, STEEL, STEEL_DEEP, -1)
@@ -120,14 +128,14 @@ func cam() -> Image:
 	_axle(26, 13)
 	_axle(38, 13)
 	# The sling: a short sewn loop of webbing, with a bar tack.
-	_part(_poly([Vector2(28, 50), Vector2(36, 50), Vector2(37, 63), Vector2(27, 63)]), SIZE, SIZE_LT, SIZE_DK)
+	_part(_poly([Vector2(28, 50), Vector2(36, 50), Vector2(37, 63), Vector2(27, 63)]), size, size_lt, size_dk)
 	_hole(_poly([Vector2(31, 57), Vector2(33, 57), Vector2(33, 61), Vector2(31, 61)]))
 	for x in range(26, 39):
 		var c := im.get_pixel(x, 54)
 		if c.a > 0.0 and c != OUTLINE:
-			px(x, 54, "f4dccc" if x % 2 == 0 else SIZE_DK)
+			px(x, 54, "f4dccc" if x % 2 == 0 else size_dk)
 	# Thumb loop in the size color, over the top of the sling.
-	_part(_ellipse(Vector2(32, 48), 8.0, 5.0), SIZE, SIZE_LT, SIZE_DK)
+	_part(_ellipse(Vector2(32, 48), 8.0, 5.0), size, size_lt, size_dk)
 	_hole(_ellipse(Vector2(32, 48), 4.6, 1.8))
 	# The trigger bar, with a finger ear curling down at each end.
 	_part(_poly([

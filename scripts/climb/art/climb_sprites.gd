@@ -38,7 +38,8 @@ const HAT := Color("7e531c")
 const SHIRT := Color("5c8f3c")
 const PANTS := Color("2d3050")
 const HARNESS := Color("d8a63b")
-const CAM_COLORS := [Color("b3362b"), Color("f7a64a"), Color("6f5aa6"), Color("6f5aa6"), Color("437f45")]
+## A cam's size color, in rack order (CamSizes): #0.75 green, #1 red, #2 yellow, #3 blue.
+const CAM_COLORS := [Color("4f9a3a"), Color("c8382e"), Color("dcaa2c"), Color("2f6cc0")]
 const STEEL := Color("bdb8ae")
 const STEEL_LIT := Color("f5eee0")
 const STEEL_DARK := Color("6a6a70")

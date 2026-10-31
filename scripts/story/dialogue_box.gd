@@ -19,9 +19,15 @@ const NAME_COLOR := Color(1, 0.831, 0.541)
 ## Room left at the start of each option for the arrow (MenuInput.mark).
 const CURSOR := "   "
 const HINT_COLOR := Color(0.961, 0.933, 0.878, 0.6)
-## The text's width with and without a portrait beside it.
-const TEXT_WIDTH := 456.0
-const TEXT_WIDTH_PORTRAIT := 364.0
+## The box's width. It sits centered and only as tall as its page, so a
+## short line gets a short box, as Stardew Valley's and Eastward's do; it
+## widens only for a list of choices with a card beside it (the shops).
+const BOX_WIDTH := 360.0
+const BOX_WIDTH_CARD := 464.0
+## Room the box's frame takes on the left and right (the panel's margins),
+## and the portrait with the gap before it.
+const FRAME_SIDES := 16.0
+const PORTRAIT_ROOM := 88.0
 ## The card beside a list of choices that tells about the one picked, like
 ## Stardew Valley's crafting and shop menus (see choose's details).
 const DETAIL_WIDTH := 168.0
@@ -109,14 +115,17 @@ func _ready() -> void:
 	# Sits on the bottom edge of the screen and grows upward, so a long list of
 	# choices (the stores, a campfire with every recipe) never runs off the bottom.
 	_panel = PanelContainer.new()
+	_panel.anchor_left = 0.5
+	_panel.anchor_right = 0.5
 	_panel.anchor_top = 1.0
 	_panel.anchor_bottom = 1.0
-	_panel.offset_left = 8.0
-	_panel.offset_right = 472.0
-	_panel.offset_top = -86.0
+	_panel.offset_left = -BOX_WIDTH / 2.0
+	_panel.offset_right = BOX_WIDTH / 2.0
+	_panel.offset_top = -40.0
 	_panel.offset_bottom = -8.0
+	_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_panel.custom_minimum_size = Vector2(464, 78)
+	_panel.custom_minimum_size = Vector2(BOX_WIDTH, 0)
 	root.add_child(_panel)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
@@ -157,7 +166,7 @@ func _ready() -> void:
 	column.add_child(_name_label)
 	_text_label = Label.new()
 	_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_text_label.custom_minimum_size = Vector2(TEXT_WIDTH, 0)
+	_text_label.custom_minimum_size = Vector2(BOX_WIDTH - FRAME_SIDES, 0)
 	column.add_child(_text_label)
 	_options_box = VBoxContainer.new()
 	_options_box.add_theme_constant_override("separation", 0)
@@ -291,7 +300,10 @@ func _show(speaker: String, text: String, options: Array, mood := "neutral") -> 
 	var face := Portraits.for_speaker(speaker, mood)
 	_portrait.texture = face
 	_portrait_frame.visible = face != null
-	_text_label.custom_minimum_size.x = (TEXT_WIDTH_PORTRAIT if face else TEXT_WIDTH) - (DETAIL_WIDTH + 6.0 if not _details.is_empty() else 0.0)
+	var card := not _details.is_empty()
+	var width := BOX_WIDTH_CARD if card else BOX_WIDTH
+	_text_label.custom_minimum_size.x = width - FRAME_SIDES - (PORTRAIT_ROOM if face else 0.0) - (DETAIL_WIDTH + 6.0 if card else 0.0)
+	_panel.custom_minimum_size.x = width
 	_speaker = speaker
 	_voice = Portraits.voice_pitch(speaker)
 	_blipped = 0
@@ -302,6 +314,18 @@ func _show(speaker: String, text: String, options: Array, mood := "neutral") -> 
 	_hint_time = 0.0
 	_refresh_options()
 	_refresh_hint()
+	_fit()
+
+
+## Shrinks the box to its page. A Control grows to hold its contents but
+## never shrinks back on its own, so after a long list of choices the next
+## short line would sit in a tall box. Collapsing it to its bottom edge lets
+## it grow back up (grow_vertical) to just the height the page needs.
+func _fit() -> void:
+	var half := roundf(_panel.custom_minimum_size.x / 2.0)
+	_panel.offset_left = -half
+	_panel.offset_right = half
+	_panel.offset_top = _panel.offset_bottom
 
 
 ## True once the whole page is showing.

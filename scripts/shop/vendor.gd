@@ -138,6 +138,8 @@ static func trade_for(offer: ShopOffer) -> Dictionary:
 
 ## The picture of what [param offer] gets you.
 static func icon_of(offer: ShopOffer) -> Texture2D:
+	if offer.kind == "gear" and offer.id == "cam":
+		return CamSizes.icon(Gear.count("cam")) # the next size on your rack
 	if offer.kind == "gear" and Gear.get_gear(offer.id):
 		return Gear.get_gear(offer.id).icon
 	var item := ItemDB.get_item(offer.id)
