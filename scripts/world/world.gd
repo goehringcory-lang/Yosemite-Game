@@ -551,7 +551,11 @@ func _cross_seam() -> void:
 	var back := seam.reversed(behind)
 	# The rims stay open; the seam back is the one that closes them later.
 	back._opened = seam._opened
+	back._blended_a = seam._blended_a
+	back._blended_b = seam._blended_b
 	seam._opened = []
+	seam._blended_a = null
+	seam._blended_b = null
 	var shift := -seam.offset
 	var camera := _camera()
 	var lag := camera.get_screen_center_position() - camera.global_position

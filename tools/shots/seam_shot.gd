@@ -25,32 +25,32 @@ func _ready() -> void:
 	add_child(viewport)
 	var camera := Camera2D.new()
 	viewport.add_child(camera)
+	# SHOT_RAW=1 lays the maps edge to edge with no nudge, overlap or blend.
+	var raw := OS.get_environment("SHOT_RAW") == "1"
+	var only := OS.get_environment("SHOT_ONLY")
 	for pair in PAIRS:
+		if only != "" and not (pair[0] + "_" + pair[1]).contains(only):
+			continue
 		var a: Region = load("res://scenes/regions/%s.tscn" % pair[0]).instantiate()
 		var exit: RegionExit = a.find_child(pair[1], true, false)
 		var b: Region = load("res://scenes/regions/%s.tscn" % exit.target_region).instantiate()
 		viewport.add_child(b)
 		viewport.add_child(a)
-		var spawn := b.get_spawn(exit.target_spawn)
-		var edge := _edge_point(a, exit.global_position)
-		var b_edge := _edge_point(b, spawn.global_position)
-		b.position = edge - b_edge
-		camera.position = edge
+		var seam := Seam.make(a, exit, b, not raw)
+		if seam == null:
+			push_warning("no seam at %s %s" % pair)
+			a.free()
+			b.free()
+			continue
+		b.position = seam.offset
+		if not raw:
+			seam.open(a)
+		camera.position = seam.point
 		for i in 6:
 			await get_tree().process_frame
-		viewport.get_texture().get_image().save_png("%s/%s_%s.png" % [dir, pair[0], pair[1]])
+		viewport.get_texture().get_image().save_png("%s/%s_%s%s.png" % [dir, pair[0], pair[1], "_raw" if raw else ""])
+		seam.close()
 		a.free()
 		b.free()
 	get_tree().quit()
 
-
-## The point on the region's border nearest [param p].
-static func _edge_point(r: Region, p: Vector2) -> Vector2:
-	var bounds := r.get_bounds()
-	var d := [p.x - bounds.position.x, bounds.end.x - p.x, p.y - bounds.position.y, bounds.end.y - p.y]
-	var i: int = d.find(d.min())
-	match i:
-		0: return Vector2(bounds.position.x, p.y)
-		1: return Vector2(bounds.end.x, p.y)
-		2: return Vector2(p.x, bounds.position.y)
-	return Vector2(p.x, bounds.end.y)

@@ -9,6 +9,12 @@ extends RefCounted
 ## facing edge of the next region. Exits that take clock time (long trails
 ## and drives) or keep hours (shop doors) aren't seams: they still fade.
 
+## How far the next map slides along the edge at each seam so the painted
+## road meets itself, measured by tools/seams/measure_seams.tscn:
+## {region id: {exit name: pixels}}.
+const NUDGES_PATH := "res://data/park/seam_nudges.json"
+static var _nudges = null
+
 ## An exit or spawn this close to a map edge is on that edge.
 const EXIT_SLACK := 48.0
 const SPAWN_SLACK := 160.0
@@ -27,6 +33,13 @@ var point := Vector2.ZERO
 ## The blocker cells taken out of the two maps' rims while the seam is open:
 ## [TileMapLayer, cell, source, atlas coords, alternative].
 var _opened: Array = []
+## The two regions whose grounds blend while the seam is open.
+var _blended_a: Region
+var _blended_b: Region
+
+## The two maps overlap by this many pixels at a seam, and their painted
+## grounds blend across the overlap (see seasonal_ground.gdshader).
+const OVERLAP := 64.0
 
 ## Each map is ringed by blocker cells just past its edge. Across a seam
 ## they are taken out for this many pixels either side of the road, so the
@@ -51,8 +64,9 @@ static func candidates(region: Region) -> Array[RegionExit]:
 
 
 ## The seam from [param region] through [param exit] into [param neighbor],
-## or null if the two maps don't meet edge to edge there.
-static func make(region: Region, exit: RegionExit, neighbor: Region) -> Seam:
+## or null if the two maps don't meet edge to edge there. [param nudged]
+## slides the neighbor by the measured nudge (see NUDGES_PATH).
+static func make(region: Region, exit: RegionExit, neighbor: Region, nudged := true) -> Seam:
 	if neighbor.indoors:
 		return null
 	var bounds := region.get_bounds()
@@ -67,7 +81,21 @@ static func make(region: Region, exit: RegionExit, neighbor: Region) -> Seam:
 	seam.side = side
 	seam.point = _onto_edge(bounds, exit_at, side)
 	seam.offset = seam.point - _onto_edge(neighbor.get_bounds(), landing, -side)
+	if nudged:
+		seam.offset += Vector2(absf(side.y), absf(side.x)) * nudge(region.region_id, exit.name)
+		seam.offset -= Vector2(side) * OVERLAP
 	return seam
+
+
+## The measured slide along the edge for [param region]'s [param exit_name].
+static func nudge(region_id: String, exit_name: String) -> float:
+	if _nudges == null:
+		_nudges = {}
+		if FileAccess.file_exists(NUDGES_PATH):
+			var parsed = JSON.parse_string(FileAccess.get_file_as_string(NUDGES_PATH))
+			if parsed is Dictionary:
+				_nudges = parsed
+	return float(_nudges.get(region_id, {}).get(exit_name, 0.0))
 
 
 ## Where the road comes in on [param neighbor]'s [param edge]: the exit's
@@ -105,22 +133,80 @@ func is_across(pos: Vector2, bounds: Rect2) -> bool:
 	return pos.y >= bounds.end.y
 
 
-## Takes the rims out of both maps around the road (see CORRIDOR).
+## How far the two maps overlap: OVERLAP once nudged into place, measured
+## from where the neighbor's edge sits against this one's.
+func _overlap() -> float:
+	var nb := neighbor_bounds()
+	match side:
+		Vector2i.LEFT: return nb.end.x - point.x
+		Vector2i.RIGHT: return point.x - nb.position.x
+		Vector2i.UP: return nb.end.y - point.y
+	return point.y - nb.position.y
+
+
+## Takes the rims out of both maps around the road (see CORRIDOR), and
+## blends their painted grounds across the overlap.
 func open(region: Region) -> void:
 	close()
-	_open_rim(region, point, side, neighbor_bounds())
+	_blend(region, point, side, neighbor_bounds(), point)
 	var mine := region.get_bounds()
 	mine.position -= offset
-	_open_rim(neighbor, point - offset, -side, mine)
+	_blend(neighbor, point - offset - Vector2(side) * _overlap(), -side, mine, point - offset)
+	_open_rim(region, point, side, neighbor_bounds())
+	_open_rim(neighbor, point - offset - Vector2(side) * _overlap(), -side, mine)
 
 
-## Puts the rims back.
+## Puts the rims back and the grounds' edges as they were.
 func close() -> void:
+	for r in [_blended_a, _blended_b]:
+		if is_instance_valid(r):
+			for ground in _grounds(r):
+				(ground.material as ShaderMaterial).set_shader_parameter("seam_on", false)
+	_blended_a = null
+	_blended_b = null
 	for cell in _opened:
 		var layer: TileMapLayer = cell[0]
 		if is_instance_valid(layer):
 			layer.set_cell(cell[1], cell[2], cell[3], cell[4])
 	_opened.clear()
+
+
+## Sets [param r]'s painted ground to blend over its [param edge] (whose
+## point near the road is [param at]) into [param other]'s ground, in r's
+## coordinates. [param origin] is the same spot for both maps.
+func _blend(r: Region, at: Vector2, edge: Vector2i, other: Rect2, origin: Vector2) -> void:
+	if _blended_a == null:
+		_blended_a = r
+	else:
+		_blended_b = r
+	var depth := _overlap()
+	if depth <= 0.0:
+		return
+	var axis := 0 if edge.x != 0 else 1
+	var inner := at - Vector2(edge) * depth
+	for ground in _grounds(r):
+		var mat := ground.material as ShaderMaterial
+		var to_tex := func(p: Vector2) -> Vector2: return ground.to_local(r.to_global(p))
+		var a: Vector2 = to_tex.call(at)
+		var b: Vector2 = to_tex.call(inner)
+		var lo: Vector2 = to_tex.call(other.position)
+		var hi: Vector2 = to_tex.call(other.end)
+		mat.set_shader_parameter("seam_on", true)
+		mat.set_shader_parameter("seam_axis", axis)
+		mat.set_shader_parameter("seam_band", Vector2(a.x, b.x) if axis == 0 else Vector2(a.y, b.y))
+		mat.set_shader_parameter("seam_span", Vector2(lo.y, hi.y) if axis == 0 else Vector2(lo.x, hi.x))
+		mat.set_shader_parameter("seam_origin", to_tex.call(origin))
+		mat.set_shader_parameter("seam_flip", edge == Vector2i.RIGHT or edge == Vector2i.DOWN)
+
+
+## The painted grounds of [param r] that take the seasonal ground shader.
+static func _grounds(r: Region) -> Array[Sprite2D]:
+	var found: Array[Sprite2D] = []
+	for ground_name in ["GroundArt", "GroundPainting"]:
+		var ground := r.get_node_or_null(ground_name) as Sprite2D
+		if ground and ground.material is ShaderMaterial and (ground.material as ShaderMaterial).shader.resource_path.ends_with("seasonal_ground.gdshader"):
+			found.append(ground)
+	return found
 
 
 ## Takes out [param r]'s rim cells near [param at] on [param edge] that
@@ -153,7 +239,8 @@ func reversed(region: Region) -> Seam:
 	back.neighbor = region
 	back.offset = -offset
 	back.side = -side
-	back.point = point - offset
+	# the neighbor's own edge, OVERLAP back from this one's
+	back.point = point - offset - Vector2(side) * _overlap()
 	for node in neighbor.find_children("*", "RegionExit", true, false):
 		var candidate := node as RegionExit
 		if candidate.target_region == region.region_id and (neighbor.to_local(candidate.global_position) - back.point).length() < SPAWN_SLACK * 2.0:

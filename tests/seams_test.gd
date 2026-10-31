@@ -59,11 +59,18 @@ func _ready() -> void:
 			"the camera doesn't drift after arriving by the edge (%s -> %s)" % [settled, camera.get_screen_center_position()])
 	check(world.seam != null and world.seam.neighbor.region_id == "leidig_meadow", "arriving by the edge lays the next region out at once")
 	check(camera.limit_left < 0, "and the camera can look over the edge")
+	_check_blend(world, true)
 	await _walk_across(world, "move_left", "leidig_meadow")
 	await _walk_across(world, "move_right", "yosemite_village")
 	# A north-south seam: from the hotel down the trail by Stoneman Bridge.
 	await world.go_to_region("the_ahwahnee", "south_entry")
 	await _walk_across(world, "move_down", "ahwahnee_trail")
+	_check_blend(world, true)
+	var ahwahnee: Region = world.seam.neighbor
+	world.seam.close()
+	check(Seam._grounds(ahwahnee).all(func(g: Sprite2D) -> bool: return not g.material.get_shader_parameter("seam_on")),
+			"closing a seam puts the ground's edge back")
+	world.seam.open(world.region)
 
 	# A drive that takes clock time still fades.
 	check(Seam.candidates(load("res://scenes/regions/big_oak_flat_junction.tscn").instantiate()).all(
@@ -92,8 +99,22 @@ func _check_all_seams() -> void:
 				continue
 			var seam := Seam.make(region, exit, regions[exit.target_region])
 			check(seam != null, "%s: %s meets %s edge to edge" % [id, exit_name, exit.target_region])
+			if seam:
+				# the neighbor's edge tucks under this one by the overlap,
+				# and the way back lands on the same spot
+				check(is_equal_approx(seam._overlap(), Seam.OVERLAP), "%s: %s overlaps by %d px" % [id, exit_name, Seam.OVERLAP])
+				var back := seam.reversed(region)
+				check(back.offset == -seam.offset and is_equal_approx(back._overlap(), Seam.OVERLAP),
+						"%s: %s lines up with the seam back" % [id, exit_name])
 	for region: Region in regions.values():
 		region.free()
+
+
+## The grounds on both sides of the open seam blend into each other.
+func _check_blend(world: Node, on: bool) -> void:
+	var grounds := Seam._grounds(world.region) + Seam._grounds(world.seam.neighbor)
+	check(grounds.size() >= 2 and grounds.all(func(g: Sprite2D) -> bool: return g.material.get_shader_parameter("seam_on") == on),
+			"%s and %s: the grounds blend over the seam" % [world.region.region_id, world.seam.neighbor.region_id])
 
 
 ## Walks [param action] from where the player stands until they're in
