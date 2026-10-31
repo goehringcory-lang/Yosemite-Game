@@ -208,7 +208,8 @@ static func pitch_banner(ci: CanvasItem, state: ClimbState, age: float) -> void:
 
 # ---------------------------------------------------------------- crux meter
 
-## The skill check at a crux. [param kind] is "timing", "rhythm" or "mash",
+## The skill check at a crux. [param kind] is "timing", "rhythm", "mash" or
+## "dyno",
 ## or "pumped" after a miss, when you have to eat before the next try.
 static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, time: float) -> void:
 	var r := Rect2(SCREEN.x * 0.5 - 110, 60, 220, 66)
@@ -235,6 +236,28 @@ static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, t
 			ci.draw_rect(Rect2(mx - 1, bar.position.y - 4, 3, bar.size.y + 8), UI.WOOD_DARK)
 			ci.draw_rect(Rect2(mx, bar.position.y - 3, 1, bar.size.y + 6), UI.CREAM)
 			UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 58), "Space: stop in the green", UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+		"dyno":
+			ci.draw_rect(bar.grow(1), UI.WOOD_DARK)
+			ci.draw_rect(bar, Color("5e4a38"))
+			var win: float = data.window
+			var center: float = data.center
+			var good := Rect2(bar.position.x + bar.size.x * (center - win / 2.0), bar.position.y, bar.size.x * win, bar.size.y)
+			ci.draw_rect(good, UI.GOOD_DARK)
+			var perfect_w := win * 0.38
+			var perf := Rect2(bar.position.x + bar.size.x * (center - perfect_w / 2.0), bar.position.y, bar.size.x * perfect_w, bar.size.y)
+			ci.draw_rect(perf, UI.GOOD)
+			# The load: a fill that only rises while you hold.
+			var charge: float = data.charge
+			var fill := Rect2(bar.position.x, bar.position.y + 3, bar.size.x * charge, bar.size.y - 6)
+			ci.draw_rect(fill, Color(UI.GOLD, 0.85))
+			var mx: float = bar.position.x + bar.size.x * charge
+			ci.draw_rect(Rect2(mx - 1, bar.position.y - 4, 3, bar.size.y + 8), UI.WOOD_DARK)
+			ci.draw_rect(Rect2(mx, bar.position.y - 3, 1, bar.size.y + 6), UI.CREAM)
+			if not data.holding:
+				var tleft: float = data.time_left
+				ci.draw_rect(Rect2(bar.position.x, bar.end.y + 4, bar.size.x * clampf(tleft / float(data.time_total), 0.0, 1.0), 2), UI.GOLD)
+			var prompt := "Let go in the green!" if data.holding else "Hold Space to sink onto the wing"
+			UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 58), prompt, UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 		"rhythm", "mash":
 			var need: int = data.need
 			var done: int = data.done

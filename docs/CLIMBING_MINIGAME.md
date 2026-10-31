@@ -4,7 +4,7 @@ Status: shipped. Every route in the guidebook has its own climb, set in the real
 
 ## Experience
 
-A climb is a short sequence of decisions: read the wall, choose a line, decide where to shake out and where to protect, then reach the ledge with enough stamina for the next pitch. On the harder routes the cheapest hold in reach is often the wrong one: a string of crimps pumps you until every move costs double, and gear placed off a crimp costs five times what it does from a jug. Nothing is timed against you, apart from three small, forgiving skill checks at cruxes. The satisfaction is in feeling a new piece of gear change the line: cams open up a crack, quickdraws clip the old pitons on the Spire, a belay device softens a fall, ascenders jug the Nose's fixed lines, aiders get you past the Great Roof, and an ice axe stops a slide on the glacier.
+A climb is a short sequence of decisions: read the wall, choose a line, decide where to shake out and where to protect, then reach the ledge with enough stamina for the next pitch. On the harder routes the cheapest hold in reach is often the wrong one: a string of crimps pumps you until every move costs double, and gear placed off a crimp costs five times what it does from a jug. Nothing is timed against you, apart from four small, forgiving skill checks at cruxes. The satisfaction is in feeling a new piece of gear change the line: cams open up a crack, quickdraws clip the old pitons on the Spire, a belay device softens a fall, ascenders jug the Nose's fixed lines, aiders get you past the Great Roof, and an ice axe stops a slide on the glacier.
 
 ## Play loop
 
@@ -81,6 +81,7 @@ The painters in `scripts/climb/art/` draw on the 480 x 270 menu grid. `ClimbHiRe
 | timing | A marker sweeps a bar; `Space` in the green (center is perfect). The green is wider with shoes, chalk, and on a top rope | Firefall Slab's bulge, Swan Slab's polished wave, Separate Reality's lip, Astroman's Boulder Problem... |
 | mash | Tap Up quickly | Nutcracker's mantel |
 | rhythm | Alternate Left and Right to the beat | The Narrows, Harding Slot, the King Swing, the Pendulum |
+| dyno | Hold `Space` (or Up) to sink onto the move; a fill rises (0.7 of the timing marker's speed) and only goes up. Let go in the green (center is perfect); hold to the end and you peel off. You have the mash check's time to start | Astroman's chicken wing dyno, in the flare below the Harding Slot |
 
 **How many.** A pitch's authored crux always counts. On top of it a grade 3 pitch has at least 1 crux point, a grade 4 pitch 2 and a grade 5 pitch 3 (`ClimbProfiles.CRUXES_BY_DIFF`), spread out and kept off the stances and fixed ropes. The added ones are timing checks named for the pitch's style, and add only 2 to their holds, so they test timing more than stamina. Swan Slab and Firefall Slab have 1 crux; the Nose has 20.
 

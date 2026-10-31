@@ -6,7 +6,7 @@ extends Node
 ##   SHOT_HOURS   comma-separated game hours to shoot at (default 7,12,19)
 ##   SHOT_MOVES   moves to climb before each shot (default 5)
 ##   SHOT_INTRO   1 to shoot the route card instead of the climb
-##   SHOT_SPECIAL cards to shoot instead: "crux", "pumped", "result", "pause", "night"
+##   SHOT_SPECIAL cards to shoot instead: "crux", "pumped", "dyno", "result", "pause", "night"
 ##   SHOT_DIR     folder for the PNGs (default user://)
 ##   SHOT_UNLIT   1 to leave the wall unlit (ClimbLight off), as on Low
 ## The screenshot is the window's own size (3x the 480 x 270 screen).
@@ -74,6 +74,12 @@ func _ready() -> void:
 				game.state.pending = {"kind": _env("SHOT_SPECIAL", ""), "name": "The Narrows", "window": 0.3}
 				game._start_crux()
 				game._crux.done = 4
+			"dyno":
+				game.state.pending = {"kind": "dyno", "name": "Chicken wing dyno", "window": 0.22}
+				game._start_crux()
+				game._crux.holding = true
+				game._crux.charge = game._crux.center - 0.1
+				game._crux.speed = 0.0
 			"storm":
 				game.state.start_minutes = 15 * 60
 				for k in 60:

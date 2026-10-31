@@ -396,6 +396,10 @@ func test_crux() -> void:
 	var shod := ClimbState.new(r, 0, 1, {"climbing_shoes": 1})
 	var barefoot := ClimbState.new(r, 0, 1, {})
 	check(shod.crux_window() > barefoot.crux_window(), "climbing shoes widen the crux window")
+	# Astroman's Harding Slot: a chicken wing dyno up the flare, then the slot.
+	var slot := ClimbProfiles.pitch_spec(route("astroman"), 5)
+	check(slot.cruxes == [3, 6] and ClimbProfiles.crux_at(slot, 3).kind == "dyno" and ClimbProfiles.crux_at(slot, 6).kind == "rhythm",
+		"Astroman's Harding Slot has a chicken wing dyno below the slot (%s)" % str(slot.cruxes))
 
 
 ## Harder climbs have more crux points and a faster meter, but the green can
