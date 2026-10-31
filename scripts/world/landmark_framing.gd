@@ -24,12 +24,16 @@ const SPEED := 1.8
 const WALL_FULL := 220.0
 ## ...fading to none over this many more.
 const WALL_FADE := 260.0
+## A move of more than this many pixels in one frame is a jump (a spawn, a
+## door), which frames the view at once instead of easing.
+const JUMP := 48.0
 
 ## The camera's current tilt, in pixels (0 or less).
 var tilt := 0.0
 
 var _region: Node = null
 var _walls: Array[float] = []
+var _last_at := Vector2.INF
 
 
 func _ready() -> void:
@@ -46,11 +50,17 @@ func _process(delta: float) -> void:
 	var camera := player.get_node_or_null("Camera") as Camera2D
 	if camera == null:
 		return
-	if region != _region:
+	var at := player.global_position
+	var arrived := region != _region
+	if arrived:
 		_region = region
 		_walls = _wall_feet(region)
-		tilt = 0.0
-	var target := target_tilt(camera, player.global_position)
+	var target := target_tilt(camera, at)
+	# Arriving somewhere (a new region, a spawn, a door) frames the view at
+	# once, as the camera itself does; only walking eases the tilt.
+	if arrived or _last_at.distance_to(at) > JUMP:
+		tilt = target
+	_last_at = at
 	tilt = lerpf(tilt, target, 1.0 - exp(-SPEED * delta))
 	if absf(tilt - target) < 0.25:
 		tilt = target
@@ -63,7 +73,10 @@ func target_tilt(camera: Camera2D, at: Vector2) -> float:
 	if look.weight <= 0.0:
 		return 0.0
 	var height := camera.get_viewport_rect().size.y / camera.zoom.y
-	var natural_top := camera.get_screen_center_position().y - camera.offset.y - height / 2.0
+	# Where the camera's top would be with no tilt, from the player and the
+	# camera's limits (not the smoothed camera, so it is the same every frame
+	# the player stands still, however fast the frames come).
+	var natural_top := clampf(at.y - height / 2.0, camera.limit_top, camera.limit_bottom - height)
 	var margin: float = look.margin if look.margin >= 0.0 else MARGIN
 	var want_top := maxf(look.top, at.y - (height - margin))
 	return minf(0.0, want_top - natural_top) * look.weight
