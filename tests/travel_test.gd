@@ -89,9 +89,11 @@ func _ready() -> void:
 	check(ledge_up != null and ledge_up.is_unlocked() and await _can_use(world.player, ledge_up), "and its foot can be walked up to")
 	var set_out := GameClock.minutes
 	ledge_up.interact(world.player)
-	await get_tree().create_timer(2.5).timeout
-	while world._busy:
+	# the clock runs on once you're up, so look as soon as you get there
+	for i in 600:
 		await get_tree().process_frame
+		if not world._busy and world.region.region_id == "glacier_point":
+			break
 	check(world.region.region_id == "glacier_point" and world.player.position == world.region.get_spawn("ledge_trail_top").position,
 		"the Ledge Trail climbs back to Glacier Point")
 	check(GameClock.minutes - set_out == ledge_up.minutes, "the climb up takes its time (%d min)" % (GameClock.minutes - set_out))
