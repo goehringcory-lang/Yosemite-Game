@@ -1016,7 +1016,7 @@ func _build() -> void:
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(spacer)
 	_route_label = _label(box)
-	_hint_label = _label(box)
+	_hint_label = _label(box, true)
 	_hint_label.modulate = DIM
 	_hint_label.add_theme_font_size_override("font_size", 8)
 
@@ -1037,13 +1037,13 @@ func _build() -> void:
 	_area_canvas.draw.connect(_draw_area)
 	_area_view.add_child(_area_canvas)
 	_area_marker = _overlay(_area_canvas, _draw_area_marker)
-	_area_footer = _label(_area_view)
+	_area_footer = _label(_area_view, true)
 	_area_footer.position = Vector2(10, 245)
 	_area_footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_area_footer.custom_minimum_size.x = 454
 	_area_footer.size.x = 454
 	_area_footer.add_theme_font_size_override("font_size", 8)
-	_area_hint = _label(_area_view)
+	_area_hint = _label(_area_view, true)
 	_area_hint.position = Vector2(290, 4)
 	_area_hint.size = Vector2(184, 12)
 	_area_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -1053,8 +1053,8 @@ func _build() -> void:
 
 
 ## Labels in the info panel wrap to its width; others stay on one line.
-func _label(parent: Control) -> Label:
-	var label := Label.new()
+func _label(parent: Control, hints := false) -> Label:
+	var label: Label = ButtonHints.new() if hints else Label.new()
 	if parent is VBoxContainer:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.custom_minimum_size.x = INFO_RECT.size.x - 14

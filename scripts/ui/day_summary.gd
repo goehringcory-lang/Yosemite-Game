@@ -99,7 +99,8 @@ func _build(log: DayLog) -> void:
 		_list("New in the field log", log.animals)
 		if log.dishes > 0:
 			_list("At the fire", PackedStringArray(["%d %s cooked" % [log.dishes, "dish" if log.dishes == 1 else "dishes"]]))
-	_footer = _label("", DIM)
+	_footer = ButtonHints.new()
+	_footer.add_theme_color_override("font_color", DIM)
 	_footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_footer.modulate.a = 0.0
 	_column.add_child(_footer)

@@ -87,7 +87,7 @@ func _ready() -> void:
 	tabs.add_theme_constant_override("separation", 4)
 	column.add_child(tabs)
 	for i in TAB_NAMES.size():
-		var label := Label.new()
+		var label := ButtonHints.new()
 		label.mouse_filter = Control.MOUSE_FILTER_STOP
 		label.gui_input.connect(_on_tab_input.bind(i))
 		tabs.add_child(label)
@@ -128,7 +128,7 @@ func _ready() -> void:
 	_detail_text.custom_minimum_size.y = DETAIL_LINES * (_detail_text.get_line_height() + _detail_text.get_theme_constant("line_spacing"))
 	var footer := HBoxContainer.new()
 	column.add_child(footer)
-	_footer = Label.new()
+	_footer = ButtonHints.new()
 	_footer.add_theme_color_override("font_color", DIM)
 	_footer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	footer.add_child(_footer)
@@ -316,7 +316,7 @@ func _refresh_hints() -> void:
 	var gamepad := MenuInput.button(tree, "k", "g") == "g"
 	for i in _tab_labels.size():
 		var label := _tab_labels[i]
-		label.text = TAB_NAMES[i] if gamepad else "%s  %s" % [TAB_KEYS[i], TAB_NAMES[i]]
+		label.text = TAB_NAMES[i] if gamepad else "[%s] %s" % [TAB_KEYS[i], TAB_NAMES[i]]
 		label.add_theme_color_override("font_color", HEADING if i == _tab else DIM)
 		label.add_theme_stylebox_override("normal", _tab_style if i == _tab else _plain_style)
 	var move := "[%s] Choose" % MenuInput.button(tree, "Arrows", "Stick") if _uses_slots() \

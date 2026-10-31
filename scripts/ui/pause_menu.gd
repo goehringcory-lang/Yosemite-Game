@@ -132,7 +132,8 @@ func _ready() -> void:
 	var filler := Control.new()
 	filler.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(filler)
-	_footer = _label("", DIM)
+	_footer = ButtonHints.new()
+	_footer.add_theme_color_override("font_color", DIM)
 	column.add_child(_footer)
 
 

@@ -203,7 +203,7 @@ func _build_menu() -> void:
 	_hint.position = Vector2(40, 228)
 	_hint.size = Vector2(SCREEN.x - 80, 16)
 	add_child(_hint)
-	_footer = Label.new()
+	_footer = ButtonHints.new()
 	_footer.add_theme_color_override("font_color", Color(0.961, 0.933, 0.878, 0.8))
 	_footer_band = _on_band(_footer, SCREEN.y - 17)
 

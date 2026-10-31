@@ -11,6 +11,9 @@ const MESSAGE_GAP := 2.0
 ## Groups of the screens that hide the HUD while they're open.
 ## Seconds the place name stays up after you arrive.
 const LOCATION_SHOWN := 4.0
+## Seconds the hint line naming the book's keys stays up after you arrive
+## somewhere or close a menu, before it fades to leave the view clear.
+const HINTS_SHOWN := 8.0
 const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary"]
 
 var _player: Player
@@ -18,6 +21,7 @@ var _player: Player
 var food_label: Label
 var _location_text := ""
 var _location_tween: Tween
+var _hints_tween: Tween
 var _status: Label
 ## The "you got this" cards at the top left.
 var toasts: ItemToasts
@@ -85,7 +89,7 @@ func _ready() -> void:
 	Gear.added.connect(_on_gear_added)
 	QuestLog.quest_completed.connect(func(_quest: QuestData) -> void: Sound.play("quest_done", 0.0, 0.0))
 	var panel := PanelContainer.new()
-	_status = Label.new()
+	_status = ButtonHints.new()
 	panel.add_child(_status)
 	status_bar.add_child(panel)
 	# The clock and the place name are wooden plaques; the hint line keeps the plain frame.
@@ -213,6 +217,20 @@ func _show_location_banner() -> void:
 	_location_tween = create_tween()
 	_location_tween.tween_interval(LOCATION_SHOWN)
 	_location_tween.tween_property(location_panel, "modulate:a", 0.0, 0.8)
+	_show_hints()
+
+
+## Brings the hint line up for a while, then fades it, as cozy games keep
+## their screen clear once you know the keys.
+func _show_hints() -> void:
+	if _hints_tween:
+		_hints_tween.kill()
+	if _covered:
+		return
+	status_bar.modulate.a = 1.0
+	_hints_tween = create_tween()
+	_hints_tween.tween_interval(HINTS_SHOWN)
+	_hints_tween.tween_property(status_bar, "modulate:a", 0.0, 0.8)
 
 
 ## Shows a sign's text until the player walks away from it.
@@ -276,9 +294,15 @@ func _update_cover() -> void:
 		return
 	_covered = covered
 	var alpha := 0.0 if covered else 1.0
-	for panel: Control in [clock_panel, location_panel, status_bar, info_panel]:
+	for panel: Control in [clock_panel, location_panel, info_panel]:
 		panel.modulate.a = alpha
 	message_label.visible = not covered
+	if covered:
+		if _hints_tween:
+			_hints_tween.kill()
+		status_bar.modulate.a = 0.0
+	else:
+		_show_hints()
 
 
 ## The pickup message sits at the bottom left, or above the sign panel while one is open.
@@ -319,9 +343,9 @@ func _update_prompt() -> void:
 			create_tween().tween_property(prompt_panel, "modulate:a", 1.0, 0.12)
 	if target == null:
 		return
-	prompt_label.text = "%s  %s" % [interact_button(), Player.prompt_for(target)]
+	prompt_label.text = "[%s] %s" % [interact_button(), Player.prompt_for(target)]
 	if target.has_method("can_receive_gift") and target.can_receive_gift():
-		prompt_label.text += "    %s  Give a gift" % prompt("G", "LB")
+		prompt_label.text += "   [%s] Give a gift" % prompt("G", "LB")
 	prompt_panel.size = Vector2.ZERO
 	var screen := UiScale.from_view(_player.get_global_transform_with_canvas().origin)
 	# Above whichever head is higher, so it never covers the person you face.
@@ -369,4 +393,4 @@ static func objective_text() -> String:
 ## The hint line: the keys that open the book's three tabs. A gamepad opens
 ## it with Y and turns the tabs from there.
 func _refresh_status() -> void:
-	_status.text = prompt("J: Journal  ·  Q: Quests  ·  B: Backpack", "Y: Journal, Quests, Backpack")
+	_status.text = prompt("[J] Journal  ·  [Q] Quests  ·  [B] Backpack", "[Y] Journal, Quests, Backpack")

@@ -297,18 +297,18 @@ func _check_menus(world: Node) -> void:
 	_press("ui_cancel")
 
 	world.hud._input(InputEventKey.new())
-	check(world.hud._status.text.contains("J: Journal"), "the hint line names the journal key (%s)" % world.hud._status.text)
+	check(world.hud._status.text.contains("[J] Journal"), "the hint line names the journal key (%s)" % world.hud._status.text)
 	world.open_travel_map()
 	check("[Arrows] Choose   [E] Travel   [Esc] Close" in world.park_map._hint_label.text, "the travel map shows keyboard prompts")
 	world.hud._input(InputEventJoypadButton.new())
 	check("[D-pad] Choose   [A] Travel   [B] Close" in world.park_map._hint_label.text, "the open map switches to gamepad prompts")
-	check(world.hud._status.text.contains("Y: Journal") and not world.hud._status.text.contains("J: Journal"), "the hint line switches to the gamepad's Y")
+	check(world.hud._status.text.contains("[Y] Journal") and not world.hud._status.text.contains("[J] Journal"), "the hint line switches to the gamepad's Y")
 	world.park_map.close()
 	world.open_shuttle_map("Happy Isles")
 	check("[A] Ride" in world.park_map._area_hint.text, "the shuttle map shows gamepad prompts (%s)" % world.park_map._area_hint.text)
 	world.park_map.close()
 	world.hud._input(InputEventKey.new())
-	check(world.hud._status.text.contains("J: Journal"), "keyboard prompts come back with the keyboard")
+	check(world.hud._status.text.contains("[J] Journal"), "keyboard prompts come back with the keyboard")
 
 	var journal: Journal = world.get_tree().get_first_node_in_group("journal")
 	journal.open()
@@ -476,7 +476,7 @@ func _check_central_hub(world: Node) -> void:
 	# frame ran all four physics steps at once.
 	await get_tree().process_frame
 	await get_tree().process_frame
-	check(world.hud.prompt_panel.visible and world.hud.prompt_label.text == "E  Read: Camp 4", "facing a sign shows its prompt (%s)" % world.hud.prompt_label.text)
+	check(world.hud.prompt_panel.visible and world.hud.prompt_label.text == "[E] Read: Camp 4", "facing a sign shows its prompt (%s)" % world.hud.prompt_label.text)
 	world.player.position = region.get_spawn("arrival").position
 	for i in 4:
 		await get_tree().physics_frame
