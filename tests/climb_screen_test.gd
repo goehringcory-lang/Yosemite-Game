@@ -184,6 +184,7 @@ func test_screen_details() -> void:
 	press(game, "move_up")
 	game._update_crux(2.0)
 	check(game._crux.kind == "pumped" and game.state.slipped_cruxes == 3, "sink too far on the wing and you miss the dyno")
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
 	press(game, "interact")
 	check(game._crux.kind == "dyno" and not game._crux.holding, "eating brings the dyno back")
 	game.state.pending = {}

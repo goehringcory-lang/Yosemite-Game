@@ -221,6 +221,12 @@ func _input(event: InputEvent) -> void:
 	for a in ["move_up", "move_left", "move_right", "use_tool", "interact", "ui_cancel"]:
 		if event.is_action_pressed(a):
 			is_press = true
+	# Letting go is the move on a dyno, so its release gets through too.
+	if _phase == Phase.CRUX and _crux.get("holding", false) and not event.is_echo():
+		for a in ["move_up", "use_tool", "interact"]:
+			if event.is_action_released(a):
+				_crux_input(event)
+				return
 	if not is_press or event.is_echo():
 		return
 	get_viewport().set_input_as_handled()
