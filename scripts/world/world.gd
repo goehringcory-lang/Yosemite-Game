@@ -77,6 +77,7 @@ func _ready() -> void:
 	add_child(SunLight.new())
 	add_child(AirGlow.new())
 	add_child(RoomLight.new())
+	add_child(LandmarkFraming.new())
 	LitSprites.attach_sprite(player.sprite)
 	# before the save loads, so it gets back which moments were seen
 	add_child(StoryMoments.new())

@@ -39,6 +39,15 @@
 [ext_resource type="Resource" path="res://data/characters/staff/mateo_reyes.tres" id="sar_mateo"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_sar_volunteer.tres" id="sar_volunteer"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_sar_hauler.tres" id="sar_hauler"]
+[ext_resource type="Script" path="res://scripts/world/landmark_view.gd" id="lv_script"]
+[ext_resource type="Script" path="res://scripts/world/backdrop_fall.gd" id="bf_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/upper_falls_backdrop.png" id="uf_backdrop"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/upper_yosemite_fall_0.png" id="uf_0"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/upper_yosemite_fall_1.png" id="uf_1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/upper_yosemite_fall_2.png" id="uf_2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/upper_yosemite_fall_3.png" id="uf_3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/upper_yosemite_fall_4.png" id="uf_4"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/upper_yosemite_fall_5.png" id="uf_5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sar_cabin"]
 size = Vector2(80, 24)
@@ -60,6 +69,32 @@ size = Vector2(80, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sar_sign_reach"]
 size = Vector2(96, 40)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_upper_fall"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("uf_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("uf_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("uf_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("uf_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("uf_4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("uf_5")
+}],
+"loop": true,
+"name": &"default",
+"speed": 8.0
+}]
 
 [node name="YosemiteVillageStory" type="Node2D"]
 
@@ -378,3 +413,25 @@ script = ExtResource("fw_script")
 kind = "hole"
 size = Vector2(340, 140)
 title = "Sentinel Hole"
+
+
+[node name="UpperFallsBackdrop" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(0, -204)
+texture = ExtResource("uf_backdrop")
+centered = false
+
+[node name="UpperYosemiteFall" type="AnimatedSprite2D" parent="."]
+z_index = -9
+position = Vector2(1376, -149)
+sprite_frames = SubResource("SpriteFrames_upper_fall")
+centered = false
+script = ExtResource("bf_script")
+
+[node name="YosemiteFallsView" type="Node2D" parent="."]
+script = ExtResource("lv_script")
+area = Rect2(1040, 0, 860, 760)
+top = -204.0
+feather = 200.0
+margin = 28.0
+landmark = "Yosemite Falls"
