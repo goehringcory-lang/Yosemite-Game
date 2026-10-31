@@ -32,6 +32,9 @@ const MOVE_TIME := 0.2
 const FALL_TIME := 0.55
 ## A crux check ignores input for this long when it starts.
 const CRUX_GRACE := 0.35
+## A dyno's fill rises this fraction as fast as the timing marker moves:
+## you're reading one rise, not a sweep you can watch go by.
+const DYNO_SPEED := 0.7
 ## The top of the gear tray along the bottom. A belayer whose feet sink below
 ## this is off the bottom of the picture, not half hidden behind the tray.
 const TRAY_TOP := 237.0
@@ -462,6 +465,13 @@ func _start_crux() -> void:
 		"rhythm":
 			_crux = {"kind": kind, "need": 8, "done": 0, "left_next": true,
 				"time_total": state.crux_seconds(kind), "time_left": state.crux_seconds(kind)}
+		"dyno":
+			# Hold to sink onto the chicken wing; the fill can't come back
+			# down, so let go when it's in the green or go too far and peel.
+			var win: float = state.pending.window
+			_crux = {"kind": kind, "window": win, "center": minf(randf_range(0.6, 0.78), 0.96 - win / 2.0),
+				"charge": 0.0, "holding": false, "speed": state.crux_speed() * DYNO_SPEED,
+				"time_total": state.crux_seconds(kind), "time_left": state.crux_seconds(kind)}
 		_:
 			_crux = {"kind": "mash", "need": int(state.pending.get("need", 0)) if int(state.pending.get("need", 0)) > 0 else 9, "done": 0, "left_next": true,
 				"time_total": state.crux_seconds("mash"), "time_left": state.crux_seconds("mash")}
@@ -510,6 +520,17 @@ func _update_crux(delta: float) -> void:
 			# forever: wait too long and it counts as a miss.
 			if _crux.passes >= 9:
 				_resolve_crux("slip")
+		"dyno":
+			if _crux.holding:
+				_crux.charge += _crux.speed * delta
+				if _crux.charge >= 1.0:
+					# Sank too far: the wing slips out before you go.
+					_crux.charge = 1.0
+					_resolve_crux("slip")
+			else:
+				_crux.time_left -= delta
+				if _crux.time_left <= 0.0:
+					_resolve_crux("slip")
 		_:
 			_crux.time_left -= delta
 			if _crux.time_left <= 0.0:
@@ -532,6 +553,22 @@ func _crux_input(event: InputEvent) -> void:
 			if event.is_action_pressed("use_tool") or event.is_action_pressed("interact") or event.is_action_pressed("move_up"):
 				var off := absf(_crux.pos - _crux.center)
 				var half: float = _crux.window / 2.0
+				if off <= half * 0.38:
+					_resolve_crux("perfect")
+				elif off <= half:
+					_resolve_crux("good")
+				else:
+					_resolve_crux("slip")
+		"dyno":
+			var keys := ["use_tool", "interact", "move_up"]
+			if not _crux.holding:
+				if keys.any(func(k: String) -> bool: return event.is_action_pressed(k)):
+					_crux.holding = true
+			elif keys.any(func(k: String) -> bool: return event.is_action_released(k)):
+				var off := absf(float(_crux.charge) - float(_crux.center))
+				var half: float = _crux.window / 2.0
+				_fx.dust(_torso() + Vector2(4, -16), _dust_color(), 4)
+				_shake = maxf(_shake, 2.0)
 				if off <= half * 0.38:
 					_resolve_crux("perfect")
 				elif off <= half:
@@ -1061,6 +1098,8 @@ func _pose() -> Dictionary:
 			"shake":
 				a = ClimbSprites.rest_pose()
 				a["hl"] += Vector2(sin(_time * 40.0) * 1.5, 0)
+	if _phase == Phase.CRUX and _crux.get("kind", "") == "dyno":
+		a = ClimbSprites.chicken_wing_pose(_crux.charge if _crux.holding else 0.0)
 	if state.chalk_moves > 0:
 		a["chalk"] = true
 	return a

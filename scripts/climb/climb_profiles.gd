@@ -22,7 +22,7 @@ extends RefCounted
 ##   crux        row of the hard move. Harder pitches get more crux points
 ##               on top of it (see CRUXES_BY_DIFF); pitch_spec lists them all
 ##               in "cruxes".
-##   crux_kind   timing | rhythm | mash  (default timing)
+##   crux_kind   timing | rhythm | mash | dyno  (default timing)
 ##   crux_name   the move's name, shown on the meter
 ##   rest        rows with a good stance (a bit of stamina back)
 ##   fixed       rows with a fixed rope (ascenders make them easy)
@@ -282,7 +282,17 @@ const PROFILES := {
 			{"name": "Enduro Corner", "style": "crack", "cracks": 0.55, "pins": [6], "deco": ["corner"], "beta": "A long, sustained corner. Pace yourself."},
 			{"name": "Changing Corners", "style": "crack", "cracks": 0.45, "crux": 6, "crux_name": "Changing corners", "deco": ["corner"], "beta": "Switch from one wall of the corner to the other on thin holds."},
 			{"name": "The Sidewalk", "style": "slab", "cracks": 0.3, "rest": [3, 6], "deco": ["streaks"], "beta": "A ramp of easier ground. Eat and shake out."},
-			{"name": "Harding Slot", "style": "chimney", "cols": [1, 2, 3], "cracks": 0.35, "crux": 5, "crux_kind": "rhythm", "crux_name": "Harding Slot", "deco": ["chimney"], "beta": "A body-width flue. Don't stop: alternate Left and Right."},
+			{
+				"name": "Harding Slot", "style": "chimney", "cols": [1, 2, 3], "cracks": 0.35, "deco": ["chimney"],
+				"beta": "Chicken wing up the flare and lunge into the slot. Then don't stop: alternate Left and Right.",
+				# The flare below the slot is offwidth: lock an arm in it bent
+				# like a chicken wing, sink onto it, and lunge for the slot.
+				"crux": 6, "crux_kind": "rhythm", "crux_name": "Harding Slot",
+				"crux_points": [
+					{"row": 3, "kind": "dyno", "name": "Chicken wing dyno"},
+					{"row": 6, "kind": "rhythm", "name": "Harding Slot"},
+				],
+			},
 			{"name": "The Headwall", "style": "crack", "cracks": 0.45, "pins": [3, 7], "deco": ["lichen"], "beta": "Steep to the very top."},
 		],
 	},

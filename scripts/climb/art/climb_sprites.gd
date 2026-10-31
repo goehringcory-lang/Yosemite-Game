@@ -167,6 +167,20 @@ static func roof_pose(step: int) -> Dictionary:
 	}
 
 
+## A chicken wing in a flare: the right arm folded into the crack and locked
+## against it, the left hand pressing low. [param load] (0..1) is how far
+## you've sunk onto the wing, feet drawn up, before you let go and lunge.
+static func chicken_wing_pose(load := 0.0) -> Dictionary:
+	var sink := Vector2(0, -6) * clampf(load, 0.0, 1.0)
+	return {
+		"hr": Vector2(5, -8),
+		"hl": Vector2(-9, 1),
+		"fr": Vector2(7, 19) + sink,
+		"fl": Vector2(-6, 22) + sink,
+		"lean": 1,
+	}
+
+
 ## A chimney climber: back on one wall, feet on the other. [param side] is the
 ## wall the back is against, -1 left or +1 right. Walls are about 24 px apart:
 ## the near wall's surface is at ORIGIN.x - 6, the far wall's at ORIGIN.x + 19.

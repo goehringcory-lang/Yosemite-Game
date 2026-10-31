@@ -166,6 +166,29 @@ func test_screen_details() -> void:
 	game._crux.pos = game._crux.center
 	press(game, "use_tool")
 	check(game._phase == ClimbMinigame.Phase.CLIMB and game.state.perfect_cruxes == 1, "stop in the green and you climb on")
+	# A chicken wing dyno: hold to sink onto the wing, let go in the green.
+	game.state.pending = {"kind": "dyno", "name": "Chicken wing dyno", "window": 0.3, "row": 3, "cell": Vector2i(2, 3)}
+	game._start_crux()
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	press(game, "use_tool")
+	game._update_crux(0.05)
+	check(game._crux.holding and game._crux.charge > 0.0, "holding Space sinks onto the chicken wing")
+	game._crux.charge = game._crux.center
+	release(game, "use_tool")
+	check(game._phase == ClimbMinigame.Phase.CLIMB and game.state.perfect_cruxes == 2, "let go in the green and you lunge to the slot")
+	# Hold on too long and the wing slips out.
+	Inventory.add("dried_apples", 1)
+	game.state.pending = {"kind": "dyno", "name": "Chicken wing dyno", "window": 0.3, "row": 3, "cell": Vector2i(2, 3)}
+	game._start_crux()
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	press(game, "move_up")
+	game._update_crux(2.0)
+	check(game._crux.kind == "pumped" and game.state.slipped_cruxes == 3, "sink too far on the wing and you miss the dyno")
+	press(game, "interact")
+	check(game._crux.kind == "dyno" and not game._crux.holding, "eating brings the dyno back")
+	game.state.pending = {}
+	game._phase = ClimbMinigame.Phase.CLIMB
+	game._crux = {}
 	Inventory.items.clear()
 	game.queue_free()
 	await get_tree().process_frame
@@ -294,6 +317,13 @@ func press(game: ClimbMinigame, action: String) -> void:
 	var ev := InputEventAction.new()
 	ev.action = action
 	ev.pressed = true
+	game._input(ev)
+
+
+func release(game: ClimbMinigame, action: String) -> void:
+	var ev := InputEventAction.new()
+	ev.action = action
+	ev.pressed = false
 	game._input(ev)
 
 
