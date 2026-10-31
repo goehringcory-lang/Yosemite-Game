@@ -29,7 +29,8 @@ func _ready() -> void:
 	for town: String in TOWNS:
 		GameClock.minutes = 9 * 60 + 15
 		await world.go_to_region(town, "arrival")
-		for i in 3:
+		# let the town settle, as it would have behind a fade
+		for i in 60:
 			await get_tree().physics_frame
 		await test_town(world)
 	SaveManager.delete_save()

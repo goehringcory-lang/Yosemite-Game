@@ -76,6 +76,9 @@ func _ready() -> void:
 	await _walk_across(world, "move_right", "yosemite_village")
 	# A north-south seam: from the hotel down the trail by Stoneman Bridge.
 	await world.go_to_region("the_ahwahnee", "south_entry")
+	# stepping in through a gate there's no fade to settle behind
+	for i in 30:
+		await get_tree().process_frame
 	await _walk_across(world, "move_down", "ahwahnee_trail")
 	_check_blend(world, true)
 	var ahwahnee: Region = world.seam.neighbor
@@ -87,6 +90,18 @@ func _ready() -> void:
 	# A drive that takes clock time still fades.
 	check(Seam.candidates(load("res://scenes/regions/big_oak_flat_junction.tscn").instantiate()).all(
 			func(e: RegionExit) -> bool: return e.minutes == 0), "roads that take clock time aren't seams")
+
+	# Doors step straight in and out, with no dark screen.
+	for into in [["welcome_center", "door"], ["yosemite_village", "welcome_center_door"]]:
+		var faded := false
+		world.go_to_region(into[0], into[1])
+		for i in 60:
+			faded = faded or world.hud.fade.color.a > 0.0
+			if world.region.region_id == into[0] and world.player.can_act:
+				break
+			await get_tree().process_frame
+		check(world.region.region_id == into[0] and world.player.can_act and not faded,
+				"going through the door into %s steps straight in, with no fade" % into[0])
 
 	world.queue_free()
 	await get_tree().process_frame
