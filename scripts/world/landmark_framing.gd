@@ -31,12 +31,19 @@ const JUMP := 48.0
 ## The camera's current tilt, in pixels (0 or less).
 var tilt := 0.0
 ## Added to the camera's offset on top of the tilt: the camera's lag carried
-## over a seam between regions, which World eases back to zero.
+## over a seam between regions (World._cross_seam). It closes just as the
+## camera's own lag would have, so the view eases on without a lurch.
 var carry := Vector2.ZERO
 
 var _region: Node = null
 var _walls: Array[float] = []
 var _last_at := Vector2.INF
+## The cliff feet of the region laid out across the seam, by region.
+var _neighbor_walls := {}
+
+## Near a seam the tilt blends between the two regions' over this many
+## pixels either side of the middle of the overlap.
+const SEAM_BLEND := 480.0
 
 
 func _ready() -> void:
@@ -67,7 +74,12 @@ func _process(delta: float) -> void:
 	tilt = lerpf(tilt, target, 1.0 - exp(-SPEED * delta))
 	if absf(tilt - target) < 0.25:
 		tilt = target
-	camera.offset = Vector2(carry.x, roundf(tilt) + carry.y)
+	if carry != Vector2.ZERO:
+		# Camera2D closes its lag by speed * delta of it each frame.
+		carry *= 1.0 - clampf(camera.position_smoothing_speed * delta, 0.0, 1.0)
+		if carry.length() < 0.05:
+			carry = Vector2.ZERO
+	camera.offset = Vector2(carry.x, tilt + carry.y)
 
 
 ## The player walked over a seam into [param region] and everything shifted
@@ -81,15 +93,40 @@ func crossed(region: Node, by: Vector2) -> void:
 
 
 ## The tilt the camera is easing toward with the player at [param at].
+## Near a seam (see Seam) it is a blend of this region's tilt and the next
+## one's, half and half in the middle of the overlap, so walking over into a
+## region under a cliff wall starts the tilt early and gently instead of
+## all at once on the far side.
 func target_tilt(camera: Camera2D, at: Vector2) -> float:
-	var look := view_at(at)
+	var mine := _tilt_in(_region, _walls, camera, at, 0.0)
+	var seam: Seam = get_parent().get("seam") if get_parent() else null
+	if seam == null or not is_instance_valid(seam.neighbor) or not seam.neighbor.is_inside_tree():
+		return mine
+	# how far the player is from the middle of the overlap, into this region
+	var middle := seam.point - Vector2(seam.side) * seam._overlap() * 0.5
+	var into := Vector2(-seam.side).dot(at - middle)
+	var theirs_weight := clampf(0.5 - into / (2.0 * SEAM_BLEND), 0.0, 1.0)
+	if theirs_weight <= 0.0:
+		return mine
+	if not _neighbor_walls.has(seam.neighbor):
+		_neighbor_walls = {seam.neighbor: _wall_feet(seam.neighbor)}
+	var walls: Array[float] = _neighbor_walls[seam.neighbor]
+	var theirs := _tilt_in(seam.neighbor, walls, camera, seam.neighbor.to_local(at), seam.neighbor.position.y)
+	return lerpf(mine, theirs, theirs_weight)
+
+
+## The tilt in [param region] (whose cliff feet are [param walls]) with the
+## player at [param at] in its own pixels; it sits [param shift] pixels down
+## from the camera's coordinates.
+func _tilt_in(region: Node, walls: Array[float], camera: Camera2D, at: Vector2, shift: float) -> float:
+	var look := _view_in(region, walls, at)
 	if look.weight <= 0.0:
 		return 0.0
 	var height := camera.get_viewport_rect().size.y / camera.zoom.y
 	# Where the camera's top would be with no tilt, from the player and the
 	# camera's limits (not the smoothed camera, so it is the same every frame
 	# the player stands still, however fast the frames come).
-	var natural_top := clampf(at.y - height / 2.0, camera.limit_top, camera.limit_bottom - height)
+	var natural_top := clampf(at.y - height / 2.0, camera.limit_top - shift, camera.limit_bottom - shift - height)
 	var margin: float = look.margin if look.margin >= 0.0 else MARGIN
 	var want_top := maxf(look.top, at.y - (height - margin))
 	return minf(0.0, want_top - natural_top) * look.weight
@@ -98,17 +135,21 @@ func target_tilt(camera: Camera2D, at: Vector2) -> float:
 ## The view at [param at]: {top, weight, margin, landmark}, the strongest of the wall rule and
 ## the region's [LandmarkView]s.
 func view_at(at: Vector2) -> Dictionary:
+	return _view_in(_region, _walls, at)
+
+
+func _view_in(region: Node, walls: Array[float], at: Vector2) -> Dictionary:
 	var best := {"top": 0.0, "weight": 0.0, "margin": -1.0, "landmark": ""}
-	for foot in _walls:
+	for foot in walls:
 		var below := at.y - foot
 		var w := 1.0 - clampf((below - WALL_FULL) / WALL_FADE, 0.0, 1.0)
 		if w > best.weight:
 			best = {"top": 0.0, "weight": w, "margin": -1.0, "landmark": ""}
 	for view in get_tree().get_nodes_in_group("landmark_views"):
-		if not (view is LandmarkView) or not is_instance_valid(_region) or not _region.is_ancestor_of(view):
+		if not (view is LandmarkView) or not is_instance_valid(region) or not region.is_ancestor_of(view):
 			continue
 		# A view placed by hand wins over the wall rule where both hold fully.
-		var w: float = view.weight_at(at)
+		var w: float = view.weight_at((region as Node2D).to_global(at))
 		if w > 0.0 and w >= best.weight:
 			best = {"top": view.top, "weight": w, "margin": view.margin, "landmark": view.landmark}
 	return best
