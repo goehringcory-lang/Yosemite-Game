@@ -85,6 +85,18 @@ func _process(_delta: float) -> void:
 		apply()
 
 
+## Takes [param sprite] as one of the region's falls, for a fall added after
+## the region was set up (BackdropFall, from a story overlay).
+func add_fall(sprite: AnimatedSprite2D) -> void:
+	if sprite in _falls:
+		return
+	var mat := ShaderMaterial.new()
+	mat.shader = FLOW_SHADER
+	sprite.material = mat
+	_falls.append(sprite)
+	apply()
+
+
 ## Dresses the falls for today's flow.
 func apply() -> void:
 	_key = "%d:%d" % [GameClock.season, GameClock.day]
