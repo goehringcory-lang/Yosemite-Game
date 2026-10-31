@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/mateo_reyes.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "mateo_reyes"
+display_name = "Mateo Reyes"
+years = "1970s"
+affiliation = "Camp 4 rescue site"
+bio = "Keeps the rescue cache at the Camp 4 search and rescue site: every rope coiled, every litter checked, and a yellow team shirt for each new volunteer. An invented character, not a historical figure."
+idle_lines = PackedStringArray("Every rope in the cache gets coiled the same way, so you can grab one in the dark and throw it clean.", "Yellow shirt's not for looking sharp. It's so a ranger in a helicopter can find you in the trees.", "That wheel goes under the litter for the long trail carries. Six of us on the handles, and the wheel takes the weight.", "Tent cabin's got a wood stove. Best thing about the site in October. Worst thing about it in July.", "Radio's on day and night. You learn to sleep through everything but your call sign.")
+rare_lines = PackedStringArray("My first season, I came to Camp 4 to climb and never left the site. Five years now. I still haven't been up El Cap.")
+rare_after_quest = "jo_first_call"
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.91, 0.722, 0.125, 1)
+home = "Camp 4, at the rescue site"
+staff = true
+sources = "Invented for the game. Yosemite's search and rescue volunteers have lived in canvas tent cabins at the back of Camp 4 for decades, on call for the park's rescues, and wear the team's yellow shirts in the field."

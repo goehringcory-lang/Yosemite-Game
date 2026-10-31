@@ -1,8 +1,9 @@
 extends Node
 ## Search and rescue from Camp 4 (autoload "Rescues"). Camp 4 climbers have
 ## helped with park rescues for decades, and the rescue site is still in the
-## campground. Once Ranger Hodges sends you to Jo Tolliver, who runs the
-## rescue site, some mornings the radio there calls for help, and you answer
+## campground. Once you can belay, Jo Tolliver, who runs the rescue site,
+## takes you on as a volunteer (Mateo Reyes at the cache kits you out), and
+## after that some mornings the radio there calls for help, and you answer
 ## with what the game has already taught you: reading tracks, climbing,
 ## carrying, and knowing the trails. Everyone gets found. Nobody dies.
 ##
@@ -27,8 +28,9 @@ signal changed
 ## Sent when a rescue is finished by you (for the day's page).
 signal rescued(call: Dictionary)
 
-## Jo's character id, Hodges' quest that sends you to Jo, and Jo's quest
-## whose first call teaches the job.
+## Jo's character id, Jo's quest that signs you up as a volunteer (its id is
+## from when Ranger Hodges gave it, kept so saves carry over), and Jo's
+## quest whose first call teaches the job.
 const LEAD := "jo_tolliver"
 const JOIN_QUEST := "hodges_rescue_team"
 const FIRST_QUEST := "jo_first_call"

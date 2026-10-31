@@ -236,10 +236,28 @@ const LOOKS := {
 		"carry": ["rod"],
 	},
 	# ------------------------------------------------ The Camp 4 rescue site (invented, not historical)
+	# The team wears the yellow search and rescue shirt, as Yosemite's
+	# rescuers do, so you can pick them out across a meadow.
 	"jo_tolliver": {
 		"skin": SKIN_BROWN, "hair": "2a1a14", "hair_style": "short", "hat": "helmet", "hat_color": "d84a2a",
-		"top": "d86a2a", "top_style": "jacket", "top2": "a8481e", "bottom": "4a5a6a", "bottom_style": "pants",
+		"top": "e8b820", "top_style": "shirt", "top2": "b88a10", "bottom": "4a5a6a", "bottom_style": "pants",
 		"shoes": "3a2a20", "pack": "pack", "pack_color": "3a5a8a", "carry": ["rope"],
+	},
+	"mateo_reyes": {
+		"skin": SKIN_TAN, "hair": "1a1410", "hair_style": "short", "beard": "short", "beard_color": "1a1410",
+		"hat": "cap", "hat_color": "3a4a3a",
+		"top": "e8b820", "top_style": "shirt", "top2": "b88a10", "bottom": "5a6a4a", "belt": "3a2a1a",
+		"shoes": "4a3020", "carry": ["notebook"],
+	},
+	"visitor_sar_volunteer": {
+		"skin": SKIN_FAIR, "hair": "8a5a2a", "hair_style": "bun", "hat": "helmet", "hat_color": "e8e0d0",
+		"top": "e8b820", "top_style": "shirt", "top2": "b88a10", "bottom": "4a4a52",
+		"shoes": "3a2a20", "pack": "pack", "pack_color": "c8402e", "carry": ["rope"],
+	},
+	"visitor_sar_hauler": {
+		"skin": SKIN_DEEP, "hair": "1a1410", "hat": "beanie", "hat_color": "2a3a4a",
+		"top": "e8b820", "top_style": "shirt", "top2": "b88a10", "bottom": "6a5a42",
+		"shoes": "4a3020", "pack": "frame_pack", "pack_color": "3a5a8a", "carry": ["map"],
 	},
 	# ------------------------------------------------ Ahwahnee staff (invented, not historical)
 	"ahwahnee_chef": {

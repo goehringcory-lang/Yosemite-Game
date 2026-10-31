@@ -5,11 +5,11 @@
 [resource]
 script = ExtResource("1_s")
 id = "hodges_rescue_team"
-title = "The Rescue Site"
-giver = "clare_hodges"
+title = "Volunteer for Search and Rescue"
+giver = "jo_tolliver"
 requires = PackedStringArray("leonard_belay")
-intro = PackedStringArray("You can hold a rope now, Dick Leonard tells me. Good. I have a use for people who can hold a rope.", "My rangers can't be on every trail at once. When somebody's lost or hurt, the climbers at Camp 4 go out with us. They keep a rescue cache in the camp, by the radio.", "Go and see Jo Tolliver there. Tell her I sent you. And take some pilot bread from the station stores: rescues run long, and nobody ever packs enough.")
-steps = [{"type": "talk", "target": "jo_tolliver", "objective": "Talk to Jo Tolliver at the Camp 4 rescue site", "reminder": "Jo Tolliver, at the rescue site in Camp 4. Orange jacket, red helmet, a radio that never stops talking.", "done": ["Hodges sent you? Then you can belay, and you know your way around. That's most of it.", "The rest you learn by doing. Funny you should come by now, too."]}]
+intro = PackedStringArray("You're the one who can hold a rope? Dick Leonard says so, and he doesn't say that about everybody.", "This is the search and rescue site. We live in these tent cabins all season, and when the radio goes, we go: lost hikers, hurt ankles, people stuck on the walls. The rangers can't be on every trail at once.", "We could use another volunteer. Go and see Mateo Reyes at the cache. He'll find you a yellow shirt and show you where everything lives.")
+steps = [{"type": "talk", "target": "mateo_reyes", "objective": "Get your yellow team shirt from Mateo Reyes at the rescue cache in Camp 4", "reminder": "Mateo, at the cache. Green cap, yellow shirt, coiling ropes.", "done": ["Jo signed you up? Welcome to the team.", "Here's your shirt. Yellow, so a helicopter can find you in the trees. Ropes on the pegs, helmets on the shelf, the litter by the boulder, and the radio by the door.", "Take some pilot bread for your pack: rescues run long, and nobody ever packs enough. Then go tell Jo you're ready."]}]
 outro = PackedStringArray()
 reward_items = {
 "pilot_bread": 2

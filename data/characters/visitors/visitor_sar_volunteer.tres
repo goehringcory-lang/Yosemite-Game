@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_sar_volunteer.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "visitor_sar_volunteer"
+display_name = "Rescue volunteer"
+years = "1970s"
+affiliation = "Camp 4 rescue site"
+bio = "A climber living at the Camp 4 search and rescue site for the season, on call for the park's rescues. Not a historical figure."
+idle_lines = PackedStringArray("We climb all day and keep the radio close. If it goes off, the climbing waits.", "Practice lower on Swan Slab this afternoon. Bring your belay gloves.", "Half the team has to be in camp at any time in summer. Today that's me.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Camp 4, at the rescue site"
+visitor = true

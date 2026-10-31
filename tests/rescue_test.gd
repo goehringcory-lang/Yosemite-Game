@@ -1,6 +1,6 @@
 extends Node
-## Plays search and rescue from Camp 4 (Rescues): Hodges sends you to Jo
-## Tolliver at the rescue site, Jo's first call (a boy lost in Cook's
+## Plays search and rescue from Camp 4 (Rescues): Jo Tolliver signs you up
+## at the rescue site and Mateo Reyes kits you out, Jo's first call (a boy lost in Cook's
 ## Meadow) has you follow his prints and carry him back, and after that the
 ## radio calls by season, weather and the climbs you've ticked. Also the
 ## food-sharing and climbing calls, the lower (RescueLower), nightfall, the
@@ -9,6 +9,7 @@ extends Node
 ## Exit code is the number of failed checks. Uses its own save file.
 
 const JO := "jo_tolliver"
+const MATEO := "mateo_reyes"
 
 var failures := 0
 
@@ -70,7 +71,10 @@ func test_data() -> void:
 	check(Friendship.LOVES.has(JO) and GuardianMirror.GATHERING.any(func(e: Array) -> bool: return e[0] == JO), "she has favorite gifts and a line in the cave")
 	var join := QuestLog.get_quest(Rescues.JOIN_QUEST)
 	var first := QuestLog.get_quest(Rescues.FIRST_QUEST)
-	check(join != null and join.giver == "clare_hodges" and "leonard_belay" in join.requires and join.steps[0].target == JO, "Ranger Hodges sends you to Jo once you can belay")
+	check(join != null and join.giver == JO and "leonard_belay" in join.requires and join.steps[0].target == MATEO, "Jo signs you up at the rescue site once you can belay, and sends you to Mateo")
+	var mateo := QuestLog.get_character(MATEO)
+	check(mateo != null and mateo.staff and mateo in QuestLog.STAFF and mateo.sprite_sheet != null and CharacterSheet.has_poses(mateo.sprite_sheet), "Mateo Reyes is invented staff with every pose")
+	check(Portraits.for_speaker("Mateo Reyes") != null and Friendship.LOVES.has(MATEO) and GuardianMirror.GATHERING.any(func(e: Array) -> bool: return e[0] == MATEO), "with a portrait, favorite gifts and a line in the cave")
 	check(first != null and first.giver == JO and Rescues.JOIN_QUEST in first.requires and first.steps[0].ability == Rescues.FIRST_DONE, "Jo's first quest waits on your first rescue")
 	check(Rescues.CALLS.size() >= 6 and Rescues.CALLS.size() <= 8, "six to eight kinds of call (%d)" % Rescues.CALLS.size())
 	var stages := {}
@@ -145,11 +149,13 @@ func test_calls_on_the_map() -> void:
 func test_first_call(world: Node) -> void:
 	_fresh()
 	QuestLog.completed.append_array(["clark_register", "shop_guidebook", "shop_outfit", "partner_apron", "leonard_belay"])
-	check(Rescues.talk_to(JO).is_empty() and not Rescues.on_team(), "Jo has nothing for you until Hodges sends you")
-	var lines := QuestLog.talk_to("clare_hodges")
-	check(QuestLog.active.has(Rescues.JOIN_QUEST) and said(lines, "Jo Tolliver"), "Hodges sends you to Jo")
+	check(Rescues.talk_to(JO).is_empty() and not Rescues.on_team(), "Jo has no calls for you until you've joined")
+	var lines := _talk_to_jo()
+	check(QuestLog.active.has(Rescues.JOIN_QUEST) and said(lines, "volunteer") and said(lines, "Mateo"), "at the rescue site, Jo asks you to volunteer and sends you to Mateo")
+	lines = QuestLog.talk_to(MATEO)
+	check(QuestLog.is_completed(Rescues.JOIN_QUEST) and said(lines, "shirt") and Inventory.count("pilot_bread") >= 2, "Mateo gives you your yellow shirt and some pilot bread")
 	lines = _talk_to_jo()
-	check(QuestLog.is_completed(Rescues.JOIN_QUEST) and QuestLog.active.has(Rescues.FIRST_QUEST), "Jo takes you on, and sets you a first call")
+	check(QuestLog.active.has(Rescues.FIRST_QUEST), "then Jo sets you a first call")
 	check(Rescues.current == Rescues.FIRST_CALL and Rescues.current_stage() == "search", "the radio calls about a lost boy")
 	check(said(lines, "Cook's Meadow"), "she tells you where he was last seen")
 	check(Rescues.objective().contains("prints"), "the Quests tab says to follow his prints")
