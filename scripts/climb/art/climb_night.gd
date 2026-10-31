@@ -210,7 +210,7 @@ static func _ledge(ci: CanvasItem, cx: float, cy: float) -> void:
 	# Anchor bolts and a small gear rack on the wall above.
 	for k in [-50.0, 60.0]:
 		ci.draw_rect(Rect2(cx + k, cy - 70, 3, 3), Color("bdb8ae"))
-	for i in 5:
+	for i in 4:
 		ci.draw_texture(ClimbSprites.hardware("cam", i), Vector2(cx + 96 + i * 6, cy - 70 + (i % 2) * 2), Color(0.961, 0.933, 0.878, 0.9))
 
 
@@ -311,4 +311,4 @@ static func _card(ci: CanvasItem, info: Dictionary, age: float, hanging: bool) -
 	for i in lines.size():
 		UI.ink(ci, Vector2(r.position.x + 10, r.position.y + 50 + i * 11), lines[i], UI.INK, 10)
 	if age > 0.8:
-		UI.keys(ci, Vector2(r.position.x + 85, r.end.y - 8), "[E] Sleep until dawn", UI.WARN_DARK, 10, HORIZONTAL_ALIGNMENT_CENTER)
+		UI.keys(ci, Vector2(r.position.x + 85, r.end.y - 8), "[%s] Sleep until dawn" % UI.button(ci, "E", "A"), UI.WARN_DARK, 10, HORIZONTAL_ALIGNMENT_CENTER)

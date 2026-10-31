@@ -190,7 +190,9 @@ func _on_item_added(id: String, amount: int) -> void:
 func _on_gear_added(id: String, amount: int) -> void:
 	var gear := Gear.get_gear(id)
 	if gear:
-		toasts.notify("gear:" + id, gear.icon, gear.display_name, amount)
+		# a cam shows its size: the newest one on the rack (CamSizes)
+		var icon := CamSizes.icon(Gear.count(id) - 1) if id == "cam" else gear.icon
+		toasts.notify("gear:" + id, icon, gear.display_name, amount)
 		Sound.play("item_get", 0.0, 0.0)
 
 

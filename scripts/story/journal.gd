@@ -771,7 +771,14 @@ func _backpack_page() -> void:
 	var gear: Array[Dictionary] = []
 	for item: GearData in Gear.GEAR:
 		var n := Gear.count(item.id)
-		if n > 0:
+		if n > 0 and item.id == "cam":
+			# the rack, a slot per size, each in its color (CamSizes)
+			var sizes := CamSizes.counts(n)
+			for i in sizes.size():
+				if sizes[i] > 0:
+					gear.append({"name": "%s %s" % [item.display_name, CamSizes.SIZES[i].size], "count": sizes[i], "icon": CamSizes.icon(i),
+						"facts": CamSizes.SIZES[i].fits, "description": item.description})
+		elif n > 0:
 			gear.append({"name": item.display_name, "count": n, "icon": item.icon, "facts": "", "description": item.description})
 	_slot_section("Climbing gear", gear, "None yet.")
 

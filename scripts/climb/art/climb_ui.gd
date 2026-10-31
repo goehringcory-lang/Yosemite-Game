@@ -98,6 +98,14 @@ static func keys_width(s: String, size := 10) -> float:
 	return ButtonHints.line_width(font(), size, s)
 
 
+## The name of the button to show in a keys hint drawn on [param ci]:
+## [param keyboard] ("Space") or [param gamepad] ("X"), for the device in use.
+## The climbing screens' pad buttons are listed on the pause menu's Controls
+## page: E is A, Space is X, Esc is B, Shift is Y, and the arrows are the stick.
+static func button(ci: CanvasItem, keyboard: String, gamepad: String) -> String:
+	return MenuInput.button(ci.get_tree() if ci and ci.is_inside_tree() else null, keyboard, gamepad)
+
+
 static func wrapped(ci: CanvasItem, pos: Vector2, s: String, width: float, color := INK, size := 10, shadow := false, line_gap := 2) -> int:
 	var f := font()
 	var lines := wrap_lines(s, width, size)
@@ -497,7 +505,13 @@ static var _icon_cache: Dictionary = {}
 static func icon_texture(id: String) -> Texture2D:
 	if _icon_cache.has(id):
 		return _icon_cache[id]
-	var rows: Array = ICONS.get(id, [])
+	# "cam:2" is the cam in size 2's color (CamSizes): its lobes and its sling.
+	var colors := ICON_COLORS
+	if id.begins_with("cam:"):
+		var c := CamSizes.color(int(id.get_slice(":", 1)))
+		colors = ICON_COLORS.duplicate()
+		colors.merge({"h": c.lightened(0.45), "r": c, "R": c.darkened(0.3), "u": c.lightened(0.3), "y": c.darkened(0.1), "Y": c.darkened(0.35)}, true)
+	var rows: Array = ICONS.get(id.get_slice(":", 0), [])
 	if rows.is_empty():
 		return null
 	var im := Image.create_empty(12, 12, false, Image.FORMAT_RGBA8)
@@ -505,8 +519,8 @@ static func icon_texture(id: String) -> Texture2D:
 		var line: String = rows[y]
 		for x in line.length():
 			var ch := line[x]
-			if ICON_COLORS.has(ch):
-				im.set_pixel(x, y, ICON_COLORS[ch])
+			if colors.has(ch):
+				im.set_pixel(x, y, colors[ch])
 	var tex := ImageTexture.create_from_image(im)
 	_icon_cache[id] = tex
 	return tex
