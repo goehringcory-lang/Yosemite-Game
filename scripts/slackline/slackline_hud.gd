@@ -126,17 +126,17 @@ static func trick_prompt(ci: CanvasItem, state: SlacklineState, key: String, tim
 	var t := state.next_trick_info()
 	var ready := state.can_trick()
 	var doing := not state.trick.is_empty()
-	var label := "%s  Trick: %s" % [key, t.name]
+	var label := "[%s] Trick: %s" % [key, t.name]
 	if doing:
 		label = state.trick.name + "..."
-	var w := UI.text_width(label, 10) + 18
+	var w := UI.keys_width(label, 10) + 18
 	var r := Rect2((SCREEN.x - w) / 2.0, SCREEN.y - 26, w, 18)
 	ci.modulate.a = 1.0 if ready or doing else 0.55
 	UI.panel(ci, r)
 	var col := UI.GOLD if doing else (UI.INK if ready else UI.INK_SOFT)
 	if ready and fmod(time, 1.0) < 0.12:
 		col = UI.CREAM
-	UI.ink(ci, Vector2(r.position.x + 9, r.position.y + 13), label, col, 10)
+	UI.keys(ci, Vector2(r.position.x + 9, r.position.y + 13), label, col, 10)
 	ci.modulate.a = 1.0
 
 
@@ -144,11 +144,11 @@ static func trick_prompt(ci: CanvasItem, state: SlacklineState, key: String, tim
 static func hint(ci: CanvasItem, text: String, y: float, alpha: float) -> void:
 	if alpha <= 0.0:
 		return
-	var w := UI.text_width(text, 10) + 16
+	var w := UI.keys_width(text, 10) + 16
 	var r := Rect2((SCREEN.x - w) / 2.0, y, w, 18)
 	ci.modulate.a = alpha
 	UI.panel(ci, r)
-	UI.ink(ci, Vector2(r.position.x + 8, r.position.y + 13), text, UI.INK, 10)
+	UI.keys(ci, Vector2(r.position.x + 8, r.position.y + 13), text, UI.INK, 10)
 	ci.modulate.a = 1.0
 
 
@@ -261,7 +261,7 @@ static func select_card(ci: CanvasItem, rows: Array[Dictionary], chosen: int, ag
 	ci.draw_rect(Rect2(x, y + 2, w - 32, 1), UI.PAPER_DARK)
 	for i in blurb.size():
 		UI.ink(ci, Vector2(x, y + 16 + i * 12), blurb[i], UI.INK, 10)
-	UI.ink(ci, Vector2(r.get_center().x, r.end.y - 10), keys, UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.keys(ci, Vector2(r.get_center().x, r.end.y - 10), keys, UI.INK_SOFT, 10, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 static func _locked_text(line: Dictionary) -> String:
@@ -326,7 +326,7 @@ static func result_card(ci: CanvasItem, info: Dictionary, age: float, keys: Stri
 		if land >= 1.0:
 			UI.ink(ci, at + Vector2(0, 18), MEDAL_NAMES[info.medal], MEDALS[info.medal - 1][2], 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 	if age >= t:
-		UI.ink(ci, Vector2(r.get_center().x, r.end.y - 10), keys, UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+		UI.keys(ci, Vector2(r.get_center().x, r.end.y - 10), keys, UI.INK_SOFT, 10, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 ## Seconds until a results card with [param rows] rows has counted up.

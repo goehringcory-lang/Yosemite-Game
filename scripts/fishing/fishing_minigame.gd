@@ -120,7 +120,7 @@ func _ready() -> void:
 	_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.draw.connect(_draw)
 	add_child(_canvas)
-	_label = Label.new()
+	_label = ButtonHints.new()
 	_label.position = Vector2(BAR.position.x - 70, BAR.end.y + 8)
 	_label.custom_minimum_size = Vector2(162, 0)
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -336,7 +336,7 @@ func _show_label() -> void:
 	if phase == Phase.WAIT:
 		_label.text = "The fly drifts..." if forward_cast != "" else "Waiting for a bite..."
 	elif phase == Phase.REEL:
-		_label.text = "!  Hold %s to reel" % _use_button()
+		_label.text = "!  Hold [%s] to reel" % _use_button()
 
 
 func _use_button() -> String:
@@ -376,10 +376,10 @@ func _draw_meter() -> void:
 	var mx := bar.position.x + bar.size.x * meter_pos
 	ci.draw_rect(Rect2(mx - 1, bar.position.y - 4, 3, bar.size.y + 8), ClimbUI.WOOD_DARK)
 	ci.draw_rect(Rect2(mx, bar.position.y - 3, 1, bar.size.y + 6), ClimbUI.CREAM)
-	var hint := "%s: stop in the green" % _use_button()
+	var hint := "[%s] Stop in the green" % _use_button()
 	if fly.has("name"):
 		hint += "  ·  %s" % fly.name
-	ClimbUI.ink(ci, Vector2(bar.position.x + bar.size.x / 2, CARD.end.y - 14), hint, ClimbUI.INK_SOFT, 9, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+	ClimbUI.keys(ci, Vector2(bar.position.x + bar.size.x / 2, CARD.end.y - 14), hint, ClimbUI.INK_SOFT, 9, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 ## A stick of an angler with the rod up: the line loops out behind on the

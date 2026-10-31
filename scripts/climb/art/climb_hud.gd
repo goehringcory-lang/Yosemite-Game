@@ -139,10 +139,10 @@ static func toolbar(ci: CanvasItem, state: ClimbState, time: float, usable: Dict
 static func hints(ci: CanvasItem, text: String, x: float) -> void:
 	if text == "":
 		return
-	var w := UI.text_width(text, 10) + 16
+	var w := UI.keys_width(text, 10) + 16
 	var r := Rect2(x, SCREEN.y - 28, w, 18)
 	UI.panel(ci, r)
-	UI.ink(ci, Vector2(r.position.x + 8, r.position.y + 13), text, UI.INK, 10)
+	UI.keys(ci, Vector2(r.position.x + 8, r.position.y + 13), text, UI.INK, 10)
 
 
 ## What just happened, as a parchment note under the route plate.
@@ -219,7 +219,7 @@ static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, t
 	match kind:
 		"pumped":
 			UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 37), "You missed the green. Your arms are done.", UI.INK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
-			UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 54), "E: eat %s (+%d), then try again" % [data.food, data.energy], UI.GOOD_DARK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+			UI.keys(ci, Vector2(r.position.x + 110, r.position.y + 54), "[E] Eat %s (+%d), then try again" % [data.food, data.energy], UI.GOOD_DARK, 10, HORIZONTAL_ALIGNMENT_CENTER)
 		"timing":
 			ci.draw_rect(bar.grow(1), UI.WOOD_DARK)
 			ci.draw_rect(bar, Color("5e4a38"))
@@ -235,7 +235,7 @@ static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, t
 			var mx: float = bar.position.x + bar.size.x * float(data.pos)
 			ci.draw_rect(Rect2(mx - 1, bar.position.y - 4, 3, bar.size.y + 8), UI.WOOD_DARK)
 			ci.draw_rect(Rect2(mx, bar.position.y - 3, 1, bar.size.y + 6), UI.CREAM)
-			UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 58), "Space: stop in the green", UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+			UI.keys(ci, Vector2(r.position.x + 110, r.position.y + 58), "[Space] Stop in the green", UI.INK_SOFT, 10, HORIZONTAL_ALIGNMENT_CENTER)
 		"dyno":
 			ci.draw_rect(bar.grow(1), UI.WOOD_DARK)
 			ci.draw_rect(bar, Color("5e4a38"))
@@ -256,8 +256,8 @@ static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, t
 			if not data.holding:
 				var tleft: float = data.time_left
 				ci.draw_rect(Rect2(bar.position.x, bar.end.y + 4, bar.size.x * clampf(tleft / float(data.time_total), 0.0, 1.0), 2), UI.GOLD)
-			var prompt := "Let go in the green!" if data.holding else "Hold Space to sink onto the wing"
-			UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 58), prompt, UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+			var prompt := "Let go in the green!" if data.holding else "Hold [Space] to sink onto the wing"
+			UI.keys(ci, Vector2(r.position.x + 110, r.position.y + 58), prompt, UI.INK_SOFT, 10, HORIZONTAL_ALIGNMENT_CENTER)
 		"rhythm", "mash":
 			var need: int = data.need
 			var done: int = data.done
@@ -407,7 +407,7 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 	UI.icon(ci, "food", Vector2(x, fy - 9))
 	var ok := state.food_ready(recommended_food)
 	UI.ink(ci, Vector2(x + 16, fy), "Food: %d energy" % carrying + ("" if recommended_food <= 0 else "  (bring about %d)" % recommended_food), UI.GOOD_DARK if ok else UI.WARN_DARK, 10)
-	UI.ink(ci, Vector2(r.end.x - 16, fy), "Esc: not yet" if too_late else "E: start climbing     Esc: not yet", UI.INK_SOFT, 10, 240.0, HORIZONTAL_ALIGNMENT_RIGHT)
+	UI.keys(ci, Vector2(r.end.x - 16, fy), "[Esc] Not yet" if too_late else "[E] Start climbing    [Esc] Not yet", UI.INK_SOFT, 10, HORIZONTAL_ALIGNMENT_RIGHT)
 
 
 static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, belayer_line: String, age: float, won: bool) -> void:
@@ -470,7 +470,7 @@ static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, 
 		ly += 6.0 + quote.size() * 11.0
 	for i in fact_lines.size():
 		UI.ink(ci, Vector2(x, ly + 6 + i * 11), fact_lines[i], UI.INK_SOFT, 10)
-	UI.ink(ci, Vector2(r.end.x - 16, r.end.y - 10), "E: continue", UI.INK_SOFT, 10, 120.0, HORIZONTAL_ALIGNMENT_RIGHT)
+	UI.keys(ci, Vector2(r.end.x - 16, r.end.y - 10), "[E] Continue", UI.INK_SOFT, 10, HORIZONTAL_ALIGNMENT_RIGHT)
 
 
 static func pause_card(ci: CanvasItem, state: ClimbState) -> void:
@@ -484,4 +484,4 @@ static func pause_card(ci: CanvasItem, state: ClimbState) -> void:
 		note = "The problem will still be here tomorrow."
 	UI.ink(ci, Vector2(r.position.x + 100, r.position.y + 22), verb, UI.INK, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 	UI.ink(ci, Vector2(r.position.x + 100, r.position.y + 38), note, UI.INK_SOFT, 10, 190.0, HORIZONTAL_ALIGNMENT_CENTER)
-	UI.ink(ci, Vector2(r.position.x + 100, r.position.y + 62), "E: yes, retreat     Esc: keep climbing", UI.WARN_DARK, 10, 190.0, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.keys(ci, Vector2(r.position.x + 100, r.position.y + 62), "[E] Yes, retreat    [Esc] Keep climbing", UI.WARN_DARK, 10, HORIZONTAL_ALIGNMENT_CENTER)

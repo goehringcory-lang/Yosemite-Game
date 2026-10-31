@@ -1115,31 +1115,31 @@ func _hint() -> String:
 	if state.status != ClimbState.Status.CLIMBING:
 		return ""
 	if state.is_pumped():
-		return "E: eat, then try the move again"
+		return "[E] Eat, then try the move again"
 	var parts: Array[String] = []
 	if state.can_clip():
-		parts.append("Space: clip the bolt" if state.bolt_kinds.get(state.row, "bolt") == "bolt" else "Space: clip the old piton")
+		parts.append("[Space] Clip the bolt" if state.bolt_kinds.get(state.row, "bolt") == "bolt" else "[Space] Clip the old piton")
 	elif state.can_place_cam():
-		parts.append("Space: place a cam")
+		parts.append("[Space] Place a cam")
 	if state.is_at_belay() and (not route.boulder or state.can_eat()):
 		if state.can_eat():
-			parts.append("E: eat")
+			parts.append("[E] Eat")
 	elif state.can_shake():
-		parts.append("E: shake out")
+		parts.append("[E] Shake out")
 	elif state.can_chalk():
-		parts.append("E: chalk up")
+		parts.append("[E] Chalk up")
 	for dx in [-1, 0, 1]:
 		if state.can_jug(dx):
-			parts.append("Shift+arrow: jug")
+			parts.append("[Shift]+[Arrows] Jug")
 			break
 	for dx in [-1, 0, 1]:
 		if state.can_aid(dx):
-			parts.append("Shift+arrow: aid")
+			parts.append("[Shift]+[Arrows] Aid")
 			break
 	if parts.is_empty():
 		# The reminder is for the first minute; after that it just covers the wall.
-		return "Arrows: climb     Esc: retreat" if _time < 40.0 and state.pitch == 0 else ""
-	return "     ".join(parts)
+		return "[Arrows] Climb    [Esc] Retreat" if _time < 40.0 and state.pitch == 0 else ""
+	return "    ".join(parts)
 
 
 func _usable() -> Dictionary:

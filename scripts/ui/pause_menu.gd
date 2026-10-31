@@ -51,6 +51,8 @@ const HEADING := Color(1, 0.831, 0.541)
 const DIM := Color(0.961, 0.933, 0.878, 0.6)
 const PANEL_POS := Vector2(30, 16)
 const PANEL_SIZE := Vector2(420, 238)
+## The shortest the panel gets when it fits a short page.
+const PANEL_MIN_HEIGHT := 150.0
 ## The width of the card beside the pause menu's choices.
 const CARD_WIDTH := 132.0
 const NAME_WIDTH := 96
@@ -362,6 +364,17 @@ func close() -> void:
 	closed.emit()
 
 
+## Sizes the panel to the page showing, centered on the screen, so a short
+## page isn't a tall board with its bottom half empty.
+func _fit_panel() -> void:
+	_panel.custom_minimum_size = Vector2(PANEL_SIZE.x, 0)
+	var height := clampf(_panel.get_combined_minimum_size().y + 6.0, PANEL_MIN_HEIGHT, UiScale.SCREEN.y - 8.0)
+	_panel.size = Vector2(PANEL_SIZE.x, height)
+	_panel.custom_minimum_size = _panel.size
+	_panel.position = Vector2(PANEL_POS.x, roundf((UiScale.SCREEN.y - height) / 2.0))
+	_panel.pivot_offset = _panel.size / 2.0
+
+
 ## The page showing now (Page.MAIN, SETTINGS or CONTROLS).
 func page() -> Page:
 	return _page
@@ -374,6 +387,7 @@ func _show_page(which: Page) -> void:
 	for i in _pages.size():
 		_pages[i].visible = i == which
 	_title.text = ["Paused", "Settings", "Controls"][which]
+	_fit_panel.call_deferred()
 	if which == Page.SETTINGS:
 		_settings_cursor = 0
 		_restart_sample()

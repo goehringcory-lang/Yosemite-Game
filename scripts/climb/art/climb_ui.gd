@@ -84,6 +84,20 @@ static func ink(ci: CanvasItem, pos: Vector2, s: String, color := INK, size := 1
 	ci.draw_string(font(), _aligned(pos, s, size, align).round(), s, HORIZONTAL_ALIGNMENT_LEFT, width, size, color)
 
 
+## Like [method ink], but each "[key]" in [param s] is drawn as a pixel
+## button (see ButtonHints), for the keys hints on the climbing screens.
+static func keys(ci: CanvasItem, pos: Vector2, s: String, color := INK, size := 10, align := HORIZONTAL_ALIGNMENT_LEFT) -> void:
+	var f := font()
+	var w := keys_width(s, size)
+	if align != HORIZONTAL_ALIGNMENT_LEFT:
+		pos.x -= w * 0.5 if align == HORIZONTAL_ALIGNMENT_CENTER else w
+	ButtonHints.draw_hint(ci, f, size, s, Vector2(pos.x, pos.y - f.get_ascent(size)).round(), color)
+
+
+static func keys_width(s: String, size := 10) -> float:
+	return ButtonHints.line_width(font(), size, s)
+
+
 static func wrapped(ci: CanvasItem, pos: Vector2, s: String, width: float, color := INK, size := 10, shadow := false, line_gap := 2) -> int:
 	var f := font()
 	var lines := wrap_lines(s, width, size)

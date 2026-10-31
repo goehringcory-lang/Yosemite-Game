@@ -447,11 +447,11 @@ func _draw_hud() -> void:
 	ClimbUI.ink(ci, Vector2(14, 32), "%d%% of the way down  ·  %s" % [roundi(depth * 100.0), left], ClimbUI.INK_SOFT, 10, 156)
 	_gauge(SPEED_BAR, speed / MAX_SPEED, ClimbUI.GOOD if speed <= SAFE_SPEED else (ClimbUI.GOLD if speed <= HOT_SPEED else ClimbUI.WARN), "speed", SAFE_SPEED / MAX_SPEED)
 	_gauge(HEAT_BAR, heat, Color("b3362b") if _locked > 0.0 else ClimbUI.WARN, "brake", -1.0)
-	var hint := "Hold %s: let the rope run  ·  release: brake  ·  Esc: hand it to the team" % _use_button()
-	var w := ClimbUI.text_width(hint, 10) + 16
+	var hint := "Hold [%s] Let the rope run  ·  Let go to brake  ·  [Esc] Hand it to the team" % _use_button()
+	var w := ClimbUI.keys_width(hint, 10) + 16
 	var r := Rect2(roundf((SCREEN.x - w) / 2.0), SCREEN.y - 26, w, 18)
 	ClimbUI.panel(ci, r)
-	ClimbUI.ink(ci, Vector2(r.position.x + 8, r.position.y + 13), hint, ClimbUI.INK, 10)
+	ClimbUI.keys(ci, Vector2(r.position.x + 8, r.position.y + 13), hint, ClimbUI.INK, 10)
 
 
 ## An upright gauge in a wood frame, filled [param frac] from the bottom,

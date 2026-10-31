@@ -17,7 +17,7 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | Text never collides | Long place names drop their leading parts so the banner never runs into the clock | `HUD.set_location` | test |
 | The place name shows as you arrive | The banner names where you are, then fades after four seconds, and comes back when you go somewhere new | `HUD.set_location` | by eye |
 | Interact prompt | A drawn E key and "Talk to Wren" over the player; the pad's A button on a gamepad | `hud.gd` (existing) | settings test |
-| Buttons drawn as buttons | Every hint draws its keys as pixel buttons, not names in brackets: keycaps (arrows as arrows), the pad's colored face buttons, shoulder pills, a D-pad | `scripts/ui/button_hints.gd` | test (text kept, keys read, never wider than the old text, pad or keys by setting) |
+| Buttons drawn as buttons | Every hint draws its keys as pixel buttons, not names in brackets: keycaps (arrows as arrows), the pad's colored face buttons, shoulder pills, a D-pad; the climbing, slackline, fishing and rescue screens draw theirs the same way | `scripts/ui/button_hints.gd`, `ClimbUI.keys` | test (text kept, keys read, never wider than the old text, pad or keys by setting) |
 | A clear screen | The hint line naming the book's keys fades eight seconds after you arrive or close a menu | `HUD._show_hints` | settings test |
 | A save message | "Good morning! Your game was saved." | `world.gd` (existing) | smoke test |
 
