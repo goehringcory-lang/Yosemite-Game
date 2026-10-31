@@ -288,7 +288,7 @@ func _climb_input(event: InputEvent) -> void:
 		elif assist and state.can_aid(dx):
 			state.aid_step(dx)
 		elif assist:
-			state.message = "Shift + an arrow aids a hard move (aiders) or jugs a fixed rope (ascenders), if you have them and it's there."
+			state.message = "%s aids a hard move (aiders) or jugs a fixed rope (ascenders), if you have them and it's there." % _button("Shift + an arrow", "Y + the stick")
 			_toast(state.message)
 		else:
 			state.move(dx)
@@ -903,6 +903,7 @@ func _bolt_pos(cell: Vector2i) -> Vector2:
 
 ## Quickdraws hanging from clipped bolts, and cams in their cracks.
 func _draw_protection() -> void:
+	var cams := 0
 	for piece: Dictionary in state.protection:
 		var cell: Vector2i = piece.cell
 		if piece.kind == "draw":
@@ -911,8 +912,9 @@ func _draw_protection() -> void:
 			_canvas.draw_texture(tex, p + Vector2(-5, -2))
 		else:
 			var p := (_screen(cell.y, cell.x) + Vector2(4, -4)).round()
-			var ci := (cell.y + cell.x) % ClimbSprites.CAM_COLORS.size()
-			_canvas.draw_texture(ClimbSprites.hardware("cam", ci), p + Vector2(-6, -4))
+			# cams go in in rack order, so each shows its size's color (CamSizes)
+			_canvas.draw_texture(ClimbSprites.hardware("cam", CamSizes.size_of(cams)), p + Vector2(-6, -4))
+			cams += 1
 
 
 ## Where the rope leaves each piece of protection.
@@ -1111,34 +1113,39 @@ func _pose() -> Dictionary:
 	return a
 
 
+## [param keyboard] or [param gamepad], for the device in use (MenuInput.button).
+func _button(keyboard: String, gamepad: String) -> String:
+	return MenuInput.button(get_tree() if is_inside_tree() else null, keyboard, gamepad)
+
+
 func _hint() -> String:
 	if state.status != ClimbState.Status.CLIMBING:
 		return ""
 	if state.is_pumped():
-		return "[E] Eat, then try the move again"
+		return "[%s] Eat, then try the move again" % _button("E", "A")
 	var parts: Array[String] = []
 	if state.can_clip():
-		parts.append("[Space] Clip the bolt" if state.bolt_kinds.get(state.row, "bolt") == "bolt" else "[Space] Clip the old piton")
+		parts.append("[%s] %s" % [_button("Space", "X"), "Clip the bolt" if state.bolt_kinds.get(state.row, "bolt") == "bolt" else "Clip the old piton"])
 	elif state.can_place_cam():
-		parts.append("[Space] Place a cam")
+		parts.append("[%s] Place a cam" % _button("Space", "X"))
 	if state.is_at_belay() and (not route.boulder or state.can_eat()):
 		if state.can_eat():
-			parts.append("[E] Eat")
+			parts.append("[%s] Eat" % _button("E", "A"))
 	elif state.can_shake():
-		parts.append("[E] Shake out")
+		parts.append("[%s] Shake out" % _button("E", "A"))
 	elif state.can_chalk():
-		parts.append("[E] Chalk up")
+		parts.append("[%s] Chalk up" % _button("E", "A"))
 	for dx in [-1, 0, 1]:
 		if state.can_jug(dx):
-			parts.append("[Shift]+[Arrows] Jug")
+			parts.append("[%s]+[%s] Jug" % [_button("Shift", "Y"), _button("Arrows", "Stick")])
 			break
 	for dx in [-1, 0, 1]:
 		if state.can_aid(dx):
-			parts.append("[Shift]+[Arrows] Aid")
+			parts.append("[%s]+[%s] Aid" % [_button("Shift", "Y"), _button("Arrows", "Stick")])
 			break
 	if parts.is_empty():
 		# The reminder is for the first minute; after that it just covers the wall.
-		return "[Arrows] Climb    [Esc] Retreat" if _time < 40.0 and state.pitch == 0 else ""
+		return "[%s] Climb    [%s] Retreat" % [_button("Arrows", "Stick"), _button("Esc", "B")] if _time < 40.0 and state.pitch == 0 else ""
 	return "    ".join(parts)
 
 

@@ -64,6 +64,8 @@ var _curfew_pending := false
 @onready var park_map: ParkMap = $ParkMap
 ## The forest past the map edges, seen only beside a seam.
 var backdrop := SeamBackdrop.new()
+## Tilts the camera up at the cliffs; also carries its lag over a seam.
+var framing := LandmarkFraming.new()
 ## Today's events, for the page at bedtime.
 var day_log: DayLog
 
@@ -89,6 +91,7 @@ func _ready() -> void:
 	add_child(SunLight.new())
 	add_child(AirGlow.new())
 	add_child(RoomLight.new())
+	add_child(framing)
 	add_child(backdrop)
 	# The camera eases to its limits, so when a seam opens the view over the
 	# edge (or closes it) it pans there instead of jumping.
@@ -564,9 +567,12 @@ func _cross_seam() -> void:
 	(player.get_node("SmoothMotion") as SmoothMotion).shift(shift)
 	_fit_camera()
 	camera.reset_smoothing()
-	# Carry the camera's lag over, so it eases in as it would have.
-	camera.offset = lag
-	create_tween().tween_property(camera, "offset", Vector2.ZERO, 1.0 / camera.position_smoothing_speed) \
+	# Carry the camera's lag over, so it eases in as it would have. The lag
+	# is measured past the framing's tilt, which carries over by itself.
+	framing.crossed(region, shift)
+	framing.carry = lag - Vector2(0.0, roundf(framing.tilt))
+	camera.offset = Vector2(framing.carry.x, roundf(framing.tilt) + framing.carry.y)
+	create_tween().tween_property(framing, "carry", Vector2.ZERO, 1.0 / camera.position_smoothing_speed) \
 			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 	_arrive()
 
