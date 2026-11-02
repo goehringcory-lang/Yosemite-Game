@@ -49,7 +49,7 @@ func _ready() -> void:
 		StoryContent.attach(region)
 		var exits: Array = region.find_children("*", "RegionExit", true, false)
 		var uses: Array = region.find_children("*", "", true, false).filter(func(n: Node) -> bool:
-			return n is RegionDoor or n is ShuttleStop or n is TravelPoint or n is WorkSpot
+			return n is RegionDoor or n is ShuttleStop or n is TravelPoint or n is WorkSpot \
 				or n is BackcountryCamp or n is DivingBoard)
 		ways[region_id] = _ways_out(region)
 		var start := _start(region)
