@@ -38,6 +38,7 @@ func _ready() -> void:
 	GameClock.paused = true
 	await test_pause_settings()
 	test_pause_graphics()
+	test_graphics_watch()
 	test_prompts()
 	await test_book()
 	await test_dialogue_reveal()
@@ -77,7 +78,7 @@ func test_graphics() -> void:
 	Settings.load_settings()
 	var override := Settings.graphics_override_path()
 	check(override != Settings.GRAPHICS_OVERRIDE, "a test keeps its own override file (%s)" % override)
-	check(Settings.graphics == Settings.Graphics.HIGH, "graphics default to High")
+	check(Settings.graphics == Settings.Graphics.AUTO and not Settings.low(), "graphics default to Auto, which starts as High")
 	check(ProjectSettings.get_setting("rendering/renderer/rendering_method") == "forward_plus", "the project runs on Forward+")
 	check(ProjectSettings.get_setting("application/config/project_settings_override") == Settings.GRAPHICS_OVERRIDE,
 		"the project reads the graphics override file")
@@ -92,20 +93,58 @@ func test_graphics() -> void:
 	Settings.graphics = Settings.Graphics.HIGH
 	Settings.save()
 	check(not FileAccess.file_exists(override), "High removes the override file")
+	# Auto: High until it finds the computer slow, then Low
+	Settings.graphics = Settings.Graphics.AUTO
+	Settings.auto_low = true
+	Settings.save()
+	check(Settings.low() and Settings.graphics_name() == "Auto (Low)", "Auto on a slow computer is Low")
+	check(config.load(override) == OK and config.get_value("rendering", "renderer/rendering_method", "") == "gl_compatibility",
+		"and starts next time on the Compatibility renderer")
+	Settings.reset_defaults()
+	Settings.load_settings()
+	check(Settings.graphics == Settings.Graphics.AUTO and Settings.auto_low, "Auto's finding loads back")
+	Settings.auto_low = false
+	Settings.save()
+	check(not FileAccess.file_exists(override) and Settings.graphics_name() == "Auto (High)", "Auto on a fast computer is High")
+	# settings from before Auto: High becomes Auto, Low stays Low
+	var old := ConfigFile.new()
+	old.set_value("display", "graphics", 0)
+	old.save(TEST_PATH)
+	Settings.load_settings()
+	check(Settings.graphics == Settings.Graphics.AUTO, "an old High setting becomes Auto")
+	old.set_value("display", "graphics", 1)
+	old.save(TEST_PATH)
+	Settings.load_settings()
+	check(Settings.graphics == Settings.Graphics.LOW, "an old Low setting stays Low")
+	Settings.graphics = Settings.Graphics.AUTO
+	Settings.save()
 
 
-## The pause menu's Graphics row steps between High and Low and says a change
-## waits for a restart.
+## The pause menu's Graphics row steps Auto, High, Low and says a renderer
+## change waits for a restart.
 func test_pause_graphics() -> void:
 	var pause: PauseMenu = get_tree().get_first_node_in_group("pause_menu")
-	Settings._started_graphics = Settings.graphics
-	check(pause._setting_value(PauseMenu.Setting.GRAPHICS) == "‹  High  ›", "the pause menu shows High")
+	Settings.graphics = Settings.Graphics.AUTO
+	Settings.auto_low = false
+	Settings._started_renderer = Settings.renderer()
+	check(pause._setting_value(PauseMenu.Setting.GRAPHICS) == "‹  Auto (High)  ›", "the pause menu shows Auto (High)")
+	pause.change_setting(PauseMenu.Setting.GRAPHICS, 1)
+	check(Settings.graphics == Settings.Graphics.HIGH and pause._setting_value(PauseMenu.Setting.GRAPHICS) == "‹  High  ›",
+		"then High, with nothing to wait for")
 	pause.change_setting(PauseMenu.Setting.GRAPHICS, 1)
 	check(Settings.graphics == Settings.Graphics.LOW and pause._setting_value(PauseMenu.Setting.GRAPHICS) == "‹  Low (on restart)  ›",
-		"a change shows it waits for a restart")
+		"Low shows it waits for a restart")
 	pause.change_setting(PauseMenu.Setting.GRAPHICS, 1)
-	check(Settings.graphics == Settings.Graphics.HIGH and not FileAccess.file_exists(Settings.graphics_override_path()),
-		"and steps back to High, removing the override")
+	check(Settings.graphics == Settings.Graphics.AUTO and not FileAccess.file_exists(Settings.graphics_override_path()),
+		"and steps back round to Auto, removing the override")
+
+
+## GraphicsWatch: the typical frame decides, so one long hitch doesn't count.
+func test_graphics_watch() -> void:
+	var frames := PackedFloat32Array([16.0, 17.0, 16.5, 400.0, 16.2])
+	check(GraphicsWatch.median(frames) < GraphicsWatch.SLOW_MS, "one long hitch isn't a slow computer")
+	frames = PackedFloat32Array([33.0, 34.0, 16.0, 33.5, 35.0])
+	check(GraphicsWatch.median(frames) > GraphicsWatch.SLOW_MS, "steady 30 frames a second is")
 
 
 func test_bad_values() -> void:
