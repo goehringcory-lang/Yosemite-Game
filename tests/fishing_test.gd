@@ -346,6 +346,48 @@ func test_greg_in_camp(world: Node) -> void:
 	check(hole != null and hole.kind == "hole" and player.fishing.get_prompt() == "Fish Stoneman Hole", "and from it you cast into Stoneman Hole (%s)" % player.fishing.get_prompt())
 	var box: StoryPickup = world.region.find_child("GregFlyBox", true, false)
 	check(box != null and box.item_id == "greg_fly_box" and not Fishing.is_water(ground, box.global_position), "his fly box lies on the bank")
+	if box == null:
+		return
+	await _test_fly_box(world, box, ground)
+
+
+## The quest sends you to the Merced's bank below Stoneman Meadow, "where the
+## grass meets the water": the box has to be there, out in the open where you
+## can see it (no flowers or grass drawn over it), and you have to be able to
+## walk up to it and pick it up.
+func _test_fly_box(world: Node, box: StoryPickup, ground: TileMapLayer) -> void:
+	var at := box.global_position
+	var meadow: Node2D = world.region.find_child("StonemanMeadow", true, false)
+	check(meadow != null and absf(at.x - meadow.global_position.x) < 96.0 and at.y > meadow.global_position.y, "the fly box is below Stoneman Meadow")
+	var by_water := false
+	for reach in [16.0, 24.0, 32.0, 40.0]:
+		by_water = by_water or Fishing.is_water(ground, at + Vector2(0, reach))
+	check(by_water, "right where the grass meets the water")
+	var footprint := Rect2(at + Vector2(-20, -26), Vector2(40, 40))
+	var over: Array[String] = []
+	for sprite: Sprite2D in world.region.find_children("*", "Sprite2D", true, false):
+		if box.is_ancestor_of(sprite) or sprite.texture == null or not sprite.is_visible_in_tree():
+			continue
+		if sprite.find_parent("Player") != null or sprite.find_parent("Greg") != null:
+			continue
+		var rect: Rect2 = sprite.get_global_transform() * sprite.get_rect()
+		if rect.size.x < 400.0 and rect.size.y < 400.0 and rect.intersects(footprint):
+			over.append(sprite.get_parent().name)
+	check(over.is_empty(), "and in the open, not hidden in the flowers %s" % [over])
+	var grid := WalkGrid.of(world.region)
+	var path := grid.route(world.region.get_spawn("arrival").global_position, at + Vector2(0, -24))
+	check(not path.is_empty() and path[path.size() - 1].distance_to(at + Vector2(0, -24)) < 8.0, "you can walk to it from the camp")
+	var player: Player = world.player
+	player.global_position = at + Vector2(0, -24)
+	player.facing = Vector2i.DOWN
+	player.interaction_area.position = Vector2(player.facing) * 24.0
+	for i in 3:
+		await get_tree().physics_frame
+	check(player.get_target() == box, "and it's what you're facing when you stand over it")
+	Inventory.remove("greg_fly_box", Inventory.count("greg_fly_box"))
+	box.interact(player)
+	check(Inventory.count("greg_fly_box") == 1 and box.taken and not box.visible, "picking it up puts it in your pack")
+	Inventory.remove("greg_fly_box", 1)
 
 
 ## Every hole and rapids in the overlays sits on the river: a hole's middle

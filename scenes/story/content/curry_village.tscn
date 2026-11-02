@@ -113,7 +113,7 @@ timetable = PackedStringArray("5:30 plaza", "6:00 river_bank", "8:30 store_door"
 shop = ExtResource("16_r")
 
 [node name="GregFlyBox" parent="." instance=ExtResource("12_r")]
-position = Vector2(1968, 1904)
+position = Vector2(2032, 1928)
 item_id = "greg_fly_box"
 found_text = "A dented aluminum fly box in the grass by the water, GREG scratched in the lid. Greg will want this back."
 
