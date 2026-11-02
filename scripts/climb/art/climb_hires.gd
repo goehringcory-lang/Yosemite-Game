@@ -78,9 +78,54 @@ static func scale2x(im: Image, detail := {}) -> Image:
 	var w := src.get_width()
 	var h := src.get_height()
 	var data := src.get_data().to_int32_array()
+	if detail.get("grain", []).is_empty():
+		return _scale_plain(src, data, w, h)
 	var out := _bands(h, w * h >= PARALLEL_PIXELS, func(y0: int, y1: int) -> PackedInt32Array:
 		return _scale_rows(data, w, h, y0, y1, detail))
 	return Image.create_from_data(w * 2, h * 2, false, Image.FORMAT_RGBA8, out.to_byte_array())
+
+
+## Scale2x with no grain, the same picture as _scale_rows makes, much faster:
+## the engine doubles every pixel (nearest), and only the pixels Scale2x
+## would round off are looked at in script. A pixel whose neighbours above
+## and below match, or left and right, stays a plain 2x2 block, so a row
+## whose rows above and below are the same (most of a sky, a cloud or a far
+## ridge) is done already.
+static func _scale_plain(src: Image, data: PackedInt32Array, w: int, h: int) -> Image:
+	var doubled := src.duplicate() as Image
+	doubled.resize(w * 2, h * 2, Image.INTERPOLATE_NEAREST)
+	var base := doubled.get_data().to_int32_array()
+	var w2 := w * 2
+	var out := _bands(h, w * h >= PARALLEL_PIXELS, func(y0: int, y1: int) -> PackedInt32Array:
+		var rows := base.slice(y0 * 2 * w2, y1 * 2 * w2)
+		for y in range(y0, y1):
+			var row := y * w
+			var up := row - w if y > 0 else row
+			var dn := row + w if y < h - 1 else row
+			if data.slice(up, up + w) == data.slice(dn, dn + w):
+				continue
+			var o0 := (y - y0) * 2 * w2
+			var o1 := o0 + w2
+			for x in w:
+				var a := data[up + x]
+				var d := data[dn + x]
+				if a == d:
+					continue
+				var p := data[row + x]
+				var c := data[row + x - 1] if x > 0 else p
+				var b := data[row + x + 1] if x < w - 1 else p
+				if c == b:
+					continue
+				if c == a:
+					rows[o0 + 2 * x] = a
+				if a == b:
+					rows[o0 + 2 * x + 1] = b
+				if d == c:
+					rows[o1 + 2 * x] = c
+				if b == d:
+					rows[o1 + 2 * x + 1] = d
+		return rows)
+	return Image.create_from_data(w2, h * 2, false, Image.FORMAT_RGBA8, out.to_byte_array())
 
 
 static func _rgba(im: Image) -> Image:
