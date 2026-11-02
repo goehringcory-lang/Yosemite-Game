@@ -11,16 +11,20 @@ extends RefCounted
 
 enum TextSpeed { SLOW, NORMAL, FAST, INSTANT }
 enum Prompts { AUTO, KEYBOARD, GAMEPAD }
-enum Graphics { HIGH, LOW }
+enum Graphics { HIGH, LOW, AUTO }
 
 const DEFAULT_PATH := "user://settings.cfg"
 const TEXT_SPEED_NAMES := ["Slow", "Normal", "Fast", "Instant"]
 ## Letters a second the dialogue box reveals at each speed (0: all at once).
 const TEXT_SPEED_CPS := [30.0, 60.0, 120.0, 0.0]
 const PROMPT_NAMES := ["Auto", "Keyboard", "Gamepad"]
-const GRAPHICS_NAMES := ["High", "Low"]
-## The renderer each graphics level runs on. Low is the simpler Compatibility
-## renderer (OpenGL), for older computers.
+const GRAPHICS_NAMES := ["High", "Low", "Auto"]
+## The order the pause menu steps through the graphics levels.
+const GRAPHICS_ORDER := [Graphics.AUTO, Graphics.HIGH, Graphics.LOW]
+## The renderer for High and for Low. Low is the simpler Compatibility
+## renderer (OpenGL), for older computers; it also draws the picture at
+## 960x540 and scales it up (see apply_graphics), which takes a third of the
+## work at 1920x1080.
 const GRAPHICS_RENDERERS := ["forward_plus", "gl_compatibility"]
 ## The file project.godot reads over its own settings at start-up
 ## (application/config/project_settings_override), so Low can pick the
@@ -52,11 +56,15 @@ static var ambience_volume := MAX_VOLUME
 ## pixel art as in Stardew Valley and keeps every letter distinct, or smooth
 ## Noto Sans.
 static var pixel_font := true
-## High (Forward+) or Low (Compatibility); a change takes effect the next time
-## the game starts.
-static var graphics := Graphics.HIGH
-## The graphics level the game started with (-1 until settings first load).
-static var _started_graphics := -1
+## High (Forward+, drawn at the window's size), Low (Compatibility, drawn at
+## 960x540 and scaled up), or Auto: High until the game finds it runs slowly
+## on this computer (see GraphicsWatch), then Low. The drawing size changes at
+## once; the renderer the next time the game starts.
+static var graphics := Graphics.AUTO
+## Auto found this computer too slow for High, so Auto means Low here.
+static var auto_low := false
+## The renderer the game started with ("" until settings first load).
+static var _started_renderer := ""
 const SMOOTH_FONT := "res://assets/fonts/NotoSans-Regular.ttf"
 const PIXEL_FONT := "res://assets/fonts/DotGothic16Prop-Regular.ttf"
 static var _fonts: Dictionary = {}
@@ -72,8 +80,8 @@ static func ensure_loaded() -> void:
 	if not _loaded:
 		load_settings()
 		apply_font()
-		if _started_graphics < 0:
-			_started_graphics = graphics
+		if _started_renderer == "":
+			_started_renderer = renderer()
 
 
 ## The font for the UI, as chosen: DotGothic16 or Noto Sans.
@@ -136,7 +144,12 @@ static func load_settings() -> void:
 	music_volume = clampi(int(config.get_value("audio", "music", music_volume)), 0, MAX_VOLUME)
 	ambience_volume = clampi(int(config.get_value("audio", "ambience", ambience_volume)), 0, MAX_VOLUME)
 	pixel_font = bool(config.get_value("display", "pixel_font", pixel_font))
-	graphics = clampi(int(config.get_value("display", "graphics", graphics)), 0, Graphics.size() - 1) as Graphics
+	if config.has_section_key("display", "graphics_level"):
+		graphics = clampi(int(config.get_value("display", "graphics_level", graphics)), 0, Graphics.size() - 1) as Graphics
+	elif int(config.get_value("display", "graphics", Graphics.HIGH)) == Graphics.LOW:
+		# from before Auto: Low stays Low, High (the old default) becomes Auto
+		graphics = Graphics.LOW
+	auto_low = bool(config.get_value("display", "auto_low", auto_low))
 
 
 static func save() -> Error:
@@ -152,7 +165,8 @@ static func save() -> Error:
 	config.set_value("audio", "music", music_volume)
 	config.set_value("audio", "ambience", ambience_volume)
 	config.set_value("display", "pixel_font", pixel_font)
-	config.set_value("display", "graphics", int(graphics))
+	config.set_value("display", "graphics_level", int(graphics))
+	config.set_value("display", "auto_low", auto_low)
 	_save_graphics_override()
 	return config.save(path)
 
@@ -166,20 +180,51 @@ static func graphics_override_path() -> String:
 ## High so the project's own renderer (Forward+) stands.
 static func _save_graphics_override() -> void:
 	var file := graphics_override_path()
-	if graphics == Graphics.HIGH:
+	if not low():
 		if FileAccess.file_exists(file):
 			DirAccess.remove_absolute(file)
 		return
 	var config := ConfigFile.new()
-	config.set_value("rendering", "renderer/rendering_method", GRAPHICS_RENDERERS[graphics])
+	config.set_value("rendering", "renderer/rendering_method", renderer())
 	config.save(file)
 
 
-## True when the graphics level was changed since the game started, so it
-## waits for a restart.
+## True when the game should look after slower computers: Low, or Auto on a
+## computer found to be slow.
+static func low() -> bool:
+	ensure_loaded()
+	return graphics == Graphics.LOW or (graphics == Graphics.AUTO and auto_low)
+
+
+## The renderer the graphics level asks for.
+static func renderer() -> String:
+	return GRAPHICS_RENDERERS[1 if low() else 0]
+
+
+## "High", "Low", or "Auto (High)" / "Auto (Low)" for what Auto chose.
+static func graphics_name() -> String:
+	ensure_loaded()
+	if graphics == Graphics.AUTO:
+		return "Auto (%s)" % GRAPHICS_NAMES[Graphics.LOW if auto_low else Graphics.HIGH]
+	return GRAPHICS_NAMES[graphics]
+
+
+## True when the renderer the graphics level asks for isn't the one the game
+## started with, so that part waits for a restart.
 static func graphics_pending() -> bool:
 	ensure_loaded()
-	return _started_graphics >= 0 and graphics != _started_graphics
+	return _started_renderer != "" and renderer() != _started_renderer
+
+
+## Draws the picture at the window's size (High), or at 960x540 scaled up
+## (Low): the pixel art looks the same, but there are a quarter as many pixels
+## to fill at 1920x1080, and every full-screen effect costs a quarter as much.
+static func apply_graphics(window: Window) -> void:
+	if window == null or DisplayServer.get_name() == "headless":
+		return
+	var mode := Window.CONTENT_SCALE_MODE_VIEWPORT if low() else Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+	if window.content_scale_mode != mode:
+		window.content_scale_mode = mode
 
 
 static func reset_defaults() -> void:
@@ -192,7 +237,8 @@ static func reset_defaults() -> void:
 	music_volume = 8
 	ambience_volume = MAX_VOLUME
 	pixel_font = true
-	graphics = Graphics.HIGH
+	graphics = Graphics.AUTO
+	auto_low = false
 	_customized = false
 
 
@@ -214,6 +260,7 @@ static func max_window_scale() -> int:
 ## the player has changed anything (the project's window size stands).
 static func apply(window: Window) -> void:
 	ensure_loaded()
+	apply_graphics(window)
 	if window == null or DisplayServer.get_name() == "headless" or not _customized:
 		return
 	if fullscreen:

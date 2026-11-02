@@ -105,6 +105,7 @@ func _ready() -> void:
 	add_child(SunLight.new())
 	add_child(AirGlow.new())
 	add_child(RoomLight.new())
+	add_child(GraphicsWatch.new())
 	add_child(framing)
 	add_child(backdrop)
 	# The camera eases to its limits, so when a seam opens the view over the

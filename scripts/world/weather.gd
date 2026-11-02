@@ -164,7 +164,9 @@ func _populate() -> void:
 	rng.seed = hash(_key)
 	var area := _view.grow(MARGIN)
 	for kind_name: String in counts:
-		var n := mini(int(COUNTS[kind_name] * float(counts[kind_name])), MAX_FLAKES - _pos.size())
+		# Low graphics: half as many, for slower computers
+		var share := 0.5 if Settings.low() else 1.0
+		var n := mini(int(COUNTS[kind_name] * float(counts[kind_name]) * share), MAX_FLAKES - _pos.size())
 		for i in n:
 			_pos.append(area.position + Vector2(rng.randf() * area.size.x, rng.randf() * area.size.y))
 			_kind.append(KINDS.find(kind_name))

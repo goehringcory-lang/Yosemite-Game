@@ -493,7 +493,10 @@ func change_setting(which: int, step: int) -> void:
 			Settings.pixel_font = not Settings.pixel_font
 			Settings.apply_font()
 		Setting.GRAPHICS:
-			Settings.graphics = wrapi(Settings.graphics + step, 0, Settings.Graphics.size()) as Settings.Graphics
+			var order := Settings.GRAPHICS_ORDER
+			Settings.graphics = order[wrapi(order.find(Settings.graphics) + step, 0, order.size())]
+			# picking Auto again looks afresh at how the game runs here
+			Settings.auto_low = false
 		Setting.FULLSCREEN:
 			Settings.fullscreen = not Settings.fullscreen
 		Setting.WINDOW_SIZE:
@@ -579,7 +582,7 @@ func _setting_value(which: int) -> String:
 		Setting.FONT:
 			value = "Pixel" if Settings.pixel_font else "Smooth"
 		Setting.GRAPHICS:
-			value = Settings.GRAPHICS_NAMES[Settings.graphics]
+			value = Settings.graphics_name()
 			if Settings.graphics_pending():
 				value += " (on restart)"
 		Setting.FULLSCREEN:
