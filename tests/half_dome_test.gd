@@ -162,7 +162,12 @@ func test_night_out() -> void:
 func test_quests() -> void:
 	_fresh()
 	QuestLog.completed.append_array(["hodges_patrol", "anderson_half_dome", "ansel_monolith"])
+	var season := GameClock.season
+	GameClock.season = GameClock.Season.WINTER
 	var lines := QuestLog.talk_to("clare_hodges")
+	check(not QuestLog.active.has("hodges_first_night") and said(lines, "until spring"), "with the Mist Trail under snow, Hodges waits for spring to send you out")
+	GameClock.season = season
+	lines = QuestLog.talk_to("clare_hodges")
 	check(QuestLog.active.has("hodges_first_night"), "Ranger Hodges offers the first night out")
 	Inventory.add("pilot_bread", 4)
 	lines = QuestLog.talk_to("clare_hodges")

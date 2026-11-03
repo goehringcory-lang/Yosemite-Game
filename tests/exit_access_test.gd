@@ -1,7 +1,8 @@
 extends Node
 ## Checks the ways in and out of every region: from the region's arrival spot
 ## the player can walk into every exit, walk up to and use every trail sign,
-## building door, shuttle stop, map kiosk and Guardian's Year work spot, and
+## building door, shuttle stop, map kiosk, Guardian's Year work spot, the
+## backcountry tent site and the Diving Board, and
 ## reach every spot that a way into the region lands on. So no road or
 ## doorway ends at an edge of the map with its exit off to one side, no trail
 ## marker stands where you can't get to it, and no way in drops you somewhere
@@ -48,7 +49,8 @@ func _ready() -> void:
 		StoryContent.attach(region)
 		var exits: Array = region.find_children("*", "RegionExit", true, false)
 		var uses: Array = region.find_children("*", "", true, false).filter(func(n: Node) -> bool:
-			return n is RegionDoor or n is ShuttleStop or n is TravelPoint or n is WorkSpot)
+			return n is RegionDoor or n is ShuttleStop or n is TravelPoint or n is WorkSpot \
+				or n is BackcountryCamp or n is DivingBoard)
 		ways[region_id] = _ways_out(region)
 		var start := _start(region)
 		check(start != null, "%s: has a spot to start from" % region_id)
