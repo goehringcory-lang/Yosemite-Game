@@ -519,6 +519,7 @@ func _arrive() -> void:
 		plants.refresh()
 	if not region.indoors:
 		Chongo.visit(region)
+	RoomWindows.attach(region)
 	region_changed.emit(region)
 	_update_location()
 	_preload_neighbors()
