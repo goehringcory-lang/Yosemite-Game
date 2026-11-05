@@ -51,6 +51,7 @@ func _ready() -> void:
 	test_panel_stretch()
 	await test_button_hints()
 	await test_nearest_target(world)
+	await test_game_feel(world)
 	SaveManager.delete_save()
 	print("OK: %d failure(s)" % failures if failures == 0 else "FAILED: %d failure(s)" % failures)
 	get_tree().quit(failures)
@@ -169,11 +170,15 @@ func test_music() -> void:
 		var afternoon := Sound.music_choice()
 		check(afternoon in ["", Sound.SEASON_MUSIC_AFTERNOON[season]], "%s afternoons play a second piece (%s)" % [GameClock.SEASON_NAMES[season], afternoon])
 	GameClock.season = GameClock.Season.SUMMER
+	GameClock.minutes = 7 * 60
+	check(Sound.music_choice() in ["", Sound.DAWN_MUSIC], "the first-light piece in the early morning")
+	GameClock.minutes = 18 * 60
+	check(Sound.music_choice() in ["", Sound.DUSK_MUSIC], "the evening piece from 5 PM")
 	GameClock.minutes = 22 * 60
 	check(Sound.music_choice() in ["", Sound.NIGHT_MUSIC], "the night piece after 8 PM")
 	Sound.set_ambience("title")
 	check(Sound.music_choice() == Sound.TITLE_MUSIC, "the title theme on the title screen")
-	for piece: String in Sound.SEASON_MUSIC + Sound.SEASON_MUSIC_AFTERNOON + [Sound.NIGHT_MUSIC, Sound.TITLE_MUSIC]:
+	for piece: String in Sound.SEASON_MUSIC + Sound.SEASON_MUSIC_AFTERNOON + [Sound.DAWN_MUSIC, Sound.DUSK_MUSIC, Sound.NIGHT_MUSIC, Sound.TITLE_MUSIC]:
 		check(ResourceLoader.exists(Sound.DIR + piece + ".wav"), "%s is built" % piece)
 	Settings.ensure_loaded()
 	check(Settings.music_volume >= 0 and Settings.music_volume <= Settings.MAX_VOLUME, "music has a volume setting")
@@ -633,3 +638,63 @@ func test_nearest_target(world: Node) -> void:
 	check(player.get_target() == things[0], "swap them and the other is the target")
 	for thing in things:
 		thing.queue_free()
+
+
+## The small touches: screens open and close behind the pixel wipe, finds
+## twinkle and burst, a chosen line flashes, and the camera looks ahead.
+func test_game_feel(world: Node) -> void:
+	var wipe := ScreenWipe.reveal(get_tree())
+	await get_tree().process_frame
+	check(wipe != null and wipe.is_inside_tree() and wipe.layer > 28, "a screen opens under the pixel wipe, above every menu")
+	await get_tree().create_timer(ScreenWipe.TIME + 0.3).timeout
+	check(not is_instance_valid(wipe), "the wipe clears and is gone")
+	var screen := Node.new()
+	get_tree().root.add_child(screen)
+	ScreenWipe.attach(screen)
+	screen.queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var wipes := get_tree().root.get_children().filter(func(n: Node) -> bool: return n is ScreenWipe)
+	check(wipes.size() == 2, "a screen wipes open, and the valley wipes back as it closes (%d wipes)" % wipes.size())
+
+	var player: Player = world.player
+	var burst := Sparkle.burst(player.get_parent(), player.global_position, Sparkle.STAR)
+	check(burst != null and burst.is_inside_tree() and not burst._motes.is_empty(), "a find bursts into motes")
+	await get_tree().create_timer(Sparkle.LIFE[Sparkle.GLOW] + 0.2).timeout
+	check(not is_instance_valid(burst), "the burst fades and frees itself")
+
+	var forage: ForageSpawner = world.forage
+	var glints := 0
+	var finds := 0
+	for f in forage.get_children():
+		if f is Forageable:
+			finds += 1
+			if f.get_node_or_null("Glint") is Glint:
+				glints += 1
+	check(finds == 0 or glints == finds or Settings.low(), "every find on the ground glints now and then (%d of %d)" % [glints, finds])
+
+	var line := Label.new()
+	line.text = "   Resume"
+	world.hud.add_child(line)
+	MenuInput.mark(line, true)
+	MenuInput.press(line)
+	check(line.modulate.r > 1.2, "a chosen line flashes bright")
+	await get_tree().create_timer(0.4).timeout
+	check(line.modulate.is_equal_approx(Color.WHITE), "and settles back")
+	line.queue_free()
+
+	var framing: LandmarkFraming = world.get_node("LandmarkFraming")
+	var start := player.global_position
+	player.can_act = true
+	Input.action_press("move_right")
+	for i in 40:
+		await get_tree().physics_frame
+	var moved := player.global_position.x - start.x
+	if moved > 20.0 and not world.region.indoors:
+		check(framing.lead.x > 4.0, "walking right, the camera looks ahead to the right (lead %.1f)" % framing.lead.x)
+	else:
+		check(framing.lead.length() < 4.0, "blocked or indoors, the camera doesn't lead (lead %.1f)" % framing.lead.length())
+	Input.action_release("move_right")
+	for i in 120:
+		await get_tree().physics_frame
+	check(framing.lead.length() < 4.0, "standing still, it settles back over the player (lead %.1f)" % framing.lead.length())

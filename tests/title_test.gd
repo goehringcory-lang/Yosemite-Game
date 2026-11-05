@@ -30,6 +30,10 @@ func _ready() -> void:
 	await test_without_save()
 	await test_with_save()
 	await test_fresh_start()
+	await test_slots()
+	await test_intro()
+	await test_end_credits()
+	test_reset_all()
 	SaveManager.delete_save()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SETTINGS_PATH))
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
@@ -75,8 +79,13 @@ func test_without_save() -> void:
 	check(not title._menu.visible, "and the title menu hides under it")
 	_press("move_right")
 	check(Settings.text_speed == Settings.TextSpeed.FAST, "the Settings page works from the title screen")
-	for i in PauseMenu.Setting.BACK:
+	for i in PauseMenu.Setting.CONTROLS:
 		_press("move_down")
+	_press("interact")
+	check(title._pause.page() == PauseMenu.Page.CONTROLS, "Controls opens from the Settings page")
+	_press("ui_cancel")
+	check(title._pause.page() == PauseMenu.Page.SETTINGS and title._pause._settings_cursor == PauseMenu.Setting.CONTROLS, "and Esc goes back to Settings")
+	_press("move_down")
 	_press("interact")
 	check(not title._pause.is_open() and title._menu.visible, "Back on Settings returns to the title menu")
 	_press("interact")
@@ -99,15 +108,61 @@ func test_with_save() -> void:
 	FileAccess.open(SAVE_PATH, FileAccess.WRITE).store_string("{}")
 	var title := await _open_title()
 	check(title.options()[0] == TitleScreen.Option.CONTINUE, "with a save, Continue comes first")
+	check(title.options()[1] == TitleScreen.Option.LOAD, "then Load game")
 	check(title.cursor_option() == TitleScreen.Option.CONTINUE, "and the cursor starts on it")
 	_press("move_down")
+	_press("move_down")
 	_press("interact")
-	check(title._confirm_new and not title._starting, "New Game asks before starting over")
-	check(not SaveManager._fresh, "and nothing changes yet")
+	check(title._pause.is_open() and title._pause.page() == PauseMenu.Page.SLOTS and title._pause._slot_mode == PauseMenu.SlotMode.NEW,
+		"New Game opens the save slots to pick one")
+	check(title._pause._slot_cursor == 1, "the cursor starts on the first empty slot")
+	check(not SaveManager._fresh and not title._starting, "and nothing changes yet")
+	_press("move_up")
+	_press("interact")
+	check(title._pause._slot_confirm == 1 and not title._starting, "starting over in a used slot asks first")
 	_press("ui_cancel")
-	check(not title._confirm_new, "Esc takes the question back")
+	check(not title._pause.is_open() and title._menu.visible and not SaveManager._fresh, "Esc takes it back to the title menu")
+	_press("move_up")
+	_press("interact")
+	check(title._pause.is_open() and title._pause._slot_mode == PauseMenu.SlotMode.LOAD and title._pause._slot_cursor == 0,
+		"Load game opens the slots on the newest save")
+	_press("move_down")
+	_press("interact")
+	check(title._pause.is_open() and not title._starting, "an empty slot doesn't load")
+	_press("ui_cancel")
 	title.queue_free()
 	await get_tree().process_frame
+
+
+## Three slots, each its own file: slot 1 is the old save.json, Continue picks
+## the newest, and the menus show the date and place without loading.
+func test_slots() -> void:
+	SaveManager.save_path = SAVE_PATH
+	for n in range(1, SaveManager.SLOTS + 1):
+		SaveManager.delete_slot(n)
+	check(SaveManager.slot_path(1) == SAVE_PATH, "slot 1 is the save file from before slots")
+	check(SaveManager.slot_path(2) != SAVE_PATH and SaveManager.slot_path(2).ends_with("_2.json"), "slot 2 has its own file (%s)" % SaveManager.slot_path(2))
+	check(not SaveManager.any_save() and SaveManager.latest_slot() == 0 and SaveManager.first_empty_slot() == 1, "no slots used at first")
+	FileAccess.open(SaveManager.slot_path(1), FileAccess.WRITE).store_string(JSON.stringify({"clock": {"day": 4, "season": 1, "year": 2, "minutes": 14 * 60 + 15},
+		"summary": {"place": "Curry Village", "saved_at": 1000}}))
+	FileAccess.open(SaveManager.slot_path(3), FileAccess.WRITE).store_string(JSON.stringify({"clock": {"day": 1}, "summary": {"saved_at": 2000}}))
+	var info := SaveManager.slot_info(1)
+	check(info.get("date") == "Summer 4 (Thu), Year 2" and info.get("time") == "2:15 PM" and info.get("place") == "Curry Village",
+		"a slot's date, time and place read from its file (%s)" % info)
+	check(SaveManager.slot_info(2).is_empty() and SaveManager.first_empty_slot() == 2, "an empty slot has nothing to show")
+	check(SaveManager.latest_slot() == 3, "the newest save is the one Continue picks")
+	FileAccess.open(SaveManager.slot_path(2), FileAccess.WRITE).store_string("not json")
+	check(SaveManager.slot_info(2).get("broken", false), "a broken file says so instead of crashing")
+	SaveManager.slot = 3
+	check(SaveManager.save_path == SaveManager.slot_path(3) and SaveManager.has_save(), "the current slot is what saves and loads")
+	var title := await _open_title()
+	title.select(TitleScreen.Option.CONTINUE)
+	check(SaveManager.slot == 3 and title._starting, "Continue carries on the newest game")
+	title.queue_free()
+	await get_tree().process_frame
+	for n in range(1, SaveManager.SLOTS + 1):
+		SaveManager.delete_slot(n)
+	SaveManager.save_path = SAVE_PATH
 
 
 func test_fresh_start() -> void:
@@ -124,6 +179,69 @@ func test_fresh_start() -> void:
 	check(not SaveManager._fresh and SaveManager.load_game(), "the first save is the new game's, and loads again")
 	world.queue_free()
 	await get_tree().process_frame
+
+
+## The opening: the logo and menu come in, any key finishes that at once, and
+## the sky has its clouds and, now and then, ravens.
+func test_intro() -> void:
+	var title := await _open_title()
+	check(title.intro_playing() and title._logo.modulate.a < 0.5 and title._menu.modulate.a < 0.5, "the logo and menu come in when the title opens")
+	var sky: TitleSky = title.find_children("*", "TitleSky", true, false)[0]
+	check(sky != null and not sky.ravens_flying(), "the sky starts with no ravens")
+	_press("move_down")
+	check(not title.intro_playing() and title._logo.modulate.a == 1.0 and title._menu.modulate.a == 1.0 and title._fade.color.a == 0.0, "a key finishes the opening at once")
+	check(title.cursor_option() != title.options()[0], "and still moves the cursor")
+	sky._process(TitleSky.FIRST_RAVENS + 0.1)
+	check(sky.ravens_flying(), "ravens cross the sky soon after")
+	sky._process((TitleSky.SCREEN.x + 100.0) / TitleSky.RAVEN_SPEED)
+	check(not sky.ravens_flying(), "and are gone once across")
+	check(TitleSky._cloud_shape(30, 1).size() > 4, "the clouds have a shape")
+	title.queue_free()
+	await get_tree().process_frame
+
+
+## The roll at the end of the story: what it says, that it holds the game, and
+## that Esc ends it and gives the game back.
+func test_end_credits() -> void:
+	var text := "\n".join(EndCredits.lines().map(func(l: Array) -> String: return l[1]))
+	check(text.contains("Map data © OpenStreetMap contributors") and text.contains("Open Database License (ODbL)"), "the end credits carry the OpenStreetMap credit too")
+	check(text.contains("Cory Goehring") and text.contains("Godot Engine") and text.ends_with(EndCredits.LAST_LINE), "and who made it, the engine, and a thank-you last")
+	var named := 0
+	for character: CharacterData in QuestLog.CHARACTERS:
+		if character.needs_tribal_review:
+			check(not EndCredits.register_names().has(character.display_name), "%s waits on tribal review and isn't listed" % character.display_name)
+		else:
+			named += 1
+	check(named > 0 and EndCredits.register_names().size() == named, "everyone else in the Register is named (%d)" % named)
+	check(EndCredits.staff_names().size() == QuestLog.STAFF.size(), "and the valley's people today")
+	GameClock.paused = false
+	Sound.set_ambience("world")
+	var roll := EndCredits.roll(get_tree())
+	var ended := [false]
+	roll.finished.connect(func() -> void: ended[0] = true)
+	for i in 10:
+		await get_tree().process_frame
+	check(roll.is_rolling() and GameClock.paused and Sound.ambience() == "title", "the roll holds the clock and plays the title music")
+	check(roll.scrolled() > 0.0, "and climbs")
+	check(roll._end < INF and roll._end > EndCredits.SCREEN.y, "and knows where it ends")
+	_press("ui_cancel")
+	check(not roll.is_rolling(), "Esc skips it")
+	await get_tree().create_timer(EndCredits.FADE_OUT + 0.3).timeout
+	check(ended[0] and not GameClock.paused and Sound.ambience() == "world", "and the game comes back as it was")
+	check(get_tree().get_nodes_in_group("end_credits").is_empty(), "and the roll is gone")
+
+
+## Quit to title puts everything back to a new game's start.
+func test_reset_all() -> void:
+	GameClock.day = 9
+	GameClock.minutes = 15 * 60
+	GameClock.paused = true
+	Inventory.items["granola_bar"] = 3
+	QuestLog.completed.append("some_quest")
+	NewGame.reset_all()
+	check(GameClock.day == 1 and GameClock.minutes == GameClock.DAY_START_HOUR * 60 and not GameClock.paused, "the clock goes back to the first morning")
+	check(Inventory.items.is_empty() and QuestLog.completed.is_empty(), "and the backpack and quests are empty")
+	check(ResourceLoader.exists(TitleScreen.SCENE), "the title screen to go back to exists")
 
 
 func _press(action: String) -> void:

@@ -71,6 +71,34 @@ const SMOOTH_FONT := "res://assets/fonts/NotoSans-Regular.ttf"
 const PIXEL_FONT := "res://assets/fonts/DotGothic16Prop-Regular.ttf"
 static var _fonts: Dictionary = {}
 
+## The keys the player can change on the Controls page: a name, the actions
+## the key does, the key it starts as (a physical key, as on a US keyboard),
+## and the gamepad button for it (gamepad buttons stay as they are). Each
+## action's other keys (the arrows, C, X) stay too, so the menus always work.
+const BINDINGS := [
+	{"id": "up", "name": "Walk up", "actions": ["move_up"], "key": KEY_W, "pad": "Stick up"},
+	{"id": "down", "name": "Walk down", "actions": ["move_down"], "key": KEY_S, "pad": "Stick down"},
+	{"id": "left", "name": "Walk left", "actions": ["move_left"], "key": KEY_A, "pad": "Stick left"},
+	{"id": "right", "name": "Walk right", "actions": ["move_right"], "key": KEY_D, "pad": "Stick right"},
+	{"id": "run", "name": "Run, climb aid", "actions": ["run", "assist"], "key": KEY_SHIFT, "pad": "B or RT, Y"},
+	{"id": "interact", "name": "Talk, read, eat", "actions": ["interact"], "key": KEY_E, "pad": "A"},
+	{"id": "use", "name": "Use, place a cam", "actions": ["use_tool"], "key": KEY_SPACE, "pad": "X"},
+	{"id": "gift", "name": "Give a gift", "actions": ["gift"], "key": KEY_G, "pad": "LB"},
+	{"id": "map", "name": "Map", "actions": ["map"], "key": KEY_M, "pad": "Back"},
+	{"id": "journal", "name": "Journal", "actions": ["journal"], "key": KEY_J, "pad": "Y"},
+	{"id": "quests", "name": "Quests", "actions": ["quests"], "key": KEY_Q, "pad": "Y, then RB"},
+	{"id": "backpack", "name": "Backpack", "actions": ["backpack"], "key": KEY_B, "pad": "Y, then RB"},
+	{"id": "press", "name": "Press book", "actions": ["press_book"], "key": KEY_P, "pad": "Y, then RB"},
+]
+## Keys the menus need, so they can't be given to anything else.
+const RESERVED_KEYS := [KEY_ESCAPE, KEY_ENTER, KEY_KP_ENTER, KEY_TAB, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT]
+## The player's changed keys: binding id -> physical keycode. Keys left out
+## are as in BINDINGS.
+static var keys: Dictionary = {}
+## Each action's events as the project set them up, before any key changed.
+static var _original_events: Dictionary = {}
+static var _key_pattern: RegEx
+
 static var _loaded := false
 ## True once settings came from a file or the player changed one, so the
 ## window is only resized when they asked for it.
@@ -153,6 +181,12 @@ static func load_settings() -> void:
 		# from before Auto: Low stays Low, High (the old default) becomes Auto
 		graphics = Graphics.LOW
 	auto_low = bool(config.get_value("display", "auto_low", auto_low))
+	for binding: Dictionary in BINDINGS:
+		var key := int(config.get_value("keys", binding.id, 0))
+		if key > 0 and key != binding.key and not key in RESERVED_KEYS:
+			keys[binding.id] = key
+	_drop_clashes()
+	apply_keys()
 
 
 static func save() -> Error:
@@ -171,6 +205,8 @@ static func save() -> Error:
 	config.set_value("display", "pixel_font", pixel_font)
 	config.set_value("display", "graphics_level", int(graphics))
 	config.set_value("display", "auto_low", auto_low)
+	for id: String in keys:
+		config.set_value("keys", id, int(keys[id]))
 	_save_graphics_override()
 	return config.save(path)
 
@@ -244,6 +280,8 @@ static func reset_defaults() -> void:
 	pixel_font = true
 	graphics = Graphics.AUTO
 	auto_low = false
+	keys.clear()
+	apply_keys()
 	_customized = false
 
 
@@ -277,3 +315,120 @@ static func apply(window: Window) -> void:
 	if window.size != size:
 		window.size = size
 		window.move_to_center()
+
+
+# ---------------------------------------------------------------- keys
+
+
+## The binding (from BINDINGS) with id [param id], or {}.
+static func binding(id: String) -> Dictionary:
+	for b: Dictionary in BINDINGS:
+		if b.id == id:
+			return b
+	return {}
+
+
+## The physical key binding [param id] is on now.
+static func key_for(id: String) -> int:
+	return int(keys.get(id, binding(id).get("key", 0)))
+
+
+## The name of a physical key as the keyboard in use labels it ("E", "Space").
+static func key_label(physical: int) -> String:
+	var shown := physical
+	if DisplayServer.get_name() != "headless":
+		var mapped := DisplayServer.keyboard_get_keycode_from_physical(physical)
+		if mapped != KEY_NONE:
+			shown = mapped
+	var name := OS.get_keycode_string(shown)
+	return name if name != "" else "?"
+
+
+## Puts binding [param id] on [param physical]. A key another binding had
+## swaps over to it, so no key does two things. Returns false for a key the
+## menus keep (Esc, Enter, Tab, the arrows).
+static func set_key(id: String, physical: int) -> bool:
+	if physical in RESERVED_KEYS or binding(id).is_empty():
+		return false
+	var old := key_for(id)
+	for b: Dictionary in BINDINGS:
+		if b.id != id and key_for(b.id) == physical:
+			_store_key(b.id, old)
+	_store_key(id, physical)
+	apply_keys()
+	return true
+
+
+static func _store_key(id: String, physical: int) -> void:
+	if physical == int(binding(id).key):
+		keys.erase(id)
+	else:
+		keys[id] = physical
+
+
+## Every key back as it started.
+static func reset_keys() -> void:
+	keys.clear()
+	apply_keys()
+
+
+## A hand-edited settings file could put two bindings on one key; the later
+## one goes back to its own key.
+static func _drop_clashes() -> void:
+	var used := {}
+	for b: Dictionary in BINDINGS:
+		var key := key_for(b.id)
+		if used.has(key):
+			keys.erase(b.id)
+		used[key_for(b.id)] = true
+
+
+## Puts the chosen keys into the InputMap: each action's first key becomes
+## its binding's key, and its other keys and buttons stay.
+static func apply_keys() -> void:
+	for b: Dictionary in BINDINGS:
+		for action: String in b.actions:
+			if not InputMap.has_action(action):
+				continue
+			if not _original_events.has(action):
+				_original_events[action] = InputMap.action_get_events(action)
+			var physical := key_for(b.id)
+			InputMap.action_erase_events(action)
+			var replaced := false
+			for event: InputEvent in _original_events[action]:
+				if event is InputEventKey and not replaced:
+					replaced = true
+					var key := event.duplicate() as InputEventKey
+					key.keycode = KEY_NONE
+					key.physical_keycode = physical as Key
+					InputMap.action_add_event(action, key)
+				else:
+					InputMap.action_add_event(action, event)
+
+
+## [param keyboard] (a hint's key names: "E", "WASD", "J/Esc") with the
+## player's changed keys put in, so every hint names the key that works.
+static func key_text(keyboard: String) -> String:
+	if keys.is_empty():
+		return keyboard
+	if _key_pattern == null:
+		_key_pattern = RegEx.create_from_string("(?<![A-Za-z])(WASD|Space|Shift|[EGMJQBP])(?![A-Za-z])")
+	var out := ""
+	var at := 0
+	for found in _key_pattern.search_all(keyboard):
+		out += keyboard.substr(at, found.get_start() - at)
+		out += _hint_name(found.get_string(1))
+		at = found.get_end()
+	return out + keyboard.substr(at)
+
+
+const _HINT_IDS := {"Space": "use", "Shift": "run", "E": "interact", "G": "gift", "M": "map", "J": "journal", "Q": "quests", "B": "backpack", "P": "press"}
+
+
+static func _hint_name(token: String) -> String:
+	if token == "WASD":
+		var names := ""
+		for id in ["up", "left", "down", "right"]:
+			names += key_label(key_for(id))
+		return names if names.length() == 4 else "%s/%s/%s/%s" % [key_label(key_for("up")), key_label(key_for("left")), key_label(key_for("down")), key_label(key_for("right"))]
+	return key_label(key_for(_HINT_IDS[token]))

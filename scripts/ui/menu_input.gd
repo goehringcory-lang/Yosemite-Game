@@ -24,7 +24,7 @@ static func button(tree: SceneTree, keyboard: String, gamepad: String) -> String
 	if hud:
 		return hud.prompt(keyboard, gamepad)
 	Settings.ensure_loaded()
-	return gamepad if Settings.prompts == Settings.Prompts.GAMEPAD else keyboard
+	return gamepad if Settings.prompts == Settings.Prompts.GAMEPAD else Settings.key_text(keyboard)
 
 
 ## True for a fresh press of confirm (interact, use, or Enter).
@@ -146,6 +146,29 @@ static func mark(label: Control, chosen: bool) -> void:
 			arrow.offset_left = roundf(x)
 			arrow.offset_right = roundf(x) + 5.0, -2.0, 1.0, 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	arrow.visible = chosen
+
+
+## The line you just chose answers the press: it flashes bright and settles,
+## and its arrow pokes in a pixel and back, so a choice lands like a button
+## going down rather than only a sound. [param line] is the chosen label (or
+## its row); its "Cursor" arrow, if any, is found inside it.
+static func press(line: Control) -> void:
+	if line == null or not line.is_inside_tree():
+		return
+	var running: Tween = line.get_meta("press_tween", null)
+	if running and running.is_valid():
+		running.kill()
+	line.modulate = Color(1.6, 1.5, 1.25)
+	var tween := line.create_tween()
+	tween.tween_property(line, "modulate", Color.WHITE, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	line.set_meta("press_tween", tween)
+	var arrow := line.find_child("Cursor", true, false) as TextureRect
+	if arrow and arrow.visible:
+		arrow.offset_left = 3.0
+		arrow.offset_right = 8.0
+		arrow.create_tween().tween_method(func(x: float) -> void:
+			arrow.offset_left = roundf(x)
+			arrow.offset_right = roundf(x) + 5.0, 3.0, 1.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 
 static var _boxes: Dictionary = {}

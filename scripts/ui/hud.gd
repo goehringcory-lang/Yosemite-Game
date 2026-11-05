@@ -96,7 +96,7 @@ func _ready() -> void:
 	_screen.move_child(toasts, fade.get_index()) # under the fade, so the black covers it
 	Inventory.added.connect(_on_item_added)
 	Gear.added.connect(_on_gear_added)
-	QuestLog.quest_completed.connect(func(_quest: QuestData) -> void: Sound.play("quest_done", 0.0, 0.0))
+	QuestLog.quest_completed.connect(_on_quest_done)
 	var panel := PanelContainer.new()
 	_status = ButtonHints.new()
 	panel.add_child(_status)
@@ -344,13 +344,14 @@ func interact_button() -> String:
 
 ## Picks the button name to show for the current device: [param keyboard] or [param gamepad].
 ## The Button prompts setting can pin it to one device.
+## Keyboard names follow the keys changed on the Controls page.
 func prompt(keyboard: String, gamepad: String) -> String:
 	match Settings.prompts:
 		Settings.Prompts.KEYBOARD:
-			return keyboard
+			return Settings.key_text(keyboard)
 		Settings.Prompts.GAMEPAD:
 			return gamepad
-	return gamepad if _gamepad else keyboard
+	return gamepad if _gamepad else Settings.key_text(keyboard)
 
 
 ## Shows "E  Talk to ..." above the player when something usable is in front of them.
@@ -376,6 +377,13 @@ func _update_prompt() -> void:
 		screen.y = minf(screen.y, UiScale.from_view((target as CanvasItem).get_global_transform_with_canvas().origin).y)
 	var size := prompt_panel.get_combined_minimum_size()
 	prompt_panel.position = (screen + Vector2(-size.x / 2.0, -40)).clamp(Vector2(2, 2), UiScale.SCREEN - size - Vector2(2, 2)).round()
+
+
+## A quest done: its chime, and warm motes rising round the player.
+func _on_quest_done(_quest: QuestData) -> void:
+	Sound.play("quest_done", 0.0, 0.0)
+	if is_instance_valid(_player) and _player.is_inside_tree():
+		Sparkle.burst(_player.get_parent(), _player.global_position + Vector2(0, -16), Sparkle.GLOW)
 
 
 ## Covers the screen with the pixel-diamond wipe (see pixel_wipe.gdshader).

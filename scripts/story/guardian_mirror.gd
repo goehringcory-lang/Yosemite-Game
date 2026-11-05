@@ -76,6 +76,8 @@ func interact(player: Player) -> void:
 	await box.say(QuestLog.find_guardian())
 	await box.say(closing_lines())
 	box.close()
+	# the story's end: the credits roll, then the valley and the Guardian's Year
+	await EndCredits.roll(get_tree()).finished
 	player.can_act = true
 	_busy = false
 
