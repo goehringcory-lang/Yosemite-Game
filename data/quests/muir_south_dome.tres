@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "muir_south_dome"
+title = "Above the Clouds"
+giver = "john_muir"
+requires = PackedStringArray("muir_cathedral", "anderson_cables")
+offered_in = 6
+out_of_season = PackedStringArray("The South Dome will keep till summer. Anderson's iron is down for the winter, and so is the snow on the trail up from the Valley.", "Come and find me when the meadows are green, and we'll talk about a morning on top.")
+intro = PackedStringArray("So you've been up the South Dome on Anderson's iron. Half Dome, you call it. Anderson stood on it first, in October of '75, and I went up his rope a few weeks after him, in November, with snow on the ground.", "But not at midday, with the sun flat on everything. Be on top at sunrise. Some mornings the cloud lies in the Valley like a lake, and the domes stand up out of it like islands.", "That means a night out at Little Yosemite, and an early start in the dark. Take crusts and tea and a blanket. You need nothing else.", "Go and look, and come back up to the meadows and tell me what you saw.")
+steps = [{"type": "unlocked", "ability": "muir_cloud_sea", "objective": "Sleep a night at Little Yosemite Valley, and be on top of Half Dome before 10 in the morning", "reminder": "Sunrise on the South Dome, mind, not noon. Sleep at the camp in Little Yosemite and be up the cables before ten.", "done": []}, {"type": "return", "objective": "Tell John Muir about the morning on top of Half Dome", "reminder": "I'm here among the lodgepoles at the Cathedral trailhead, whenever you're back.", "done": ["The Valley full of cloud, and your own shadow lying out on it with a rainbow round its head? Then you've seen what I saw up there.", "I stood on the brink and waved my arms, and my shadow waved back from the cloud, ringed in all the colors. A man might think himself a saint. It's only the sun at your back and the mist in front of you, but it's no less glorious for that."]}]
+outro = PackedStringArray("Here, some crusts for the trail. A crust and a cup of tea, and you can go anywhere in these mountains.", "And there's a trail to walk all the way from that Valley to the high peaks, if anyone ever builds it. I'd like to think someone will.")
+reward_items = {"dry_crusts": 3, "yerba_buena": 2}

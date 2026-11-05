@@ -11,7 +11,8 @@ extends Node
 ## waterfalls placed in the world by SoundEmitter).
 ##
 ## Music (tools/audio/build_music.gd) plays the way it does in Stardew
-## Valley: a piece for the season, or the night, now and then, with the
+## Valley: a piece for the time of day now and then (first light, the
+## season's morning and afternoon pieces, the evening, the night), with the
 ## ambience on its own in between. It rests in the rain and on the wall, comes
 ## in softer indoors, and fades out when the time of day or the season calls
 ## for a different piece. The title screen's theme loops.
@@ -20,6 +21,13 @@ extends Node
 ## fade up and down together. In "world" mode their mix follows the hour, the
 ## season, the weather, the region (quiet indoors, windy up high), and the
 ## climbing screen.
+##
+## Over the beds, wildlife calls now and then from somewhere off to one side
+## (call_choices): chickadees, jays, robins and woodpeckers by day, a dawn
+## chorus at first light, owls, coyotes and spring frogs at night, ravens and
+## swifts on the wall, and thunder on a stormy day. Each is a one-shot with
+## two takes, panned and pitched a little differently every time, so the
+## soundscape never comes round on a loop you can learn.
 
 const DIR := "res://assets/audio/"
 const BUS_EFFECTS := &"Effects"
@@ -30,6 +38,11 @@ const SEASON_MUSIC := ["music_spring", "music_summer", "music_fall", "music_wint
 ## Each season's afternoon piece (from AFTERNOON_FROM), so a day isn't one tune.
 const SEASON_MUSIC_AFTERNOON := ["music_spring_b", "music_summer_b", "music_fall_b", "music_winter_b"]
 const AFTERNOON_FROM := 13
+## First light's piece until this hour, and the evening's from EVENING_FROM.
+const DAWN_MUSIC := "music_dawn"
+const DAWN_UNTIL := 9
+const DUSK_MUSIC := "music_dusk"
+const EVENING_FROM := 17
 const NIGHT_MUSIC := "music_night"
 const TITLE_MUSIC := "music_title"
 ## Seconds of quiet between one piece and the next, at random in this range.
@@ -44,7 +57,17 @@ const MUSIC_INDOORS := 0.55
 const NIGHT_FROM := 20
 const NIGHT_UNTIL := 6
 ## Sounds that come in numbered takes (name_1, name_2, ...).
-const VARIANTS := {"step_dirt": 3, "step_snow": 3, "step_wood": 3, "step_wet": 3, "climb_move": 3}
+const VARIANTS := {"step_dirt": 3, "step_snow": 3, "step_wood": 3, "step_wet": 3, "climb_move": 3,
+	"call_chickadee": 2, "call_jay": 2, "call_robin": 2, "call_warbler": 2, "call_woodpecker": 2,
+	"call_raven": 2, "call_owl": 2, "call_frogs": 2, "call_swift": 2, "call_coyote": 2, "thunder": 2}
+## Seconds between wildlife calls, at random in this range (a dawn chorus
+## comes faster, night calls slower), and how far to the side they come from
+## (pixels from the middle of the view, so they pan left or right).
+const CALL_GAP := Vector2(4.0, 11.0)
+const CALL_SPREAD := Vector2(160.0, 520.0)
+## Rain this hard brings thunder now and then.
+const THUNDER_RAIN := 0.75
+const CALL_VOICES := 3
 const BEDS := ["amb_day", "amb_night", "amb_wind", "amb_rain"]
 ## Seconds for a bed to fade most of the way to its new level.
 const BED_FADE := 1.5
@@ -61,6 +84,11 @@ var _music: AudioStreamPlayer
 ## The piece playing (or due next), and the seconds until it starts.
 var _music_id := ""
 var _music_wait := MUSIC_START
+var _calls: Array[AudioStreamPlayer2D] = []
+var _next_call := 0
+var _call_wait := 2.0
+## The last call played, so the same bird doesn't answer itself.
+var _last_call := ""
 
 
 func _ready() -> void:
@@ -83,6 +111,16 @@ func _ready() -> void:
 		player.volume_linear = 0.0
 		add_child(player)
 		_beds[bed] = player
+	for i in CALL_VOICES:
+		var call := AudioStreamPlayer2D.new()
+		call.bus = BUS_AMBIENCE
+		# Calls are heard from wherever they're placed: they pan, but they don't
+		# fade out the way a campfire does when you walk away.
+		call.max_distance = 4000.0
+		call.attenuation = 0.4
+		call.panning_strength = 0.8
+		add_child(call)
+		_calls.append(call)
 	_music = AudioStreamPlayer.new()
 	_music.bus = BUS_MUSIC
 	add_child(_music)
@@ -97,6 +135,9 @@ func _exit_tree() -> void:
 	for player: AudioStreamPlayer in _pool + _beds.values() + [_music]:
 		player.stop()
 		player.stream = null
+	for call in _calls:
+		call.stop()
+		call.stream = null
 	_streams.clear()
 	# The audio thread lets go of a stopped sound on its next mix; give it time
 	# for one before the engine checks for leaks (40 ms wasn't always enough).
@@ -227,6 +268,10 @@ func music_choice() -> String:
 				return ""
 			if GameClock.hour >= NIGHT_FROM or GameClock.hour < NIGHT_UNTIL:
 				return NIGHT_MUSIC
+			if GameClock.hour < DAWN_UNTIL:
+				return DAWN_MUSIC
+			if GameClock.hour >= EVENING_FROM:
+				return DUSK_MUSIC
 			if GameClock.hour >= AFTERNOON_FROM:
 				return SEASON_MUSIC_AFTERNOON[GameClock.season]
 			return SEASON_MUSIC[GameClock.season]
@@ -279,8 +324,135 @@ func _on_day_started() -> void:
 		_music_wait = MUSIC_START
 
 
+## The wildlife that might call now, as {sound: weight}, from the hour, the
+## season, the weather and the place (empty for none: indoors, off, or the
+## title screen's quiet moments). Thunder is chosen apart from these.
+func call_choices() -> Dictionary:
+	var mode := _mode
+	if mode == "world" and get_tree().get_first_node_in_group("climb_screen"):
+		mode = "climb"
+	var day := _daylight()
+	var hour := GameClock.hour + GameClock.minute / 60.0
+	var season := GameClock.season
+	var winter := season == GameClock.Season.WINTER
+	var warm := season in [GameClock.Season.SPRING, GameClock.Season.SUMMER]
+	match mode:
+		"title":
+			return {"call_chickadee": 3, "call_jay": 1, "call_robin": 2}
+		"climb":
+			if day > 0.5:
+				return {"call_raven": 2, "call_swift": 0 if winter else 3}
+			return {"call_owl": 1}
+		"world":
+			var world := get_tree().get_first_node_in_group("world")
+			var region: Region = world.region if world else null
+			if region and region.indoors:
+				return {}
+			var high := region != null and region.hub_id in HIGH_COUNTRY
+			if day > 0.5:
+				var birds := {
+					"call_chickadee": 3 if warm else 2,
+					"call_jay": 3 if season == GameClock.Season.FALL else 2,
+					"call_robin": 0 if winter or high else (4 if hour < 9.0 else 2),
+					"call_warbler": 2 if warm and not high else 0,
+					"call_woodpecker": 2 if not winter else 1,
+					"call_raven": 3 if winter or high else 1,
+				}
+				if high:
+					birds["call_swift"] = 0 if winter else 1
+				return birds
+			if winter:
+				return {"call_owl": 1}
+			return {"call_owl": 3, "call_frogs": 3 if warm and not high else 0, "call_coyote": 1}
+	return {}
+
+
+## Seconds until the next call: a dawn chorus comes thick and fast, night
+## calls are few, and birds keep quiet in the rain.
+func _call_gap() -> float:
+	var hour := GameClock.hour + GameClock.minute / 60.0
+	var gap := randf_range(CALL_GAP.x, CALL_GAP.y)
+	if _mode == "world" and hour >= 5.5 and hour < 8.0:
+		gap *= 0.45
+	elif _daylight() < 0.5:
+		gap *= 1.8
+	if _mode == "title":
+		gap *= 1.5
+	return gap * (1.0 + 3.0 * clampf(Weather.today().rain, 0.0, 1.0))
+
+
+## A weighted pick from [param choices], not the one that just called if
+## there's another.
+func _pick_call(choices: Dictionary) -> String:
+	var total := 0.0
+	for id: String in choices:
+		if id != _last_call or choices.size() == 1:
+			total += float(choices[id])
+	if total <= 0.0:
+		return ""
+	var roll := randf() * total
+	for id: String in choices:
+		if id == _last_call and choices.size() > 1:
+			continue
+		roll -= float(choices[id])
+		if roll < 0.0:
+			return id
+	return ""
+
+
+func _update_calls(delta: float) -> void:
+	_call_wait -= delta
+	if _call_wait > 0.0:
+		return
+	_call_wait = _call_gap()
+	var id := ""
+	var rain: float = Weather.today().rain if _mode == "world" else 0.0
+	if rain >= THUNDER_RAIN and randf() < 0.35 and not _indoors():
+		id = "thunder"
+	else:
+		id = _pick_call(call_choices())
+	if id == "":
+		return
+	_last_call = id
+	play_call(id)
+
+
+## Plays wildlife call (or thunder) [param id] from off to one side of the
+## view. Returns the player, for tests.
+func play_call(id: String) -> AudioStreamPlayer2D:
+	var stream := _stream(_pick(id))
+	if stream == null:
+		return null
+	var call := _calls[_next_call]
+	_next_call = (_next_call + 1) % _calls.size()
+	var side := -1.0 if randf() < 0.5 else 1.0
+	var offset := Vector2(side * randf_range(CALL_SPREAD.x, CALL_SPREAD.y), randf_range(-220.0, -40.0))
+	call.global_position = _listener_center() + offset
+	call.stream = stream
+	# Some from nearby, most from farther off.
+	call.volume_db = randf_range(-7.0, 0.0)
+	call.pitch_scale = 1.0 + randf_range(-0.04, 0.04)
+	call.play()
+	return call
+
+
+## Where the 2D listener is: the middle of what the camera sees.
+func _listener_center() -> Vector2:
+	var viewport := get_viewport()
+	var camera := viewport.get_camera_2d()
+	if camera:
+		return camera.get_screen_center_position()
+	return viewport.get_canvas_transform().affine_inverse() * (viewport.get_visible_rect().size / 2.0)
+
+
+func _indoors() -> bool:
+	var world := get_tree().get_first_node_in_group("world")
+	return world != null and world.region != null and world.region.indoors
+
+
 func _process(delta: float) -> void:
 	_update_music(delta)
+	_update_calls(delta)
 	var targets := bed_targets()
 	var k := 1.0 - exp(-delta * 3.0 / BED_FADE)
 	for bed: String in BEDS:

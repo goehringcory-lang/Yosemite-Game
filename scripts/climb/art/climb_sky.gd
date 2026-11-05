@@ -51,8 +51,9 @@ static func palette(hour: float) -> Dictionary:
 
 
 ## The sky: three colors stepped into flat bands with dithered seams, a sun
-## (or moon), and stars at night.
-static func sky(pal: Dictionary) -> Image:
+## (or moon), and stars at night. [param with_sun] false leaves the sun out,
+## for a view looking away from it (the glory from Half Dome).
+static func sky(pal: Dictionary, with_sun := true) -> Image:
 	var im := Image.create_empty(SCREEN.x, SCREEN.y, false, Image.FORMAT_RGBA8)
 	# The pattern repeats every 4 pixels across, so paint one 4-wide strip
 	# and copy it along the sky.
@@ -72,7 +73,7 @@ static func sky(pal: Dictionary) -> Image:
 	NightSky.paint(im, stars(pal))
 	if pal.night:
 		_disc(im, Vector2i(410, 46), 7, Color("d6f1ee"), Color("bdb8ae"))
-	else:
+	elif with_sun:
 		# The sun climbs out of the east in the morning and drops west at night.
 		var day_t := clampf((hour - 5.5) / 15.0, 0.0, 1.0)
 		var sun := Vector2i(int(lerpf(440, 330, day_t)), int(150 - sin(day_t * PI) * 120))

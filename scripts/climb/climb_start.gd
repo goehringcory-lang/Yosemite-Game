@@ -97,12 +97,15 @@ func climb(player: Player, top_out := true) -> bool:
 	var minigame: ClimbMinigame = MINIGAME.instantiate()
 	minigame.setup(route)
 	tree.root.add_child(minigame)
+	ScreenWipe.attach(minigame)
 	var state := minigame.state
 	var result: Array = await minigame.finished
 	var success: bool = result[0]
 	GameClock.paused = was_paused
 	Perks.note("perfect_cruxes", state.perfect_cruxes)
 	var report: Array[Dictionary] = []
+	if success:
+		Achievements.sent(route, state)
 	if success and QuestLog.record_climb(route.id):
 		report = QuestLog.tick_report(route.id)
 	player.can_act = true

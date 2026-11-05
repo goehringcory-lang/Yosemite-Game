@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tools/shots/room_windows_shot.gd" id="1"]
+
+[node name="RoomWindowsShot" type="Node"]
+script = ExtResource("1")

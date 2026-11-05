@@ -83,6 +83,20 @@ const PIECES := {
 		"arp": [0, -1, 2, -1, 4, -1, 2, -1], "arp_voice": "bell", "lead": "clarinet",
 		"lead_octave": 0, "pad": 0.18, "bass": 0.3, "busy": 0.35,
 	},
+	# The day's edges, the same in every season: first light (from the day's
+	# start until DAWN_UNTIL) and the evening (EVENING_FROM until the night).
+	"music_dawn": {
+		"seed": 71, "bpm": 66.0, "root": 52, "scale": LYDIAN,
+		"chords": [0, 1, 0, 4, 5, 1, 3, 4, 0, 1, 5, 3, 0, 1, 4, 0],
+		"arp": [0, -1, 2, 4, 5, 4, 2, -1], "arp_voice": "harp", "lead": "flute",
+		"lead_octave": 12, "pad": 0.16, "bass": 0.3, "busy": 0.35,
+	},
+	"music_dusk": {
+		"seed": 79, "bpm": 72.0, "root": 50, "scale": MIXOLYDIAN,
+		"chords": [0, 6, 3, 0, 5, 3, 6, 4, 0, 6, 3, 5, 3, 6, 4, 0],
+		"arp": [0, 2, 4, 2, 5, 2, 4, 2], "arp_voice": "guitar", "lead": "clarinet",
+		"lead_octave": 0, "pad": 0.14, "bass": 0.45, "busy": 0.4, "swing": 0.08,
+	},
 	"music_night": {
 		"seed": 53, "bpm": 60.0, "root": 53, "scale": MAJOR,
 		"chords": [0, 3, 5, 4, 0, 3, 1, 4, 3, 2, 5, 4, 0, 3, 4, 0],

@@ -107,6 +107,7 @@ func _rock_work(player: Player) -> void:
 	player.can_act = false
 	var game := RockWork.new()
 	get_tree().root.add_child(game)
+	ScreenWipe.attach(game)
 	game.start()
 	var set_it: bool = await game.finished
 	var outcome := game.outcome

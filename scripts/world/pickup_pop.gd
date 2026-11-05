@@ -1,7 +1,7 @@
 class_name PickupPop
 extends Sprite2D
 ## The picture of something you just picked up: it hops up off the ground,
-## then flies into the player and is gone. Purely for show; the item is
+## then flies into the player and is gone in a twinkle of gold. Purely for show; the item is
 ## already in the pack when this starts.
 ##
 ##   PickupPop.spawn(sprite, player)
@@ -32,7 +32,14 @@ func _ready() -> void:
 	var tween := create_tween()
 	tween.tween_property(self, "position:y", start.y - HOP, HOP_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_method(_fly.bind(start - Vector2(0, HOP)), 0.0, 1.0, FLY_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_callback(queue_free)
+	tween.tween_callback(_arrive)
+
+
+## In the pack: a little burst of gold where it went in.
+func _arrive() -> void:
+	if is_instance_valid(_player):
+		Sparkle.burst(get_parent(), _player.global_position + Vector2(0, -20), Sparkle.STAR)
+	queue_free()
 
 
 ## Moves from [param from] toward the player's chest, shrinking as it goes.

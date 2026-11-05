@@ -97,6 +97,9 @@ func _ready() -> void:
 	add_child(Critters.new())
 	add_child(Bears.new())
 	add_child(Deer.new())
+	add_child(Bobcats.new())
+	add_child(Owls.new())
+	add_child(Falcons.new())
 	add_child(RescueField.new())
 	add_child(Rustle.new())
 	add_child(StringLights.new())
@@ -114,6 +117,8 @@ func _ready() -> void:
 	LitSprites.attach_sprite(player.sprite)
 	# before the save loads, so it gets back which moments were seen
 	add_child(StoryMoments.new())
+	var first_day := FirstDay.new()
+	add_child(first_day)
 	var saved := SaveManager.peek_node(name)
 	var start := str(saved.get("region", Park.HOME_REGION))
 	start = RETIRED_REGIONS.get(start, start)
@@ -123,23 +128,11 @@ func _ready() -> void:
 	_enter_region(start, Park.HOME_SPAWN if start == Park.HOME_REGION else "arrival")
 	if not SaveManager.load_game():
 		SaveManager.clear_pending()
-		Inventory.start_new_game()
-		Park.start_new_game()
-		Gear.start_new_game()
-		Granary.start_new_game()
-		Recipes.start_new_game()
-		Cooking.start_new_game()
-		QuestLog.start_new_game()
-		Perks.start_new_game()
-		Friendship.start_new_game()
-		Herbarium.start_new_game()
-		BoardRequests.start_new_game()
-		Rescues.start_new_game()
-		FieldLog.start_new_game()
-		Festivals.start_new_game()
-		Stewardship.start_new_game()
+		NewGame.reset()
+		first_day.start_new_game()
 		if forage:
 			forage.respawn()
+	Achievements.settle()
 	hud.bind_player(player)
 	Sound.set_ambience("world")
 	add_child(Journal.new())
@@ -519,6 +512,7 @@ func _arrive() -> void:
 		plants.refresh()
 	if not region.indoors:
 		Chongo.visit(region)
+	RoomWindows.attach(region)
 	region_changed.emit(region)
 	_update_location()
 	_preload_neighbors()
@@ -693,7 +687,7 @@ func _hand_camera_over() -> void:
 	var target := camera.global_position
 	var eased := clampf(camera.position_smoothing_speed * get_process_delta_time(), 0.0, 1.0)
 	framing.carry = (_crossed_view - target) * (1.0 - eased)
-	camera.offset = Vector2(framing.carry.x, framing.tilt + framing.carry.y)
+	camera.offset = Vector2(framing.carry.x + framing.lead.x, framing.tilt + framing.carry.y + framing.lead.y)
 	camera.reset_smoothing()
 
 
@@ -818,6 +812,11 @@ func _fit_camera() -> void:
 func _set_paused(paused: bool) -> void:
 	player.can_act = not paused
 	GameClock.paused = paused
+
+
+## Where the player is, for the save menus (see SaveManager.slot_info).
+func location_name() -> String:
+	return _location_name() if region and player else ""
 
 
 ## "Cook's Meadow" inside a hub, or the region's name.

@@ -6,7 +6,8 @@ extends Node
 ##   SHOT_HOURS   comma-separated game hours to shoot at (default 7,12,19)
 ##   SHOT_MOVES   moves to climb before each shot (default 5)
 ##   SHOT_INTRO   1 to shoot the route card instead of the climb
-##   SHOT_SPECIAL cards to shoot instead: "crux", "pumped", "dyno", "result", "pause", "night"
+##   SHOT_SPECIAL cards to shoot instead: "crux", "pumped", "dyno", "result", "pause", "night",
+##                or "falcon" for a peregrine stooping past the wall
 ##   SHOT_DIR     folder for the PNGs (default user://)
 ##   SHOT_UNLIT   1 to leave the wall unlit (ClimbLight off), as on Low
 ##   SHOT_PAD     1 to show the gamepad's buttons in the hints
@@ -95,11 +96,18 @@ func _ready() -> void:
 				game._result_age = 2.0
 			"pause":
 				game._phase = ClimbMinigame.Phase.PAUSE
+			"falcon":
+				game.send_falcon()
 			"night":
 				game._night = {"night": 1, "place": "hanging", "meal": "an acorn cake"}
 				game._phase = ClimbMinigame.Phase.NIGHT
 				game._night_age = 2.0
 		for f in 40:
+			await get_tree().process_frame
+		if _env("SHOT_SPECIAL", "") == "falcon":
+			# catch it mid-stoop, over the sky
+			game._falcon_from = Vector2(ClimbMinigame.SCREEN.x * 0.92, -8.0)
+			game._falcon_t = 0.42
 			await get_tree().process_frame
 		_save(dir, route.id, hour)
 		game.queue_free()
