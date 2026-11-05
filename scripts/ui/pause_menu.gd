@@ -42,13 +42,14 @@ const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again 
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
 const TITLE_CONFIRM := "To the title? Progress since your last save is lost. Press again."
 const TITLE_SAVED := "To the title? Your game is saved. Press again."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, FONT, GRAPHICS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Font", "Graphics", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, FONT, GRAPHICS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Font", "Graphics", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill the screen. The picture stays sharp in whole-pixel steps.",
 	"The window's size, in whole steps of 960 x 540.",
 	"Which buttons hints name. Auto follows the last device you used.",
+	"The first day's card under the clock, naming the next thing to try.",
 	"Smooth letters are easiest to read; pixel letters match the art.",
 	"Low uses a simpler renderer for older computers. A change takes effect when you next start the game.",
 	"How loud the whole game is.",
@@ -841,6 +842,8 @@ func change_setting(which: int, step: int) -> void:
 			Settings.window_scale = clampi(Settings.window_scale + step, Settings.MIN_SCALE, Settings.max_window_scale())
 		Setting.PROMPTS:
 			Settings.prompts = wrapi(Settings.prompts + step, 0, Settings.Prompts.size()) as Settings.Prompts
+		Setting.TIPS:
+			Settings.tips = not Settings.tips
 		Setting.MASTER_VOLUME:
 			Settings.master_volume = clampi(Settings.master_volume + step, 0, Settings.MAX_VOLUME)
 		Setting.MUSIC_VOLUME:
@@ -999,6 +1002,8 @@ func _setting_value(which: int) -> String:
 			value = "%dx  (%d x %d)" % [Settings.window_scale, Settings.BASE_SIZE.x * Settings.window_scale, Settings.BASE_SIZE.y * Settings.window_scale]
 		Setting.PROMPTS:
 			value = Settings.PROMPT_NAMES[Settings.prompts]
+		Setting.TIPS:
+			value = "On" if Settings.tips else "Off"
 		Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME:
 			value = _volume_text(_volume(which))
 		_:

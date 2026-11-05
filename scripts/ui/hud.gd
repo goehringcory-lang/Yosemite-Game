@@ -158,6 +158,18 @@ func _ready() -> void:
 	prompt_panel.add_theme_stylebox_override("panel", bubble)
 
 
+## Adds [param control] to the HUD's screen, under the wipe, so the black
+## between places covers it (the first day's card and arrow use it).
+func add_overlay(control: Control) -> void:
+	_screen.add_child(control)
+	_screen.move_child(control, fade.get_index())
+
+
+## True while a menu, map or conversation covers the screen.
+func is_covered() -> bool:
+	return _covered
+
+
 func bind_player(player: Player) -> void:
 	_player = player
 	_refresh_clock()

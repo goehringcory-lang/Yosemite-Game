@@ -327,6 +327,7 @@ func interact(player: Player) -> void:
 		return
 	_busy = true
 	player.can_act = false
+	Perks.note("casts")
 	var world := get_tree().get_first_node_in_group("world")
 	var fly := tied_fly()
 	var fish := pick(world.region.hub_id, GameClock.season, fly, FishingWater.kind_at(get_tree(), cast_point(player)))

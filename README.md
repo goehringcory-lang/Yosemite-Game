@@ -70,6 +70,14 @@ As you play, the valley teaches you **perks**: small, permanent bonuses earned f
 
 Sleep in the tent to end the day, which also saves the game. First comes the day's page: the date, then what the day brought, counted out one by one (see [Game feel](#game-feel)). You can also save any time from the pause menu (Esc, then Save game, then a slot; saving into another slot moves the game there, after asking if that slot holds another game): it keeps where you're standing, the time of day, and everything you're carrying, and Continue on the title screen picks up right there. If you're still up at 2 AM you pass out, and the game moves to the next day anyway. Once you have a wilderness permit you can also sleep out at the backcountry camp in Little Yosemite Valley (see *The first night out and Half Dome*).
 
+## The first day
+
+A new game teaches itself as you go, one small step at a time, with no text walls. A little card under the clock names the next thing to try with its button drawn in ("[WASD] Walk around camp", "[E] Talk to Galen Clark"), and a gold arrow points the way to what it's about: it bobs over a campfire, a tent or a fishing hole when it's on screen, and sits at the screen's edge pointing toward it when it isn't (a person's own quest bubble marks them, so the arrow only points from off screen). Do the thing and the line turns green with a soft chime, and the next one slides in.
+
+The lessons wait for their moment rather than a schedule: walk, talk to Clark, gather three things to eat, look in the backpack, check your quests, run, then out the south gate to Curry Village and a look at the map. When evening comes it's supper at the campfire (if you have something raw for the pot) and then bed in your tent; once Wren is waiting at Firefall Slab it's the climb, and once Greg's rod is in your pack it's a cast. Anything you've already done by yourself is marked off without being shown, and the climbing and fishing screens teach their own buttons once you're on them. The buttons follow the device you're using. **Tips** in the pause menu's Settings turns the card off, and saves from before it existed load with it finished.
+
+The code is `scripts/story/first_day.gd` (World adds one; it saves which lessons are done), and `tests/first_day_test.tscn` walks through it.
+
 ## Game feel
 
 The small touches that make the Valley feel alive, in the spirit of Stardew Valley. [docs/POLISH.md](docs/POLISH.md) goes through Stardew's hallmarks one by one: what this game does for each, where it lives, how it's checked, and what isn't done. The tests are in `tests/polish_test.tscn`, and `SHOT_DIR=/tmp/shots xvfb-run -a godot --path . res://tools/shots/polish_shot.tscn` photographs each one.
