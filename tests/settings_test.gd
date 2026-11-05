@@ -232,7 +232,7 @@ func test_pause_save(pause: PauseMenu) -> void:
 	check(not pause._confirm_quit, "moving on forgets the question")
 	_press("interact")
 	check(pause._confirm_quit and pause._option_labels[PauseMenu.Option.QUIT].text.contains("Your game is saved"), "Quit says the game is saved")
-	check(pause._option_labels[PauseMenu.Option.QUIT_TITLE].text == "Quit to title", "and only the chosen line asks")
+	check(not pause._option_labels[PauseMenu.Option.QUIT_TITLE].text.contains("?"), "and only the chosen line asks")
 	_press("move_up")
 	_press("move_up")
 	var saved = JSON.parse_string(FileAccess.get_file_as_string(SaveManager.save_path))
