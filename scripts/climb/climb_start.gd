@@ -104,6 +104,8 @@ func climb(player: Player, top_out := true) -> bool:
 	GameClock.paused = was_paused
 	Perks.note("perfect_cruxes", state.perfect_cruxes)
 	var report: Array[Dictionary] = []
+	if success:
+		Achievements.sent(route, state)
 	if success and QuestLog.record_climb(route.id):
 		report = QuestLog.tick_report(route.id)
 	player.can_act = true
