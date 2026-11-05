@@ -18,6 +18,7 @@ const WORLD_ABILITIES := {
 	"night_out": "a night at the backcountry camp (Backcountry)",
 	"half_dome_cables": "climbing the Half Dome cables (Backcountry)",
 	"diving_board_light": "the Diving Board in the afternoon (Backcountry)",
+	"muir_cloud_sea": "on top of Half Dome before ten after a night at Little Yosemite (Backcountry)",
 }
 
 var failures := 0
