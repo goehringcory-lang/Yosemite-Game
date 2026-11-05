@@ -3,6 +3,8 @@ extends Node2D
 ## The top of Half Dome. The first time you walk out onto it, by the cables
 ## or off the end of Snake Dike, the view down the Valley plays
 ## (Backcountry.SUMMIT_VIEW) and the summit is marked (Backcountry.SUMMIT).
+## Up here early in the morning for John Muir's quest, it plays the sea of
+## cloud instead (Backcountry.CLOUD_SEA_VIEW), once.
 
 ## How close you have to come, in pixels.
 @export var radius := 320.0
@@ -12,9 +14,12 @@ var _check := 0.0
 
 func _process(delta: float) -> void:
 	_check -= delta
-	if _check > 0.0 or QuestLog.is_unlocked(Backcountry.SUMMIT):
+	if _check > 0.0:
 		return
 	_check = 0.25
+	var cloud := Backcountry.cloud_sea_due()
+	if not cloud and QuestLog.is_unlocked(Backcountry.SUMMIT):
+		return
 	var world := get_tree().get_first_node_in_group("world")
 	if world == null or world.get("_busy") or not "player" in world:
 		return
@@ -25,4 +30,8 @@ func _process(delta: float) -> void:
 		if not box.is_queued_for_deletion():
 			return
 	Backcountry.mark(Backcountry.SUMMIT)
-	Backcountry.show_view(player, Backcountry.SUMMIT_VIEW, Backcountry.SUMMIT_WORDS)
+	if cloud:
+		Backcountry.mark(Backcountry.CLOUD_SEA)
+		Backcountry.show_view(player, Backcountry.CLOUD_SEA_VIEW, Backcountry.CLOUD_SEA_WORDS)
+	else:
+		Backcountry.show_view(player, Backcountry.SUMMIT_VIEW, Backcountry.SUMMIT_WORDS)

@@ -36,6 +36,8 @@ func _ready() -> void:
 	test_quests()
 	await test_places(world)
 	await test_sleep_out(world)
+	test_muir_quest()
+	await test_cloud_sea(world)
 	SaveManager.delete_save()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
@@ -240,3 +242,59 @@ func test_sleep_out(world: Node) -> void:
 	check(str(saved.get("region", "")) == "little_yosemite_valley", "and the game saved there")
 	await world.sleep()
 	check(world.region.region_id == Park.HOME_REGION, "the tent at home still takes you home")
+
+
+func test_muir_quest() -> void:
+	_fresh()
+	check(QuestLog.get_quest(Backcountry.MUIR_QUEST) != null and RegisterPages.HISTORY.has(Backcountry.MUIR_QUEST), "Muir's Above the Clouds is a quest with a Register note")
+	QuestLog.completed.append_array(["muir_cathedral", "muir_glacier", "muir_soda_springs", "muir_cassiope"])
+	QuestLog.talk_to("john_muir")
+	check(not QuestLog.active.has(Backcountry.MUIR_QUEST), "Muir waits until you've been up Anderson's cables")
+	QuestLog.completed.append("anderson_cables")
+	var season := GameClock.season
+	GameClock.season = GameClock.Season.WINTER
+	var lines := QuestLog.talk_to("john_muir")
+	check(not QuestLog.active.has(Backcountry.MUIR_QUEST) and said(lines, "till summer"), "in winter Muir says the Dome will keep till summer")
+	GameClock.season = GameClock.Season.SUMMER
+	QuestLog.talk_to("john_muir")
+	check(QuestLog.active.has(Backcountry.MUIR_QUEST), "in summer Muir sends you up the Dome for sunrise")
+	GameClock.minutes = 12 * 60
+	check(not Backcountry.cloud_sea_due(), "at noon there's no cloud in the Valley to see")
+	GameClock.minutes = 7 * 60
+	check(Backcountry.cloud_sea_due(), "at seven in the morning there is")
+	QuestLog.talk_to("john_muir")
+	check(QuestLog.active.has(Backcountry.MUIR_QUEST), "talking to Muir before you've been up doesn't finish it")
+	Backcountry.mark(Backcountry.CLOUD_SEA)
+	check(not Backcountry.cloud_sea_due(), "the sea of cloud shows only once")
+	lines = QuestLog.talk_to("john_muir")
+	lines = QuestLog.talk_to("john_muir") if QuestLog.active.has(Backcountry.MUIR_QUEST) else lines
+	check(QuestLog.is_completed(Backcountry.MUIR_QUEST) and Inventory.count("dry_crusts") >= 3, "telling Muir finishes Above the Clouds, with crusts for the trail")
+	GameClock.season = season
+	GameClock.minutes = GameClock.DAY_START_HOUR * 60
+
+
+func test_cloud_sea(world: Node) -> void:
+	_fresh()
+	QuestLog.completed.append_array(["muir_cathedral", "muir_glacier", "muir_soda_springs", "muir_cassiope", "anderson_cables"])
+	var season := GameClock.season
+	GameClock.season = GameClock.Season.SUMMER
+	QuestLog.talk_to("john_muir")
+	check(QuestLog.active.has(Backcountry.MUIR_QUEST), "(Muir's quest is open)")
+	GameClock.minutes = 7 * 60
+	world._enter_region("half_dome", "summit")
+	var vista: StoryVista = null
+	for i in 60:
+		await get_tree().physics_frame
+		for child in get_tree().root.get_children():
+			if child is StoryVista:
+				vista = child
+		if vista:
+			break
+	check(vista != null and vista.spec.get("cloud_sea", false), "on top at seven with Muir's quest, the summit shows the sea of cloud")
+	check(QuestLog.is_unlocked(Backcountry.CLOUD_SEA) and QuestLog.is_unlocked(Backcountry.SUMMIT), "and marks the cloud sea and the summit")
+	if vista:
+		vista.close()
+		await vista.finished
+	check(world.player.can_act, "and gives the player back when it closes")
+	GameClock.season = season
+	GameClock.minutes = GameClock.DAY_START_HOUR * 60
