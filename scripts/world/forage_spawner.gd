@@ -77,7 +77,7 @@ func respawn() -> void:
 		return
 	spawned_day = _today()
 	var habitats := _find_habitats()
-	var taken := {}
+	var taken := _keep_clear()
 	for item in ItemDB.forage_items():
 		if not item.is_forageable_in(GameClock.season):
 			continue
@@ -94,6 +94,23 @@ func respawn() -> void:
 	for i in int(Perks.bonus("enids_eye")):
 		_spawn_extra(habitats, taken)
 	_spawn_litter(habitats, taken)
+
+
+## Cells to leave empty: round each thing a quest sends you to pick up
+## (StoryPickup), so no berry bush or flower is drawn over Greg's fly box.
+## Pickups have no body for _is_unblocked to find.
+func _keep_clear() -> Dictionary:
+	var cells := {}
+	var region := get_parent()
+	while region and not region is Region:
+		region = region.get_parent()
+	if region == null:
+		return cells
+	for node in region.find_children("*", "StoryPickup", true, false):
+		var pickup := node as StoryPickup
+		if pickup and not pickup.taken:
+			_mark_around(cells, world_to_cell(pickup.global_position))
+	return cells
 
 
 ## Enid's Eye (a perk): one more find of something in season, on a free spot.
