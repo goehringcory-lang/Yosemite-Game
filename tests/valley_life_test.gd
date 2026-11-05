@@ -497,8 +497,14 @@ func test_facelift(world: Node) -> void:
 func test_journal_and_day_log(world: Node) -> void:
 	var lines := _journal_lines()
 	check("Field log: %d of %d animals" % [FieldLog.count(), FieldLog.total()] in lines, "the Journal has the field log, with its count")
-	check(_has_line(lines, "American Robin (Turdus migratorius)"), "a logged animal shows its Latin name")
-	check(_has_line(lines, "Steller's Jay · All year. Open ground"), "one not yet logged shows when and where to look")
+	var journal: Journal = get_tree().get_first_node_in_group("journal")
+	journal.open(Journal.Tab.WILDLIFE)
+	var robin: Array = journal._slot_items.filter(func(i: Dictionary) -> bool: return i.name == "American Robin")
+	var jay: Array = journal._slot_items.filter(func(i: Dictionary) -> bool: return i.name.begins_with("Steller's Jay"))
+	journal.close()
+	check(not robin.is_empty() and "Turdus migratorius" in robin[0].facts, "a logged animal shows its Latin name on the Wildlife tab")
+	check(not jay.is_empty() and jay[0].dim and jay[0].facts == "All year" and jay[0].description.begins_with("Look: Open ground"),
+		"one not yet logged shows when and where to look")
 	var quests := _journal_lines(Journal.Tab.QUESTS)
 	if not BoardRequests.taken.is_empty():
 		check(_has_line(quests, "Notes from the Camp 4 board"), "the Quests tab lists the board's notes")
