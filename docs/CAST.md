@@ -248,6 +248,9 @@ After the Nose (Tuolumne open):
 After Tuolumne (Muir's glacier first):
   Muir: A Fire at Soda Springs .... supper for two (40 energy), then sit by his fire after dark
                                     (8 PM to 2 AM) → dry crusts recipe, 2 bread
+  Muir: Above the Clouds .......... (summer and fall; after Cathedral Peak and Anderson's Cables) a night at
+                                    Little Yosemite Valley, on top of Half Dome before 10 AM: the Valley under
+                                    cloud and your shadow in a glory; tell him → 3 dry crusts, 2 yerba buena
 The seasons, the hours, and the hubs past the Valley:
   Clark: The Big Trees ............ (after Swan Slab) a sequoia cone from the Grizzly Giant,
                                     Mariposa Grove at Wawona → pilot bread, apricots

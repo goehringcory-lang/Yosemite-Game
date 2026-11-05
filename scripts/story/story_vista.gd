@@ -144,7 +144,7 @@ func _build_words() -> void:
 ## landmark layer and how far down its face (0 the skyline, 1 its foot).
 func _paint() -> void:
 	var pal := ClimbSky.palette(float(spec.get("hour", 12.0)))
-	_sky = ImageTexture.create_from_image(ClimbSky.sky(pal))
+	_sky = ImageTexture.create_from_image(ClimbSky.sky(pal, not spec.get("sun_behind", false)))
 	var land := ClimbLandscape.build({"view": spec.get("view", []), "ground": spec.get("ground", "valley_forest"),
 		"alpine": spec.get("alpine", false)}, pal, hash(spec.get("title", "")))
 	_layers.clear()
@@ -233,6 +233,8 @@ func _draw_picture() -> void:
 		c.draw_texture(l.tex, Vector2(0, roundf(h * l.sink) - l.pad))
 		if i == _figure_layer and _figure.x >= 0.0 and spec.get("figure_kind", "climber") != "wreck":
 			_draw_figure(c, _figure + Vector2(0, roundf(h * l.sink) - l.pad))
+	if spec.get("cloud_sea", false):
+		_draw_cloud_sea(c, roundf(h * _layers[1].sink) - _layers[1].pad)
 	if spec.get("figure_kind", "") == "wreck":
 		# the wreck lies in the near grass, in front of everything
 		_draw_wreck(c, Vector2(spec.get("wreck_x", 300.0), SCREEN.y - BOTTOM_BAR - 14.0))
@@ -270,6 +272,49 @@ func _draw_figure(c: CanvasItem, at: Vector2) -> void:
 	c.draw_rect(Rect2(p + Vector2(0, -4), Vector2(2, 3)), Color("3a4466"))
 	c.draw_rect(Rect2(p + Vector2(0, -9), Vector2(2, 2)), Color("f0c088"))
 	c.draw_rect(Rect2(p + Vector2(-2, -8), Vector2(1, 2)), Color("f0c088"))
+
+
+## A sea of cloud filling the Valley up to the middle layer's feet, lit
+## from behind the viewer, and their shadow on it ringed by a glory (the
+## round rainbow seen around your own shadow on cloud, with the sun at your
+## back). [param shift] is where the middle layer is drawn.
+func _draw_cloud_sea(c: CanvasItem, shift: float) -> void:
+	var top := ClimbLandscape.LAYER_BASE[1] + ClimbLandscape.PAD - 52.0 + shift
+	var bottom := SCREEN.y - BOTTOM_BAR
+	var lit := Color("fff4e6")
+	var body := Color("e6dce8")
+	var shade := Color("b8b0cc")
+	# the deck: billows along the top, slowly drifting, shading down
+	var step := 4.0
+	var x := 0.0
+	while x < SCREEN.x:
+		var bump := 3.0 * sin(x * 0.045 + _time * 0.15) + 2.0 * sin(x * 0.11 - _time * 0.1) + 1.5 * sin(x * 0.23)
+		var y0 := roundf(top + bump)
+		c.draw_rect(Rect2(x, y0, step, 2), lit)
+		c.draw_rect(Rect2(x, y0 + 2, step, 5), body)
+		c.draw_rect(Rect2(x, y0 + 7, step, bottom - y0 - 7), body.lerp(shade, 0.35))
+		x += step
+	# soft bands of shade in the deck, further down
+	for k in 4:
+		var y := top + 14.0 + k * 11.0
+		for xx in range(0, int(SCREEN.x), 8):
+			var w := sin(xx * 0.03 + k * 1.7 + _time * 0.08)
+			if w > 0.2:
+				c.draw_rect(Rect2(xx, y + roundf(w * 2.0), 8, 2), shade.lerp(body, 0.4))
+	# the glory, and your shadow at its middle, thrown long down the cloud
+	var g := Vector2(float(spec.get("glory_x", 240.0)), top + 18.0)
+	var pulse := 0.85 + 0.15 * sin(_time * 1.2)
+	var bands := [Color("6a7ad8"), Color("6ac0a0"), Color("e8d860"), Color("e89a5a"), Color("d0607a")]
+	for i in bands.size():
+		var col: Color = bands[i]
+		col.a = 0.55 * pulse
+		c.draw_arc(g, 11.0 + i * 2.0, 0.0, TAU, 40, col, 2.0)
+	c.draw_arc(g, 8.0, 0.0, TAU, 32, Color(1, 1, 1, 0.5 * pulse), 4.0)
+	var dark := Color(0.32, 0.3, 0.42, 0.75)
+	c.draw_rect(Rect2(g + Vector2(-1, -4), Vector2(3, 3)), dark)
+	c.draw_rect(Rect2(g + Vector2(-2, -1), Vector2(5, 7)), dark)
+	c.draw_colored_polygon(PackedVector2Array([g + Vector2(-2, 6), g + Vector2(3, 6), g + Vector2(6, 26), g + Vector2(-5, 26)]),
+		Color(dark, 0.45))
 
 
 ## The old car at El Portal, one axle gone: rust on the gold grass.
@@ -328,6 +373,12 @@ func _draw_foreground(c: CanvasItem) -> void:
 					var half := 15.0 * (1.0 - t * 0.7)
 					c.draw_colored_polygon(PackedVector2Array([Vector2(x - half, y0), Vector2(x, y0 - hgt * 0.38),
 						Vector2(x + half, y0), Vector2(x + half * 0.6, y0 + 2), Vector2(x - half * 0.6, y0 + 2)]), dark)
+	if spec.get("foreground", "") == "summit_lip":
+		# the edge of the summit, granite lit pink by the sun behind you
+		var rock := PackedVector2Array([Vector2(0, bottom - 9), Vector2(120, bottom - 12), Vector2(230, bottom - 7),
+			Vector2(330, bottom - 11), Vector2(480, bottom - 6), Vector2(480, bottom), Vector2(0, bottom)])
+		c.draw_colored_polygon(rock, Color("3a2e34"))
+		c.draw_polyline(PackedVector2Array([rock[0], rock[1], rock[2], rock[3], rock[4]]), Color("c89888"), 1.0)
 	if spec.get("photograph", false):
 		# the white border of the print
 		var edge := 10.0
