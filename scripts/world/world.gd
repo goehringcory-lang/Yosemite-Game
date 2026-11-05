@@ -114,6 +114,8 @@ func _ready() -> void:
 	LitSprites.attach_sprite(player.sprite)
 	# before the save loads, so it gets back which moments were seen
 	add_child(StoryMoments.new())
+	var first_day := FirstDay.new()
+	add_child(first_day)
 	var saved := SaveManager.peek_node(name)
 	var start := str(saved.get("region", Park.HOME_REGION))
 	start = RETIRED_REGIONS.get(start, start)
@@ -138,6 +140,7 @@ func _ready() -> void:
 		FieldLog.start_new_game()
 		Festivals.start_new_game()
 		Stewardship.start_new_game()
+		first_day.start_new_game()
 		if forage:
 			forage.respawn()
 	hud.bind_player(player)

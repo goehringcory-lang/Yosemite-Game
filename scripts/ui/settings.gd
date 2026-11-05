@@ -45,6 +45,8 @@ static var window_scale := 2
 ## Which buttons the on-screen hints name: follow the last device used, or
 ## always the keyboard's or the gamepad's.
 static var prompts := Prompts.AUTO
+## The first day's tips (FirstDay): the card naming the next thing to try.
+static var tips := true
 ## Volume of everything, of one-shot sounds (steps, climbing, menus), and of
 ## the ambience (birds, wind, rain, campfires, waterfalls); 0 to MAX_VOLUME.
 static var master_volume := 8
@@ -139,6 +141,7 @@ static func load_settings() -> void:
 	fullscreen = bool(config.get_value("display", "fullscreen", fullscreen))
 	window_scale = clampi(int(config.get_value("display", "window_scale", window_scale)), MIN_SCALE, MAX_SCALE)
 	prompts = clampi(int(config.get_value("input", "prompts", prompts)), 0, Prompts.size() - 1) as Prompts
+	tips = bool(config.get_value("input", "tips", tips))
 	master_volume = clampi(int(config.get_value("audio", "master", master_volume)), 0, MAX_VOLUME)
 	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
 	music_volume = clampi(int(config.get_value("audio", "music", music_volume)), 0, MAX_VOLUME)
@@ -160,6 +163,7 @@ static func save() -> Error:
 	config.set_value("display", "fullscreen", fullscreen)
 	config.set_value("display", "window_scale", window_scale)
 	config.set_value("input", "prompts", int(prompts))
+	config.set_value("input", "tips", tips)
 	config.set_value("audio", "master", master_volume)
 	config.set_value("audio", "effects", effects_volume)
 	config.set_value("audio", "music", music_volume)
@@ -232,6 +236,7 @@ static func reset_defaults() -> void:
 	fullscreen = false
 	window_scale = 2
 	prompts = Prompts.AUTO
+	tips = true
 	master_volume = 8
 	effects_volume = MAX_VOLUME
 	music_volume = 8
