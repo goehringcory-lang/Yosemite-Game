@@ -1,16 +1,25 @@
 class_name PauseMenu
 extends CanvasLayer
-## Esc (gamepad Start) pauses the game. World adds one. Three pages:
+## Esc (gamepad Start) pauses the game. World adds one. Four pages:
 ##   Main: Resume, Save game, Settings, Controls, Quit, and your current goal
-##   Settings: text speed, full screen, window size, button prompts, and
-##     the volumes
-##   Controls: every control, keyboard and gamepad
+##   Settings: text speed, full screen, window size, button prompts, font,
+##     graphics, the volumes, and the way to Controls
+##   Controls: each control's key, which you can change, and its gamepad button
+##   Saves: the save slots, to save into (or, from the title screen, to load
+##     or to start a new game in)
 ## Up/Down choose, E (A) selects, Left/Right change a setting, Esc (B) goes back.
-## The title screen opens the Settings page on its own with open_settings().
+## The title screen opens the Settings page on its own with open_settings(),
+## and the Saves page with open_slots().
 
 signal closed
+## The title screen's Load game or New Game picked slot [param slot]: the
+## slot is set on SaveManager (and New Game has called start_fresh()), so the
+## World can start.
+signal slot_chosen(slot: int)
 
-enum Page { MAIN, SETTINGS, CONTROLS }
+enum Page { MAIN, SETTINGS, CONTROLS, SLOTS }
+## What the Saves page is for.
+enum SlotMode { SAVE, LOAD, NEW }
 
 const CONTROLS := [
 	["Walk (hold to run)", "WASD or arrows (Shift)", "Stick or D-pad (B or RT)"],
@@ -30,8 +39,8 @@ enum Option { RESUME, SAVE, SETTINGS, CONTROLS, QUIT }
 const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Quit to desktop"]
 const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again to quit."
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, FONT, GRAPHICS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Font", "Graphics", "Volume", "Music", "Sound effects", "Ambience", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, FONT, GRAPHICS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Font", "Graphics", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill the screen. The picture stays sharp in whole-pixel steps.",
@@ -43,8 +52,17 @@ const SETTING_HELP := [
 	"The songs for each season, the night, and the title screen.",
 	"Footsteps, climbing, and menus.",
 	"Birds, crickets, wind, rain, campfires, and waterfalls.",
+	"See every control, and change which key does what.",
 	"Back to the pause menu.",
 ]
+## The Controls page's rows after the keys.
+## How many keys the Controls page lists in its left column.
+const CONTROLS_PER_COLUMN := 7
+const CONTROLS_RESET := "Reset keys"
+const CONTROLS_BACK := "Back"
+const CONTROLS_NOTE := "Menus also take the arrows, Enter, and Esc. Climbing: E eats or chalks up, Esc retreats."
+const LISTEN_TEXT := "Press a key for %s.  Esc keeps the old one."
+const RESERVED_TEXT := "Esc, Enter, Tab, and the arrows stay with the menus."
 ## A line that plays at the chosen text speed while Text speed is selected.
 const SPEED_SAMPLE := "Sample: The granite glows gold at dusk."
 const HEADING := Color(1, 0.831, 0.541)
@@ -78,6 +96,27 @@ var _help_label: Label
 var _sample_label: Label
 var _sample_shown := 0.0
 var _device_headers: Array[Label] = []
+## Controls page: a name, key and pad label per binding, then Reset and Back.
+var _control_names: Array[Label] = []
+var _control_keys: Array[Label] = []
+var _control_note: Label
+var _controls_cursor := 0
+## The binding (an index into Settings.BINDINGS) waiting for a key, or -1.
+var _listening := -1
+var _controls_message := ""
+## Controls was opened from the Settings page, so Back goes there.
+var _controls_from_settings := false
+## Saves page: two lines per slot, then Back.
+var _slot_labels: Array[Label] = []
+var _slot_details: Array[Label] = []
+var _slot_back: Label
+var _slot_note: Label
+var _slot_mode := SlotMode.SAVE
+var _slot_cursor := 0
+## The slot waiting for a second press before it's written over (0: none).
+var _slot_confirm := 0
+## Opened by open_slots(): backing out of Saves closes the menu.
+var _slots_only := false
 var _cursor := 0
 var _settings_cursor := 0
 var _confirm_quit := false
@@ -131,6 +170,7 @@ func _ready() -> void:
 	_pages.append(_build_main())
 	_pages.append(_build_settings())
 	_pages.append(_build_controls())
+	_pages.append(_build_slots())
 	for page in _pages:
 		column.add_child(page)
 	var filler := Control.new()
@@ -306,20 +346,81 @@ func _card_panel() -> PanelContainer:
 
 
 func _build_controls() -> Control:
+	var page := VBoxContainer.new()
+	page.add_theme_constant_override("separation", 0)
+	# the keys in two columns side by side, so all of them fit the screen
 	var grid := GridContainer.new()
-	grid.columns = 3
-	grid.add_theme_constant_override("h_separation", 6)
+	grid.columns = 7
+	grid.add_theme_constant_override("h_separation", 4)
 	grid.add_theme_constant_override("v_separation", 0)
-	grid.add_child(_label(""))
-	for header in ["Keyboard and mouse", "Gamepad"]:
-		var label := _label(header, HEADING)
-		grid.add_child(label)
-		_device_headers.append(label)
-	for row: Array in CONTROLS:
-		grid.add_child(_label(row[0], HEADING))
-		grid.add_child(_label(row[1]))
-		grid.add_child(_label(row[2]))
-	return grid
+	page.add_child(grid)
+	for side in 2:
+		if side == 1:
+			grid.add_child(_spacer_x(10))
+		grid.add_child(_label(""))
+		for header in ["Keyboard", "Gamepad"]:
+			var label := _label(header, HEADING)
+			grid.add_child(label)
+			_device_headers.append(label)
+	var count := Settings.BINDINGS.size()
+	_control_names.resize(count)
+	_control_keys.resize(count)
+	for row in CONTROLS_PER_COLUMN:
+		for side in 2:
+			var i := row + side * CONTROLS_PER_COLUMN
+			if side == 1:
+				grid.add_child(_spacer_x(10))
+			if i >= count:
+				for n in 3:
+					grid.add_child(_label(""))
+				continue
+			var b: Dictionary = Settings.BINDINGS[i]
+			var name_label := _label(b.name)
+			grid.add_child(name_label)
+			_control_names[i] = name_label
+			var key := ButtonHints.new()
+			key.custom_minimum_size = Vector2(30, 12)
+			grid.add_child(key)
+			_control_keys[i] = key
+			grid.add_child(_label(b.pad, DIM))
+	page.add_child(_spacer(3))
+	for text in [CONTROLS_RESET, CONTROLS_BACK]:
+		var label := _label(text)
+		page.add_child(label)
+		_control_names.append(label)
+	page.add_child(_spacer(3))
+	_control_note = _label("", DIM)
+	_control_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_control_note.custom_minimum_size.x = PANEL_SIZE.x - 16
+	page.add_child(_control_note)
+	return page
+
+
+func _spacer_x(width: int) -> Control:
+	var spacer := Control.new()
+	spacer.custom_minimum_size.x = width
+	return spacer
+
+
+func _build_slots() -> Control:
+	var page := VBoxContainer.new()
+	page.add_theme_constant_override("separation", 0)
+	for n in SaveManager.SLOTS:
+		var label := _label("")
+		page.add_child(label)
+		_slot_labels.append(label)
+		var detail := _label("", DIM)
+		page.add_child(detail)
+		_slot_details.append(detail)
+		page.add_child(_spacer(3))
+	_slot_back = _label("")
+	page.add_child(_slot_back)
+	page.add_child(_spacer(4))
+	_slot_note = _label("", DIM)
+	_slot_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_slot_note.custom_minimum_size.x = PANEL_SIZE.x - 16
+	page.add_child(_slot_note)
+	return page
 
 
 func is_open() -> bool:
@@ -334,6 +435,8 @@ func open() -> void:
 	_save_note = ""
 	_just_saved = false
 	_settings_only = false
+	_slots_only = false
+	_listening = -1
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud and not hud.device_changed.is_connected(_refresh):
 		hud.device_changed.connect(_refresh)
@@ -351,6 +454,30 @@ func open_settings() -> void:
 	open()
 	_settings_only = true
 	_show_page(Page.SETTINGS)
+
+
+## Opens straight onto the Saves page, for the title screen's Load game
+## (SlotMode.LOAD) or New Game (SlotMode.NEW); Back closes the menu.
+func open_slots(mode: SlotMode) -> void:
+	open()
+	_slots_only = true
+	_show_slots(mode)
+
+
+## Turns to the Saves page, the cursor on the slot that makes sense: the one
+## being played (Save), the newest (Load), or the first empty one (New Game).
+func _show_slots(mode: SlotMode) -> void:
+	_slot_mode = mode
+	_slot_confirm = 0
+	_save_note = ""
+	var n := SaveManager.slot
+	match mode:
+		SlotMode.LOAD:
+			n = SaveManager.latest_slot()
+		SlotMode.NEW:
+			n = SaveManager.first_empty_slot()
+	_slot_cursor = clampi(n, 1, SaveManager.SLOTS) - 1
+	_show_page(Page.SLOTS)
 
 
 func close() -> void:
@@ -386,12 +513,20 @@ func _show_page(which: Page) -> void:
 	_page = which
 	for i in _pages.size():
 		_pages[i].visible = i == which
-	_title.text = ["Paused", "Settings", "Controls"][which]
+	_title.text = ["Paused", "Settings", "Controls", _slots_title()][which]
 	_fit_panel.call_deferred()
 	if which == Page.SETTINGS:
 		_settings_cursor = 0
 		_restart_sample()
+	if which == Page.CONTROLS:
+		_controls_cursor = 0
+		_listening = -1
+		_controls_message = ""
 	_refresh()
+
+
+func _slots_title() -> String:
+	return ["Save game", "Load game", "New game"][_slot_mode]
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -405,19 +540,50 @@ func _unhandled_input(event: InputEvent) -> void:
 				open()
 		return
 	get_viewport().set_input_as_handled()
+	if _listening >= 0:
+		_listen_input(event)
+		return
 	if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
 		Sound.play("ui_back")
-		if _page == Page.MAIN or _settings_only:
-			close()
-		else:
-			_cursor = OPTIONS.find(["", "Settings", "Controls"][_page])
-			_show_page(Page.MAIN)
+		_back()
 		return
 	match _page:
 		Page.MAIN:
 			_main_input(event)
 		Page.SETTINGS:
 			_settings_input(event)
+		Page.CONTROLS:
+			_controls_input(event)
+		Page.SLOTS:
+			_slots_input(event)
+
+
+## Back from the page showing: to the page that opened it, or closed.
+func _back() -> void:
+	match _page:
+		Page.MAIN:
+			close()
+		Page.SETTINGS:
+			if _settings_only:
+				close()
+			else:
+				_cursor = Option.SETTINGS
+				_show_page(Page.MAIN)
+		Page.CONTROLS:
+			if _controls_from_settings:
+				_controls_from_settings = false
+				_show_page(Page.SETTINGS)
+				_settings_cursor = Setting.CONTROLS
+				_refresh()
+			else:
+				_cursor = Option.CONTROLS
+				_show_page(Page.MAIN)
+		Page.SLOTS:
+			if _slots_only:
+				close()
+			else:
+				_cursor = Option.SAVE
+				_show_page(Page.MAIN)
 
 
 func _main_input(event: InputEvent) -> void:
@@ -433,10 +599,11 @@ func _main_input(event: InputEvent) -> void:
 			Option.RESUME:
 				close()
 			Option.SAVE:
-				save_game()
+				_show_slots(SlotMode.SAVE)
 			Option.SETTINGS:
 				_show_page(Page.SETTINGS)
 			Option.CONTROLS:
+				_controls_from_settings = false
 				_show_page(Page.CONTROLS)
 			Option.QUIT:
 				if _confirm_quit:
@@ -446,13 +613,146 @@ func _main_input(event: InputEvent) -> void:
 					_refresh()
 
 
-## Saves the game where the player stands and notes the time on the menu.
+## Saves the game where the player stands, in the slot being played, and
+## notes the time on the menu.
 func save_game() -> void:
 	_just_saved = SaveManager.save_game()
 	if _just_saved:
-		_save_note = "Saved at %s." % GameClock.get_time_string()
+		_save_note = "Saved in slot %d at %s." % [SaveManager.slot, GameClock.get_time_string()]
 	else:
 		_save_note = "Couldn't save. Check that the game can write to its save folder."
+	_refresh()
+
+
+func _slots_input(event: InputEvent) -> void:
+	var rows := SaveManager.SLOTS + 1 # the slots, then Back
+	var step := MenuInput.vertical(event)
+	if step != 0:
+		_slot_cursor = wrapi(_slot_cursor + step, 0, rows)
+		_slot_confirm = 0
+		Sound.play("ui_move")
+		_refresh()
+	elif MenuInput.confirm(event):
+		if _slot_cursor >= SaveManager.SLOTS:
+			Sound.play("ui_back")
+			_back()
+			return
+		choose_slot(_slot_cursor + 1)
+
+
+## Does what the Saves page does with slot [param n]: saves into it, loads
+## it, or starts a new game in it. Writing over another game asks first.
+func choose_slot(n: int) -> void:
+	_slot_cursor = n - 1
+	var used := SaveManager.slot_used(n)
+	match _slot_mode:
+		SlotMode.SAVE:
+			if used and n != SaveManager.slot and _slot_confirm != n:
+				_slot_confirm = n
+				Sound.play("ui_select")
+				_refresh()
+				return
+			_slot_confirm = 0
+			SaveManager.slot = n
+			Sound.play("ui_select")
+			save_game()
+		SlotMode.LOAD:
+			if not used:
+				Sound.play("ui_back")
+				return
+			Sound.play("ui_select")
+			SaveManager.slot = n
+			close()
+			slot_chosen.emit(n)
+		SlotMode.NEW:
+			if used and _slot_confirm != n:
+				_slot_confirm = n
+				Sound.play("ui_select")
+				_refresh()
+				return
+			Sound.play("ui_select")
+			SaveManager.slot = n
+			SaveManager.start_fresh()
+			close()
+			slot_chosen.emit(n)
+
+
+func _controls_input(event: InputEvent) -> void:
+	var rows := Settings.BINDINGS.size() + 2 # the keys, Reset keys, Back
+	var step := MenuInput.vertical(event)
+	var side := MenuInput.horizontal(event)
+	var keys := Settings.BINDINGS.size()
+	if side != 0 and _controls_cursor < keys:
+		# Left/Right cross between the two columns of keys
+		var other := _controls_cursor + side * CONTROLS_PER_COLUMN
+		if other >= 0 and other < keys:
+			_controls_cursor = other
+		elif side > 0:
+			_controls_cursor = keys - 1
+		Sound.play("ui_move")
+		_controls_message = ""
+		_refresh()
+	elif step != 0:
+		_controls_cursor = wrapi(_controls_cursor + step, 0, rows)
+		_controls_message = ""
+		Sound.play("ui_move")
+		_refresh()
+	elif MenuInput.confirm(event):
+		Sound.play("ui_select")
+		if _controls_cursor == rows - 1:
+			_back()
+		elif _controls_cursor == rows - 2:
+			reset_keys()
+		else:
+			_listening = _controls_cursor
+			_controls_message = ""
+			_refresh()
+
+
+## While a key is wanted: the next key pressed is the binding's (Esc keeps
+## the old key). Gamepad buttons and the mouse are ignored.
+func _listen_input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed or event.echo:
+		if event.is_action_pressed("ui_cancel") and not event is InputEventKey:
+			_listening = -1
+			_refresh()
+		return
+	var key := event as InputEventKey
+	var physical := key.physical_keycode if key.physical_keycode != KEY_NONE else key.keycode
+	if physical == KEY_ESCAPE:
+		Sound.play("ui_back")
+		_listening = -1
+		_refresh()
+		return
+	bind_key(_listening, physical)
+
+
+## Puts binding [param index] (into Settings.BINDINGS) on [param physical],
+## saves, and tells the HUD so its hints name the new key.
+func bind_key(index: int, physical: int) -> void:
+	_listening = -1
+	var b: Dictionary = Settings.BINDINGS[index]
+	if Settings.set_key(b.id, physical):
+		Sound.play("ui_select")
+		_controls_message = "%s is now %s." % [b.name, Settings.key_label(physical)]
+		_keys_changed()
+	else:
+		Sound.play("ui_back")
+		_controls_message = RESERVED_TEXT
+		_refresh()
+
+
+func reset_keys() -> void:
+	Settings.reset_keys()
+	_controls_message = "Every key is back as it started."
+	_keys_changed()
+
+
+func _keys_changed() -> void:
+	Settings.save()
+	var hud := get_tree().get_first_node_in_group("hud") as HUD
+	if hud:
+		hud.refresh_settings()
 	_refresh()
 
 
@@ -465,6 +765,11 @@ func _settings_input(event: InputEvent) -> void:
 		_refresh()
 		return
 	var change := MenuInput.horizontal(event)
+	if change == 0 and MenuInput.confirm(event) and _settings_cursor == Setting.CONTROLS:
+		Sound.play("ui_select")
+		_controls_from_settings = true
+		_show_page(Page.CONTROLS)
+		return
 	if change == 0 and MenuInput.confirm(event):
 		if _settings_cursor == Setting.BACK:
 			if _settings_only:
@@ -564,13 +869,81 @@ func _refresh() -> void:
 	if _settings_only and _settings_cursor == Setting.BACK:
 		_help_label.text = "Back to the title screen."
 	_sample_label.visible = _settings_cursor == Setting.TEXT_SPEED
+	_refresh_controls()
+	_refresh_slots()
 	# Mark the column for the device in use, in words as well as color.
 	var gamepad := MenuInput.button(get_tree(), "k", "g") == "g"
-	_device_headers[0].text = "Keyboard and mouse" + ("" if gamepad else " (in use)")
-	_device_headers[1].text = "Gamepad" + (" (in use)" if gamepad else "")
-	_device_headers[0].modulate = DIM if gamepad else Color.WHITE
-	_device_headers[1].modulate = Color.WHITE if gamepad else DIM
+	for i in _device_headers.size():
+		var pad := i % 2 == 1
+		_device_headers[i].text = ["Keyboard", "Gamepad"][i % 2]
+		_device_headers[i].modulate = Color.WHITE if pad == gamepad else DIM
 	_footer.text = _footer_text()
+
+
+func _refresh_controls() -> void:
+	for i in _control_names.size():
+		var text: String = Settings.BINDINGS[i].name if i < Settings.BINDINGS.size() else [CONTROLS_RESET, CONTROLS_BACK][i - Settings.BINDINGS.size()]
+		_set_choice(_control_names[i], text, i == _controls_cursor)
+	for i in _control_keys.size():
+		var id: String = Settings.BINDINGS[i].id
+		_control_keys[i].text = "..." if i == _listening else "[%s]" % Settings.key_label(Settings.key_for(id))
+		_control_keys[i].modulate = Color.WHITE if Settings.key_for(id) == int(Settings.BINDINGS[i].key) else HEADING
+	if _listening >= 0:
+		_control_note.text = LISTEN_TEXT % Settings.BINDINGS[_listening].name
+	elif _controls_message != "":
+		_control_note.text = _controls_message
+	else:
+		_control_note.text = CONTROLS_NOTE
+
+
+## Each slot's two lines: "Slot 1   Spring 4 (Thu), Year 1" and where and
+## when, or "Empty".
+func _refresh_slots() -> void:
+	for i in _slot_labels.size():
+		var n := i + 1
+		var info := SaveManager.slot_info(n)
+		var text := "Slot %d   " % n
+		var detail := ""
+		if info.is_empty():
+			text += "Empty"
+			detail = "Start a new game here." if _slot_mode == SlotMode.NEW else ""
+		elif info.get("broken", false):
+			text += "Can't be read"
+		else:
+			text += str(info.date)
+			var parts := PackedStringArray()
+			if str(info.place) != "":
+				parts.append(str(info.place))
+			parts.append(str(info.time))
+			if int(info.saved_at) > 0:
+				parts.append("saved " + _when(int(info.saved_at)))
+			detail = " · ".join(parts)
+		if _slot_mode == SlotMode.SAVE and n == SaveManager.slot and not _slots_only:
+			text += "   (this game)"
+		if _slot_confirm == n:
+			detail = "Press again to replace this game." if _slot_mode == SlotMode.SAVE else "Press again to start over here. The old game is replaced when you first sleep."
+		_set_choice(_slot_labels[i], text, i == _slot_cursor)
+		_slot_details[i].text = "      " + detail
+	_set_choice(_slot_back, "Back", _slot_cursor >= SaveManager.SLOTS)
+	_slot_note.modulate = HEADING if _save_note != "" else Color.WHITE
+	match _slot_mode:
+		SlotMode.SAVE when _save_note != "":
+			_slot_note.text = _save_note
+		SlotMode.SAVE:
+			_slot_note.text = "Save into any slot. Saving in another slot keeps this game there from now on, and sleeping in your tent saves there too."
+		SlotMode.LOAD:
+			_slot_note.text = "Pick a game to carry on."
+		SlotMode.NEW:
+			_slot_note.text = "Pick a slot for the new game. Each slot is its own game."
+
+
+## "Nov 5, 7:24 PM" for a Unix time, in the computer's time zone.
+static func _when(unix: int) -> String:
+	var bias := int(Time.get_time_zone_from_system().get("bias", 0))
+	var d := Time.get_datetime_dict_from_unix_time(unix + bias * 60)
+	const MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+	var hour := int(d.hour)
+	return "%s %d, %d:%02d %s" % [MONTHS[int(d.month) - 1], int(d.day), 12 if hour % 12 == 0 else hour % 12, int(d.minute), "AM" if hour < 12 else "PM"]
 
 
 ## "< Normal >" for a setting's current value.
@@ -639,7 +1012,11 @@ func _footer_text() -> String:
 		Page.SETTINGS:
 			return "[%s] Choose   [%s] Change   [%s] Back" % [choose, MenuInput.button(tree, "Left/Right", "D-pad L/R"), back]
 		Page.CONTROLS:
-			return "[%s] Back" % back
+			if _listening >= 0:
+				return "Press any key   [Esc] Cancel"
+			return "[%s] Choose   [%s] Change key   [%s] Back" % [MenuInput.button(tree, "Arrows", "D-pad"), ok, back]
+		Page.SLOTS:
+			return "[%s] Choose   [%s] %s   [%s] Back" % [choose, ok, ["Save here", "Load", "Start here"][_slot_mode], back]
 	return "[%s] Choose   [%s] Select   [%s] Resume" % [choose, ok, back]
 
 

@@ -24,7 +24,7 @@ static func button(tree: SceneTree, keyboard: String, gamepad: String) -> String
 	if hud:
 		return hud.prompt(keyboard, gamepad)
 	Settings.ensure_loaded()
-	return gamepad if Settings.prompts == Settings.Prompts.GAMEPAD else keyboard
+	return gamepad if Settings.prompts == Settings.Prompts.GAMEPAD else Settings.key_text(keyboard)
 
 
 ## True for a fresh press of confirm (interact, use, or Enter).

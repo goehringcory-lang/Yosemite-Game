@@ -820,6 +820,11 @@ func _set_paused(paused: bool) -> void:
 	GameClock.paused = paused
 
 
+## Where the player is, for the save menus (see SaveManager.slot_info).
+func location_name() -> String:
+	return _location_name() if region and player else ""
+
+
 ## "Cook's Meadow" inside a hub, or the region's name.
 func _location_name() -> String:
 	var place := region.place_at(player.position)

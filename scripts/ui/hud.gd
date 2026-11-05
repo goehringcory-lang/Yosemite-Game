@@ -332,13 +332,14 @@ func interact_button() -> String:
 
 ## Picks the button name to show for the current device: [param keyboard] or [param gamepad].
 ## The Button prompts setting can pin it to one device.
+## Keyboard names follow the keys changed on the Controls page.
 func prompt(keyboard: String, gamepad: String) -> String:
 	match Settings.prompts:
 		Settings.Prompts.KEYBOARD:
-			return keyboard
+			return Settings.key_text(keyboard)
 		Settings.Prompts.GAMEPAD:
 			return gamepad
-	return gamepad if _gamepad else keyboard
+	return gamepad if _gamepad else Settings.key_text(keyboard)
 
 
 ## Shows "E  Talk to ..." above the player when something usable is in front of them.
