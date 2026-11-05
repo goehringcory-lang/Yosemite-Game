@@ -1,7 +1,8 @@
 class_name PauseMenu
 extends CanvasLayer
 ## Esc (gamepad Start) pauses the game. World adds one. Three pages:
-##   Main: Resume, Save game, Settings, Controls, Quit, and your current goal
+##   Main: Resume, Save game, Settings, Controls, Quit to title, Quit to
+##     desktop, and your current goal
 ##   Settings: text speed, full screen, window size, button prompts, and
 ##     the volumes
 ##   Controls: every control, keyboard and gamepad
@@ -26,10 +27,12 @@ const CONTROLS := [
 	["Climb: eat, chalk up, retreat", "E / Esc", "A / B"],
 	["Climb: aid or jug", "Shift + arrow", "Y + stick"],
 ]
-enum Option { RESUME, SAVE, SETTINGS, CONTROLS, QUIT }
-const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Quit to desktop"]
+enum Option { RESUME, SAVE, SETTINGS, CONTROLS, QUIT_TITLE, QUIT }
+const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Quit to title", "Quit to desktop"]
 const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again to quit."
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
+const TITLE_CONFIRM := "To the title? Progress since your last save is lost. Press again."
+const TITLE_SAVED := "To the title? Your game is saved. Press again."
 enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, FONT, GRAPHICS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, BACK }
 const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Font", "Graphics", "Volume", "Music", "Sound effects", "Ambience", "Back"]
 const SETTING_HELP := [
@@ -438,12 +441,37 @@ func _main_input(event: InputEvent) -> void:
 				_show_page(Page.SETTINGS)
 			Option.CONTROLS:
 				_show_page(Page.CONTROLS)
+			Option.QUIT_TITLE:
+				if _confirm_quit:
+					quit_to_title()
+				else:
+					_confirm_quit = true
+					_refresh()
 			Option.QUIT:
 				if _confirm_quit:
 					get_tree().quit()
 				else:
 					_confirm_quit = true
 					_refresh()
+
+
+## Leaves the game for the title screen: the screen fades to black, every
+## autoload goes back to a new game's state (NewGame.reset_all), so whatever
+## is played next starts clean, and the title screen comes up.
+func quit_to_title() -> void:
+	_open = false
+	_panel.visible = false
+	var fade := ColorRect.new()
+	fade.color = Color(0, 0, 0, 0)
+	fade.size = UiScale.SCREEN
+	add_child(fade)
+	var tween := create_tween()
+	tween.tween_property(fade, "color:a", 1.0, 0.4)
+	await tween.finished
+	SaveManager.clear_pending()
+	SaveManager._fresh = false # Continue loads the save on disk again
+	NewGame.reset_all()
+	get_tree().change_scene_to_file(TitleScreen.SCENE)
 
 
 ## Saves the game where the player stands and notes the time on the menu.
@@ -547,8 +575,10 @@ func _refresh() -> void:
 		var text: String = OPTIONS[i]
 		if i == Option.SAVE and _save_note != "":
 			text += "   " + _save_note
-		elif i == Option.QUIT and _confirm_quit:
+		elif i == Option.QUIT and _confirm_quit and i == _cursor:
 			text = QUIT_SAVED if _just_saved else QUIT_CONFIRM
+		elif i == Option.QUIT_TITLE and _confirm_quit and i == _cursor:
+			text = TITLE_SAVED if _just_saved else TITLE_CONFIRM
 		_set_choice(_option_labels[i], text, i == _cursor)
 	_goal_label.text = HUD.objective_text() if HUD.objective_text() != "" else "Explore, and talk to people around the valley."
 	_card_date.text = "%s, Year %d" % [GameClock.get_date_string(), GameClock.year]
