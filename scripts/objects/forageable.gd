@@ -11,6 +11,11 @@ var cell: Vector2i
 
 func _ready() -> void:
 	sprite.texture = item.icon
+	if not Settings.low():
+		var glint := Glint.new()
+		glint.name = "Glint"
+		glint.position = sprite.offset + Vector2(5, -5)
+		add_child(glint)
 
 
 func interact(player: Player) -> void:

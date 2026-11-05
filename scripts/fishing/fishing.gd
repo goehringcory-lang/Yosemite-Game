@@ -343,6 +343,8 @@ func interact(player: Player) -> void:
 	player.clear_pose()
 	if caught:
 		player.pose("arms_up", 0.9) # holding it up
+		# out of the water in a spray of drops
+		Sparkle.burst(player.get_parent(), to_global(_fly_at), Sparkle.SPLASH)
 	queue_redraw()
 	game.queue_free()
 	GameClock.advance_minutes(CAST_MINUTES)

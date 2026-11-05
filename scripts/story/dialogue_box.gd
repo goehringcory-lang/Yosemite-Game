@@ -502,6 +502,8 @@ func _input(event: InputEvent) -> void:
 		else:
 			_answer = 1
 			Sound.play("ui_select", -3.0)
+			if _cursor >= 0 and _cursor < _options_box.get_child_count():
+				MenuInput.press(_options_box.get_child(_cursor) as Control)
 	elif event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_answer = -1
