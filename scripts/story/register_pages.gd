@@ -111,6 +111,8 @@ const PAGES: Array[Dictionary] = [
 		"text": "Steel cables now, where my rope went. Boards to stand on. Still my holes underneath."},
 	{"quest": "ansel_diving_board", "by": "Ansel Adams",
 		"text": "From the Diving Board, a red filter, and the sky gone black behind the face. The first time a picture looked the way it felt."},
+	{"quest": "muir_south_dome", "by": "John Muir",
+		"text": "The South Dome at sunrise, on Anderson's rope: the Valley drowned in cloud, and my shadow out on it in a ring of rainbow. Only the sun at my back."},
 	{"quest": "lost_guardian", "by": "The lost Guardian",
 		"text": "The last sheet from the press. Where the plant should be, a looking-glass."},
 	# The Guardian's Year: a page a season, and the player's own at the end.
@@ -149,6 +151,7 @@ const HISTORY := {
 	"ansel_monolith": "Documented: Ansel Adams made 'Monolith, the Face of Half Dome' from the Diving Board in April 1927. Dramatized: his quickdraws, which came long after his time.",
 	"hodges_first_night": "Documented: Yosemite requires a wilderness permit for overnight trips, Little Yosemite Valley is a backcountry camp above Nevada Fall on the way to Half Dome, and food must be stored in bear-resistant canisters or lockers. Dramatized: Hodges handing out permits and canisters, which came long after her time.",
 	"anderson_cables": "Documented: the Sierra Club put up the first cables on Half Dome's back in 1919, roughly along George Anderson's 1875 route, and the posts go up for the summer and come down for the winter. Dramatized: Anderson, who died in 1884, seeing them.",
+	"muir_south_dome": "Documented: John Muir climbed Half Dome in November 1875, a few weeks after George Anderson's first ascent, using Anderson's rope, and wrote of the view in The Yosemite (1912). A glory, the ring of rainbow light around your own shadow on cloud or mist with the sun behind you, is a real effect, often called the Brocken specter. The John Muir Trail, named for him after his death in 1914, was built from 1915 to 1938 and runs from Happy Isles past Little Yosemite Valley to Mount Whitney. Dramatized: the errand, the cloud sea on the morning you go, and his words here. To verify: whether Muir saw a glory from the Dome, against The Yosemite's chapter on the South Dome.",
 	"ansel_diving_board": "Documented: Ansel Adams made 'Monolith, the Face of Half Dome' from the Diving Board in April 1927, using a red filter to darken the sky, and later called it his first visualized photograph. Dramatized: his cam, and sending you there.",
 	"anderson_half_dome": "Documented: George Anderson, a Scottish-born blacksmith, reached the top of Half Dome in October 1875 by drilling holes, setting iron pins, and roping between them. Later cables roughly follow his line. His beans are dramatized.",
 	"robbins_clean": "Documented: Royal and Liz Robbins made the first ascent of Nutcracker in 1967, protecting it with nuts to show that clean climbing worked. Robbins was among the Tahquitz climbers who worked out the decimal grades in the 1950s. His lines here are dramatized; his portrayal is to be confirmed with his family.",

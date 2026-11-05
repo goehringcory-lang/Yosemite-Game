@@ -7,7 +7,8 @@ extends Node2D
 ## they stay where they were made. Where snow lies on the ground
 ## (Seasons.snow_cover), each step also leaves a boot print that stays for
 ## the rest of the day, unless fresh snow fills it in. Running kicks up a
-## bigger spray. Player adds one as a child, and so does everyone walking
+## bigger spray, and pulling up from a run skids a puff out either side of
+## the feet. Player adds one as a child, and so does everyone walking
 ## about (NPC), [member quiet]: their steps make no sound.
 
 ## Pixels walked between steps (the walk cycle's footfalls).
@@ -39,6 +40,8 @@ var quiet := false
 ## Faster than this (pixels a second), the feet kick up a spray.
 const RUN_SPEED := 220.0
 var _running := false
+## The body's speed when last looked at, to see it pull up from a run.
+var _pace := 0.0
 
 
 func _ready() -> void:
@@ -75,6 +78,14 @@ func _process(delta: float) -> void:
 	var moved := feet.distance_to(_last)
 	_last = feet
 	_running = delta > 0.0 and moved / delta > RUN_SPEED
+	# Stopping dead from a run. Read from the body's own speed, which holds
+	# between physics ticks (the feet only move on the tick).
+	var mover := body as CharacterBody2D
+	if mover:
+		var speed := mover.get_real_velocity().length()
+		if _pace > RUN_SPEED and speed < 1.0:
+			_skid(feet)
+		_pace = speed
 	# A jump (a door, a spawn) is not a step.
 	if moved > 0.0 and moved < 16.0:
 		_walked += moved
@@ -115,6 +126,18 @@ func _step(at: Vector2) -> void:
 		_prints.append([at.floor(), region.region_id if region else "", _left, 0.0])
 		if _prints.size() > MAX_PRINTS:
 			_prints.pop_front()
+	var color := _ground_color()
+	if color.a <= 0.0:
+		return # frozen ground: no dust
+	var behind := Vector2.ZERO
+	if _running and _body() and "facing" in _body():
+		behind = -Vector2(_body().get("facing"))
+	_add([at, 0.0, 2 if _running else 0, color, behind])
+
+
+## What the feet kick up here: dust, spray in the rain, powder in the snow,
+## less off damp spring earth, and nothing (alpha 0) off frozen ground.
+func _ground_color() -> Color:
 	var color := Color(0.8, 0.72, 0.56, 0.6)
 	var weather := Weather.today()
 	if weather.rain > 0.0:
@@ -122,13 +145,21 @@ func _step(at: Vector2) -> void:
 	elif weather.snow > 0.0:
 		color = Color(0.96, 0.98, 1.0, 0.8)
 	elif GameClock.season == GameClock.Season.WINTER:
-		return # frozen ground: no dust
+		color.a = 0.0
 	elif GameClock.season == GameClock.Season.SPRING:
-		color.a = 0.4 # damp spring earth
-	var behind := Vector2.ZERO
-	if _running and _body() and "facing" in _body():
-		behind = -Vector2(_body().get("facing"))
-	_add([at, 0.0, 2 if _running else 0, color, behind])
+		color.a = 0.4
+	return color
+
+
+## Pulling up from a run: the feet skid and throw a puff either side.
+func _skid(feet: Vector2) -> void:
+	if _indoors():
+		return
+	var color := _ground_color()
+	if color.a <= 0.0:
+		return
+	_add([feet + Vector2(-5, 0), 0.0, 0, color, Vector2.ZERO])
+	_add([feet + Vector2(5, 0), 0.0, 0, color, Vector2.ZERO])
 
 
 ## A footstep: boards indoors, a crunch in snow or on winter ground, a squelch

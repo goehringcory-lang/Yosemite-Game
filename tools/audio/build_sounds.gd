@@ -66,6 +66,21 @@ func _init() -> void:
 	# Rivers, and the story's moments (after the rest, for the same reason).
 	_save("river", _river(), RATE_BED, -11.0)
 	_save("story_sting", _sting(), RATE_FX, -7.0)
+	# Wildlife calls, played now and then over the beds (Sound._update_calls),
+	# so the birds and the owl never come round on a loop. Two takes of each.
+	for i in 2:
+		var take := "_%d" % (i + 1)
+		_save("call_chickadee" + take, _call_chickadee(100 + i), RATE_FX, -13.0)
+		_save("call_jay" + take, _call_jay(102 + i), RATE_FX, -14.0)
+		_save("call_robin" + take, _call_robin(104 + i), RATE_FX, -14.0)
+		_save("call_warbler" + take, _call_warbler(106 + i), RATE_FX, -16.0)
+		_save("call_woodpecker" + take, _call_woodpecker(108 + i), RATE_FX, -11.0)
+		_save("call_raven" + take, _call_raven(110 + i), RATE_FX, -14.0)
+		_save("call_owl" + take, _call_owl(112 + i), RATE_FX, -14.0)
+		_save("call_frogs" + take, _call_frogs(114 + i), RATE_FX, -13.0)
+		_save("call_swift" + take, _call_swift(116 + i), RATE_FX, -16.0)
+		_save("call_coyote" + take, _call_coyote(118 + i), RATE_FX, -17.0)
+		_save("thunder" + take, _thunder(120 + i), RATE_BED, -7.0)
 	print("Sounds written to %s. Run godot --headless --path . --import next." % OUT)
 	quit()
 
@@ -233,33 +248,25 @@ func _envelope(buf: PackedFloat32Array, attack: float, rate: int) -> void:
 
 # ------------------------------------------------------------------ ambience
 
-## Pines in a light breeze, with mountain chickadees ("fee-bee"), a far-off
-## warbler's trill, and a Steller's jay now and then.
+## Pines in a light breeze, and a meadow's hum. The birds sing over it on
+## their own (the call_* sounds), so the loop has nothing in it to recognize.
 func _amb_day() -> PackedFloat32Array:
 	_rng.seed = 1
 	return _loop(16.0, 1.5, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
 		var n := buf.size()
 		_add_band_noise(buf, rate, _wander(n, rate, 3.0, 350.0, 700.0), 0.8, _wander(n, rate, 2.5, 0.05, 0.16))
 		_add_noise(buf, rate, 0.05, 2500.0, 600.0)
-		# Chickadees: a clear two-note whistle, the second note lower.
-		for at in [1.2, 6.8, 11.9]:
-			var f := _rng.randf_range(3600.0, 4100.0)
-			var amp := _rng.randf_range(0.18, 0.3)
-			_add_tone(buf, rate, at, 0.32, f, f * 0.98, amp)
-			_add_tone(buf, rate, at + 0.42, 0.36, f * 0.86, f * 0.84, amp * 0.85)
-		# A warbler's trill: quick falling notes.
-		for at in [3.9, 13.6]:
-			for k in 9:
-				var f := 5200.0 - k * 120.0
-				_add_tone(buf, rate, at + k * 0.075, 0.06, f, f - 900.0, 0.08)
-		# A jay: two harsh calls, far off.
-		var jay := 9.3
-		for k in 2:
-			_add_tone(buf, rate, jay + k * 0.32, 0.2, 1900.0, 1500.0, 0.06, 0.8)
+		# Insects far off in the grass: a faint, slow-beating shimmer.
+		var hum := _wander(n, rate, 4.0, 0.0, 0.018)
+		var phase := 0.0
+		for i in n:
+			phase += TAU * 2900.0 / rate
+			buf[i] += sin(phase) * hum[i] * (0.6 + 0.4 * sin(TAU * 7.0 * i / rate))
 		)
 
 
-## Crickets in the meadow grass, a soft breeze, and a great horned owl.
+## Crickets in the meadow grass and a soft breeze. The owls, frogs and
+## coyotes call over it on their own.
 func _amb_night() -> PackedFloat32Array:
 	_rng.seed = 2
 	return _loop(20.0, 1.5, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
@@ -276,10 +283,6 @@ func _amb_night() -> PackedFloat32Array:
 				for p in 3:
 					_add_tone(buf, rate, t + p * 0.035, 0.025, freq, freq, amp)
 				t += every * _rng.randf_range(0.95, 1.05)
-		# "Hoo, h-hoo, hoo, hoo."
-		var owl := 7.5
-		for note: Array in [[0.0, 0.45], [0.75, 0.16], [0.95, 0.4], [1.55, 0.4], [2.15, 0.45]]:
-			_add_tone(buf, rate, owl + float(note[0]), float(note[1]), 330.0, 300.0, 0.22, 0.25)
 		)
 
 
@@ -639,4 +642,236 @@ func _knock(freq: float, length: float) -> PackedFloat32Array:
 	var buf := _buf(length, RATE_FX)
 	_add_ping(buf, RATE_FX, 0.0, [[freq, 1.0], [freq * 2.4, 0.5], [freq * 3.9, 0.2]], length / 5.0, 1.0)
 	_add_click(buf, RATE_FX, 0.0, 0.006, 0.4, 3000.0)
+	return buf
+
+
+# ------------------------------------------------------------------ wildlife calls
+
+## A voice for a call: a tone sweeping [param f0] to [param f1] Hz over
+## [param dur] seconds, with [param partials] (multiples of the tone, and
+## their levels), a flutter of [param am_hz] at [param am_depth], and a
+## breath of noise for a rough throat. [param bend] curves the sweep: below 1
+## it moves early, above 1 late.
+func _add_voice(buf: PackedFloat32Array, rate: int, at: float, dur: float, f0: float, f1: float, amp: float,
+		partials := [[1.0, 1.0]], am_hz := 0.0, am_depth := 0.0, noise := 0.0, bend := 1.0) -> void:
+	var start := int(at * rate)
+	var n := int(dur * rate)
+	var phase := 0.0
+	var low := 0.0
+	var a := _one_pole(3000.0, rate)
+	for i in n:
+		if start + i >= buf.size():
+			break
+		var t := float(i) / n
+		var freq := lerpf(f0, f1, pow(t, bend))
+		phase += TAU * freq / rate
+		# A quick start and a softer end, like a bird's note.
+		var env := minf(t * 14.0, 1.0) * pow(1.0 - t, 0.8)
+		var v := 0.0
+		for p: Array in partials:
+			v += sin(phase * float(p[0])) * float(p[1])
+		if am_hz > 0.0:
+			v *= 1.0 - am_depth * (0.5 + 0.5 * sin(TAU * am_hz * float(i) / rate))
+		if noise > 0.0:
+			low += a * (_rng.randf_range(-1.0, 1.0) - low)
+			v += low * noise * 3.0
+		buf[start + i] += v * env * amp
+
+
+## Softens a call heard from farther off: a one-pole low-pass at [param cutoff].
+func _distance(buf: PackedFloat32Array, rate: int, cutoff: float) -> void:
+	var a := _one_pole(cutoff, rate)
+	var low := 0.0
+	for i in buf.size():
+		low += a * (buf[i] - low)
+		buf[i] = low
+
+
+## A mountain chickadee: "fee-bee-bee", a clear whistle and two lower notes.
+func _call_chickadee(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(1.6, RATE_FX)
+	var f := _rng.randf_range(3600.0, 4100.0)
+	var at := 0.05
+	_add_voice(buf, RATE_FX, at, 0.34, f, f * 0.985, 0.3)
+	at += 0.42
+	for k in _rng.randi_range(1, 2):
+		_add_voice(buf, RATE_FX, at, 0.22, f * 0.85, f * 0.83, 0.26)
+		at += 0.3
+	if _rng.randf() < 0.5:
+		# and a "chick-a-dee-dee" buzz after it
+		_add_voice(buf, RATE_FX, at + 0.05, 0.06, 5200.0, 4200.0, 0.12)
+		for k in 2:
+			_add_voice(buf, RATE_FX, at + 0.14 + k * 0.13, 0.11, 3200.0, 3000.0, 0.15, [[1.0, 1.0], [2.0, 0.3]], 90.0, 0.7)
+	return buf
+
+
+## A Steller's jay: three to five harsh "shook" calls.
+func _call_jay(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(1.4, RATE_FX)
+	var f := _rng.randf_range(1900.0, 2300.0)
+	var calls := _rng.randi_range(3, 5)
+	for k in calls:
+		_add_voice(buf, RATE_FX, 0.04 + k * _rng.randf_range(0.17, 0.21), 0.12, f, f * 0.72, 0.35,
+			[[1.0, 1.0], [2.0, 0.6], [3.0, 0.4], [4.0, 0.2]], 75.0, 0.6, 0.12, 0.6)
+	return buf
+
+
+## An American robin caroling: "cheerily, cheer-up, cheerio", slurred
+## phrases rising and falling.
+func _call_robin(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(2.6, RATE_FX)
+	var at := 0.05
+	for phrase in _rng.randi_range(3, 5):
+		var base := _rng.randf_range(2100.0, 2700.0)
+		for note in _rng.randi_range(2, 3):
+			var lo := base * _rng.randf_range(0.85, 1.0)
+			var hi := base * _rng.randf_range(1.12, 1.3)
+			var up := _rng.randf() < 0.5
+			_add_voice(buf, RATE_FX, at, _rng.randf_range(0.09, 0.14), lo if up else hi, hi if up else lo, 0.3, [[1.0, 1.0], [2.0, 0.12]])
+			at += _rng.randf_range(0.11, 0.15)
+		at += _rng.randf_range(0.18, 0.32)
+	return buf
+
+
+## A warbler's song: a quick trill of falling notes, then a flourish.
+func _call_warbler(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(1.3, RATE_FX)
+	var f := _rng.randf_range(5000.0, 5600.0)
+	var notes := _rng.randi_range(8, 11)
+	for k in notes:
+		var top := f - k * 110.0
+		_add_voice(buf, RATE_FX, 0.04 + k * 0.07, 0.055, top, top - 900.0, 0.3)
+	var end := 0.04 + notes * 0.07
+	_add_voice(buf, RATE_FX, end + 0.05, 0.14, 3800.0, 5600.0, 0.3, [[1.0, 1.0]], 0.0, 0.0, 0.0, 2.0)
+	return buf
+
+
+## A woodpecker drumming on a dead snag: a fast roll that slows a little
+## and fades, from a little way off.
+func _call_woodpecker(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(1.4, RATE_FX)
+	var wood := _rng.randf_range(700.0, 1000.0)
+	var at := 0.02
+	var gap := _rng.randf_range(0.045, 0.055)
+	for k in _rng.randi_range(14, 20):
+		var amp := 0.9 * pow(0.95, k)
+		_add_ping(buf, RATE_FX, at, [[wood, 1.0], [wood * 2.3, 0.45], [wood * 3.7, 0.2]], 0.008, amp)
+		_add_click(buf, RATE_FX, at, 0.003, amp * 0.7, 3500.0)
+		at += gap
+		gap *= 1.012
+	_distance(buf, RATE_FX, 4000.0)
+	return buf
+
+
+## A common raven: one to three deep, rough croaks, sometimes a "tok".
+func _call_raven(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(1.8, RATE_FX)
+	var f := _rng.randf_range(380.0, 460.0)
+	var at := 0.05
+	for k in _rng.randi_range(1, 3):
+		_add_voice(buf, RATE_FX, at, 0.34, f * 1.05, f * 0.88, 0.32,
+			[[1.0, 0.8], [2.0, 1.0], [3.0, 0.8], [4.0, 0.5], [5.0, 0.35], [6.0, 0.2]], 34.0, 0.55, 0.2, 0.5)
+		at += _rng.randf_range(0.45, 0.6)
+	if _rng.randf() < 0.5:
+		_add_ping(buf, RATE_FX, at, [[1150.0, 1.0], [2300.0, 0.4]], 0.012, 0.6)
+	_distance(buf, RATE_FX, 3500.0)
+	return buf
+
+
+## A great horned owl: "hoo, h-hoo, hoo, hoo", low and soft.
+func _call_owl(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(3.0, RATE_FX)
+	var f := _rng.randf_range(300.0, 340.0)
+	var notes := [[0.0, 0.45], [0.75, 0.16], [0.95, 0.4], [1.55, 0.4], [2.15, 0.45]]
+	if _rng.randf() < 0.5:
+		notes = [[0.0, 0.5], [0.7, 0.14], [0.88, 0.38], [1.5, 0.5]]
+	for note: Array in notes:
+		_add_voice(buf, RATE_FX, 0.05 + float(note[0]), float(note[1]), f, f * 0.9, 0.4, [[1.0, 1.0], [2.0, 0.18]], 0.0, 0.0, 0.03)
+	_distance(buf, RATE_FX, 1500.0)
+	return buf
+
+
+## Pacific chorus frogs by the water: a few "rib-bit"s at different pitches,
+## two pulsed buzzes each.
+func _call_frogs(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(3.2, RATE_FX)
+	for frog in 3:
+		var f := _rng.randf_range(1700.0, 2400.0)
+		var amp := _rng.randf_range(0.18, 0.32)
+		var at := _rng.randf_range(0.05, 0.6)
+		while at < 2.7:
+			_add_voice(buf, RATE_FX, at, 0.07, f * 0.9, f, amp, [[1.0, 1.0], [2.0, 0.4]], 110.0, 0.9)
+			_add_voice(buf, RATE_FX, at + 0.1, 0.12, f, f * 1.08, amp, [[1.0, 1.0], [2.0, 0.4]], 120.0, 0.9)
+			at += _rng.randf_range(0.5, 0.9)
+	_distance(buf, RATE_FX, 3800.0)
+	return buf
+
+
+## White-throated swifts screaming past the wall: a high, falling twitter.
+func _call_swift(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(1.2, RATE_FX)
+	var f := _rng.randf_range(5800.0, 6400.0)
+	var notes := _rng.randi_range(9, 13)
+	for k in notes:
+		var top := f * pow(0.965, k)
+		_add_voice(buf, RATE_FX, 0.03 + k * 0.065, 0.05, top, top * 0.9, 0.3 * (1.0 - 0.4 * float(k) / notes))
+	return buf
+
+
+## Coyotes far off across the meadow: yips, then a howl that rises, holds
+## and falls, and a second one joining in.
+func _call_coyote(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(3.6, RATE_FX)
+	var at := 0.05
+	for k in _rng.randi_range(3, 5):
+		var f := _rng.randf_range(800.0, 1000.0)
+		_add_voice(buf, RATE_FX, at, 0.09, f, f * 1.35, 0.25, [[1.0, 1.0], [2.0, 0.3]], 0.0, 0.0, 0.02, 0.5)
+		at += _rng.randf_range(0.13, 0.2)
+	for voice in 2:
+		var f := _rng.randf_range(520.0, 620.0) * (1.0 + voice * 0.18)
+		var start := at + 0.1 + voice * 0.6
+		var dur := _rng.randf_range(1.4, 1.9)
+		# rise, hold with a waver, then fall away
+		var n := int(dur * RATE_FX)
+		var s0 := int(start * RATE_FX)
+		var phase := 0.0
+		for i in n:
+			if s0 + i >= buf.size():
+				break
+			var t := float(i) / n
+			var shape := smoothstep(0.0, 0.25, t) * (1.0 - 0.35 * smoothstep(0.7, 1.0, t))
+			var freq := f * (1.0 + 0.9 * shape) * (1.0 + 0.012 * sin(TAU * 5.5 * float(i) / RATE_FX))
+			phase += TAU * freq / RATE_FX
+			var env := minf(t * 8.0, 1.0) * pow(1.0 - t, 1.2)
+			buf[s0 + i] += (sin(phase) + 0.25 * sin(phase * 2.0)) * env * 0.25
+	_distance(buf, RATE_FX, 2000.0)
+	return buf
+
+
+## Thunder rolling down the Valley: sometimes a crack first, then a long,
+## lumpy rumble off the walls.
+func _thunder(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(6.5, RATE_BED)
+	var n := buf.size()
+	var near := seed_value % 2 == 0
+	if near:
+		_add_noise(buf, RATE_BED, 0.9, 1400.0, 80.0, 0, int(0.25 * RATE_BED))
+	var from := int(0.15 * RATE_BED)
+	_add_noise(buf, RATE_BED, 1.0, 110.0, 0.0, from, n)
+	_add_noise(buf, RATE_BED, 0.3, 380.0, 60.0, from, n)
+	var swell := _wander(n, RATE_BED, 0.45, 0.2, 1.0)
+	for i in range(from, n):
+		var t := float(i - from) / (n - from)
+		buf[i] *= swell[i] * minf(t * 6.0, 1.0) * pow(1.0 - t, 1.6)
 	return buf

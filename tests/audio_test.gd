@@ -14,7 +14,9 @@ const SETTINGS_PATH := "user://audio_test_settings.cfg"
 const USED := ["amb_day", "amb_night", "amb_wind", "amb_rain", "waterfall", "campfire",
 	"step_dirt", "step_snow", "step_wood", "step_wet", "climb_move", "climb_clip", "climb_cam",
 	"climb_chalk", "climb_eat", "climb_fall", "climb_jug", "climb_crux", "climb_topout",
-	"ui_move", "ui_select", "ui_back", "slack_twang", "slack_gust", "slack_cheer", "slack_medal"]
+	"ui_move", "ui_select", "ui_back", "slack_twang", "slack_gust", "slack_cheer", "slack_medal",
+	"call_chickadee", "call_jay", "call_robin", "call_warbler", "call_woodpecker", "call_raven",
+	"call_owl", "call_frogs", "call_swift", "call_coyote", "thunder"]
 
 var failures := 0
 var world: Node
@@ -41,6 +43,7 @@ func _ready() -> void:
 	await get_tree().process_frame
 	GameClock.paused = true
 	test_world_ambience()
+	await test_calls()
 	await test_emitters()
 	await test_footsteps()
 	await test_climbing()
@@ -154,6 +157,73 @@ func test_world_ambience() -> void:
 	check(quiet.values().max() == 0.0, "no ambience when it's off")
 	Sound.set_ambience("world")
 	world._enter_region("curry_village", "arrival")
+
+
+func test_calls() -> void:
+	world._enter_region("curry_village", "arrival")
+	_clear_weather()
+	GameClock.season = GameClock.Season.SPRING
+	GameClock.minutes = 12 * 60
+	var spring_noon := _calling(Sound.call_choices())
+	check("call_chickadee" in spring_noon and "call_robin" in spring_noon and not "call_owl" in spring_noon, "spring noons have chickadees and robins, no owls (%s)" % ", ".join(spring_noon))
+	GameClock.minutes = 23 * 60
+	var spring_night := _calling(Sound.call_choices())
+	check("call_owl" in spring_night and "call_frogs" in spring_night and not "call_robin" in spring_night, "spring nights have owls and frogs, no robins (%s)" % ", ".join(spring_night))
+	GameClock.season = GameClock.Season.WINTER
+	var winter_night := _calling(Sound.call_choices())
+	check(winter_night == ["call_owl"], "winter nights have only the owl (%s)" % ", ".join(winter_night))
+	GameClock.minutes = 12 * 60
+	var winter_noon := _calling(Sound.call_choices())
+	check(not "call_robin" in winter_noon and not "call_warbler" in winter_noon and "call_raven" in winter_noon, "no robins or warblers in winter, but ravens (%s)" % ", ".join(winter_noon))
+	GameClock.season = GameClock.Season.SUMMER
+	world._enter_region("glacier_point", "arrival")
+	var high := _calling(Sound.call_choices())
+	check("call_raven" in high and not "call_robin" in high, "ravens, not robins, up at Glacier Point (%s)" % ", ".join(high))
+	world._enter_region("curry_store", "")
+	check(Sound.call_choices().is_empty(), "no wildlife calls indoors")
+	world._enter_region("curry_village", "arrival")
+	Sound.set_ambience("")
+	check(Sound.call_choices().is_empty(), "no calls when the ambience is off")
+	Sound.set_ambience("world")
+	# A dawn chorus comes faster than the middle of the day, rain hushes it.
+	GameClock.minutes = int(6.5 * 60)
+	var dawn := _average_gap()
+	GameClock.minutes = 12 * 60
+	var noon := _average_gap()
+	_set_weather(1.0, 0.0)
+	var rainy := _average_gap()
+	_clear_weather()
+	check(dawn < noon * 0.7, "the dawn chorus calls more often (every %.1f s, against %.1f at noon)" % [dawn, noon])
+	check(rainy > noon * 2.0, "and the birds quiet down in the rain (%.1f s)" % rainy)
+	# Calls never repeat the same bird twice running when there's another.
+	Sound._last_call = "call_jay"
+	var repeats := 0
+	for i in 200:
+		if Sound._pick_call({"call_jay": 5, "call_robin": 1}) == "call_jay":
+			repeats += 1
+	check(repeats == 0, "a bird doesn't answer itself")
+	var call := Sound.play_call("call_robin")
+	await get_tree().process_frame
+	var center := Sound._listener_center()
+	check(call != null and call.bus == Sound.BUS_AMBIENCE and call.stream != null, "a call plays on the Ambience bus")
+	check(call != null and absf(call.global_position.x - center.x) >= Sound.CALL_SPREAD.x - 1.0, "and comes from off to one side of the view, so it pans")
+	check(Sound.play_call("no_such_bird") == null, "an unknown call plays nothing")
+	call.stop()
+
+
+## The calls in [param choices] that can happen (weight above 0), sorted.
+func _calling(choices: Dictionary) -> Array:
+	var out := choices.keys().filter(func(id: String) -> bool: return float(choices[id]) > 0.0)
+	out.sort()
+	return out
+
+
+func _average_gap() -> float:
+	seed(7)
+	var total := 0.0
+	for i in 200:
+		total += Sound._call_gap()
+	return total / 200.0
 
 
 func test_emitters() -> void:

@@ -69,6 +69,7 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/hodges_first_night.tres"),
 	preload("res://data/quests/anderson_cables.tres"),
 	preload("res://data/quests/ansel_diving_board.tres"),
+	preload("res://data/quests/muir_south_dome.tres"),
 	# The press book (QuestData.press_line): plants for the naturalists and
 	# rangers, beside the tick list. See Herbarium.
 	preload("res://data/quests/enid_press.tres"),
