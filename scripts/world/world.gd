@@ -138,8 +138,10 @@ func _ready() -> void:
 		FieldLog.start_new_game()
 		Festivals.start_new_game()
 		Stewardship.start_new_game()
+		Achievements.start_new_game()
 		if forage:
 			forage.respawn()
+	Achievements.settle()
 	hud.bind_player(player)
 	Sound.set_ambience("world")
 	add_child(Journal.new())
