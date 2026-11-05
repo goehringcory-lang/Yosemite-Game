@@ -8,9 +8,13 @@ extends Control
 ## its Settings page (with Controls inside); Credits opens the credits.
 ##
 ## Behind it all is a pixel painting of the Valley (assets/ui/title_background.png):
-## El Capitan, Half Dome far off, Bridalveil Fall, which shimmers.
+## El Capitan, Half Dome far off, Bridalveil Fall, which shimmers. Small
+## clouds drift over it and now and then a pair of ravens glides across
+## (TitleSky). On opening, the picture fades up, the logo drops in, and the
+## menu fades in under it; any key finishes that at once.
 
 const WORLD_SCENE := "res://scenes/world/world.tscn"
+const SCENE := "res://scenes/ui/title_screen.tscn"
 const SCREEN := Vector2(480, 270)
 const BACKGROUND := "res://assets/ui/title_background.png"
 ## Where Bridalveil Fall is in the background, for the shimmer: the middle of
@@ -41,6 +45,9 @@ var _select_style: StyleBoxTexture
 var _plain_style: StyleBoxEmpty
 var _pause: PauseMenu
 var _credits: Credits
+## The logo and tagline, which drop in when the screen opens.
+var _logo: Control
+var _intro: Tween
 
 
 func _ready() -> void:
@@ -52,6 +59,7 @@ func _ready() -> void:
 	_build_background()
 	_build_title()
 	_build_menu()
+	_play_intro()
 	_pause = PauseMenu.new()
 	_pause.closed.connect(_refresh)
 	_pause.slot_chosen.connect(func(_slot: int) -> void: _start())
@@ -64,7 +72,7 @@ func _ready() -> void:
 	_fade.size = SCREEN
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_fade)
-	create_tween().tween_property(_fade, "color:a", 0.0, 0.6)
+	_intro.tween_property(_fade, "color:a", 0.0, 0.6)
 	Sound.set_ambience("title")
 	_refresh()
 
@@ -77,6 +85,7 @@ func _build_background() -> void:
 	background.size = SCREEN
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
+	add_child(TitleSky.new())
 	# Drawn on its own node so it stays above the background.
 	_shimmer = Control.new()
 	_shimmer.size = SCREEN
@@ -96,6 +105,43 @@ const LOGO_INK := Color("2a1b14")
 const LOGO_EXTRUDE := Color("6b4829")
 
 
+## Fades the menu up after the logo has dropped into place.
+const INTRO_LOGO_DELAY := 0.35
+const INTRO_LOGO_TIME := 0.8
+const INTRO_MENU_DELAY := 0.9
+const INTRO_MENU_TIME := 0.5
+
+
+func _play_intro() -> void:
+	_logo.modulate.a = 0.0
+	_logo.position.y = -14.0
+	_menu.modulate.a = 0.0
+	_footer_band.modulate.a = 0.0
+	_intro = create_tween().set_parallel(true)
+	_intro.tween_property(_logo, "modulate:a", 1.0, INTRO_LOGO_TIME * 0.6).set_delay(INTRO_LOGO_DELAY)
+	_intro.tween_property(_logo, "position:y", 0.0, INTRO_LOGO_TIME).set_delay(INTRO_LOGO_DELAY) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	for node: CanvasItem in [_menu, _footer_band]:
+		_intro.tween_property(node, "modulate:a", 1.0, INTRO_MENU_TIME).set_delay(INTRO_MENU_DELAY)
+
+
+## True while the logo and menu are still coming in.
+func intro_playing() -> bool:
+	return _intro != null and _intro.is_running()
+
+
+## Jumps the opening to its end (any key does this).
+func finish_intro() -> void:
+	if not intro_playing():
+		return
+	_intro.kill()
+	_logo.modulate.a = 1.0
+	_logo.position.y = 0.0
+	_menu.modulate.a = 1.0
+	_footer_band.modulate.a = 1.0
+	_fade.color.a = 0.0
+
+
 func _logo_label(text: String, color: Color, outline: int, at: Vector2) -> Label:
 	var label := Label.new()
 	label.text = text
@@ -111,11 +157,15 @@ func _logo_label(text: String, color: Color, outline: int, at: Vector2) -> Label
 
 
 func _build_title() -> void:
+	_logo = Control.new()
+	_logo.size = SCREEN
+	_logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_logo)
 	var name: String = ProjectSettings.get_setting("application/config/name")
 	# the extrusion: the letters stacked downward in dark wood
 	for dy in [4, 3, 2]:
-		add_child(_logo_label(name, LOGO_EXTRUDE, 8, Vector2(0, LOGO_TOP + dy)))
-	add_child(_logo_label(name, GOLD_DEEP, 6, Vector2(0, LOGO_TOP)))
+		_logo.add_child(_logo_label(name, LOGO_EXTRUDE, 8, Vector2(0, LOGO_TOP + dy)))
+	_logo.add_child(_logo_label(name, GOLD_DEEP, 6, Vector2(0, LOGO_TOP)))
 	# the lit top half of each letter, clipped to the upper part of the line
 	var lit := Control.new()
 	lit.clip_contents = true
@@ -123,7 +173,7 @@ func _build_title() -> void:
 	lit.size = Vector2(SCREEN.x, 27)
 	lit.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	lit.add_child(_logo_label(name, GOLD_LIGHT, 0, Vector2.ZERO))
-	add_child(lit)
+	_logo.add_child(lit)
 	# a divider: two gold rules either side of a small diamond
 	var divider := Control.new()
 	divider.position = Vector2(SCREEN.x / 2.0 - 60, LOGO_TOP + 56)
@@ -136,15 +186,15 @@ func _build_title() -> void:
 		var d := PackedVector2Array([Vector2(60, -1), Vector2(64, 3), Vector2(60, 7), Vector2(56, 3)])
 		divider.draw_colored_polygon(d, LOGO_INK)
 		divider.draw_colored_polygon(PackedVector2Array([Vector2(60, 0), Vector2(63, 3), Vector2(60, 6), Vector2(57, 3)]), GOLD_LIGHT))
-	add_child(divider)
+	_logo.add_child(divider)
 	var tagline := Label.new()
 	tagline.text = ProjectSettings.get_setting("application/config/description")
-	_on_band(tagline, LOGO_TOP + 63)
+	_on_band(tagline, LOGO_TOP + 63, _logo)
 
 
 ## Sets [param label] on a soft dark band across the picture at [param y], so
 ## its letters stay crisp over the busy painting without a heavy outline.
-func _on_band(label: Label, y: float) -> PanelContainer:
+func _on_band(label: Label, y: float, parent: Node = self) -> PanelContainer:
 	var band := PanelContainer.new()
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.165, 0.106, 0.078, 0.62)
@@ -161,7 +211,7 @@ func _on_band(label: Label, y: float) -> PanelContainer:
 	# centred whenever it knows its width
 	var centre := func() -> void: band.position.x = roundf((SCREEN.x - band.size.x) / 2.0)
 	band.resized.connect(centre)
-	add_child(band)
+	parent.add_child(band)
 	centre.call_deferred()
 	return band
 
@@ -239,6 +289,8 @@ func _draw_shimmer() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_pressed() and not event.is_echo():
+		finish_intro() # the menu works at once; a key just hurries the opening
 	if _starting or _pause.is_open() or _credits.is_open():
 		return
 	var step := MenuInput.vertical(event)
