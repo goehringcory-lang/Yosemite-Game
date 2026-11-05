@@ -107,9 +107,11 @@ func lead_for(player: Node2D, target_tilt: float) -> Vector2:
 		return Vector2.ZERO
 	if "can_act" in player and not player.get("can_act"):
 		return Vector2.ZERO
-	# Where they're really going: walking into a wall is standing still.
-	var heading := body.get_real_velocity()
-	if heading.length() < 1.0:
+	# Only a walk leads: the way they mean to go (a nudge out of a wall after
+	# a spawn is not a walk), and only while they really move (walking into
+	# a wall is standing still).
+	var heading := body.velocity
+	if heading.length() < 1.0 or body.get_real_velocity().length() < 20.0:
 		return Vector2.ZERO
 	heading = heading.normalized()
 	# Under a cliff the tilt keeps the player near the bottom of the screen;
