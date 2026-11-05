@@ -29,7 +29,7 @@ func _ready() -> void:
 	await _snap(dir, scale, "title")
 	title.select(TitleScreen.Option.NEW_GAME)
 	await _snap(dir, scale, "title_new_game")
-	title._confirm_new = false
+	title._pause.close()
 	title.select(TitleScreen.Option.SETTINGS)
 	await _snap(dir, scale, "title_settings")
 	title._pause.close()

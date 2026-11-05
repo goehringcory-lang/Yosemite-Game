@@ -13,6 +13,11 @@ extends RefCounted
 ## shut in winter by Park.SEASONAL "half_dome_cables" and needing the
 ## permit), the summit, and the Diving Board on its shoulder. Each first is
 ## kept as a QuestLog unlock, so the quests can ask for it.
+##
+## John Muir's "muir_south_dome" asks for the summit at sunrise, which means
+## a night at the camp and an early start: on top in the morning with his
+## quest open, the Valley is under a sea of cloud and your shadow lies out
+## on it in a ring of rainbow light (CLOUD_SEA_VIEW, played by SummitMoment).
 
 const PERMIT := "wilderness_permit"
 const CANISTER := "bear_canister"
@@ -25,6 +30,9 @@ const NIGHT_OUT := "night_out"
 const SUMMIT := "half_dome_summit"
 const CABLES := "half_dome_cables"
 const DIVING_BOARD := "diving_board_light"
+## On top in the early morning for John Muir, over the cloud in the Valley.
+const CLOUD_SEA := "muir_cloud_sea"
+const MUIR_QUEST := "muir_south_dome"
 ## How many things to eat the canister holds (a real one holds a few days'
 ## food for one person). It's packed with the best food first; the rest of
 ## what you carry spends the night in your pack.
@@ -37,6 +45,11 @@ const BEAR_VISITS := 0.5
 ## "about an hour" of afternoon light, given a little room).
 const FACE_LIT_FROM := 15
 const FACE_LIT_TO := 17
+## The morning hours the cloud still fills the Valley under the summit. You
+## wake at six; from the camp it's an hour and a half to the saddle and the
+## better part of an hour up the cables, so only a night out gets you there.
+const CLOUD_FROM := 5
+const CLOUD_TO := 10
 
 
 static func is_backcountry(region_id: String) -> bool:
@@ -115,6 +128,26 @@ const DIVING_BOARD_VIEW := {
 		{"k": "mt_watkins", "x": 80, "s": 0.8, "l": 0}],
 	"ground": "half_dome_forest",
 }
+
+
+## The summit for Muir: the Valley under cloud at sunrise, the peaks standing
+## out of it, and your shadow on the cloud with the glory round its head.
+const CLOUD_SEA_VIEW := {
+	"title": "Above the clouds", "hour": 6.8, "rise_from": 0.55, "rise_to": 0.8,
+	"view": [{"k": "el_capitan", "x": 250, "s": 0.55, "l": 0}, {"k": "glacier_point", "x": 95, "s": 1.25, "l": 1},
+		{"k": "north_dome", "x": 405, "s": 1.15, "l": 1}, {"k": "sierra_crest", "x": 240, "s": 0.7, "l": 0}],
+	"ground": "valley_forest", "cloud_sea": true, "sun_behind": true, "glory_x": 250, "foreground": "summit_lip",
+}
+const CLOUD_SEA_WORDS := {"who": "Half Dome at sunrise",
+	"text": "The Valley is gone. A sea of cloud fills it wall to wall, with Glacier Point and North Dome standing out of it like islands, and out on the cloud below the lip lies your own shadow, with a ring of rainbow light round its head."}
+
+
+## Whether the summit should show the sea of cloud now: Muir's quest is
+## open, its view isn't seen yet, and it's early morning.
+static func cloud_sea_due() -> bool:
+	if QuestLog.is_unlocked(CLOUD_SEA) or not QuestLog.active.has(MUIR_QUEST):
+		return false
+	return GameClock.hour_in_range(CLOUD_FROM, CLOUD_TO)
 
 
 ## Plays a view (StoryVista) with the player held and the clock stopped,

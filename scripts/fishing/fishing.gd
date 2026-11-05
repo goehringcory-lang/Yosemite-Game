@@ -343,6 +343,8 @@ func interact(player: Player) -> void:
 	player.clear_pose()
 	if caught:
 		player.pose("arms_up", 0.9) # holding it up
+		# out of the water in a spray of drops
+		Sparkle.burst(player.get_parent(), to_global(_fly_at), Sparkle.SPLASH)
 	queue_redraw()
 	game.queue_free()
 	GameClock.advance_minutes(CAST_MINUTES)
@@ -360,6 +362,7 @@ func interact(player: Player) -> void:
 func land(fish: Dictionary) -> String:
 	var fish_name: String = FieldLog.get_animal(fish.id).get("name", fish.id)
 	var first := FieldLog.spot(fish.id, true)
+	Achievements.caught(fish)
 	var size := "%d-inch " % fish.length if fish.has("length") else ""
 	var text := "Caught a %s%s%s!" % [size, fish_name, " (new in your field log)" if first else ""]
 	if fish.get("trophy", false):
