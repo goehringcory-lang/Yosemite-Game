@@ -104,6 +104,11 @@ var _night_age := 0.0
 var _lightning := 0.0
 var _next_lightning := 4.0
 var _bird_phase := 0.0
+## A peregrine falcon stooping past a big wall now and then: seconds until
+## the next, and how far through its dive one is (below 0 when none is).
+var _falcon_wait := 0.0
+var _falcon_t := -1.0
+var _falcon_from := Vector2.ZERO
 var _won_line := ""
 var _swing_x := 0.0
 var _seed := -1
@@ -179,6 +184,7 @@ func _process(delta: float) -> void:
 	_speech_age += delta
 	_crux_result_age += delta
 	_bird_phase += delta
+	_update_falcon(delta)
 	_stamina_flash = maxf(_stamina_flash - delta * 3.0, 0.0)
 	_shake = maxf(_shake - delta * 18.0, 0.0)
 	_act_t = minf(_act_t + delta / 0.35, 1.0)
@@ -804,10 +810,82 @@ func _draw_layers(height: float) -> void:
 				_canvas.draw_rect(Rect2(pos, Vector2(1, 2)), Color(0.961, 0.933, 0.878, 0.8))
 
 
+## Walls at least this tall have peregrines about.
+const FALCON_WALL_FT := 400
+## Seconds between falcons, and how long a stoop across the screen takes.
+const FALCON_EVERY := Vector2(35.0, 80.0)
+const FALCON_STOOP := 1.6
+
+
+## Now and then on a big wall by day, a peregrine falcon comes over high,
+## folds its wings and stoops past on the swifts. The first one you see goes
+## in your field log (FieldLog).
+func _update_falcon(delta: float) -> void:
+	if route == null or route.boulder or route.height_ft < FALCON_WALL_FT or _pal.is_empty() or _pal.night:
+		return
+	if _falcon_t >= 0.0:
+		_falcon_t += delta / FALCON_STOOP
+		if _falcon_t >= 0.35 and FieldLog.spot("peregrine_falcon", true):
+			_toast("A peregrine falcon stoops past the wall! It's in your Wildlife journal.")
+		if _falcon_t >= 1.0:
+			_falcon_t = -1.0
+		return
+	if _falcon_wait <= 0.0:
+		_falcon_wait = randf_range(FALCON_EVERY.x * 0.4, FALCON_EVERY.y * 0.6)
+	_falcon_wait -= delta
+	if _falcon_wait <= 0.0:
+		_falcon_wait = randf_range(FALCON_EVERY.x, FALCON_EVERY.y)
+		_falcon_t = 0.0
+		# over the open sky beside the wall, not behind it
+		_falcon_from = Vector2(randf_range(SCREEN.x * 0.84, SCREEN.x * 0.97), -8.0)
+
+
+## Starts a falcon's stoop now (for tests and screenshots).
+func send_falcon() -> void:
+	_falcon_wait = 0.0001
+	_falcon_t = -1.0
+	_update_falcon(0.001)
+
+
+## Where the stooping falcon is [param t] through its dive: in high, then
+## down and across, curving out at the bottom.
+func _falcon_at(t: float) -> Vector2:
+	var drop := Vector2(-SCREEN.x * 0.12, SCREEN.y * 0.9)
+	return _falcon_from + Vector2(drop.x * t, drop.y * (t * t * 0.6 + t * 0.4))
+
+
+func _draw_falcon() -> void:
+	if _falcon_t < 0.0:
+		return
+	var at := _falcon_at(_falcon_t).round()
+	var col := Color(0.2, 0.23, 0.28, 0.97)
+	var dark := Color(0.1, 0.11, 0.14, 0.97)
+	var pale := Color(0.86, 0.84, 0.8, 0.97)
+	var c := _canvas
+	if _falcon_t < 0.2:
+		# still gliding: long pointed wings out, swept back, a dark helmet
+		c.draw_rect(Rect2(at + Vector2(-3, 0), Vector2(7, 2)), col)
+		c.draw_rect(Rect2(at + Vector2(-5, 0), Vector2(2, 1)), dark)
+		c.draw_rect(Rect2(at + Vector2(3, -1), Vector2(2, 2)), dark)
+		for i in 5:
+			c.draw_rect(Rect2(at + Vector2(1 - i, -1 - i), Vector2(2, 1)), col if i < 4 else dark)
+			c.draw_rect(Rect2(at + Vector2(1 - i, 2 + i), Vector2(2, 1)), col if i < 4 else dark)
+		return
+	# wings folded: a slate teardrop, head first, with a streak of air behind
+	var dir := (_falcon_at(minf(_falcon_t + 0.02, 1.0)) - _falcon_at(_falcon_t)).normalized()
+	for i in 7:
+		var w := 3.0 if i < 3 else (2.0 if i < 5 else 1.0)
+		c.draw_rect(Rect2((at - dir * i).round() - Vector2(1, 1), Vector2(w, w)), dark if i == 0 else col)
+	c.draw_rect(Rect2((at - dir * 2).round(), Vector2(1, 1)), pale)
+	for i in range(9, 22, 3):
+		c.draw_rect(Rect2((at - dir * i).round(), Vector2(1, 1)), Color(0.96, 0.95, 0.9, 0.3 - i * 0.012))
+
+
 ## Swifts darting past the wall.
 func _draw_birds() -> void:
 	if _pal.night:
 		return
+	_draw_falcon()
 	for i in 3:
 		var t := fposmod(_bird_phase * (0.12 + i * 0.03) + i * 0.37, 1.0)
 		var x := SCREEN.x + 20 - t * (SCREEN.x * 0.62)

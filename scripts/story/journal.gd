@@ -5,20 +5,22 @@ extends CanvasLayer
 ##            keepers, the guidebook's tick list, and perks
 ##   Quests: the main story's next step and every open quest
 ##   Press Book: the plants you've pressed, and where the rest grow
+##   Wildlife: every bird, mammal, butterfly and fish in the field log
+##             (FieldLog), a picture each, filled in as you find them
 ##   Logbook: achievements, and the collection log of summits, climbs sent
 ##            and fish caught (Achievements)
 ##   Backpack: everything you carry (climbing gear, food, forage) in slots
-## J, Q, P, L and B open it on their tab (gamepad Y opens the Journal), Tab (LB/RB)
+## J, Q, P, N, L and B open it on their tab (gamepad Y opens the Journal), Tab (LB/RB)
 ## turns to the next tab, and the tab's own key or Esc (B) closes it.
 ##
 ## World adds one of these. It pauses the clock while it's open.
 
-enum Tab { JOURNAL, QUESTS, PRESS, LOGBOOK, BACKPACK }
+enum Tab { JOURNAL, QUESTS, PRESS, WILDLIFE, LOGBOOK, BACKPACK }
 
-const TAB_NAMES := ["Journal", "Quests", "Press Book", "Logbook", "Backpack"]
+const TAB_NAMES := ["Journal", "Quests", "Press Book", "Wildlife", "Logbook", "Backpack"]
 ## The action that opens each tab, and the key it's on.
-const TAB_ACTIONS := ["journal", "quests", "press_book", "logbook", "backpack"]
-const TAB_KEYS := ["J", "Q", "P", "L", "B"]
+const TAB_ACTIONS := ["journal", "quests", "press_book", "wildlife", "logbook", "backpack"]
+const TAB_KEYS := ["J", "Q", "P", "N", "L", "B"]
 ## A plant that isn't in the press book yet shows as a shadow of itself.
 const UNFOUND := Color(0.165, 0.106, 0.078, 0.4)
 const HEADING := Color(1, 0.831, 0.541)
@@ -175,7 +177,7 @@ func is_open() -> bool:
 	return _open
 
 
-## The tab showing now (Tab.JOURNAL, QUESTS, PRESS or BACKPACK).
+## The tab showing now (Tab.JOURNAL, QUESTS, PRESS, WILDLIFE, LOGBOOK or BACKPACK).
 func tab() -> Tab:
 	return _tab
 
@@ -307,6 +309,8 @@ func _refresh() -> void:
 			_quests_page()
 		Tab.PRESS:
 			_press_page()
+		Tab.WILDLIFE:
+			_wildlife_page()
 		Tab.LOGBOOK:
 			_logbook_page()
 		Tab.BACKPACK:
@@ -316,10 +320,10 @@ func _refresh() -> void:
 	_refresh_hints()
 
 
-## True on the tabs laid out as slots with a cursor (the Backpack and the
-## Press Book); the others are pages that scroll.
+## True on the tabs laid out as slots with a cursor (the Backpack, the
+## Press Book and Wildlife); the others are pages that scroll.
 func _uses_slots() -> bool:
-	return _tab == Tab.BACKPACK or _tab == Tab.PRESS
+	return _tab == Tab.BACKPACK or _tab == Tab.PRESS or _tab == Tab.WILDLIFE
 
 
 ## The tab names and the controls hint, in the current device's buttons.
@@ -468,17 +472,14 @@ func _calendar() -> void:
 		_line("     %s. Hosted by %s." % [Festivals.when_text(festival), host.display_name if host else festival.host], DIM)
 
 
-## The birds and animals you've seen or heard (FieldLog), and how to find
-## the rest.
+## How the field log (FieldLog) is coming along, group by group; the
+## animals themselves are on the Wildlife tab.
 func _field_log() -> void:
 	_heading("Field log: %d of %d animals" % [FieldLog.count(), FieldLog.total()])
-	for animal: Dictionary in FieldLog.ANIMALS:
-		if FieldLog.has(animal.id):
-			var where: String = FieldLog.seen[animal.id].get("where", "")
-			_check_line(true, "%s (%s)%s" % [animal.name, animal.latin, " · %s" % where if where != "" else ""], Color(0.827, 0.894, 0.541))
-			_line("     " + animal.note, DIM)
-		else:
-			_check_line(false, "%s · %s. %s" % [animal.name, FieldLog.seasons_text(animal.seasons), animal.hint], DIM)
+	var parts := PackedStringArray()
+	for group: String in FieldLog.GROUPS:
+		parts.append("%s %d of %d" % [FieldLog.GROUP_NAMES[group], FieldLog.count_in(group), FieldLog.total_in(group)])
+	_line(", ".join(parts) + ". Every one is on the Wildlife tab (N).", DIM)
 
 
 ## Everyone you've helped on a rescue call (Rescues), newest first.
@@ -769,6 +770,35 @@ func _pressed(plant: Dictionary) -> Dictionary:
 	var found: String = " Found at %s." % entry.where if str(entry.get("where", "")) != "" else ""
 	return {"name": plant.name, "count": 1, "icon": Herbarium.icon(plant.id), "facts": "%s · %s" % [plant.latin, Herbarium.rarity_name(plant)],
 		"description": plant.note + found, "dim": false}
+
+
+# ---------------------------------------------------------------- the Wildlife tab
+
+## The wildlife journal: every animal in the field log as a slot, by group.
+## One not yet found is a shadow of itself, and says where and when to look.
+func _wildlife_page() -> void:
+	for group: String in FieldLog.GROUPS:
+		var pages: Array[Dictionary] = []
+		for animal: Dictionary in FieldLog.in_group(group):
+			pages.append(_logged(animal))
+		_slot_section("%s (%d of %d)" % [FieldLog.GROUP_NAMES[group], FieldLog.count_in(group), FieldLog.total_in(group)], pages, "")
+	if FieldLog.count() == FieldLog.total():
+		_line("Every animal in the book. The valley's naturalists would be proud.", Color(0.827, 0.894, 0.541))
+	else:
+		_line("Walk up slowly to get a good look; running scares things off. Stand still a while to listen.", DIM)
+
+
+## What a slot shows for [param animal]: its picture, and either its
+## natural history and where you found it, or where and when to look.
+func _logged(animal: Dictionary) -> Dictionary:
+	var how: String = {"seen": "seen", "heard": "heard", "caught": "caught on a fly rod"}.get(animal.how, "")
+	if not FieldLog.has(animal.id):
+		return {"name": "%s (not yet %s)" % [animal.name, how], "count": 1, "icon": FieldLog.icon(animal.id),
+			"facts": FieldLog.seasons_text(animal.seasons), "description": "Look: " + animal.hint, "dim": true}
+	var entry: Dictionary = FieldLog.seen[animal.id]
+	var found: String = " First %s at %s." % [how, entry.where] if str(entry.get("where", "")) != "" else ""
+	return {"name": animal.name, "count": 1, "icon": FieldLog.icon(animal.id),
+		"facts": "%s · %s" % [animal.latin, FieldLog.seasons_text(animal.seasons)], "description": animal.note + found, "dim": false}
 
 
 # ---------------------------------------------------------------- the Logbook tab
