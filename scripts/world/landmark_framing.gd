@@ -30,6 +30,14 @@ const JUMP := 48.0
 
 ## The camera's current tilt, in pixels (0 or less).
 var tilt := 0.0
+## How far the camera looks ahead of the player as they walk, in pixels, and
+## how quickly it swings round (per second): slower than the walk, so a turn
+## eases the view over rather than snapping it. Up and down the lead is
+## shorter (the screen is shorter), and gives way to the tilt under a cliff.
+const LEAD := Vector2(36, 20)
+const LEAD_SPEED := 1.6
+## The camera's current lead ahead of the player.
+var lead := Vector2.ZERO
 ## Added to the camera's offset on top of the tilt: the camera's lag carried
 ## over a seam between regions (World._cross_seam). It closes just as the
 ## camera's own lag would have, so the view eases on without a lurch.
@@ -68,18 +76,46 @@ func _process(delta: float) -> void:
 	var target := target_tilt(camera, at)
 	# Arriving somewhere (a new region, a spawn, a door) frames the view at
 	# once, as the camera itself does; only walking eases the tilt.
-	if arrived or _last_at.distance_to(at) > JUMP:
+	var jumped := arrived or _last_at.distance_to(at) > JUMP
+	if jumped:
 		tilt = target
 	_last_at = at
 	tilt = lerpf(tilt, target, 1.0 - exp(-SPEED * delta))
 	if absf(tilt - target) < 0.25:
 		tilt = target
+	var want := lead_for(player, target)
+	if jumped:
+		lead = Vector2.ZERO
+	lead = lead.lerp(want, 1.0 - exp(-LEAD_SPEED * delta))
+	if lead.distance_to(want) < 0.25:
+		lead = want
 	if carry != Vector2.ZERO:
 		# Camera2D closes its lag by speed * delta of it each frame.
 		carry *= 1.0 - clampf(camera.position_smoothing_speed * delta, 0.0, 1.0)
 		if carry.length() < 0.05:
 			carry = Vector2.ZERO
-	camera.offset = Vector2(carry.x, tilt + carry.y)
+	camera.offset = Vector2(carry.x + lead.x, tilt + carry.y + lead.y)
+
+
+## Where the camera leads to with [param player] walking as they are, under a
+## tilt of [param target_tilt]: ahead of them, so you see where you're going.
+## Standing still (or not free to move: a conversation, a screen), it
+## settles back over them. Indoors the rooms are small, so it stays put.
+func lead_for(player: Node2D, target_tilt: float) -> Vector2:
+	var body := player as CharacterBody2D
+	if body == null or not is_instance_valid(_region) or _region.get("indoors") == true:
+		return Vector2.ZERO
+	if "can_act" in player and not player.get("can_act"):
+		return Vector2.ZERO
+	# Where they're really going: walking into a wall is standing still.
+	var heading := body.get_real_velocity()
+	if heading.length() < 1.0:
+		return Vector2.ZERO
+	heading = heading.normalized()
+	# Under a cliff the tilt keeps the player near the bottom of the screen;
+	# leading up or down there would fight it.
+	var free := 1.0 - clampf(absf(target_tilt) / 24.0, 0.0, 1.0)
+	return Vector2(heading.x * LEAD.x, heading.y * LEAD.y * free).round()
 
 
 ## The player walked over a seam into [param region] and everything shifted

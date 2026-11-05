@@ -7,7 +7,11 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | Stardew hallmark | Here | Where | Checked by |
 |---|---|---|---|
 | "Item get" cards at the corner with picture and count | Cards slide in at the top left, clear of the message line; repeats count up ("x2") with a bump; gear gets a brighter chime | `scripts/ui/item_toasts.gd` | test (stacking, counting, at most 3); shot `polish_toasts.png` |
-| Things you pick up fly into you | Forage and story items hop up and fly into the player | `scripts/world/pickup_pop.gd` | smoke test picks forage up |
+| Things you pick up fly into you | Forage and story items hop up and fly into the player, landing in a twinkle of gold | `scripts/world/pickup_pop.gd`, `scripts/world/sparkle.gd` | smoke test picks forage up |
+| Bursts for the big moments | A trout leaves the water in a spray of drops; a quest done sends warm motes rising round you; half the motes on Low | `Sparkle.burst`, `Fishing.interact`, `HUD._on_quest_done` | test (bursts and frees itself) |
+| Things worth picking up catch the light | Finds on the ground twinkle every few seconds, out of step with each other; none on Low | `scripts/world/glint.gd`, `Forageable` | test (every find has a glint) |
+| Buttons that press | The chosen line on the title screen, pause menu, settings and conversation choices flashes bright and settles, and its arrow pokes in and back | `MenuInput.press` | test (flashes, then settles) |
+| Footsteps that skid | Pulling up from a run throws a puff out either side of the feet (dust, spray, powder; none indoors or on frozen ground) | `Footfall._skid` | by eye |
 | Every item has a picture | All 38 items, including the 12 cooked foods that showed only names before | `tools/ui/food_icons.gd` | test (every item has an icon) |
 | Shop and cooking menus show the goods | Pictures beside every trade and every dish, highlight across the row | `DialogueBox.choose(..., icons)`, `vendor.gd`, `station.gd` | shots `polish_shop.png`, `polish_campfire.png`; story test (long lists fit) |
 | A card about the thing under the cursor | Beside the campfire and shop lists: a dish's ingredients with what you have of each (red when short), its energy, yield and time, and its note; a ware's price against the food you carry, how many you own, and what it's for | `DialogueBox.choose(..., details)`, `Station.menu_for`, `Vendor.offer_card` | test (one card per choice, short ingredients in red, fits the screen); shots `polish_campfire.png`, `polish_shop.png` |
@@ -55,6 +59,8 @@ This is the list of what makes Stardew Valley feel finished, what this game does
 | String lights at night | The bulbs strung over Curry Village's plaza glow after dusk with the lit windows | `scripts/world/string_lights.gd` | shot `polish_clock_23.png` |
 | Weather | Rain, snow, cloud shadows, overcast tint (existing) | `weather.gd`, `cloud_shadows.gd` | `docs/weather_winter_snow.png` |
 | Smooth camera and scene wipes | Camera smoothing; between places the screen fills with pixel diamonds in a sweep from the top left, in the palette's night color, and they shrink away the same way | `player.tscn`, `assets/shaders/pixel_wipe.gdshader`, `HUD.fade_to_black` | travel test; shot `tools/shots/wipe_shot.tscn` |
+| A camera that looks where you're going | The view eases ahead of you as you walk (36 px across, 20 up or down) and settles back when you stop; the cliff tilt wins under a wall; rooms and doors don't lead | `LandmarkFraming.lead`, `lead_for` | test (walking right leads right, standing still settles) |
+| Screens that wipe in and out | The climbing wall, slackline, Half Dome cables, rock work and rescue lower open out of the pixel diamonds, and the valley opens out of them when you leave; a cover on top, so nothing waits on it | `scripts/ui/screen_wipe.gd`, `ScreenWipe.attach` | test (wipes above every menu, clears and frees, one in and one out) |
 
 ## Sound and music
 

@@ -70,6 +70,7 @@ func interact(player: Player) -> void:
 	GameClock.paused = true
 	var game: CablesMinigame = MINIGAME.new()
 	tree.root.add_child(game)
+	ScreenWipe.attach(game)
 	game.start(crowd)
 	var made_it: bool = await game.finished
 	var outcome := game.outcome

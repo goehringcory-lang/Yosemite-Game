@@ -260,6 +260,8 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Does what the menu option does (Option.CONTINUE, NEW_GAME, ...).
 func select(option: int) -> void:
 	_cursor = maxi(_options.find(option), 0)
+	if _cursor < _labels.size():
+		MenuInput.press(_labels[_cursor])
 	match option:
 		Option.CONTINUE:
 			Sound.play("ui_select")

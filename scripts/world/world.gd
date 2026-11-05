@@ -693,7 +693,7 @@ func _hand_camera_over() -> void:
 	var target := camera.global_position
 	var eased := clampf(camera.position_smoothing_speed * get_process_delta_time(), 0.0, 1.0)
 	framing.carry = (_crossed_view - target) * (1.0 - eased)
-	camera.offset = Vector2(framing.carry.x, framing.tilt + framing.carry.y)
+	camera.offset = Vector2(framing.carry.x + framing.lead.x, framing.tilt + framing.carry.y + framing.lead.y)
 	camera.reset_smoothing()
 
 

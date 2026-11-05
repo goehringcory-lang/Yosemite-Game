@@ -429,6 +429,7 @@ func _main_input(event: InputEvent) -> void:
 		_refresh()
 	elif MenuInput.confirm(event):
 		Sound.play("ui_select")
+		MenuInput.press(_option_labels[_cursor])
 		match _cursor:
 			Option.RESUME:
 				close()
@@ -481,6 +482,8 @@ func _settings_input(event: InputEvent) -> void:
 			change = -Settings.MAX_VOLUME
 	if change != 0:
 		change_setting(_settings_cursor, change)
+		if _settings_cursor < _setting_values.size():
+			MenuInput.press(_setting_values[_settings_cursor])
 
 
 ## Steps setting [param which] (a Setting) by [param step], then saves and applies it.

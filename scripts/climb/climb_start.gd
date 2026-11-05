@@ -97,6 +97,7 @@ func climb(player: Player, top_out := true) -> bool:
 	var minigame: ClimbMinigame = MINIGAME.instantiate()
 	minigame.setup(route)
 	tree.root.add_child(minigame)
+	ScreenWipe.attach(minigame)
 	var state := minigame.state
 	var result: Array = await minigame.finished
 	var success: bool = result[0]

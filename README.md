@@ -91,6 +91,11 @@ The small touches that make the Valley feel alive, in the spirit of Stardew Vall
 - **Plants rustle.** Ferns, bracken, shrubs and flowers sway and rustle when you brush past them (`scripts/world/rustle.gd`).
 - **Pictures in the shops and at the fire.** Every trade and every dish in a choice list shows its picture (`DialogueBox.choose` takes an icon per option).
 - **Every food has a picture.** The acorn chain and the campfire dishes are drawn by `tools/ui/food_icons.gd` in the forage icons' style.
+- **The camera looks ahead.** As you walk, the view eases a little ahead of you (36 pixels across, 20 up or down), so you see where you're going, and settles back over you when you stop, talk, or open a screen. It swings round more slowly than you turn, so changing direction glides. Under a cliff the tilt up at the wall wins over leading up or down, rooms don't lead, and doors and spawns start it afresh (`LandmarkFraming.lead`).
+- **Screens open with the wipe.** The climbing wall, the slackline, the Half Dome cables, rock work and a rescue lower used to pop up in one frame. Each now opens out of the same pixel diamonds the game wipes between places with, and the valley opens up the same way when you leave. The wipe is a cover drawn on top, so it never holds anything up (`scripts/ui/screen_wipe.gd`).
+- **Bursts for the moments that count.** A find that flies into your pack lands in a twinkle of gold, a trout comes out of the water in a spray of drops, and finishing a quest sends warm motes rising round you. Finds lying on the ground catch the light every few seconds, so a berry reads as something to pick up (`scripts/world/sparkle.gd`, `scripts/world/glint.gd`). Low graphics draws half the motes and no glints.
+- **Skids.** Pull up from a run and your feet throw a puff of dust out either side (spray in the rain, powder in the snow, nothing off frozen winter ground or indoors), on top of the dust, prints and breath every step already made (`Footfall._skid`).
+- **Buttons that press.** The line you choose in a menu (the title screen, the pause menu, a setting, a conversation's choices) flashes bright and settles, and its arrow pokes in a pixel and back, so a choice lands like a button going down and not only as a sound (`MenuInput.press`).
 
 ![Item cards](docs/polish_toasts.png)
 ![A conversation with a portrait](docs/polish_dialogue.png)

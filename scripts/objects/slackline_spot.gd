@@ -28,6 +28,7 @@ func walk(player: Player) -> void:
 	GameClock.paused = true
 	var minigame: SlacklineMinigame = MINIGAME.new()
 	player.get_tree().root.add_child(minigame)
+	ScreenWipe.attach(minigame)
 	await minigame.finished
 	var spent := minigame.minutes()
 	GameClock.paused = was_paused

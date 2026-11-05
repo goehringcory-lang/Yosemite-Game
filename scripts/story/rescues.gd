@@ -386,6 +386,7 @@ func climb_to_party(player: Player, start: ClimbStart) -> void:
 	player.can_act = false
 	var lower := RescueLower.new()
 	player.get_tree().root.add_child(lower)
+	ScreenWipe.attach(lower)
 	var visitor_path := RescueField.VISITOR_DIR % call.get("look", "")
 	var visitor: CharacterData = load(visitor_path) if ResourceLoader.exists(visitor_path) else null
 	lower.start(route, visitor.sprite_sheet if visitor else null)
