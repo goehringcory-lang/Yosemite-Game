@@ -48,6 +48,7 @@ func _ready() -> void:
 	await test_lit_park()
 	test_fire_outshines_lamps()
 	await test_indoors()
+	await test_room_windows()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
 
@@ -276,6 +277,52 @@ func test_indoors() -> void:
 	await _frames(3)
 	check(not room.visible and RoomLight.level == 0.0, "back outside, the room's dimming is gone")
 	set_date(SUMMER, 14, 12)
+
+
+func test_room_windows() -> void:
+	var rooms := RoomWindows.data()
+	check(rooms.size() >= 20, "the rooms' windows are mapped (%d rooms)" % rooms.size())
+	var bad := []
+	for id: String in rooms:
+		var path: String = world.region_scene_path(id)
+		if not ResourceLoader.exists(path):
+			bad.append(id)
+			continue
+		var region := (load(path) as PackedScene).instantiate()
+		var room := region.get_node_or_null("Room") as Sprite2D
+		var size := room.texture.get_size() if room and room.texture else Vector2.ZERO
+		for pane: Dictionary in rooms[id].panes:
+			if not Rect2(Vector2.ZERO, size).encloses(Rect2(pane.x, pane.y, pane.w, pane.h)):
+				bad.append("%s pane at %d,%d" % [id, pane.x, pane.y])
+		if not region.indoors:
+			bad.append(id + " is not indoors")
+		region.free()
+	check(bad.is_empty(), "every mapped window is in its room's picture %s" % [bad])
+	set_date(SUMMER, 14, 12)
+	var t := Sun.times()
+	var clear := {"clouds": 0.0, "rain": 0.0, "snow": 0.0}
+	var noon := RoomWindows.light_at(12.0, clear)
+	check(noon.noon > 0.95 and noon.sky_mix < 0.05 and noon.moon == 0.0, "at noon the room is as painted")
+	var night := RoomWindows.light_at(23.0, clear)
+	check(night.noon < 0.01 and night.golden < 0.01, "no sun on the floor at night")
+	check(night.sky_mix > 0.95 and night.night > 0.9, "the glass shows the night sky")
+	check(night.moon > 0.5, "a full moon shines in on a clear night")
+	check(RoomWindows.light_at(23.0, {"clouds": 1.0, "rain": 0.8, "snow": 0.0}).moon == 0.0, "...but not through rain")
+	var evening := RoomWindows.light_at(t.y - 0.4, clear)
+	var morning := RoomWindows.light_at(t.x + 0.4, clear)
+	check(evening.golden > 0.4 and evening.noon < 0.6, "the low evening sun takes over from the noon light")
+	check(evening.sun_lean > 0.5 and morning.sun_lean < -0.5, "evening light leans east across the room, morning light west")
+	check(evening.sun_reach > noon.sun_reach, "low sun reaches further across the floor")
+	var cloudy := RoomWindows.light_at(12.0, {"clouds": 1.0, "rain": 1.0, "snow": 0.0})
+	check(cloudy.noon < 0.2, "rain takes the sun off the floor")
+	await world.go_to_region("curry_store", "door")
+	await _frames(3)
+	var windows := world.region.get_node_or_null("RoomWindows") as RoomWindows
+	check(windows != null and windows.spec.panes.size() == 2, "the store's two windows follow the clock")
+	check(windows != null and windows.z_index > (world.region.get_node("Room") as Sprite2D).z_index, "...drawn over the room's picture")
+	await world.go_to_region("curry_village", "store_door")
+	await _frames(3)
+	check(world.region.get_node_or_null("RoomWindows") == null, "no room windows outdoors")
 
 
 func _frames(n: int) -> void:

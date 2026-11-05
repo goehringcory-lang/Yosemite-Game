@@ -22,6 +22,7 @@ static func reset() -> void:
 	FieldLog.start_new_game()
 	Festivals.start_new_game()
 	Stewardship.start_new_game()
+	Achievements.start_new_game()
 
 
 ## Everything, the clock and the larder too: for the pause menu's Quit to

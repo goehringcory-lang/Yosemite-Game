@@ -10,13 +10,28 @@ extends Node
 ## (a save from when the game was called Yosemite Game is copied over; see
 ## OldUserDir).
 
-## Tests point this at a separate file so they never touch a real save.
-var save_path := "user://save.json"
+## How many save slots there are. Each slot is its own game.
+const SLOTS := 3
+const SAVE_VERSION := 1
+
+## Slot 1's file. Slots 2 and 3 sit beside it (save_2.json, save_3.json), so a
+## save from before there were slots is slot 1.
+var base_path := "user://save.json"
+## The slot the game saves to and loads from (1 to SLOTS). The title screen
+## picks it; saving into another slot from the pause menu moves the game there.
+var slot := 1
+## The current slot's file. Tests point this at a separate file so they never
+## touch a real save; setting it picks slot 1 of that file.
+var save_path: String:
+	get:
+		return slot_path(slot)
+	set(value):
+		base_path = value
+		slot = 1
 
 
 func _init() -> void:
 	OldUserDir.migrate()
-const SAVE_VERSION := 1
 
 ## Saved data for persist nodes that weren't in the tree when the game
 ## loaded, by node name. World hands it over with restore() once they appear.
@@ -28,6 +43,82 @@ var _fresh := false
 
 func has_save() -> bool:
 	return FileAccess.file_exists(save_path)
+
+
+## The file for save slot [param n] (1 to SLOTS).
+func slot_path(n: int) -> String:
+	if n <= 1:
+		return base_path
+	return "%s_%d.%s" % [base_path.get_basename(), n, base_path.get_extension()]
+
+
+func slot_used(n: int) -> bool:
+	return FileAccess.file_exists(slot_path(n))
+
+
+## True when any slot holds a game.
+func any_save() -> bool:
+	for n in range(1, SLOTS + 1):
+		if slot_used(n):
+			return true
+	return false
+
+
+## The slot saved most recently, for Continue (0 when there is no save that
+## can be read).
+func latest_slot() -> int:
+	var best := 0
+	var best_time := -1
+	for n in range(1, SLOTS + 1):
+		var info := slot_info(n)
+		if info.is_empty() or info.get("broken", false):
+			continue
+		var at := int(info.get("saved_at", 0))
+		if at <= 0:
+			at = FileAccess.get_modified_time(slot_path(n))
+		if at > best_time:
+			best = n
+			best_time = at
+	return best
+
+
+## The first slot with no game in it (0 when all are used).
+func first_empty_slot() -> int:
+	for n in range(1, SLOTS + 1):
+		if not slot_used(n):
+			return n
+	return 0
+
+
+## What the save menus show about slot [param n]: {} when it's empty, else
+## "date" ("Spring 4 (Thu), Year 1"), "time" ("2:15 PM"), "place", and
+## "saved_at" (Unix time; 0 for a save from before slots). A save file that
+## can't be read gives {"broken": true}.
+func slot_info(n: int) -> Dictionary:
+	if not slot_used(n):
+		return {}
+	var data = JSON.parse_string(FileAccess.get_file_as_string(slot_path(n)))
+	if typeof(data) != TYPE_DICTIONARY:
+		return {"broken": true}
+	var clock: Dictionary = data.get("clock", {}) if typeof(data.get("clock")) == TYPE_DICTIONARY else {}
+	var season := clampi(int(clock.get("season", 0)), 0, GameClock.SEASON_NAMES.size() - 1)
+	var day := maxi(int(clock.get("day", 1)), 1)
+	var minutes := int(clock.get("minutes", GameClock.DAY_START_HOUR * 60))
+	var hour := (minutes / 60) % 24
+	var h12 := 12 if hour % 12 == 0 else hour % 12
+	var summary: Dictionary = data.get("summary", {}) if typeof(data.get("summary")) == TYPE_DICTIONARY else {}
+	return {
+		"date": "%s %d (%s), Year %d" % [GameClock.SEASON_NAMES[season], day, GameClock.WEEKDAY_NAMES[(day - 1) % 7], maxi(int(clock.get("year", 1)), 1)],
+		"time": "%d:%02d %s" % [h12, minutes % 60, "AM" if hour < 12 else "PM"],
+		"place": str(summary.get("place", "")),
+		"saved_at": int(summary.get("saved_at", 0)),
+	}
+
+
+## Removes the game in slot [param n].
+func delete_slot(n: int) -> void:
+	if slot_used(n):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(slot_path(n)))
 
 
 ## Makes the next World start a new game even though a save exists.
@@ -45,6 +136,7 @@ func save_game() -> bool:
 		"clock": GameClock.save_data(),
 		"inventory": Inventory.save_data(),
 		"nodes": nodes,
+		"summary": _summary(),
 	}
 	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	if file == null:
@@ -99,6 +191,15 @@ func restore(root: Node) -> void:
 ## Forgets saved data that hasn't been restored yet, for a new game.
 func clear_pending() -> void:
 	_pending.clear()
+
+
+## A little about the game for the save menus, so they needn't load it.
+func _summary() -> Dictionary:
+	var summary := {"saved_at": int(Time.get_unix_time_from_system())}
+	var world := get_tree().get_first_node_in_group("world")
+	if world and world.has_method("location_name"):
+		summary["place"] = world.location_name()
+	return summary
 
 
 func _persist_nodes() -> Array[Node]:

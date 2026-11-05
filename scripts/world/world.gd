@@ -126,6 +126,7 @@ func _ready() -> void:
 		NewGame.reset()
 		if forage:
 			forage.respawn()
+	Achievements.settle()
 	hud.bind_player(player)
 	Sound.set_ambience("world")
 	add_child(Journal.new())
@@ -505,6 +506,7 @@ func _arrive() -> void:
 		plants.refresh()
 	if not region.indoors:
 		Chongo.visit(region)
+	RoomWindows.attach(region)
 	region_changed.emit(region)
 	_update_location()
 	_preload_neighbors()
@@ -679,7 +681,7 @@ func _hand_camera_over() -> void:
 	var target := camera.global_position
 	var eased := clampf(camera.position_smoothing_speed * get_process_delta_time(), 0.0, 1.0)
 	framing.carry = (_crossed_view - target) * (1.0 - eased)
-	camera.offset = Vector2(framing.carry.x, framing.tilt + framing.carry.y)
+	camera.offset = Vector2(framing.carry.x + framing.lead.x, framing.tilt + framing.carry.y + framing.lead.y)
 	camera.reset_smoothing()
 
 
@@ -804,6 +806,11 @@ func _fit_camera() -> void:
 func _set_paused(paused: bool) -> void:
 	player.can_act = not paused
 	GameClock.paused = paused
+
+
+## Where the player is, for the save menus (see SaveManager.slot_info).
+func location_name() -> String:
+	return _location_name() if region and player else ""
 
 
 ## "Cook's Meadow" inside a hub, or the region's name.

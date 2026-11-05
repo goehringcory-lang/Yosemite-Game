@@ -1,28 +1,32 @@
 class_name Journal
 extends CanvasLayer
-## The player's book, in four tabs:
+## The player's book, in five tabs:
 ##   Journal: the Guardian's Register, the missing Guardian, the valley's
 ##            keepers, the guidebook's tick list, and perks
 ##   Quests: the main story's next step and every open quest
 ##   Press Book: the plants you've pressed, and where the rest grow
+##   Logbook: achievements, and the collection log of summits, climbs sent
+##            and fish caught (Achievements)
 ##   Backpack: everything you carry (climbing gear, food, forage) in slots
-## J, Q, P and B open it on their tab (gamepad Y opens the Journal), Tab (LB/RB)
+## J, Q, P, L and B open it on their tab (gamepad Y opens the Journal), Tab (LB/RB)
 ## turns to the next tab, and the tab's own key or Esc (B) closes it.
 ##
 ## World adds one of these. It pauses the clock while it's open.
 
-enum Tab { JOURNAL, QUESTS, PRESS, BACKPACK }
+enum Tab { JOURNAL, QUESTS, PRESS, LOGBOOK, BACKPACK }
 
-const TAB_NAMES := ["Journal", "Quests", "Press Book", "Backpack"]
+const TAB_NAMES := ["Journal", "Quests", "Press Book", "Logbook", "Backpack"]
 ## The action that opens each tab, and the key it's on.
-const TAB_ACTIONS := ["journal", "quests", "press_book", "backpack"]
-const TAB_KEYS := ["J", "Q", "P", "B"]
+const TAB_ACTIONS := ["journal", "quests", "press_book", "logbook", "backpack"]
+const TAB_KEYS := ["J", "Q", "P", "L", "B"]
 ## A plant that isn't in the press book yet shows as a shadow of itself.
 const UNFOUND := Color(0.165, 0.106, 0.078, 0.4)
 const HEADING := Color(1, 0.831, 0.541)
 const DIM := Color(0.961, 0.933, 0.878, 0.6)
 ## The thin line under each section heading.
 const RULE := Color(0.945, 0.812, 0.416, 0.45)
+## A ticked line: something done, found or earned.
+const DONE := Color(0.827, 0.894, 0.541)
 const PANEL_POS := Vector2(30, 16)
 const PANEL_SIZE := Vector2(420, 238)
 ## How wide a line of text on the page is, leaving room for the scroll bar.
@@ -303,6 +307,8 @@ func _refresh() -> void:
 			_quests_page()
 		Tab.PRESS:
 			_press_page()
+		Tab.LOGBOOK:
+			_logbook_page()
 		Tab.BACKPACK:
 			_backpack_page()
 	_detail.visible = _uses_slots()
@@ -763,6 +769,112 @@ func _pressed(plant: Dictionary) -> Dictionary:
 	var found: String = " Found at %s." % entry.where if str(entry.get("where", "")) != "" else ""
 	return {"name": plant.name, "count": 1, "icon": Herbarium.icon(plant.id), "facts": "%s · %s" % [plant.latin, Herbarium.rarity_name(plant)],
 		"description": plant.note + found, "dim": false}
+
+
+# ---------------------------------------------------------------- the Logbook tab
+
+## Achievements, then the collection log: summits, climbs sent, fish caught.
+func _logbook_page() -> void:
+	_achievements()
+	_summits()
+	_sends()
+	_fish()
+
+
+## Every achievement by group: earned ones ticked, the rest with how to earn
+## them and how far along you are.
+func _achievements() -> void:
+	_heading("Achievements: %d of %d" % [Achievements.count(), Achievements.total()])
+	for group: String in Achievements.GROUPS:
+		_line(group.to_upper(), DIM)
+		for achievement: Dictionary in Achievements.ACHIEVEMENTS:
+			if achievement.group != group:
+				continue
+			if Achievements.has(achievement.id):
+				_check_line(true, "%s · %s" % [achievement.name, achievement.how], DONE)
+				continue
+			var p := Achievements.progress(achievement)
+			var count := " (%d of %d)" % [p[0], p[1]] if p[1] > 1 else ""
+			_check_line(false, "%s · %s%s" % [achievement.name, achievement.how, count], DIM)
+
+
+## The summits you've stood on, highest first, and how to reach the rest.
+func _summits() -> void:
+	_heading("Summits: %d of %d" % [Achievements.summit_count(), Achievements.SUMMITS.size()])
+	for summit: Dictionary in Achievements.SUMMITS:
+		var title := "%s, %s ft" % [summit.name, _thousands(summit.feet)]
+		if Achievements.on_summit(summit.id):
+			var when := Achievements.day_text(int(Achievements.summits[summit.id].day))
+			_check_line(true, title + (" · %s" % when if when != "" else ""), DONE)
+			_line("     " + summit.note, DIM)
+		else:
+			_check_line(false, "%s · %s" % [title, summit.how], DIM)
+
+
+## Every route you've topped out, in guidebook order: how often, your
+## cleanest and fastest send, and the day of the first.
+func _sends() -> void:
+	var routes := 0
+	for route in Guidebook.routes():
+		if Achievements.sends.has(route.id):
+			routes += 1
+	_heading("Climbs sent: %d %s, %d route%s" % [Achievements.send_count(), "send" if Achievements.send_count() == 1 else "sends",
+		routes, "" if routes == 1 else "s"])
+	if routes == 0:
+		_line("Top out on a route and it goes in here, with how many times you've sent it, your cleanest go and your fastest.", DIM)
+		return
+	for route in Guidebook.routes():
+		if not Achievements.sends.has(route.id):
+			continue
+		var entry: Dictionary = Achievements.sends[route.id]
+		var times := int(entry.count)
+		_check_line(true, "%s  %s · %s" % [route.display_name, route.grade, "sent once" if times == 1 else "sent %d times" % times], DONE)
+		var facts := PackedStringArray()
+		var falls := int(entry.falls)
+		if falls == 0:
+			facts.append("no falls")
+		elif falls > 0:
+			facts.append("fewest falls: %d" % falls)
+		var fastest := Achievements.time_text(int(entry.minutes))
+		if fastest != "":
+			facts.append("fastest: %s" % fastest)
+		var first := Achievements.day_text(int(entry.first_day))
+		if first != "":
+			facts.append("first: %s" % first)
+		if not facts.is_empty():
+			var text := ", ".join(facts)
+			_line("     %s%s." % [text.left(1).to_upper(), text.substr(1)], DIM)
+
+
+## Every kind of fish: how many you've landed, the biggest and the trophies,
+## or where to try for one you haven't.
+func _fish() -> void:
+	_heading("Fish caught: %d" % Achievements.fish_count())
+	for one: Dictionary in Fishing.FISH:
+		var animal := FieldLog.get_animal(one.id)
+		var fish_name: String = animal.get("name", one.id)
+		if not Achievements.fish.has(one.id):
+			_check_line(false, "%s · %s" % [fish_name, animal.get("hint", "")], DIM)
+			continue
+		var entry: Dictionary = Achievements.fish[one.id]
+		var line := "%s · %d caught" % [fish_name, int(entry.count)]
+		if int(entry.biggest) > 0:
+			line += ", biggest %d in" % int(entry.biggest)
+		if int(entry.trophies) > 0:
+			line += ", %d %s" % [int(entry.trophies), "trophy" if int(entry.trophies) == 1 else "trophies"]
+		_check_line(true, line, DONE)
+		var first := PackedStringArray()
+		for part: String in [str(entry.where), Achievements.day_text(int(entry.first_day))]:
+			if part != "":
+				first.append(part)
+		if not first.is_empty():
+			_line("     First one: %s." % ", ".join(first), DIM)
+
+
+## 8842 -> "8,842".
+static func _thousands(n: int) -> String:
+	var text := str(n)
+	return text if text.length() <= 3 else text.left(text.length() - 3) + "," + text.right(3)
 
 
 # ---------------------------------------------------------------- the Backpack tab

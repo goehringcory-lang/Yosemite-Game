@@ -192,6 +192,7 @@ func test_pause_settings() -> void:
 	_press("move_down")
 	_press("interact")
 	check(pause.page() == PauseMenu.Page.CONTROLS, "Controls opens")
+	test_rebind(pause)
 	_press("ui_cancel")
 	check(pause.is_open() and pause.page() == PauseMenu.Page.MAIN, "Esc on a page goes back to the main page")
 	_press("move_down")
@@ -219,8 +220,23 @@ func test_pause_save(pause: PauseMenu) -> void:
 		_press("move_up")
 	check(pause._cursor == PauseMenu.Option.SAVE, "the cursor reaches Save game")
 	_press("interact")
-	check(SaveManager.has_save(), "Save game writes the save file")
-	check(pause.is_open() and "Saved at" in pause._option_labels[PauseMenu.Option.SAVE].text, "the menu says it saved, and stays open")
+	check(pause.page() == PauseMenu.Page.SLOTS and pause._slot_mode == PauseMenu.SlotMode.SAVE and pause._slot_cursor == 0,
+		"Save game opens the save slots, on the slot being played")
+	_press("interact")
+	check(SaveManager.has_save(), "E on the slot writes the save file")
+	check(pause.is_open() and "Saved in slot 1 at" in pause._slot_note.text and pause._slot_details[0].text.contains("saved "), "the page says it saved, and the menu stays open (%s)" % pause._slot_note.text)
+	check(SaveManager.slot_info(1).get("place", "") != "", "the save notes where you are for the slot list")
+	# saving over another game asks first, then moves this game to that slot
+	FileAccess.open(SaveManager.slot_path(2), FileAccess.WRITE).store_string("{}")
+	_press("move_down")
+	_press("interact")
+	check(pause._slot_confirm == 2 and SaveManager.slot == 1, "saving over another game asks first")
+	_press("interact")
+	check(SaveManager.slot == 2 and SaveManager.slot_info(2).has("date"), "pressing again saves there, and the game goes on in slot 2")
+	SaveManager.delete_slot(2)
+	SaveManager.slot = 1
+	_press("ui_cancel")
+	check(pause.page() == PauseMenu.Page.MAIN and pause._cursor == PauseMenu.Option.SAVE, "Esc goes back to the main page on Save game")
 	_press("move_down")
 	_press("move_down")
 	_press("move_down")
@@ -239,6 +255,55 @@ func test_pause_save(pause: PauseMenu) -> void:
 	var player_data: Dictionary = saved.nodes.get(str(world.player.name), {})
 	check(is_equal_approx(float(player_data.get("x", 0.0)), spot.x), "the save holds where the player stands")
 	check(int(saved.clock.minutes) == 14 * 60 + 15, "the save holds the time of day")
+
+
+## The Controls page: E on a key waits for the next key, which takes over
+## the action (and the hints); a key in use swaps; Esc keeps the old key; the
+## menus' keys can't be taken; Reset puts everything back.
+func test_rebind(pause: PauseMenu) -> void:
+	var interact := Settings.BINDINGS.map(func(b: Dictionary) -> String: return b.id).find("interact")
+	for i in interact:
+		_press("move_down")
+	_press("interact")
+	check(pause._listening == interact, "E on a control waits for a key")
+	_key(KEY_ESCAPE)
+	check(pause._listening == -1 and Settings.key_for("interact") == KEY_E and pause.is_open(), "Esc keeps the old key, and the menu open")
+	_press("interact")
+	_key(KEY_F)
+	check(Settings.key_for("interact") == KEY_F and _has_key("interact", KEY_F) and not _has_key("interact", KEY_E), "a new key takes over Talk")
+	check(_has_key("interact", KEY_X), "and the action's other key stays")
+	check(world.hud.prompt("E", "A") == "F" and MenuInput.button(get_tree(), "[J] Journal  [E] Talk", "A") == "[J] Journal  [F] Talk", "hints name the new key")
+	check(_saved("keys", "interact") == KEY_F, "the key is saved")
+	_press("interact")
+	_key(KEY_G)
+	check(Settings.key_for("interact") == KEY_G and Settings.key_for("gift") == KEY_F, "a key another control had swaps over")
+	_press("interact")
+	_key(KEY_TAB)
+	check(Settings.key_for("interact") == KEY_G and pause._control_note.text == PauseMenu.RESERVED_TEXT, "the menus' keys can't be taken")
+	Settings.load_settings()
+	check(Settings.key_for("interact") == KEY_G and _has_key("interact", KEY_G), "changed keys load back")
+	for i in Settings.BINDINGS.size() - interact:
+		_press("move_down")
+	check(pause._controls_cursor == Settings.BINDINGS.size(), "the cursor reaches Reset keys")
+	_press("interact")
+	check(Settings.keys.is_empty() and _has_key("interact", KEY_E) and _has_key("gift", KEY_G), "Reset keys puts every key back")
+	check(world.hud.prompt("E", "A") == "E", "and the hints with them")
+
+
+func _has_key(action: String, physical: int) -> bool:
+	return InputMap.action_get_events(action).any(func(e: InputEvent) -> bool: return e is InputEventKey and e.physical_keycode == physical)
+
+
+func _key(physical: Key) -> void:
+	var event := InputEventKey.new()
+	event.physical_keycode = physical
+	event.pressed = true
+	Input.parse_input_event(event)
+	Input.flush_buffered_events()
+	var release := event.duplicate() as InputEventKey
+	release.pressed = false
+	Input.parse_input_event(release)
+	Input.flush_buffered_events()
 
 
 func test_prompts() -> void:
