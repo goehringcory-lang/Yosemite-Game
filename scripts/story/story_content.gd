@@ -24,6 +24,8 @@ static func attach(region: Region) -> void:
 	EasterEggs.dress(region)
 	# The Guardian's Year's work spots, and what the work leaves behind.
 	Stewardship.dress(region)
+	# Your camp at the homestead, and what the story has given it.
+	Camp.dress(region)
 	# Wren's slackline can be rigged between trees in any outdoor region.
 	if not region.indoors:
 		region.add_child(TravelSlackline.new())

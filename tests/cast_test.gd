@@ -449,6 +449,8 @@ func _check_side_stories() -> void:
 		check(opened.size() >= 2, "at least two side stories open after %s (%d)" % [gate, opened.size()])
 	for quest: QuestData in side:
 		var gives := not (quest.reward_gear.is_empty() and quest.reward_items.is_empty() and quest.reward_recipes.is_empty() and quest.reward_unlocks.is_empty())
+		# some give a thing for your camp instead (Camp.PIECES)
+		gives = gives or Camp.reward_line(quest.id) != ""
 		check(gives or quest.giver in ["tenaya", "maria_lebrado"], "%s gives something back" % quest.id)
 
 
@@ -466,7 +468,7 @@ func _play_side_stories() -> void:
 	QuestLog.record_climb("glacier_point_apron")
 	check(QuestLog.tick_report("glacier_point_apron").size() == 3, "one Apron tick finishes both Eichorn's and Wren's quests")
 	QuestLog.talk_to("wren_alvarez")
-	check(QuestLog.is_completed("wren_apron") and Inventory.count("chocolate_bar") == 2, "Wren shares the shop's snacks")
+	check(QuestLog.is_completed("wren_apron") and Camp.has("hammock"), "Wren hangs a hammock at your camp")
 
 	QuestLog.completed.append_array(["eichorn_apron", "robbins_clean"])
 	Inventory.items.clear()

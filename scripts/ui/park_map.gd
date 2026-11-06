@@ -102,6 +102,8 @@ var _park_marker: Control
 var _area_marker: Control
 ## The bob-and-pulse step of the "you are here" pin, the only thing redrawn every frame.
 var _pin_phase := 0
+## Where the story's next steps are (QuestTarget.all), worked out on opening.
+var _targets: Array[Dictionary] = []
 var _note_box: StyleBox
 ## The slim strip under the area map: the panels' dark board and gold edge,
 ## without the wood frame, which is too deep for it.
@@ -154,6 +156,7 @@ func _show(region: Region, player_position: Vector2, travel: bool, preselect: St
 	_here = region.to_lonlat(player_position)
 	var place := region.place_at(player_position)
 	_here_name = place.display_name if place else region.display_name
+	_targets = QuestTarget.all()
 	_legs.clear()
 	for leg in Park.legs_from(_hub_here):
 		var best: Dictionary = _legs.get(leg.to, {})
@@ -382,6 +385,10 @@ func _refresh() -> void:
 		_hint_label.text = "Travel from a map kiosk or a road out of the area.\n[%s] Choose   [%s] Close   %s" % [_button("Arrows"), _button("M"), tab_hint]
 	_area_title.text = "" if not _view.is_empty() else "%s area map" % Park.get_hub(_hub_here).display_name
 	_fit_info()
+	# still too long: the map's flag shows the story's next step, so the note
+	# can drop it and keep the road
+	if _info_panel.get_combined_minimum_size().y > INFO_RECT.size.y:
+		_route_label.text = _road_text(hub)
 	_refresh_area_text()
 	_park_frame.queue_redraw()
 	_park_canvas.queue_redraw()
@@ -440,6 +447,14 @@ func _refresh_area_text() -> void:
 
 
 func _route_text(hub: HubData) -> String:
+	var next := ""
+	for target: Dictionary in _targets:
+		if target.hub == hub.id:
+			next += "%s next: %s. " % ["Story" if target.what == "main" else "Press book", target.quest.title]
+	return next + _road_text(hub)
+
+
+func _road_text(hub: HubData) -> String:
 	if hub.id == _hub_here:
 		return "You are here." if not _travel or _any_road_open() else "You are here. Every road out is closed." + _on_foot_text()
 	if not _legs.has(hub.id):
@@ -785,14 +800,57 @@ func _draw_pin(canvas: Control, at: Vector2) -> void:
 	canvas.draw_rect(Rect2(head + Vector2(-2, -2), Vector2(1, 1)), Color(0.961, 0.933, 0.878, 0.85))
 
 
-## The "you are here" pin on the park map.
+## The "you are here" pin on the park map, and a flag on the hub where the
+## story's next step is (QuestTarget).
 func _draw_park_marker() -> void:
+	for target: Dictionary in _targets:
+		var hub := Park.get_hub(target.hub)
+		if hub:
+			_draw_quest_flag(_park_marker, _map_point(Vector2(hub.longitude, hub.latitude)) + Vector2(0, -4), target.what)
 	_draw_pin(_park_marker, _map_point(_here))
 
 
-## The "you are here" pin on the area map, where the player stands.
+## A flag on a pole for the story's next step: gold with a "!" for the main
+## story, green for the press book's.
+func _draw_quest_flag(canvas: Control, at: Vector2, what: String) -> void:
+	var base := at.floor()
+	var wave: float = [0.0, 1.0, 0.0, -1.0][_pin_phase]
+	var top := base + Vector2(0, -16)
+	var fill := SIGN_GOLD if what == "main" else Color("8fc46a")
+	canvas.draw_rect(Rect2(base + Vector2(-2, -1), Vector2(5, 2)), Color(INK, 0.5))
+	canvas.draw_rect(Rect2(top + Vector2(-1, 0), Vector2(3, 17)), INK)
+	canvas.draw_rect(Rect2(top, Vector2(1, 16)), Color("e4ddcc"))
+	var cloth := PackedVector2Array([top + Vector2(1, 0), top + Vector2(12, 1 + wave), top + Vector2(12, 8 + wave), top + Vector2(1, 9)])
+	var rim := PackedVector2Array([top + Vector2(1, -1), top + Vector2(13, wave), top + Vector2(13, 9 + wave), top + Vector2(1, 10)])
+	canvas.draw_colored_polygon(rim, INK)
+	canvas.draw_colored_polygon(cloth, fill)
+	canvas.draw_rect(Rect2(top + Vector2(6, 2), Vector2(1, 4)), BROWN)
+	canvas.draw_rect(Rect2(top + Vector2(6, 7), Vector2(1, 1)), BROWN)
+
+
+## Where a target's flag goes on the illustrated map: its route's climb
+## marker, or its place's point, or nowhere (Vector2.INF).
+func _target_anchor(target: Dictionary) -> Vector2:
+	if target.route != "":
+		for climb: Dictionary in _view.get("climbs", []):
+			if climb.route == target.route:
+				return _v2(climb.anchor)
+	for point: Dictionary in _points:
+		if point.id == target.point:
+			return _v2(point.anchor)
+	return Vector2.INF
+
+
+## The "you are here" pin on the area map, where the player stands, and a
+## flag where the story's next step is in this part of the park.
 func _draw_area_marker() -> void:
 	if not _view.is_empty():
+		for target: Dictionary in _targets:
+			if target.hub != _hub_here:
+				continue
+			var anchor := _target_anchor(target)
+			if anchor != Vector2.INF:
+				_draw_quest_flag(_area_marker, anchor * float(_area_scale), target.what)
 		_draw_pin(_area_marker, _view_point(_here) * float(_area_scale))
 		return
 	var hub := Park.get_hub(_hub_here)

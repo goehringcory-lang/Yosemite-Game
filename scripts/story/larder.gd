@@ -62,6 +62,20 @@ func _on_day_started() -> void:
 	last_spoiled = "Spoiled overnight: %s." % ", ".join(names)
 
 
+## Gives back the days left of [param days] units of [param id] that just
+## came into the pack from the camp chest, in place of the fresh ones
+## Inventory.add assumed, so a trip through the chest never freshens food.
+func receive(id: String, days: Array) -> void:
+	var list: Array = batches.get(id, [])
+	if list.is_empty() or days.is_empty():
+		return
+	for i in mini(days.size(), list.size()):
+		list.pop_back() # the newest: the ones that just arrived
+	list.append_array(days)
+	list.sort()
+	batches[id] = list
+
+
 func save_data() -> Dictionary:
 	return {"batches": batches}
 

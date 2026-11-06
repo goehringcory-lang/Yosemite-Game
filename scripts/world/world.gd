@@ -399,7 +399,7 @@ func travel(leg: Dictionary) -> void:
 ## spot in this region where you pitched your tent for a night out in the
 ## backcountry (BackcountryCamp): then you wake up there, and the morning
 ## says what became of your food.
-func sleep(passed_out := false, camp_spawn := "") -> void:
+func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	if _busy:
 		return
 	_busy = true
@@ -412,6 +412,7 @@ func sleep(passed_out := false, camp_spawn := "") -> void:
 	await show_day_summary()
 
 	var fell_asleep_at := ""
+	var message_extra := ""
 	var wake_spawn := Park.HOME_SPAWN
 	var night_out := ""
 	if camp_spawn != "" and not passed_out:
@@ -423,6 +424,12 @@ func sleep(passed_out := false, camp_spawn := "") -> void:
 			fell_asleep_at = "backcountry:" + fell_asleep_at
 		_enter_region(Park.HOME_REGION, Park.HOME_SPAWN)
 	GameClock.start_new_day()
+	# sleeping through the winter: every day still turns over (food spoils,
+	# the seasons change), you just don't see them
+	for i in extra_nights:
+		GameClock.start_new_day()
+	if extra_nights > 0:
+		message_extra = "You slept through to %s %d. The Tioga Road is open." % [GameClock.SEASON_NAMES[GameClock.season], GameClock.day]
 	if forage:
 		await forage.respawn()
 	# A new season brings up different plants for the press book.
@@ -448,8 +455,12 @@ func sleep(passed_out := false, camp_spawn := "") -> void:
 		message = "You fell asleep at %s. A ranger drove you back to camp." % fell_asleep_at
 	elif passed_out:
 		message = "You stayed out too late and passed out..."
+	if message_extra != "":
+		message += "\n" + message_extra
 	if Larder.last_spoiled != "":
 		message += "\n" + Larder.last_spoiled
+	if Camp.last_spoiled != "":
+		message += "\n" + Camp.last_spoiled
 	hud.show_message(message)
 	if passed_out:
 		_show_bear_tracks() # once per pass-out, so it never repeats on later mornings
@@ -785,6 +796,15 @@ func _connect_tents(root: Node) -> void:
 	for node in root.find_children("*", "StaticBody2D", true, false):
 		if node.has_signal("sleep_requested") and not node.is_connected("sleep_requested", sleep):
 			node.connect("sleep_requested", sleep)
+		if node.has_signal("rest_requested") and not node.is_connected("rest_requested", rest):
+			node.connect("rest_requested", rest)
+
+
+## Sleeps [param nights] nights in a row at home, waking on the last
+## morning: the tent's "sleep through to the thaw" while the snow has the
+## high country shut.
+func rest(nights: int) -> void:
+	await sleep(false, "", maxi(nights - 1, 0))
 
 
 func _camera() -> Camera2D:

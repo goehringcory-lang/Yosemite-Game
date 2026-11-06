@@ -44,6 +44,12 @@ const FRAME_TIME := 0.18
 ## they have to say, their offers come up, as a Vendor's do. Only while
 ## there's something on offer.
 @export var shop: ShopData
+## Lines said instead of the usual talk (quests, news and all), for a scene
+## like the supper after the finale (GuardianFeast). Empty for the usual.
+var say_instead := PackedStringArray()
+
+## Sent when a conversation with them ends.
+signal talked_to
 
 var facing := Vector2i.DOWN
 var _home := Vector2.ZERO
@@ -569,7 +575,12 @@ func interact(player: Player) -> void:
 		quest_marker.refresh()
 	if character and not character.visitor:
 		Friendship.note_talk(character.id)
-	if character and character.visitor:
+	if character and not say_instead.is_empty():
+		var said: Array[Dictionary] = []
+		for text: String in say_instead:
+			said.append({"speaker": character.display_name, "text": text})
+		await DialogueBox.say_to(player, said)
+	elif character and character.visitor:
 		var line := character.idle_lines[_rng.randi() % character.idle_lines.size()] if not character.idle_lines.is_empty() else ""
 		await DialogueBox.say_to(player, [{"speaker": character.display_name, "text": line}])
 	else:
@@ -589,6 +600,7 @@ func interact(player: Player) -> void:
 		if QuestLog.final_entry_pending() and character.id == "galen_clark":
 			await _write_last_page(player)
 	_talking = false
+	talked_to.emit()
 	if _comes_and_goes():
 		_refresh_stay()
 	if quest_marker:

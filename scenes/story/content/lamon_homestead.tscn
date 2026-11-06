@@ -14,14 +14,14 @@
 [node name="LamonHomesteadStory" type="Node2D"]
 
 [node name="Chuckah" parent="." instance=ExtResource("1_r")]
-position = Vector2(2136, 820)
+position = Vector2(430, 530)
 texture_empty = ExtResource("6_r")
 texture_built = ExtResource("7_r")
 body_size = Vector2(60, 16)
 reach_size = Vector2(76, 80)
 
 [node name="Campfire" parent="." instance=ExtResource("2_r")]
-position = Vector2(2000, 944)
+position = Vector2(420, 400)
 station = "campfire"
 display_name = "Campfire"
 texture = ExtResource("8_r")
@@ -32,7 +32,7 @@ body_size = Vector2(52, 16)
 reach_size = Vector2(72, 48)
 
 [node name="BedrockMortar" parent="." instance=ExtResource("2_r")]
-position = Vector2(1812, 1000)
+position = Vector2(200, 476)
 station = "mortar"
 display_name = "Bedrock mortar"
 texture = ExtResource("9_r")
@@ -41,7 +41,7 @@ body_size = Vector2(100, 20)
 reach_size = Vector2(120, 52)
 
 [node name="LeachingBasin" parent="." instance=ExtResource("2_r")]
-position = Vector2(2260, 900)
+position = Vector2(270, 512)
 station = "leaching"
 display_name = "Leaching basin"
 texture = ExtResource("10_r")
@@ -57,4 +57,4 @@ offset = Vector2(48, -32)
 [node name="JamesLamon" parent="." instance=ExtResource("3_r")]
 character = ExtResource("5_r")
 spot = "home"
-offset = Vector2(80, 0)
+offset = Vector2(-56, 128)

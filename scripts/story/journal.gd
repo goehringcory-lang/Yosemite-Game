@@ -362,8 +362,9 @@ func _refresh_more() -> void:
 # ---------------------------------------------------------------- the Journal tab
 
 func _journal_page() -> void:
-	_register()
 	_missing_guardian()
+	_register()
+	_camp()
 	_keepers()
 	_friends()
 	_calendar()
@@ -394,17 +395,61 @@ func _register() -> void:
 			_line("     (Placeholder pending tribal review.)", DIM)
 
 
-## What people have said about the missing Guardian (GuardianSearch), and,
-## once the cave is found, whose sightings they were.
+## The case board: what people have said about the missing Guardian
+## (GuardianSearch) and what the press book's old sheets turned up, with a
+## blank for each one still to come and who might turn it up. Once the cave
+## is found, whose sightings they were.
 func _missing_guardian() -> void:
-	var sightings := GuardianSearch.sightings()
-	if sightings.is_empty():
+	if GuardianSearch.sightings().is_empty():
 		return
-	_heading("The missing Guardian")
-	for sighting: Dictionary in sightings:
-		_line("%s · %s" % [sighting.who, sighting.text])
+	var count := GuardianSearch.board_count()
+	_heading("The missing Guardian: %d of %d leads" % [count.x, count.y])
+	var board := GuardianSearch.board()
+	var shown_clue_heading := false
+	for entry: Dictionary in board:
+		if entry.kind == "clue" and not shown_clue_heading:
+			shown_clue_heading = true
+			_line("What the press book's old sheets say:", HEADING)
+		if entry.found:
+			_check_line(true, "%s · %s" % [entry.who, entry.text] if entry.kind == "sighting" else entry.text)
+		else:
+			_check_line(false, "? ? ?   %s" % entry.hint, DIM)
+	_line(GuardianGap.journal_line(), DIM if not QuestLog.is_completed(QuestLog.FINALE_QUEST) else Color.WHITE)
 	if QuestLog.is_completed(QuestLog.FINALE_QUEST):
 		_line(GuardianSearch.ANSWER, Color(0.827, 0.894, 0.541))
+
+
+## Your camp at the homestead (Camp): what the story has given it so far,
+## a blank for each thing still to come and who has it, the keepsake shelf,
+## and what's in the chest.
+func _camp() -> void:
+	var have := Camp.pieces()
+	_heading("Your camp: %d of %d things" % [have.size(), Camp.PIECES.size()])
+	for piece: Dictionary in Camp.PIECES:
+		if Camp.has(piece.id):
+			var who := Camp.giver_name(piece)
+			_check_line(true, "%s%s" % [piece.name, " · from %s" % who if who != "" else ""])
+		elif piece.id == "summit_cairn":
+			_check_line(false, "? ? ?   Something for every summit you stand on.", DIM)
+		else:
+			var quest := QuestLog.get_quest(piece.quest)
+			var who := Camp.giver_name(piece)
+			_check_line(false, "? ? ?   Something from %s, after \"%s\"." % [who, quest.title if quest else piece.quest], DIM)
+	var keepsakes := Camp.keepsakes()
+	if not keepsakes.is_empty():
+		var names := PackedStringArray()
+		for keepsake: Dictionary in keepsakes:
+			names.append(keepsake.name)
+		_line("On the keepsake shelf (%d of %d): %s." % [keepsakes.size(), Camp.KEEPSAKES.size(), ", ".join(names)])
+	if Camp.has("chest"):
+		if Camp.chest.is_empty():
+			_line("The camp chest is empty (%d spaces)." % Camp.chest_spaces(), DIM)
+		else:
+			var stored := PackedStringArray()
+			for id: String in Camp.chest:
+				var item := ItemDB.get_item(id)
+				stored.append(ItemDB.count_name(Camp.chest_count(id), item.display_name if item else id))
+			_line("In the camp chest (%d of %d spaces): %s." % [Camp.chest.size(), Camp.chest_spaces(), ", ".join(stored)])
 
 
 ## The keepers you've met: everyone in the Register you've talked with, in

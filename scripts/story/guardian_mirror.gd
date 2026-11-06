@@ -16,7 +16,7 @@ const LOOKING := [
 	"There's no plant on it, and no outline of one. Where the specimen should be the sheet is cut away, and behind it, hung on the rock, is a small looking-glass.",
 	"You lean in to read the collector's line. Your own face looks back at you, with pine needles in your hair and the press under your arm.",
 	"Collected for the Guardian of Yosemite. Every label, the whole time.",
-	"The speck on the Apron at sunrise. The climber who left no scratch on Nutcracker. The figure in Ansel Adams's negative, the headlamp on the Nose, the climber on the Lyell ice. Every sighting, the whole time.",
+	"The speck on the Apron at sunrise. The climber who left no scratch on Nutcracker. The figure in Ansel Adams's negative, the headlamp on the Nose, the climber on the Lyell ice, the snow plant drawn and never picked. Every sighting, the whole time.",
 	"Sand shifts behind you. You turn around.",
 	"They're all here. Everyone with a page in the Register is standing in the sand of the cave floor, as if they'd been walking up the talus behind you the whole way.",
 ]
@@ -74,10 +74,11 @@ func interact(player: Player) -> void:
 	await box.say(narrate(LOOKING.slice(LOOKING.size() - 1)))
 	await box.say(gathering_lines())
 	await box.say(QuestLog.find_guardian())
-	await box.say(closing_lines())
+	await box.say(walk_out_lines())
 	box.close()
-	# the story's end: the credits roll, then the valley and the Guardian's Year
-	await EndCredits.roll(get_tree()).finished
+	# everyone walks you home to a supper at your camp (GuardianFeast); the
+	# credits roll when you turn in, and then comes the Guardian's Year
+	walk_home()
 	player.can_act = true
 	_busy = false
 
@@ -99,10 +100,25 @@ static func gathering_lines() -> Array[Dictionary]:
 	return lines
 
 
-## The game's last words.
+## Leaving the cave.
+static func walk_out_lines() -> Array[Dictionary]:
+	var lines := narrate(["Outside, the light is going gold on the Royal Arches. Somebody has brought bread. Somebody has brought a rope, out of habit."])
+	lines.append_array(GuardianFeast.arrival_lines())
+	return lines
+
+
+## Takes you home to the supper at your camp, in the evening.
+func walk_home() -> void:
+	if GameClock.hour < GuardianFeast.EVENING:
+		GameClock.advance_minutes((GuardianFeast.EVENING - GameClock.hour) * 60 - GameClock.minute)
+	get_tree().call_group("world", "go_to_region", Park.HOME_REGION, Park.HOME_SPAWN, 0)
+	get_tree().call_group("hud", "show_message", GuardianFeast.HINT)
+
+
+## The game's last words (at the end of the supper, before the credits).
 static func closing_lines() -> Array[Dictionary]:
 	return narrate([
-		"Outside, the light is going gold on the Royal Arches. Somebody has brought bread. Somebody has brought a rope, out of habit.",
+		"The fire burns down. One by one they say goodnight and go back to their own years, and the meadow is quiet, and the camp is yours.",
 		"The end of Valley Days. Your tick list holds %d of %d routes and your press book %d of %d plants. The valley is still open, and it has a Guardian." % [
 			Guidebook.ticked_count(), Guidebook.routes().size(), Herbarium.count(), Herbarium.total()],
 	])

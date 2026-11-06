@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/carved_oak_hidden.png" id="10_r"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/carved_oak.png" id="11_r"]
 [ext_resource type="Resource" path="res://data/characters/staff/ahwahnee_chef.tres" id="12_r"]
+[ext_resource type="Script" path="res://scripts/objects/guardian_gap.gd" id="gap_r"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oak"]
 size = Vector2(44, 14)
@@ -31,6 +32,7 @@ position = Vector2(1648, 1528)
 stop_name = "The Ahwahnee"
 
 [node name="GuardianCaveMouth" parent="." instance=ExtResource("6_r")]
+script = ExtResource("gap_r")
 position = Vector2(2256, 456)
 label = "the gap in the talus"
 target_region = "guardian_cave"

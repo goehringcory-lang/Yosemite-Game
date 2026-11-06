@@ -297,8 +297,8 @@ func test_story_beats() -> void:
 	for character: CharacterData in QuestLog.CHARACTERS + QuestLog.STAFF:
 		for beat: Dictionary in character.story_beats:
 			var after := QuestLog.get_quest(beat.after)
-			check(after != null and (after.main_line or after.guardian_line) and not beat.lines.is_empty(),
-				"%s's beat after %s follows a main-line or Guardian's Year quest" % [character.id, beat.after])
+			check(after != null and (after.main_line or after.guardian_line or after.press_line) and not beat.lines.is_empty(),
+				"%s's beat after %s follows a main-line, press-book or Guardian's Year quest" % [character.id, beat.after])
 		check(not (character.needs_tribal_review and not character.story_beats.is_empty()), "%s has no unreviewed story beats" % character.id)
 	new_game()
 	var clark := QuestLog.get_character("galen_clark")
@@ -358,8 +358,8 @@ func test_missing_guardian() -> void:
 	check(lines.any(func(l: Dictionary) -> bool: return "hasn't been seen" in l.text), "Clark says the Guardian is missing")
 	for sighting: Dictionary in GuardianSearch.SIGHTINGS:
 		var quest := QuestLog.get_quest(sighting.quest)
-		check(quest != null and quest.main_line and QuestLog.get_character(sighting.who) != null,
-			"the sighting after %s follows the main line, from %s" % [sighting.quest, sighting.who])
+		check(quest != null and (quest.main_line or quest.press_line) and QuestLog.get_character(sighting.who) != null,
+			"the sighting after %s follows the main line or the press book, from %s" % [sighting.quest, sighting.who])
 		check(not QuestLog.get_character(sighting.who).needs_tribal_review, "%s's sighting puts no words in a Native character's mouth" % sighting.who)
 		if sighting.who != "galen_clark":
 			var beat := QuestLog.get_character(sighting.who).latest_beat(func(q: String) -> bool: return q == sighting.quest)

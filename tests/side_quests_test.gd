@@ -129,7 +129,7 @@ func _play_bear_season() -> void:
 	check(said(lines, "sow and two cubs"), "Lamon has bears in his orchard")
 	set_clock(GameClock.Season.WINTER, 10)
 	QuestLog.talk_to("clare_hodges")
-	check(QuestLog.is_completed("hodges_bear_season") and Inventory.count("beef_jerky") == 3,
+	check(QuestLog.is_completed("hodges_bear_season") and Camp.has("bear_box"),
 		"a quest started in fall can be finished after the season turns")
 
 
