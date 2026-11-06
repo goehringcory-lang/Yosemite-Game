@@ -146,15 +146,19 @@ func test_falcons(world: Node) -> void:
 		var view := falcons._view()
 		falcon.pos = view.get_center() + Vector2(-120, 160)
 		falcon.time = 0.5
-		for i in 20:
+		# step until it folds its wings (stepping a fixed time can carry it
+		# through the whole dive to the strike, depending on which way it turned)
+		for i in 40:
+			if falcon.state != "soar":
+				break
 			falcons._process(0.05)
 		check(falcon.state == "stoop" and not falcons._prey.is_empty(), "then folds its wings and stoops on a bird below")
-		check(FieldLog.has("peregrine_falcon"), "...and you've had a good look at it")
 		for i in 60:
 			falcons._process(0.02)
 			if falcon.state != "stoop":
 				break
 		check(falcon.state == "climb" and falcon.height < Falcons.SOAR_HEIGHT * 0.5 and not falcons._puffs.is_empty(), "the strike leaves a puff of feathers, and it climbs away")
+		check(FieldLog.has("peregrine_falcon"), "...and you've had a good look at it")
 		for i in 400:
 			falcons._process(0.05)
 		check(falcons.falcons().is_empty() and falcons._cooldown > 0.0, "then it's gone, and the next waits a while"))
