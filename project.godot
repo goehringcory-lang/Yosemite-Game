@@ -40,6 +40,7 @@ FieldLog="*res://scripts/story/field_log.gd"
 Festivals="*res://scripts/story/festivals.gd"
 Stewardship="*res://scripts/story/stewardship.gd"
 Achievements="*res://scripts/story/achievements.gd"
+Camp="*res://scripts/story/guardian_camp.gd"
 Sound="*res://scripts/autoload/sound.gd"
 
 [display]

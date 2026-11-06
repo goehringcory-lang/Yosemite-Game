@@ -84,7 +84,7 @@ func _play(world) -> void:
 	lines = QuestLog.talk_to(CHEF)
 	check(QuestLog.is_completed(QUEST) and said(lines, "carved into the bark"), "he pulls the vines aside and shows you the carving")
 	check(said(lines, "theirs to tell"), "and says the story isn't his to tell")
-	check(Inventory.count("bread_pudding") == 2, "he sends you off with bread pudding")
+	check(Camp.has("dutch_oven"), "he sends you off with a Dutch oven for your camp")
 	check(oak.is_revealed() and oak.get_node("Sprite").texture == oak.revealed_texture, "the carving shows on the trunk")
 	check("carved a face" in oak.current_text(), "and the oak's text describes it")
 	check(not waiting.is_here() and not waiting.visible, "the chef goes back to his kitchen")

@@ -279,7 +279,11 @@ func has_guidebook() -> bool:
 func main_objective() -> Dictionary:
 	for quest: QuestData in QUESTS:
 		if quest.main_line and active.has(quest.id):
-			return {"quest": quest, "objective": objective_text(quest)}
+			var objective := objective_text(quest)
+			# On the Nose in the fall: the road to the next chapter shuts soon.
+			if quest.id == "harding_summit" and GameClock.season == GameClock.Season.FALL and Park.is_open("tioga_road"):
+				objective += " (The Tioga Road to the high country closes on Fall %d.)" % TIOGA_CLOSES_DAY
+			return {"quest": quest, "objective": objective}
 	# Between quests: point at the next person on the main line.
 	for quest: QuestData in QUESTS:
 		if not quest.main_line or is_completed(quest.id):
@@ -309,9 +313,57 @@ func main_objective() -> Dictionary:
 			var objective := "Talk to %s" % _who_and_where(quest.giver)
 			# Muir waits up in Tuolumne, and the Tioga Road shuts for winter.
 			if quest.id == "muir_cathedral" and not Park.is_open("tioga_road"):
-				objective += ". The Tioga Road is closed for winter. It reopens in early summer."
+				objective += ". " + snowed_in_text()
+			elif quest.id == "muir_cathedral" and GameClock.season == GameClock.Season.FALL:
+				objective += ". Go soon: the Tioga Road closes for winter on Fall %d." % TIOGA_CLOSES_DAY
 			return {"quest": quest, "objective": objective}
 	return {}
+
+
+## The day of fall the Tioga Road closes (Park.SEASONAL).
+const TIOGA_CLOSES_DAY := 23
+## Main-line and press-book quests that need the high country.
+const HIGH_COUNTRY_QUESTS := ["muir_cathedral", "muir_glacier", "muir_cassiope"]
+
+
+## True while the snow has shut the Tioga Road and the story is waiting on
+## the high country: the Nose is climbed, and Muir's quests aren't done.
+func snowed_in() -> bool:
+	if Park.is_open("tioga_road") or not is_completed("harding_summit"):
+		return false
+	return HIGH_COUNTRY_QUESTS.any(func(id: String) -> bool: return not is_completed(id))
+
+
+## What the Quests card says while the story is snowed in: when the road
+## opens, what you can do in the meantime, and the tent.
+func snowed_in_text() -> String:
+	var text := "The Tioga Road is closed for winter. It reopens on Summer 1"
+	var nights := Park.nights_until_open("tioga_road")
+	if nights > 0:
+		text += ", %d night%s from now" % [nights, "" if nights == 1 else "s"]
+	text += "."
+	var meanwhile := things_to_do_now(3)
+	if not meanwhile.is_empty():
+		text += " Meanwhile: %s." % ", ".join(meanwhile)
+	text += " Or sleep through to the thaw in your tent."
+	return text
+
+
+## Up to [param limit] stories someone would start with you today, as
+## "Title from Name": the side stories and press-book quests not held up by
+## anything, for the weeks the main line is waiting on the snow.
+func things_to_do_now(limit := 3) -> PackedStringArray:
+	var out := PackedStringArray()
+	for quest: QuestData in QUESTS:
+		if out.size() >= limit:
+			break
+		if quest.main_line or active.has(quest.id) or is_completed(quest.id):
+			continue
+		if available_from(quest.giver) != quest:
+			continue
+		var giver := get_character(quest.giver)
+		out.append("%s from %s" % [quest.title, giver.display_name if giver else quest.giver])
+	return out
 
 
 ## The press book's next step, shown beside the main story: {"quest",
@@ -734,6 +786,9 @@ func _give_rewards(quest: QuestData) -> String:
 	var text := "Quest complete: %s!" % quest.title
 	if not got.is_empty():
 		text += " Received %s." % ", ".join(got)
+	var camp := Camp.reward_line(quest.id)
+	if camp != "":
+		text += " " + camp
 	return text
 
 

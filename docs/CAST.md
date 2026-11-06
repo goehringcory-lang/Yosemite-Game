@@ -199,6 +199,31 @@ The plants (`Herbarium.PLANTS`), by where they grow:
 
 Evergreens can be pressed all year, so no quest is ever stuck behind a season; the wildflowers are up in spring and summer only. To add a plant, add it to `Herbarium.PLANTS` with a drawing in `tools/plants/plant_art.gd`.
 
+### The Guardian's camp
+
+Quests that give something for the camp (`Camp.PIECES`, `scripts/story/guardian_camp.gd`). Where it says "instead of", the quest's food reward went to the camp.
+
+```
+Apple-box chest .. Lamon, Lamon's Garden ................. the camp chest (10 kinds of thing); 2 apples instead of 4
+Camp stool ....... Wren, Looking for a Partner ........... instead of trail mix; the keepsake shelf comes with it
+Gear rack ........ Leonard, The Rock Climbing Section .... shows your rope, cams, quickdraws and ice axe
+Ranger's lantern . Hodges, her patrol .................... lit at night
+Canvas tent ...... Jennie Curry, her errand .............. replaces the little tent; 3 apples instead of 6
+Half Dome print .. Ansel Adams, Monolith
+Webbing hammock .. Wren, the rest of the Apron ........... instead of chocolate and apricots
+Bird bath ........ Enid Michael, the dawn chorus ......... instead of strawberries
+Woodpile ......... Lamon, laying food by for winter ...... instead of 3 fresh apples
+Pot crane ........ Salathé, Hard Steel
+Dutch oven ....... the Ahwahnee's chef, the larder ....... instead of bread pudding
+Bear box ......... Hodges, Bear Season ................... instead of jerky; the chest holds 6 more kinds
+Fish board ....... Greg, Tight Lines ..................... traced with your biggest fish
+Framed sheets .... Enid Michael, The Full Press .......... instead of elderberry sauce
+Summit cairn ..... (no quest) ............................ a stone for every summit in the logbook
+The sign ......... after the cave ........................ THE GUARDIAN'S CAMP
+```
+
+Every main-line quest from Firefall Slab on also leaves a keepsake on the shelf (`Camp.KEEPSAKES`).
+
 ### The Guardian's Year
 
 After the finale, a year of the Guardian's work (`QuestData.guardian_line`), one arc a season, each offered only in its season and each leaving the map changed (`Stewardship`, `WorkSpot`). Quests ask for the work with `work` steps; a run of them opens one after another without a trip back to the giver. `tests/guardian_year_test.tscn` plays it.

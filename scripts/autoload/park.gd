@@ -171,6 +171,15 @@ func load_data(data: Dictionary) -> void:
 		spotted_peaks[str(id)] = true
 
 
+## Nights from today until [param closure] next opens (0 if it's open now).
+func nights_until_open(closure: String) -> int:
+	var rule: Dictionary = SEASONAL.get(closure, {})
+	if rule.is_empty() or is_open(closure):
+		return 0
+	var year_days := 4 * GameClock.DAYS_PER_SEASON
+	return posmod(_date_index(rule.open[0], rule.open[1]) - _date_index(GameClock.season, GameClock.day), year_days)
+
+
 func _date_index(season: int, day: int) -> int:
 	return season * GameClock.DAYS_PER_SEASON + day - 1
 
