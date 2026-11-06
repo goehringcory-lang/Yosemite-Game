@@ -246,18 +246,116 @@ func _envelope(buf: PackedFloat32Array, attack: float, rate: int) -> void:
 		buf[i] *= env
 
 
+## [param n] samples of noise through [method _add_noise]'s filters, on their
+## own so a layer can be shaped by a swell before it is mixed in.
+func _noise(n: int, rate: int, lp: float, hp := 0.0) -> PackedFloat32Array:
+	var out := PackedFloat32Array()
+	out.resize(n)
+	_add_noise(out, rate, 1.0, lp, hp)
+	return out
+
+
+## How hard the wind blows, one value a sample, about 0 to 1: a slow swell
+## times a quicker flutter, raised to a power so most of the time is a lull
+## and the gusts stand out. [param floor] is the lull's level.
+func _gusts(n: int, rate: int, period: float, floor: float) -> PackedFloat32Array:
+	var slow := _wander(n, rate, period, 0.0, 1.0)
+	var quick := _wander(n, rate, period * 0.31, 0.5, 1.0)
+	for i in n:
+		slow[i] = lerpf(floor, 1.0, pow(slow[i] * quick[i], 1.5))
+	return slow
+
+
+## Wind following [param gust]: the air's low rush ([param air]), and a hush
+## in the needles ([param needles]) that only opens up near a gust's top and
+## brightens from [param lo] towards [param lo] + [param span] Hz as it does.
+func _add_breeze(buf: PackedFloat32Array, rate: int, gust: PackedFloat32Array, air: float, needles: float, lo: float, span: float) -> void:
+	var n := buf.size()
+	var rush := _noise(n, rate, 350.0, 40.0)
+	var center := PackedFloat32Array()
+	var gain := PackedFloat32Array()
+	center.resize(n)
+	gain.resize(n)
+	for i in n:
+		var g := gust[i]
+		buf[i] += rush[i] * air * g
+		center[i] = lo + span * g
+		gain[i] = needles * g * g * g
+	_add_band_noise(buf, rate, center, 0.9, gain)
+
+
+## Leaves rustling as [param gust] moves them: little runs of short, airy
+## grains, often when the wind is up and hardly at all in a lull.
+## [param busy] is how often a run starts at the top of a gust.
+func _add_leaves(buf: PackedFloat32Array, rate: int, gust: PackedFloat32Array, busy: float, amp: float) -> void:
+	var seconds := float(buf.size()) / rate
+	var t := 0.0
+	while t < seconds - 0.2:
+		var g := gust[int(t * rate)]
+		if _rng.randf() < busy * g * g:
+			var at := t
+			for k in _rng.randi_range(2, 6):
+				_add_grain(buf, rate, at, _rng.randf_range(0.012, 0.05), _rng.randf_range(2200.0, 4800.0), amp * g * _rng.randf_range(0.4, 1.0))
+				at += _rng.randf_range(0.015, 0.05)
+		t += _rng.randf_range(0.05, 0.16)
+
+
+## A rustle: a few milliseconds of band-passed noise around [param center] Hz,
+## quick to start and quick to die.
+func _add_grain(buf: PackedFloat32Array, rate: int, at: float, length: float, center: float, amp: float) -> void:
+	var start := int(at * rate)
+	var n := int(length * rate)
+	var f := 2.0 * sin(PI * minf(center, rate / 6.0) / rate)
+	var low := 0.0
+	var band := 0.0
+	for i in n:
+		if start + i >= buf.size():
+			break
+		var high := _rng.randf_range(-1.0, 1.0) - low - band / 1.5
+		band += f * high
+		low += f * band
+		var t := float(i) / n
+		buf[start + i] += band * amp * minf(t * 8.0, 1.0) * (1.0 - t) * (1.0 - t)
+
+
+## One bubble ringing as it forms in running water: a sine at [param freq] Hz
+## that rises as it dies away over about [param decay] seconds.
+func _add_bubble(buf: PackedFloat32Array, rate: int, at: float, freq: float, decay: float, amp: float) -> void:
+	var start := int(at * rate)
+	var n := int(decay * 5.0 * rate)
+	var phase := 0.0
+	for i in n:
+		if start + i >= buf.size():
+			break
+		var t := float(i) / rate
+		phase += TAU * freq * (1.0 + t / decay * 0.25) / rate
+		buf[start + i] += sin(phase) * amp * exp(-t / decay) * minf(i / (0.0008 * rate), 1.0)
+
+
+## A raindrop striking a leaf close by: a tap and a tiny ringing splash.
+func _add_drop(buf: PackedFloat32Array, rate: int, at: float, amp: float) -> void:
+	_add_click(buf, rate, at, 0.003, amp, 3500.0)
+	_add_bubble(buf, rate, at + 0.002, _rng.randf_range(1200.0, 2600.0), 0.006, amp * 0.35)
+
+
 # ------------------------------------------------------------------ ambience
 
-## Pines in a light breeze, and a meadow's hum. The birds sing over it on
-## their own (the call_* sounds), so the loop has nothing in it to recognize.
+## A light breeze in the pines. Wind isn't a steady hiss: it comes in gusts
+## with near-quiet lulls between, and only a gust is strong enough to sound in
+## the needles and set the leaves rustling. So everything here rides one gust
+## swell: a low, soft rush of air, a hush in the needles that brightens as the
+## gust builds, and little rustles of leaves, more of them the harder it blows.
+## The birds sing over it on their own (the call_* sounds), so the loop has
+## nothing in it to recognize.
 func _amb_day() -> PackedFloat32Array:
 	_rng.seed = 1
-	return _loop(16.0, 1.5, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
+	return _loop(32.0, 3.0, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
 		var n := buf.size()
-		_add_band_noise(buf, rate, _wander(n, rate, 3.0, 350.0, 700.0), 0.8, _wander(n, rate, 2.5, 0.05, 0.16))
-		_add_noise(buf, rate, 0.05, 2500.0, 600.0)
+		var gust := _gusts(n, rate, 6.5, 0.06)
+		_add_breeze(buf, rate, gust, 0.35, 0.08, 650.0, 1300.0)
+		_add_leaves(buf, rate, gust, 0.9, 0.05)
 		# Insects far off in the grass: a faint, slow-beating shimmer.
-		var hum := _wander(n, rate, 4.0, 0.0, 0.018)
+		var hum := _wander(n, rate, 4.0, 0.0, 0.006)
 		var phase := 0.0
 		for i in n:
 			phase += TAU * 2900.0 / rate
@@ -265,13 +363,13 @@ func _amb_day() -> PackedFloat32Array:
 		)
 
 
-## Crickets in the meadow grass and a soft breeze. The owls, frogs and
-## coyotes call over it on their own.
+## Crickets in the meadow grass and the night air barely moving. The owls,
+## frogs and coyotes call over it on their own.
 func _amb_night() -> PackedFloat32Array:
 	_rng.seed = 2
 	return _loop(20.0, 1.5, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
 		var n := buf.size()
-		_add_band_noise(buf, rate, _wander(n, rate, 4.0, 250.0, 500.0), 0.7, _wander(n, rate, 3.0, 0.03, 0.08))
+		_add_breeze(buf, rate, _gusts(n, rate, 8.0, 0.1), 0.12, 0.012, 500.0, 800.0)
 		# Each cricket chirps in bursts of pulses at its own pitch and pace.
 		var crickets := [[4300.0, 0.62, 0.11], [4700.0, 0.55, 0.07], [3900.0, 0.8, 0.05], [5100.0, 0.47, 0.035]]
 		for c: Array in crickets:
@@ -286,27 +384,47 @@ func _amb_night() -> PackedFloat32Array:
 		)
 
 
-## Wind over granite and through the high country's lodgepole pines.
+## Wind over granite and through the high country's lodgepole pines: stronger
+## gusts than the valley's, a low moan where it pours over the rock, and the
+## needles roaring at the top of each gust.
 func _amb_wind() -> PackedFloat32Array:
 	_rng.seed = 3
-	return _loop(14.0, 2.0, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
+	return _loop(30.0, 3.0, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
 		var n := buf.size()
-		_add_band_noise(buf, rate, _wander(n, rate, 2.2, 220.0, 900.0), 2.5, _wander(n, rate, 1.8, 0.02, 0.12))
-		_add_band_noise(buf, rate, _wander(n, rate, 3.1, 600.0, 1400.0), 4.0, _wander(n, rate, 2.6, 0.0, 0.05))
-		_add_noise(buf, rate, 0.15, 400.0)
+		var gust := _gusts(n, rate, 5.0, 0.15)
+		_add_breeze(buf, rate, gust, 0.6, 0.07, 500.0, 1100.0)
+		# The moan over the rock: a narrow band that slides up as a gust builds.
+		var center := PackedFloat32Array()
+		var gain := PackedFloat32Array()
+		center.resize(n)
+		gain.resize(n)
+		for i in n:
+			center[i] = 180.0 + 260.0 * gust[i]
+			gain[i] = 0.012 * gust[i] * gust[i]
+		_add_band_noise(buf, rate, center, 6.0, gain)
+		_add_leaves(buf, rate, gust, 0.5, 0.035)
 		)
 
 
-## Steady rain on leaves and the ground, with drips.
+## Steady rain on leaves and the ground: a soft wash, and drops, near and far,
+## doing most of the work (a wash alone sounds like a radio between stations).
 func _amb_rain() -> PackedFloat32Array:
 	_rng.seed = 4
 	return _loop(10.0, 1.0, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
-		_add_noise(buf, rate, 0.5, 5000.0, 900.0)
-		_add_noise(buf, rate, 0.25, 600.0)
+		var n := buf.size()
+		var wash := _wander(n, rate, 1.6, 0.75, 1.0)
+		var hiss := _noise(n, rate, 2800.0, 500.0)
+		var low := _noise(n, rate, 500.0)
+		for i in n:
+			buf[i] += (hiss[i] * 0.28 + low[i] * 0.3) * wash[i]
 		var t := 0.0
-		while t < float(buf.size()) / rate:
-			_add_click(buf, rate, t, 0.004, _rng.randf_range(0.2, 0.7), _rng.randf_range(2500.0, 7000.0))
-			t += _rng.randf_range(0.005, 0.05)
+		while t < float(n) / rate:
+			# Mostly small far drops; now and then a big one close by.
+			if _rng.randf() < 0.12:
+				_add_drop(buf, rate, t, _rng.randf_range(0.25, 0.6))
+			else:
+				_add_click(buf, rate, t, 0.004, _rng.randf_range(0.1, 0.4), _rng.randf_range(1800.0, 4500.0))
+			t += _rng.randf_range(0.004, 0.04)
 		)
 
 
@@ -326,21 +444,27 @@ func _waterfall() -> PackedFloat32Array:
 		)
 
 
-## A river running over cobbles: a soft rush, a wandering burble in the
-## middle, and small bubbles rising, quieter than a waterfall.
+## A river running over cobbles. What makes water sound like water and not
+## noise is its bubbles: each one rings as it forms, a little tone that rises
+## and dies in a few milliseconds, and thousands of them make the burble. So
+## this is a low rush under a dense spray of bubbles, the near ones bigger and
+## lower, coming in little runs where the current breaks over a stone.
 func _river() -> PackedFloat32Array:
 	_rng.seed = 7
-	return _loop(9.0, 1.5, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
+	return _loop(12.0, 1.5, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
 		var n := buf.size()
-		_add_noise(buf, rate, 0.35, 420.0, 90.0)
-		_add_noise(buf, rate, 0.08, 1800.0, 500.0)
-		_add_band_noise(buf, rate, _wander(n, rate, 0.6, 500.0, 1300.0), 2.2, _wander(n, rate, 0.5, 0.05, 0.16))
-		# bubbles: quick upward chirps, a few a second
-		var t := 0.05
+		var flow := _wander(n, rate, 1.3, 0.7, 1.0)
+		var rush := _noise(n, rate, 320.0, 60.0)
+		var spray := _noise(n, rate, 1600.0, 600.0)
+		for i in n:
+			buf[i] += (rush[i] * 0.2 + spray[i] * 0.012) * flow[i]
+		var t := 0.0
 		while t < float(n) / rate - 0.05:
-			var f := _rng.randf_range(380.0, 900.0)
-			_add_tone(buf, rate, t, _rng.randf_range(0.015, 0.04), f, f * _rng.randf_range(1.3, 1.8), _rng.randf_range(0.03, 0.08))
-			t += _rng.randf_range(0.08, 0.35)
+			var f := _rng.randf_range(250.0, 1400.0)
+			# Small bubbles ring higher, shorter and quieter.
+			var size := 1.0 - (f - 250.0) / 1150.0
+			_add_bubble(buf, rate, t, f, lerpf(0.004, 0.018, size), lerpf(0.04, 0.14, size) * flow[int(t * rate)])
+			t += _rng.randf_range(0.004, 0.04) if _rng.randf() < 0.8 else _rng.randf_range(0.05, 0.15)
 		)
 
 
