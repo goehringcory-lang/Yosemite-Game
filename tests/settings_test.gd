@@ -23,6 +23,7 @@ func _ready() -> void:
 	Settings.path = TEST_PATH
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_PATH))
 	test_persistence()
+	test_stretch()
 	test_bad_values()
 	Settings.path = TEST_PATH
 	test_graphics()
@@ -63,11 +64,37 @@ func test_persistence() -> void:
 	Settings.load_settings()
 	check(Settings.text_speed == Settings.TextSpeed.FAST, "text speed loads back")
 	check(Settings.fullscreen, "full screen loads back")
+	check(not Settings.pixel_perfect and Settings.fullscreen_choice() == 1, "full screen fills the screen by default")
 	check(Settings.window_scale == 2, "window size loads back")
 	check(Settings.prompts == Settings.Prompts.GAMEPAD, "button prompts load back")
 	check(Settings.chars_per_second() == 120.0, "Fast reveals 120 letters a second")
 	Settings.text_speed = Settings.TextSpeed.INSTANT
 	check(Settings.chars_per_second() == 0.0, "Instant shows a page at once")
+
+
+## Filling the screen: the picture grows in any step, so a 2560x1440 screen
+## or a Steam Deck is covered edge to edge; Pixel perfect full screen keeps
+## whole steps (2x, 3x), with a border where the screen isn't a multiple.
+func test_stretch() -> void:
+	check(ProjectSettings.get_setting("display/window/stretch/scale_mode") == "fractional",
+		"the project scales the picture to fill the window, not in whole steps only")
+	check(ProjectSettings.get_setting("display/window/stretch/mode") == "canvas_items", "and still draws at the window's size")
+	Settings.reset_defaults()
+	check(Settings.stretch() == Window.CONTENT_SCALE_STRETCH_FRACTIONAL, "a window fills")
+	Settings.set_fullscreen_choice(1)
+	check(Settings.fullscreen and not Settings.pixel_perfect and Settings.stretch() == Window.CONTENT_SCALE_STRETCH_FRACTIONAL,
+		"Fill: full screen, covered edge to edge")
+	Settings.set_fullscreen_choice(2)
+	check(Settings.fullscreen and Settings.pixel_perfect and Settings.stretch() == Window.CONTENT_SCALE_STRETCH_INTEGER,
+		"Pixel perfect: full screen in whole steps")
+	Settings.save()
+	Settings.reset_defaults()
+	Settings.load_settings()
+	check(Settings.fullscreen_choice() == 2, "Pixel perfect loads back")
+	Settings.set_fullscreen_choice(0)
+	check(not Settings.fullscreen and not Settings.pixel_perfect and Settings.stretch() == Window.CONTENT_SCALE_STRETCH_FRACTIONAL,
+		"Off: a window, which always fills")
+	Settings.save()
 
 
 ## Graphics: Low writes the Compatibility renderer into the override file the
@@ -124,6 +151,20 @@ func test_graphics() -> void:
 ## change waits for a restart.
 func test_pause_graphics() -> void:
 	var pause: PauseMenu = get_tree().get_first_node_in_group("pause_menu")
+	# Full screen: Off, Fill, Pixel perfect, and round again
+	Settings.set_fullscreen_choice(0)
+	check(pause._setting_value(PauseMenu.Setting.FULLSCREEN) == "‹  Off  ›", "the pause menu shows full screen Off")
+	pause.change_setting(PauseMenu.Setting.FULLSCREEN, 1)
+	check(Settings.fullscreen and pause._setting_value(PauseMenu.Setting.FULLSCREEN) == "‹  Fill  ›", "then Fill")
+	pause.change_setting(PauseMenu.Setting.FULLSCREEN, 1)
+	check(Settings.pixel_perfect and pause._setting_value(PauseMenu.Setting.FULLSCREEN) == "‹  Pixel perfect  ›", "then Pixel perfect")
+	check(_saved("display", "pixel_perfect") == true, "which is saved at once")
+	pause.change_setting(PauseMenu.Setting.FULLSCREEN, 1)
+	check(not Settings.fullscreen and not Settings.pixel_perfect, "and round to Off")
+	pause.change_setting(PauseMenu.Setting.FULLSCREEN, -1)
+	check(Settings.fullscreen_choice() == 2, "Left steps back to Pixel perfect")
+	Settings.set_fullscreen_choice(0)
+	Settings.save()
 	Settings.graphics = Settings.Graphics.AUTO
 	Settings.auto_low = false
 	Settings._started_renderer = Settings.renderer()

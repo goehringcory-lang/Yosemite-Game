@@ -19,6 +19,9 @@ const TEXT_SPEED_NAMES := ["Slow", "Normal", "Fast", "Instant"]
 const TEXT_SPEED_CPS := [30.0, 60.0, 120.0, 0.0]
 const PROMPT_NAMES := ["Auto", "Keyboard", "Gamepad"]
 const GRAPHICS_NAMES := ["High", "Low", "Auto"]
+## The Full screen row's choices: a window, full screen filled, or full
+## screen in whole-pixel steps (see [member pixel_perfect]).
+const FULLSCREEN_NAMES := ["Off", "Fill", "Pixel perfect"]
 ## The order the pause menu steps through the graphics levels.
 const GRAPHICS_ORDER := [Graphics.AUTO, Graphics.HIGH, Graphics.LOW]
 ## The renderer for High and for Low. Low is the simpler Compatibility
@@ -40,6 +43,10 @@ const MAX_VOLUME := 10
 static var path := DEFAULT_PATH
 static var text_speed := TextSpeed.NORMAL
 static var fullscreen := false
+## Full screen in whole-pixel steps (2x, 3x...), leaving a border where the
+## screen isn't a whole multiple of 960x540, instead of filling the screen.
+## Only full screen looks at it: a window is always filled.
+static var pixel_perfect := false
 ## Window size in whole steps of 960x540 (2 = 1920x1080, the default window).
 static var window_scale := 2
 ## Which buttons the on-screen hints name: follow the last device used, or
@@ -167,6 +174,7 @@ static func load_settings() -> void:
 	_customized = true
 	text_speed = clampi(int(config.get_value("text", "speed", text_speed)), 0, TextSpeed.size() - 1) as TextSpeed
 	fullscreen = bool(config.get_value("display", "fullscreen", fullscreen))
+	pixel_perfect = bool(config.get_value("display", "pixel_perfect", pixel_perfect))
 	window_scale = clampi(int(config.get_value("display", "window_scale", window_scale)), MIN_SCALE, MAX_SCALE)
 	prompts = clampi(int(config.get_value("input", "prompts", prompts)), 0, Prompts.size() - 1) as Prompts
 	tips = bool(config.get_value("input", "tips", tips))
@@ -195,6 +203,7 @@ static func save() -> Error:
 	var config := ConfigFile.new()
 	config.set_value("text", "speed", int(text_speed))
 	config.set_value("display", "fullscreen", fullscreen)
+	config.set_value("display", "pixel_perfect", pixel_perfect)
 	config.set_value("display", "window_scale", window_scale)
 	config.set_value("input", "prompts", int(prompts))
 	config.set_value("input", "tips", tips)
@@ -270,6 +279,7 @@ static func apply_graphics(window: Window) -> void:
 static func reset_defaults() -> void:
 	text_speed = TextSpeed.NORMAL
 	fullscreen = false
+	pixel_perfect = false
 	window_scale = 2
 	prompts = Prompts.AUTO
 	tips = true
@@ -291,6 +301,41 @@ static func chars_per_second() -> float:
 	return TEXT_SPEED_CPS[text_speed]
 
 
+## Which Full screen choice is on: 0 a window, 1 Fill, 2 Pixel perfect
+## (an index into [constant FULLSCREEN_NAMES]).
+static func fullscreen_choice() -> int:
+	if not fullscreen:
+		return 0
+	return 2 if pixel_perfect else 1
+
+
+## Turns on Full screen choice [param choice] (see [method fullscreen_choice]).
+static func set_fullscreen_choice(choice: int) -> void:
+	choice = clampi(choice, 0, FULLSCREEN_NAMES.size() - 1)
+	fullscreen = choice > 0
+	pixel_perfect = choice == 2
+
+
+## How the picture grows to the window: in any step that fills it (the
+## default, so a 2560x1440 screen or a Steam Deck is covered edge to edge), or
+## in whole steps only, for Pixel perfect full screen. The project starts
+## with the first (Godot's default display/window/stretch/scale_mode).
+static func stretch() -> Window.ContentScaleStretch:
+	ensure_loaded()
+	if fullscreen and pixel_perfect:
+		return Window.CONTENT_SCALE_STRETCH_INTEGER
+	return Window.CONTENT_SCALE_STRETCH_FRACTIONAL
+
+
+## Puts [method stretch] into effect on [param window], at once.
+static func apply_stretch(window: Window) -> void:
+	if window == null or DisplayServer.get_name() == "headless":
+		return
+	var mode := stretch()
+	if window.content_scale_stretch != mode:
+		window.content_scale_stretch = mode
+
+
 ## The largest window scale that fits the screen the window is on.
 static func max_window_scale() -> int:
 	if DisplayServer.get_name() == "headless":
@@ -304,6 +349,7 @@ static func max_window_scale() -> int:
 static func apply(window: Window) -> void:
 	ensure_loaded()
 	apply_graphics(window)
+	apply_stretch(window)
 	if window == null or DisplayServer.get_name() == "headless" or not _customized:
 		return
 	if fullscreen:

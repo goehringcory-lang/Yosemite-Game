@@ -46,7 +46,7 @@ enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, FONT, GRAPHIC
 const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Font", "Graphics", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
-	"Fill the screen. The picture stays sharp in whole-pixel steps.",
+	"Fill covers the whole screen. Pixel perfect keeps every pixel the same size, with a border where the screen isn't a whole multiple of 960 x 540.",
 	"The window's size, in whole steps of 960 x 540.",
 	"Which buttons hints name. Auto follows the last device you used.",
 	"The first day's card under the clock, naming the next thing to try.",
@@ -835,7 +835,8 @@ func change_setting(which: int, step: int) -> void:
 			# picking Auto again looks afresh at how the game runs here
 			Settings.auto_low = false
 		Setting.FULLSCREEN:
-			Settings.fullscreen = not Settings.fullscreen
+			var count := Settings.FULLSCREEN_NAMES.size()
+			Settings.set_fullscreen_choice(wrapi(Settings.fullscreen_choice() + step, 0, count))
 		Setting.WINDOW_SIZE:
 			if Settings.fullscreen:
 				return
@@ -995,7 +996,7 @@ func _setting_value(which: int) -> String:
 			if Settings.graphics_pending():
 				value += " (on restart)"
 		Setting.FULLSCREEN:
-			value = "On" if Settings.fullscreen else "Off"
+			value = Settings.FULLSCREEN_NAMES[Settings.fullscreen_choice()]
 		Setting.WINDOW_SIZE:
 			if Settings.fullscreen:
 				return "(full screen)"
