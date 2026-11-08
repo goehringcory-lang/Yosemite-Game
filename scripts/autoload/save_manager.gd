@@ -138,12 +138,26 @@ func save_game() -> bool:
 		"nodes": nodes,
 		"summary": _summary(),
 	}
-	var file := FileAccess.open(save_path, FileAccess.WRITE)
+	# Written beside the save first and only then moved over it, so a crash,
+	# a quit or a full disk part way through leaves the last good save as it
+	# was (a broken save starts a new game, which the next sleep saves over).
+	var text := JSON.stringify(data, "\t")
+	var temp := save_path + ".tmp"
+	var file := FileAccess.open(temp, FileAccess.WRITE)
 	if file == null:
 		push_error("Could not write save file: %s" % error_string(FileAccess.get_open_error()))
 		return false
+	file.store_string(text)
+	file.close()
+	if FileAccess.get_file_as_string(temp) != text:
+		push_error("Could not write save file: the copy on disk is incomplete (is the disk full?)")
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(temp))
+		return false
+	var moved := DirAccess.rename_absolute(ProjectSettings.globalize_path(temp), ProjectSettings.globalize_path(save_path))
+	if moved != OK:
+		push_error("Could not write save file: %s" % error_string(moved))
+		return false
 	_fresh = false
-	file.store_string(JSON.stringify(data, "\t"))
 	return true
 
 
