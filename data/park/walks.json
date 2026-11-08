@@ -1,0 +1,632 @@
+{
+	"links": {
+		"ahwahnee_meadow": {
+			"the_ahwahnee": [
+				"ToAhwahnee",
+				"west_road"
+			],
+			"yosemite_village": [
+				"ToVillage",
+				"east_road"
+			]
+		},
+		"ahwahnee_trail": {
+			"lamon_homestead": [
+				"ToHomestead",
+				"north_gate"
+			],
+			"the_ahwahnee": [
+				"ToAhwahnee",
+				"south_entry"
+			]
+		},
+		"big_oak_flat_junction": {
+			"el_capitan_meadow": [
+				"ToElCapitan",
+				"west"
+			]
+		},
+		"bridalveil_fall": {
+			"four_mile_trailhead": [
+				"ToFourMile",
+				"west"
+			],
+			"tunnel_view": [
+				"ToTunnelView",
+				"east"
+			]
+		},
+		"crows_camp": {
+			"mirror_lake": [
+				"ToMirrorLake",
+				"cairn"
+			]
+		},
+		"curry_village": {
+			"housekeeping_camp": [
+				"WestRoad",
+				"east"
+			],
+			"lamon_homestead": [
+				"HomesteadGate",
+				"gate"
+			],
+			"upper_pines": [
+				"EastRoad",
+				"west"
+			]
+		},
+		"el_capitan_meadow": {
+			"big_oak_flat_junction": [
+				"NorthsideDriveWest",
+				"east"
+			],
+			"bridalveil_fall": [
+				"ToElCapBridge",
+				"el_cap_bridge"
+			],
+			"leidig_meadow": [
+				"ToLeidigMeadow",
+				"west"
+			]
+		},
+		"four_mile_trailhead": {
+			"bridalveil_fall": [
+				"ToBridalveil",
+				"east"
+			],
+			"yosemite_village": [
+				"ToVillage",
+				"southside_west"
+			]
+		},
+		"happy_isles": {
+			"tenaya_creek": [
+				"ToTenayaCreek",
+				"west"
+			],
+			"upper_pines": [
+				"ToUpperPines",
+				"east"
+			]
+		},
+		"housekeeping_camp": {
+			"curry_village": [
+				"ToCurry",
+				"west_road"
+			],
+			"yosemite_village": [
+				"ToVillage",
+				"southside_east"
+			]
+		},
+		"lamon_homestead": {
+			"ahwahnee_trail": [
+				"NorthToAhwahnee",
+				"south_entry"
+			],
+			"curry_village": [
+				"ToCurryVillage",
+				"homestead"
+			]
+		},
+		"leidig_meadow": {
+			"el_capitan_meadow": [
+				"ToElCapitan",
+				"east"
+			],
+			"yosemite_village": [
+				"ToVillage",
+				"west_road"
+			]
+		},
+		"mirror_lake": {
+			"crows_camp": [
+				"ToCrowsCamp",
+				"west"
+			],
+			"tenaya_creek": [
+				"ToTenayaCreek",
+				"east"
+			]
+		},
+		"tenaya_creek": {
+			"happy_isles": [
+				"ToHappyIsles",
+				"east"
+			],
+			"mirror_lake": [
+				"ToMirrorLake",
+				"west"
+			]
+		},
+		"the_ahwahnee": {
+			"ahwahnee_meadow": [
+				"NorthsideDriveWest",
+				"east"
+			],
+			"ahwahnee_trail": [
+				"ToStonemanBridge",
+				"north_entry"
+			]
+		},
+		"tunnel_view": {
+			"bridalveil_fall": [
+				"ToBridalveil",
+				"west"
+			]
+		},
+		"upper_pines": {
+			"curry_village": [
+				"ToCurry",
+				"east_road"
+			],
+			"happy_isles": [
+				"ToHappyIsles",
+				"west"
+			]
+		},
+		"yosemite_village": {
+			"ahwahnee_meadow": [
+				"NorthsideEast",
+				"west"
+			],
+			"four_mile_trailhead": [
+				"SouthsideWest",
+				"east"
+			],
+			"housekeeping_camp": [
+				"SouthsideEast",
+				"west"
+			],
+			"leidig_meadow": [
+				"NorthsideWest",
+				"east"
+			]
+		}
+	},
+	"routes": {
+		"ahwahnee_meadow": {
+			"east|exit:ToVillage": [
+				1968,
+				512,
+				12,
+				516
+			],
+			"west|exit:ToAhwahnee": [
+				80,
+				512,
+				2036,
+				516
+			]
+		},
+		"curry_village": {
+			"plaza@traveler_ranger|exit:WestRoad": [
+				1632,
+				1400,
+				1532,
+				1452,
+				588,
+				1556,
+				556,
+				1580,
+				20,
+				1652,
+				16,
+				1648
+			],
+			"west_road|plaza@traveler_ranger": [
+				80,
+				1648,
+				852,
+				1532,
+				876,
+				1524,
+				1532,
+				1452,
+				1636,
+				1404,
+				1632,
+				1400
+			]
+		},
+		"el_capitan_meadow": {
+			"east|the_nose@traveler_climber_lead": [
+				2480,
+				704,
+				1236,
+				572,
+				1232,
+				568
+			],
+			"east|the_nose@traveler_climber_second": [
+				2480,
+				704,
+				1396,
+				588,
+				1364,
+				572,
+				1360,
+				572
+			],
+			"the_nose@traveler_climber_lead|exit:ToLeidigMeadow": [
+				1232,
+				568,
+				2548,
+				708
+			],
+			"the_nose@traveler_climber_second|exit:ToLeidigMeadow": [
+				1360,
+				572,
+				1692,
+				652,
+				2548,
+				708
+			]
+		},
+		"happy_isles": {
+			"east|exit:ToUpperPines": [
+				2224,
+				1248,
+				12,
+				1252
+			],
+			"west|exit:ToTenayaCreek": [
+				80,
+				1248,
+				2292,
+				1252
+			]
+		},
+		"housekeeping_camp": {
+			"camp|exit:ToVillage": [
+				912,
+				624,
+				12,
+				484
+			],
+			"east|exit:ToVillage": [
+				1968,
+				480,
+				12,
+				484
+			],
+			"west|beach": [
+				80,
+				480,
+				548,
+				724,
+				964,
+				860,
+				996,
+				884,
+				1108,
+				924
+			],
+			"west|exit:ToCurry": [
+				80,
+				480,
+				2036,
+				484
+			]
+		},
+		"leidig_meadow": {
+			"east|exit:ToElCapitan": [
+				1968,
+				480,
+				12,
+				484
+			],
+			"west|exit:ToVillage": [
+				80,
+				480,
+				2036,
+				484
+			]
+		},
+		"mirror_lake": {
+			"lakeshore@traveler_day_hiker|exit:ToTenayaCreek": [
+				1176,
+				1040,
+				156,
+				1212,
+				12,
+				1220
+			],
+			"west|lakeshore@traveler_day_hiker": [
+				80,
+				1216,
+				468,
+				1076,
+				1180,
+				1044,
+				1176,
+				1040
+			]
+		},
+		"tenaya_creek": {
+			"east|exit:ToHappyIsles": [
+				1968,
+				704,
+				12,
+				740
+			],
+			"west|exit:ToMirrorLake": [
+				80,
+				736,
+				2036,
+				708
+			]
+		},
+		"the_ahwahnee": {
+			"front_door@traveler_hotel_guest|exit:NorthsideDriveWest": [
+				1624,
+				1256,
+				20,
+				1876,
+				16,
+				1872
+			],
+			"west_road|tea_lawn@traveler_hotel_guest": [
+				112,
+				1872,
+				940,
+				1356,
+				948,
+				1356,
+				944,
+				1352
+			]
+		},
+		"upper_pines": {
+			"campground|exit:ToHappyIsles": [
+				976,
+				560,
+				1532,
+				652,
+				2036,
+				900
+			],
+			"east|campground": [
+				1968,
+				896,
+				1628,
+				716,
+				1268,
+				676,
+				1204,
+				620,
+				980,
+				564,
+				976,
+				560
+			]
+		},
+		"yosemite_village": {
+			"bests_studio@traveler_hotel_guest|exit:NorthsideEast": [
+				2264,
+				804,
+				2420,
+				852,
+				2524,
+				916,
+				3380,
+				1028,
+				3828,
+				1236,
+				3824,
+				1232
+			],
+			"camp_4@traveler_climber_lead|exit:NorthsideWest": [
+				728,
+				696,
+				20,
+				1236,
+				16,
+				1232
+			],
+			"camp_4@traveler_climber_second|exit:NorthsideWest": [
+				760,
+				668,
+				20,
+				1236,
+				16,
+				1232
+			],
+			"east_road|bests_studio@traveler_hotel_guest": [
+				3760,
+				1232,
+				3132,
+				1036,
+				3060,
+				988,
+				2436,
+				876,
+				2396,
+				844,
+				2268,
+				804,
+				2264,
+				804
+			],
+			"post_office@traveler_camp_kid|exit:SouthsideEast": [
+				2732,
+				804,
+				2716,
+				868,
+				2708,
+				1340,
+				2708,
+				1716,
+				3468,
+				1764,
+				3828,
+				1940,
+				3824,
+				1936
+			],
+			"ranger_station@traveler_ranger|exit:SouthsideEast": [
+				2488,
+				796,
+				2460,
+				860,
+				2460,
+				884,
+				2708,
+				1132,
+				2708,
+				1716,
+				3468,
+				1764,
+				3828,
+				1940,
+				3824,
+				1936
+			],
+			"southside_east|ranger_station@traveler_ranger": [
+				3760,
+				1936,
+				3044,
+				1716,
+				2708,
+				1716,
+				2652,
+				1140,
+				2516,
+				932,
+				2460,
+				876,
+				2460,
+				852,
+				2492,
+				796,
+				2488,
+				796
+			],
+			"southside_east|village_store@traveler_camp_kid": [
+				3760,
+				1936,
+				3044,
+				1716,
+				2708,
+				1716,
+				2708,
+				1596,
+				2932,
+				1156
+			],
+			"village_store@traveler_camp_kid|post_office@traveler_camp_kid": [
+				2932,
+				1156,
+				2724,
+				1076,
+				2716,
+				836,
+				2732,
+				804
+			],
+			"west_road|camp_4_fire@traveler_climber_lead": [
+				80,
+				1232,
+				524,
+				812,
+				548,
+				756,
+				544,
+				756
+			],
+			"west_road|camp_4_fire@traveler_climber_second": [
+				80,
+				1232,
+				636,
+				764,
+				632,
+				760
+			]
+		}
+	},
+	"spots": {
+		"curry_village": {
+			"plaza@traveler_ranger": [
+				1632,
+				1400
+			]
+		},
+		"el_capitan_meadow": {
+			"the_nose@traveler_climber_lead": [
+				1232,
+				568
+			],
+			"the_nose@traveler_climber_second": [
+				1360,
+				572
+			]
+		},
+		"housekeeping_camp": {
+			"beach": [
+				1108,
+				924
+			],
+			"camp": [
+				912,
+				624
+			]
+		},
+		"mirror_lake": {
+			"lakeshore@traveler_day_hiker": [
+				1176,
+				1040
+			]
+		},
+		"the_ahwahnee": {
+			"front_door@traveler_hotel_guest": [
+				1624,
+				1256
+			],
+			"tea_lawn@traveler_hotel_guest": [
+				944,
+				1352
+			]
+		},
+		"upper_pines": {
+			"campground": [
+				976,
+				560
+			]
+		},
+		"yosemite_village": {
+			"bests_studio@traveler_hotel_guest": [
+				2264,
+				804
+			],
+			"camp_4@traveler_climber_lead": [
+				728,
+				696
+			],
+			"camp_4@traveler_climber_second": [
+				760,
+				668
+			],
+			"camp_4_fire@traveler_climber_lead": [
+				544,
+				756
+			],
+			"camp_4_fire@traveler_climber_second": [
+				632,
+				760
+			],
+			"post_office@traveler_camp_kid": [
+				2732,
+				804
+			],
+			"ranger_station@traveler_ranger": [
+				2488,
+				796
+			],
+			"village_store@traveler_camp_kid": [
+				2932,
+				1156
+			]
+		}
+	}
+}

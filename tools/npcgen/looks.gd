@@ -323,6 +323,40 @@ const LOOKS := {
 		"top": "b0603a", "top_style": "sweater", "top2": "8a4a2a", "bottom": "4a5a6e", "bottom_style": "pants",
 		"shoes": "4a3a2a", "carry": ["camera"],
 	},
+	# ------------------------------------------------ Travelers (invented, see Travelers)
+	# Everyday people who walk between the Valley's areas on a day of their
+	# own: a pair of big-wall climbers, a patrol ranger, a camp kid on an
+	# errand, a day hiker and a guest from the Ahwahnee.
+	"traveler_climber_lead": {
+		"skin": SKIN_FAIR, "hair": "c8904a", "hair_style": "long", "hat": "headband", "hat_color": "3a8a9a",
+		"top": "c8482e", "top_style": "shirt", "top2": "8a2a1a", "bottom": "d8ccb0", "bottom_style": "pants",
+		"shoes": "6a4a30", "pack": "pack", "pack_color": "3a5a8a", "carry": ["rope", "chalk_bag"],
+	},
+	"traveler_climber_second": {
+		"skin": SKIN_TAN, "hair": "2a1a14", "hair_style": "short", "beard": "short", "beard_color": "2a1a14",
+		"hat": "beanie", "hat_color": "5a6a3a", "top": "5a7a9a", "top_style": "plaid", "top2": "34506a",
+		"bottom": "6a5a48", "shoes": "4a3020", "pack": "haul_bag", "pack_color": "c8402e",
+	},
+	"traveler_ranger": {
+		"skin": SKIN_BROWN, "hair": "1a1410", "hair_style": "short", "hat": "campaign", "hat_color": "8a7a52",
+		"top": "b0a27a", "top_style": "jacket", "top2": "8a7c58", "bottom": "4a5a3a", "belt": "3a2a1a",
+		"badge": "e0c060", "shoes": "3a2a20", "carry": ["map"],
+	},
+	"traveler_camp_kid": {
+		"skin": SKIN_LIGHT, "hair": "b0703a", "hair_style": "short", "hat": "cap", "hat_color": "c8402e",
+		"top": "e8d050", "top_style": "stripes", "top2": "3a7aba", "bottom": "4a5a8a", "shoes": "d8d0c0",
+		"carry": ["basket"],
+	},
+	"traveler_day_hiker": {
+		"skin": SKIN_DEEP, "hair": "1a1410", "hair_style": "bun", "hat": "wide", "hat_color": "c8b070",
+		"top": "4a8a6a", "top_style": "shirt", "top2": "2f6a4e", "bottom": "7a6a52", "bottom_style": "knickers",
+		"socks": "c8402e", "shoes": "6a4a30", "pack": "pack", "pack_color": "c87a2a", "carry": ["stick"],
+	},
+	"traveler_hotel_guest": {
+		"skin": SKIN_FAIR, "hair": "4a3020", "hair_style": "bun", "hat": "wide", "hat_color": "e8dcc0",
+		"hat_band": "4a6a9a", "top": "8aa0c8", "top_style": "blouse", "top2": "e8e4d8", "bottom_style": "skirt",
+		"bottom": "3a4a6a", "shoes": "3a2a20", "carry": ["parasol"],
+	},
 }
 
 ## Icons in assets/sprites/story_items.png, left to right.

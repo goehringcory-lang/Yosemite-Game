@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/traveler_climber_lead.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "traveler_climber_lead"
+display_name = "Big-wall climber"
+years = "1970s"
+bio = "An everyday climber from the 1970s who walks out from Camp 4 to the foot of El Capitan on dry days. Not a historical figure."
+idle_lines = PackedStringArray("Camp 4's the cheapest bed in the Valley and the best view of the stars.", "Every crack up there has a name. Some of them have two.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Camp 4"
+visitor = true

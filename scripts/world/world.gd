@@ -101,6 +101,8 @@ func _ready() -> void:
 	add_child(Owls.new())
 	add_child(Falcons.new())
 	add_child(RescueField.new())
+	# people walking between the Valley's areas on days of their own
+	add_child(Travelers.new())
 	add_child(Rustle.new())
 	add_child(StringLights.new())
 	player.add_child(Lantern.new())

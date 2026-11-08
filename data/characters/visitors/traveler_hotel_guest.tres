@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/traveler_hotel_guest.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "traveler_hotel_guest"
+display_name = "Hotel guest"
+years = "1930s"
+bio = "An everyday guest at the Ahwahnee in the 1930s who walks to the Village on fine days. Not a historical figure."
+idle_lines = PackedStringArray("The hotel is lovely, but the Valley is better.", "I came for a week. I've stayed three. Don't tell my sister.")
+sprite_sheet = ExtResource("2_sprite")
+home = "The Ahwahnee"
+visitor = true
