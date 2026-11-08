@@ -2,7 +2,8 @@ class_name QuestMarker
 extends Node2D
 ## The little speech bubble over someone's head when they have something for
 ## you: an orange "!" for a new quest (or a quest that sent you to them), a
-## blue "?" when talking to them finishes one (see QuestLog.marker_for). It
+## blue "?" when talking to them finishes one (see QuestLog.marker_for), and
+## a pink heart when a friend has a heart scene to share (HeartScenes). It
 ## bobs gently, and hides while you're talking. NPC and Vendor each add one.
 
 ## Seconds between checks of whether they have something for you.
@@ -13,15 +14,17 @@ const BOB := 3.0
 const INK := Color("2a1b14")
 const NEW := Color("f7a64a")
 const DONE := Color("3a86a8")
-## 3x5 glyphs (each cell drawn 2x2 px) for the bubble.
+const HEART := Color("e0607e")
+## Glyphs five cells high (each cell drawn 2x2 px) for the bubble.
 const GLYPHS := {
 	"!": ["010", "010", "010", "000", "010"],
 	"?": ["111", "001", "011", "000", "010"],
+	"heart": ["01010", "11111", "11111", "01110", "00100"],
 }
 
 ## Whose quests to check (a character id, or a shop's talk target).
 var character_id := ""
-## "!" or "?" while showing, or "".
+## "!", "?" or "heart" while showing, or "".
 var marker := ""
 ## Set while the person is talking with you.
 var hidden_while_talking := false
@@ -47,6 +50,8 @@ func _process(delta: float) -> void:
 
 func refresh() -> void:
 	var kind := "" if hidden_while_talking or character_id == "" else QuestLog.marker_for(character_id)
+	if kind == "" and not hidden_while_talking and character_id != "" and HeartScenes.ready_for(character_id) > 0:
+		kind = "heart"
 	if kind != marker:
 		marker = kind
 		queue_redraw()
@@ -64,8 +69,10 @@ func _draw() -> void:
 	draw_rect(Rect2(0, top + 14, 2, 4), Color.WHITE)
 	draw_rect(Rect2(0, top + 18, 2, 2), INK)
 	var glyph: Array = GLYPHS[marker]
-	var ink := NEW if marker == "!" else DONE
+	var ink: Color = {"!": NEW, "?": DONE, "heart": HEART}[marker]
+	# centered in the bubble, which is centered on x = 1
+	var left := 1 - String(glyph[0]).length()
 	for y in glyph.size():
-		for x in 3:
+		for x in String(glyph[y]).length():
 			if glyph[y][x] == "1":
-				draw_rect(Rect2(-2 + x * 2, top + 2 + y * 2, 2, 2), ink)
+				draw_rect(Rect2(left + x * 2, top + 2 + y * 2, 2, 2), ink)

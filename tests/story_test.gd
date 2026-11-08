@@ -301,14 +301,13 @@ func test_story_beats() -> void:
 				"%s's beat after %s follows a main-line, press-book or Guardian's Year quest" % [character.id, beat.after])
 		check(not (character.needs_tribal_review and not character.story_beats.is_empty()), "%s has no unreviewed story beats" % character.id)
 	new_game()
-	var clark := QuestLog.get_character("galen_clark")
 	var idle := QuestLog.talk_to("galen_clark") # starts The Guidebook
 	QuestLog.active.erase("clark_register")
 	QuestLog.completed.append_array(["clark_register", "shop_guidebook"])
 	var first := QuestLog.talk_to("galen_clark")
 	check(first.size() == 1 and "two books" in first[0].text, "Clark has news after the guidebook")
 	var second := QuestLog.talk_to("galen_clark")
-	check(second.size() > 0 and String(second[0].text) in clark.idle_lines, "and then goes back to his usual lines")
+	check(second.size() > 0 and second[0].get("everyday", false), "and then goes back to everyday talk")
 	QuestLog.completed.append_array(["shop_outfit", "partner_apron", "leonard_belay", "eichorn_apron"])
 	QuestLog.completed.append("clark_big_trees") # his side story would be offered first
 	var news := QuestLog.talk_to("galen_clark")
@@ -317,7 +316,7 @@ func test_story_beats() -> void:
 	QuestLog.start_new_game()
 	QuestLog.load_data(saved)
 	check(QuestLog.heard_beats.has("galen_clark:eichorn_apron"), "heard news is saved")
-	check(String(QuestLog.talk_to("galen_clark")[0].text) in clark.idle_lines, "and isn't repeated after loading")
+	check(QuestLog.talk_to("galen_clark")[0].get("everyday", false), "and isn't repeated after loading")
 	QuestLog.completed.append("clark_last_page")
 	var goodbye := QuestLog.talk_to("dick_leonard")
 	check(goodbye.size() == 2 and "held the rope" in goodbye[1].text, "after the last page, Leonard says goodbye")
@@ -329,9 +328,8 @@ func test_story_beats() -> void:
 ## one at a time, instead of going quiet. Before that he doesn't nag.
 func test_last_page_waiting() -> void:
 	new_game()
-	var clark := QuestLog.get_character("galen_clark")
 	QuestLog.completed.append("clark_register")
-	check(String(QuestLog.talk_to("galen_clark")[0].text) in clark.idle_lines, "early on, Clark doesn't hint at the last page")
+	check(QuestLog.talk_to("galen_clark")[0].get("everyday", false), "early on, Clark doesn't hint at the last page")
 	QuestLog.completed.append("muir_glacier")
 	QuestLog.heard_beats.append("galen_clark:muir_glacier")
 	check("Tenaya Creek" in QuestLog.talk_to("galen_clark")[0].text, "after the glacier, Clark sends you to Tenaya first")

@@ -92,4 +92,4 @@ func _play(world) -> void:
 	await get_tree().process_frame
 	check(cook.is_here() and cook.visible, "where he is again")
 	lines = QuestLog.talk_to(CHEF)
-	check(String(lines[0].text) in QuestLog.get_character(CHEF).idle_lines, "and he's back to his usual lines")
+	check(lines[0].get("everyday", false), "and he's back to everyday talk")

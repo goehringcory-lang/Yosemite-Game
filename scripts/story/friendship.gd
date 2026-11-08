@@ -70,22 +70,59 @@ const PLAIN_LINES := [
 	"Oh, thank you.",
 ]
 
+## How many of the latest things you did are kept for people to mention.
+const NEWS_KEPT := 4
+## Animals worth telling people about the first time you see one.
+const SIGHTINGS := ["black_bear", "bobcat", "peregrine_falcon", "great_gray_owl"]
+
 ## Character id -> points (0 to MAX_HEARTS * POINTS_PER_HEART).
 var points: Dictionary = {}
 ## Character id -> the day (Friendship.today()) you last talked or gave.
 var talked: Dictionary = {}
 var gifted: Dictionary = {}
+## Character id -> the hearts of the last heart scene they shared with you
+## (HeartScenes: 3 or 5).
+var scenes: Dictionary = {}
+## Character id -> the day a close friend last saved you something (HeartScenes).
+var saved_for_you: Dictionary = {}
+## What you've been up to lately, for people to mention in passing
+## (SmallTalk): the last NEWS_KEPT notable things, oldest first, each
+## {"id", "kind", "what", "day"} (see [method note_news]).
+var news: Array = []
+var news_count := 0
+## Character id -> the newest news id they've caught up on.
+var told: Dictionary = {}
+## Character id -> the everyday line they said last, so it isn't said twice running.
+var said: Dictionary = {}
 
 
 func _ready() -> void:
 	add_to_group("persist")
-	QuestLog.quest_completed.connect(func(quest: QuestData) -> void: add(quest.giver, QUEST_POINTS))
+	QuestLog.quest_completed.connect(func(quest: QuestData) -> void:
+		add(quest.giver, QUEST_POINTS)
+		# they've just heard all about it
+		hear_news(quest.giver))
+	# (every autoload exists by now, though the later ones aren't ready yet)
+	QuestLog.ticked.connect(func(route_id: String) -> void: note_news("climb", route_words(route_id)))
+	Rescues.rescued.connect(func(call: Dictionary) -> void:
+		note_news("rescue", str(call.get("who", "")))
+		hear_news(Rescues.LEAD))
+	Achievements.landed.connect(_on_landed)
+	FieldLog.logged.connect(func(id: String) -> void:
+		if id in SIGHTINGS:
+			note_news("sighting", with_article(str(FieldLog.get_animal(id).get("name", id)))))
 
 
 func start_new_game() -> void:
 	points = {}
 	talked = {}
 	gifted = {}
+	scenes = {}
+	saved_for_you = {}
+	news = []
+	news_count = 0
+	told = {}
+	said = {}
 	changed.emit()
 
 
@@ -167,27 +204,106 @@ func give(character_id: String, item_id: String) -> String:
 	match kind:
 		"loved":
 			add(character_id, LOVED_POINTS)
-			lines = LOVED_LINES
+			# in their own words, if they have some (SmallTalk)
+			var own := SmallTalk.loved_line(character_id)
+			lines = [own] if own != "" else LOVED_LINES
 		"liked":
 			add(character_id, LIKED_POINTS)
 			lines = LIKED_LINES
 		_:
 			add(character_id, PLAIN_POINTS)
-	return lines[(hash(character_id) + today()) % lines.size()]
+	return lines[absi(hash(character_id) + today()) % lines.size()]
+
+
+# ------------------------------------------------------------------- the news
+
+## Something you did that people might mention (SmallTalk). [param kind] is
+## "climb", "rescue", "fish" or "sighting"; [param what] is how a line puts
+## it: "the Nose", "Toby Lindqvist", "a 19-inch Brown Trout", "a Bobcat".
+func note_news(kind: String, what: String) -> void:
+	if what == "":
+		return
+	news_count += 1
+	news.append({"id": news_count, "kind": kind, "what": what, "day": today()})
+	while news.size() > NEWS_KEPT:
+		news.pop_front()
+
+
+## The latest news [param character_id] hasn't caught up on, of one of
+## [param kinds], from the last SmallTalk.NEWS_DAYS days; or {}.
+func news_for(character_id: String, kinds: Array) -> Dictionary:
+	var heard := int(told.get(character_id, 0))
+	for i in range(news.size() - 1, -1, -1):
+		var item: Dictionary = news[i]
+		if int(item.id) <= heard or today() - int(item.day) > SmallTalk.NEWS_DAYS:
+			break
+		if item.kind in kinds:
+			return item
+	return {}
+
+
+## [param character_id] has caught up on everything you've done so far.
+func hear_news(character_id: String) -> void:
+	if character_id != "":
+		told[character_id] = news_count
+
+
+## A fish is news the first time you land its kind, or when it's a trophy.
+func _on_landed(one: Dictionary) -> void:
+	var id: String = one.get("id", "")
+	var first := int(Achievements.fish.get(id, {}).get("count", 0)) == 1
+	if id == "" or not (first or one.get("trophy", false)):
+		return
+	var fish_name := str(FieldLog.get_animal(id).get("name", id))
+	note_news("fish", with_article("%d-inch %s" % [int(one.length), fish_name] if one.has("length") else fish_name))
+
+
+## A route's name the way it goes in the middle of a sentence ("the Nose").
+static func route_words(route_id: String) -> String:
+	for route: RouteData in Guidebook.routes():
+		if route.id == route_id:
+			return "the " + route.display_name.substr(4) if route.display_name.begins_with("The ") else route.display_name
+	return ""
+
+
+## [param words] with "a" or "an" in front, as it's said ("an 18-inch").
+static func with_article(words: String) -> String:
+	var first := words.get_slice(" ", 0).get_slice("-", 0).to_lower()
+	var vowel_sound := first.left(1) in ["a", "e", "i", "o", "u"]
+	if first.is_valid_int():
+		# eight, eleven, eighteen, eighty...
+		vowel_sound = first.begins_with("8") or first in ["11", "18"]
+	return ("an " if vowel_sound else "a ") + words
 
 
 func save_data() -> Dictionary:
-	return {"points": points, "talked": talked, "gifted": gifted}
+	return {"points": points, "talked": talked, "gifted": gifted, "scenes": scenes,
+		"saved_for_you": saved_for_you, "news": news, "news_count": news_count, "told": told, "said": said}
 
 
 func load_data(data: Dictionary) -> void:
-	points = {}
-	talked = {}
-	gifted = {}
-	for key in data.get("points", {}):
-		points[str(key)] = int(data.points[key])
-	for key in data.get("talked", {}):
-		talked[str(key)] = int(data.talked[key])
-	for key in data.get("gifted", {}):
-		gifted[str(key)] = int(data.gifted[key])
+	points = _ints(data.get("points", {}))
+	talked = _ints(data.get("talked", {}))
+	gifted = _ints(data.get("gifted", {}))
+	# (saves from before heart scenes and small talk have none of these)
+	scenes = _ints(data.get("scenes", {}))
+	saved_for_you = _ints(data.get("saved_for_you", {}))
+	news = []
+	for item in data.get("news", []):
+		if item is Dictionary:
+			news.append({"id": int(item.get("id", 0)), "kind": str(item.get("kind", "")), "what": str(item.get("what", "")), "day": int(item.get("day", 0))})
+	news_count = int(data.get("news_count", news.back().id if not news.is_empty() else 0))
+	told = _ints(data.get("told", {}))
+	said = {}
+	var lines: Dictionary = data.get("said", {})
+	for key in lines:
+		said[str(key)] = str(lines[key])
 	changed.emit()
+
+
+## A saved dictionary of whole numbers (JSON brings them back as floats).
+static func _ints(saved: Dictionary) -> Dictionary:
+	var out := {}
+	for key in saved:
+		out[str(key)] = int(saved[key])
+	return out
