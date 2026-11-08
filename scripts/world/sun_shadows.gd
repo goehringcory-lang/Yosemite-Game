@@ -150,13 +150,15 @@ func _scan() -> void:
 			continue
 		_still.append(caster)
 		if not _placed.has(id):
-			# a still caster for the first time: paint again when it changes
-			for signal_name in ["visibility_changed", "tree_exiting"]:
-				if not caster.is_connected(signal_name, _changed):
+			# A still caster for the first time: paint again when it changes.
+			# A new picture is a change, not motion: every seasonal plant gets
+			# one as the season turns, and taking that for animation painted
+			# hundreds of them every frame from then on. Frames are motion.
+			for signal_name in ["visibility_changed", "tree_exiting", "texture_changed"]:
+				if caster.has_signal(signal_name) and not caster.is_connected(signal_name, _changed):
 					caster.connect(signal_name, _changed)
-			for signal_name in ["texture_changed", "frame_changed"]:
-				if caster.has_signal(signal_name) and not caster.is_connected(signal_name, _animated.bind(caster)):
-					caster.connect(signal_name, _animated.bind(caster), CONNECT_ONE_SHOT)
+			if caster.has_signal("frame_changed") and not caster.is_connected("frame_changed", _animated.bind(caster)):
+				caster.connect("frame_changed", _animated.bind(caster), CONNECT_ONE_SHOT)
 	# The still ones are painted again every scan in any case, so a change
 	# nothing announced (a flip, a new caster) shows within RESCAN.
 	_dirty = true
