@@ -511,10 +511,24 @@ func move(dx: int) -> bool:
 		return false
 	var target := hold_at(row + 1, col + dx)
 	if target.is_empty():
+		# A boulder's hand-made holds aren't pruned of dead ends (see
+		# _remove_dead_ends): off the line, with nothing above in reach, you
+		# let go onto the pad rather than hang there with no way on.
+		if route.boulder and _nothing_in_reach():
+			_fall_on_pad()
+			return true
 		message = "No hold there."
 		return false
 	var cost := move_cost(row + 1, col + dx)
 	_step(dx, cost, MINUTES_PER_MOVE - int(Perks.bonus("light_rack")))
+	return true
+
+
+## True when no hold is in reach above: straight up or a column either side.
+func _nothing_in_reach() -> bool:
+	for d in [-1, 0, 1]:
+		if not hold_at(row + 1, col + d).is_empty():
+			return false
 	return true
 
 
