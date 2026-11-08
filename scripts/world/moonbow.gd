@@ -20,6 +20,9 @@ var level := 0.0
 
 var _time := 0.0
 var _tint: CanvasModulate
+## The arc laid out in cells (see _lay_out_arc), and the radius it was for.
+var _cells: Array = []
+var _cells_for := -1.0
 
 
 func _ready() -> void:
@@ -41,8 +44,12 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
-func _draw() -> void:
-	# The arc is laid out in 2px cells, in cell units (half the radius).
+## Lays the arc out once for [member radius]: its cells as [x, y, colour,
+## alpha before the shimmer and the level]. The square round it was
+## scanned every frame the moonbow was up, for the few hundred cells on it.
+func _lay_out_arc() -> void:
+	_cells_for = radius
+	_cells = []
 	var r := radius * 0.5
 	var reach := int(r) + 5
 	for px in range(-reach, reach + 1):
@@ -66,9 +73,21 @@ func _draw() -> void:
 				alpha = 0.1
 			# Brightest at the top of the arc, fading toward its feet.
 			alpha *= 0.3 + 0.7 * smoothstep(2.0, -r * 0.45, float(py))
-			alpha *= (0.82 + 0.18 * sin(_time * 1.1 + px * 0.12)) * level
-			if alpha > 0.01:
-				draw_rect(Rect2(px * 2, py * 2, 2, 2), Color(color.r, color.g, color.b, alpha))
+			_cells.append([px, py, color, alpha])
+
+
+func _draw() -> void:
+	# The arc is laid out in 2px cells, in cell units (half the radius).
+	if _cells_for != radius:
+		_lay_out_arc()
+	for cell: Array in _cells:
+		var px: int = cell[0]
+		var py: int = cell[1]
+		var color: Color = cell[2]
+		var alpha: float = cell[3]
+		alpha *= (0.82 + 0.18 * sin(_time * 1.1 + px * 0.12)) * level
+		if alpha > 0.01:
+			draw_rect(Rect2(px * 2, py * 2, 2, 2), Color(color.r, color.g, color.b, alpha))
 	# A pale haze where the spray hangs.
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0, 0.45))
 	for i in 3:

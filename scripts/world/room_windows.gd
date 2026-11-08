@@ -32,6 +32,9 @@ const MOON := Color(0.6, 0.7, 1.0)
 const MOON_ADD := 0.07
 ## Bands each shaft is drawn in, so its fade follows the painter's curve.
 const BANDS := 12
+## The light through the windows moves on in steps of this many hours
+## (1.2 game minutes, under a second of play).
+const HOUR_STEP := 0.02
 
 static var _data := {}
 
@@ -152,7 +155,10 @@ static func light_at(hour: float, weather: Dictionary) -> Dictionary:
 
 
 func _update() -> void:
-	var hour := hour_override if hour_override >= 0.0 else Sun.hour_now()
+	# The live clock is snapped (to HOUR_STEP): it moves on every frame, and
+	# each change drew all the room's beams and glow again, two dozen times
+	# a second.
+	var hour := hour_override if hour_override >= 0.0 else snappedf(Sun.hour_now(), HOUR_STEP)
 	var weather := Weather.today()
 	var key := "%.3f %s" % [hour, weather]
 	if key == _key:
