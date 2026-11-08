@@ -74,6 +74,9 @@ var _route := PackedVector2Array()
 ## are world positions, and World moves regions about: a seam lays one
 ## beside the region you're in, and moves the one behind you as you cross.
 var _region_at := Vector2.ZERO
+## The region that was in, so a move to another area (a Traveler's
+## hand_over) starts afresh there rather than counting as the region moving.
+var _region_of: Region
 var _heading_home := false
 ## Walking pace between stops (tests speed it up).
 var travel_speed := TRAVEL_SPEED
@@ -139,6 +142,7 @@ func _ready() -> void:
 	_home = global_position
 	_target = _home
 	var home_region := _find_region()
+	_region_of = home_region
 	_region_at = home_region.global_position if home_region else Vector2.ZERO
 	_rng.seed = hash(name)
 	_wait = _rng.randf_range(0.5, 3.0)
@@ -447,7 +451,13 @@ func _find_region() -> Region:
 ## region laid beside yours set off a whole map's width toward the seam.
 func _follow_region() -> void:
 	var region := _find_region()
-	if region == null or region.global_position == _region_at:
+	if region == null:
+		return
+	if region != _region_of:
+		_region_of = region
+		_region_at = region.global_position
+		return
+	if region.global_position == _region_at:
 		return
 	var shift := region.global_position - _region_at
 	_region_at = region.global_position
