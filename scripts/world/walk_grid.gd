@@ -15,6 +15,11 @@ const FOOT := Vector2(22, 14)
 
 var _astar := AStarGrid2D.new()
 var _origin := Vector2.ZERO
+## The region the grid is for. Positions in and out are the world's, and
+## the grid is in the region's own pixels: a region isn't always at the
+## world's origin (a seam lays it beside the one you're in, and moves the
+## one behind you once you cross).
+var _region: Node2D
 
 
 ## The region's grid, built on first use and kept on the region.
@@ -28,6 +33,8 @@ static func of(region: Region) -> WalkGrid:
 
 
 func _build(region: Region) -> void:
+	_region = region
+	var to_world := region.get_global_transform() if region.is_inside_tree() else Transform2D.IDENTITY
 	var bounds := region.get_bounds()
 	_origin = bounds.position
 	var cells := Vector2i((bounds.size / CELL).ceil())
@@ -45,7 +52,7 @@ func _build(region: Region) -> void:
 	query.collide_with_areas = false
 	for y in cells.y:
 		for x in cells.x:
-			query.transform = Transform2D(0.0, _astar.offset + Vector2(x, y) * CELL + Vector2(0, -6))
+			query.transform = Transform2D(0.0, to_world * (_astar.offset + Vector2(x, y) * CELL + Vector2(0, -6)))
 			for hit: Dictionary in space.intersect_shape(query, 8):
 				var body: Object = hit.collider
 				if not (body is NPC or body is Player):
@@ -54,7 +61,16 @@ func _build(region: Region) -> void:
 
 
 func _cell(pos: Vector2) -> Vector2i:
-	return Vector2i(((pos - _origin) / CELL).floor())
+	return Vector2i(((_local(pos) - _origin) / CELL).floor())
+
+
+## [param pos] from the world into the region's own pixels, and back.
+func _local(pos: Vector2) -> Vector2:
+	return _region.to_local(pos) if _region and _region.is_inside_tree() else pos
+
+
+func _global(pos: Vector2) -> Vector2:
+	return _region.to_global(pos) if _region and _region.is_inside_tree() else pos
 
 
 ## True if [param pos] is on open ground.
@@ -83,7 +99,7 @@ func nearest_open(pos: Vector2, reach := 12) -> Vector2:
 						best = c
 						best_d = d
 		if best_d < INF:
-			return _astar.offset + Vector2(best) * CELL
+			return _global(_astar.offset + Vector2(best) * CELL)
 	return pos
 
 
@@ -117,7 +133,7 @@ func route(from: Vector2, to: Vector2) -> PackedVector2Array:
 
 
 func _center(cell: Vector2i) -> Vector2:
-	return _astar.offset + Vector2(cell) * CELL
+	return _global(_astar.offset + Vector2(cell) * CELL)
 
 
 ## True if a straight walk from [param a] to [param b] stays on open ground.

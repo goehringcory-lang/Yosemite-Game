@@ -70,6 +70,10 @@ var _stops: Array = []
 var _stop := -1
 ## The turning points still to walk through on the way to a stop.
 var _route := PackedVector2Array()
+## Where their region was when _home, _target and _route were set. Those
+## are world positions, and World moves regions about: a seam lays one
+## beside the region you're in, and moves the one behind you as you cross.
+var _region_at := Vector2.ZERO
 var _heading_home := false
 ## Walking pace between stops (tests speed it up).
 var travel_speed := TRAVEL_SPEED
@@ -134,6 +138,8 @@ func _ready() -> void:
 			push_warning("%s: no spot named '%s'" % [name, spot])
 	_home = global_position
 	_target = _home
+	var home_region := _find_region()
+	_region_at = home_region.global_position if home_region else Vector2.ZERO
 	_rng.seed = hash(name)
 	_wait = _rng.randf_range(0.5, 3.0)
 	_stops = parse_timetable(timetable)
@@ -303,6 +309,7 @@ func _process(delta: float) -> void:
 	if _routine_check > 0.0 or character == null or (not character.visitor and _stops.is_empty()):
 		return
 	_routine_check = 0.5
+	_follow_region()
 	var out := is_out()
 	if _stops.is_empty():
 		if out != _out and not _talking:
@@ -435,6 +442,21 @@ func _find_region() -> Region:
 	return node
 
 
+## Moves _home, _target and _route along with their region, if World has
+## moved it since they were set. Left where they were, a wanderer in the
+## region laid beside yours set off a whole map's width toward the seam.
+func _follow_region() -> void:
+	var region := _find_region()
+	if region == null or region.global_position == _region_at:
+		return
+	var shift := region.global_position - _region_at
+	_region_at = region.global_position
+	_home += shift
+	_target += shift
+	for i in _route.size():
+		_route[i] += shift
+
+
 ## Placeholder figure in the character's color when there's no sprite sheet.
 func _draw() -> void:
 	GroundShadow.draw_under(self)
@@ -465,6 +487,7 @@ func roam_radius() -> float:
 
 
 func _physics_process(delta: float) -> void:
+	_follow_region()
 	if _talking or not visible:
 		return
 	if not _route.is_empty():
