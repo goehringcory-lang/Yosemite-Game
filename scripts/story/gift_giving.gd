@@ -41,7 +41,10 @@ static func offer(player: Player, character_id: String, speaker: String, anchor:
 					Sound.play("heart", 0.0, 0.0)
 					var lines := [{"speaker": speaker, "text": thanks}]
 					if Friendship.hearts(character_id) > before:
-						lines.append({"speaker": "", "text": "%s likes you a little more (%d of %d hearts)." % [speaker, Friendship.hearts(character_id), Friendship.MAX_HEARTS]})
+						var more := "%s likes you a little more (%d of %d hearts)." % [speaker, Friendship.hearts(character_id), Friendship.MAX_HEARTS]
+						if HeartScenes.ready_for(character_id) > 0:
+							more += " %s has something to tell you." % speaker.split(" ")[0]
+						lines.append({"speaker": "", "text": more})
 					await box.say(lines)
 	box.close()
 	player.can_act = true

@@ -632,8 +632,11 @@ func _pressed_progress(step: Dictionary) -> String:
 
 
 ## Runs a conversation with [param character_id], updating quests along the
-## way, and returns the lines to show.
-func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
+## way, and returns the lines to show. [param places] are where they're
+## standing (their spot or timetable stop, and the region), for small talk.
+## With nothing else to say, the lines are everyday talk (SmallTalk, marked
+## "everyday"), or none while a heart scene waits (HeartScenes).
+func talk_to(character_id: String, speaker_name := "", places := PackedStringArray()) -> Array[Dictionary]:
 	var character := get_character(character_id)
 	var speaker := speaker_name if speaker_name != "" else (character.display_name if character else character_id)
 	var lines: Array[Dictionary] = []
@@ -705,13 +708,15 @@ func talk_to(character_id: String, speaker_name := "") -> Array[Dictionary]:
 		if not beat.is_empty() and not beat.key in heard_beats:
 			heard_beats.append(beat.key)
 			_add_lines(lines, speaker, beat.lines)
+			# that was the news, so they won't bring up what you did as well
+			Friendship.hear_news(character_id)
 			return lines
 		# A quest held up by a side story: say who to go and see.
 		var waiting := waiting_hint(character_id)
 		if waiting != "":
 			_add_lines(lines, speaker, [waiting])
 			return lines
-		_add_lines(lines, speaker, character.idle_lines_for(character.rare_after_quest == "" or is_completed(character.rare_after_quest)))
+		lines.append_array(SmallTalk.talk(character, speaker, places))
 	return lines
 
 

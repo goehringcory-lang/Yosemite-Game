@@ -495,12 +495,25 @@ func _friends() -> void:
 			heart.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
 			heart.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			row.add_child(heart)
-		if not Friendship.can_gift(character.id):
+		var note_text := friend_note(character.id)
+		if note_text != "":
 			var note := Label.new()
-			note.text = "   gift given this week"
+			note.text = "   " + note_text
 			note.add_theme_color_override("font_color", DIM)
 			row.add_child(note)
 		_body.add_child(row)
+
+
+## A word after a friend's hearts: a heart scene waiting (HeartScenes), a
+## gift given this week, or a close friend who saves you things; or "".
+static func friend_note(character_id: String) -> String:
+	if HeartScenes.ready_for(character_id) > 0:
+		return "has something to tell you"
+	if not Friendship.can_gift(character_id):
+		return "gift given this week"
+	if HeartScenes.close(character_id):
+		return "saves you something each week"
+	return ""
 
 
 ## The festivals (Festivals), soonest first.

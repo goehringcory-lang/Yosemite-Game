@@ -587,12 +587,18 @@ func interact(player: Player) -> void:
 		var lines := Festivals.talk_to(character.id)
 		lines.append_array(BoardRequests.deliver(character.id))
 		lines.append_array(Rescues.talk_to(character.id))
-		lines.append_array(QuestLog.talk_to(character.id))
-		if shop and not Vendor.offers_open(shop).is_empty():
+		lines.append_array(QuestLog.talk_to(character.id, "", places()))
+		# with nothing else to say, a friend shares what they've been saving up
+		var scene := HeartScenes.ready_for(character.id) if lines.is_empty() else 0
+		var trading := shop != null and not Vendor.offers_open(shop).is_empty()
+		if scene > 0 or trading:
 			player.can_act = false
 			var box := DialogueBox.open(player)
 			await box.say(lines)
-			await Vendor.trade_menu(box, shop, character.display_name, true)
+			if scene > 0:
+				await HeartScenes.play(box, character.id, character.display_name, self)
+			if trading:
+				await Vendor.trade_menu(box, shop, character.display_name, true)
 			box.close()
 			player.can_act = true
 		else:
@@ -606,6 +612,20 @@ func interact(player: Player) -> void:
 	if quest_marker:
 		quest_marker.hidden_while_talking = false
 		quest_marker.refresh()
+
+
+## Where they're standing, for small talk (SmallTalk "places"): their
+## timetable stop (or [member spot]), then the region.
+func places() -> PackedStringArray:
+	var out := PackedStringArray()
+	if _stop >= 0 and _stop < _stops.size():
+		out.append(str(_stops[_stop][1]))
+	elif spot != "":
+		out.append(spot)
+	var region := _find_region()
+	if region and region.region_id != "":
+		out.append(region.region_id)
+	return out
 
 
 ## True if this person keeps friendship hearts (visitors just pass through).

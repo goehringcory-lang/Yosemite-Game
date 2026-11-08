@@ -235,13 +235,20 @@ func interact(player: Player) -> void:
 		_marker.hidden_while_talking = true
 		_marker.refresh()
 	var box := DialogueBox.open(player)
+	# everyday talk (SmallTalk) stands in for the greeting
+	var chatted := false
 	if shop.talk_target != "":
 		var story := Festivals.talk_to(shop.talk_target)
 		story.append_array(BoardRequests.deliver(shop.talk_target))
-		story.append_array(QuestLog.talk_to(shop.talk_target, shop.keeper))
-		if not story.is_empty():
+		var region := _region_id()
+		story.append_array(QuestLog.talk_to(shop.talk_target, shop.keeper, PackedStringArray([region]) if region != "" else PackedStringArray()))
+		chatted = story.any(func(line: Dictionary) -> bool: return line.get("everyday", false))
+		if story.is_empty() and HeartScenes.ready_for(shop.talk_target) > 0:
+			await HeartScenes.play(box, shop.talk_target, shop.keeper, self)
+			chatted = true
+		elif not story.is_empty():
 			await box.say(story)
-	if shop.greeting != "":
+	if shop.greeting != "" and not chatted:
 		await box.say([{"speaker": shop.keeper, "text": shop.greeting}])
 	await trade_menu(box, shop, shop.keeper)
 	box.close()
@@ -250,6 +257,14 @@ func interact(player: Player) -> void:
 	if _marker:
 		_marker.hidden_while_talking = false
 		_marker.refresh()
+
+
+## The region they keep shop in, for small talk ("" if none).
+func _region_id() -> String:
+	var node := get_parent()
+	while node and not node is Region:
+		node = node.get_parent()
+	return (node as Region).region_id if node else ""
 
 
 static func _owned(offer: ShopOffer) -> int:

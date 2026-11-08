@@ -20,6 +20,8 @@ extends Node
 
 signal unlocked(achievement: Dictionary)
 signal changed
+## Sent when a fish is landed, after it's logged (Friendship tells people).
+signal landed(one: Dictionary)
 
 ## The park's summits you can stand on, highest first: by a climb's tick
 ## ("route"), or by a QuestLog unlock ("unlock"). Either way up Half Dome
@@ -247,6 +249,7 @@ func caught(one: Dictionary) -> void:
 		entry.trophies = int(entry.trophies) + 1
 	fish[id] = entry
 	_on_progress()
+	landed.emit(one)
 
 
 func fish_count() -> int:
