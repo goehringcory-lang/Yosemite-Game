@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/traveler_day_hiker.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "traveler_day_hiker"
+display_name = "Day hiker"
+years = "1960s"
+bio = "An everyday hiker from the 1960s, camped at Upper Pines, who walks up to Mirror Lake most mornings. Not a historical figure."
+idle_lines = PackedStringArray("Early on the trail, early back. That's the trick in summer.", "I leave the camera in the tent. I just look.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Upper Pines"
+visitor = true
