@@ -15,6 +15,9 @@ const FOOT := Vector2(22, 14)
 
 var _astar := AStarGrid2D.new()
 var _origin := Vector2.ZERO
+## This grid's cell and body sizes (CELL and FOOT unless built finer).
+var _cell_size := CELL
+var _foot := FOOT
 
 
 ## The region's grid, built on first use and kept on the region.
@@ -27,25 +30,35 @@ static func of(region: Region) -> WalkGrid:
 	return grid
 
 
+## A grid of [param cell] px cells for a body of [param foot] (finer than the
+## usual, to find the narrow bridges a player fits over), not kept. For tools.
+static func finer(region: Region, cell: int, foot: Vector2) -> WalkGrid:
+	var grid := WalkGrid.new()
+	grid._cell_size = cell
+	grid._foot = foot
+	grid._build(region)
+	return grid
+
+
 func _build(region: Region) -> void:
 	var bounds := region.get_bounds()
 	_origin = bounds.position
-	var cells := Vector2i((bounds.size / CELL).ceil())
+	var cells := Vector2i((bounds.size / _cell_size).ceil())
 	_astar.region = Rect2i(Vector2i.ZERO, cells)
-	_astar.cell_size = Vector2(CELL, CELL)
-	_astar.offset = _origin + Vector2(CELL, CELL) / 2.0
+	_astar.cell_size = Vector2(_cell_size, _cell_size)
+	_astar.offset = _origin + Vector2(_cell_size, _cell_size) / 2.0
 	_astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
 	_astar.update()
 	var space := region.get_world_2d().direct_space_state
 	var query := PhysicsShapeQueryParameters2D.new()
 	var box := RectangleShape2D.new()
-	box.size = FOOT
+	box.size = _foot
 	query.shape = box
 	query.collision_mask = 1
 	query.collide_with_areas = false
 	for y in cells.y:
 		for x in cells.x:
-			query.transform = Transform2D(0.0, _astar.offset + Vector2(x, y) * CELL + Vector2(0, -6))
+			query.transform = Transform2D(0.0, _astar.offset + Vector2(x, y) * _cell_size + Vector2(0, -6))
 			for hit: Dictionary in space.intersect_shape(query, 8):
 				var body: Object = hit.collider
 				if not (body is NPC or body is Player):
@@ -54,7 +67,7 @@ func _build(region: Region) -> void:
 
 
 func _cell(pos: Vector2) -> Vector2i:
-	return Vector2i(((pos - _origin) / CELL).floor())
+	return Vector2i(((pos - _origin) / _cell_size).floor())
 
 
 ## True if [param pos] is on open ground.
@@ -83,7 +96,7 @@ func nearest_open(pos: Vector2, reach := 12) -> Vector2:
 						best = c
 						best_d = d
 		if best_d < INF:
-			return _astar.offset + Vector2(best) * CELL
+			return _astar.offset + Vector2(best) * _cell_size
 	return pos
 
 
@@ -117,12 +130,12 @@ func route(from: Vector2, to: Vector2) -> PackedVector2Array:
 
 
 func _center(cell: Vector2i) -> Vector2:
-	return _astar.offset + Vector2(cell) * CELL
+	return _astar.offset + Vector2(cell) * _cell_size
 
 
 ## True if a straight walk from [param a] to [param b] stays on open ground.
 func _clear(a: Vector2, b: Vector2) -> bool:
-	var steps := ceili(a.distance_to(b) / (CELL / 2.0))
+	var steps := ceili(a.distance_to(b) / (_cell_size / 2.0))
 	for s in range(1, steps + 1):
 		var cell := _cell(a.lerp(b, float(s) / steps))
 		if not _astar.is_in_boundsv(cell) or _astar.is_point_solid(cell):

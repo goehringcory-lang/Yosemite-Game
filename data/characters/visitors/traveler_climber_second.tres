@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/traveler_climber_second.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "traveler_climber_second"
+display_name = "Climbing partner"
+years = "1970s"
+bio = "An everyday climber from the 1970s, the other half of a big-wall team, who hauls the bag out to El Capitan. Not a historical figure."
+idle_lines = PackedStringArray("Somebody has to carry the haul bag. Today it's me. It's always me.", "We share one stove, one rope and about half a brain.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Camp 4"
+visitor = true

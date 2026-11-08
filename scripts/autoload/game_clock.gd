@@ -106,8 +106,13 @@ func start_new_day() -> void:
 
 ## 0.0 at midnight, 0.5 at noon. Smooth between ticks, for lighting.
 func get_day_progress() -> float:
-	var smooth_minutes := minutes + _elapsed / seconds_per_tick * MINUTES_PER_TICK
-	return fposmod(smooth_minutes, 1440.0) / 1440.0
+	return fposmod(smooth_minutes(), 1440.0) / 1440.0
+
+
+## [member minutes], with the part of the next tick gone by: it moves on
+## every frame rather than ten minutes at a time (for people walking to time).
+func smooth_minutes() -> float:
+	return minutes + _elapsed / seconds_per_tick * MINUTES_PER_TICK
 
 
 func get_time_string() -> String:
