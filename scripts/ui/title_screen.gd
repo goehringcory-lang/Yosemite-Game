@@ -48,6 +48,21 @@ var _credits: Credits
 ## The logo and tagline, which drop in when the screen opens.
 var _logo: Control
 var _intro: Tween
+## Whether the clock was stopped before the title came up (see _enter_tree).
+var _clock_was_paused := false
+
+
+## The clock waits while the title is up, and goes back as it was when the
+## title goes: otherwise it ran on behind the menu, so a new game started
+## hours into its first day, or (after a quarter of an hour) at the 2 AM
+## curfew with the clock stopped there.
+func _enter_tree() -> void:
+	_clock_was_paused = GameClock.paused
+	GameClock.paused = true
+
+
+func _exit_tree() -> void:
+	GameClock.paused = _clock_was_paused
 
 
 func _ready() -> void:

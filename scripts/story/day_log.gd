@@ -35,7 +35,7 @@ func _ready() -> void:
 	Friendship.heart_gained.connect(_on_heart)
 	Rescues.rescued.connect(func(call: Dictionary) -> void: rescues.append("%s (%s)" % [call.title, call.who]))
 	FieldLog.logged.connect(func(id: String) -> void: animals.append(str(FieldLog.get_animal(id).get("name", id))))
-	GameClock.day_started.connect(clear.unbind(3))
+	GameClock.day_started.connect(_on_day_started.unbind(3))
 
 
 func _on_ticked(route_id: String) -> void:
@@ -54,6 +54,14 @@ func _on_heart(character_id: String, hearts: int) -> void:
 			friends.remove_at(i)
 			break
 	friends.append("%s (%d heart%s)" % [who, hearts, "" if hearts == 1 else "s"])
+
+
+## A new morning starts the page over. Nights on a wall turn the days over
+## too, but they come as the climb ends, after its first ascent went on the
+## page: that stays for the page at bedtime.
+func _on_day_started() -> void:
+	if not GameClock.on_the_wall:
+		clear()
 
 
 func clear() -> void:

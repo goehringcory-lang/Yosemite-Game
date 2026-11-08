@@ -574,7 +574,9 @@ func _set_up_step(id: String) -> void:
 ## already, or loaded in the background?
 func _region_ready(id: String) -> bool:
 	var path := region_scene_path(id)
-	return _regions.has(id) or _preloaded.has(path) or ResourceLoader.has_cached(path)
+	# Part way set up counts: its first step takes the background-loaded
+	# scene, which then isn't cached any more, and the rest never came.
+	return _regions.has(id) or _setting_up.has(id) or _preloaded.has(path) or ResourceLoader.has_cached(path)
 
 
 ## Lays the next region beside this one while the player is near a seam
@@ -863,7 +865,13 @@ func _update_location() -> void:
 
 func get_offstage_persist_nodes() -> Array[Node]:
 	var nodes: Array[Node] = []
-	for cached: Region in _regions.values():
+	var offstage: Array = _regions.values()
+	# Part way set up and given its saved state already (step 1 of
+	# _set_up_step took it out of SaveManager's pending data).
+	for made: Region in _setting_up.values():
+		if int(made.get_meta("set_up_step", 0)) >= 2:
+			offstage.append(made)
+	for cached: Region in offstage:
 		if cached != region:
 			for node in cached.find_children("*", "", true, false):
 				if node.is_in_group("persist"):

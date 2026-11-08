@@ -109,7 +109,7 @@ func _ribbon_at(y: float) -> float:
 
 func _darkness() -> float:
 	if _tint == null:
-		_tint = get_tree().root.find_child("DayNight", true, false) as CanvasModulate
+		_tint = NightLight.world_tint(get_tree())
 		if _tint == null:
 			return 0.0
 	if not _tint.visible:

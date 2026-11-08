@@ -631,6 +631,13 @@ func _distance_moved(player: Player, action: String, run: bool) -> float:
 ## Standing just south of [param target] and facing it, is it what the
 ## interact button would use?
 func _can_use(player: Player, target: Node2D) -> bool:
+	# Forage is scattered at random each day; a pick-up lying in front of the
+	# target would be what the player faces, so the check passed or failed by
+	# chance. Clear any right beside it first.
+	for item in player.get_parent().find_children("*", "Forageable", true, false):
+		if (item as Node2D).global_position.distance_to(target.global_position) < 64.0:
+			item.get_parent().remove_child(item)
+			item.queue_free()
 	player.global_position = target.global_position + Vector2(0, 8)
 	player.facing = Vector2i.UP
 	player.interaction_area.position = Vector2(0, -24)

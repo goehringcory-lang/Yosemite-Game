@@ -334,11 +334,17 @@ func interact(player: Player) -> void:
 	if fish.is_empty():
 		fish = pick(world.region.hub_id, GameClock.season, fly)
 	var game := FishingMinigame.new()
+	# The clock waits while you play the cast, as on the other screens, and
+	# the cast's own CAST_MINUTES go on after: it ran on underneath, so a cast
+	# took longer than that, and the 2 AM curfew could fall in the middle.
+	var was_paused := GameClock.paused
+	GameClock.paused = true
 	get_tree().root.add_child(game)
 	game.start(fish, -1, fly)
 	_game = game
 	_fly_at = to_local(cast_point(player))
 	var caught: bool = await game.finished
+	GameClock.paused = was_paused
 	var outcome := game.outcome
 	_game = null
 	player.clear_pose()

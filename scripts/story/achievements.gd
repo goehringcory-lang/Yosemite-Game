@@ -346,8 +346,9 @@ func progress(achievement: Dictionary) -> Array[int]:
 			have = Perks.stat(unlock.id)
 			need = int(unlock.count)
 		"medal":
+			# a Camp 4 line, as for the first gold: not the travel line you rig anywhere
 			for key: String in Perks.stats:
-				if key.begins_with("slackline_medal_") and int(Perks.stats[key]) >= 3:
+				if key.begins_with("slackline_medal_") and key != "slackline_medal_" + SlacklineState.TRAVEL and int(Perks.stats[key]) >= 3:
 					have = 1
 		"pressed":
 			have = Herbarium.count()

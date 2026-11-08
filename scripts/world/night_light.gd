@@ -53,9 +53,18 @@ func _ready() -> void:
 		_add_halo()
 
 
+## World's day and night tint (its DayNight child), or null outside the game.
+## Found through the "world" group rather than by searching the tree: World
+## keeps the region ahead of DayNight, so a search walks the region's
+## thousands of nodes first, and every lamp in a region does it on arrival.
+static func world_tint(tree: SceneTree) -> CanvasModulate:
+	var world: Node = tree.get_first_node_in_group("world") if tree else null
+	return world.get_node_or_null("DayNight") as CanvasModulate if world else null
+
+
 func _process(delta: float) -> void:
 	if _tint == null:
-		_tint = get_tree().root.find_child("DayNight", true, false) as CanvasModulate
+		_tint = world_tint(get_tree())
 		if _tint == null:
 			return
 	var dark := 0.0

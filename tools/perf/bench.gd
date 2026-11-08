@@ -13,14 +13,14 @@ extends Node
 ## then opens the climbing screen on a few routes ("open ms": painting the
 ## sky, landscape and wall) and times its frames.
 ##
-## Run:  godot --headless --fixed-fps 60 --path . res://tools/perf/bench.tscn [-- frames=600 dwell=2 only=yosemite_valley,wawona]
+## Run:  godot --headless --fixed-fps 60 --path . res://tools/perf/bench.tscn [-- frames=600 dwell=2 only=yosemite_village,wawona]
 ## --fixed-fps 60 gives every frame a 1/60 s step (so one physics tick a frame,
 ## like a real 60 fps game) while running as fast as the CPU allows.
 ## Numbers are printed as a table and also written to user://bench.json.
 ## Headless has no GPU, so these are CPU (script, physics, scene) costs only.
 
 const REGIONS := [
-	"lamon_homestead", "yosemite_valley", "curry_village", "yosemite_village",
+	"lamon_homestead", "curry_village", "yosemite_village",
 	"ahwahnee_trail", "the_ahwahnee", "curry_mountain_shop", "el_portal", "wawona",
 	"glacier_point", "tuolumne_meadows",
 ]
@@ -78,7 +78,7 @@ func _ready() -> void:
 		r["first_frame_ms"] = (Time.get_ticks_usec() - t) / 1000.0
 		await _settle()
 		# A return visit (the region is cached).
-		world._enter_region("lamon_homestead" if id != "lamon_homestead" else "yosemite_valley", "")
+		world._enter_region("lamon_homestead" if id != "lamon_homestead" else "yosemite_village", "")
 		await _settle()
 		t = Time.get_ticks_usec()
 		world._enter_region(id, "arrival")

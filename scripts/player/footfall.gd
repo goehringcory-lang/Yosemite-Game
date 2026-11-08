@@ -33,8 +33,16 @@ var _last := Vector2.ZERO
 var _breath: Node2D
 ## Each print: [position, region id, left foot, age in seconds].
 var _prints: Array = []
-var _prints_day := ""
+var _prints_day := -1
 var _print_layer: Node2D
+## The prints changed (one made, filling in, gone, or the walker is in
+## another region), so their layer draws again. Up to MAX_PRINTS of them for
+## each walker, the player and everyone walking about, so they aren't drawn
+## again every frame while they lie still.
+var _prints_dirty := false
+var _prints_region := ""
+## Puffs were drawn last frame, so the frame after the last one clears them.
+var _puffed := false
 ## No footstep sounds (for other people's feet).
 var quiet := false
 ## Faster than this (pixels a second), the feet kick up a spray.
@@ -109,10 +117,14 @@ func _process(delta: float) -> void:
 		else:
 			i += 1
 	_age_prints(delta)
-	visible = not _puffs.is_empty() or not _prints.is_empty()
-	if visible:
+	var puffing := not _puffs.is_empty()
+	visible = puffing or not _prints.is_empty()
+	if puffing or _puffed:
 		queue_redraw()
 		_breath.queue_redraw()
+	_puffed = puffing
+	if _prints_dirty:
+		_prints_dirty = false
 		_print_layer.queue_redraw()
 
 
@@ -126,6 +138,7 @@ func _step(at: Vector2) -> void:
 		_prints.append([at.floor(), region.region_id if region else "", _left, 0.0])
 		if _prints.size() > MAX_PRINTS:
 			_prints.pop_front()
+		_prints_dirty = true
 	var color := _ground_color()
 	if color.a <= 0.0:
 		return # frozen ground: no dust
@@ -209,12 +222,22 @@ func _region() -> Region:
 
 ## Prints last the day; falling snow fills them in.
 func _age_prints(delta: float) -> void:
-	var today := "%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day]
+	var today := (GameClock.year * 4 + GameClock.season) * 32 + GameClock.day
 	if today != _prints_day:
 		_prints_day = today
-		_prints.clear()
-	if _prints.is_empty() or Weather.today().snow <= 0.0:
+		if not _prints.is_empty():
+			_prints.clear()
+			_prints_dirty = true
+	if _prints.is_empty():
 		return
+	var region := _region()
+	var here := region.region_id if region else ""
+	if here != _prints_region:
+		_prints_region = here
+		_prints_dirty = true
+	if Weather.today().snow <= 0.0:
+		return
+	_prints_dirty = true # fading as the snow fills them in
 	var i := 0
 	while i < _prints.size():
 		_prints[i][3] += delta

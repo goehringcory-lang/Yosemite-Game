@@ -47,6 +47,11 @@ const ROPE_C := Color("b3362b")
 const ROPE_D := Color("b3362b")
 
 static var _cache: Dictionary = {}
+## The climber pictures in [member _cache], oldest first. One is painted for
+## every pose, kit and weather it's seen in (hundreds on a big wall), and
+## they were kept for the whole session; past CLIMBER_CACHE the oldest go.
+static var _climber_keys: Array[String] = []
+const CLIMBER_CACHE := 1500
 
 
 ## Shoulder and hip positions relative to the torso center.
@@ -213,6 +218,9 @@ static func climber(pose: Dictionary, kit: Dictionary, flags := {}) -> Texture2D
 		im = _paint_climber(pose, kit, flags)
 	var tex := ClimbHiRes.texture(im)
 	_cache[key] = tex
+	_climber_keys.append(key)
+	if _climber_keys.size() > CLIMBER_CACHE:
+		_cache.erase(_climber_keys.pop_front())
 	return tex
 
 
@@ -240,6 +248,46 @@ static func _kit_key(kit: Dictionary) -> String:
 ## color it runs along. The edge on the upper-left (where the light hits the
 ## figure's outside) is lighter, so the outline breaks up there.
 static func _outline(im: Image) -> void:
+	if im.get_format() != Image.FORMAT_RGBA8:
+		_outline_any(im)
+		return
+	# The same as _outline_any, reading alpha from the bytes: a figure is
+	# painted again on a new pose, often each frame of a move, and a
+	# get_pixel for every pixel and its four neighbours took most of it.
+	# Alpha > 0.1 is a byte of 26 or more, > 0.5 one of 128 or more.
+	var w := im.get_width()
+	var h := im.get_height()
+	var data := im.get_data()
+	var row := w * 4
+	var out := {}
+	for y in h:
+		for x in w:
+			var i := y * row + x * 4
+			if data[i + 3] >= 26:
+				continue
+			# The opaque neighbour, in the same order: left, right, up, down.
+			var n := Vector2i(-1, -1)
+			var lit_side := false
+			if x > 0 and data[i - 1] >= 128:
+				n = Vector2i(x - 1, y)
+			elif x < w - 1 and data[i + 7] >= 128:
+				n = Vector2i(x + 1, y)
+				lit_side = true
+			elif y > 0 and data[i - row + 3] >= 128:
+				n = Vector2i(x, y - 1)
+			elif y < h - 1 and data[i + row + 3] >= 128:
+				n = Vector2i(x, y + 1)
+				lit_side = true
+			if n.x >= 0:
+				var src := im.get_pixelv(n)
+				var v := src.v * (0.62 if lit_side else 0.34)
+				out[Vector2i(x, y)] = Color.from_hsv(src.h, minf(src.s + 0.2, 1.0), v, 1.0)
+	for p: Vector2i in out:
+		im.set_pixelv(p, out[p])
+
+
+## [method _outline] for an image in any format, a pixel at a time.
+static func _outline_any(im: Image) -> void:
 	var w := im.get_width()
 	var h := im.get_height()
 	var out := {}
@@ -653,7 +701,10 @@ static func _paint_chimney(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 ## boulderer's spotter, hands up) or "cheer", and
 ## [param frame] 0..2 (see the header).
 static func belayer(look: Dictionary, mode := "belay", frame := 0) -> Texture2D:
-	var key := "b|%s|%s|%d" % [str(look.get("id", "")), mode, frame]
+	# A look with no id (a rescued visitor's, read off their sprite sheet) is
+	# told apart by its colours, or every one is drawn as the first one was.
+	var id := str(look.get("id", ""))
+	var key := "b|%s|%s|%d" % [id if id != "" else "look%d" % look.hash(), mode, frame]
 	if _cache.has(key):
 		return _cache[key]
 	var im := _paint_belayer(look, mode, frame)

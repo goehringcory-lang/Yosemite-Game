@@ -57,6 +57,10 @@ var _last_pos := Vector2.INF
 var _target: Node2D
 var _look := 0.0
 var _time := 0.0
+## What each lesson's target was when last looked for: [_time then, region,
+## node or null]. Each look searches the whole region, and the evening's
+## cook lesson (until you've cooked) and the bed card asked every frame.
+var _found: Dictionary = {}
 
 var _card: PanelContainer
 var _line: ButtonHints
@@ -167,7 +171,7 @@ func _process(delta: float) -> void:
 	_look -= delta
 	if _look <= 0.0:
 		_look = LOOK_EVERY
-		_target = _find_target(current())
+		_target = _target_for(current())
 	_show(player)
 
 
@@ -237,7 +241,7 @@ func _ready_for(id: String) -> bool:
 		"map":
 			return _region_id() == "curry_village"
 		"cook":
-			return GameClock.hour >= SUPPER_HOUR and _has_raw_food() and _find_target("cook") != null
+			return GameClock.hour >= SUPPER_HOUR and _has_raw_food() and _target_for("cook") != null
 		"sleep":
 			return GameClock.hour >= BED_HOUR or GameClock.hour < 4
 		"climb":
@@ -273,12 +277,24 @@ func text_for(id: String) -> String:
 		"cook":
 			return "[%s] Cook supper at the campfire" % use
 		"sleep":
-			return "[%s] Sleep in your tent" % use if _find_target("sleep") != null else "Head back to your tent at Lamon's camp"
+			return "[%s] Sleep in your tent" % use if _target_for("sleep") != null else "Head back to your tent at Lamon's camp"
 		"climb":
 			return "[%s] Climb Firefall Slab with Wren" % use
 		"fish":
 			return "Face the water, [%s] Cast" % use
 	return ""
+
+
+## [method _find_target], looked up again only after LOOK_EVERY or in
+## another region.
+func _target_for(id: String) -> Node2D:
+	var world := get_parent()
+	var region: Region = world.region if world and "region" in world else null
+	var seen: Array = _found.get(id, [])
+	if seen.is_empty() or _time - float(seen[0]) >= LOOK_EVERY or seen[1] != region:
+		seen = [_time, region, _find_target(id)]
+		_found[id] = seen
+	return seen[2] if is_instance_valid(seen[2]) else null
 
 
 ## What lesson [param id] points at in this region, or null.

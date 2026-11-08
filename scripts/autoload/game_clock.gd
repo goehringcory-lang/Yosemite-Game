@@ -45,6 +45,9 @@ var year := 1
 ## after midnight so the day doesn't roll over until the player sleeps.
 var minutes := DAY_START_HOUR * 60
 var paused := false
+## True while [method advance_through_nights] turns the days over for
+## nights spent on a wall, which aren't nights in bed (see DayLog).
+var on_the_wall := false
 
 var hour: int:
 	get:
@@ -84,8 +87,10 @@ func is_too_late_for(trip_minutes: int) -> bool:
 func advance_through_nights(elapsed: int, nights: int) -> bool:
 	# The time of day on the last day, counted from that day's midnight.
 	var end := minutes + elapsed - nights * 24 * 60
+	on_the_wall = true
 	for i in nights:
 		start_new_day()
+	on_the_wall = false
 	advance_minutes(maxi(end - minutes, 0))
 	return end >= PASS_OUT_HOUR * 60
 

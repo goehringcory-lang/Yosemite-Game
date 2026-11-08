@@ -367,10 +367,15 @@ func _update_prompt() -> void:
 			create_tween().tween_property(prompt_panel, "modulate:a", 1.0, 0.12)
 	if target == null:
 		return
-	prompt_label.text = "[%s] %s" % [interact_button(), Player.prompt_for(target)]
+	var text := "[%s] %s" % [interact_button(), Player.prompt_for(target)]
 	if target.has_method("can_receive_gift") and target.can_receive_gift():
-		prompt_label.text += "   [%s] Give a gift" % prompt("G", "LB")
-	prompt_panel.size = Vector2.ZERO
+		text += "   [%s] Give a gift" % prompt("G", "LB")
+	# Set (and the panel shrunk to it) only when it changes: it was laid out
+	# again every frame you faced something, twice for anyone you can give a
+	# gift to, the line without the gift and then with it.
+	if prompt_label.text != text:
+		prompt_label.text = text
+		prompt_panel.size = Vector2.ZERO
 	var screen := UiScale.from_view(_player.get_global_transform_with_canvas().origin)
 	# Above whichever head is higher, so it never covers the person you face.
 	if target is CanvasItem:

@@ -75,6 +75,11 @@ func is_swaying(sprite: Sprite2D) -> bool:
 
 func _collect() -> void:
 	_plants.clear()
+	# Stand anything still swaying up straight, or it stays leaning where you
+	# left it (beside you across a seam, or when you come back).
+	for sprite in _swaying:
+		if is_instance_valid(sprite):
+			sprite.skew = 0.0
 	_swaying.clear()
 	if _region == null or not "entities" in _region or _region.entities == null:
 		return

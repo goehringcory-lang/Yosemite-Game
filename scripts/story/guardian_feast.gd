@@ -59,6 +59,11 @@ const NPC_SCENE := preload("res://scenes/story/npc.tscn")
 
 ## Guests talked to at this supper (not saved: the supper is one evening).
 var talked: Dictionary = {}
+## The guests seated round the fire. Kept here, not looked up by group: the
+## group can't see them while the homestead is out of the tree (World keeps
+## the regions you've left) or before they're added (that's deferred), and a
+## look that found nobody seated everyone again, on every quest change.
+var _guests: Array = []
 
 
 ## True from the end of the finale until you've slept the supper off.
@@ -82,13 +87,14 @@ func _ready() -> void:
 
 
 func _refresh() -> void:
+	_guests = _guests.filter(func(guest) -> bool: return is_instance_valid(guest) and not guest.is_queued_for_deletion())
 	var pending := is_pending()
-	var guests: Array = get_tree().get_nodes_in_group("feast_guest") if is_inside_tree() else []
-	if pending and guests.is_empty():
+	if pending and _guests.is_empty():
 		_seat_guests()
-	elif not pending and not guests.is_empty():
-		for guest in guests:
+	elif not pending and not _guests.is_empty():
+		for guest in _guests:
 			guest.queue_free()
+		_guests.clear()
 
 
 ## Seats everyone with a line round the campfire, facing it.
@@ -113,6 +119,7 @@ func _seat_guests() -> void:
 		npc.add_to_group("feast_guest")
 		npc.talked_to.connect(func() -> void: talked[character.id] = true)
 		entities.add_child.call_deferred(npc)
+		_guests.append(npc)
 		seat += 1
 
 

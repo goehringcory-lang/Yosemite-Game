@@ -34,3 +34,6 @@ static func reset_all() -> void:
 	GameClock.paused = false
 	Larder.load_data({})
 	reset()
+	# As at launch, so a save from before the logbook, loaded next, has its
+	# achievements rebuilt quietly (Achievements.settle) and not all announced.
+	Achievements._fresh_state = false

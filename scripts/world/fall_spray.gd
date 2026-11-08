@@ -33,6 +33,10 @@ var level := 0.0
 var _time := 0.0
 var _drops: CPUParticles2D
 var _bow: Node2D
+## The bow laid out in cells (see _lay_out_bow), and the radius it was for.
+var _cells: Array = []
+var _haze: Array[Vector2] = []
+var _cells_for := -1.0
 
 
 func _ready() -> void:
@@ -101,19 +105,23 @@ func _process(delta: float) -> void:
 		_bow.queue_redraw()
 
 
-func _draw_bow() -> void:
-	# In cell units (2px). The bow is strongest in the thick of the spray and
-	# fades toward its feet and its crown; it breathes as the spray gusts.
+## Lays the bow out once for [member radius]: its cells as [x, y, band
+## colour, alpha before the gusts and the strength], and the haze's cells.
+## The whole square round the bow (over 5,000 cells, for some hundreds
+## drawn) was scanned every frame it was up; only the gusts and the
+## strength change.
+func _lay_out_bow() -> void:
+	_cells_for = radius
+	_cells = []
+	_haze = []
 	var r := radius * 0.5
 	var reach := int(r) + 4
-	var strength := level * lerpf(0.55, 1.0, flow)
 	for px in range(-reach, reach + 1):
 		for py in range(-reach, 2):
 			var dist := Vector2(px, py).length()
 			var band := int(floor(r - dist + 3.0))
 			if band < 0 or band >= BANDS.size():
 				continue
-			var col: Color = BANDS[band]
 			var alpha := 0.42
 			# the outermost and innermost bands are dithered, so the edge stays crisp
 			if (band == 0 or band == BANDS.size() - 1) and (px + py) % 2 == 0:
@@ -121,12 +129,30 @@ func _draw_bow() -> void:
 			# brightest low down, where the spray is thickest; the crown thins out
 			var up := -float(py) / r
 			alpha *= clampf(1.15 - up * 0.9, 0.15, 1.0) * clampf((up + 0.05) * 4.0, 0.0, 1.0)
-			alpha *= 0.75 + 0.25 * sin(_time * 1.3 + px * 0.21 - py * 0.1)
-			alpha *= strength
-			if alpha > 0.02:
-				_bow.draw_rect(Rect2(px * 2, py * 2, 2, 2), Color(col, alpha))
+			if alpha > 0.0:
+				_cells.append([px, py, BANDS[band], alpha])
 	# a faint bright haze inside the bow, as in a real one
 	for py in range(-int(r * 0.6), 1, 2):
 		for px in range(-int(r * 0.8), int(r * 0.8) + 1, 2):
 			if Vector2(px, py).length() < r - 4 and (px + py) % 4 == 0:
-				_bow.draw_rect(Rect2(px * 2, py * 2, 2, 2), Color(1, 1, 0.95, 0.035 * strength))
+				_haze.append(Vector2(px * 2, py * 2))
+
+
+func _draw_bow() -> void:
+	# In cell units (2px). The bow is strongest in the thick of the spray and
+	# fades toward its feet and its crown; it breathes as the spray gusts.
+	if _cells_for != radius:
+		_lay_out_bow()
+	var strength := level * lerpf(0.55, 1.0, flow)
+	for cell: Array in _cells:
+		var px: int = cell[0]
+		var py: int = cell[1]
+		var col: Color = cell[2]
+		var alpha: float = cell[3]
+		alpha *= 0.75 + 0.25 * sin(_time * 1.3 + px * 0.21 - py * 0.1)
+		alpha *= strength
+		if alpha > 0.02:
+			_bow.draw_rect(Rect2(px * 2, py * 2, 2, 2), Color(col, alpha))
+	var haze := Color(1, 1, 0.95, 0.035 * strength)
+	for at: Vector2 in _haze:
+		_bow.draw_rect(Rect2(at, Vector2(2, 2)), haze)

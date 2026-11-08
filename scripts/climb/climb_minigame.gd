@@ -80,6 +80,11 @@ var _step := 0
 var _time := 0.0
 var _fade := 0.0
 var _start_minutes := 0
+## The route card's food to bring (see _recommended_food), -1 until worked out.
+var _food_to_bring := -1
+## Storm rain: drops a second (as 5 a frame was at 60 fps), and those owed.
+const RAIN_PER_SECOND := 300.0
+var _rain_due := 0.0
 var _kit := {}
 var _pose_mode := "wall"
 var _act_t := 1.0
@@ -224,8 +229,10 @@ func _process(delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	var is_press := false
+	# A stick past its deadzone sends a press with every motion event, so a
+	# held or wobbling stick counts once, as it crosses (MenuInput.pressed).
 	for a in ["move_up", "move_left", "move_right", "use_tool", "interact", "ui_cancel"]:
-		if event.is_action_pressed(a):
+		if MenuInput.pressed(event, a):
 			is_press = true
 	# Letting go is the move on a dyno, so its release gets through too.
 	if _phase == Phase.CRUX and _crux.get("holding", false) and not event.is_echo():
@@ -281,11 +288,11 @@ func _climb_input(event: InputEvent) -> void:
 		return
 	var before := Vector3i(state.col, state.row, state.pitch)
 	var dx := 99
-	if event.is_action_pressed("move_up"):
+	if MenuInput.pressed(event, "move_up"):
 		dx = 0
-	elif event.is_action_pressed("move_left"):
+	elif MenuInput.pressed(event, "move_left"):
 		dx = -1
-	elif event.is_action_pressed("move_right"):
+	elif MenuInput.pressed(event, "move_right"):
 		dx = 1
 	var assist := Input.is_action_pressed("assist")
 	if dx != 99:
@@ -562,7 +569,7 @@ func _crux_input(event: InputEvent) -> void:
 				if not state.is_pumped():
 					_start_crux()
 		"timing":
-			if event.is_action_pressed("use_tool") or event.is_action_pressed("interact") or event.is_action_pressed("move_up"):
+			if event.is_action_pressed("use_tool") or event.is_action_pressed("interact") or MenuInput.pressed(event, "move_up"):
 				var off := absf(_crux.pos - _crux.center)
 				var half: float = _crux.window / 2.0
 				if off <= half * 0.38:
@@ -574,7 +581,7 @@ func _crux_input(event: InputEvent) -> void:
 		"dyno":
 			var keys := ["use_tool", "interact", "move_up"]
 			if not _crux.holding:
-				if keys.any(func(k: String) -> bool: return event.is_action_pressed(k)):
+				if keys.any(func(k: String) -> bool: return MenuInput.pressed(event, k)):
 					_crux.holding = true
 			elif keys.any(func(k: String) -> bool: return event.is_action_released(k)):
 				var off := absf(float(_crux.charge) - float(_crux.center))
@@ -588,8 +595,8 @@ func _crux_input(event: InputEvent) -> void:
 				else:
 					_resolve_crux("slip")
 		"rhythm":
-			var left := event.is_action_pressed("move_left")
-			var right := event.is_action_pressed("move_right")
+			var left := MenuInput.pressed(event, "move_left")
+			var right := MenuInput.pressed(event, "move_right")
 			if left or right:
 				if left == _crux.left_next:
 					_crux.done += 1
@@ -600,7 +607,7 @@ func _crux_input(event: InputEvent) -> void:
 				else:
 					_crux.time_left -= 0.4
 		_:
-			if event.is_action_pressed("move_up"):
+			if MenuInput.pressed(event, "move_up"):
 				_crux.done += 1
 				_fx.dust(_torso() + Vector2(0, -14), _dust_color(), 2)
 				if _crux.done >= _crux.need:
@@ -779,7 +786,10 @@ func _draw_screen() -> void:
 
 ## About how much food energy this route wants, for the route card.
 func _recommended_food() -> int:
-	return ClimbProfiles.recommended_food(route)
+	# Once: it copies every pitch's spec, and the route card is drawn each frame.
+	if _food_to_bring < 0:
+		_food_to_bring = ClimbProfiles.recommended_food(route)
+	return _food_to_bring
 
 
 func _draw_clouds(height: float) -> void:
@@ -1196,7 +1206,10 @@ func _button(keyboard: String, gamepad: String) -> String:
 	return MenuInput.button(get_tree() if is_inside_tree() else null, keyboard, gamepad)
 
 
-func _hint() -> String:
+## The key hints under the toolbar. [param usable] is this frame's
+## [method _usable], whose "eat" it reuses: can_eat looks through and sorts
+## the pack's food each time, and this ran it twice a frame more at a belay.
+func _hint(usable: Dictionary) -> String:
 	if state.status != ClimbState.Status.CLIMBING:
 		return ""
 	if state.is_pumped():
@@ -1206,8 +1219,9 @@ func _hint() -> String:
 		parts.append("[%s] %s" % [_button("Space", "X"), "Clip the bolt" if state.bolt_kinds.get(state.row, "bolt") == "bolt" else "Clip the old piton"])
 	elif state.can_place_cam():
 		parts.append("[%s] Place a cam" % _button("Space", "X"))
-	if state.is_at_belay() and (not route.boulder or state.can_eat()):
-		if state.can_eat():
+	var eat: bool = usable.get("eat", false)
+	if state.is_at_belay() and (not route.boulder or eat):
+		if eat:
 			parts.append("[%s] Eat" % _button("E", "A"))
 	elif state.can_shake():
 		parts.append("[%s] Shake out" % _button("E", "A"))
@@ -1326,7 +1340,12 @@ func _weather(delta: float) -> void:
 		return
 	var wind := -90.0 if state.is_windy() else -50.0
 	if state.is_stormy():
-		for i in 5:
+		# So many drops a second, not a frame (it was 5 a frame): ClimbFx
+		# keeps 400 bits, which a fast screen filled with drops that vanished
+		# halfway down, taking the chalk and dust with them.
+		_rain_due += minf(delta, 0.1) * RAIN_PER_SECOND
+		while _rain_due >= 1.0:
+			_rain_due -= 1.0
 			_fx.spawn(Vector2(randf_range(0, SCREEN.x + 90), -4), Vector2(wind, 240), 1.2, Color(0.839, 0.945, 0.933, 0.85), 1, 0.0, true)
 		# The storm's own lightning: in the high country only once it has
 		# built, and a long way off on a rainy day in the Valley.
@@ -1372,8 +1391,9 @@ func _draw_hud(height: float) -> void:
 	ClimbHud.pump(_canvas, state, _time)
 	ClimbHud.boosts(_canvas, state)
 	if _phase == Phase.CLIMB or _phase == Phase.PAUSE:
-		var toolbar_end := ClimbHud.toolbar(_canvas, state, _time, _usable())
-		ClimbHud.hints(_canvas, _hint(), toolbar_end + 6.0)
+		var usable := _usable()
+		var toolbar_end := ClimbHud.toolbar(_canvas, state, _time, usable)
+		ClimbHud.hints(_canvas, _hint(usable), toolbar_end + 6.0)
 	if _phase == Phase.CLIMB:
 		ClimbHud.toast(_canvas, _toast_text, _toast_age)
 		ClimbHud.pitch_banner(_canvas, state, _banner_age)

@@ -99,10 +99,12 @@ func _physics_process(_delta: float) -> void:
 		clear_pose()
 
 	if input != Vector2.ZERO:
+		# By sign, not rounding: a stick tilted part way gives less than 0.5,
+		# which rounds to no facing at all.
 		if absf(input.x) > absf(input.y):
-			facing = Vector2i(signi(roundi(input.x)), 0)
+			facing = Vector2i.RIGHT if input.x > 0.0 else Vector2i.LEFT
 		else:
-			facing = Vector2i(0, signi(roundi(input.y)))
+			facing = Vector2i.DOWN if input.y > 0.0 else Vector2i.UP
 		interaction_area.position = Vector2(facing) * 24.0
 	_animate(_delta, input != Vector2.ZERO, running)
 
@@ -228,6 +230,8 @@ func save_data() -> Dictionary:
 func load_data(data: Dictionary) -> void:
 	position = Vector2(data.get("x", position.x), data.get("y", position.y))
 	facing = Vector2i(int(data.get("facing_x", 0)), int(data.get("facing_y", 1)))
+	if not CharacterSheet.ROWS.has(facing):
+		facing = Vector2i.DOWN # a save from when a part-tilted stick could leave no facing
 	interaction_area.position = Vector2(facing) * 24.0
 
 

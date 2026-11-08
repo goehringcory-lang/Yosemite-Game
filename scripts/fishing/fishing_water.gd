@@ -22,6 +22,9 @@ const ROCK_DARK := Color("47433e")
 const RING := Color(0.85, 0.95, 1.0, 0.5)
 ## How far past its oval a hole's ragged shore can reach, in pixels.
 const EDGE := 16.0
+## How far past [member size] the drawing can reach (a rock's surge and the
+## foam trailing below it), so it's drawn while any of that is in view.
+const VIEW_MARGIN := 64.0
 
 @export_enum("rapids", "hole") var kind := "hole"
 ## The water's extent from [member position], in pixels.
@@ -100,7 +103,20 @@ func _process(delta: float) -> void:
 		for ring: Array in _rings:
 			ring[1] += delta
 		_rings = _rings.filter(func(ring: Array) -> bool: return ring[1] < 2.4)
-	queue_redraw()
+	# Drawn again only while in view: rapids are hundreds of draw calls, and
+	# they ran every frame wherever you were in the region.
+	if _in_view():
+		queue_redraw()
+
+
+## True when the camera can see this stretch, or what's drawn past its edge.
+func _in_view() -> bool:
+	var camera := get_viewport().get_camera_2d()
+	if camera == null:
+		return true
+	var seen := get_viewport_rect().size / camera.zoom
+	var view := Rect2(camera.get_screen_center_position() - seen / 2.0, seen)
+	return view.intersects(Rect2(global_position, size).grow(VIEW_MARGIN))
 
 
 func _draw() -> void:
