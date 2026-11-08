@@ -256,7 +256,8 @@ func refresh() -> void:
 ## True if a call is on the radio and it's not too late to go.
 func call_waiting() -> bool:
 	refresh()
-	return offered != "" and GameClock.hour < LAST_CALL_HOUR
+	# by the minutes: after midnight the hour reads 0 or 1 again
+	return offered != "" and GameClock.minutes < LAST_CALL_HOUR * 60
 
 
 ## Starts [param id] as the call underway.
@@ -374,6 +375,11 @@ func climb_to_party(player: Player, start: ClimbStart) -> void:
 		player.can_act = true
 		return
 	var success := await start.climb(player, false)
+	# The climb's time passes as it ends, and if that's after nightfall the
+	# night team has gone up for them (the HUD says so): no one to lower.
+	if current != call.id:
+		player.can_act = true
+		return
 	if not success:
 		DialogueBox.say_to(player, [{"speaker": "", "text": "You didn't reach them. Catch your breath and try again: %s is still up there." % call.who}])
 		return
@@ -465,7 +471,9 @@ func _on_day_started() -> void:
 
 
 func _on_time_changed(hour: int, _minute: int) -> void:
-	if current != "" and hour >= NIGHTFALL:
+	# Past midnight the hour reads 0 or 1 again (the clock runs on until you
+	# sleep): that's after nightfall, not before it.
+	if current != "" and (hour >= NIGHTFALL or GameClock.minutes >= 24 * 60):
 		var tree := get_tree()
 		var hud := tree.get_first_node_in_group("hud") if tree else null
 		var text := _wrap_up()

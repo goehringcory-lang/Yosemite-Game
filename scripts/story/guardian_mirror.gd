@@ -109,8 +109,11 @@ static func walk_out_lines() -> Array[Dictionary]:
 
 ## Takes you home to the supper at your camp, in the evening.
 func walk_home() -> void:
-	if GameClock.hour < GuardianFeast.EVENING:
-		GameClock.advance_minutes((GuardianFeast.EVENING - GameClock.hour) * 60 - GameClock.minute)
+	# By the minutes, not the hour: after midnight the hour reads 0 or 1, and
+	# "wait for the evening" ran the clock on into the 2 AM curfew.
+	var evening := GuardianFeast.EVENING * 60
+	if GameClock.minutes < evening:
+		GameClock.advance_minutes(evening - GameClock.minutes)
 	get_tree().call_group("world", "go_to_region", Park.HOME_REGION, Park.HOME_SPAWN, 0)
 	get_tree().call_group("hud", "show_message", GuardianFeast.HINT)
 
