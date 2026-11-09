@@ -1,8 +1,8 @@
 class_name TitleScreen
 extends Control
 ## The first screen: the game's name over a painted view of the Valley, and
-## Continue and Load game (when there is a save), New Game, Settings,
-## Credits and Quit. Up/Down choose, E (A) or Enter selects. Continue carries
+## Continue and Load game (when there is a save), New Game (by way of the
+## character screen, CharacterCreator), Settings, Credits and Quit. Up/Down choose, E (A) or Enter selects. Continue carries
 ## on the game saved most recently; Load game and New Game open the pause
 ## menu's Saves page on its own, to pick one of the save slots; Settings opens
 ## its Settings page (with Controls inside); Credits opens the credits.
@@ -45,6 +45,8 @@ var _select_style: StyleBoxTexture
 var _plain_style: StyleBoxEmpty
 var _pause: PauseMenu
 var _credits: Credits
+## "Who's arriving?", between picking New Game and the game starting.
+var _creator: CharacterCreator
 ## The logo and tagline, which drop in when the screen opens.
 var _logo: Control
 var _intro: Tween
@@ -77,8 +79,12 @@ func _ready() -> void:
 	_play_intro()
 	_pause = PauseMenu.new()
 	_pause.closed.connect(_refresh)
-	_pause.slot_chosen.connect(func(_slot: int) -> void: _start())
+	_pause.slot_chosen.connect(_on_slot_chosen)
 	add_child(_pause)
+	_creator = CharacterCreator.new()
+	_creator.done.connect(_start)
+	_creator.cancelled.connect(_on_creator_cancelled)
+	add_child(_creator)
 	_credits = Credits.new()
 	_credits.closed.connect(_refresh)
 	add_child(_credits)
@@ -306,7 +312,7 @@ func _draw_shimmer() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_pressed() and not event.is_echo():
 		finish_intro() # the menu works at once; a key just hurries the opening
-	if _starting or _pause.is_open() or _credits.is_open():
+	if _starting or _pause.is_open() or _credits.is_open() or _creator.is_open():
 		return
 	var step := MenuInput.vertical(event)
 	if step != 0:
@@ -338,7 +344,7 @@ func select(option: int) -> void:
 				# the first game goes in slot 1 without asking
 				SaveManager.slot = 1
 				SaveManager.start_fresh()
-				_start()
+				_creator.open()
 			else:
 				_pause.open_slots(PauseMenu.SlotMode.NEW)
 		Option.SETTINGS:
@@ -352,6 +358,23 @@ func select(option: int) -> void:
 	_refresh()
 
 
+## A slot was picked on the Saves page: a game to load starts at once, and
+## a new one goes by way of the character screen.
+func _on_slot_chosen(_slot: int) -> void:
+	if _pause._slot_mode == PauseMenu.SlotMode.NEW:
+		_creator.open()
+		_refresh()
+	else:
+		_start()
+
+
+## Backing out of the character screen: no new game after all, so Continue
+## and Load game still find the saves that are there.
+func _on_creator_cancelled() -> void:
+	SaveManager.cancel_fresh()
+	_refresh()
+
+
 func _start() -> void:
 	_starting = true
 	var tween := create_tween()
@@ -361,7 +384,7 @@ func _start() -> void:
 
 
 func _refresh() -> void:
-	var covered := _pause.is_open() or _credits.is_open()
+	var covered := _pause.is_open() or _credits.is_open() or _creator.is_open()
 	_menu.visible = not covered
 	_hint.visible = not covered
 	_footer_band.visible = not covered

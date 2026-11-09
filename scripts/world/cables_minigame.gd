@@ -253,5 +253,5 @@ func _draw_slope(r: Rect2) -> void:
 				ci.draw_rect(Rect2(h + Vector2(-1, -8), Vector2(3, 2)), Color("e0ac7e"))
 	var you: Vector2 = at.call(float(board))
 	ci.draw_rect(Rect2(you + Vector2(-2, -8), Vector2(4, 7)), Color("1e1614"))
-	ci.draw_rect(Rect2(you + Vector2(-1, -7), Vector2(2, 3)), Color("6a8a4a"))
-	ci.draw_rect(Rect2(you + Vector2(-1, -10), Vector2(2, 2)), Color("f0c088"))
+	ci.draw_rect(Rect2(you + Vector2(-1, -7), Vector2(2, 3)), PlayerLook.tint("top", "6a8a4a"))
+	ci.draw_rect(Rect2(you + Vector2(-1, -10), Vector2(2, 2)), PlayerLook.tint("skin", "f0c088"))

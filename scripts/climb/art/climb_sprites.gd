@@ -31,12 +31,23 @@ const SIZE := Vector2i(56, 64)
 const ORIGIN := Vector2(28, 38)
 const BSIZE := Vector2i(48, 56)
 
-const SKIN := Color("d6bd88")
-const SKIN_LIT := Color("d6bd88")
-const SKIN_SHADE := Color("b0925f")
-const HAT := Color("7e531c")
-const SHIRT := Color("5c8f3c")
-const PANTS := Color("2d3050")
+## The climber's colors: the shipped look's unless you chose your own
+## (PlayerLook.climb_colors, taken up by _wear).
+const DEFAULT_COLORS := {
+	"skin": Color("d6bd88"), "skin_shade": Color("b0925f"), "hat": Color("7e531c"),
+	"shirt": Color("5c8f3c"), "pants": Color("2d3050"), "hair": Color("6b4829"), "hat_kind": "brim",
+}
+static var SKIN: Color = DEFAULT_COLORS.skin
+static var SKIN_LIT: Color = DEFAULT_COLORS.skin
+static var SKIN_SHADE: Color = DEFAULT_COLORS.skin_shade
+static var HAT: Color = DEFAULT_COLORS.hat
+static var SHIRT: Color = DEFAULT_COLORS.shirt
+static var PANTS: Color = DEFAULT_COLORS.pants
+static var HAIR: Color = DEFAULT_COLORS.hair
+## "brim" (a brimmed hat with a band), "dome" (a cap or beanie) or "none".
+static var HAT_KIND: String = DEFAULT_COLORS.hat_kind
+## The PlayerLook.version the colors above were taken from.
+static var _worn := -1
 const HARNESS := Color("d8a63b")
 ## A cam's size color, in rack order (CamSizes): #0.75 green, #1 red, #2 yellow, #3 blue.
 const CAM_COLORS := [Color("4f9a3a"), Color("c8382e"), Color("dcaa2c"), Color("2f6cc0")]
@@ -207,7 +218,32 @@ static func blend_pose(a: Dictionary, b: Dictionary, t: float) -> Dictionary:
 
 # ---------------------------------------------------------------- climber API
 
+## Takes up the look you chose, if it changed since the last climber was
+## painted: its colors, and no climber painted in the old ones.
+static func _wear() -> void:
+	if _worn == PlayerLook.version:
+		return
+	_worn = PlayerLook.version
+	var colors := DEFAULT_COLORS.duplicate()
+	colors.merge(PlayerLook.climb_colors(), true)
+	if colors.skin == SKIN and colors.skin_shade == SKIN_SHADE and colors.hat == HAT and colors.shirt == SHIRT \
+			and colors.pants == PANTS and colors.hair == HAIR and colors.hat_kind == HAT_KIND:
+		return
+	SKIN = colors.skin
+	SKIN_LIT = colors.skin
+	SKIN_SHADE = colors.skin_shade
+	HAT = colors.hat
+	SHIRT = colors.shirt
+	PANTS = colors.pants
+	HAIR = colors.hair
+	HAT_KIND = colors.hat_kind
+	for key: String in _climber_keys:
+		_cache.erase(key)
+	_climber_keys.clear()
+
+
 static func climber(pose: Dictionary, kit: Dictionary, flags := {}) -> Texture2D:
+	_wear()
 	var key := "c|%s|%s|%s" % [_pose_key(pose), _kit_key(kit), str(flags)]
 	if _cache.has(key):
 		return _cache[key]
@@ -588,7 +624,7 @@ static func _draw_axe(im: Image, hand: Vector2) -> void:
 
 ## The head, from behind: hair, ears and a broad-brimmed hat with a band.
 static func _head(im: Image, hx: int, hy: int, tilt: float) -> void:
-	var hair := Color("6b4829")
+	var hair := HAIR
 	# Neck.
 	P.rect(im, hx - 2, hy + 4, 4, 3, SKIN_SHADE)
 	P.px(im, hx - 2, hy + 4, SKIN)
@@ -602,6 +638,13 @@ static func _head(im: Image, hx: int, hy: int, tilt: float) -> void:
 	P.px(im, hx - 5, hy + 3, SKIN_SHADE)
 	P.px(im, hx + 4, hy + 2, SKIN_SHADE)
 	P.px(im, hx + 4, hy + 3, SKIN_SHADE.darkened(0.15))
+	if HAT_KIND == "none":
+		return
+	if HAT_KIND == "dome":
+		# a cap or beanie: the crown alone, pulled down over the hair
+		P.shaded_ellipse(im, hx, hy - 2, 4.8, 3.6, HAT, HAT.lightened(0.3), HAT.darkened(0.22))
+		P.hline(im, hx - 4, hy, 9, HAT.darkened(0.3))
+		return
 	# Hat: brim, crown, hatband, a bright highlight and a brim shadow on the hair.
 	P.ellipse(im, hx, hy - 2, 6.6, 2.3, HAT.darkened(0.2))
 	P.ellipse(im, hx - 0.5, hy - 3, 5.8, 1.8, HAT)
@@ -678,12 +721,17 @@ static func _paint_chimney(pose: Dictionary, kit: Dictionary, flags: Dictionary)
 	P.shaded_ellipse(im, hx + 1, hy, 4.8, 4.8, SKIN, SKIN_LIT, SKIN_SHADE)
 	P.rect(im, hx + 5, hy + 1, 1, 2, SKIN)
 	P.px(im, hx + 3, hy, Color("2a1b14"))
-	P.rect(im, hx - 3, hy - 2, 5, 7, Color("6b4829"))
-	P.rect(im, hx - 3, hy - 2, 2, 7, Color("92693d"))
-	P.ellipse(im, hx + 1, hy - 3, 6.8, 2.2, HAT.darkened(0.2))
-	P.ellipse(im, hx + 1, hy - 4, 6.0, 1.7, HAT)
-	P.shaded_ellipse(im, hx + 1, hy - 5, 3.6, 3.0, HAT, HAT.lightened(0.3), HAT.darkened(0.22))
-	P.hline(im, hx - 2, hy - 3, 7, Color("d8a63b"))
+	P.rect(im, hx - 3, hy - 2, 5, 7, HAIR)
+	P.rect(im, hx - 3, hy - 2, 2, 7, Color("92693d") if HAIR == DEFAULT_COLORS.hair else HAIR.lightened(0.2))
+	if HAT_KIND == "brim":
+		P.ellipse(im, hx + 1, hy - 3, 6.8, 2.2, HAT.darkened(0.2))
+		P.ellipse(im, hx + 1, hy - 4, 6.0, 1.7, HAT)
+		P.shaded_ellipse(im, hx + 1, hy - 5, 3.6, 3.0, HAT, HAT.lightened(0.3), HAT.darkened(0.22))
+		P.hline(im, hx - 2, hy - 3, 7, Color("d8a63b"))
+	elif HAT_KIND == "dome":
+		P.shaded_ellipse(im, hx + 1, hy - 3, 4.8, 3.4, HAT, HAT.lightened(0.3), HAT.darkened(0.22))
+	else:
+		P.shaded_ellipse(im, hx + 1, hy - 3, 4.6, 2.6, HAIR, HAIR.lightened(0.22), HAIR.darkened(0.22))
 	_outline(im)
 	if int(pose.get("side", -1)) > 0:
 		im.flip_x()

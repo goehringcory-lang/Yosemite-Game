@@ -42,6 +42,7 @@ var _asleep := false
 
 func _ready() -> void:
 	add_to_group("persist")
+	apply_look()
 	add_child(Footfall.new())
 	add_child(fishing)
 	add_child(SmoothMotion.new())
@@ -221,6 +222,15 @@ func _interact() -> void:
 	var target := get_target()
 	if target:
 		target.interact(self)
+
+
+## Puts on the look you chose (PlayerLook): on arriving, and again whenever
+## it changes.
+func apply_look() -> void:
+	var frame := sprite.frame
+	sprite.texture = PlayerLook.sheet()
+	sprite.hframes = CharacterSheet.columns(sprite.texture)
+	sprite.frame = mini(frame, sprite.hframes * sprite.vframes - 1)
 
 
 func save_data() -> Dictionary:

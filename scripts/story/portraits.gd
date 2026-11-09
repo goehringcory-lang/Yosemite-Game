@@ -43,6 +43,9 @@ static var _sheets: Dictionary = {}
 static func for_speaker(speaker: String, mood := "neutral") -> Texture2D:
 	if speaker == "":
 		return null
+	# you, in the look you chose
+	if speaker == "You" or (speaker == PlayerLook.player_name and not _is_cast(speaker)):
+		return PlayerLook.face(mood)
 	if _names.is_empty():
 		_index(CHARACTER_DIR)
 		for extra: String in EXTRA:
@@ -70,6 +73,16 @@ static func for_speaker(speaker: String, mood := "neutral") -> Texture2D:
 			face.region = Rect2(index * side, 0, side, side)
 			_cache[key] = face
 	return _cache[key]
+
+
+## True if [param speaker] is someone in the cast (so a player who takes a
+## cast member's name doesn't take their face in a conversation).
+static func _is_cast(speaker: String) -> bool:
+	if _names.is_empty():
+		_index(CHARACTER_DIR)
+		for extra: String in EXTRA:
+			_names[extra] = EXTRA[extra]
+	return _names.has(speaker) and _names[speaker] != "player"
 
 
 ## The mood a line reads as, from its words: surprised if it opens with "Oh!"
