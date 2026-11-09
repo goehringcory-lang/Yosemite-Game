@@ -187,6 +187,36 @@ func test_screen_details() -> void:
 	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
 	press(game, "interact")
 	check(game._crux.kind == "dyno" and not game._crux.holding, "eating brings the dyno back")
+	# Hold to tap (Settings): a crux of quick taps answers to one long press.
+	Settings.ensure_loaded()
+	game.state.pending = {"kind": "mash", "name": "The offwidth", "need": 6, "row": 3, "cell": Vector2i(2, 3)}
+	game._start_crux()
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	Input.action_press("move_up")
+	game._update_crux(1.0)
+	check(game._crux.kind == "mash" and game._crux.done == 0, "holding Up does nothing with Hold to tap off")
+	Settings.hold_taps = true
+	game._update_crux(0.25)
+	check(game._crux.done == 1, "with it on, the held key taps by itself")
+	Input.action_release("move_up")
+	game._crux.done = 0
+	game._crux.hold = 0.0
+	game.hold_crux(0.5, true)
+	check(game._crux.done == 2, "with it on, holding Up taps four times a second")
+	game.hold_crux(0.2, false)
+	game.hold_crux(0.2, true)
+	check(game._crux.done == 2, "letting go starts the count again")
+	game.hold_crux(1.0, true)
+	check(game._phase == ClimbMinigame.Phase.CLIMB, "...and a long hold finishes the crux")
+	game.state.pending = {"kind": "rhythm", "name": "The layback", "row": 3, "cell": Vector2i(2, 3)}
+	game._start_crux()
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	var before_left: float = game._crux.time_left
+	press(game, "move_right")
+	check(game._crux.done == 1 and is_equal_approx(game._crux.time_left, before_left), "with it on, the wrong side still counts on a left-right crux")
+	game.hold_crux(2.0, true)
+	check(game._phase == ClimbMinigame.Phase.CLIMB, "...and holding a side finishes it")
+	Settings.hold_taps = false
 	game.state.pending = {}
 	game._phase = ClimbMinigame.Phase.CLIMB
 	game._crux = {}

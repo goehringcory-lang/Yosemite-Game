@@ -42,14 +42,16 @@ const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again 
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
 const TITLE_CONFIRM := "To the title? Progress since your last save is lost. Press again."
 const TITLE_SAVED := "To the title? Your game is saved. Press again."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, FONT, GRAPHICS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Font", "Graphics", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, TIMING, HOLD_TAPS, FONT, GRAPHICS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Activity timing", "Hold to tap", "Font", "Graphics", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill covers the whole screen. Pixel perfect keeps every pixel the same size, with a border where the screen isn't a whole multiple of 960 x 540.",
 	"The window's size, in whole steps of 960 x 540.",
 	"Which buttons hints name. Auto follows the last device you used.",
 	"The first day's card under the clock, naming the next thing to try.",
+	"How much room climbing cruxes, casting, reeling, the cables, trail work and the slackline give you. Relaxed and Gentle slow them down and widen the green.",
+	"On a climbing crux that wants quick taps, hold the key instead.",
 	"Smooth letters are easiest to read; pixel letters match the art.",
 	"Low uses a simpler renderer for older computers. A change takes effect when you next start the game.",
 	"How loud the whole game is.",
@@ -75,6 +77,8 @@ const PANEL_POS := Vector2(30, 16)
 const PANEL_SIZE := Vector2(420, 238)
 ## The shortest the panel gets when it fits a short page.
 const PANEL_MIN_HEIGHT := 150.0
+## Settings rows on screen at once. The list scrolls with the cursor past that.
+const SETTINGS_SHOWN := 13
 ## The width of the card beside the pause menu's choices.
 const CARD_WIDTH := 132.0
 const NAME_WIDTH := 96
@@ -93,6 +97,8 @@ var _card_date: Label
 var _help_title: Label
 var _card_stats: Label
 var _setting_names: Array[Label] = []
+var _settings_top := 0
+var _more_label: Label
 ## Volume setting -> its slider bar.
 var _sliders: Dictionary = {}
 var _setting_values: Array[Label] = []
@@ -290,7 +296,8 @@ func _build_settings() -> Control:
 	var both := HBoxContainer.new()
 	both.add_theme_constant_override("separation", 8)
 	var page := VBoxContainer.new()
-	# Rows sit close so all eleven settings and the hint line fit.
+	# Rows sit close so thirteen settings and the hint line fit; the rest
+	# scroll into view with the cursor (see _scroll_settings).
 	page.add_theme_constant_override("separation", 0)
 	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	both.add_child(page)
@@ -330,6 +337,8 @@ func _build_settings() -> Control:
 	_sample_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_sample_label.custom_minimum_size.x = CARD_WIDTH - 14
 	column.add_child(_sample_label)
+	_more_label = _label("", DIM)
+	column.add_child(_more_label)
 	both.add_child(card)
 	return both
 
@@ -504,6 +513,27 @@ func _fit_panel() -> void:
 	_panel.custom_minimum_size = _panel.size
 	_panel.position = Vector2(PANEL_POS.x, roundf((UiScale.SCREEN.y - height) / 2.0))
 	_panel.pivot_offset = _panel.size / 2.0
+
+
+## Shows the SETTINGS_SHOWN rows around the cursor, and says in the card
+## when there are more above or below.
+func _scroll_settings() -> void:
+	var last := maxi(_setting_names.size() - SETTINGS_SHOWN, 0)
+	_settings_top = clampi(clampi(_settings_top, _settings_cursor - SETTINGS_SHOWN + 1, _settings_cursor), 0, last)
+	for i in _setting_names.size():
+		_setting_names[i].get_parent().visible = i >= _settings_top and i < _settings_top + SETTINGS_SHOWN
+	var more: Array[String] = []
+	if _settings_top > 0:
+		more.append("above")
+	if _settings_top < last:
+		more.append("below")
+	_more_label.text = "More %s." % " and ".join(more) if not more.is_empty() else ""
+	_more_label.visible = not more.is_empty()
+
+
+## The settings rows on screen now: the first, and how many.
+func settings_shown() -> Vector2i:
+	return Vector2i(_settings_top, mini(SETTINGS_SHOWN, _setting_names.size()))
 
 
 ## The page showing now (Page.MAIN, SETTINGS or CONTROLS).
@@ -845,6 +875,10 @@ func change_setting(which: int, step: int) -> void:
 			Settings.prompts = wrapi(Settings.prompts + step, 0, Settings.Prompts.size()) as Settings.Prompts
 		Setting.TIPS:
 			Settings.tips = not Settings.tips
+		Setting.TIMING:
+			Settings.timing = wrapi(Settings.timing + step, 0, Settings.Timing.size()) as Settings.Timing
+		Setting.HOLD_TAPS:
+			Settings.hold_taps = not Settings.hold_taps
 		Setting.MASTER_VOLUME:
 			Settings.master_volume = clampi(Settings.master_volume + step, 0, Settings.MAX_VOLUME)
 		Setting.MUSIC_VOLUME:
@@ -901,6 +935,7 @@ func _refresh() -> void:
 		if _sliders.has(i):
 			_sliders[i].queue_redraw()
 		_setting_values[i].modulate = DIM if i == Setting.WINDOW_SIZE and Settings.fullscreen else Color.WHITE
+	_scroll_settings()
 	_help_label.text = SETTING_HELP[_settings_cursor]
 	_help_title.text = SETTING_NAMES[_settings_cursor]
 	if _settings_only and _settings_cursor == Setting.BACK:
@@ -1005,6 +1040,10 @@ func _setting_value(which: int) -> String:
 			value = Settings.PROMPT_NAMES[Settings.prompts]
 		Setting.TIPS:
 			value = "On" if Settings.tips else "Off"
+		Setting.TIMING:
+			value = Settings.TIMING_NAMES[Settings.timing]
+		Setting.HOLD_TAPS:
+			value = "On" if Settings.hold_taps else "Off"
 		Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME:
 			value = _volume_text(_volume(which))
 		_:

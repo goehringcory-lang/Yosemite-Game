@@ -154,9 +154,10 @@ func start(caught_fish: Dictionary, seed := -1, tied_fly := {}) -> void:
 	Sound.play("slack_twang", -8.0, 0.1)
 
 
-## The green's width with the fly tied on.
+## The green's width with the fly tied on, wider under the Timing assist
+## (Settings).
 func window() -> float:
-	return WINDOW + float(fly.get("window", 0.0))
+	return (WINDOW + float(fly.get("window", 0.0))) * Settings.room()
 
 
 ## Points for the two casts so far (0 to 4).
@@ -235,7 +236,7 @@ func _begin_cast(which: Phase) -> void:
 
 func _sweep(delta: float) -> void:
 	var speed := BACK_SPEED if phase == Phase.BACK_CAST else FORWARD_SPEED
-	meter_pos += meter_dir * speed * delta
+	meter_pos += meter_dir * speed * Settings.pace() * delta
 	if meter_pos >= 1.0 or meter_pos <= 0.0:
 		meter_pos = clampf(meter_pos, 0.0, 1.0)
 		meter_dir = -meter_dir
@@ -302,7 +303,8 @@ func _move_fish(delta: float) -> void:
 			if band <= 0.01:
 				step = absf(step) + 0.2
 		_target = clampf(fish_at + step, 0.05, 0.95)
-	fish_at = move_toward(fish_at, _target, (0.25 + 0.9 * fight) * delta)
+	# the Timing assist (Settings) tires the fish: it swims slower
+	fish_at = move_toward(fish_at, _target, (0.25 + 0.9 * fight) * Settings.pace() * delta)
 
 
 func _process(delta: float) -> void:

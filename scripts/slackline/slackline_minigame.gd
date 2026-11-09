@@ -291,7 +291,8 @@ func _walk(delta: float) -> void:
 	# right at the edge, time slows so there's a moment to save it
 	var target := EDGE_SLOWMO if absf(state.lean) > SlacklineState.EDGE else 1.0
 	_slowmo = move_toward(_slowmo, target, delta * 4.0)
-	var dt := delta * _slowmo
+	# the Timing assist (Settings) slows the whole walk, sway and all
+	var dt := delta * _slowmo * Settings.pace()
 	var before := state.progress
 	state.step(dt, _push)
 	_ghost = lerpf(_ghost, state.lean, minf(1.0, delta * 6.0))

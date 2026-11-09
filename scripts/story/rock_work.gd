@@ -83,10 +83,15 @@ func start(seed := -1) -> void:
 	Sound.play("climb_move", -6.0, 0.1)
 
 
+## The green's width now: WINDOW, wider under the Timing assist (Settings).
+func window() -> float:
+	return WINDOW * Settings.room()
+
+
 ## What a stop at [param pos] is: "perfect", "good" or "miss".
 func judge(pos: float) -> String:
 	var off := absf(pos - meter_center)
-	var half := WINDOW / 2.0
+	var half := window() / 2.0
 	if off <= half * PERFECT_SHARE:
 		return "perfect"
 	return "good" if off <= half else "miss"
@@ -112,7 +117,7 @@ func step(delta: float) -> void:
 	if _grace > 0.0:
 		_grace -= delta
 	else:
-		meter_pos += meter_dir * float(STOPS[stop].speed) * delta
+		meter_pos += meter_dir * float(STOPS[stop].speed) * Settings.pace() * delta
 		if meter_pos >= 1.0 or meter_pos <= 0.0:
 			meter_pos = clampf(meter_pos, 0.0, 1.0)
 			meter_dir = -meter_dir
@@ -133,7 +138,7 @@ func _begin_stop() -> void:
 	meter_pos = 0.0
 	meter_dir = 1.0
 	meter_passes = 0
-	var half := WINDOW / 2.0
+	var half := window() / 2.0
 	meter_center = _rng.randf_range(0.2 + half, 0.8 - half)
 
 
@@ -190,9 +195,9 @@ func _draw() -> void:
 		var bar := Rect2(CARD_RECT.position.x + 44, CARD_RECT.position.y + 30, CARD_RECT.size.x - 58, 12)
 		ci.draw_rect(bar.grow(1), ClimbUI.WOOD_DARK)
 		ci.draw_rect(bar, Color("5e4a38"))
-		var good := Rect2(bar.position.x + bar.size.x * (meter_center - WINDOW / 2.0), bar.position.y, bar.size.x * WINDOW, bar.size.y)
+		var good := Rect2(bar.position.x + bar.size.x * (meter_center - window() / 2.0), bar.position.y, bar.size.x * window(), bar.size.y)
 		ci.draw_rect(good, ClimbUI.GOOD_DARK)
-		var perfect_w := WINDOW * PERFECT_SHARE
+		var perfect_w := window() * PERFECT_SHARE
 		var perfect := Rect2(bar.position.x + bar.size.x * (meter_center - perfect_w / 2.0), bar.position.y, bar.size.x * perfect_w, bar.size.y)
 		ci.draw_rect(perfect, ClimbUI.GOOD)
 		var mx := bar.position.x + bar.size.x * meter_pos
