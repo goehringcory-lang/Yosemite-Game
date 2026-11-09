@@ -36,8 +36,8 @@ const CONTROLS := [
 	["Climb: eat, chalk up, retreat", "E / Esc", "A / B"],
 	["Climb: aid or jug", "Shift + arrow", "Y + stick"],
 ]
-enum Option { RESUME, SAVE, SETTINGS, CONTROLS, QUIT_TITLE, QUIT }
-const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Quit to title", "Quit to desktop"]
+enum Option { RESUME, SAVE, SETTINGS, CONTROLS, LOOK, QUIT_TITLE, QUIT }
+const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Your look", "Quit to title", "Quit to desktop"]
 const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again to quit."
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
 const TITLE_CONFIRM := "To the title? Progress since your last save is lost. Press again."
@@ -90,6 +90,9 @@ var _page := Page.MAIN
 var _option_labels: Array[Label] = []
 var _goal_label: Label
 var _card_date: Label
+var _card_face: TextureRect
+## The character screen, opened from "Your look" (in a game only).
+var _creator: CharacterCreator
 var _help_title: Label
 var _card_stats: Label
 var _setting_names: Array[Label] = []
@@ -248,6 +251,7 @@ func _build_card() -> Control:
 	frame.add_theme_stylebox_override("panel", frame_style)
 	frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var face := TextureRect.new()
+	_card_face = face
 	face.texture = Portraits.for_speaker("You")
 	face.custom_minimum_size = Vector2(48, 48)
 	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -544,6 +548,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				open()
 		return
 	get_viewport().set_input_as_handled()
+	if _creator and _creator.is_open():
+		return
 	if _listening >= 0:
 		_listen_input(event)
 		return
@@ -610,6 +616,8 @@ func _main_input(event: InputEvent) -> void:
 			Option.CONTROLS:
 				_controls_from_settings = false
 				_show_page(Page.CONTROLS)
+			Option.LOOK:
+				open_look()
 			Option.QUIT_TITLE:
 				if _confirm_quit:
 					quit_to_title()
@@ -622,6 +630,27 @@ func _main_input(event: InputEvent) -> void:
 				else:
 					_confirm_quit = true
 					_refresh()
+
+
+## Opens the character screen on the look you have, over the menu. Done
+## puts the new look on (in the world, on the card here and everywhere your
+## face shows); Esc leaves you as you were.
+func open_look() -> void:
+	if _creator == null:
+		_creator = CharacterCreator.new()
+		_creator.done.connect(_on_look_closed)
+		_creator.cancelled.connect(_on_look_closed)
+		add_child(_creator)
+	_panel.visible = false
+	_creator.open(true)
+
+
+func _on_look_closed() -> void:
+	var player := _player()
+	if player:
+		player.apply_look()
+	_panel.visible = _open
+	_refresh()
 
 
 ## Leaves the game for the title screen: the screen fades to black, every
@@ -893,7 +922,10 @@ func _refresh() -> void:
 			text = TITLE_SAVED if _just_saved else TITLE_CONFIRM
 		_set_choice(_option_labels[i], text, i == _cursor)
 	_goal_label.text = HUD.objective_text() if HUD.objective_text() != "" else "Explore, and talk to people around the valley."
+	_card_face.texture = Portraits.for_speaker("You")
 	_card_date.text = "%s, Year %d" % [GameClock.get_date_string(), GameClock.year]
+	if PlayerLook.player_name != "":
+		_card_date.text = PlayerLook.player_name + "\n" + _card_date.text
 	_card_stats.text = "\n".join(card_text())
 	for i in _setting_names.size():
 		_set_choice(_setting_names[i], SETTING_NAMES[i], i == _settings_cursor)
@@ -952,6 +984,8 @@ func _refresh_slots() -> void:
 			if str(info.place) != "":
 				parts.append(str(info.place))
 			parts.append(str(info.time))
+			if str(info.get("name", "")) != "":
+				parts.insert(0, str(info.name))
 			if int(info.saved_at) > 0:
 				parts.append("saved " + _when(int(info.saved_at)))
 			detail = " · ".join(parts)

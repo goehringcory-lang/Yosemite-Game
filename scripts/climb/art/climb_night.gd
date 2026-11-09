@@ -38,7 +38,7 @@ static func draw(ci: CanvasItem, info: Dictionary, state: ClimbState, route: Rou
 		ci.draw_texture(UI.icon_texture("haul_bag"), Vector2(cx - 76 + sway, cy + 56))
 	# Two people, eating by headlamp, facing each other across the stove.
 	var partner := ClimbProfiles.belayer_look(route)
-	var me := ClimbSprites.belayer(PLAYER_LOOK, "sit", 0)
+	var me := ClimbSprites.belayer(PlayerLook.belayer_look(PLAYER_LOOK), "sit", 0)
 	var they := ClimbSprites.belayer(partner, "sit", int(time * 1.2) % 2)
 	var y0 := cy - 41.0
 	var x_me := cx - 58.0

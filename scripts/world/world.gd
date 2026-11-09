@@ -135,6 +135,7 @@ func _ready() -> void:
 		if forage:
 			forage.respawn()
 	Achievements.settle()
+	player.apply_look() # the look saved with the game just loaded, if any
 	hud.bind_player(player)
 	Sound.set_ambience("world")
 	add_child(Journal.new())

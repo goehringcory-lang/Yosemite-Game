@@ -295,7 +295,8 @@ func close() -> void:
 
 
 func _show(speaker: String, text: String, options: Array, mood := "neutral") -> void:
-	_name_label.text = speaker
+	# your own lines carry the name you gave
+	_name_label.text = PlayerLook.display_name() if speaker == "You" else speaker
 	_name_label.visible = speaker != ""
 	var face := Portraits.for_speaker(speaker, mood)
 	_portrait.texture = face

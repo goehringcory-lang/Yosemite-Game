@@ -111,6 +111,7 @@ func slot_info(n: int) -> Dictionary:
 		"date": "%s %d (%s), Year %d" % [GameClock.SEASON_NAMES[season], day, GameClock.WEEKDAY_NAMES[(day - 1) % 7], maxi(int(clock.get("year", 1)), 1)],
 		"time": "%d:%02d %s" % [h12, minutes % 60, "AM" if hour < 12 else "PM"],
 		"place": str(summary.get("place", "")),
+		"name": str(summary.get("name", "")),
 		"saved_at": int(summary.get("saved_at", 0)),
 	}
 
@@ -126,6 +127,11 @@ func start_fresh() -> void:
 	_fresh = true
 
 
+## Takes start_fresh() back (New Game was backed out of before it began).
+func cancel_fresh() -> void:
+	_fresh = false
+
+
 ## Returns false if the file couldn't be written.
 func save_game() -> bool:
 	var nodes := _pending.duplicate()
@@ -135,6 +141,7 @@ func save_game() -> bool:
 		"version": SAVE_VERSION,
 		"clock": GameClock.save_data(),
 		"inventory": Inventory.save_data(),
+		"player": PlayerLook.save_data(),
 		"nodes": nodes,
 		"summary": _summary(),
 	}
@@ -171,6 +178,8 @@ func load_game() -> bool:
 		return false
 	GameClock.load_data(data.get("clock", {}))
 	Inventory.load_data(data.get("inventory", {}))
+	# a game saved before you could choose a look loads as the look it had
+	PlayerLook.load_data(data.get("player", {}) if typeof(data.get("player")) == TYPE_DICTIONARY else {})
 	var nodes: Dictionary = data.get("nodes", {})
 	_pending = nodes.duplicate()
 	for node in get_tree().get_nodes_in_group("persist"):
@@ -209,7 +218,7 @@ func clear_pending() -> void:
 
 ## A little about the game for the save menus, so they needn't load it.
 func _summary() -> Dictionary:
-	var summary := {"saved_at": int(Time.get_unix_time_from_system())}
+	var summary := {"saved_at": int(Time.get_unix_time_from_system()), "name": PlayerLook.player_name}
 	var world := get_tree().get_first_node_in_group("world")
 	if world and world.has_method("location_name"):
 		summary["place"] = world.location_name()
