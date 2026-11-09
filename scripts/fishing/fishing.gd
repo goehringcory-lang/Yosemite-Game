@@ -381,4 +381,5 @@ func land(fish: Dictionary) -> String:
 		text += " " + fish.release
 	get_tree().call_group("hud", "show_message", text)
 	Sound.play("item_get" if first else "pickup", -2.0, 0.1)
+	Rumble.play("landed")
 	return text

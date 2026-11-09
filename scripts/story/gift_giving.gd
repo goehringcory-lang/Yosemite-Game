@@ -39,6 +39,7 @@ static func offer(player: Player, character_id: String, speaker: String, anchor:
 				if thanks != "":
 					Hearts.pop(anchor)
 					Sound.play("heart", 0.0, 0.0)
+					Rumble.play("heart")
 					var lines := [{"speaker": speaker, "text": thanks}]
 					if Friendship.hearts(character_id) > before:
 						var more := "%s likes you a little more (%d of %d hearts)." % [speaker, Friendship.hearts(character_id), Friendship.MAX_HEARTS]
