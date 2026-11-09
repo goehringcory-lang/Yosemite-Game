@@ -122,6 +122,8 @@ const CRUX_SPEED_PER_GRADE := 0.12
 const CRUX_SPEED_PER_ROUTE_GRADE := 0.06
 ## ...but never so fast that it crosses the green in less than this.
 const CRUX_MIN_GREEN_SECONDS := 0.1
+## The widest the Timing assist (Settings) makes the green, so it stays on the bar.
+const ASSIST_MAX_WINDOW := 0.6
 ## Each miss on a crux makes the next try a little easier: a wider green and
 ## a slower marker, up to CRUX_MERCY_TRIES misses.
 const CRUX_MERCY_WINDOW := 0.03
@@ -695,7 +697,8 @@ func crux_window() -> float:
 		window -= WET_WINDOW
 	if is_windy():
 		window -= WIND_WINDOW
-	return clampf(window, 0.1, 0.5)
+	# the Timing assist (Settings) widens whatever the climb came to
+	return minf(clampf(window, 0.1, 0.5) * Settings.room(), ASSIST_MAX_WINDOW)
 
 
 ## How fast the crux meter's marker moves, in bar lengths a second: faster on
@@ -705,7 +708,7 @@ func crux_speed() -> float:
 	var speed := CRUX_SPEED + CRUX_SPEED_PER_GRADE * int(spec.get("diff", 2)) \
 		+ CRUX_SPEED_PER_ROUTE_GRADE * int(route.pitches.max())
 	speed *= pow(CRUX_MERCY_SLOWDOWN, _crux_mercy())
-	return minf(speed, crux_window() / CRUX_MIN_GREEN_SECONDS)
+	return minf(speed, crux_window() / CRUX_MIN_GREEN_SECONDS) * Settings.pace()
 
 
 ## Seconds a "rhythm" or "mash" crux gives you: less on a harder pitch, more
@@ -715,7 +718,7 @@ func crux_seconds(kind: String) -> float:
 	seconds -= CRUX_SECONDS_PER_GRADE * int(spec.get("diff", 2))
 	if kind == "rhythm" and has_shoes:
 		seconds += 2.0
-	return seconds + 0.5 * _crux_mercy()
+	return (seconds + 0.5 * _crux_mercy()) * Settings.room()
 
 
 func _crux_mercy() -> int:

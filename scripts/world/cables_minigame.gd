@@ -98,7 +98,7 @@ func start(how_busy: String, seed := -1) -> void:
 
 
 func window() -> float:
-	return float(CROWDS[crowd].window)
+	return float(CROWDS[crowd].window) * Settings.room()
 
 
 ## What a stop at [param pos] is: "perfect", "good" or "miss".
@@ -125,7 +125,7 @@ func step(delta: float) -> void:
 		if _grace > 0.0:
 			_grace -= delta
 		else:
-			meter_pos += meter_dir * float(CROWDS[crowd].speed) * delta
+			meter_pos += meter_dir * float(CROWDS[crowd].speed) * Settings.pace() * delta
 			if meter_pos >= 1.0 or meter_pos <= 0.0:
 				meter_pos = clampf(meter_pos, 0.0, 1.0)
 				meter_dir = -meter_dir

@@ -12,12 +12,23 @@ extends RefCounted
 enum TextSpeed { SLOW, NORMAL, FAST, INSTANT }
 enum Prompts { AUTO, KEYBOARD, GAMEPAD }
 enum Graphics { HIGH, LOW, AUTO }
+## How much room the timed activities give you (see [method pace] and
+## [method room]).
+enum Timing { STANDARD, RELAXED, GENTLE }
 
 const DEFAULT_PATH := "user://settings.cfg"
 const TEXT_SPEED_NAMES := ["Slow", "Normal", "Fast", "Instant"]
 ## Letters a second the dialogue box reveals at each speed (0: all at once).
 const TEXT_SPEED_CPS := [30.0, 60.0, 120.0, 0.0]
 const PROMPT_NAMES := ["Auto", "Keyboard", "Gamepad"]
+const TIMING_NAMES := ["Standard", "Relaxed", "Gentle"]
+## At each Timing: how fast the meters' markers, the fish and the slackline
+## move (1 is as designed), and how much wider the greens and longer the
+## time limits are.
+const TIMING_PACE := [1.0, 0.75, 0.55]
+const TIMING_ROOM := [1.0, 1.3, 1.6]
+## Taps a second a held key counts for when [member hold_taps] is on.
+const HOLD_TAPS_PER_SECOND := 4.0
 const GRAPHICS_NAMES := ["High", "Low", "Auto"]
 ## The Full screen row's choices: a window, full screen filled, or full
 ## screen in whole-pixel steps (see [member pixel_perfect]).
@@ -54,6 +65,13 @@ static var window_scale := 2
 static var prompts := Prompts.AUTO
 ## The first day's tips (FirstDay): the card naming the next thing to try.
 static var tips := true
+## Assist: how forgiving the timed activities are. It slows the markers on
+## the climbing, casting, cables and trail-work meters, the fish on the line
+## and the slackline, and widens their greens and time limits.
+static var timing := Timing.STANDARD
+## Assist: on a crux that wants quick taps (and the left-right ones), holding
+## the key counts as tapping it.
+static var hold_taps := false
 ## Volume of everything, of one-shot sounds (steps, climbing, menus), and of
 ## the ambience (birds, wind, rain, campfires, waterfalls); 0 to MAX_VOLUME.
 static var master_volume := 8
@@ -178,6 +196,8 @@ static func load_settings() -> void:
 	window_scale = clampi(int(config.get_value("display", "window_scale", window_scale)), MIN_SCALE, MAX_SCALE)
 	prompts = clampi(int(config.get_value("input", "prompts", prompts)), 0, Prompts.size() - 1) as Prompts
 	tips = bool(config.get_value("input", "tips", tips))
+	timing = clampi(int(config.get_value("assist", "timing", timing)), 0, Timing.size() - 1) as Timing
+	hold_taps = bool(config.get_value("assist", "hold_taps", hold_taps))
 	master_volume = clampi(int(config.get_value("audio", "master", master_volume)), 0, MAX_VOLUME)
 	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
 	music_volume = clampi(int(config.get_value("audio", "music", music_volume)), 0, MAX_VOLUME)
@@ -207,6 +227,8 @@ static func save() -> Error:
 	config.set_value("display", "window_scale", window_scale)
 	config.set_value("input", "prompts", int(prompts))
 	config.set_value("input", "tips", tips)
+	config.set_value("assist", "timing", int(timing))
+	config.set_value("assist", "hold_taps", hold_taps)
 	config.set_value("audio", "master", master_volume)
 	config.set_value("audio", "effects", effects_volume)
 	config.set_value("audio", "music", music_volume)
@@ -283,6 +305,8 @@ static func reset_defaults() -> void:
 	window_scale = 2
 	prompts = Prompts.AUTO
 	tips = true
+	timing = Timing.STANDARD
+	hold_taps = false
 	master_volume = 8
 	effects_volume = MAX_VOLUME
 	music_volume = 8
@@ -293,6 +317,20 @@ static func reset_defaults() -> void:
 	keys.clear()
 	apply_keys()
 	_customized = false
+
+
+## How fast the timed activities run under the Timing assist: 1 as designed,
+## less when it's relaxed. Meters multiply their marker's speed by it.
+static func pace() -> float:
+	ensure_loaded()
+	return TIMING_PACE[timing]
+
+
+## How much wider the greens and longer the time limits are under the Timing
+## assist: 1 as designed, more when it's relaxed.
+static func room() -> float:
+	ensure_loaded()
+	return TIMING_ROOM[timing]
 
 
 ## Letters a second for the dialogue reveal, or 0 to show a page at once.

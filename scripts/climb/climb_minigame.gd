@@ -554,6 +554,38 @@ func _update_crux(delta: float) -> void:
 			_crux.time_left -= delta
 			if _crux.time_left <= 0.0:
 				_resolve_crux("good" if _crux.done >= _crux.need * 0.6 else "slip")
+			elif Settings.hold_taps:
+				var held := Input.is_action_pressed("move_up") if _crux.kind == "mash" \
+						else Input.is_action_pressed("move_left") or Input.is_action_pressed("move_right")
+				hold_crux(delta, held)
+
+
+## The Hold to tap assist (Settings): while the crux's key is [param held], it
+## counts as a tap every 1 / Settings.HOLD_TAPS_PER_SECOND seconds, so a crux
+## of quick taps or of left and right can be done with one long press.
+func hold_crux(delta: float, held: bool) -> void:
+	if not _crux.get("kind", "") in ["mash", "rhythm"]:
+		return
+	if not held:
+		_crux["hold"] = 0.0
+		return
+	_crux["hold"] = float(_crux.get("hold", 0.0)) + delta
+	while _crux.get("kind", "") in ["mash", "rhythm"] and float(_crux.hold) >= 1.0 / Settings.HOLD_TAPS_PER_SECOND:
+		_crux.hold -= 1.0 / Settings.HOLD_TAPS_PER_SECOND
+		_crux_tap()
+
+
+## One tap on a "mash" or "rhythm" crux: fills a cell, and the last one
+## finishes the move (perfect with time to spare).
+func _crux_tap() -> void:
+	_crux.done += 1
+	if _crux.kind == "rhythm":
+		_fx.dust(_torso() + Vector2(-8 if _crux.left_next else 8, 4), _dust_color(), 2)
+		_crux.left_next = not _crux.left_next
+	else:
+		_fx.dust(_torso() + Vector2(0, -14), _dust_color(), 2)
+	if _crux.done >= _crux.need:
+		_resolve_crux("perfect" if _crux.time_left > _crux.time_total * 0.4 else "good")
 
 
 func _crux_input(event: InputEvent) -> void:
@@ -598,20 +630,14 @@ func _crux_input(event: InputEvent) -> void:
 			var left := MenuInput.pressed(event, "move_left")
 			var right := MenuInput.pressed(event, "move_right")
 			if left or right:
-				if left == _crux.left_next:
-					_crux.done += 1
-					_crux.left_next = not _crux.left_next
-					_fx.dust(_torso() + Vector2(-8 if left else 8, 4), _dust_color(), 2)
-					if _crux.done >= _crux.need:
-						_resolve_crux("perfect" if _crux.time_left > _crux.time_total * 0.4 else "good")
+				# With Hold to tap on, either side keeps the rhythm.
+				if left == _crux.left_next or Settings.hold_taps:
+					_crux_tap()
 				else:
 					_crux.time_left -= 0.4
 		_:
 			if MenuInput.pressed(event, "move_up"):
-				_crux.done += 1
-				_fx.dust(_torso() + Vector2(0, -14), _dust_color(), 2)
-				if _crux.done >= _crux.need:
-					_resolve_crux("perfect" if _crux.time_left > _crux.time_total * 0.4 else "good")
+				_crux_tap()
 
 
 func _resolve_crux(result: String) -> void:

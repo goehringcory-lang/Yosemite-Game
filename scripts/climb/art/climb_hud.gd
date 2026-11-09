@@ -273,7 +273,11 @@ static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, t
 			var tleft: float = data.time_left
 			ci.draw_rect(Rect2(bar.position.x, bar.end.y + 4, bar.size.x * clampf(tleft / float(data.time_total), 0.0, 1.0), 2), UI.GOLD)
 			var prompt := "Tap Up quickly!" if kind == "mash" else ("Left!" if left_next else "Right!")
-			if kind == "rhythm":
+			if Settings.hold_taps:
+				# the Hold to tap assist: one long press does it
+				prompt = "Hold Up!" if kind == "mash" else "Hold Left or Right!"
+				UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 58), prompt, UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+			elif kind == "rhythm":
 				var arrow := "<" if left_next else ">"
 				UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 58), "%s %s %s  (alternate Left and Right)" % [arrow, prompt, arrow], UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 			else:
