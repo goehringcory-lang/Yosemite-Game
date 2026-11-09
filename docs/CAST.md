@@ -9,9 +9,9 @@ This is the full cast of people the player meets, where they live in the park, a
 ## Art
 
 - Every person has a 48×96 walking sheet in `assets/sprites/npcs/<id>.png`, laid out like the player's: 16×24 frames, with columns stand / step A / step B and rows down / up / left / right.
-- The sheets are drawn in code by `tools/npcgen/npcgen.gd` from the looks in `tools/npcgen/looks.gd` (hair, hat, clothes, era props). To regenerate them:
+- The sheets are drawn in code by `tools/npcgen/npcgen.gd` from the looks in `tools/npcgen/looks.gd` (hair, hat, clothes, era props). The painting itself is `scripts/player/figure_painter.gd` (and `scripts/story/portrait_painter.gd` for portraits), which the game also runs for the player's own look (`PlayerLook`). The tool paints at 16px and `tools/art32` then makes the 32px sheets, so regenerate them with:
   ```bash
-  godot --headless --path . -s res://tools/npcgen/npcgen.gd
+  tools/art32/regen.sh res://tools/npcgen/npcgen.gd
   godot --headless --path . --import
   ```
   You can replace any PNG with hand-drawn art in the same layout.
