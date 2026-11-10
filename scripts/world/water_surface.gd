@@ -57,6 +57,18 @@ func _process(_delta: float) -> void:
 	if not visible:
 		return
 	_mat.set_shader_parameter("ground_origin", _ground.global_position)
+	# the season's grade on the ground, so the shader knows bare ground when
+	# it sees it (only what stands on the ground is mirrored)
+	var grade := _ground.material as ShaderMaterial
+	var season_tint: Variant = grade.get_shader_parameter("tint") if grade else null
+	var season_amount: Variant = grade.get_shader_parameter("tint_amount") if grade else null
+	var season_desat: Variant = grade.get_shader_parameter("desaturate") if grade else null
+	var snow: Variant = grade.get_shader_parameter("snow") if grade else null
+	var tint_c: Color = season_tint if season_tint is Color else Color.WHITE
+	_mat.set_shader_parameter("season_tint", Vector3(tint_c.r, tint_c.g, tint_c.b))
+	_mat.set_shader_parameter("season_amount", float(season_amount) if season_amount != null else 0.0)
+	_mat.set_shader_parameter("season_desaturate", float(season_desat) if season_desat != null else 0.0)
+	_mat.set_shader_parameter("snow", float(snow) if snow != null else 0.0)
 	var xf := get_viewport().get_canvas_transform()
 	var scale_k := xf.get_scale()
 	var size := get_viewport_rect().size / scale_k

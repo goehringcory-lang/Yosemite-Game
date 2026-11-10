@@ -37,6 +37,13 @@ uniform float glow : hint_range(0.0, 1.0) = 0.0;
 // How far below the bank the reflections reach, in art pixels.
 uniform float reach = 30.0;
 uniform float strength : hint_range(0.0, 1.0) = 0.78;
+// The season's grade on the painted ground (seasonal_ground.gdshader's tint,
+// tint_amount, desaturate and snow), so the bare ground on the screen can be
+// told from the things standing on it.
+uniform vec3 season_tint : source_color = vec3(1.0);
+uniform float season_amount : hint_range(0.0, 1.0) = 0.0;
+uniform float season_desaturate : hint_range(0.0, 1.0) = 0.0;
+uniform float snow : hint_range(0.0, 1.0) = 0.0;
 
 varying vec2 world_pos;
 
@@ -68,6 +75,31 @@ vec3 screen_at(vec2 wp) {
 
 vec3 untint(vec3 c) {
 	return clamp(c / max(tint, vec3(0.04)), 0.0, 1.0);
+}
+
+// The painted ground as the season leaves it (as in seasonal_ground, without
+// its frost and snow).
+vec3 graded(vec3 c) {
+	float lum = dot(c, vec3(0.299, 0.587, 0.114));
+	float grass = clamp((c.g - max(c.r, c.b)) * 10.0, 0.0, 1.0);
+	vec3 rgb = mix(c, season_tint * (0.35 + lum * 1.05), season_amount * (0.3 + 0.7 * grass));
+	return mix(rgb, vec3(dot(rgb, vec3(0.299, 0.587, 0.114))), season_desaturate);
+}
+
+// How much the screen at [wp] shows something standing there (a tree, a
+// boulder, a person, a cliff) and not the flat ground: 0 bare ground, 1 a
+// thing. Only things are mirrored. Flat banks don't show in real water, and
+// mirroring bright grass or sand washed the water pale. Off the painted
+// ground (the next area, a wall hung above the map) everything counts.
+float standing(vec2 wp, vec3 seen) {
+	vec4 g = ground_at(wp);
+	if (g.a < 0.5) return 1.0;
+	float away = distance(seen, graded(g.rgb));
+	if (snow > 0.0) {
+		// lying snow: white, or the blue of a drift's edge
+		away = min(away, min(distance(seen, vec3(0.95, 0.97, 1.0)), distance(seen, vec3(0.76, 0.83, 0.93))) + (1.0 - snow) * 0.1);
+	}
+	return smoothstep(0.1, 0.24, away);
 }
 
 void vertex() {
@@ -114,11 +146,11 @@ void fragment() {
 			float a = strength * fade * mix(0.55, 1.0, clear) * (row < 0.12 + d / reach * 0.25 ? 0.35 : 1.0);
 			// reflections are darker than what they mirror and take the water's colour
 			vec3 refl = mix(r * vec3(0.74, 0.8, 0.84), c, 0.16);
+			c = mix(c, refl, a * standing(src, r));
 			// a pale line of light where the water meets the bank
 			if (d < 1.5) {
-				refl = mix(refl, vec3(0.85, 0.95, 0.95), 0.25 * clear);
+				c = mix(c, vec3(0.85, 0.95, 0.95), 0.25 * clear * a);
 			}
-			c = mix(c, refl, a);
 		}
 		// sparkles of sun moving with the ripples
 		float glint = step(0.993 - glow * 0.014, hash(ap + vec2(floor(t * 2.0 + hash(ap) * 3.0), 0.0)));
@@ -136,4 +168,13 @@ void fragment() {
 		}
 		COLOR = vec4(c, 1.0);
 	}
+}
+
+
+// The colours read from the screen are already lit: the lamps, the fires and
+// the sun have had their say on the ground and on everything mirrored. Left
+// to the default, each light in reach would be added a second time and wash
+// the water pale (the day/night tint still applies).
+void light() {
+	LIGHT = vec4(0.0);
 }
