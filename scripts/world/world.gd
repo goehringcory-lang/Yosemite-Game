@@ -141,6 +141,7 @@ func _ready() -> void:
 	add_child(Journal.new())
 	add_child(PauseMenu.new())
 	add_child(LookAway.new())
+	add_child(ProblemReport.new())
 	_update_location()
 
 

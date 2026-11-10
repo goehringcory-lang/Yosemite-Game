@@ -22,8 +22,8 @@ enum Page { MAIN, SETTINGS, CONTROLS, SLOTS }
 ## What the Saves page is for.
 enum SlotMode { SAVE, LOAD, NEW }
 
-enum Option { RESUME, SAVE, SETTINGS, CONTROLS, LOOK, QUIT_TITLE, QUIT }
-const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Your look", "Quit to title", "Quit to desktop"]
+enum Option { RESUME, SAVE, SETTINGS, CONTROLS, LOOK, REPORT, QUIT_TITLE, QUIT }
+const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Your look", "Report a problem", "Quit to title", "Quit to desktop"]
 const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again to quit."
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
 const TITLE_CONFIRM := "To the title? Progress since your last save is lost. Press again."
@@ -637,6 +637,10 @@ func _main_input(event: InputEvent) -> void:
 				_show_page(Page.CONTROLS)
 			Option.LOOK:
 				open_look()
+			Option.REPORT:
+				var report := get_tree().get_first_node_in_group("problem_report") as ProblemReport
+				if report:
+					report.open()
 			Option.QUIT_TITLE:
 				if _confirm_quit:
 					quit_to_title()

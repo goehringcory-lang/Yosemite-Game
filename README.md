@@ -35,6 +35,7 @@ godot project.godot         # opens the editor; press F5 to play
 | Climbing: aid a hard move, or jug a fixed rope | Shift + arrow | Y + stick |
 | Slackline: lean back (hold the side away from the tip) / trick / step off | Left / Right / E / Esc | Stick left / right / A / B |
 | Binoculars: look about / zoom / step back | Arrows (Shift faster) or drag with the mouse / E or mouse wheel / Esc | Stick / A / B |
+| Report a problem (writes a report file to send) | F8, or the pause menu | Start, then Report a problem |
 | *Debug:* skip 1 hour / sleep now / unlock and go to Glacier Point | F2 / F3 / F4 | |
 
 A prompt above the player's head shows what the interact button will do (a drawn E key, then "Read: Camp 4"), and it switches to the pad's buttons when you use a gamepad. Every menu's hint line (pause menu, journal, conversations, maps, title, credits, the day's page) follows the same switch. Keys are drawn as little pixel buttons rather than names in brackets: cream keycaps for the keyboard (arrow keys as arrows), and for a pad the colored A, B, X and Y discs, shoulder pills and a D-pad with the arms in use lit (`scripts/ui/button_hints.gd`).
@@ -54,6 +55,8 @@ The code is `scripts/ui/title_screen.gd`, `scripts/ui/credits.gd` and `scripts/u
 **Assist options.** Every activity is a timing test, so Settings has two ways to make them easier, for anyone who finds them too quick or can't tap fast. **Activity timing** is Standard, Relaxed or Gentle. Relaxed and Gentle slow the moving marker to 75% and 55% of its speed (`Settings.pace()`) and make the green 1.3 and 1.6 times as wide (`Settings.room()`): the climbing cruxes (which also get that much more time on the ones with a time limit), both casts and the fish you follow on the reel, the Half Dome cables, the trail crew's rock bar, and the slackline, which sways and walks slower. **Hold to tap** is for the climbing cruxes that want quick taps (Up, or Left and Right in turn): hold the key and it taps four times a second, either side counts, and the card says "Hold Up!". Nothing else changes: the rewards, perfects and stories are the same at every setting. Both are saved under `[assist]` in `settings.cfg`, and `tools/shots/assist_shot.tscn` photographs the settings and a crux at Standard and Gentle.
 
 **Rumble, and pausing when you look away.** A controller rumbles on the moments you'd feel: a fall, a crux stuck perfectly or slipped, a piece clipped, the top, a fish taking the fly and coming to hand, a gust or a bucking line on the slackline, a heart won with a gift, and a quest done. Each is short and soft (`Rumble.CUES` in `scripts/ui/rumble.gd`: weak motor, strong motor, seconds), it only goes to the gamepad you last pressed something on, never while you're on the keyboard, and **Vibration** in Settings turns it off. Switch to another window and the game pauses (`LookAway`, `scripts/ui/look_away.gd`): out walking that opens the pause menu, and in the middle of anything else (a climb, a conversation, the slackline) the whole game holds still under a "Paused" card until you press a key or a button back at the window. **Pause when away** turns that off. Both are saved under `[input]` in `settings.cfg`.
+
+**Report a problem.** For playtesters: press **F8** anywhere in a game, or pick **Report a problem** in the pause menu (the way in on a controller). The game holds still under a card, you type what happened (or nothing) and press Enter, and it writes one zip to the `reports` folder beside the saves, then names the file and can open the folder. Nothing is sent anywhere; the tester mails or uploads the file. The zip holds `screenshot.png` (the game as it was when you pressed the key, without the card or the pause menu), `report.txt` (the note; the area, spot, date and time; the save slot, the main goal and the quests under way; the system, processor, graphics card and renderer; the controller; and the settings), `save.json` (the slot's saved game) and `godot.log` (the session's log, where script errors show). `ProblemReport` in `scripts/ui/problem_report.gd`; World adds one. `tools/shots/report_shot.tscn` photographs the card.
 
 Controls are set in **Project > Project Settings > Input Map**.
 
@@ -883,6 +886,7 @@ godot --headless --path . res://tests/cooking_test.tscn   # the new forage, the 
 godot --headless --path . res://tests/settings_test.tscn
 godot --headless --path . res://tests/assist_test.tscn
 godot --headless --path . res://tests/look_away_test.tscn   # controller rumble, pausing when the window loses focus
+godot --headless --path . res://tests/problem_report_test.tscn   # F8: the card, and the report file
 godot --headless --path . res://tests/side_quests_test.tscn   # seasonal and time-of-day side stories
 godot --headless --path . res://tests/half_dome_test.tscn     # the first night out, the cables, the summit
 godot --headless --path . res://tests/title_test.tscn
