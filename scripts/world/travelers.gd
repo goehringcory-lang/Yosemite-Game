@@ -23,7 +23,9 @@ extends Node
 
 const WALKS_PATH := "res://data/park/walks.json"
 const CHARACTER_DIR := "res://data/characters/visitors/%s.tres"
-const SCENE := preload("res://scenes/world/traveler.tscn")
+## Loaded at spawn, not preloaded: traveler.gd uses Travelers, so a preload
+## here is a load cycle ("Parse Error: Busy").
+const SCENE_PATH := "res://scenes/world/traveler.tscn"
 ## Their walking pace (pixels a second): steady, a little slower than
 ## NPC.TRAVEL_SPEED, since they have all day. With the clock at its usual
 ## pace (GameClock: 10 minutes every 7 seconds) that's this many pixels a
@@ -436,7 +438,7 @@ func _keep(id: String, shown: Dictionary, now: float) -> void:
 	var gone: Array = _gone.get(id, [])
 	if not gone.is_empty() and is_same(gone[0], day) and gone[1] == segment.n:
 		return
-	node = SCENE.instantiate()
+	node = (load(SCENE_PATH) as PackedScene).instantiate()
 	node.name = "Traveler_" + id
 	node.character = load(CHARACTER_DIR % id)
 	node.plan_id = id
