@@ -3,7 +3,7 @@ extends Node
 ## player would (a bot presses the keys' actions through the screen's own
 ## handlers, resolves crux checks and nights), and checks it tops out, draws
 ## every phase without errors, and reports once.
-## Run: godot --headless --path . res://tests/climb_screen_test.tscn
+## Run (it needs a window): xvfb-run -a godot --path . res://tests/climb_screen_test.tscn
 
 var failures := 0
 

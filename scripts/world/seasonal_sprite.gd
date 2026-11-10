@@ -7,12 +7,18 @@ extends Sprite2D
 @export var winter_texture: Texture2D
 
 var _summer_texture: Texture2D
+var _season := -1
 
 
 func _ready() -> void:
 	_summer_texture = texture
-	GameClock.day_started.connect(_update.unbind(3))
-	_update()
+
+
+## Watches the season itself (a loaded game changes it with no new day).
+func _process(_delta: float) -> void:
+	if GameClock.season != _season:
+		_season = GameClock.season
+		_update()
 
 
 func _update() -> void:

@@ -73,6 +73,10 @@ func _ready() -> void:
 	add_to_group("first_day")
 	GameClock.day_started.connect(_on_day_started.unbind(3))
 	Cooking.cooked.connect(func(_meal: String) -> void: mark("cook"))
+	# a recipe cooked at the fire is supper too, not only the pot
+	Recipes.made.connect(func(recipe: RecipeData) -> void:
+		if recipe.station == "campfire":
+			mark("cook"))
 	_build.call_deferred()
 
 

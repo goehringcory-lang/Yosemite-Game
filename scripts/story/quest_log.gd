@@ -695,6 +695,11 @@ func talk_to(character_id: String, speaker_name := "", places := PackedStringArr
 		changed.emit()
 		return lines
 
+	# With nothing of the story to say, a waiting heart scene comes before
+	# "come back in winter" and Clark's talk of the book, or it would never play.
+	if lines.is_empty() and HeartScenes.ready_for(character_id) > 0:
+		return lines
+
 	# A quest that's ready but for the season: say when to come back.
 	var seasonal: QuestData = waiting_for_season(character_id) if lines.is_empty() else null
 	# After the last page, Clark talks about the book you wrote, not the job.

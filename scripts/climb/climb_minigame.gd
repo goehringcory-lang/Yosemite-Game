@@ -23,7 +23,6 @@ signal finished(success: bool, minutes: int)
 
 const L := preload("res://scripts/climb/art/climb_layout.gd")
 const UI := preload("res://scripts/climb/art/climb_ui.gd")
-const P := preload("res://scripts/climb/art/climb_paint.gd")
 
 enum Phase { INTRO, CLIMB, CRUX, NIGHT, PAUSE, RESULT }
 
@@ -99,7 +98,6 @@ var _speech_text := ""
 var _speech_age := 99.0
 var _stamina_flash := 0.0
 var _shake := 0.0
-var _confirm_retreat := false
 var _crux := {}
 var _crux_grace := 0.0
 var _crux_result := ""
@@ -115,7 +113,6 @@ var _falcon_wait := 0.0
 var _falcon_t := -1.0
 var _falcon_from := Vector2.ZERO
 var _won_line := ""
-var _swing_x := 0.0
 var _seed := -1
 ## True while a roof pitch is showing: the picture runs sideways.
 var _roof := false

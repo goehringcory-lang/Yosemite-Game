@@ -24,6 +24,7 @@ static func reset() -> void:
 	Stewardship.start_new_game()
 	Achievements.start_new_game()
 	Camp.start_new_game()
+	Crow.paper_day = ""
 
 
 ## Everything, the clock and the larder too: for the pause menu's Quit to

@@ -22,20 +22,6 @@ enum Page { MAIN, SETTINGS, CONTROLS, SLOTS }
 ## What the Saves page is for.
 enum SlotMode { SAVE, LOAD, NEW }
 
-const CONTROLS := [
-	["Walk (hold to run)", "WASD or arrows (Shift)", "Stick or D-pad (B or RT)"],
-	["Talk, read, use", "E, Space, X, C, or click", "A or X"],
-	["Give a gift", "G", "LB"],
-	["Park and area map", "M (Tab: tabs)", "Back (LB/RB: tabs)"],
-	["Journal, quests, backpack", "J, Q, B (Tab: tabs)", "Y (LB/RB: tabs)"],
-	["Pause, or go back", "Esc", "Start, or B"],
-	["Menus: choose, confirm", "Up/Down, E or Enter", "Stick or D-pad, A"],
-	["Dialogue: show all, next", "E (twice)", "A (twice)"],
-	["Climb: move up", "W / Up (A, D: diagonal)", "Stick up / left / right"],
-	["Climb: place a cam, clip a bolt", "Space or C", "X"],
-	["Climb: eat, chalk up, retreat", "E / Esc", "A / B"],
-	["Climb: aid or jug", "Shift + arrow", "Y + stick"],
-]
 enum Option { RESUME, SAVE, SETTINGS, CONTROLS, LOOK, QUIT_TITLE, QUIT }
 const OPTIONS := ["Resume", "Save game", "Settings", "Controls", "Your look", "Quit to title", "Quit to desktop"]
 const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again to quit."
@@ -668,6 +654,8 @@ func _main_input(event: InputEvent) -> void:
 func open_look() -> void:
 	if _creator == null:
 		_creator = CharacterCreator.new()
+		# a new look isn't in the save yet
+		_creator.done.connect(func() -> void: _just_saved = false)
 		_creator.done.connect(_on_look_closed)
 		_creator.cancelled.connect(_on_look_closed)
 		add_child(_creator)
@@ -974,7 +962,9 @@ func _refresh() -> void:
 		_help_label.text = "Back to the title screen."
 	_sample_label.visible = _settings_cursor == Setting.TEXT_SPEED
 	_refresh_controls()
-	_refresh_slots()
+	# reads each save from disk, so only for the page that shows them
+	if _page == Page.SLOTS:
+		_refresh_slots()
 	# Mark the column for the device in use, in words as well as color.
 	var gamepad := MenuInput.button(get_tree(), "k", "g") == "g"
 	for i in _device_headers.size():

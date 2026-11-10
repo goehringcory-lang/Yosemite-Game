@@ -31,7 +31,11 @@ func _ready() -> void:
 	QuestLog.quest_completed.connect(func(quest: QuestData) -> void: quests.append(quest.title))
 	Perks.unlocked.connect(func(perk: Dictionary) -> void: perks.append(str(perk.get("name", ""))))
 	Recipes.learned.connect(func(recipe: RecipeData) -> void: recipes.append(recipe.display_name))
-	Recipes.made.connect(func(_recipe: RecipeData) -> void: dishes += 1)
+	# dishes off the fire: a recipe cooked there, or whatever went in the pot
+	Recipes.made.connect(func(recipe: RecipeData) -> void:
+		if recipe.station == "campfire":
+			dishes += 1)
+	Cooking.cooked.connect(func(_meal: String) -> void: dishes += 1)
 	Friendship.heart_gained.connect(_on_heart)
 	Rescues.rescued.connect(func(call: Dictionary) -> void: rescues.append("%s (%s)" % [call.title, call.who]))
 	FieldLog.logged.connect(func(id: String) -> void: animals.append(str(FieldLog.get_animal(id).get("name", id))))

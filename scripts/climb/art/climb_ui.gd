@@ -13,7 +13,6 @@ const WOOD_LIGHT := Color("ad7a22")
 const WOOD_HI := Color("d8a63b")
 # The "paper" is the dark board of the game's panels, and "ink" is cream.
 const PAPER := Color("47301f")
-const PAPER_SHADE := Color("47301f")
 const PAPER_DARK := Color("2a1b14")
 const GILT := Color("b0925f")
 const INK := Color("e4ddcc")
@@ -26,7 +25,6 @@ const GOOD_DARK := Color("aecb62")
 const WARN := Color("d9772a")
 const WARN_DARK := Color("d9772a")
 const GOLD := Color("d8a63b")
-const SKY_BLUE := Color("3a86a8")
 
 static var _font: Font
 
@@ -58,25 +56,30 @@ static func _aligned(pos: Vector2, s: String, size: int, align: int) -> Vector2:
 
 
 ## Text with a dark drop shadow, for use over the wall and sky. A positive
-## [param width] clips it.
-static func text(ci: CanvasItem, pos: Vector2, s: String, color := CREAM, size := 10, width := -1.0, align := HORIZONTAL_ALIGNMENT_LEFT) -> void:
+## [param width] clips it. [param alpha] fades it (the item's own modulate
+## can't: that is for everything the item draws).
+static func text(ci: CanvasItem, pos: Vector2, s: String, color := CREAM, size := 10, width := -1.0, align := HORIZONTAL_ALIGNMENT_LEFT, alpha := 1.0) -> void:
 	var p := _aligned(pos, s, size, align).round()
 	var left := HORIZONTAL_ALIGNMENT_LEFT
-	ci.draw_string(font(), p + Vector2(0, 1), s, left, width, size, SHADOW)
-	ci.draw_string(font(), p + Vector2(1, 0), s, left, width, size, SHADOW)
-	ci.draw_string(font(), p + Vector2(1, 1), s, left, width, size, SHADOW)
-	ci.draw_string(font(), p, s, left, width, size, color)
+	var shadow := Color(SHADOW, SHADOW.a * alpha)
+	ci.draw_string(font(), p + Vector2(0, 1), s, left, width, size, shadow)
+	ci.draw_string(font(), p + Vector2(1, 0), s, left, width, size, shadow)
+	ci.draw_string(font(), p + Vector2(1, 1), s, left, width, size, shadow)
+	ci.draw_string(font(), p, s, left, width, size, Color(color, color.a * alpha))
 
 
 ## Text with a 1 px dark outline all round, for labels over busy rock.
-static func outlined(ci: CanvasItem, pos: Vector2, s: String, color := CREAM, size := 10, width := -1.0, align := HORIZONTAL_ALIGNMENT_LEFT) -> void:
+## [param alpha] fades it, as for [method text].
+static func outlined(ci: CanvasItem, pos: Vector2, s: String, color := CREAM, size := 10, width := -1.0, align := HORIZONTAL_ALIGNMENT_LEFT, alpha := 1.0) -> void:
 	var p := _aligned(pos, s, size, align).round()
 	var left := HORIZONTAL_ALIGNMENT_LEFT
+	# the eight copies overlap, so the outline fades faster to look even
+	var shadow := Color(SHADOW, SHADOW.a * alpha * alpha)
 	for dy in [-1, 0, 1]:
 		for dx in [-1, 0, 1]:
 			if dx != 0 or dy != 0:
-				ci.draw_string(font(), p + Vector2(dx, dy), s, left, width, size, SHADOW)
-	ci.draw_string(font(), p, s, left, width, size, color)
+				ci.draw_string(font(), p + Vector2(dx, dy), s, left, width, size, shadow)
+	ci.draw_string(font(), p, s, left, width, size, Color(color, color.a * alpha))
 
 
 ## Ink on parchment: no shadow.
@@ -104,19 +107,6 @@ static func keys_width(s: String, size := 10) -> float:
 ## page: E is A, Space is X, Esc is B, Shift is Y, and the arrows are the stick.
 static func button(ci: CanvasItem, keyboard: String, gamepad: String) -> String:
 	return MenuInput.button(ci.get_tree() if ci and ci.is_inside_tree() else null, keyboard, gamepad)
-
-
-static func wrapped(ci: CanvasItem, pos: Vector2, s: String, width: float, color := INK, size := 10, shadow := false, line_gap := 2) -> int:
-	var f := font()
-	var lines := wrap_lines(s, width, size)
-	var y := 0.0
-	for line in lines:
-		if shadow:
-			text(ci, pos + Vector2(0, y), line, color, size)
-		else:
-			ink(ci, pos + Vector2(0, y), line, color, size)
-		y += size + line_gap
-	return lines.size()
 
 
 static func wrap_lines(s: String, width: float, size := 10) -> PackedStringArray:

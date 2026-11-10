@@ -289,35 +289,10 @@ func _is_unblocked(cell: Vector2i) -> bool:
 	return get_world_2d().direct_space_state.intersect_point(query, 1).is_empty()
 
 
-func _has_flora(cell: Vector2i) -> bool:
-	return flora != null and flora.get_cell_source_id(cell) != -1
-
-
 func _touches_tile(cell: Vector2i, atlas_coords: Vector2i) -> bool:
 	for dy in range(-1, 2):
 		for dx in range(-1, 2):
 			if ground.get_cell_atlas_coords(cell + Vector2i(dx, dy)) == atlas_coords:
-				return true
-	return false
-
-
-func _touches_terrain(cell: Vector2i, types: Array) -> bool:
-	for dy in range(-1, 2):
-		for dx in range(-1, 2):
-			var n := cell + Vector2i(dx, dy)
-			if ground.get_cell_source_id(n) == SOURCE_TERRAIN and ground.get_cell_atlas_coords(n).y in types:
-				return true
-	return false
-
-
-func _touches_flora(cell: Vector2i, kind: int) -> bool:
-	if flora == null:
-		return false
-	var frame := Terrain.frame_coords(kind)
-	for dy in range(-1, 2):
-		for dx in range(-1, 2):
-			var n := cell + Vector2i(dx, dy)
-			if flora.get_cell_source_id(n) == SOURCE_FLORA and flora.get_cell_atlas_coords(n) == frame:
 				return true
 	return false
 

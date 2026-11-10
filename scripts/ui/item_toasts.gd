@@ -17,7 +17,6 @@ const GAP := 2.0
 ## Pixels the card slides in from the left.
 const SLIDE := 24.0
 const NAME_COLOR := Color(1, 0.831, 0.541)
-const COUNT_COLOR := Color(1, 0.831, 0.541)
 
 ## Each entry: {"key", "card", "count", "label", "time"}.
 var _cards: Array[Dictionary] = []

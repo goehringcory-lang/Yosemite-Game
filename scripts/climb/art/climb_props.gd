@@ -495,14 +495,3 @@ static func tripod(im: Image, x: int, y: int, c: Dictionary, dir := 1) -> void:
 	P.line(im, Vector2(x, y - 9), Vector2(x + 5 * dir, y - 14), _lit(Color("6a6a70"), c), 2)
 	P.px(im, x + 5 * dir, y - 15, _lit(Color("d6f1ee"), c))
 
-
-## A string of bright pennants hung between two points.
-static func bunting(im: Image, a: Vector2, b: Vector2, c: Dictionary) -> void:
-	var cols := [Color("b3362b"), Color("d8a63b"), Color("6f5aa6"), Color("84b04a")]
-	var n := int(absf(b.x - a.x) / 5.0)
-	for i in n + 1:
-		var t := float(i) / maxf(n, 1)
-		var px := lerpf(a.x, b.x, t)
-		var py := lerpf(a.y, b.y, t) + sin(t * PI) * 5.0
-		P.px(im, int(px), int(py), DARK)
-		P.rect(im, int(px), int(py) + 1, 2, 3, _lit(cols[i % 4], c))

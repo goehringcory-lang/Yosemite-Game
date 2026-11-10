@@ -147,7 +147,7 @@ static func build(profile: Dictionary, pal: Dictionary, seed_value: int, width :
 		images.append(P.make(width, SCREEN.y + 150 + PAD))
 	# A faint generic ridge in each layer so the horizon is never empty.
 	for l in 3:
-		_ridge(images[l], l, pal, rng, profile.get("alpine", false))
+		_ridge(images[l], l, pal, rng, profile.get("alpine", profile.get("weather", "") == "alpine"))
 	# The far Sierra crest goes in first and rides the farthest layer, so
 	# nearer landmarks stand in front of it.
 	var specs: Array[Dictionary] = []

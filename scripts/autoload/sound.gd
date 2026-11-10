@@ -278,11 +278,6 @@ func music_choice() -> String:
 	return ""
 
 
-## The piece playing now, or "" between pieces.
-func music_playing() -> String:
-	return _music_id if _music.playing else ""
-
-
 func _music_level() -> float:
 	var world := get_tree().get_first_node_in_group("world")
 	var region: Region = world.region if world else null
@@ -384,15 +379,21 @@ func _call_gap() -> float:
 ## A weighted pick from [param choices], not the one that just called if
 ## there's another.
 func _pick_call(choices: Dictionary) -> String:
+	# "another" has to be one that can call: a choice weighted 0 isn't one
+	var others := 0.0
+	for id: String in choices:
+		if id != _last_call:
+			others += float(choices[id])
+	var skip := _last_call if others > 0.0 else ""
 	var total := 0.0
 	for id: String in choices:
-		if id != _last_call or choices.size() == 1:
+		if id != skip:
 			total += float(choices[id])
 	if total <= 0.0:
 		return ""
 	var roll := randf() * total
 	for id: String in choices:
-		if id == _last_call and choices.size() > 1:
+		if id == skip:
 			continue
 		roll -= float(choices[id])
 		if roll < 0.0:

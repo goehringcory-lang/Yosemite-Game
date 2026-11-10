@@ -12,16 +12,6 @@ const POUNCE := 5
 ## How long the pounce lasts, at the end of a stalk.
 const POUNCE_TIME := 0.35
 
-var _state_was := ""
-var _in_state := 0.0
-
-
-func _process(delta: float) -> void:
-	if state != _state_was:
-		_state_was = state
-		_in_state = 0.0
-	_in_state += delta
-
 
 func _draw() -> void:
 	draw_shadow(22.0)

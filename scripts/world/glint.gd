@@ -34,11 +34,6 @@ func _process(delta: float) -> void:
 		queue_redraw()
 
 
-## True while it twinkles, for tests.
-func shining() -> bool:
-	return _age >= 0.0
-
-
 func _draw() -> void:
 	if _age < 0.0:
 		return

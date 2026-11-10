@@ -599,24 +599,6 @@ static func _chimney(im: Image, c: Dictionary, rng: RandomNumberGenerator, deco:
 	return {"edge": edge, "gap": Rect2i(left, 0, right - left, h)}
 
 
-static func _face_into(im: Image, c: Dictionary, rng: RandomNumberGenerator, r: Rect2i, base_tone: float, side: int) -> void:
-	var y := r.position.y
-	while y < r.end.y:
-		var bh := rng.randi_range(46, 120)
-		var t := base_tone + rng.randf_range(-0.4, 0.4)
-		im.fill_rect(Rect2i(r.position.x, y, r.size.x, mini(bh, r.end.y - y)), tone(c, t))
-		im.fill_rect(Rect2i(r.position.x, y, r.size.x, 1), c.seam)
-		im.fill_rect(Rect2i(r.position.x, y + 1, r.size.x, 1), tone(c, t + 0.9))
-		y += bh
-	for yy in range(r.position.y, r.end.y):
-		for xx in range(r.position.x, r.end.x):
-			if P.noise(xx, yy, 5) < 0.06:
-				var col := im.get_pixel(xx, yy)
-				im.set_pixel(xx, yy, col.lightened(0.15) if P.noise(xx, yy, 6) > 0.5 else col.darkened(0.2))
-
-
-# ---------------------------------------------------------------- glacier
-
 ## Snow and ice, lit like the rock: broad sastrugi and sun cups for snow,
 ## bubbled blue ice with white fractures, crevasses with snow bridges.
 static func _glacier(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: String, deco: Array, state: ClimbState) -> void:

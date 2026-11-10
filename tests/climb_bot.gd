@@ -209,12 +209,3 @@ func _solve(state: ClimbState, r: int, c: int, pump: int, runout: int, cams: int
 	_plan[memo] = out
 	return out
 
-
-## True if a piece could go in at ([param r], [param c]): a crack with a cam
-## left, or a fixed piece in reach with a draw left.
-func _protectable(state: ClimbState, r: int, c: int) -> bool:
-	if state.route.top_rope or r >= state.top_row:
-		return true
-	if state.cams_left > 0 and state.hold_at(r, c).get("crack", false):
-		return true
-	return state.quickdraws_left > 0 and state.bolts.has(r) and absi(int(state.bolts[r]) - c) <= 1

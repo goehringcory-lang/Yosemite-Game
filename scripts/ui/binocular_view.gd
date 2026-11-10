@@ -732,11 +732,8 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
 		get_viewport().set_input_as_handled()
 		close()
-	elif MenuInput.confirm(event):
-		get_viewport().set_input_as_handled()
-		if _ready_to_draw:
-			_set_zoom(0 if zoom_index > 0 else 1)
 	elif event is InputEventMouseButton:
+		# before confirm: a left click is also "use", and would zoom and never drag
 		var mb := event as InputEventMouseButton
 		if mb.pressed and mb.button_index == MOUSE_BUTTON_WHEEL_UP:
 			_set_zoom(zoom_index + 1)
@@ -750,8 +747,10 @@ func _input(event: InputEvent) -> void:
 		pan_x -= motion.x / zoom
 		tilt += motion.y / (LAYER_TILT[1] * zoom)
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("interact") or event.is_action_pressed("use_tool"):
+	elif MenuInput.confirm(event):
 		get_viewport().set_input_as_handled()
+		if _ready_to_draw:
+			_set_zoom(0 if zoom_index > 0 else 1)
 
 
 # ------------------------------------------------------------------ drawing

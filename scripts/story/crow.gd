@@ -141,10 +141,12 @@ func _puff(who: Node2D, at: Vector2) -> void:
 	smoke.position = at
 	smoke.z_index = 6
 	who.add_child(smoke)
-	get_tree().create_timer(6.0).timeout.connect(func() -> void:
+	# the tree, kept: Crow's camp may be out of it by the time the smoke clears
+	var tree := get_tree()
+	tree.create_timer(6.0).timeout.connect(func() -> void:
 		if is_instance_valid(smoke):
 			smoke.emitting = false
-			get_tree().create_timer(4.5).timeout.connect(smoke.queue_free))
+			tree.create_timer(4.5).timeout.connect(smoke.queue_free))
 
 
 ## [[text, mood?, speaker?], ...] as dialogue lines (Crow speaks by default).
