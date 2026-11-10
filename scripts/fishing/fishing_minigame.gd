@@ -207,6 +207,7 @@ func step(delta: float, holding: bool) -> Phase:
 					phase = Phase.REEL
 					line = minf(0.9, HOOK_SET[cast_points()] + float(fly.get("hook", 0.0)))
 					Sound.play("climb_clip", 0.0, 0.1)
+					Rumble.play("bite")
 				else:
 					_end("no_rise", false)
 			_show_label()

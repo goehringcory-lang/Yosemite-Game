@@ -140,6 +140,7 @@ func _ready() -> void:
 	Sound.set_ambience("world")
 	add_child(Journal.new())
 	add_child(PauseMenu.new())
+	add_child(LookAway.new())
 	_update_location()
 
 

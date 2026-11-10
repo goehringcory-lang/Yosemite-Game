@@ -53,6 +53,8 @@ The code is `scripts/ui/title_screen.gd`, `scripts/ui/credits.gd` and `scripts/u
 
 **Assist options.** Every activity is a timing test, so Settings has two ways to make them easier, for anyone who finds them too quick or can't tap fast. **Activity timing** is Standard, Relaxed or Gentle. Relaxed and Gentle slow the moving marker to 75% and 55% of its speed (`Settings.pace()`) and make the green 1.3 and 1.6 times as wide (`Settings.room()`): the climbing cruxes (which also get that much more time on the ones with a time limit), both casts and the fish you follow on the reel, the Half Dome cables, the trail crew's rock bar, and the slackline, which sways and walks slower. **Hold to tap** is for the climbing cruxes that want quick taps (Up, or Left and Right in turn): hold the key and it taps four times a second, either side counts, and the card says "Hold Up!". Nothing else changes: the rewards, perfects and stories are the same at every setting. Both are saved under `[assist]` in `settings.cfg`, and `tools/shots/assist_shot.tscn` photographs the settings and a crux at Standard and Gentle.
 
+**Rumble, and pausing when you look away.** A controller rumbles on the moments you'd feel: a fall, a crux stuck perfectly or slipped, a piece clipped, the top, a fish taking the fly and coming to hand, a gust or a bucking line on the slackline, a heart won with a gift, and a quest done. Each is short and soft (`Rumble.CUES` in `scripts/ui/rumble.gd`: weak motor, strong motor, seconds), it only goes to the gamepad you last pressed something on, never while you're on the keyboard, and **Vibration** in Settings turns it off. Switch to another window and the game pauses (`LookAway`, `scripts/ui/look_away.gd`): out walking that opens the pause menu, and in the middle of anything else (a climb, a conversation, the slackline) the whole game holds still under a "Paused" card until you press a key or a button back at the window. **Pause when away** turns that off. Both are saved under `[input]` in `settings.cfg`.
+
 Controls are set in **Project > Project Settings > Input Map**.
 
 **Water only where there is water.** The water's reflections (`WaterSurface`) read the whole screen, so they are drawn only over the parts of the view near painted water, and not at all when none is in view. `python3 tools/perf/water_cells.py` finds the water in each region's painted ground, in 32-pixel cells, and writes `data/park/water_cells.json`; run it again after repainting a ground (a ground missing from it is drawn over the whole view, as before).
@@ -880,6 +882,7 @@ godot --headless --path . res://tests/perks_test.tscn
 godot --headless --path . res://tests/cooking_test.tscn   # the new forage, the cooking pot, and meal effects on a climb
 godot --headless --path . res://tests/settings_test.tscn
 godot --headless --path . res://tests/assist_test.tscn
+godot --headless --path . res://tests/look_away_test.tscn   # controller rumble, pausing when the window loses focus
 godot --headless --path . res://tests/side_quests_test.tscn   # seasonal and time-of-day side stories
 godot --headless --path . res://tests/half_dome_test.tscn     # the first night out, the cables, the summit
 godot --headless --path . res://tests/title_test.tscn

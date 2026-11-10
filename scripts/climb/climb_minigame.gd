@@ -393,11 +393,13 @@ func _events() -> void:
 					_speak("start")
 			"clip":
 				Sound.play("climb_clip")
+				Rumble.play("clip")
 				_fx.sparks(_torso() + Vector2(8, -10), 8)
 				if randf() < 0.5:
 					_speak("clip")
 			"cam":
 				Sound.play("climb_cam")
+				Rumble.play("clip")
 				_fx.sparks(_torso() + Vector2(8, -6), 6)
 			"chalk":
 				Sound.play("climb_chalk")
@@ -421,6 +423,7 @@ func _events() -> void:
 					_speak("rest")
 			"fall":
 				Sound.play("climb_fall", 0.0, 0.03)
+				Rumble.play("fall")
 				_fell = true
 				_shake = 6.0
 				_speak("fall")
@@ -428,8 +431,11 @@ func _events() -> void:
 			"crux":
 				_crux_result = e.result
 				_crux_result_age = 0.0
+				if e.result == "slip":
+					Rumble.play("miss")
 				if e.result == "perfect":
 					Sound.play("climb_crux", 0.0, 0.0)
+					Rumble.play("crux")
 					_fx.sparks(_torso() + Vector2(0, -16), 16)
 					_speak("crux")
 			"aid", "jug":
@@ -441,6 +447,7 @@ func _events() -> void:
 				_phase = Phase.NIGHT
 			"topout":
 				Sound.play("climb_topout", 0.0, 0.0)
+				Rumble.play("top")
 				_fx.confetti(_torso() + Vector2(0, -20))
 				_pose_mode = "cheer"
 				_result_delay = 1.6

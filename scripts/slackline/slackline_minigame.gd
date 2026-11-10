@@ -314,9 +314,11 @@ func _on_event(e: Dictionary) -> void:
 			_quiver = 1.0
 			_shake = maxf(_shake, 0.6 + float(e.kick) * 0.4)
 			Sound.play("slack_twang", -4.0 + float(e.kick) * 3.0, 0.08)
+			Rumble.play("buck", 0.6 + float(e.kick) * 0.4)
 			_fx.dust(feet() + Vector2(0, 1), Color(0.839, 0.741, 0.533, 0.8), 3)
 		"gust":
 			Sound.play("slack_gust", -2.0)
+			Rumble.play("gust")
 			if _rng.randf() < 0.6:
 				_say("gust")
 		"wobble":
@@ -353,6 +355,7 @@ func _on_event(e: Dictionary) -> void:
 			_quiver = 1.0
 			_slowmo = 1.0
 			Sound.play("climb_fall", -2.0, 0.03)
+			Rumble.play("fall", 0.7)
 			for c in _crowd:
 				c.gasp = 1.0
 			_say("fell_late" if state.progress > 0.7 else "fell_early")
@@ -374,6 +377,7 @@ func _finish_walk() -> void:
 		walked = true
 	Perks.note("slackline_crossings")
 	Sound.play("climb_topout")
+	Rumble.play("top")
 	_fx.confetti(feet() + Vector2(0, -30), 50)
 	_cheer(2.5)
 	_say("prize" if prize_now else "walked")

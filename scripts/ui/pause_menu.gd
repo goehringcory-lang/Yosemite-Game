@@ -28,8 +28,8 @@ const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again 
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
 const TITLE_CONFIRM := "To the title? Progress since your last save is lost. Press again."
 const TITLE_SAVED := "To the title? Your game is saved. Press again."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, TIMING, HOLD_TAPS, FONT, GRAPHICS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Activity timing", "Hold to tap", "Font", "Graphics", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, TIMING, HOLD_TAPS, VIBRATION, PAUSE_AWAY, FONT, GRAPHICS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Activity timing", "Hold to tap", "Vibration", "Pause when away", "Font", "Graphics", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill covers the whole screen. Pixel perfect keeps every pixel the same size, with a border where the screen isn't a whole multiple of 960 x 540.",
@@ -38,6 +38,8 @@ const SETTING_HELP := [
 	"The first day's card under the clock, naming the next thing to try.",
 	"How much room climbing cruxes, casting, reeling, the cables, trail work and the slackline give you. Relaxed and Gentle slow them down and widen the green.",
 	"On a climbing crux that wants quick taps, hold the key instead.",
+	"A controller rumbles on a fall, a crux, a fish on the line, and a quest done.",
+	"The game pauses when you switch to another window.",
 	"Smooth letters are easiest to read; pixel letters match the art.",
 	"Low uses a simpler renderer for older computers. A change takes effect when you next start the game.",
 	"How loud the whole game is.",
@@ -450,6 +452,7 @@ func open() -> void:
 	_was_paused = GameClock.paused
 	GameClock.paused = true
 	_set_player_can_act(false)
+	Rumble.stop()
 
 
 ## Opens straight onto the Settings page; Back closes the menu.
@@ -896,6 +899,14 @@ func change_setting(which: int, step: int) -> void:
 			Settings.timing = wrapi(Settings.timing + step, 0, Settings.Timing.size()) as Settings.Timing
 		Setting.HOLD_TAPS:
 			Settings.hold_taps = not Settings.hold_taps
+		Setting.VIBRATION:
+			Settings.vibration = not Settings.vibration
+			if Settings.vibration:
+				Rumble.play("crux") # so you feel what you turned on
+			else:
+				Rumble.stop()
+		Setting.PAUSE_AWAY:
+			Settings.pause_away = not Settings.pause_away
 		Setting.MASTER_VOLUME:
 			Settings.master_volume = clampi(Settings.master_volume + step, 0, Settings.MAX_VOLUME)
 		Setting.MUSIC_VOLUME:
@@ -1068,6 +1079,10 @@ func _setting_value(which: int) -> String:
 			value = Settings.TIMING_NAMES[Settings.timing]
 		Setting.HOLD_TAPS:
 			value = "On" if Settings.hold_taps else "Off"
+		Setting.VIBRATION:
+			value = "On" if Settings.vibration else "Off"
+		Setting.PAUSE_AWAY:
+			value = "On" if Settings.pause_away else "Off"
 		Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME:
 			value = _volume_text(_volume(which))
 		_:

@@ -72,6 +72,10 @@ static var timing := Timing.STANDARD
 ## Assist: on a crux that wants quick taps (and the left-right ones), holding
 ## the key counts as tapping it.
 static var hold_taps := false
+## Controller rumble (see Rumble).
+static var vibration := true
+## Pause the game when its window isn't the one in front (see LookAway).
+static var pause_away := true
 ## Volume of everything, of one-shot sounds (steps, climbing, menus), and of
 ## the ambience (birds, wind, rain, campfires, waterfalls); 0 to MAX_VOLUME.
 static var master_volume := 8
@@ -198,6 +202,8 @@ static func load_settings() -> void:
 	tips = bool(config.get_value("input", "tips", tips))
 	timing = clampi(int(config.get_value("assist", "timing", timing)), 0, Timing.size() - 1) as Timing
 	hold_taps = bool(config.get_value("assist", "hold_taps", hold_taps))
+	vibration = bool(config.get_value("input", "vibration", vibration))
+	pause_away = bool(config.get_value("input", "pause_away", pause_away))
 	master_volume = clampi(int(config.get_value("audio", "master", master_volume)), 0, MAX_VOLUME)
 	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
 	music_volume = clampi(int(config.get_value("audio", "music", music_volume)), 0, MAX_VOLUME)
@@ -229,6 +235,8 @@ static func save() -> Error:
 	config.set_value("input", "tips", tips)
 	config.set_value("assist", "timing", int(timing))
 	config.set_value("assist", "hold_taps", hold_taps)
+	config.set_value("input", "vibration", vibration)
+	config.set_value("input", "pause_away", pause_away)
 	config.set_value("audio", "master", master_volume)
 	config.set_value("audio", "effects", effects_volume)
 	config.set_value("audio", "music", music_volume)
@@ -307,6 +315,8 @@ static func reset_defaults() -> void:
 	tips = true
 	timing = Timing.STANDARD
 	hold_taps = false
+	vibration = true
+	pause_away = true
 	master_volume = 8
 	effects_volume = MAX_VOLUME
 	music_volume = 8

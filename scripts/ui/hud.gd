@@ -285,6 +285,7 @@ func _process(_delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	var was_gamepad := _gamepad
+	Rumble.note(event)
 	if event is InputEventJoypadButton or (event is InputEventJoypadMotion and absf(event.axis_value) > 0.5):
 		_gamepad = true
 	elif event is InputEventKey or event is InputEventMouseButton:
@@ -387,6 +388,7 @@ func _update_prompt() -> void:
 ## A quest done: its chime, and warm motes rising round the player.
 func _on_quest_done(_quest: QuestData) -> void:
 	Sound.play("quest_done", 0.0, 0.0)
+	Rumble.play("quest")
 	if is_instance_valid(_player) and _player.is_inside_tree():
 		Sparkle.burst(_player.get_parent(), _player.global_position + Vector2(0, -16), Sparkle.GLOW)
 
