@@ -21,6 +21,8 @@ uniform float vignette : hint_range(0.0, 1.0) = 0.22;
 // grey rock from a grey dusk.
 uniform vec3 tint : source_color = vec3(1.0);
 uniform float golden : hint_range(0.0, 1.0) = 0.0;
+// How much the shade cools under a low, warm sun (0 leaves the old wash).
+uniform float low_sun : hint_range(0.0, 1.0) = 0.6;
 uniform float alpenglow : hint_range(0.0, 1.0) = 0.0;
 uniform vec3 alpen_color : source_color = vec3(1.0, 0.66, 0.58);
 uniform float night : hint_range(0.0, 1.0) = 0.0;
@@ -50,6 +52,16 @@ void fragment() {
 	// Golden hour: warmer and a little richer.
 	float gl = luma(g);
 	g = mix(g, mix(vec3(gl), g, 1.1) * vec3(1.05, 1.0, 0.94), golden * 0.4);
+
+	// Low sun: the day's tint lays its orange over everything alike, but the
+	// low sun only reaches what stands in its light. What it doesn't (the
+	// dark of the trees, asphalt, the long shadows) is lit by the blue sky
+	// overhead, so the darks give the orange back and lean cool, and the
+	// evening reads as warm light and cool shade, not as a pink wash.
+	float warmth = smoothstep(0.12, 0.45, (tint.r - tint.b) / max(tint.r, 0.05));
+	float shade = 1.0 - smoothstep(0.12, 0.5, base_lum);
+	vec3 sky_lit = base * tint_lum * vec3(0.88, 0.95, 1.16);
+	g = mix(g, mix(sky_lit, sky_lit * sky_lit * (3.0 - 2.0 * sky_lit), 0.18), warmth * shade * low_sun * (1.0 - lit));
 
 	// Alpenglow on pale, colourless things: granite, snow, pale sand.
 	float rock = smoothstep(0.4, 0.62, base_lum) * (1.0 - smoothstep(0.1, 0.24, base_sat));

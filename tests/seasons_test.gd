@@ -280,3 +280,11 @@ func test_rainbow_and_water() -> void:
 		if node is WaterSurface:
 			surface = node
 	check(surface != null and surface.visible, "the water's surface is drawn outdoors")
+	if surface:
+		var ground := WaterSurface._find_ground(world.region)
+		var grade := (ground.material as ShaderMaterial) if ground else null
+		var shader: ShaderMaterial = surface.material
+		check(grade != null and grade.get_shader_parameter("tint_amount") != null
+				and is_equal_approx(float(shader.get_shader_parameter("season_amount")), float(grade.get_shader_parameter("tint_amount"))),
+				"and it knows the season's grade on the ground, so it mirrors what stands on the bank and not the bank")
+		check(shader.shader.code.contains("void light()"), "and no lamp or sun is added to it a second time")
