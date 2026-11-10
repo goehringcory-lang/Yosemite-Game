@@ -85,10 +85,12 @@ func _process(delta: float) -> void:
 	var feet := body.global_position
 	var moved := feet.distance_to(_last)
 	_last = feet
-	_running = delta > 0.0 and moved / delta > RUN_SPEED
-	# Stopping dead from a run. Read from the body's own speed, which holds
-	# between physics ticks (the feet only move on the tick).
+	# Read from the body's own speed where it has one: that holds between
+	# physics ticks (the feet only move on the tick, so the distance covered
+	# in one drawn frame reads as a run on a fast screen).
 	var mover := body as CharacterBody2D
+	_running = mover.get_real_velocity().length() > RUN_SPEED if mover else delta > 0.0 and moved / delta > RUN_SPEED
+	# Stopping dead from a run.
 	if mover:
 		var speed := mover.get_real_velocity().length()
 		if _pace > RUN_SPEED and speed < 1.0:

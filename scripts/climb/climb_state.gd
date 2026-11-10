@@ -301,11 +301,6 @@ func is_bolted() -> bool:
 	return spec.get("bolts", "") == "line"
 
 
-## Any pitch with fixed pieces to clip (bolts or old pitons).
-func has_fixed_pieces() -> bool:
-	return not bolts.is_empty()
-
-
 func style() -> String:
 	return spec.get("style", "crack")
 
@@ -860,6 +855,9 @@ func chalk_up() -> bool:
 		return false
 	if is_snow():
 		message = "Chalk does nothing on snow and ice."
+		return false
+	if is_at_belay() and not route.boulder:
+		message = "Chalk up once you're off the ledge."
 		return false
 	if chalked_this_pitch:
 		message = "You've already chalked up on this pitch. Save it for the next one."

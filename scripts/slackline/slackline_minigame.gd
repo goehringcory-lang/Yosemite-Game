@@ -103,7 +103,6 @@ var _fall_t := 0.0
 var _shown_score := 0.0
 var _score_pulse := 0.0
 var _slowmo := 1.0
-var _best_pct := 0
 var _popups: Array[Dictionary] = []
 var _result := {}
 ## Rows of the results card counted so far, and whether its medal has landed.
@@ -154,6 +153,7 @@ func _ready() -> void:
 	# a gold won before the quest that asks for one still counts
 	if not QuestLog.is_unlocked(GOLD) and SlacklineState.LINES.any(func(l: Dictionary) -> bool: return medal_for(l.id) >= 3):
 		QuestLog.unlocks.append(GOLD)
+		QuestLog.changed.emit()
 	_kit = {"climbing_shoes": int(Gear.owned.get("climbing_shoes", 0)), "chalk_bag": int(Gear.owned.get("chalk_bag", 0))}
 	_paint()
 	for i in ART.CROWD.size():
@@ -231,7 +231,6 @@ func begin(id := "") -> bool:
 	_fall_t = 0.0
 	_shown_score = 0.0
 	_ghost = state.lean
-	_best_pct = 0
 	_popups.clear()
 	new_best = false
 	last_medal = 0
@@ -302,7 +301,6 @@ func _walk(delta: float) -> void:
 		Sound.play("step_wood", -16.0, 0.1)
 	_bounce = maxf(0.0, _bounce - delta * 5.0)
 	_quiver = maxf(0.0, _quiver - delta * 2.0)
-	_best_pct = maxi(_best_pct, state.percent())
 	for e in state.take_events():
 		_on_event(e)
 

@@ -21,10 +21,13 @@ static func spawn(from: Sprite2D, player: Node2D) -> void:
 	pop.texture = from.texture
 	pop.offset = from.offset
 	pop._player = player
-	# Beside the player, not under the spawner: code walks the spawner's children.
-	player.get_parent().add_child(pop)
-	pop.global_position = from.global_position
 	pop.z_index = 5
+	# Beside the player, not under the spawner: code walks the spawner's children.
+	# Placed before it goes in the tree: _ready reads where it starts.
+	var parent := player.get_parent()
+	var parent_2d := parent as CanvasItem
+	pop.position = parent_2d.get_global_transform().affine_inverse() * from.global_position if parent_2d else from.global_position
+	parent.add_child(pop)
 
 
 func _ready() -> void:

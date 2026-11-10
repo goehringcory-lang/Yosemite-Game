@@ -53,7 +53,6 @@ const SEATS := [
 	Vector2(40, 108), Vector2(-24, 112), Vector2(-86, 98), Vector2(-130, 60), Vector2(-150, 4),
 ]
 const FIRE := Vector2(420, 400)
-const HOME_REGION := "lamon_homestead"
 
 const NPC_SCENE := preload("res://scenes/story/npc.tscn")
 
@@ -121,14 +120,6 @@ func _seat_guests() -> void:
 		entities.add_child.call_deferred(npc)
 		_guests.append(npc)
 		seat += 1
-
-
-## The lines for [param id] at the supper ("" if they aren't at it).
-static func line_for(id: String) -> String:
-	for entry: Array in LINES:
-		if entry[0] == id:
-			return entry[1]
-	return ""
 
 
 ## What you hear when you walk in, and what the HUD says.

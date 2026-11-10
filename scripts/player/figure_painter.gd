@@ -18,7 +18,6 @@ extends RefCounted
 
 const FW := 16
 const FH := 24
-const LINEUP_PNG := "res://docs/cast_lineup.png"
 const OUTLINE := Color("2a1f1a")
 const SHOE := "3a2a20"
 const SHADOW := Color("1c1830")

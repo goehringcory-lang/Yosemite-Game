@@ -5,7 +5,6 @@ extends Node
 ## Routes come from res://data/park/routes.json, which tools/mapgen builds by
 ## pathfinding along the real OpenStreetMap road network.
 
-const MAIN_HUB := "yosemite_valley"
 ## Your camp: where new games start and where you wake up each morning.
 const HOME_REGION := "lamon_homestead"
 const HOME_SPAWN := "home"

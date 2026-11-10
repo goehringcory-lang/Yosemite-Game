@@ -35,9 +35,6 @@ func _ready() -> void:
 	var world := get_parent()
 	if world.has_signal("region_changed"):
 		world.region_changed.connect(_on_region_changed.unbind(1))
-	if not _watching():
-		set_process(false)
-		return
 	_check_device.call_deferred()
 
 
@@ -70,8 +67,12 @@ func _process(_delta: float) -> void:
 	var now := Time.get_ticks_usec()
 	var ms := (now - _last_usec) / 1000.0
 	_last_usec = now
+	# Not watching now (High, Low, or already dropped): start afresh if Auto
+	# is picked again.
 	if not _watching():
-		set_process(false)
+		_frames.clear()
+		_elapsed = 0.0
+		_strikes = 0
 		return
 	# only time real play: not paused, not in another window, not loading
 	if get_tree().paused or not get_window().has_focus() or ms > 1000.0:
@@ -94,7 +95,7 @@ func _process(_delta: float) -> void:
 
 
 func _go_low() -> void:
-	set_process(false)
+	_strikes = 0
 	Settings.auto_low = true
 	Settings.save()
 	Settings.apply_graphics(get_window())

@@ -34,7 +34,7 @@ func _ready() -> void:
 		await world.go_to_region(region_id, "arrival")
 		for i in 3:
 			await get_tree().physics_frame
-		test_dressing(world.region)
+		await test_dressing(world.region)
 	await test_emotes(world)
 	await test_cast_days(world)
 	await test_moments(world)

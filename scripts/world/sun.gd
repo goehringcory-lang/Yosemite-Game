@@ -38,7 +38,7 @@ static func times(season := -1, day := -1) -> Vector2:
 	return a.lerp(b, absf(f))
 
 
-## The clock time now, in hours (past 24 after midnight).
+## The clock time now, in hours (0 to 24).
 static func hour_now() -> float:
 	return GameClock.get_day_progress() * 24.0
 

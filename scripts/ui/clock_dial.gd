@@ -42,6 +42,11 @@ func _process(delta: float) -> void:
 	if _hour() >= SUN_SET or _hour() < SUN_RISE:
 		if int(_time * 4.0) != int((_time - delta) * 4.0):
 			queue_redraw()
+	# Rain and snow fall a step at a time.
+	if int(_time * 6.0) != int((_time - delta) * 6.0):
+		var weather := Weather.today()
+		if float(weather.get("rain", 0.0)) > 0.0 or float(weather.get("snow", 0.0)) > 0.0:
+			queue_redraw()
 
 
 ## The hour as a number that runs past midnight (25.5 is 1:30 AM).

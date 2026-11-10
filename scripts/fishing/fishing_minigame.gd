@@ -336,7 +336,7 @@ func _show_label() -> void:
 		return
 	_label.visible = phase == Phase.WAIT or phase == Phase.REEL
 	if phase == Phase.WAIT:
-		_label.text = "The fly drifts..." if forward_cast != "" else "Waiting for a bite..."
+		_label.text = "The fly drifts..."
 	elif phase == Phase.REEL:
 		_label.text = "!  Hold [%s] to reel" % _use_button()
 

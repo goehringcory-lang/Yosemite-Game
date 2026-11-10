@@ -164,14 +164,12 @@ static func popups(ci: CanvasItem, list: Array[Dictionary]) -> void:
 		var pop := 1.0 + maxf(0.0, 0.25 - age) * 2.0
 		var size := 16 if p.big else 10
 		var at: Vector2 = p.at - Vector2(0, rise)
-		ci.modulate.a = a
 		if pop > 1.01:
 			ci.draw_set_transform(at, 0.0, Vector2(pop, pop))
-			UI.outlined(ci, Vector2.ZERO, p.text, p.color, size, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+			UI.outlined(ci, Vector2.ZERO, p.text, p.color, size, -1.0, HORIZONTAL_ALIGNMENT_CENTER, a)
 			ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 		else:
-			UI.outlined(ci, at.round(), p.text, p.color, size, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
-		ci.modulate.a = 1.0
+			UI.outlined(ci, at.round(), p.text, p.color, size, -1.0, HORIZONTAL_ALIGNMENT_CENTER, a)
 
 
 ## "Ready..." then "Walk!" as you step off the tree.

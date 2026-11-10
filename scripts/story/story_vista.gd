@@ -254,9 +254,6 @@ func _draw_figure(c: CanvasItem, at: Vector2) -> void:
 				c.draw_rect(Rect2(lamp - Vector2(2, 2), Vector2(5, 5)), Color(1.0, 0.85, 0.5, 0.25))
 				c.draw_rect(Rect2(lamp, Vector2(1, 1)), Color("fff2c0"))
 		return
-	if kind == "wreck":
-		_draw_wreck(c, p)
-		return
 	if kind == "stakes":
 		# Muir's stakes in a line across the ice, and the climber beside them
 		for k in 5:

@@ -4,7 +4,7 @@ extends Node
 ## on foot, the Camp Curry Store and the Mountain Shop have insides with
 ## shopkeepers who trade food for goods (without ever handing out the gear
 ## that opens a climbing tier), people live there, and the lamps come on at night.
-## Run: godot --headless --path . res://tools/hubs/../../tests/curry_village_test.tscn
+## Run: godot --headless --path . res://tests/curry_village_test.tscn
 ##   i.e. godot --headless --path . res://tests/curry_village_test.tscn
 ## Exit code is the number of failed checks.
 

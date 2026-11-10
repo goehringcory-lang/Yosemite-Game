@@ -109,4 +109,4 @@ With `base = 2 + grade` (grade is the pitch's 1-5 difficulty), a jug costs `base
 
 ## Not done yet
 
-Rappel and descent scenes (the profiles record each descent), save-in-the-middle, gamepad glyphs on the hints, sound, and tribal review of anything on these routes that touches Native places (none of the current text does).
+Rappel and descent scenes (the profiles record each descent), save-in-the-middle, and tribal review of anything on these routes that touches Native places (none of the current text does).

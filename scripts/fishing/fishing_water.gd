@@ -11,7 +11,7 @@ extends Node2D
 ## Place one in a story overlay with its top-left corner at [member position]
 ## and [member size] covering the water: the rapids draw their foam and
 ## rocks, a hole its slow rings and the odd rising trout. A cast whose fly
-## lands inside fishes it (Fishing.water_at).
+## lands inside fishes it (Fishing.water_ahead).
 
 const RUN := "run"
 const FOAM := Color(0.94, 0.97, 1.0, 0.85)

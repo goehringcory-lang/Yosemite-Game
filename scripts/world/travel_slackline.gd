@@ -38,6 +38,9 @@ var rigged: Array[StaticBody2D] = []
 
 var _region: Region
 var _webbing: Node2D
+## The area the one line is rigged in, to take it down from there when it
+## goes up in another.
+static var _rigged_in: TravelSlackline
 
 
 func _ready() -> void:
@@ -102,6 +105,10 @@ func is_rigged_on(tree: StaticBody2D) -> bool:
 ## Rigs the line from [param a] to [param b], taking it down wherever it was.
 func rig(a: StaticBody2D, b: StaticBody2D) -> void:
 	take_down()
+	# there is one line: it comes down in the area it was last rigged in too
+	if is_instance_valid(_rigged_in) and _rigged_in != self:
+		_rigged_in.take_down()
+	_rigged_in = self
 	rigged = [a, b]
 	_webbing = Webbing.new()
 	_webbing.name = "RiggedSlackline"

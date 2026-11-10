@@ -1,6 +1,6 @@
 class_name Journal
 extends CanvasLayer
-## The player's book, in five tabs:
+## The player's book, in six tabs:
 ##   Journal: the Guardian's Register, the missing Guardian, the valley's
 ##            keepers, the guidebook's tick list, and perks
 ##   Quests: the main story's next step and every open quest
@@ -662,7 +662,7 @@ func _quests_page() -> void:
 
 	# Who has something for you, as on a help-wanted board.
 	var asking: Array[CharacterData] = []
-	for character: CharacterData in QuestLog.CHARACTERS:
+	for character: CharacterData in QuestLog.CHARACTERS + QuestLog.STAFF:
 		var offer: QuestData = QuestLog.available_from(character.id)
 		# the main story's and the press book's next steps are already shown above
 		if offer != null and not offer in shown:

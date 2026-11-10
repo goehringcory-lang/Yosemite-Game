@@ -27,7 +27,6 @@ const REACH := [24.0, 40.0]
 ## Game minutes a cast takes, caught or not.
 const CAST_MINUTES := 15
 
-const Terrain := preload("res://tools/mapgen/terrain.gd")
 
 ## Each fish: its field log id, the hubs it's in, the seasons it bites, how
 ## often it takes the fly in each kind of water (FishingWater: "run", the

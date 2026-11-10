@@ -80,18 +80,6 @@ func buy(offer: ShopOffer) -> Dictionary:
 	return trade_for(offer)
 
 
-func offer_icon(offer: ShopOffer) -> Texture2D:
-	return icon_of(offer)
-
-
-func offer_name(offer: ShopOffer) -> String:
-	return name_of(offer)
-
-
-func offer_card(offer: ShopOffer) -> Dictionary:
-	return card_of(offer)
-
-
 ## The offers in [param data] the player can take right now: they own what
 ## each one requires, and don't have as many as it allows already.
 static func offers_open(data: ShopData) -> Array[ShopOffer]:
@@ -226,7 +214,9 @@ func receive_gift(player: Player) -> void:
 
 
 func interact(player: Player) -> void:
-	if shop and shop.talk_target != "":
+	if shop == null:
+		return
+	if shop.talk_target != "":
 		Friendship.note_talk(shop.talk_target)
 	player.can_act = false
 	_talking = true

@@ -274,7 +274,7 @@ func objective() -> String:
 	var call := active_call()
 	match current_stage():
 		"search":
-			return "Find %s: follow the fresh prints from %s (%s). Before dark." % [call.who, _spot_text(call), call.place]
+			return "Find %s: follow the fresh prints from %s. Before dark." % [call.who, _spot_text(call)]
 		"feed":
 			return "Share food worth %d energy with %s. You have %d." % [int(call.feed), call.who, FoodDB.carried_energy()]
 		"carry":

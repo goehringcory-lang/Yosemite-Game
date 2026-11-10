@@ -63,7 +63,3 @@ func _ready() -> void:
 	tween.tween_property(_rect, "color:a", 0.0, _time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_callback(queue_free)
 
-
-## How covered the view still is (1 all, 0 clear), for tests.
-func cover() -> float:
-	return _rect.color.a if _rect else 1.0

@@ -290,9 +290,7 @@ static func crux_result(ci: CanvasItem, result: String, age: float) -> void:
 	var text: String = {"perfect": "PERFECT!", "good": "Good", "slip": "Missed!"}.get(result, "")
 	var col: Color = {"perfect": UI.GOLD, "good": UI.CREAM, "slip": UI.WARN}.get(result, UI.CREAM)
 	var y := 100.0 - age * 30.0
-	ci.modulate.a = clampf(1.4 - age, 0.0, 1.0)
-	UI.text(ci, Vector2(SCREEN.x * 0.5, y), text, col, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
-	ci.modulate.a = 1.0
+	UI.text(ci, Vector2(SCREEN.x * 0.5, y), text, col, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER, clampf(1.4 - age, 0.0, 1.0))
 
 
 # ---------------------------------------------------------------- cards

@@ -170,12 +170,6 @@ func _tilt_in(region: Node, walls: Array[float], camera: Camera2D, at: Vector2, 
 	return minf(0.0, want_top - natural_top) * look.weight
 
 
-## The view at [param at]: {top, weight, margin, landmark}, the strongest of the wall rule and
-## the region's [LandmarkView]s.
-func view_at(at: Vector2) -> Dictionary:
-	return _view_in(_region, _walls, at)
-
-
 func _view_in(region: Node, walls: Array[float], at: Vector2) -> Dictionary:
 	var best := {"top": 0.0, "weight": 0.0, "margin": -1.0, "landmark": ""}
 	for foot in walls:

@@ -11,8 +11,6 @@ extends Node
 ## PlantSpawner puts a few of each where it grows (see "grows").
 
 signal changed
-## Sent when a plant goes into the book for the first time.
-signal pressed_plant(id: String)
 
 const ABILITY := "plant_press"
 const SHEET := "res://assets/sprites/plants.png"
@@ -716,7 +714,6 @@ func press(id: String, where := "") -> bool:
 		return false
 	pressed[id] = {"where": where, "date": GameClock.get_date_string()}
 	changed.emit()
-	pressed_plant.emit(id)
 	return true
 
 
