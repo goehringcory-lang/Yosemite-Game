@@ -16,7 +16,7 @@ const USED := ["amb_day", "amb_night", "amb_wind", "amb_rain", "waterfall", "cam
 	"climb_chalk", "climb_eat", "climb_fall", "climb_jug", "climb_crux", "climb_topout",
 	"ui_move", "ui_select", "ui_back", "slack_twang", "slack_gust", "slack_cheer", "slack_medal",
 	"call_chickadee", "call_jay", "call_robin", "call_warbler", "call_woodpecker", "call_raven",
-	"call_owl", "call_frogs", "call_swift", "call_coyote", "thunder"]
+	"call_owl", "call_frogs", "call_swift", "call_coyote", "thunder", "shutter"]
 
 var failures := 0
 var world: Node

@@ -30,6 +30,9 @@ extends Resource
 ##   "work"       task, count: have done this many of the task's work spots
 ##                around the park (Stewardship.SPOTS), like resetting steps
 ##                on the Mist Trail
+##   "photographed" count, shots (ids from Photos.SHOT_LIST): have these
+##                pictures on Ansel's shot list, and at least this many of
+##                the list in all (see Photos)
 ## Every step except "talk" is turned in by talking to the quest giver.
 ##
 ## Any step can also hand the player something the moment it's done:
@@ -51,6 +54,10 @@ extends Resource
 ## one arc a season, each ending in a change you can see on the map (see
 ## Stewardship).
 @export var guardian_line := false
+## A quest that takes many days and gets done along the way (a portfolio of
+## photographs): like a press-book quest, it doesn't keep its giver from
+## offering their next story.
+@export var unhurried := false
 ## Character id of the person who gives the quest.
 @export var giver: String
 ## Quest ids that must be finished before this one is offered.

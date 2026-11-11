@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "ansel_exhibition"
+title = "The Back Wall"
+unhurried = true
+giver = "ansel_adams"
+requires = PackedStringArray("ansel_portfolio")
+intro = PackedStringArray("The studio keeps its back wall, by the window, for pictures that aren't mine. Visitors' pictures, mostly. Some of them are better than they know.", "I'd like a wall of yours. Eighteen from the list. That means the hard ones: weather, the moon, an animal that won't wait for you.", "It took me most of my life. You have a head start, and no glass plates to carry.")
+steps = [{"type": "photographed", "count": 18, "objective": "Photograph 18 pictures from Ansel's list", "reminder": "Eighteen from the list, for the back wall. The ones you're missing are the ones that need luck. Luck needs you to be out there.", "done": ["Eighteen. I've hung them where the afternoon comes in.", "People stop at them. They don't know why yet. It's because somebody stood there and paid attention."]}]
+outro = PackedStringArray("Take this. Anyone who's out at dawn and at dusk both isn't eating properly.", "And keep going. There are a few lines left on that list, and I never did finish it myself.")
+reward_items = {"trail_mix": 2, "cheddar_wedge": 1, "chocolate_bar": 1}

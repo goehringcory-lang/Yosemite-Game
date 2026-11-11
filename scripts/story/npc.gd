@@ -181,8 +181,16 @@ func _ready() -> void:
 		QuestLog.changed.connect(_refresh_stay)
 		_refresh_stay()
 	add_to_group("talkers")
+	add_to_group("photo_subjects")
 	_glance = _rng.randf_range(GLANCE_MIN, GLANCE_MAX)
 	_doze = _rng.randf_range(0.0, DOZE)
+
+
+## What a camera pointed this way sees (Photos): them, if they're about.
+func photo_subjects() -> Array:
+	if character == null or not is_visible_in_tree():
+		return []
+	return [{"kind": "person", "id": character.id, "name": character.display_name, "at": global_position + Vector2(0, -16)}]
 
 
 ## A line of a conversation was just shown (DialogueBox.say). If it's theirs,

@@ -97,6 +97,11 @@ func _build(log: DayLog) -> void:
 		_list("Recipes learned", log.recipes)
 		_list("Friendships", log.friends)
 		_list("New in the field log", log.animals)
+		if log.photos > 0:
+			var prints := PackedStringArray(["%d %s" % [log.photos, "photograph" if log.photos == 1 else "photographs"]])
+			if not log.shots.is_empty():
+				prints.append("for Ansel's list: %s" % ", ".join(log.shots))
+			_list("In the album", prints)
 		if log.dishes > 0:
 			_list("At the fire", PackedStringArray(["%d %s cooked" % [log.dishes, "dish" if log.dishes == 1 else "dishes"]]))
 	_footer = ButtonHints.new()

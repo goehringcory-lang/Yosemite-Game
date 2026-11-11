@@ -369,6 +369,7 @@ func _journal_page() -> void:
 	_friends()
 	_calendar()
 	_field_log()
+	_photographs()
 	_rescue_log()
 	if QuestLog.final_entry >= 0:
 		_heading("The last page")
@@ -538,6 +539,20 @@ func _field_log() -> void:
 	for group: String in FieldLog.GROUPS:
 		parts.append("%s %d of %d" % [FieldLog.GROUP_NAMES[group], FieldLog.count_in(group), FieldLog.total_in(group)])
 	_line(", ".join(parts) + ". Every one is on the Wildlife tab (N).", DIM)
+
+
+## How the photograph album (Photos) is coming along, once you have the
+## camera; the prints themselves are in the album.
+func _photographs() -> void:
+	if not Photos.has_camera():
+		return
+	_heading("Photographs: %d of %d on Ansel's list" % [Photos.listed_count(), Photos.SHOT_LIST.size()])
+	var parts := PackedStringArray()
+	for group: String in Photos.GROUPS:
+		parts.append("%s %d of %d" % [group, Photos.listed_in(group), Photos.in_group(group).size()])
+	var keys := MenuInput.button(get_tree(), "F, then Tab", "RB, then Y")
+	_line("%s. %d %s in the album: raise the camera and open it (%s)." % [", ".join(parts), Photos.album.size(),
+		"print" if Photos.album.size() == 1 else "prints", keys], DIM)
 
 
 ## Everyone you've helped on a rescue call (Rescues), newest first.

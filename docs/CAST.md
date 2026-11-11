@@ -50,7 +50,7 @@ NPCs go in a hub's story overlay (`scenes/story/content/<hub>.tscn`). Each NPC h
 | **James McCauley** | | Glacier Point | Bread, a Firefall entry |
 | **Enid Michael** | 1883–1966 | The Museum garden, then Sentinel Dome | the plant press, 4 cooking recipes |
 | **Clare Marie Hodges** | 1890–1970 | Ranger station | 2 quickdraws, jerky (fall) |
-| **Ansel Adams** | 1902–1984 | Best's Studio | 2 quickdraws |
+| **Ansel Adams** | 1902–1984 | Best's Studio | The Box Brownie (a camera) and two lenses, 2 quickdraws |
 | **George Anderson** | d. 1884 | Happy Isles | Anderson's eyebolt |
 | **Royal Robbins** | 1935–2017 | The Ahwahnee | Belay device, 2 cams, 2 quickdraws |
 | **Lucy Telles** ✦ | c. 1885–1955 | Yosemite Museum | Acorn cakes, a Register entry |
@@ -253,6 +253,11 @@ Clark's guidebook errand ─┬─ Lamon: Lamon's Garden ............ onions + b
                           └─ Degnan: Bread for the Valley ...... deliver to Leonard + Curry → 3 bread, starter
                                 └─ Curry: Let the Bread Rise ... starter → 6 apples
 Tabuce: Acorns for the Winter → The Chuckah ✦ .................. acorns → chuckah + acorn recipes (needed for the Nose)
+Ansel Adams's camera (any time after Clark's Register; see the README's Photography):
+  Ansel Adams: The Box Brownie .... he lends you his first camera; take a photograph and show him → dried apples
+  Ansel Adams: A Portfolio ........ (unhurried) 8 pictures from his shot list → the wide and long lenses, trail mix
+  Ansel Adams: The Back Wall ...... (unhurried; after his other stories are offered) 18 pictures from the list
+                                    → trail mix, cheddar, chocolate
 After Swan Slab:
   Wren Alvarez: The Rest of the Apron ... food, then climb the Apron with Wren → chocolate, apricots
   Wren Alvarez: Gold on the Line ... win a gold medal on a Camp 4 slackline → Wren's Slackline (rig it between two trees anywhere)

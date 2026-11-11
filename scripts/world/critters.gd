@@ -83,6 +83,21 @@ var _last_region: Node
 func _ready() -> void:
 	z_index = 4
 	_rng.randomize()
+	add_to_group("photo_subjects")
+
+
+## What a camera pointed this way sees (Photos): every bird, squirrel and
+## butterfly about, where it's drawn.
+func photo_subjects() -> Array:
+	var out := []
+	for bird in _birds:
+		out.append({"kind": "animal", "id": bird.kind, "name": str(FieldLog.get_animal(bird.kind).get("name", "A bird")), "at": to_global(bird.pos + Vector2(0, -8))})
+	for squirrel in _squirrels:
+		out.append({"kind": "animal", "id": squirrel.kind, "name": str(FieldLog.get_animal(squirrel.kind).get("name", "A squirrel")), "at": to_global(squirrel.pos + Vector2(0, -8))})
+	for fly in _flies:
+		var id := "butterfly_%d" % fly.wings
+		out.append({"kind": "animal", "id": id, "name": str(FieldLog.get_animal(id).get("name", "A butterfly")), "at": to_global(fly.pos)})
+	return out
 
 
 ## Puts a bird of [param kind] at [param at] (for tests).

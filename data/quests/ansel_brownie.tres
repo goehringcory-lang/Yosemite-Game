@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "ansel_brownie"
+title = "The Box Brownie"
+giver = "ansel_adams"
+requires = PackedStringArray("clark_register")
+intro = PackedStringArray("You keep looking at the prints on the wall. Good. Most people look at the price.", "My first camera was a Kodak Box Brownie. My parents gave it to me on our first trip here, in 1916. I was fourteen, and I photographed everything that held still and a good deal that didn't.", "It's still on the shelf back there. Take it. A box, a lens and a shutter: there's nothing on it to get wrong.", "Don't photograph what you think I'd like. Find something you looked at twice, put a frame round it, and bring me that.")
+start_unlocks = PackedStringArray("camera")
+steps = [{"type": "unlocked", "ability": "first_photograph", "objective": "Take a photograph with the Box Brownie, and show Ansel Adams", "reminder": "Raise the camera, move the frame until what's in it is the picture, and press the shutter. Then come and show me.", "done": ["Let me see it. Hm. You stood where you stood on purpose. That's most of it.", "The rest is light, and light is mostly waiting."]}]
+outro = PackedStringArray("Keep the Brownie as long as you like. Your prints go in the album, and I've put a list in the back of it: pictures I'd want to see if I were starting over.", "It isn't homework. But I will want to look.")
+reward_items = {"dried_apples": 2}

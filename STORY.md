@@ -146,6 +146,10 @@ People don't only speak when they have a quest. As the main line moves on, the p
 
 Back from the glacier, Clark doesn't go quiet if the last page is still waiting on someone. He names who hasn't been heard yet, one at a time: Tenaya, then Maria Lebrado, then Lucy Telles (`QuestData.waiting_on`). These are Clark's words about them, not theirs, and he asks whether they *want* to talk, never assumes it.
 
+### Ansel's camera
+
+Ansel Adams's line in the story has always been that he photographs the valley and leaves the people out, and that the Register doesn't. The camera turns that round: he lends the player the Box Brownie his parents gave him in 1916 (*The Box Brownie*, offered any time after Clark's Register), asks for a portfolio (*A Portfolio*), and then gives the back wall of the studio to the player's prints (*The Back Wall*). His list of 25 pictures is a collection like the press book and the field log, but it asks for something those don't: being in the right place at the right hour. "The rest is light, and light is mostly waiting." It's a side line, never needed for the tick list or the finale. Nothing on the list is of Native people or their places as such, and the portrait line takes anyone who's about. The README's Photography section has the rules.
+
 ### The Guardian's camp
 
 The player's camp is the missing Guardian's empty spot, and the story fills it. The keepers give things for it, often in place of food: James Lamon an apple box to keep things in and a winter's woodpile, Jennie Curry a canvas wall tent like Camp Curry's, Ranger Hodges a lantern and a bear box, Salathé a pot crane he forged, Ansel Adams a print of Half Dome, Enid Michael a bird bath and frames for the press book's sheets; Wren, Greg and the Ahwahnee's chef give a stool, a hammock, a fish board and a Dutch oven. Every main-line quest leaves a small keepsake on a plank shelf, and a cairn by the tent grows a stone for every summit. By the end, the camp says who the player has been, and that the Guardian has a camp after all. No camp thing comes from a Native character: anything new in their voices waits on tribal review.

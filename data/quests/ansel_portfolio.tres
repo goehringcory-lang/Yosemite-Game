@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "ansel_portfolio"
+title = "A Portfolio"
+unhurried = true
+giver = "ansel_adams"
+requires = PackedStringArray("ansel_brownie")
+intro = PackedStringArray("In 1927 I put eighteen prints in a portfolio, and a friend in San Francisco found people to buy it. It was the first time anyone treated what I did as a profession.", "Make me one. Eight pictures off the list in the back of your album: a cliff, something alive, the light doing what it only does once a day. Any eight.", "Go early or go late. At noon this valley is as flat as a postcard.")
+steps = [{"type": "photographed", "count": 8, "objective": "Photograph 8 pictures from Ansel's list", "reminder": "Eight from the list. The back of the album says where to stand. It can't tell you when: that's the light's business.", "done": ["Eight. Lay them out on the table. No, not in the order you made them. In the order they want to be seen.", "This one. You waited for this one, didn't you? It shows."]}]
+outro = PackedStringArray("A Brownie's lens sees about what your eye does. Take these two out of my bag: a wide one for when the cliff won't fit, and a long one for anything with legs or wings.", "Use the long one on the bears. That's what it's for.")
+reward_gear = {"camera_lenses": 1}
+reward_items = {"trail_mix": 2}

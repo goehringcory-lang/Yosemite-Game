@@ -18,7 +18,7 @@ const HINTS_SHOWN := 8.0
 const WIPE_TIME := 0.5
 ## The wipe's color: the deep night of the palette, not flat black.
 const WIPE_COLOR := Color(0.067, 0.059, 0.09)
-const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary"]
+const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary", "photo_album"]
 
 var _player: Player
 ## The food energy you carry, under the time.
@@ -75,6 +75,7 @@ func _ready() -> void:
 	GameClock.time_changed.connect(_refresh_clock.unbind(2))
 	GameClock.day_started.connect(_refresh_clock.unbind(3))
 	device_changed.connect(_refresh_status)
+	QuestLog.changed.connect(_refresh_status)
 	_dim = ColorRect.new()
 	_dim.color = Color(0.082, 0.078, 0.11, 0)
 	_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -311,9 +312,13 @@ func _update_cover() -> void:
 	# Cards hide under a menu, and during a conversation unless they're
 	# fresh (what you just bought or cooked), so they don't sit over the
 	# person you're talking to.
-	toasts.visible = not menu and (not covered or toasts.has_fresh())
+	# Looking through the camera hides the HUD too, but leaves the view as
+	# it is: the viewfinder does its own shading.
+	var viewfinder := get_tree().get_first_node_in_group("camera_view")
+	var shooting: bool = viewfinder != null and viewfinder.is_open()
+	toasts.visible = not menu and not shooting and (not covered or toasts.has_fresh())
 	_dim.color.a = move_toward(_dim.color.a, 0.42 if menu else 0.0, get_process_delta_time() * 3.0)
-	covered = covered or menu
+	covered = covered or menu or shooting
 	if covered == _covered:
 		return
 	_covered = covered
@@ -430,7 +435,9 @@ static func objective_text() -> String:
 	return ""
 
 
-## The hint line: the keys that open the book's three tabs. A gamepad opens
-## it with Y and turns the tabs from there.
+## The hint line: the keys that open the book's three tabs (a gamepad opens
+## it with Y and turns the tabs from there), and the camera once you have it.
 func _refresh_status() -> void:
 	_status.text = prompt("[J] Journal  ·  [Q] Quests  ·  [B] Backpack", "[Y] Journal, Quests, Backpack")
+	if Photos.has_camera():
+		_status.text += prompt("  ·  [F] Camera", "  ·  [RB] Camera")

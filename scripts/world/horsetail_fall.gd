@@ -42,6 +42,14 @@ func _ready() -> void:
 	_glow.material = add
 	_glow.draw.connect(_draw_glow)
 	add_child(_glow)
+	add_to_group("photo_subjects")
+
+
+## What a camera pointed this way sees (Photos): the fall, while the sun is on it.
+func photo_subjects() -> Array:
+	if level < 0.3:
+		return []
+	return [{"kind": "event", "id": "horsetail", "name": "Horsetail Fall, alight", "at": to_global(Vector2(0, LENGTH * 0.4))}]
 
 
 func _process(delta: float) -> void:

@@ -20,6 +20,10 @@ var animals: PackedStringArray = []
 ## Rescue calls you saw through today (Rescues), as "title (who)".
 var rescues: PackedStringArray = []
 var dishes := 0
+## Photographs taken today, and the pictures on Ansel's list they were the
+## first to answer (Photos).
+var photos := 0
+var shots: PackedStringArray = []
 
 
 func _ready() -> void:
@@ -39,6 +43,8 @@ func _ready() -> void:
 	Friendship.heart_gained.connect(_on_heart)
 	Rescues.rescued.connect(func(call: Dictionary) -> void: rescues.append("%s (%s)" % [call.title, call.who]))
 	FieldLog.logged.connect(func(id: String) -> void: animals.append(str(FieldLog.get_animal(id).get("name", id))))
+	Photos.taken.connect(func(_photo: Dictionary) -> void: photos += 1)
+	Photos.list_ticked.connect(func(entry: Dictionary) -> void: shots.append(str(entry.get("name", ""))))
 	GameClock.day_started.connect(_on_day_started.unbind(3))
 
 
@@ -79,17 +85,21 @@ func clear() -> void:
 	animals = []
 	rescues = []
 	dishes = 0
+	photos = 0
+	shots = []
 
 
 ## True when nothing worth a line happened.
 func is_empty() -> bool:
 	return items.is_empty() and gear.is_empty() and ticks.is_empty() and quests.is_empty() \
-		and perks.is_empty() and recipes.is_empty() and friends.is_empty() and animals.is_empty() and rescues.is_empty() and dishes == 0
+		and perks.is_empty() and recipes.is_empty() and friends.is_empty() and animals.is_empty() and rescues.is_empty() and dishes == 0 \
+		and photos == 0
 
 
 func save_data() -> Dictionary:
 	return {"items": items, "gear": gear, "ticks": ticks, "quests": quests, "perks": perks,
-		"recipes": recipes, "friends": friends, "animals": animals, "rescues": rescues, "dishes": dishes}
+		"recipes": recipes, "friends": friends, "animals": animals, "rescues": rescues, "dishes": dishes,
+		"photos": photos, "shots": shots}
 
 
 func load_data(data: Dictionary) -> void:
@@ -103,3 +113,5 @@ func load_data(data: Dictionary) -> void:
 	animals = PackedStringArray(data.get("animals", []))
 	rescues = PackedStringArray(data.get("rescues", []))
 	dishes = int(data.get("dishes", 0))
+	photos = int(data.get("photos", 0))
+	shots = PackedStringArray(data.get("shots", []))

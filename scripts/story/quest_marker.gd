@@ -36,6 +36,7 @@ func _init(id := "") -> void:
 	character_id = id
 	z_index = 20
 	_check = randf() * CHECK
+	add_to_group("photo_hidden") # a photograph is of the person, not the bubble
 
 
 func _process(delta: float) -> void:

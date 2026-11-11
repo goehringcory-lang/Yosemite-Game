@@ -48,6 +48,11 @@ const PAGES: Array[Dictionary] = [
 		"text": "Learn a plant before you gather it, and never take the last one in a patch. People here worked this out over thousands of years."},
 	{"quest": "hodges_patrol", "by": "Clare Marie Hodges",
 		"text": "Ranger. Yes, a woman ranger. The bears got used to it."},
+	{"quest": "ansel_brownie", "by": "Ansel Adams",
+		"text": "A Box Brownie, 1916. I was fourteen. Stand where you mean to stand, and then wait for the light.",
+		"notes": [
+			{"quest": "ansel_exhibition", "text": "Added under it: The back wall of the studio is full, and none of it is mine."},
+		]},
 	{"quest": "ansel_monolith", "by": "Ansel Adams",
 		"text": "You can't really see this valley from the floor. The light on Half Dome lasts about an hour.",
 		"notes": [
@@ -148,6 +153,9 @@ const HISTORY := {
 	"mccauley_firefall": "Documented: James McCauley paid for the Four Mile Trail (1872) and ran the Mountain House at Glacier Point. The Firefall is usually traced to his family, David Curry made it a nightly show, and the Park Service ended it in January 1968. Its start is told several ways.",
 	"enid_leave_some": "Documented: Enid Michael worked as a seasonal ranger-naturalist from 1921 to 1942, kept the Museum's wildflower garden, and wrote hundreds of nature notes. Her lines here are dramatized.",
 	"hodges_patrol": "Documented: Clare Marie Hodges was hired in 1918 as Yosemite's first woman ranger and patrolled on horseback. Dramatized: the patrol errand.",
+	"ansel_brownie": "Documented: Ansel Adams first came to Yosemite with his family in June 1916, at fourteen, and his parents gave him a Kodak No. 1 Box Brownie for the trip. He came back every year for the rest of his life. Dramatized: lending it to you, and the shot list.",
+	"ansel_portfolio": "Documented: Adams's first portfolio, 'Parmelian Prints of the High Sierras', came out in 1927: eighteen prints, with the backing of the San Francisco patron Albert Bender. Dramatized: your portfolio, and the lenses, which no Box Brownie takes.",
+	"ansel_exhibition": "Documented: Harry Best opened Best's Studio in the Valley in 1902, selling paintings and photographs to visitors. Adams married Best's daughter Virginia in 1928, and the family has run the studio, now The Ansel Adams Gallery, ever since. Dramatized: a wall of your prints.",
 	"ansel_monolith": "Documented: Ansel Adams made 'Monolith, the Face of Half Dome' from the Diving Board in April 1927. Dramatized: his quickdraws, which came long after his time.",
 	"hodges_first_night": "Documented: Yosemite requires a wilderness permit for overnight trips, Little Yosemite Valley is a backcountry camp above Nevada Fall on the way to Half Dome, and food must be stored in bear-resistant canisters or lockers. Dramatized: Hodges handing out permits and canisters, which came long after her time.",
 	"anderson_cables": "Documented: the Sierra Club put up the first cables on Half Dome's back in 1919, roughly along George Anderson's 1875 route, and the posts go up for the summer and come down for the winter. Dramatized: Anderson, who died in 1884, seeing them.",
