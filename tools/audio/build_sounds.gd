@@ -66,6 +66,9 @@ func _init() -> void:
 	# Rivers, and the story's moments (after the rest, for the same reason).
 	_save("river", _river(), RATE_BED, -11.0)
 	_save("story_sting", _sting(), RATE_FX, -7.0)
+	# The camera's shutter. It and everything after it start from a seed of
+	# their own, so it changes nothing else.
+	_save("shutter", _shutter(140), RATE_FX, -8.0)
 	# Wildlife calls, played now and then over the beds (Sound._update_calls),
 	# so the birds and the owl never come round on a loop. Two takes of each.
 	for i in 2:
@@ -81,8 +84,6 @@ func _init() -> void:
 		_save("call_swift" + take, _call_swift(116 + i), RATE_FX, -16.0)
 		_save("call_coyote" + take, _call_coyote(118 + i), RATE_FX, -17.0)
 		_save("thunder" + take, _thunder(120 + i), RATE_BED, -7.0)
-	# The camera's shutter (last again, so nothing above changes).
-	_save("shutter", _shutter(130), RATE_FX, -8.0)
 	print("Sounds written to %s. Run godot --headless --path . --import next." % OUT)
 	quit()
 
@@ -573,19 +574,6 @@ func _clip(seed_value: int) -> PackedFloat32Array:
 	return buf
 
 
-## A box camera's shutter: the lever's click, the leaf snapping across, and
-## a duller clack as it comes to rest.
-func _shutter(seed_value: int) -> PackedFloat32Array:
-	_rng.seed = seed_value
-	var buf := _buf(0.22, RATE_FX)
-	var tin := [[1450.0, 1.0], [2380.0, 0.5], [3900.0, 0.3]]
-	_add_click(buf, RATE_FX, 0.0, 0.004, 0.6)
-	_add_ping(buf, RATE_FX, 0.0, tin, 0.01, 0.4)
-	_add_click(buf, RATE_FX, 0.055, 0.007, 1.0)
-	_add_ping(buf, RATE_FX, 0.055, [[820.0, 1.0], [1640.0, 0.4]], 0.018, 0.7)
-	return buf
-
-
 ## A cam going into a crack: trigger clicks, then a clink as it seats.
 func _cam(seed_value: int) -> PackedFloat32Array:
 	var buf := _ratchet(seed_value, 3)
@@ -713,6 +701,19 @@ func _cheer(seed_value: int) -> PackedFloat32Array:
 func _tick(freq: float, length: float) -> PackedFloat32Array:
 	var buf := _buf(length, RATE_FX)
 	_add_ping(buf, RATE_FX, 0.0, [[freq, 1.0], [freq * 2.7, 0.3]], length / 4.0, 1.0)
+	return buf
+
+
+## A box camera's shutter: the lever's click, the leaf snapping across, and
+## a duller clack as it comes to rest.
+func _shutter(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(0.22, RATE_FX)
+	var tin := [[1450.0, 1.0], [2380.0, 0.5], [3900.0, 0.3]]
+	_add_click(buf, RATE_FX, 0.0, 0.004, 0.6)
+	_add_ping(buf, RATE_FX, 0.0, tin, 0.01, 0.4)
+	_add_click(buf, RATE_FX, 0.055, 0.007, 1.0)
+	_add_ping(buf, RATE_FX, 0.055, [[820.0, 1.0], [1640.0, 0.4]], 0.018, 0.7)
 	return buf
 
 

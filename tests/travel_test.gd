@@ -666,7 +666,8 @@ func _check_curfew(world: Node) -> void:
 	var day := GameClock.day
 	GameClock.minutes = 25 * 60 + 50
 	await world.go_to_region("happy_isles", "shuttle", ShuttleStop.RIDE_MINUTES)
-	await get_tree().create_timer(4.0).timeout
+	await _wait_until(func() -> bool:
+		return GameClock.day == day + 1 and world.region.region_id == Park.HOME_REGION and world.player.can_act and not world._busy)
 	check(GameClock.day == day + 1 and world.region.region_id == Park.HOME_REGION and world.player.can_act and not world._busy,
 		"a ride that ends at 2 AM still passes the player out (day %d, %s)" % [GameClock.day, world.region.region_id])
 
@@ -681,9 +682,20 @@ func _check_curfew(world: Node) -> void:
 	var box: DialogueBox = world.get_tree().get_first_node_in_group("dialogue_box")
 	check(box != null and not box.is_queued_for_deletion(), "the dialogue box is still on screen at 2 AM")
 	box.press()
-	await get_tree().create_timer(4.0).timeout
+	await _wait_until(func() -> bool:
+		return GameClock.day == day + 1 and world.region.region_id == Park.HOME_REGION and world.player.can_act and not world._busy)
 	check(GameClock.day == day + 1 and world.region.region_id == Park.HOME_REGION and world.player.can_act, "the player passes out once the box closes")
 	check(world.get_tree().get_nodes_in_group("dialogue_box").all(func(b: Node) -> bool: return b.is_queued_for_deletion()), "no dialogue box is left open")
+
+
+## Waits until [param done] is true, or [param seconds] have gone by. A
+## night's sleep takes about a second, but a busy machine (a shared CI
+## runner) can take several, so the checks after one wait for it and not
+## for a fixed time.
+func _wait_until(done: Callable, seconds := 30.0) -> void:
+	var until := Time.get_ticks_msec() + int(seconds * 1000.0)
+	while not done.call() and Time.get_ticks_msec() < until:
+		await get_tree().process_frame
 
 
 func _walkable_cells(region: Region) -> Dictionary:
