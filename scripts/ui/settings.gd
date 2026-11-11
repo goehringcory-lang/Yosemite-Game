@@ -76,6 +76,9 @@ static var hold_taps := false
 static var vibration := true
 ## Pause the game when its window isn't the one in front (see LookAway).
 static var pause_away := true
+## Trees and plants sway and gusts cross the grass (see Wind). Off stills
+## them, for anyone the movement bothers.
+static var wind := true
 ## Volume of everything, of one-shot sounds (steps, climbing, menus), and of
 ## the ambience (birds, wind, rain, campfires, waterfalls); 0 to MAX_VOLUME.
 static var master_volume := 8
@@ -204,6 +207,7 @@ static func load_settings() -> void:
 	hold_taps = bool(config.get_value("assist", "hold_taps", hold_taps))
 	vibration = bool(config.get_value("input", "vibration", vibration))
 	pause_away = bool(config.get_value("input", "pause_away", pause_away))
+	wind = bool(config.get_value("display", "wind", wind))
 	master_volume = clampi(int(config.get_value("audio", "master", master_volume)), 0, MAX_VOLUME)
 	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
 	music_volume = clampi(int(config.get_value("audio", "music", music_volume)), 0, MAX_VOLUME)
@@ -237,6 +241,7 @@ static func save() -> Error:
 	config.set_value("assist", "hold_taps", hold_taps)
 	config.set_value("input", "vibration", vibration)
 	config.set_value("input", "pause_away", pause_away)
+	config.set_value("display", "wind", wind)
 	config.set_value("audio", "master", master_volume)
 	config.set_value("audio", "effects", effects_volume)
 	config.set_value("audio", "music", music_volume)
@@ -317,6 +322,7 @@ static func reset_defaults() -> void:
 	hold_taps = false
 	vibration = true
 	pause_away = true
+	wind = true
 	master_volume = 8
 	effects_volume = MAX_VOLUME
 	music_volume = 8

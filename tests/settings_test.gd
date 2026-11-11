@@ -244,6 +244,11 @@ func test_pause_settings() -> void:
 	check(not Settings.pause_away and pause._setting_value(PauseMenu.Setting.PAUSE_AWAY).contains("Off") and _saved("input", "pause_away") == false, "Pause when away turns off and is saved")
 	pause.change_setting(PauseMenu.Setting.PAUSE_AWAY, 1)
 	check(Settings.vibration and Settings.pause_away, "...and both back on")
+	check(Settings.wind and pause._setting_value(PauseMenu.Setting.WIND).contains("On") and Wind.strength_now() > 0.0, "Wind starts on")
+	pause.change_setting(PauseMenu.Setting.WIND, 1)
+	check(not Settings.wind and _saved("display", "wind") == false and Wind.strength_now() == 0.0, "Wind turns off, is saved, and the air is still")
+	pause.change_setting(PauseMenu.Setting.WIND, 1)
+	check(Settings.wind, "...and on again")
 	await get_tree().process_frame
 	check(pause._panel.get_combined_minimum_size().y <= UiScale.SCREEN.y - 8.0, "the settings page fits on the screen")
 	check(pause.settings_shown() == Vector2i(0, PauseMenu.SETTINGS_SHOWN) and pause._more_label.text == "More below.", "it shows the first rows and says there are more")

@@ -17,6 +17,13 @@ shader_type canvas_item;
 // relief too (see lit.gdshaderinc). Without one the normal is flat and the
 // ground is lit as before.
 #include "res://assets/shaders/lit.gdshaderinc"
+// Gusts cross the grass: a band of blades catching the light, moving with
+// the wind (scripts/world/wind.gd). gust_grass is how bright (0 none).
+#include "res://assets/shaders/wind.gdshaderinc"
+
+uniform float gust_grass : hint_range(0.0, 1.0) = 1.0;
+// where in the world this pixel of ground lies
+varying vec2 world_px;
 
 uniform vec3 tint : source_color = vec3(1.0);
 uniform float tint_amount : hint_range(0.0, 1.0) = 0.0;
@@ -120,6 +127,10 @@ bool seam_keeps(vec2 tpx) {
 	return (seam_flip ? 1.0 - t : t) < f;
 }
 
+void vertex() {
+	world_px = (MODEL_MATRIX * vec4(VERTEX, 0.0, 1.0)).xy;
+}
+
 void fragment() {
 	if (seam_on && !seam_keeps(UV / TEXTURE_PIXEL_SIZE)) {
 		discard;
@@ -205,6 +216,17 @@ void fragment() {
 	float k = tint_amount * (0.3 + 0.7 * grass) * (1.0 - water);
 	rgb = mix(rgb, tint * (0.35 + lum * 1.05), k);
 	rgb = mix(rgb, vec3(dot(rgb, vec3(0.299, 0.587, 0.114))), desaturate * (1.0 - water * 0.7));
+	if (gust_grass > 0.0 && wind_strength > 0.0 && grass > 0.5) {
+		// in whole art pixels of the world, so the band is the same one on
+		// both sides of a seam; the blades that turn are short streaks lying
+		// along the wind, more of them the harder it blows
+		vec2 wp = floor(world_px * 0.5);
+		float gust = wind_gust(wp * 2.0, TIME) * min(wind_strength, 1.5);
+		float blade = hash(vec2(floor((wp.x + mod(wp.y, 2.0)) / 3.0), wp.y));
+		float turned = step(1.0 - gust * 0.38, blade);
+		rgb = mix(rgb, rgb * vec3(1.22, 1.18, 1.0) + vec3(0.02, 0.03, 0.0), turned * gust_grass);
+		rgb *= 1.0 + 0.06 * gust * gust_grass;
+	}
 	// frost: small clumps of whitened pixels, mostly on grass, hardly on paving
 	// the art is drawn at 2x, so work in 2x2 blocks of texture pixels
 	vec2 px = floor(floor(UV / TEXTURE_PIXEL_SIZE) * 0.5);

@@ -119,6 +119,7 @@ func apply() -> void:
 			sprite.texture = tex
 			if sprite.has_meta("lit"):
 				LitSprites.attach_sprite(sprite)
+			Wind.attach_sprite(sprite)
 	var g: Dictionary = GROUND_LOOKS[_season]
 	for ground in _grounds:
 		var mat := ground.material as ShaderMaterial
