@@ -2,7 +2,7 @@ extends Node
 ## Headless test of the assist settings (Settings.timing and
 ## Settings.hold_taps): that they save and load, and that Relaxed and Gentle
 ## timing slow the marker and widen the green on every timed activity: the
-## climbing cruxes, the cast and the fish, the Half Dome cables, and the
+## climbing cruxes (and the swing, the layback, the piton and the haul), the cast and the fish, the Half Dome cables, and the
 ## trail crew's rock bar. Standard leaves each one as designed. The pause
 ## menu's rows are in tests/settings_test.gd, and holding instead of tapping
 ## on a crux is in tests/climb_screen_test.gd.
@@ -87,6 +87,35 @@ func test_climbing() -> void:
 	check(is_equal_approx(windows[2], windows[0] * Settings.TIMING_ROOM[2]), "Gentle widens the green by its share")
 	check(_rising(_at_each(state.crux_seconds.bind("mash"))) and _rising(_at_each(state.crux_seconds.bind("rhythm"))),
 		"the quick-tap and left-right cruxes give more time")
+	# The longer checks (ClimbCheck) get the same help.
+	var check_of := func(kind: String) -> ClimbCheck:
+		state.pending = {"kind": kind, "name": kind}
+		var made := state.make_check()
+		state.pending = {}
+		return made
+	check(_rising(_at_each(func() -> float: return check_of.call("swing").window)) and _falling(_at_each(func() -> float: return check_of.call("swing").pace)),
+		"the King Swing's green widens and the swing slows")
+	check(_rising(_at_each(func() -> float: return check_of.call("layback").window)) and _falling(_at_each(func() -> float: return check_of.call("layback").pace)),
+		"a layback's green widens and the tension slows")
+	check(_rising(_at_each(func() -> float: return check_of.call("nail").window)) and _falling(_at_each(func() -> float: return check_of.call("nail").swing_speed)),
+		"a piton's green widens and the hammer slows")
+	check(_rising(_at_each(func() -> float: return check_of.call("haul").good_seconds)) and _rising(_at_each(func() -> float: return check_of.call("haul").time_total)),
+		"hauling the bag gives you longer")
+	# Slowed down, a swing takes longer in real time, but never runs out
+	# sooner for it: a patient swing that makes it on Standard makes it on Gentle.
+	var swung := _at_each(func() -> String:
+		var s: SwingCheck = check_of.call("swing")
+		var t := 0.0
+		while not s.is_done() and t < 60.0:
+			var held := {}
+			if s.angle >= s.green_from() + s.window * 0.2 and absf(s.speed) < 0.15:
+				s.press("tool")
+			elif s.amplitude() < SwingCheck.TARGET + 0.02:
+				held = {"right": s.speed >= 0.0, "left": s.speed < 0.0}
+			s.step(1.0 / 60.0, held)
+			t += 1.0 / 60.0
+		return s.result)
+	check(swung.all(func(r: String) -> bool: return r in ["perfect", "good"]), "a patient swing makes it at every timing (%s)" % [swung])
 	var swan: RouteData = load("res://data/routes/swan_slab.tres")
 	var easy := ClimbState.new(swan, 0, 1, {"climbing_shoes": 1})
 	easy.chalk_moves = 5

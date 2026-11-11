@@ -84,6 +84,9 @@ func _init() -> void:
 		_save("call_swift" + take, _call_swift(116 + i), RATE_FX, -16.0)
 		_save("call_coyote" + take, _call_coyote(118 + i), RATE_FX, -17.0)
 		_save("thunder" + take, _thunder(120 + i), RATE_BED, -7.0)
+	# Nailing a piton on an aid move (last, so the sounds above keep their
+	# random takes). The screen plays it higher as the pin seats.
+	_save("climb_pin", _pin(130), RATE_FX, -5.0)
 	print("Sounds written to %s. Run godot --headless --path . --import next." % OUT)
 	quit()
 
@@ -571,6 +574,17 @@ func _clip(seed_value: int) -> PackedFloat32Array:
 	_add_click(buf, RATE_FX, 0.0, 0.004, 0.4)
 	_add_ping(buf, RATE_FX, 0.09, metal, 0.03, 0.9)
 	_add_click(buf, RATE_FX, 0.09, 0.005, 0.8)
+	return buf
+
+
+## A hammer striking a piton: the thud of the hammer's head, a sharp click,
+## and the steel's bright ring dying away.
+func _pin(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(0.45, RATE_FX)
+	_add_tone(buf, RATE_FX, 0.0, 0.05, 190.0, 120.0, 0.5)
+	_add_click(buf, RATE_FX, 0.0, 0.006, 0.9, 9000.0)
+	_add_ping(buf, RATE_FX, 0.002, [[1480.0, 1.0], [2470.0, 0.7], [3910.0, 0.45], [5630.0, 0.3]], 0.055, 0.8)
 	return buf
 
 

@@ -22,7 +22,11 @@ extends RefCounted
 ##   crux        row of the hard move. Harder pitches get more crux points
 ##               on top of it (see CRUXES_BY_DIFF); pitch_spec lists them all
 ##               in "cruxes".
-##   crux_kind   timing | rhythm | mash | dyno  (default timing)
+##   crux_kind   timing | rhythm | mash | dyno | swing | layback (default
+##               timing). swing and layback are played by SwingCheck and
+##               LaybackCheck (see ClimbState.make_check)
+##   crux_default what the crux points the grade adds are (default layback
+##               on a flake, timing on anything else)
 ##   crux_name   the move's name, shown on the meter
 ##   rest        rows with a good stance (a bit of stamina back)
 ##   fixed       rows with a fixed rope (ascenders make them easy)
@@ -187,7 +191,7 @@ const PROFILES := {
 		"pitches": [
 			{"name": "Flakes to the Tree", "style": "crack", "cracks": 0.4, "deco": ["flake", "tree"], "beta": "Broken flakes up to a tree belay."},
 			{"name": "The Finger Crack", "style": "crack", "cracks": 0.55, "deco": ["lichen"], "beta": "A thin crack that takes cams all the way."},
-			{"name": "Hand-Crack Corner", "style": "crack", "cracks": 0.5, "rest": [5], "deco": ["streaks"], "beta": "A corner crack. Jam and layback."},
+			{"name": "Hand-Crack Corner", "style": "crack", "cracks": 0.5, "rest": [5], "crux_default": "layback", "deco": ["streaks"], "beta": "A corner crack. Jam and layback."},
 			{"name": "The Traverse", "style": "crack", "cracks": 0.4, "deco": ["manzanita"], "beta": "Move left and keep your feet high."},
 			{"name": "The Mantel", "style": "crack", "cracks": 0.4, "crux": 6, "crux_kind": "mash", "crux_name": "The mantel", "deco": ["flake"], "beta": "Press down on the shelf, then stand up: tap Up quickly."},
 		],
@@ -279,7 +283,7 @@ const PROFILES := {
 		"pitches": [
 			{"name": "Fingertip Start", "style": "crack", "cracks": 0.45, "pins": [4], "deco": ["lichen"], "beta": "Thin cracks from the start. Chalk up."},
 			{"name": "The Boulder Problem", "style": "crack", "cracks": 0.4, "crux": 5, "crux_name": "Boulder Problem", "deco": ["streaks"], "beta": "A short, hard traverse into a fingertip crack. Small pieces."},
-			{"name": "Enduro Corner", "style": "crack", "cracks": 0.55, "pins": [6], "deco": ["corner"], "beta": "A long, sustained corner. Pace yourself."},
+			{"name": "Enduro Corner", "style": "crack", "cracks": 0.55, "pins": [6], "crux_default": "layback", "deco": ["corner"], "beta": "A long, sustained corner. Layback it: pull just hard enough, and step."},
 			{"name": "Changing Corners", "style": "crack", "cracks": 0.45, "crux": 6, "crux_name": "Changing corners", "deco": ["corner"], "beta": "Switch from one wall of the corner to the other on thin holds."},
 			{"name": "The Sidewalk", "style": "slab", "cracks": 0.3, "rest": [3, 6], "deco": ["streaks"], "beta": "A ramp of easier ground. Eat and shake out."},
 			{
@@ -390,11 +394,11 @@ const PROFILES := {
 			{"name": "Sickle Ledge", "style": "crack", "cracks": 0.5, "fixed": [1, 2, 3, 4, 5, 6], "rest": [8], "deco": ["tree"], "beta": "Fixed lines lead up to Sickle Ledge: hold Shift to jug them."},
 			{"name": "Stoveleg Cracks", "style": "crack", "cracks": 0.55, "fixed": [2, 3, 4], "pins": [5], "deco": ["lichen"], "beta": "Thin cracks. Fixed lines help on the lower half."},
 			{"name": "El Cap Tower", "style": "crack", "cracks": 0.5, "rest": [7], "bivy": "ledge", "deco": ["tree"], "beta": "A big ledge. A good place to eat and sleep."},
-			{"name": "Texas and Boot Flakes", "style": "flake", "cracks": 0.6, "pins": [3], "deco": ["flake"], "beta": "Big flakes, then a crack in the boot."},
-			{"name": "The King Swing", "style": "crack", "cracks": 0.45, "crux": 5, "crux_kind": "rhythm", "crux_name": "King Swing", "deco": ["streaks"], "beta": "Swing across the wall to the next crack: alternate Left and Right to build momentum."},
+			{"name": "Texas and Boot Flakes", "style": "flake", "cracks": 0.6, "pins": [3], "deco": ["flake"], "beta": "Big flakes, then a crack in the boot. Layback the flakes: pull just hard enough, and step."},
+			{"name": "The King Swing", "style": "crack", "cracks": 0.45, "crux": 5, "crux_kind": "swing", "crux_name": "King Swing", "deco": ["streaks"], "beta": "Lowered out on the rope: run with the swing (Left, Right) to build it, then grab the crack at the top of a swing."},
 			{"name": "Camp IV", "style": "crack", "cracks": 0.5, "rest": [3], "deco": ["tree"], "beta": "Eagle Ledge and Camp IV: a big ledge, and a good rest."},
 			{"name": "The Great Roof", "style": "roof", "cols": [0, 1, 2, 3, 4], "cracks": 0.85, "crux": 6, "crux_name": "Great Roof", "hard_aid": true, "bivy": "hanging", "deco": ["roof"], "beta": "A huge roof. Hold Shift to aid a hard move with your aiders."},
-			{"name": "Pancake Flake", "style": "flake", "cracks": 0.55, "rest": [5], "pins": [3], "deco": ["flake"], "beta": "A huge flake. The rest is mostly climbing."},
+			{"name": "Pancake Flake", "style": "flake", "cracks": 0.55, "rest": [5], "pins": [3], "deco": ["flake"], "beta": "A huge flake to layback. Then it's mostly climbing."},
 			{"name": "Changing Corners", "style": "crack", "cracks": 0.5, "crux": 5, "crux_name": "Changing Corners", "hard_aid": true, "deco": ["corner"], "beta": "Switch corner walls on tiny holds. Then it's only the headwall."},
 		],
 	},
@@ -423,7 +427,7 @@ const PROFILES := {
 			{"name": "The Dihedral", "style": "crack", "cracks": 0.5, "pins": [5], "deco": ["corner"], "beta": "A big corner climbs the first stretch."},
 			{"name": "Arch Cracks", "style": "crack", "cracks": 0.45, "deco": ["lichen"], "beta": "Cracks up the arch face."},
 			{"name": "Rotten Chimney", "style": "chimney", "cols": [1, 2, 3], "cracks": 0.4, "rest": [6], "deco": ["chimney"], "beta": "A loose chimney. Alternate Left and Right."},
-			{"name": "The Pendulum", "style": "crack", "cracks": 0.4, "crux": 5, "crux_kind": "rhythm", "crux_name": "Pendulum", "fixed": [4, 5, 6], "deco": ["streaks"], "beta": "Swing across on the rope: alternate Left and Right."},
+			{"name": "The Pendulum", "style": "crack", "cracks": 0.4, "crux": 5, "crux_kind": "swing", "crux_name": "Pendulum", "fixed": [4, 5, 6], "deco": ["streaks"], "beta": "Swing across on the rope: run with the swing, then grab the crack at its top."},
 			{"name": "Upper Arches", "style": "crack", "cracks": 0.4, "rest": [4], "deco": ["manzanita"], "beta": "More cracks and ledges to the top."},
 			{"name": "The Friction Traverse", "style": "slab", "bolts": "line", "bolt_gap": 2, "crux": 6, "crux_name": "Friction traverse", "deco": ["streaks"], "beta": "A long slab traverse. Clip the bolts and don't rush."},
 		],
@@ -598,7 +602,9 @@ static func crux_at(spec: Dictionary, row: int) -> Dictionary:
 			return point
 	if row == int(spec.get("crux", 0)):
 		return {"kind": spec.get("crux_kind", "timing"), "name": spec.get("crux_name", "The crux")}
-	return {"kind": "timing", "name": CRUX_NAMES.get(spec.get("style", "crack"), "The crux")}
+	var style: String = spec.get("style", "crack")
+	var kind: String = spec.get("crux_default", "layback" if style == "flake" else "timing")
+	return {"kind": kind, "name": "The layback" if kind == "layback" else CRUX_NAMES.get(style, "The crux")}
 
 
 ## Every crux point on [param route].

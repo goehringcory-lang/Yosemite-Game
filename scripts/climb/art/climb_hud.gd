@@ -211,9 +211,13 @@ static func pitch_banner(ci: CanvasItem, state: ClimbState, age: float) -> void:
 # ---------------------------------------------------------------- crux meter
 
 ## The skill check at a crux. [param kind] is "timing", "rhythm", "mash" or
-## "dyno",
-## or "pumped" after a miss, when you have to eat before the next try.
+## "dyno", or "pumped" after a miss, when you have to eat before the next try.
+## The longer checks ("swing", "layback", "nail", "haul") carry their rules
+## in data.check, and ClimbCheckHud draws them.
 static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, time: float) -> void:
+	if data.has("check"):
+		ClimbCheckHud.draw(ci, kind, name, data.check)
+		return
 	var r := Rect2(SCREEN.x * 0.5 - 110, 60, 220, 66)
 	UI.panel(ci, r)
 	UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 17), ("SPENT: " if kind == "pumped" else "CRUX: ") + name.to_upper(), UI.WARN_DARK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
@@ -284,11 +288,27 @@ static func crux(ci: CanvasItem, kind: String, name: String, data: Dictionary, t
 				UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 58), prompt, UI.INK_SOFT, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 
 
+## What the banner says after a check: a crux's "perfect", "good" or "slip"
+## (or "slip_" and why, after a ClimbCheck), and "nail_" or "haul_" and the
+## result for a piton or a haul.
+const RESULT_TEXT := {
+	"perfect": "PERFECT!", "good": "Good", "slip": "Missed!",
+	"slip_short": "Short!", "slip_past": "Swung past!", "slip_slam": "Slammed the corner!",
+	"slip_time": "Too slow!", "slip_barn_door": "Barn door!", "slip_pumped": "Pumped off!",
+	"nail_perfect": "PERFECT PIN!", "nail_good": "Seated", "nail_over": "Over-driven", "nail_slip": "Popped!",
+	"haul_perfect": "Clean haul!", "haul_good": "Hauled", "haul_slip": "Slow haul",
+}
+
+
 static func crux_result(ci: CanvasItem, result: String, age: float) -> void:
 	if age > 1.4:
 		return
-	var text: String = {"perfect": "PERFECT!", "good": "Good", "slip": "Missed!"}.get(result, "")
-	var col: Color = {"perfect": UI.GOLD, "good": UI.CREAM, "slip": UI.WARN}.get(result, UI.CREAM)
+	var text: String = RESULT_TEXT.get(result, "")
+	var col: Color = UI.CREAM
+	if result.begins_with("slip") or result in ["nail_over", "nail_slip", "haul_slip"]:
+		col = UI.WARN
+	elif result in ["perfect", "nail_perfect", "haul_perfect"]:
+		col = UI.GOLD
 	var y := 100.0 - age * 30.0
 	UI.text(ci, Vector2(SCREEN.x * 0.5, y), text, col, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER, clampf(1.4 - age, 0.0, 1.0))
 

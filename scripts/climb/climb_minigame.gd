@@ -13,6 +13,11 @@ extends CanvasLayer
 ## crux there's a short skill check (miss it and you eat before you try again); at a belay you can eat; on a wall, nights
 ## are spent on a ledge or a portaledge.
 ##
+## Some cruxes are longer games with rules of their own (ClimbCheck): the King
+## Swing, a layback up a flake; and on a big wall an aid move means nailing
+## a pin (NailCheck), and each belay hauling the bag (HaulCheck). They play
+## in the crux phase too, drawn by ClimbCheckHud.
+##
 ## Controls: arrows climb (up = straight up, left/right = up-left/up-right);
 ## use tool = clip a bolt or place a cam; interact = eat (at a belay ledge),
 ## shake out (on a jug, when pumped) or chalk up (on the wall); Shift + an arrow = aid a hard move or jug a fixed
@@ -31,6 +36,10 @@ const MOVE_TIME := 0.2
 const FALL_TIME := 0.55
 ## A crux check ignores input for this long when it starts.
 const CRUX_GRACE := 0.35
+## On a swing (SwingCheck) the climber hangs this far below the pivot.
+const SWING_RADIUS := 60.0
+## A haul bag starts this far below where it hangs from the anchor.
+const HAUL_DROP := 64.0
 ## A dyno's fill rises this fraction as fast as the timing marker moves:
 ## you're reading one rise, not a sweep you can watch go by.
 const DYNO_SPEED := 0.7
@@ -441,6 +450,14 @@ func _events() -> void:
 			"aid", "jug":
 				Sound.play("climb_jug")
 				_fx.sparks(_torso() + Vector2(6, -14), 6)
+			"nail", "haul":
+				# A piton or a haul: how it went, on the banner.
+				_crux_result = "%s_%s" % [e.type, e.result]
+				_crux_result_age = 0.0
+				if e.result in ["slip", "over"]:
+					Rumble.play("miss")
+				elif e.result == "perfect":
+					Sound.play("climb_crux", -4.0, 0.0)
 			"bivy":
 				_night = e
 				_night_age = 0.0
@@ -481,6 +498,11 @@ func _start_crux() -> void:
 	_phase = Phase.CRUX
 	_crux_grace = CRUX_GRACE
 	var kind: String = state.pending.kind
+	if kind in ClimbState.CHECK_KINDS:
+		# A longer check with rules of its own (ClimbCheck).
+		_crux = {"kind": kind, "check": state.make_check(), "hold": 0.0}
+		_crux["name"] = _crux_title()
+		return
 	match kind:
 		"timing":
 			_crux = {"kind": kind, "window": state.pending.window,
@@ -523,6 +545,14 @@ func _update_crux(delta: float) -> void:
 	# here doesn't spend the check.
 	if _crux_grace > 0.0:
 		_crux_grace -= delta
+		return
+	if _crux.has("check"):
+		step_check(delta, {
+			"left": Input.is_action_pressed("move_left"),
+			"right": Input.is_action_pressed("move_right"),
+			"up": Input.is_action_pressed("move_up"),
+			"pull": Input.is_action_pressed("use_tool") or Input.is_action_pressed("interact"),
+		})
 		return
 	match _crux.kind:
 		"pumped":
@@ -595,6 +625,13 @@ func _crux_tap() -> void:
 func _crux_input(event: InputEvent) -> void:
 	if _crux_grace > 0.0:
 		return
+	if _crux.has("check"):
+		var check: ClimbCheck = _crux.check
+		for pair in [["move_left", "left"], ["move_right", "right"], ["move_up", "up"], ["use_tool", "tool"], ["interact", "interact"]]:
+			if MenuInput.pressed(event, pair[0]):
+				check.press(pair[1])
+		_after_check(check)
+		return
 	match _crux.kind:
 		"pumped":
 			# Only E eats, so a late tap at the meter doesn't spend your food.
@@ -642,6 +679,79 @@ func _crux_input(event: InputEvent) -> void:
 		_:
 			if MenuInput.pressed(event, "move_up"):
 				_crux_tap()
+
+
+## A frame of a ClimbCheck: [param held] is the keys held down ("left",
+## "right", "up", "pull"), as ClimbCheck.step takes them. Tests call it.
+func step_check(delta: float, held: Dictionary) -> void:
+	var check: ClimbCheck = _crux.get("check")
+	if check == null:
+		return
+	check.step(delta, held)
+	if Settings.hold_taps:
+		_hold_tap_check(check, delta, held)
+	_after_check(check)
+
+
+## The Hold to tap assist on a ClimbCheck: holding Left or Right wiggles a
+## snagged haul bag, a side at a time, and holding Up on a layback steps
+## whenever the tension's in the green.
+func _hold_tap_check(check: ClimbCheck, delta: float, held: Dictionary) -> void:
+	var haul := check as HaulCheck
+	var layback := check as LaybackCheck
+	var want: bool = (haul != null and haul.snag >= 0 and (held.get("left", false) or held.get("right", false))) \
+		or (layback != null and held.get("up", false) and layback.in_band())
+	if not want:
+		_crux["hold"] = 1.0 / Settings.HOLD_TAPS_PER_SECOND
+		return
+	_crux["hold"] = float(_crux.get("hold", 0.0)) + delta
+	if float(_crux.hold) < 1.0 / Settings.HOLD_TAPS_PER_SECOND:
+		return
+	_crux.hold = 0.0
+	if haul != null:
+		haul.press(haul.next_side())
+	else:
+		layback.step_up()
+
+
+## After a ClimbCheck has had its frame or its key: its sounds and effects,
+## and once it's decided, the result goes to the rules.
+func _after_check(check: ClimbCheck) -> void:
+	for e in check.take_events():
+		match e.type:
+			"swish":
+				Sound.play("climb_move", -10.0, 0.1, 0.7)
+			"strike":
+				Sound.play("climb_pin", -2.0, 0.02, 0.8 + 0.7 * float(e.depth))
+				Rumble.play("clip")
+				_act_t = 0.0
+				_act_kind = "protect"
+				_shake = maxf(_shake, 1.0)
+				_fx.sparks(_torso() + Vector2(10, -20), 3)
+			"stroke":
+				Sound.play("climb_jug", -6.0)
+				_act_t = 0.0
+				_act_kind = "protect"
+			"snag":
+				Rumble.play("miss")
+				_shake = maxf(_shake, 1.5)
+			"wiggle":
+				_fx.dust(_torso() + Vector2(-14 + 4 * int(e.side), 50), _dust_color(), 2)
+			"free":
+				Sound.play("climb_cam", -4.0)
+			"step":
+				Sound.play("climb_move", -4.0, 0.08)
+				_step += 1
+				_fx.dust(_torso() + Vector2(6, 22), _dust_color(), 2)
+	if not check.is_done():
+		return
+	var kind: String = _crux.kind
+	var result := check.result
+	var detail := check.detail
+	_resolve_crux(result)
+	# A missed swing or layback says why it went wrong.
+	if result == "slip" and kind in ["swing", "layback"]:
+		_crux_result = "slip_" + detail
 
 
 func _resolve_crux(result: String) -> void:
@@ -763,7 +873,18 @@ func _torso() -> Vector2:
 	elif _shown.y > state.top_row - 0.5:
 		var stand_top := Vector2(hold.x, _ledge_y(state.top_row) - 26.0)
 		t = t.lerp(stand_top, clampf((_shown.y - (state.top_row - 0.5)) * 2.0, 0.0, 1.0))
+	var swing := _swing()
+	if swing:
+		# Out on the rope from the pivot above, rising as you swing wide.
+		t += Vector2(sin(swing.angle), -(1.0 - cos(swing.angle))) * SWING_RADIUS
 	return t.round()
+
+
+## The swing being played, or null.
+func _swing() -> SwingCheck:
+	if _phase == Phase.CRUX and _crux.get("kind", "") == "swing":
+		return _crux.get("check") as SwingCheck
+	return null
 
 
 func _harness() -> Vector2:
@@ -1030,6 +1151,10 @@ func _draw_protection() -> void:
 			_canvas.draw_texture(tex, p + Vector2(-5, -2))
 		else:
 			var p := (_screen(cell.y, cell.x) + Vector2(4, -4)).round()
+			if piece.get("hw", "cam") == "pin":
+				# A piton nailed for an aid move (NailCheck), with a draw on it.
+				_canvas.draw_texture(ClimbSprites.hardware("pin_draw"), p + Vector2(-6, -4))
+				continue
 			# cams go in in rack order, so each shows its size's color (CamSizes)
 			_canvas.draw_texture(ClimbSprites.hardware("cam", CamSizes.size_of(cams)), p + Vector2(-6, -4))
 			cams += 1
@@ -1143,6 +1268,13 @@ func _draw_climber() -> void:
 	var tex := ClimbSprites.climber(pose, _kit, flags)
 	var o := ClimbSprites.ORIGIN
 	var torso := _torso()
+	var swing := _swing()
+	if swing:
+		# The rope you're swinging on, from the piece above where you hung.
+		var pivot := torso - Vector2(sin(swing.angle), cos(swing.angle)) * SWING_RADIUS
+		_canvas.draw_line(pivot, _harness(), OUTLINE, 2.0)
+		_canvas.draw_line(pivot, _harness(), ROPE, 1.0)
+		_canvas.draw_texture(ClimbSprites.hardware("cam", 0), (pivot + Vector2(-6, -10)).round())
 	if pose.get("mode", "") == "chimney":
 		torso.x = roundf(L.CHIMNEY_X + int(pose.side) * 6.0)
 	var pos := torso - o + Vector2(_wind_sway(), 0)
@@ -1151,6 +1283,11 @@ func _draw_climber() -> void:
 	# The haul bag swings below on a big wall.
 	if route.nights > 0 and state.has_haul_bag and _shown.y > 0.5:
 		var hp := torso + Vector2(-14, 46 + sin(_time * 1.3) * 2.0)
+		if _phase == Phase.CRUX and _crux.get("kind", "") == "haul":
+			# Coming up the haul line, a stroke at a time.
+			hp.y += (1.0 - float(_crux.check.height)) * HAUL_DROP
+			if _crux.check.snag >= 0:
+				hp.x += sin(_time * 30.0)
 		_canvas.draw_line(torso + Vector2(-2, 6), hp + Vector2(0, -4), ROPE_DARK, 2.0)
 		_canvas.draw_texture(UI.icon_texture("haul_bag"), (hp + Vector2(-6, -6)).round())
 	# Headlamp glow after dark (on High, ClimbLight's real headlamp).
@@ -1226,6 +1363,19 @@ func _pose() -> Dictionary:
 				a["hl"] += Vector2(sin(_time * 40.0) * 1.5, 0)
 	if _phase == Phase.CRUX and _crux.get("kind", "") == "dyno":
 		a = ClimbSprites.chicken_wing_pose(_crux.charge if _crux.holding else 0.0)
+	var swing := _swing()
+	if swing:
+		# Hanging on the rope, legs running across the face.
+		a = ClimbSprites.hang_pose()
+		a["tilt"] = int(clampf(-swing.angle * 3.0, -3.0, 3.0))
+		if absf(swing.speed) > 0.3:
+			var run := sin(_time * 16.0) * 3.0
+			a["fr"] += Vector2(run, 0)
+			a["fl"] -= Vector2(run, 0)
+	elif _phase == Phase.CRUX and _crux.get("kind", "") == "layback":
+		# Hands on the flake, feet on the wall: the harder you pull, the more you lean out.
+		a = ClimbSprites.style_pose("flake", step)
+		a["lean"] = float(a.get("lean", 0)) - roundf(2.0 * float(_crux.check.tension))
 	if state.chalk_moves > 0:
 		a["chalk"] = true
 	return a
