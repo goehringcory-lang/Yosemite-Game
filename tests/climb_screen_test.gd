@@ -17,6 +17,7 @@ func check(cond: bool, what: String) -> void:
 func _ready() -> void:
 	await get_tree().process_frame
 	await test_controls()
+	await test_checks_on_screen()
 	await test_weather_on_screen()
 	await test_light()
 	for r in Guidebook.routes():
@@ -311,9 +312,12 @@ func play_route(r: RouteData) -> void:
 	var bot := ClimbBot.new()
 	var steps := 0
 	var phases := {}
+	var kinds := {}
 	while not done[0] and steps < 4000:
 		steps += 1
 		phases[game._phase] = true
+		if game._phase == ClimbMinigame.Phase.CRUX:
+			kinds[game._crux.get("kind", "")] = true
 		match game._phase:
 			ClimbMinigame.Phase.CRUX:
 				game._resolve_crux("perfect" if steps % 3 == 0 else "good")
@@ -339,8 +343,195 @@ func play_route(r: RouteData) -> void:
 	check(phases.has(ClimbMinigame.Phase.RESULT), "%s: the result card showed" % r.id)
 	if r.nights > 0:
 		check(phases.has(ClimbMinigame.Phase.NIGHT), "%s: the nights on the wall played" % r.id)
+		check(kinds.has("haul"), "%s: the bag was hauled at the belays" % r.id)
+	if r.id == "the_nose":
+		check(kinds.has("swing") and kinds.has("layback"), "%s: the King Swing and the flakes' laybacks played (%s)" % [r.id, kinds.keys()])
 	if is_instance_valid(game):
 		game.queue_free()
+	await get_tree().process_frame
+
+
+## A new screen on the Nose with the big-wall rack, past the route card.
+func _nose_screen(seed := 6) -> ClimbMinigame:
+	var nose: RouteData = load("res://data/routes/the_nose.tres")
+	Gear.owned = {"climbing_shoes": 1, "chalk_bag": 1, "harness": 1, "quickdraw": 6, "rope": 1, "cam": 10, "aiders": 2, "ascenders": 2, "haul_bag": 1, "portaledge": 1}
+	Inventory.items.clear()
+	Inventory.add("acorn_cake", 4)
+	Inventory.add("trail_mix", 4)
+	GameClock.paused = true
+	GameClock.minutes = 8 * 60
+	var game: ClimbMinigame = load("res://scenes/climb/climb_minigame.tscn").instantiate()
+	game.setup(nose, seed)
+	game.state.conditions = WallWeather.CALM.duplicate()
+	add_child(game)
+	game.skip_intro()
+	return game
+
+
+## Climbs the screen's state until [param predicate] holds, answering cruxes.
+func _climb_until(game: ClimbMinigame, predicate: Callable) -> bool:
+	var s := game.state
+	for i in 300:
+		if predicate.call(s):
+			return true
+		if not s.pending.is_empty():
+			s.resolve_crux("good")
+			continue
+		s.stamina = ClimbState.MAX_STAMINA
+		for d in [0, -1, 1]:
+			if not s.hold_at(s.row + 1, s.col + d).is_empty():
+				s.move(d)
+				break
+	return false
+
+
+## Runs [param frames] of a ClimbCheck on the screen, holding what
+## [param pilot] says (and letting it press keys through the screen).
+func _drive(game: ClimbMinigame, pilot: Callable, frames := 1200) -> void:
+	for i in frames:
+		if game._phase != ClimbMinigame.Phase.CRUX or not game._crux.has("check"):
+			return
+		var held: Dictionary = pilot.call(game._crux.check)
+		game.step_check(1.0 / 60.0, held)
+		if i % 20 == 0:
+			await get_tree().process_frame
+
+
+## The swing, the layback, the piton and the haul on the real screen: they
+## start, take the keys, draw, and hand their result back to the climb.
+func test_checks_on_screen() -> void:
+	# The King Swing: the panel's up, the climber's out on the rope, Space grabs.
+	var game := _nose_screen()
+	await get_tree().process_frame
+	game.state.pending = {"kind": "swing", "name": "King Swing", "window": 0.25, "row": 3, "cell": Vector2i(2, 3), "index": 1, "count": 1}
+	game._start_crux()
+	check(game._crux.get("check") is SwingCheck, "the King Swing is played by its own rules on the screen")
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	var hanging := game._torso()
+	for i in 40:
+		game.step_check(1.0 / 60.0, {"right": true})
+	await get_tree().process_frame
+	check(game._torso().x > hanging.x + 4.0, "the climber swings out across the wall (%.0f to %.0f)" % [hanging.x, game._torso().x])
+	await _drive(game, func(sw: SwingCheck) -> Dictionary:
+		if sw.angle >= sw.green_from() + sw.window * 0.2 and absf(sw.speed) < 0.15:
+			press(game, "use_tool")
+			return {}
+		if sw.amplitude() < SwingCheck.TARGET + 0.02:
+			return {"right": sw.speed >= 0.0, "left": sw.speed < 0.0}
+		return {})
+	check(game._phase == ClimbMinigame.Phase.CLIMB and game.state.pending.is_empty() and game._crux_result in ["perfect", "good"],
+		"Space at the top of the swing grabs the crack (%s)" % game._crux_result)
+	# A grab that's short says so, and you eat before the next try.
+	game.state.pending = {"kind": "swing", "name": "King Swing", "window": 0.25, "row": 3, "cell": Vector2i(2, 3), "index": 1, "count": 1}
+	game._start_crux()
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	press(game, "use_tool")
+	await get_tree().process_frame
+	check(game._crux.get("kind", "") == "pumped" and game._crux_result == "slip_short", "a grab too soon misses, and says why (%s)" % game._crux_result)
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	press(game, "interact")
+	check(game._crux.get("check") is SwingCheck and game._crux.check.angle == 0.0, "after eating, the swing starts again from hanging")
+	game.queue_free()
+	await get_tree().process_frame
+
+	# A layback: Space pulls, Up steps.
+	game = _nose_screen()
+	await get_tree().process_frame
+	game.state.pending = {"kind": "layback", "name": "The layback", "window": 0.22, "row": 3, "cell": Vector2i(2, 3), "index": 1, "count": 2}
+	game._start_crux()
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	check(game._crux.get("check") is LaybackCheck, "a layback is played by its own rules")
+	var steps0 := game._step
+	await _drive(game, func(l: LaybackCheck) -> Dictionary:
+		if l.tension >= (l.band_from() + l.band_to()) / 2.0:
+			press(game, "move_up")
+			return {}
+		return {"pull": true})
+	check(game._phase == ClimbMinigame.Phase.CLIMB and game._crux_result == "perfect" and game._step >= steps0 + LaybackCheck.NEED,
+		"pulling into the green and stepping walks up the flake (%s)" % game._crux_result)
+	# With Hold to tap, holding Up steps whenever the tension's right.
+	Settings.hold_taps = true
+	game.state.pending = {"kind": "layback", "name": "The layback", "window": 0.22, "row": 3, "cell": Vector2i(2, 3), "index": 1, "count": 2}
+	game._start_crux()
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	var feather := [true]
+	await _drive(game, func(l: LaybackCheck) -> Dictionary:
+		# pull up into the green, then ease off a little, and keep holding Up
+		if l.tension > l.band_to() - 0.02:
+			feather[0] = false
+		elif l.tension < l.band_from() + 0.04:
+			feather[0] = true
+		return {"pull": feather[0], "up": true})
+	check(game._phase == ClimbMinigame.Phase.CLIMB and game._crux_result in ["perfect", "good"], "with Hold to tap, holding Up steps in the green (%s)" % game._crux_result)
+	Settings.hold_taps = false
+	game.queue_free()
+	await get_tree().process_frame
+
+	# An aid move on the Great Roof: Shift + an arrow nails a pin first.
+	game = _nose_screen(7)
+	await get_tree().process_frame
+	game.state.pitch = 6
+	game.state._start_pitch()
+	game._new_pitch()
+	var aid_dx := [99]
+	var found := _climb_until(game, func(s: ClimbState) -> bool:
+		for d in [0, -1, 1]:
+			if s.can_aid(d):
+				aid_dx[0] = d
+				return s.pending.is_empty()
+		return false)
+	check(found, "there's a move to aid on the Great Roof")
+	game._move_t = 1.0
+	var row := game.state.row
+	Input.action_press("assist")
+	press(game, {-1: "move_left", 0: "move_up", 1: "move_right"}[aid_dx[0]])
+	Input.action_release("assist")
+	check(game._phase == ClimbMinigame.Phase.CRUX and game._crux.get("check") is NailCheck and game.state.row == row, "Shift + an arrow on a hard move means nailing a pin first")
+	await get_tree().process_frame
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	await _drive(game, func(n: NailCheck) -> Dictionary:
+		var need := n.center() - n.depth
+		if absf(need) <= n.window * 0.1:
+			press(game, "move_up")
+		elif need >= NailCheck.drive(1.0):
+			if n.swing >= 0.97:
+				press(game, "use_tool")
+		elif need >= NailCheck.drive(0.0):
+			if absf(n.swing - (need - NailCheck.DRIVE_MIN) / (NailCheck.DRIVE_MAX - NailCheck.DRIVE_MIN)) <= 0.02:
+				press(game, "use_tool")
+		else:
+			press(game, "move_up")
+		return {})
+	check(game._phase == ClimbMinigame.Phase.CLIMB and game.state.row == row + 1 and game.state.aid_moves == 1 and game._crux_result in ["nail_perfect", "nail_good"],
+		"Space drives it, Up steps onto it, and the move goes (%s)" % game._crux_result)
+	check(game.state.protection.back().hw == "pin", "the nailed pin is on the rope")
+	await get_tree().process_frame
+	game.queue_free()
+	await get_tree().process_frame
+
+	# The haul at the top of the first pitch: hold Space, let go, wiggle a snag.
+	game = _nose_screen(3)
+	await get_tree().process_frame
+	_climb_until(game, func(s: ClimbState) -> bool: return s.row == s.top_row - 1 and s.pending.is_empty())
+	var before := Vector3i(game.state.col, game.state.row, game.state.pitch)
+	for d in [0, -1, 1]:
+		if not game.state.hold_at(game.state.row + 1, game.state.col + d).is_empty():
+			game.state.move(d)
+			break
+	game._after_action(before)
+	check(game._phase == ClimbMinigame.Phase.CRUX and game._crux.get("check") is HaulCheck and game.state.pitch == 0, "at the belay the bag waits to be hauled")
+	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
+	Settings.hold_taps = true
+	await _drive(game, func(h: HaulCheck) -> Dictionary:
+		if h.snag >= 0:
+			return {"left": true}
+		if h.stroke >= 1.0 or (h.stroke > 0.0 and not h._was_pulling):
+			return {}
+		return {"pull": true})
+	Settings.hold_taps = false
+	check(game.state.pitch == 1 and game.state.pending.is_empty() and game._crux_result.begins_with("haul_"), "the bag comes up, Hold to tap wiggles it free, and the next pitch starts (%s)" % game._crux_result)
+	await get_tree().process_frame
+	game.queue_free()
 	await get_tree().process_frame
 
 

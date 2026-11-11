@@ -24,7 +24,10 @@ extends RefCounted
 ## interactive]; otherwise (tests, bots) it resolves as an average move. Miss
 ## the check and you're pumped: you eat something from the pack before you can
 ## try the move again, and with nothing to eat you come off. Harder pitches
-## have more crux points and a faster meter.
+## have more crux points and a faster meter. Some cruxes are longer games of
+## their own (a swing, a layback; see [method make_check]), and on the screen
+## an aid move means nailing a pin and a big wall's belays mean hauling the
+## bag: those wait in [member pending] the same way.
 ##
 ## Holds have a grip: a jug, an edge or a crimp. Crimps (and cruxes) pump your
 ## forearms, and every couple of points of [member pump] adds to what each
@@ -133,9 +136,34 @@ const CRUX_MERCY_TRIES := 4
 const CRUX_RHYTHM_SECONDS := 5.6
 const CRUX_MASH_SECONDS := 4.6
 const CRUX_SECONDS_PER_GRADE := 0.2
+## Seconds for a swing or a layback crux (SwingCheck, LaybackCheck) on the
+## easiest pitch, less CRUX_SECONDS_PER_GRADE a grade.
+const CRUX_SWING_SECONDS := 11.0
+const CRUX_LAYBACK_SECONDS := 9.0
 ## Aiding a hard move, and jugging a fixed rope, cost this much stamina.
 const AID_STAMINA := 3
 const JUG_STAMINA := 3
+## Nailing a pin for an aid move on the screen (NailCheck): seconds to do it,
+## the green's width (less a little a grade), and the minutes the move takes
+## with the pin dead on and over-driven (a fight to clean). A pin that pops
+## costs stamina and minutes, but you're still on your last piece.
+const NAIL_SECONDS := 9.0
+const NAIL_WINDOW := 0.24
+const NAIL_WINDOW_PER_GRADE := 0.01
+const MINUTES_PER_AID_PERFECT := 8
+const MINUTES_PER_AID_OVER := 16
+const POP_STAMINA := 3
+const MINUTES_PER_POP := 6
+## Hauling the bag on the screen (HaulCheck): minutes for a clean haul and a
+## sloppy one (a fair one is MINUTES_PER_HAUL), and what a sloppy one takes
+## out of you. Pitches this hard have a second snag.
+const MINUTES_PER_HAUL_CLEAN := 6
+const MINUTES_PER_HAUL_SLOPPY := 15
+const SLOPPY_HAUL_STAMINA := 4
+const HAUL_SECOND_SNAG := 5
+## The checks a ClimbCheck plays (see make_check), rather than the screen's
+## own meters.
+const CHECK_KINDS := ["swing", "nail", "haul", "layback"]
 ## Climbing a chimney: alternate sides, or lose the rhythm.
 const CHIMNEY_BONUS := 1
 const CHIMNEY_PENALTY := 2
@@ -539,23 +567,71 @@ func can_aid(dx: int) -> bool:
 		and cams_left > 0 and row + 1 < top_row
 
 
+## On the screen ([member interactive]) you nail a pin first: this leaves a
+## "nail" check pending (NailCheck), and [method resolve_crux] makes the move
+## or not. Otherwise (tests, bots) a cam goes in and the move is made.
 func aid_step(dx: int) -> bool:
 	if not can_aid(dx):
 		message = "Aiders work on the hard moves of a wall, with a cam to stand on." if has_aiders else "You need aiders for that."
 		return false
+	if interactive:
+		pending = {"kind": "nail", "name": "Nail a pin", "dx": dx, "row": row + 1, "cell": Vector2i(col + dx, row + 1),
+			"index": 1, "count": 1, "tries": 0, "pumped": false}
+		pending["window"] = nail_window()
+		message = ""
+		events.append({"type": "nail_start"})
+		return true
+	_aid(dx, MINUTES_PER_AID)
+	return true
+
+
+## Makes an aid move: a piece goes in at the new hold (a nailed piton, if
+## [param pin]), so it catches you if the move fails, and you stand up in
+## your aiders.
+func _aid(dx: int, mins: int, pin := false) -> void:
 	cams_left -= 1
-	# The cam goes in at the new hold, so it catches you if the move fails.
 	var cell := Vector2i(col + dx, row + 1)
 	protection_row = row + 1
 	placed_cams.append(cell)
-	protection.append({"cell": cell, "kind": "cam", "hw": "cam", "aid": true})
-	_step(dx, AID_STAMINA, MINUTES_PER_AID, true)
+	protection.append({"cell": cell, "kind": "cam", "hw": "pin" if pin else "cam", "aid": true})
+	_step(dx, AID_STAMINA, mins, true)
 	pump = maxi(pump - 1, 0)
 	aid_moves += 1
 	if status == Status.CLIMBING:
-		message = "You place a cam and stand in your aiders. Pulled through (+1 aid move)."
+		message = ("You nail a pin" if pin else "You place a cam") + " and stand in your aiders. Pulled through (+1 aid move)."
 	events.append({"type": "aid"})
-	return true
+
+
+## The nail check's green, as a share of the pin's depth: narrower on a
+## harder pitch and in the wind, wider with the Timing assist (Settings).
+func nail_window() -> float:
+	var window := NAIL_WINDOW - NAIL_WINDOW_PER_GRADE * int(spec.get("diff", 2))
+	if is_windy():
+		window -= WIND_WINDOW
+	return minf(maxf(window, 0.1) * Settings.room(), NailCheck.MAX_WINDOW)
+
+
+## Finishes nailing a pin (see [method aid_step]): "perfect", "good" or
+## "over" make the move, slower for "over"; "slip" means the pin popped.
+func _resolve_nail(result: String) -> void:
+	var dx := int(pending.get("dx", 0))
+	pending = {}
+	events.append({"type": "nail", "result": result})
+	if result == "slip":
+		stamina = maxi(stamina - POP_STAMINA, 1)
+		minutes += MINUTES_PER_POP
+		message = "The pin pops out as you weight it. You're still on your last piece: nail another (-%d)." % POP_STAMINA
+		return
+	var mins := MINUTES_PER_AID
+	if result == "perfect":
+		mins = MINUTES_PER_AID_PERFECT
+	elif result == "over":
+		mins = MINUTES_PER_AID_OVER
+	_aid(dx, mins, true)
+	if status == Status.CLIMBING and result == "over":
+		message = "Over-driven: the pin holds, but it'll be a fight to clean (+%d min)." % (MINUTES_PER_AID_OVER - MINUTES_PER_AID)
+	elif status == Status.CLIMBING and result == "perfect":
+		message = "A perfect pin: it rings true. You step up fast (+1 aid move)."
 
 
 ## Jugs up a fixed rope with the ascenders: safe, steady, and slow.
@@ -709,11 +785,36 @@ func crux_speed() -> float:
 ## Seconds a "rhythm" or "mash" crux gives you: less on a harder pitch, more
 ## after a miss.
 func crux_seconds(kind: String) -> float:
-	var seconds := CRUX_RHYTHM_SECONDS if kind == "rhythm" else CRUX_MASH_SECONDS
+	var seconds := CRUX_MASH_SECONDS
+	match kind:
+		"rhythm":
+			seconds = CRUX_RHYTHM_SECONDS
+		"swing":
+			seconds = CRUX_SWING_SECONDS
+		"layback":
+			seconds = CRUX_LAYBACK_SECONDS
 	seconds -= CRUX_SECONDS_PER_GRADE * int(spec.get("diff", 2))
 	if kind == "rhythm" and has_shoes:
 		seconds += 2.0
 	return (seconds + 0.5 * _crux_mercy()) * Settings.room()
+
+
+## The rules of the pending check when a ClimbCheck plays it (a swing, a
+## layback, a piton or the haul; see [constant CHECK_KINDS]), or null for the
+## screen's own meters (timing, rhythm, mash, dyno) and when nothing's pending.
+func make_check() -> ClimbCheck:
+	var kind: String = pending.get("kind", "")
+	match kind:
+		"swing":
+			return SwingCheck.new(crux_window(), crux_seconds(kind), Settings.pace(), is_windy())
+		"layback":
+			return LaybackCheck.new(crux_window(), crux_seconds(kind), Settings.pace())
+		"nail":
+			# The hammer swings a little slower than a crux meter's marker.
+			return NailCheck.new(nail_window(), NAIL_SECONDS * Settings.room(), crux_speed() * 0.7)
+		"haul":
+			return HaulCheck.new(haul_snags(), Settings.room(), Settings.pace())
+	return null
 
 
 func _crux_mercy() -> int:
@@ -723,9 +824,19 @@ func _crux_mercy() -> int:
 ## Finishes a try at a crux with "perfect", "good" or "slip". A slip (missing
 ## the green) leaves you pumped on the move: eat, then try again. With nothing
 ## to eat, or nothing left in your arms, you come off.
+##
+## A pending piton or haul (see [method aid_step], [method _finish_pitch])
+## is finished the same way, so whatever answers a crux answers those too.
 func resolve_crux(result: String) -> void:
 	if pending.is_empty() or is_pumped():
 		return
+	match pending.get("kind", ""):
+		"nail":
+			_resolve_nail(result)
+			return
+		"haul":
+			_resolve_haul(result)
+			return
 	var name: String = pending.name
 	var diff := int(spec.get("diff", 2))
 	events.append({"type": "crux", "result": result, "name": name})
@@ -1092,7 +1203,50 @@ func _fall_on_pad() -> void:
 		message = "You drop onto the pad. Brush the holds, chalk up, go again. %d %s left." % [left, "try" if left == 1 else "tries"]
 
 
+## At the top of a pitch. On a big wall with a haul bag, the bag comes up
+## before the next pitch: on the screen ([member interactive]) that's a
+## "haul" check (HaulCheck) left pending, which [method resolve_crux] settles;
+## otherwise it takes MINUTES_PER_HAUL.
 func _finish_pitch() -> void:
+	if needs_haul() and interactive:
+		pending = {"kind": "haul", "name": "Haul the bag", "row": row, "cell": Vector2i(col, row),
+			"index": 1, "count": 1, "tries": 0, "pumped": false, "window": 0.0}
+		message = "Belay ledge. Haul the bag up before you lead on."
+		events.append({"type": "haul_start"})
+		return
+	_next_pitch(MINUTES_PER_HAUL if needs_haul() else 0)
+
+
+## True at the top of a pitch on a big wall with a haul bag, with more
+## pitches to come: the bag has to come up.
+func needs_haul() -> bool:
+	return route.nights > 0 and has_haul_bag and pitch + 1 < route.pitches.size()
+
+
+## Snags the bag catches on, hauling up this pitch (see HaulCheck).
+func haul_snags() -> int:
+	return 2 if int(spec.get("diff", 2)) >= HAUL_SECOND_SNAG else 1
+
+
+## Finishes a haul: "perfect" is a clean one, "good" a fair one, "slip" a
+## slow, sloppy one. Then on to the next pitch (or the night).
+func _resolve_haul(result: String) -> void:
+	pending = {}
+	events.append({"type": "haul", "result": result})
+	var mins := MINUTES_PER_HAUL
+	if result == "perfect":
+		mins = MINUTES_PER_HAUL_CLEAN
+	elif result == "slip":
+		mins = MINUTES_PER_HAUL_SLOPPY
+		stamina = maxi(stamina - SLOPPY_HAUL_STAMINA, 1)
+	message = ""
+	_next_pitch(mins)
+	_check_storm()
+
+
+## On to the next pitch, or the top. [param haul_minutes] is how long the
+## bag took to haul (0 if there's no bag).
+func _next_pitch(haul_minutes: int) -> void:
 	pitch += 1
 	events.append({"type": "pitch_done", "pitch": pitch})
 	if pitch >= route.pitches.size():
@@ -1102,9 +1256,9 @@ func _finish_pitch() -> void:
 		return
 	var finished_spec := spec
 	var haul_note := ""
-	if route.nights > 0 and has_haul_bag:
-		minutes += MINUTES_PER_HAUL
-		haul_note = " You haul the bag (+%d min)." % MINUTES_PER_HAUL
+	if haul_minutes > 0:
+		minutes += haul_minutes
+		haul_note = " You haul the bag (+%d min)." % haul_minutes
 	if _night_after(finished_spec):
 		if not _bivy(finished_spec.get("bivy", "ledge")):
 			return

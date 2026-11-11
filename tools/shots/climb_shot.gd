@@ -7,7 +7,8 @@ extends Node
 ##   SHOT_MOVES   moves to climb before each shot (default 5)
 ##   SHOT_INTRO   1 to shoot the route card instead of the climb
 ##   SHOT_SPECIAL cards to shoot instead: "crux", "pumped", "dyno", "result", "pause", "night",
-##                or "falcon" for a peregrine stooping past the wall
+##                or "falcon" for a peregrine stooping past the wall, or a
+##                longer check part-way through: "swing", "nail", "haul", "layback"
 ##   SHOT_DIR     folder for the PNGs (default user://)
 ##   SHOT_UNLIT   1 to leave the wall unlit (ClimbLight off), as on Low
 ##   SHOT_PAD     1 to show the gamepad's buttons in the hints
@@ -85,6 +86,37 @@ func _ready() -> void:
 				game._crux.holding = true
 				game._crux.charge = game._crux.center - 0.1
 				game._crux.speed = 0.0
+			"swing", "nail", "haul", "layback":
+				# Part-way through, held still (pace 0) for the picture.
+				var kind := _env("SHOT_SPECIAL", "")
+				var names := {"swing": "King Swing", "nail": "Nail a pin", "haul": "Haul the bag", "layback": "The layback"}
+				game.state.pending = {"kind": kind, "name": names[kind], "window": 0.24, "row": game.state.row, "cell": Vector2i(game.state.col, game.state.row)}
+				game._start_crux()
+				game._crux_grace = 0.0
+				var c: ClimbCheck = game._crux.check
+				match kind:
+					"swing":
+						c.angle = 0.78
+						c.speed = 0.4
+						c.pace = 0.0
+					"nail":
+						c.depth = 0.47
+						c.strikes = 2
+						c.swing = 0.82
+						c.swing_speed = 0.0
+					"haul":
+						c.height = c.snags[0]
+						c.snag = 0
+						c.stroke = 0.35
+						c.strain = 0.3
+						c.wiggles = 1
+						c.last_side = -1
+						c.pace = 0.0
+					"layback":
+						c.steps = 2
+						c.tension = 0.56
+						c.strain = 0.25
+						c.pace = 0.0
 			"storm":
 				game.state.start_minutes = 15 * 60
 				for k in 60:

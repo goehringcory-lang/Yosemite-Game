@@ -4,7 +4,7 @@ Status: shipped. Every route in the guidebook has its own climb, set in the real
 
 ## Experience
 
-A climb is a short sequence of decisions: read the wall, choose a line, decide where to shake out and where to protect, then reach the ledge with enough stamina for the next pitch. On the harder routes the cheapest hold in reach is often the wrong one: a string of crimps pumps you until every move costs double, and gear placed off a crimp costs five times what it does from a jug. Nothing is timed against you, apart from four small, forgiving skill checks at cruxes. The satisfaction is in feeling a new piece of gear change the line: cams open up a crack, quickdraws clip the old pitons on the Spire, a belay device softens a fall, ascenders jug the Nose's fixed lines, aiders get you past the Great Roof, and an ice axe stops a slide on the glacier.
+A climb is a short sequence of decisions: read the wall, choose a line, decide where to shake out and where to protect, then reach the ledge with enough stamina for the next pitch. On the harder routes the cheapest hold in reach is often the wrong one: a string of crimps pumps you until every move costs double, and gear placed off a crimp costs five times what it does from a jug. Nothing is timed against you, apart from short, forgiving skill checks: four quick ones at cruxes, and four longer ones with rules of their own (the King Swing, a layback, nailing a piton on an aid move, hauling the bag on a big wall). The satisfaction is in feeling a new piece of gear change the line: cams open up a crack, quickdraws clip the old pitons on the Spire, a belay device softens a fall, ascenders jug the Nose's fixed lines, aiders get you past the Great Roof, and an ice axe stops a slide on the glacier.
 
 ## Play loop
 
@@ -29,9 +29,9 @@ A climb is a short sequence of decisions: read the wall, choose a line, decide w
 | Quickdraws | Marty's kit, then Eichorn, Robbins... | Clip bolts, and fixed pitons on cam routes |
 | Cams | Leonard onward | Place in cracks; the rack refills each pitch |
 | Belay device | Robbins (Nutcracker) | Soft catches (+10 stamina after a fall), restful belays (+6), rappel retreat |
-| Aiders | Harding | Pull through a hard move on a wall pitch for a cam and 12 minutes (costs the free ascent) |
+| Aiders | Harding | Pull through a hard move on a wall pitch (costs the free ascent). On the screen you nail a piton first (see below): a perfect pin takes 8 minutes, a seated one 12, an over-driven one 16, and one that pops costs 3 stamina and 6 minutes and you try again. Each pin takes a piece off the rack, as a cam did |
 | Ascenders | Johnson (Astroman) | Jug fixed ropes: 3 stamina, 8 minutes, you can't fall |
-| Haul bag, portaledge | Harding, Johnson | The bag swings below you (+10 minutes a pitch); a hanging night in a portaledge is a full night |
+| Haul bag, portaledge | Harding, Johnson | The bag swings below you, and at every belay but the top you haul it (see below): 6 minutes clean, 10 fair, 15 and 4 stamina sloppy. A hanging night in a portaledge is a full night |
 | Ice axe, crampons | Muir | Snow and ice moves cost less; the axe stops a slide (self-arrest) |
 
 ## Pitch styles
@@ -82,14 +82,25 @@ The painters in `scripts/climb/art/` draw on the 480 x 270 menu grid. `ClimbHiRe
 | mash | Tap Up quickly | Nutcracker's mantel |
 | rhythm | Alternate Left and Right to the beat | The Narrows, Harding Slot, the King Swing, the Pendulum |
 | dyno | Hold `Space` (or Up) to sink onto the move; a fill rises (0.7 of the timing marker's speed) and only goes up. Let go in the green (center is perfect); hold to the end and you peel off. You have the mash check's time to start | Astroman's chicken wing dyno, in the flare below the Harding Slot |
+| swing | Lowered out on the rope, you're a pendulum. Hold Left or Right to run: with the swing it grows, against it it brakes. `Space` (or `E`, or Up) grabs the crack off to the right: in the green it holds, at the top of the swing dead on it's perfect. Grab too soon and you miss; keep running and you slam into the corner past the crack. A dot on the arc shows how far the swing will carry you | The King Swing on the Nose, the Pendulum on Royal Arches |
+| layback | Hold `Space` (or `E`) to pull on the flake; the tension rises while you hold and falls when you let go. Tap Up to step your feet: a step holds with the tension in the green and eases it a little, and the green creeps up as the flake steepens. Step with too little and you barn-door off; hold it above the green and a strain bar fills until you pump off. Six steps; get there with little strain for a perfect | Every crux point on a flake pitch (the Nose's Texas and Boot Flakes and Pancake Flake), Nutcracker's Hand-Crack Corner, Astroman's Enduro Corner |
 
-**How many.** A pitch's authored crux always counts. On top of it a grade 3 pitch has at least 1 crux point, a grade 4 pitch 2 and a grade 5 pitch 3 (`ClimbProfiles.CRUXES_BY_DIFF`), spread out and kept off the stances and fixed ropes. The added ones are timing checks named for the pitch's style, and add only 2 to their holds, so they test timing more than stamina. Swan Slab and Firefall Slab have 1 crux; the Nose has 20.
+**Two more that aren't cruxes.** They're played the same way on the screen, but don't count as cruxes on the result card or for Steady Breath:
+
+| Check | How | When |
+|---|---|---|
+| Nail a pin | The hammer swings on the top bar; `Space` strikes, harder the higher it is. Each blow drives the pin and it rings higher as it seats. Up (or `E`) steps onto it: in the green it holds (its middle is perfect), past the green it's over-driven, short of it it pops | Every aid move (Shift + an arrow on the Great Roof and the Changing Corners) |
+| Haul the bag | Hold `Space` (or `E`) to pull a stroke, let go so the ratchet holds while your arms reset. Holding on at the end of a stroke only strains you. When it snags under a flake (once, or twice on a grade 5 pitch), alternate Left and Right to wiggle it free; pulling against a snag is wasted strength. Clean is under 7 seconds with little strain; it can't fail, and after 20 seconds your partner helps | At every belay on a big wall with a haul bag, before the next pitch (and before the night) |
+
+The rules of these four are in `scripts/climb/checks/` (`ClimbCheck` and one class each), drawn by `scripts/climb/art/climb_check_hud.gd`. `ClimbState.make_check()` builds the one a pending check needs. Both assists apply: Relaxed and Gentle timing widen their greens and slow them down (a slowed swing's clock runs slower too, so it never leaves you less time), and Hold to tap wiggles a snagged bag while you hold Left or Right, and steps up a layback while you hold Up with the tension in the green.
+
+**How many.** A pitch's authored crux always counts. On top of it a grade 3 pitch has at least 1 crux point, a grade 4 pitch 2 and a grade 5 pitch 3 (`ClimbProfiles.CRUXES_BY_DIFF`), spread out and kept off the stances and fixed ropes. The added ones are timing checks named for the pitch's style (laybacks on a flake, or where a pitch's `crux_default` says so), and add only 2 to their holds, so they test timing more than stamina. Swan Slab and Firefall Slab have 1 crux; the Nose has 20.
 
 **How fast.** The timing marker's speed is `0.85 + 0.12 x pitch grade + 0.06 x the route's hardest grade` bar lengths a second (`ClimbState.crux_speed`), from about 1.0 on Swan Slab to 1.7 on the Nose. It's capped so the marker never crosses the green in less than 0.1 seconds. The green is `0.30 - 0.025 x grade`, wider with shoes, chalk and a top rope, and narrower by 0.02 for each point of pump: arrive fresh. Rhythm and mash checks lose 0.2 seconds a grade.
 
 **A miss.** Outside the green (or waiting out nine sweeps) costs `3 + 2 x grade` stamina and leaves you spent on the move. `E` eats the next food in the pack and brings the meter back, with the green 0.03 wider and the marker 10% slower for each miss so far (up to 4). The route card's food advice includes a spare snack for every 4 crux points.
 
-Bots and tests resolve cruxes as an average move; the screen sets `ClimbState.interactive`.
+Bots and tests resolve cruxes as an average move, aid as a cam and 12 minutes, and the haul as 10 minutes; the screen sets `ClimbState.interactive`, and then all four wait in `ClimbState.pending` for the screen.
 
 ## Economy
 
@@ -104,7 +115,8 @@ With `base = 2 + grade` (grade is the pitch's 1-5 difficulty), a jug costs `base
 ## Verification
 
 - `tests/climb_test.tscn`: every route has a profile and authored pitches, every pitch has a line (and one you can protect all the way), a careful bot tops every route and a greedy one does clearly worse on the hard ones, pump and shaking out, each piece of gear does its job, cruxes (the spent rule, crux points and meter speed by grade), weather, wall weather (wet rock, wind, heat, the storm's warning and the lightning, the forecast), nights.
-- `tests/climb_screen_test.tscn` (needs a window): plays every route on the real screen, through crux checks, nights and the result card, and draws a stormy, windy day (the lightning ending the climb) and a hot, drying one.
+- `tests/climb_checks_test.tscn`: the swing, the piton, the haul and the layback played by scripted players (a careful one gets up each, every way of getting it wrong goes wrong the way it says), the aid move and the haul waiting on them in `ClimbState`, and the routes asking for them where they should.
+- `tests/climb_screen_test.tscn` (needs a window): plays every route on the real screen, through crux checks (the four longer ones by their own keys too), nights and the result card, and draws a stormy, windy day (the lightning ending the climb) and a hot, drying one.
 - Screenshots: see the README.
 
 ## Not done yet
