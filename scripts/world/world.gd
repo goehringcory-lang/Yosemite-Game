@@ -104,6 +104,7 @@ func _ready() -> void:
 	# people walking between the Valley's areas on days of their own
 	add_child(Travelers.new())
 	add_child(Rustle.new())
+	add_child(Wind.new())
 	add_child(StringLights.new())
 	player.add_child(Lantern.new())
 	add_child(WaterSurface.new())
@@ -566,6 +567,7 @@ func _set_up_step(id: String) -> void:
 			remove_child(made)
 		_:
 			LitSprites.attach(made)
+			Wind.attach(made)
 			made.remove_meta("set_up_step")
 			_setting_up.erase(id)
 			_regions[id] = made

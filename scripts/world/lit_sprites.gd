@@ -80,6 +80,8 @@ static func material_for(art: String) -> ShaderMaterial:
 		mat = ShaderMaterial.new()
 		mat.shader = SHADER
 		mat.set_shader_parameter("normal_map", normal)
+		# trees and plants sway in the wind through this same material
+		mat.set_shader_parameter("sway", Wind.lean_for(art))
 	_materials[art] = mat
 	return mat
 

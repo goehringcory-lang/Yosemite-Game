@@ -11,6 +11,8 @@ extends Node
 ##                  (default: the region's arrival); names get the spawn
 ##   SHOT_UNLIT     1 to leave the sprites unlit (LitSprites off), as on
 ##                  the Compatibility renderer
+##   SHOT_WIND      1 to let the wind blow (default: still air, so two
+##                  runs match)
 ##   SHOT_PREFIX    put before every file name (default none)
 ##   SHOT_RENDERER  if set, quit with an error unless this renderer is the
 ##                  one running (forward_plus, mobile or gl_compatibility)
@@ -37,6 +39,8 @@ func _ready() -> void:
 		get_tree().quit(1)
 		return
 	LitSprites.enabled = OS.get_environment("SHOT_UNLIT") != "1"
+	# still air, so two runs of the tour give the same picture
+	Wind.enabled = OS.get_environment("SHOT_WIND") == "1"
 	SaveManager.save_path = "user://renderer_tour_save.json"
 	SaveManager.delete_save()
 	var world: Node = load("res://scenes/world/world.tscn").instantiate()
