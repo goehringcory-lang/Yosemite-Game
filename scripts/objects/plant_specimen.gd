@@ -27,6 +27,12 @@ func _ready() -> void:
 	Herbarium.changed.connect(_refresh_glint)
 	QuestLog.changed.connect(_refresh_glint)
 	_refresh_glint()
+	add_to_group("photo_subjects")
+
+
+## What a camera pointed this way sees (Photos): the plant.
+func photo_subjects() -> Array:
+	return [{"kind": "plant", "id": plant_id, "name": str(Herbarium.get_plant(plant_id).get("name", "A plant")), "at": global_position + Vector2(0, -8)}]
 
 
 ## True while this plant would be new to the press book: it glints, so it

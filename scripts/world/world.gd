@@ -143,6 +143,9 @@ func _ready() -> void:
 	add_child(PauseMenu.new())
 	add_child(LookAway.new())
 	add_child(ProblemReport.new())
+	# the camera Ansel Adams lends you, and the album its prints go in
+	add_child(CameraView.new())
+	add_child(PhotoAlbum.new())
 	_update_location()
 
 

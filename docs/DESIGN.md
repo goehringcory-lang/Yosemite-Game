@@ -162,7 +162,7 @@ Possible historical figures:
 | **James Lamon** | First non-Native settler to stay year-round. Orchard (apples). |
 | **Clare Marie Hodges** | First woman ranger (1918) |
 | **Enid Michael** | Early naturalist and botanist. A plant-ID / foraging mentor, and the one who hands over the plant press (the second storyline: see STORY.md, "The press book"). |
-| **Ansel Adams** | Photography quests, views from the rim |
+| **Ansel Adams** | Photography quests, views from the rim. Built: he lends you his Box Brownie, and his shot list is the camera's collection log (`scripts/story/photos.gd`; the README's Photography section). |
 
 ### Climbers
 | Person | Story / quest ideas |
@@ -232,12 +232,13 @@ All of this is wired into the World. Each region's people, climbs, and cooking s
 | System | Files | Notes |
 |---|---|---|
 | Gear | `scripts/story/gear.gd`, `data/gear/*.tres` | Autoload `Gear`. You start with approach shoes. The Mountain Shop's *Fitted Out* quest gives climbing shoes, a chalk bag, a harness, and 5 quickdraws. |
-| Quests & dialogue | `scripts/story/quest_log.gd`, `quest_data.gd`, `character_data.gd`, `dialogue_box.gd`, `npc.gd` | Autoload `QuestLog`. Quest steps: have, have_food, pay, talk, chuckah, stored, made, climbed, return. Invented staff (the Mountain Shop's two, the Ahwahnee's chef) are in `QuestLog.STAFF`. |
+| Quests & dialogue | `scripts/story/quest_log.gd`, `quest_data.gd`, `character_data.gd`, `dialogue_box.gd`, `npc.gd` | Autoload `QuestLog`. Quest steps: have, have_food, pay, talk, chuckah, stored, made, climbed, return (and more since: see `quest_data.gd`). Invented staff (the Mountain Shop's two, the Ahwahnee's chef) are in `QuestLog.STAFF`. |
 | Food & spoilage | `scripts/story/food_db.gd`, `larder.gd`, `data/food/*.tres` | Autoloads `FoodDB` (energy, shelf life) and `Larder` (spoils food overnight). |
 | Chuckah | `scripts/story/granary.gd`, `chuckah.gd` | Autoload `Granary`. Stored acorns never spoil, and one chuckah holds 60. |
 | Cooking | `scripts/story/recipes.gd`, `station.gd`, `data/recipes/*.tres` | Stations: campfire, bedrock mortar, leaching basin. Acorn chain: 4 acorns → flour → leached meal → mush or cakes. |
 | Climbing | `scripts/climb/*`, `scenes/climb/*`, `data/routes/*.tres` | Rules are in `ClimbState`, pictures in `scripts/climb/art/`. Cams in cracks, or quickdraws on bolts (`RouteData.protection`). A route can need a partner (`RouteData.partner_quest`). |
 | Journal | `scripts/story/journal.gd` | One book, six tabs (Journal, Quests, Press Book, Wildlife, Logbook, Backpack). J: the Register, the guidebook's tick list, and perks. Q: the main story's next step and open quests. B: the Backpack, a grid of slots for gear, food (with days left), and forage, plus the chuckah. Tab (LB/RB) flips tabs. Pauses the clock. |
+| Photography | `scripts/story/photos.gd`, `scripts/ui/camera_view.gd`, `scripts/ui/photo_album.gd` | Autoload `Photos`. Ansel Adams's camera: a viewfinder over the world, real prints of what the frame held, an album, and a 25-picture shot list. Quest step: photographed. |
 | Perks | `scripts/story/perks.gd` | Autoload `Perks`. Ten gentle bonuses earned from people and experience; see **Perks** above. |
 | Tests | `tests/story_test.tscn`, `tests/world_story_test.tscn` | Run headless. The world test uses its own save file. |
 

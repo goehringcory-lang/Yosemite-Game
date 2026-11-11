@@ -31,6 +31,14 @@ func _ready() -> void:
 	material = add
 	z_index = 3
 	visible = false
+	add_to_group("photo_subjects")
+
+
+## What a camera pointed this way sees (Photos): the arc, while it shows.
+func photo_subjects() -> Array:
+	if level < 0.3:
+		return []
+	return [{"kind": "event", "id": "moonbow", "name": "The Moonbow", "at": global_position}]
 
 
 func _process(delta: float) -> void:

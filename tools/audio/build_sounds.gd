@@ -81,6 +81,8 @@ func _init() -> void:
 		_save("call_swift" + take, _call_swift(116 + i), RATE_FX, -16.0)
 		_save("call_coyote" + take, _call_coyote(118 + i), RATE_FX, -17.0)
 		_save("thunder" + take, _thunder(120 + i), RATE_BED, -7.0)
+	# The camera's shutter (last again, so nothing above changes).
+	_save("shutter", _shutter(130), RATE_FX, -8.0)
 	print("Sounds written to %s. Run godot --headless --path . --import next." % OUT)
 	quit()
 
@@ -568,6 +570,19 @@ func _clip(seed_value: int) -> PackedFloat32Array:
 	_add_click(buf, RATE_FX, 0.0, 0.004, 0.4)
 	_add_ping(buf, RATE_FX, 0.09, metal, 0.03, 0.9)
 	_add_click(buf, RATE_FX, 0.09, 0.005, 0.8)
+	return buf
+
+
+## A box camera's shutter: the lever's click, the leaf snapping across, and
+## a duller clack as it comes to rest.
+func _shutter(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(0.22, RATE_FX)
+	var tin := [[1450.0, 1.0], [2380.0, 0.5], [3900.0, 0.3]]
+	_add_click(buf, RATE_FX, 0.0, 0.004, 0.6)
+	_add_ping(buf, RATE_FX, 0.0, tin, 0.01, 0.4)
+	_add_click(buf, RATE_FX, 0.055, 0.007, 1.0)
+	_add_ping(buf, RATE_FX, 0.055, [[820.0, 1.0], [1640.0, 0.4]], 0.018, 0.7)
 	return buf
 
 

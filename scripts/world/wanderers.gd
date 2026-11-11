@@ -50,6 +50,17 @@ var _last_region: Node
 
 func _ready() -> void:
 	_rng.randomize()
+	add_to_group("photo_subjects")
+
+
+## What a camera pointed this way sees (Photos): each animal about.
+func photo_subjects() -> Array:
+	var out := []
+	var animal_name := str(FieldLog.get_animal(animal_id).get("name", animal_id.capitalize()))
+	for animal in _animals:
+		if is_instance_valid(animal):
+			out.append({"kind": "animal", "id": animal_id, "name": animal_name, "at": animal.global_position + Vector2(0, -12)})
+	return out
 
 
 func _world() -> Node:

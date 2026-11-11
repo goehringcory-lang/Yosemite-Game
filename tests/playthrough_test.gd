@@ -19,6 +19,7 @@ const WORLD_ABILITIES := {
 	"half_dome_cables": "climbing the Half Dome cables (Backcountry)",
 	"diving_board_light": "the Diving Board in the afternoon (Backcountry)",
 	"muir_cloud_sea": "on top of Half Dome before ten after a night at Little Yosemite (Backcountry)",
+	"first_photograph": "the first picture taken with Ansel's camera (Photos)",
 }
 
 var failures := 0
@@ -222,6 +223,18 @@ func _do_step(quest: QuestData, step: Dictionary) -> bool:
 					_flagged[quest.id + ":" + ability] = true
 					check(false, "%s waits on ability %s, which nothing hands over" % [quest.id, ability])
 				return false
+		"photographed":
+			# A picture for each line of Ansel's list, the asked-for ones first.
+			check(Photos.has_camera(), "%s asks for photographs once you have the camera" % quest.id)
+			var shots: Array = step.get("shots", [])
+			for id: String in shots:
+				check(not Photos.get_entry(id).is_empty(), "%s asks for a picture on the list: %s" % [quest.id, id])
+				Photos.listed[id] = {"day": Friendship.today(), "title": "playthrough"}
+			for entry: Dictionary in Photos.SHOT_LIST:
+				if Photos.listed_count() >= int(step.get("count", 0)):
+					break
+				Photos.listed[entry.id] = {"day": Friendship.today(), "title": "playthrough"}
+			check(Photos.listed_count() >= int(step.get("count", 0)), "%s asks for no more pictures than the list holds" % quest.id)
 		"work":
 			var work := Stewardship.next_work_step(quest)
 			var task: String = work.get("task", step.task)

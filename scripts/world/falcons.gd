@@ -45,6 +45,15 @@ var _last_region: Node
 func _ready() -> void:
 	z_index = 30
 	_rng.randomize()
+	add_to_group("photo_subjects")
+
+
+## What a camera pointed this way sees (Photos): each falcon, up where it flies.
+func photo_subjects() -> Array:
+	var out := []
+	for falcon in _falcons:
+		out.append({"kind": "animal", "id": "peregrine_falcon", "name": "Peregrine Falcon", "at": to_global(falcon.pos - Vector2(0, falcon.height))})
+	return out
 
 
 func _world() -> Node:

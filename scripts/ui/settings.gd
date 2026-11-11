@@ -121,6 +121,7 @@ const BINDINGS := [
 	{"id": "quests", "name": "Quests", "actions": ["quests"], "key": KEY_Q, "pad": "Y, then RB"},
 	{"id": "backpack", "name": "Backpack", "actions": ["backpack"], "key": KEY_B, "pad": "Y, then RB"},
 	{"id": "press", "name": "Press book", "actions": ["press_book"], "key": KEY_P, "pad": "Y, then RB"},
+	{"id": "camera", "name": "Camera", "actions": ["camera"], "key": KEY_F, "pad": "RB"},
 ]
 ## Keys the menus need, so they can't be given to anything else.
 const RESERVED_KEYS := [KEY_ESCAPE, KEY_ENTER, KEY_KP_ENTER, KEY_TAB, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT]
@@ -512,7 +513,7 @@ static func key_text(keyboard: String) -> String:
 	if keys.is_empty():
 		return keyboard
 	if _key_pattern == null:
-		_key_pattern = RegEx.create_from_string("(?<![A-Za-z])(WASD|Space|Shift|[EGMJQBP])(?![A-Za-z])")
+		_key_pattern = RegEx.create_from_string("(?<![A-Za-z])(WASD|Space|Shift|[EGMJQBPF])(?![A-Za-z])")
 	var out := ""
 	var at := 0
 	for found in _key_pattern.search_all(keyboard):
@@ -522,7 +523,7 @@ static func key_text(keyboard: String) -> String:
 	return out + keyboard.substr(at)
 
 
-const _HINT_IDS := {"Space": "use", "Shift": "run", "E": "interact", "G": "gift", "M": "map", "J": "journal", "Q": "quests", "B": "backpack", "P": "press"}
+const _HINT_IDS := {"Space": "use", "Shift": "run", "E": "interact", "G": "gift", "M": "map", "J": "journal", "Q": "quests", "B": "backpack", "P": "press", "F": "camera"}
 
 
 static func _hint_name(token: String) -> String:

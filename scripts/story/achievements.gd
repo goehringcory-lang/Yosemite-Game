@@ -65,6 +65,9 @@ const SUMMITS: Array[Dictionary] = [
 ##   medal            a gold medal on any slackline
 ##   pressed n        n plants in the press book
 ##   hearts           a friend at full hearts
+##   photos n         take n photographs (Photos)
+##   photo_stars n    make a photograph with n stars
+##   shot_list n      n pictures on Ansel's shot list ("all" for every one)
 const ACHIEVEMENTS: Array[Dictionary] = [
 	# Summits
 	{"id": "first_summit", "name": "Top of the World", "group": "Summits",
@@ -123,10 +126,19 @@ const ACHIEVEMENTS: Array[Dictionary] = [
 		"unlock": {"type": "stat", "id": "rescues", "count": 10}, "how": "Answer 10 rescue calls from the Camp 4 rescue site."},
 	{"id": "best_friend", "name": "Best of Friends", "group": "Valley life",
 		"unlock": {"type": "hearts"}, "how": "Fill every heart with a friend."},
+	# Photography
+	{"id": "first_print", "name": "First Exposure", "group": "Photography",
+		"unlock": {"type": "photos", "count": 1}, "how": "Take a photograph with the camera Ansel Adams lends you."},
+	{"id": "three_stars", "name": "Worth the Wait", "group": "Photography",
+		"unlock": {"type": "photo_stars", "count": 3}, "how": "Make a three-star photograph: the right subject in the right light."},
+	{"id": "portfolio", "name": "A Portfolio", "group": "Photography",
+		"unlock": {"type": "shot_list", "count": 8}, "how": "Photograph 8 of the pictures on Ansel's list."},
+	{"id": "whole_valley", "name": "The Whole Valley on Paper", "group": "Photography",
+		"unlock": {"type": "shot_list", "count": "all"}, "how": "Photograph every picture on Ansel's list."},
 ]
 
 ## The order the Logbook lists the groups in.
-const GROUPS := ["Summits", "Climbing", "Fishing", "Wildlife", "Valley life"]
+const GROUPS := ["Summits", "Climbing", "Fishing", "Wildlife", "Valley life", "Photography"]
 ## How long the HUD must be free before an achievement shows, and the time
 ## between two queued ones (as Perks).
 const TOAST_DELAY := 2.0
@@ -357,6 +369,14 @@ func progress(achievement: Dictionary) -> Array[int]:
 			for id: String in Friendship.points:
 				if Friendship.hearts(id) >= Friendship.MAX_HEARTS:
 					have = 1
+		"photos":
+			have = Photos.total
+			need = int(unlock.count)
+		"photo_stars":
+			have = 1 if Photos.best_ever >= int(unlock.count) else 0
+		"shot_list":
+			have = Photos.listed_count()
+			need = Photos.SHOT_LIST.size() if str(unlock.count) == "all" else int(unlock.count)
 	return [mini(have, need), need]
 
 

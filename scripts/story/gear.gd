@@ -31,6 +31,9 @@ const GEAR: Array[GearData] = [
 	preload("res://data/gear/royal_wulff.tres"),
 	# For nights out in the backcountry (Backcountry).
 	preload("res://data/gear/bear_canister.tres"),
+	# The camera Ansel Adams lends you, and his other lenses (Photos).
+	preload("res://data/gear/camera.tres"),
+	preload("res://data/gear/camera_lenses.tres"),
 ]
 
 ## You arrive with approach shoes. The Mountain Shop fits you with your

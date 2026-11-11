@@ -45,6 +45,14 @@ func _ready() -> void:
 	_rng.seed = 1968
 	z_index = -5 # in front of the wall and its falls, behind the trees and people
 	visible = false
+	add_to_group("photo_subjects")
+
+
+## What a camera pointed this way sees (Photos): the fall, while it's burning.
+func photo_subjects() -> Array:
+	if level < 0.3:
+		return []
+	return [{"kind": "event", "id": "firefall", "name": "The Firefall", "at": to_global(Vector2(0, LENGTH * 0.35))}]
 
 
 func _process(delta: float) -> void:

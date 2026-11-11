@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/camera.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "camera"
+display_name = "Box Brownie"
+description = "Ansel Adams's first camera, a Kodak Box Brownie from 1916, on loan. Press the camera key to raise it, move the frame over what you want, and press the shutter. Prints go in the album, with Ansel's list of pictures he'd like to see."
+icon = ExtResource("2_icon")
+tier = 0

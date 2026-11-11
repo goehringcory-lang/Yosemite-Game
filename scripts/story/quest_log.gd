@@ -31,6 +31,10 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/mccauley_firefall.tres"),
 	preload("res://data/quests/enid_leave_some.tres"),
 	preload("res://data/quests/hodges_patrol.tres"),
+	# The camera (Photos): offered before his other stories, and the
+	# portfolio is unhurried, so it never holds them up.
+	preload("res://data/quests/ansel_brownie.tres"),
+	preload("res://data/quests/ansel_portfolio.tres"),
 	preload("res://data/quests/ansel_monolith.tres"),
 	preload("res://data/quests/eichorn_apron.tres"),
 	preload("res://data/quests/eichorn_spires.tres"),
@@ -70,6 +74,8 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/anderson_cables.tres"),
 	preload("res://data/quests/ansel_diving_board.tres"),
 	preload("res://data/quests/muir_south_dome.tres"),
+	# The rest of Ansel's shot list (Photos), after his other stories.
+	preload("res://data/quests/ansel_exhibition.tres"),
 	# The press book (QuestData.press_line): plants for the naturalists and
 	# rangers, beside the tick list. See Herbarium.
 	preload("res://data/quests/enid_press.tres"),
@@ -579,6 +585,9 @@ func is_step_done(step: Dictionary) -> bool:
 			return is_unlocked(step.ability)
 		"work":
 			return Stewardship.count(step.task) >= int(step.get("count", 1))
+		"photographed":
+			return Photos.listed_count() >= int(step.get("count", 0)) \
+					and step.get("shots", []).all(func(id: String) -> bool: return Photos.is_listed(id))
 	push_error("Unknown quest step type: %s" % step.get("type", ""))
 	return false
 
@@ -601,6 +610,11 @@ func objective_text(quest: QuestData) -> String:
 		return "Ticked! Tell %s" % (giver.display_name if giver else quest.giver)
 	if step.get("type") == "pressed":
 		return step.get("objective", "") + _pressed_progress(step)
+	if step.get("type") == "photographed":
+		var giver := get_character(quest.giver)
+		if is_step_done(step):
+			return "%s (done). Show %s" % [step.get("objective", ""), giver.display_name if giver else quest.giver]
+		return "%s (%d of %d)" % [step.get("objective", ""), Photos.listed_count(), int(step.get("count", 0))]
 	if step.get("type") == "work":
 		# a run of work steps goes on to the next one without a talk between
 		var work := Stewardship.next_work_step(quest)
@@ -657,7 +671,7 @@ func talk_to(character_id: String, speaker_name := "", places := PackedStringArr
 			continue
 		# A press-book quest takes days of walking, so it doesn't hold up
 		# the giver's other stories.
-		had_own = had_own or not quest.press_line
+		had_own = had_own or not (quest.press_line or quest.unhurried)
 		var progressed := false
 		while active.has(quest.id):
 			var step := current_step(quest)
@@ -676,7 +690,8 @@ func talk_to(character_id: String, speaker_name := "", places := PackedStringArr
 			_add_lines(lines, speaker, [current_step(quest).get("reminder", "")])
 
 	# A new quest from this person, next time you talk. A side story in
-	# progress never holds up the main line, but otherwise one at a time.
+	# progress never holds up the main line, but otherwise one at a time
+	# (an unhurried one, like a press-book quest, holds nothing up).
 	var offer := available_from(character_id)
 	if finished_now or (had_own and not (offer and (offer.main_line or offer.press_line))):
 		return lines
@@ -689,6 +704,8 @@ func talk_to(character_id: String, speaker_name := "", places := PackedStringArr
 				var got := "Received the %s." % ability.replace("_", " ")
 				if ability == Herbarium.ABILITY:
 					got += " The press book is in your journal (P). Walk up to a plant to press a sprig."
+				if ability == Photos.ABILITY:
+					got += " Raise it with %s (RB on a gamepad), move the frame over what you want, and press the shutter." % Settings.key_label(Settings.key_for("camera"))
 				lines.append({"speaker": "", "text": got})
 		lines.append({"speaker": "", "text": "New quest: %s. %s" % [offer.title, current_step(offer).get("objective", "")]})
 		quest_started.emit(offer)
