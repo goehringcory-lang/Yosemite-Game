@@ -20,6 +20,7 @@ static func reset() -> void:
 	BoardRequests.start_new_game()
 	Rescues.start_new_game()
 	FieldLog.start_new_game()
+	Discoveries.start_new_game()
 	Festivals.start_new_game()
 	Stewardship.start_new_game()
 	Achievements.start_new_game()

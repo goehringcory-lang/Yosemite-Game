@@ -869,6 +869,8 @@ func _update_location() -> void:
 	if place and place.display_name != region.display_name:
 		parts.append(place.display_name)
 	hud.set_location(" · ".join(parts))
+	for found in Discoveries.visit(region, place):
+		hud.show_discovery(found)
 
 
 func get_offstage_persist_nodes() -> Array[Node]:

@@ -428,8 +428,11 @@ func _refresh_area_text() -> void:
 	var selected: Dictionary = _points[_cursor] if _cursor >= 0 else {}
 	var lines := ""
 	if not selected.is_empty():
-		lines = "%s. %s" % [selected.name, selected.blurb]
 		var stop_name: String = selected.get("stop", "")
+		if _point_known(selected) or stop_name != "":
+			lines = "%s. %s" % [selected.name, selected.blurb]
+		else:
+			lines = "Somewhere you haven't been yet. Go and find it, or see the Valley from a high lookout."
 		if _shuttle_from != "" and stop_name != "" and stop_name != _shuttle_from:
 			lines += "  [%s] Ride here, free, %d min." % [_button("E"), ShuttleStop.RIDE_MINUTES]
 		elif _shuttle_from != "" and stop_name == _shuttle_from:
@@ -625,6 +628,16 @@ func _draw_area_illustrated() -> void:
 		_draw_point(canvas, font, _cursor, true, false)
 
 
+## Is this sign's place known: a peak or fall (seen from anywhere), your
+## camp, a place you've walked to, or any place once you've seen the Valley
+## from a high lookout (Discoveries)?
+func _point_known(point: Dictionary) -> bool:
+	if point.get("tier", "") != "place" or Discoveries.valley_seen:
+		return true
+	var place_name: String = point.get("name", "")
+	return not Discoveries.is_listed_name(place_name) or Discoveries.is_name_found(place_name)
+
+
 ## The size of a point's sign.
 func _sign_size(font: Font, point: Dictionary) -> Vector2:
 	var tier: String = point.tier
@@ -700,6 +713,11 @@ func _overlap(a: Rect2, b: Rect2) -> float:
 func _draw_point(canvas: Control, font: Font, index: int, selected: bool, dimmed: bool) -> void:
 	var point: Dictionary = _points[index]
 	var text: String = point.name
+	# Places you haven't found keep their sign blank, unless the shuttle
+	# stops there (its stops are posted) and you're choosing one.
+	if not _point_known(point) and not (_shuttle_from != "" and point.has("stop")):
+		text = "???"
+		dimmed = true
 	var tier: String = point.tier
 	var ribbon := tier == "landmark" or tier == "fall"
 	var icon := 7.0 if ribbon else (8.0 if tier == "home" else 0.0)

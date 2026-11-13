@@ -29,6 +29,10 @@ var _hints_tween: Tween
 var _status: Label
 ## The "you got this" cards at the top left.
 var toasts: ItemToasts
+var _discovery_icon: Texture2D
+var _discovery_sting_at := -100000
+## Milliseconds between discovery stings.
+const DISCOVERY_STING_GAP_MS := 6000
 ## The menu-sized root every HUD element sits under (see UiScale).
 var _screen: Control
 ## Darkens the world behind the pause menu and the book.
@@ -197,6 +201,22 @@ func _on_item_added(id: String, amount: int) -> void:
 	if item:
 		toasts.notify(id, item.icon, item.display_name, amount)
 		Sound.play("pickup", 0.0, 0.08)
+
+
+## A place found for the first time (Discoveries.visit): a card with the
+## tally, and the story sting. A high lookout gets a line of its own.
+func show_discovery(found: Dictionary) -> void:
+	if found.get("viewpoint", false):
+		show_message("From %s the whole Valley lies below you. Every place in it is on your area map now." % found.name)
+		return
+	if _discovery_icon == null:
+		_discovery_icon = Discoveries.icon()
+	toasts.notify("place:" + str(found.key), _discovery_icon, "Discovered: %s (%d/%d)" % [found.name, found.count, found.total], 1)
+	# one sting at a time: an area and a spot in it often come together
+	var now := Time.get_ticks_msec()
+	if now - _discovery_sting_at > DISCOVERY_STING_GAP_MS:
+		_discovery_sting_at = now
+		Sound.play("story_sting", -6.0, 0.0)
 
 
 ## New gear is a bigger moment than a berry: it gets the brighter chime.

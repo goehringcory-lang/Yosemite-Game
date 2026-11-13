@@ -23,6 +23,7 @@ func _ready() -> void:
 	_check_hubs_and_roads()
 	_check_doors_and_reach()
 	_check_cables()
+	await _check_place_list()
 	await _check_shuttle()
 
 	SaveManager.delete_save()
@@ -125,6 +126,11 @@ func _check_shuttle() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	GameClock.minutes = 7 * 60
+	Discoveries.start_new_game()
+	var map: ParkMap = world.park_map
+	var unseen := {"tier": "place", "name": "Tunnel View"}
+	check(not map._point_known(unseen), "the area map hides a place you haven't found")
+	check(map._point_known({"tier": "landmark", "name": "Half Dome"}), "but the peaks and falls are always on it")
 	var first: Dictionary = ShuttleStop.STOPS[0]
 	await world.go_to_region(first.region, first.spawn)
 	await _settle(world)
@@ -142,17 +148,59 @@ func _check_shuttle() -> void:
 		await _settle(world)
 		check(world.region.region_id == dest.region and world.player.position == world.region.get_spawn(dest.spawn).position,
 			"the shuttle from %s drops you at %s (in %s)" % [from.name, dest.name, world.region.region_id])
-		check(GameClock.minutes - before == ShuttleStop.RIDE_MINUTES, "the ride to %s takes %d minutes" % [dest.name, ShuttleStop.RIDE_MINUTES])
+		# (the clock can tick on once while the screen wipes)
+		var took := GameClock.minutes - before
+		check(took >= ShuttleStop.RIDE_MINUTES and took < ShuttleStop.RIDE_MINUTES + 15, "the ride to %s takes %d minutes (%d)" % [dest.name, ShuttleStop.RIDE_MINUTES, took])
+
+	# Riding the loop discovers every stop's area, each with a card.
+	for _i in 3:
+		await get_tree().process_frame
+	var missing := PackedStringArray()
+	for stop: Dictionary in ShuttleStop.STOPS:
+		var region: Region = world._get_region(stop.region)
+		if not Discoveries.is_found(Discoveries.key_for(stop.region, region.display_name)):
+			missing.append(stop.region)
+	check(missing.is_empty(), "riding the loop discovers every stop's area (missing: %s)" % ", ".join(missing))
+	check(Discoveries.count() >= 8 and Discoveries.count() < Discoveries.total(), "%d of %d places found so far" % [Discoveries.count(), Discoveries.total()])
+	check(map._point_known({"tier": "place", "name": "Curry Village"}) and not map._point_known(unseen), "the map names the places you've been")
+	check(not Discoveries.valley_seen, "the Valley floor isn't a lookout")
+	var progress := Achievements.progress(Achievements.ACHIEVEMENTS.filter(func(a: Dictionary) -> bool: return a.id == "wanderer")[0])
+	check(progress[0] == Discoveries.count() and progress[1] == 25, "Wanderer counts the places found (%s)" % str(progress))
 
 	# And from the loop, the once-locked places: the rim and the cave.
 	await world.go_to_region("glacier_point", "arrival")
 	await _settle(world)
+	for _i in 3:
+		await get_tree().process_frame
 	check(world.region.region_id == "glacier_point", "you can go straight to Glacier Point")
+	check(Discoveries.valley_seen and map._point_known(unseen), "from Glacier Point every place in the Valley shows on the map")
+	check(Discoveries.is_found("glacier_point/Glacier Point"), "and Glacier Point itself is discovered")
+	var saved := Discoveries.save_data()
+	var had := Discoveries.count()
+	Discoveries.start_new_game()
+	check(Discoveries.count() == 0 and not Discoveries.valley_seen, "a new game starts with nothing discovered")
+	Discoveries.load_data(saved)
+	check(Discoveries.count() == had and Discoveries.valley_seen, "discoveries are saved and loaded")
+	Discoveries.load_data({})
+	check(Discoveries.count() == 0, "a save from before discoveries loads with none")
+	Discoveries.load_data(saved)
 	await world.go_to_region("guardian_cave", "door")
 	await _settle(world)
 	check(world.region.region_id == "guardian_cave", "and into the Guardian's cave")
 	world.queue_free()
 	await get_tree().process_frame
+
+
+## data/park/places.json matches the regions (run
+## tools/discovery/list_places.tscn after adding or renaming a Place).
+func _check_place_list() -> void:
+	var lister := preload("res://tools/discovery/list_places.gd")
+	var now: Array = await lister.collect(self)
+	var keys := now.map(func(p: Dictionary) -> String: return p.key)
+	var listed := Discoveries.places().map(func(p: Dictionary) -> String: return p.key)
+	check(keys == listed, "the list of places to discover is up to date (%d listed, %d in the regions)" % [listed.size(), keys.size()])
+	for key in ["ahwahnee_meadow/Yosemite Medical Clinic", "ahwahnee_meadow/Yosemite Valley School", "yosemite_village/Lower Yosemite Fall"]:
+		check(key in listed, "%s is a place to discover" % key)
 
 
 func _stop_named(region: Node, stop_name: String) -> ShuttleStop:
