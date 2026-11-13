@@ -116,6 +116,10 @@ const ACHIEVEMENTS: Array[Dictionary] = [
 	{"id": "every_animal", "name": "Naturalist", "group": "Wildlife",
 		"unlock": {"type": "animals", "count": "all"}, "how": "Fill in the whole field log."},
 	# Valley life
+	{"id": "wanderer", "name": "Wanderer", "group": "Valley life",
+		"unlock": {"type": "places", "count": 25}, "how": "Discover 25 places in the park."},
+	{"id": "every_corner", "name": "Every Corner", "group": "Valley life",
+		"unlock": {"type": "places", "count": "all"}, "how": "Discover every place in the park."},
 	{"id": "night_out", "name": "Under the Stars", "group": "Valley life",
 		"unlock": {"type": "unlock", "id": Backcountry.NIGHT_OUT}, "how": "Spend a night in the backcountry with your food in a bear canister."},
 	{"id": "slackline_gold", "name": "Gold on the Line", "group": "Valley life",
@@ -170,6 +174,7 @@ func _ready() -> void:
 		_by_id[achievement.id] = achievement
 	QuestLog.changed.connect(_on_progress)
 	FieldLog.changed.connect(_on_progress)
+	Discoveries.changed.connect(_on_progress)
 	Perks.changed.connect(_on_progress)
 	Herbarium.changed.connect(_on_progress)
 	Rescues.changed.connect(_on_progress)
@@ -343,6 +348,9 @@ func progress(achievement: Dictionary) -> Array[int]:
 					have = 1
 		"length":
 			have = 1 if int(fish.get(unlock.id, {}).get("biggest", 0)) >= int(unlock.inches) else 0
+		"places":
+			have = Discoveries.count()
+			need = Discoveries.total() if str(unlock.count) == "all" else int(unlock.count)
 		"animals":
 			have = FieldLog.count()
 			need = FieldLog.total() if str(unlock.count) == "all" else int(unlock.count)

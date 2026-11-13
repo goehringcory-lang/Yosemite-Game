@@ -879,6 +879,7 @@ func _logged(animal: Dictionary) -> Dictionary:
 ## Achievements, then the collection log: summits, climbs sent, fish caught.
 func _logbook_page() -> void:
 	_achievements()
+	_places_found()
 	_summits()
 	_sends()
 	_fish()
@@ -899,6 +900,30 @@ func _achievements() -> void:
 			var p := Achievements.progress(achievement)
 			var count := " (%d of %d)" % [p[0], p[1]] if p[1] > 1 else ""
 			_check_line(false, "%s · %s%s" % [achievement.name, achievement.how, count], DIM)
+
+
+## Places discovered, area by area (Discoveries): how many of each area's
+## places you've walked to, and the names of those you have.
+func _places_found() -> void:
+	_heading("Places discovered: %d of %d" % [Discoveries.count(), Discoveries.total()])
+	var areas: Dictionary = {}
+	for place: Dictionary in Discoveries.places():
+		var area: Array = areas.get_or_add(place.region, [0, 0, PackedStringArray()])
+		area[1] += 1
+		if Discoveries.is_found(place.key):
+			area[0] += 1
+			area[2].append(place.name)
+	var any := false
+	for region_id: String in areas:
+		var area: Array = areas[region_id]
+		if area[0] == 0:
+			continue
+		any = true
+		var names: PackedStringArray = area[2]
+		_check_line(area[0] == area[1], "%s (%d of %d)" % [names[0], area[0], area[1]] + (": " + ", ".join(names.slice(1)) if names.size() > 1 else ""),
+			DONE if area[0] == area[1] else DIM)
+	if not any:
+		_line("Walk somewhere new and it goes in here. From a high lookout the whole Valley shows on your area map.", DIM)
 
 
 ## The summits you've stood on, highest first, and how to reach the rest.

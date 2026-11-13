@@ -1,0 +1,581 @@
+{
+	"_note": "Written by tools/discovery/list_places.tscn. Run it again after adding or renaming a Place.",
+	"places": [
+		{
+			"hub": "yosemite_valley",
+			"key": "ahwahnee_meadow/Ahwahnee Meadow",
+			"name": "Ahwahnee Meadow",
+			"region": "ahwahnee_meadow"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "ahwahnee_meadow/Yosemite Medical Clinic",
+			"name": "Yosemite Medical Clinic",
+			"region": "ahwahnee_meadow"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "ahwahnee_meadow/Yosemite Valley School",
+			"name": "Yosemite Valley School",
+			"region": "ahwahnee_meadow"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "ahwahnee_trail/Stoneman Meadow",
+			"name": "Stoneman Meadow",
+			"region": "ahwahnee_trail"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "ahwahnee_trail/Merced River",
+			"name": "Merced River",
+			"region": "ahwahnee_trail"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "ahwahnee_trail/Stoneman Bridge",
+			"name": "Stoneman Bridge",
+			"region": "ahwahnee_trail"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "ahwahnee_trail/Far bank",
+			"name": "Far bank",
+			"region": "ahwahnee_trail"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "big_oak_flat_junction/Big Oak Flat Road Junction",
+			"name": "Big Oak Flat Road Junction",
+			"region": "big_oak_flat_junction"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "bridalveil_fall/Bridalveil Fall",
+			"name": "Bridalveil Fall",
+			"region": "bridalveil_fall"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "bridalveil_fall/Cathedral Beach",
+			"name": "Cathedral Beach",
+			"region": "bridalveil_fall"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "crane_flat/Crane Flat",
+			"name": "Crane Flat",
+			"region": "crane_flat"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "crows_camp/Crow's Camp",
+			"name": "Crow's Camp",
+			"region": "crows_camp"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "curry_village/Curry Village",
+			"name": "Curry Village",
+			"region": "curry_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "curry_village/Camp Curry Plaza",
+			"name": "Camp Curry Plaza",
+			"region": "curry_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "curry_village/Tent cabins",
+			"name": "Tent cabins",
+			"region": "curry_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "curry_village/Stoneman Meadow",
+			"name": "Stoneman Meadow",
+			"region": "curry_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "curry_village/Lamon Orchard",
+			"name": "Lamon Orchard",
+			"region": "curry_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "curry_village/Glacier Point Apron trail",
+			"name": "Glacier Point Apron trail",
+			"region": "curry_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "curry_village/Merced River",
+			"name": "Merced River",
+			"region": "curry_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "el_capitan_meadow/El Capitan Meadow",
+			"name": "El Capitan Meadow",
+			"region": "el_capitan_meadow"
+		},
+		{
+			"hub": "el_portal",
+			"key": "el_portal/El Portal",
+			"name": "El Portal",
+			"region": "el_portal"
+		},
+		{
+			"hub": "el_portal",
+			"key": "el_portal/El Portal Market",
+			"name": "El Portal Market",
+			"region": "el_portal"
+		},
+		{
+			"hub": "el_portal",
+			"key": "el_portal/Yosemite Valley Railroad",
+			"name": "Yosemite Valley Railroad",
+			"region": "el_portal"
+		},
+		{
+			"hub": "el_portal",
+			"key": "el_portal/Yosemite View Lodge",
+			"name": "Yosemite View Lodge",
+			"region": "el_portal"
+		},
+		{
+			"hub": "el_portal",
+			"key": "el_portal/Rancheria Flat",
+			"name": "Rancheria Flat",
+			"region": "el_portal"
+		},
+		{
+			"hub": "el_portal",
+			"key": "el_portal/Arch Rock Entrance",
+			"name": "Arch Rock Entrance",
+			"region": "el_portal"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "four_mile_trailhead/Four Mile Trailhead",
+			"name": "Four Mile Trailhead",
+			"region": "four_mile_trailhead"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "four_mile_trailhead/Sentinel Beach",
+			"name": "Sentinel Beach",
+			"region": "four_mile_trailhead"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "glacier_point/Glacier Point",
+			"name": "Glacier Point",
+			"region": "glacier_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "glacier_point/Overhanging Rock",
+			"name": "Overhanging Rock",
+			"region": "glacier_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "glacier_point/Geology Hut",
+			"name": "Geology Hut",
+			"region": "glacier_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "glacier_point/Glacier Point Hotel site",
+			"name": "Glacier Point Hotel site",
+			"region": "glacier_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "glacier_point/Glacier Point Amphitheater",
+			"name": "Glacier Point Amphitheater",
+			"region": "glacier_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "glacier_point/Glacier Point Parking",
+			"name": "Glacier Point Parking",
+			"region": "glacier_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "glacier_point/Washburn Point",
+			"name": "Washburn Point",
+			"region": "glacier_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "glacier_point/Sentinel Dome",
+			"name": "Sentinel Dome",
+			"region": "glacier_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "glacier_point/Sentinel Dome Trailhead",
+			"name": "Sentinel Dome Trailhead",
+			"region": "glacier_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "glacier_point/Sentinel Creek",
+			"name": "Sentinel Creek",
+			"region": "glacier_point"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "half_dome/Half Dome",
+			"name": "Half Dome",
+			"region": "half_dome"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "half_dome/Sub Dome",
+			"name": "Sub Dome",
+			"region": "half_dome"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "half_dome/The Diving Board",
+			"name": "The Diving Board",
+			"region": "half_dome"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "happy_isles/Happy Isles",
+			"name": "Happy Isles",
+			"region": "happy_isles"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "housekeeping_camp/Housekeeping Camp",
+			"name": "Housekeeping Camp",
+			"region": "housekeeping_camp"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "lamon_homestead/Lamon Homestead",
+			"name": "Lamon Homestead",
+			"region": "lamon_homestead"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "leidig_meadow/Leidig Meadow",
+			"name": "Leidig Meadow",
+			"region": "leidig_meadow"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "leidig_meadow/El Capitan Picnic Area",
+			"name": "El Capitan Picnic Area",
+			"region": "leidig_meadow"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "little_yosemite_valley/Little Yosemite Valley",
+			"name": "Little Yosemite Valley",
+			"region": "little_yosemite_valley"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "mirror_lake/Mirror Lake",
+			"name": "Mirror Lake",
+			"region": "mirror_lake"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "tenaya_creek/Tenaya Creek",
+			"name": "Tenaya Creek",
+			"region": "tenaya_creek"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "tenaya_creek/North Pines",
+			"name": "North Pines",
+			"region": "tenaya_creek"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "the_ahwahnee/The Ahwahnee",
+			"name": "The Ahwahnee",
+			"region": "the_ahwahnee"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "the_ahwahnee/Entrance Circle",
+			"name": "Entrance Circle",
+			"region": "the_ahwahnee"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "the_ahwahnee/Rose Garden",
+			"name": "Rose Garden",
+			"region": "the_ahwahnee"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "the_ahwahnee/Tea Lawn",
+			"name": "Tea Lawn",
+			"region": "the_ahwahnee"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "the_ahwahnee/East Lawn",
+			"name": "East Lawn",
+			"region": "the_ahwahnee"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "the_ahwahnee/Royal Arch Cascade",
+			"name": "Royal Arch Cascade",
+			"region": "the_ahwahnee"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "the_ahwahnee/Royal Arches",
+			"name": "Royal Arches",
+			"region": "the_ahwahnee"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "tunnel_view/Tunnel View",
+			"name": "Tunnel View",
+			"region": "tunnel_view"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Tuolumne Meadows",
+			"name": "Tuolumne Meadows",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Tuolumne Meadows Visitor Center",
+			"name": "Tuolumne Meadows Visitor Center",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Tuolumne Meadows Store",
+			"name": "Tuolumne Meadows Store",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Tuolumne Meadows Campground",
+			"name": "Tuolumne Meadows Campground",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Tuolumne Meadows Lodge",
+			"name": "Tuolumne Meadows Lodge",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Soda Springs",
+			"name": "Soda Springs",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Parsons Memorial Lodge",
+			"name": "Parsons Memorial Lodge",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Lembert Dome",
+			"name": "Lembert Dome",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Dog Lake",
+			"name": "Dog Lake",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Pothole Dome",
+			"name": "Pothole Dome",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Cathedral Lakes Trailhead",
+			"name": "Cathedral Lakes Trailhead",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tuolumne_meadows/Cathedral Peak",
+			"name": "Cathedral Peak",
+			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "upper_pines/Upper Pines",
+			"name": "Upper Pines",
+			"region": "upper_pines"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "upper_pines/Lower Pines",
+			"name": "Lower Pines",
+			"region": "upper_pines"
+		},
+		{
+			"hub": "wawona",
+			"key": "wawona/Wawona",
+			"name": "Wawona",
+			"region": "wawona"
+		},
+		{
+			"hub": "wawona",
+			"key": "wawona/Wawona Hotel",
+			"name": "Wawona Hotel",
+			"region": "wawona"
+		},
+		{
+			"hub": "wawona",
+			"key": "wawona/Yosemite History Center",
+			"name": "Yosemite History Center",
+			"region": "wawona"
+		},
+		{
+			"hub": "wawona",
+			"key": "wawona/Wawona Covered Bridge",
+			"name": "Wawona Covered Bridge",
+			"region": "wawona"
+		},
+		{
+			"hub": "wawona",
+			"key": "wawona/Wawona Store",
+			"name": "Wawona Store",
+			"region": "wawona"
+		},
+		{
+			"hub": "wawona",
+			"key": "wawona/Wawona Meadow",
+			"name": "Wawona Meadow",
+			"region": "wawona"
+		},
+		{
+			"hub": "wawona",
+			"key": "wawona/Mariposa Grove",
+			"name": "Mariposa Grove",
+			"region": "wawona"
+		},
+		{
+			"hub": "wawona",
+			"key": "wawona/Mariposa Grove Welcome Plaza",
+			"name": "Mariposa Grove Welcome Plaza",
+			"region": "wawona"
+		},
+		{
+			"hub": "wawona",
+			"key": "wawona/Grizzly Giant",
+			"name": "Grizzly Giant",
+			"region": "wawona"
+		},
+		{
+			"hub": "wawona",
+			"key": "wawona/California Tunnel Tree",
+			"name": "California Tunnel Tree",
+			"region": "wawona"
+		},
+		{
+			"hub": "wawona",
+			"key": "wawona/Mariposa Grove Museum",
+			"name": "Mariposa Grove Museum",
+			"region": "wawona"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Yosemite Village",
+			"name": "Yosemite Village",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Camp 4",
+			"name": "Camp 4",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Yosemite Valley Lodge",
+			"name": "Yosemite Valley Lodge",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Lower Yosemite Fall",
+			"name": "Lower Yosemite Fall",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Indian Village",
+			"name": "Indian Village",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Village Store",
+			"name": "Village Store",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Yosemite Cemetery",
+			"name": "Yosemite Cemetery",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Cook's Meadow",
+			"name": "Cook's Meadow",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Camp 6 parking",
+			"name": "Camp 6 parking",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Merced River",
+			"name": "Merced River",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Sentinel Bridge",
+			"name": "Sentinel Bridge",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Swinging Bridge",
+			"name": "Swinging Bridge",
+			"region": "yosemite_village"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "yosemite_village/Yosemite Chapel",
+			"name": "Yosemite Chapel",
+			"region": "yosemite_village"
+		}
+	]
+}

@@ -23,6 +23,8 @@ extends StaticBody2D
 
 ## Is the way open yet (its quest under way, its hub unlocked)?
 func is_unlocked() -> bool:
+	if Park.open_world:
+		return true
 	if needs_quest != "" and not (QuestLog.active.has(needs_quest) or QuestLog.is_completed(needs_quest)):
 		return false
 	return needs_hub == "" or Park.is_hub_unlocked(needs_hub)

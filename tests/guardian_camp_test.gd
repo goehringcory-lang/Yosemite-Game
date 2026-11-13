@@ -19,6 +19,8 @@ func check(cond: bool, what: String) -> void:
 
 
 func _ready() -> void:
+	# These checks are about the gated progression, not the open world.
+	Park.open_world = false
 	SaveManager.save_path = "user://guardian_camp_test_save.json"
 	SaveManager.delete_save()
 	Engine.time_scale = 20.0

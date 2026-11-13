@@ -174,9 +174,9 @@ L.savePng(G.OUT + '/yosemite_valley.png', W, H, img);
   const ROUND = v => +v.toFixed(1);
   const pt = (lon, lat) => { const p = project(lon, lat); return [ROUND(p.x), ROUND(p.y)]; };
   const points = P0.points.map(p => {
-    const c = p.at ? { lon: p.at[0], lat: p.at[1] } : ctx.where(p.osm);
-    if (!c) throw new Error('no OSM match for ' + p.name);
-    const out = { id: p.id, name: p.name, tier: p.tier, anchor: pt(c.lon, c.lat), label: p.label, blurb: p.blurb };
+    const c = p.anchor ? null : (p.at ? { lon: p.at[0], lat: p.at[1] } : ctx.where(p.osm));
+    if (!c && !p.anchor) throw new Error('no OSM match for ' + p.name);
+    const out = { id: p.id, name: p.name, tier: p.tier, anchor: p.anchor || pt(c.lon, c.lat), label: p.label, blurb: p.blurb };
     if (p.stop) out.stop = p.stop;
     return out;
   });
