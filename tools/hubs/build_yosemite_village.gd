@@ -192,6 +192,8 @@ func _layout() -> void:
 	# Keep the shared fire and Columbia Boulder in the open.
 	_clear_trees(13, 17, 22, 26)
 	_clear_trees(4, 9, 15, 16)
+	# Room for the Lower Yosemite Fall shuttle stop at the loop's west trailhead.
+	_clear_trees(39, 33, 43, 37)
 	# Yosemite Valley Lodge: south of Northside Drive, west of the creek.
 	_rect(32, 40, 43, 46, Terrain.PAVED)
 	_rect(25, 40, 31, 44, Terrain.PARKING)
@@ -236,8 +238,9 @@ func _layout() -> void:
 		[Terrain.PAVED, 37, 39, 38, 39], # Lodge walk
 		[Terrain.TRAIL, 15, 31, 15, 37], # Camp 4 walk-in path
 		[Terrain.TRAIL, 33, 20, 47, 20], # Camp 4 to the fall trail, over the creek
-		[Terrain.TRAIL, 47, 10, 47, 37], # Lower Yosemite Fall trail
-		[Terrain.TRAIL, 46, 10, 48, 10],
+		[Terrain.TRAIL, 47, 10, 47, 37], # Lower Yosemite Fall loop: up the east bank,
+		[Terrain.TRAIL, 40, 10, 48, 10], # over the footbridge at the foot of the fall,
+		[Terrain.TRAIL, 40, 10, 40, 37], # and back down the west bank to Northside Drive
 		[Terrain.TRAIL, 48, 24, 49, 24], # fall trail to the mall
 		[Terrain.TRAIL, 51, 14, 66, 14], # Indian Village loop
 		[Terrain.TRAIL, 60, 15, 60, 22],
@@ -633,8 +636,10 @@ func _place_village_life() -> void:
 	_shuttle("ShuttleVillage", "Yosemite Village", _tile_pos(50, 26) + Vector2(0, 4))
 	_sign_prop("LowerFallSign", "res://assets/sprites/info_sign.png", _tile_pos(49, 11) + Vector2(0, 4), Vector2(12, 4), "Lower Yosemite Fall",
 		"Lower Yosemite Fall drops 320 feet. It roars with snowmelt in late spring and can dry to a trickle by late summer.")
-	_sign_prop("LowerFallTrailhead", "res://assets/sprites/info_sign.png", _tile_pos(48, 36) + Vector2(0, 4), Vector2(12, 4), "Lower Yosemite Fall Trail",
-		"A short walk north to the foot of Lower Yosemite Fall, with the creek alongside. In spring the spray reaches the bridge.")
+	_sign_prop("LowerFallTrailhead", "res://assets/sprites/info_sign.png", _tile_pos(48, 36) + Vector2(0, 4), Vector2(12, 4), "Lower Yosemite Fall Loop",
+		"An easy loop to the foot of Lower Yosemite Fall: up the creek's east bank, over the footbridge at the foot of the fall, and back down the west side. In spring the spray reaches the bridge.")
+	# Valley shuttle stop 6, Lower Yosemite Fall, at the loop's west trailhead.
+	_shuttle("ShuttleLowerFall", "Lower Yosemite Fall", _tile_pos(42, 37) + Vector2(0, 4))
 	_sign_prop("CooksMeadowSign", "res://assets/sprites/info_sign.png", _tile_pos(58, 40) + Vector2(0, 4), Vector2(12, 4), "Cook's Meadow",
 		"From the boardwalk you can see Yosemite Falls to the north and Half Dome to the east. Stay on the boardwalk: meadows here are easily trampled.")
 	_sign_prop("SentinelBridgeSign", "res://assets/sprites/info_sign.png", _tile_pos(82, 45) + Vector2(0, 4), Vector2(12, 4), "Sentinel Bridge",
@@ -669,6 +674,7 @@ func _place_markers_and_places() -> void:
 	_marker("sar_site", 18, 15)
 	_marker("shuttle_camp_4", 24, 36)
 	_marker("shuttle_village", 50, 25)
+	_marker("shuttle_lower_fall", 42, 36)
 	_marker("lower_yosemite_fall", 47, 12)
 	_marker("cooks_meadow", 59, 42)
 	_marker("indian_village", 60, 15)

@@ -33,12 +33,18 @@ const BUILDINGS := {
 	"wilderness_center": {"size": Vector2i(42, 36), "wall": "board", "label": "WILDERNESS", "seed": 67, "roof": ["1c2a22", "2a4030", "3a5640", "4d6e50", "658a64", "84a67c"], "windows": [8, 34], "tone": 2, "green": true, "porch": true, "scale": VILLAGE_SCALE},
 	"post_office": {"size": Vector2i(56, 40), "wall": "stone", "label": "POST OFFICE", "seed": 89, "roof": ["1c2a22", "2a4030", "3a5640", "4d6e50", "658a64", "84a67c"], "windows": [10, 46], "gable": 28, "scale": VILLAGE_SCALE},
 	"valley_lodge": {"size": Vector2i(80, 44), "wall": "timber", "label": "YOSEMITE LODGE", "seed": 79, "windows": [10, 22, 58, 70], "gable": 40, "chimney": 64, "pitch": 12, "porch": true, "scale": VILLAGE_SCALE},
+	# On Ahwahnee Drive between the Village and the hotel: the clinic, built
+	# in 1929 as the Lewis Memorial Hospital, granite under a green roof; and
+	# the Valley's small public school, a brown frame building with a flag.
+	"medical_clinic": {"size": Vector2i(60, 42), "wall": "stone", "label": "MEDICAL CLINIC", "seed": 97, "roof": ["1c2a22", "2a4030", "3a5640", "4d6e50", "658a64", "84a67c"], "windows": [10, 20, 40, 50], "gable": 30, "chimney": 50, "scale": VILLAGE_SCALE},
+	"valley_school": {"flag": true, "size": Vector2i(56, 40), "wall": "board", "tone": 3, "label": "VALLEY SCHOOL", "seed": 103, "roof": ["2e2218", "4a3422", "644630", "7e5c3e", "9a7650", "b89468"], "windows": [9, 19, 37, 47], "gable": 28, "porch": true, "scale": VILLAGE_SCALE},
 }
 
 const PROPS := ["umacha", "chuckah", "bear_box", "shuttle_stop"]
 const FILES := ["village_store", "welcome_center", "museum", "bests_studio", "degnans", "wilderness_center", "post_office", "valley_lodge",
 	"chapel", "umacha", "chuckah", "bear_box", "shuttle_stop", "headstone_0", "headstone_1", "headstone_2", "headstone_clark", "tree_sequoia",
-	"village_store_glow", "welcome_center_glow", "museum_glow", "bests_studio_glow", "degnans_glow", "wilderness_center_glow", "post_office_glow", "valley_lodge_glow", "chapel_glow"]
+	"village_store_glow", "welcome_center_glow", "museum_glow", "bests_studio_glow", "degnans_glow", "wilderness_center_glow", "post_office_glow", "valley_lodge_glow", "chapel_glow",
+	"medical_clinic", "medical_clinic_glow", "valley_school", "valley_school_glow"]
 
 
 func save_all() -> void:

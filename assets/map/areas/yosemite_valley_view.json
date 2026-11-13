@@ -209,7 +209,8 @@
     218,
     68
    ],
-   "blurb": "Lower Fall drops 320 feet. Above it are the middle cascades and Upper Fall."
+   "blurb": "Lower Fall drops 320 feet. Above it are the middle cascades and Upper Fall. An easy loop trail circles to its foot.",
+   "stop": "Lower Yosemite Fall"
   },
   {
    "id": "camp_4",
@@ -329,6 +330,51 @@
    ],
    "blurb": "Open meadow at the foot of El Capitan, where climbers scan the wall.",
    "stop": "El Capitan Meadow"
+  },
+  {
+   "id": "four_mile_trailhead",
+   "name": "Four Mile Trailhead",
+   "tier": "place",
+   "anchor": [
+    227.9,
+    129.2
+   ],
+   "label": [
+    195,
+    154
+   ],
+   "blurb": "The Four Mile Trail climbs 3,200 feet up the south wall to Glacier Point. Sentinel Beach is across the road.",
+   "stop": "Four Mile Trailhead"
+  },
+  {
+   "id": "housekeeping_camp",
+   "name": "Housekeeping Camp",
+   "tier": "place",
+   "anchor": [
+    297.8,
+    94.7
+   ],
+   "label": [
+    325,
+    101
+   ],
+   "blurb": "Canvas-roofed cabins on the Merced, rented since the 1920s.",
+   "stop": "Housekeeping Camp"
+  },
+  {
+   "id": "upper_pines",
+   "name": "Upper Pines",
+   "tier": "place",
+   "anchor": [
+    343.4,
+    121.3
+   ],
+   "label": [
+    330,
+    152
+   ],
+   "blurb": "The Valley's biggest campground, in the pines between Curry Village and Happy Isles.",
+   "stop": "Upper Pines Campground"
   },
   {
    "id": "tunnel_view",

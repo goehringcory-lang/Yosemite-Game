@@ -495,6 +495,9 @@ func _four_mile_trailhead() -> void:
 	_ellipse(14.0, 26.0, 9.0, 3.0, Terrain.MEADOW, 0.3)
 	_mark_open()
 
+	# Room for Valley shuttle stop 11.
+	clear_trees(35, 18, 39, 20)
+
 	start_region("FourMileTrailhead", "four_mile_trailhead", "Four Mile Trailhead", Vector2(-119.6030, 37.7330))
 	paint_ground()
 	_save_ground_art("ground_four_mile_trailhead", 1872)
@@ -511,6 +514,8 @@ func _four_mile_trailhead() -> void:
 		decor("PicnicTable%d" % t[0], B + "camp4_table.png", foot(t[0], t[1]), Vector2(30, 8))
 	_dress(40, 60)
 	_river_rocks(river, 5)
+	shuttle("ShuttleFourMile", "Four Mile Trailhead", foot(37, 20))
+	marker("shuttle", 37, 21.5)
 	marker("arrival", 36, 22.5)
 	marker("east", 61, 22.5)
 	marker("west", 2, 22.5)
@@ -677,6 +682,20 @@ func _foot_of_talus(x: int) -> int:
 
 ## Northside Drive east of the Village, across Ahwahnee Meadow with its big
 ## black oaks (they drop acorns), under the Royal Arches side of the Valley.
+## The columns the clinic and the school stand on in Ahwahnee Meadow.
+const CLINIC_X := 6
+const SCHOOL_X := 15
+
+
+## One of the Valley's buildings (valley_art.gd) on tile row [param base_y],
+## centered on [param tile_x]: solid, with its sign, and its windows lit at dusk.
+func _valley_building(prop_name: String, sprite_name: String, tile_x: float, base_y: int, title: String, text: String) -> void:
+	var tex := texture(B + sprite_name + ".png")
+	building(prop_name, B + sprite_name + ".png", tile_x, base_y, title, text, 0, 0, 0.38)
+	if _has(sprite_name + "_glow", B):
+		_glow(sprite_name + "_glow", Vector2(tile_x * T + T / 2.0 - tex.get_width() / 2.0, base_y * T - tex.get_height()), 1.0, B)
+
+
 func _ahwahnee_meadow() -> void:
 	_begin(64, 36, 1927)
 	_wall(6.0, 2.0, 2)
@@ -685,23 +704,37 @@ func _ahwahnee_meadow() -> void:
 	_path([Vector2(-1, 15), Vector2(20, 15), Vector2(44, 14), Vector2(65, 15)], 2, Terrain.ROAD)
 	_path([Vector2(-1, 33), Vector2(30, 33), Vector2(65, 32)], 1, Terrain.TRAIL, 0.6)
 	_path([Vector2(22, 16), Vector2(26, 24), Vector2(30, 33)], 1, Terrain.TRAIL, 0.6)
+	# The Yosemite Medical Clinic and the Yosemite Valley School stand on
+	# Ahwahnee Drive at the Village end, each up a short walk from the road.
+	for door_x: int in [CLINIC_X, SCHOOL_X]:
+		_path([Vector2(door_x, 16), Vector2(door_x, 22)], 1, Terrain.TRAIL, 0.6)
 	_mark_open()
-	# Room under the oaks.
-	for o: Vector2i in [Vector2i(14, 24), Vector2i(20, 30), Vector2i(52, 22), Vector2i(56, 29)]:
+	# Room under the oaks, and round the clinic and the school.
+	for o: Vector2i in [Vector2i(10, 30), Vector2i(20, 30), Vector2i(52, 22), Vector2i(56, 29)]:
 		clear_trees(o.x - 3, o.y - 3, o.x + 3, o.y + 1)
+	for bx: int in [CLINIC_X, SCHOOL_X]:
+		clear_trees(bx - 4, 16, bx + 4, 23)
 
 	start_region("AhwahneeMeadow", "ahwahnee_meadow", "Ahwahnee Meadow", Vector2(-119.5790, 37.7470))
 	paint_ground()
 	_save_ground_art("ground_ahwahnee_meadow", 1927)
 	_place_wall("royal_arches", 105)
-	var oaks := [Vector2i(14, 24), Vector2i(20, 30), Vector2i(52, 22), Vector2i(56, 29)]
+	var oaks := [Vector2i(10, 30), Vector2i(20, 30), Vector2i(52, 22), Vector2i(56, 29)]
 	for i in oaks.size():
 		instance_scene("res://scenes/objects/black_oak.tscn", foot(oaks[i].x, oaks[i].y), "BlackOak%d" % (i + 1))
 	_info_sign("AhwahneeMeadowSign", foot(30, 16), "Ahwahnee Meadow",
 		"The Ahwahneechee lived in villages along the Valley's meadows, gathering acorns from the black oaks. Park staff now burn the meadows now and then, as they did, to keep the conifers from taking over.")
 	_info_sign("BlackOakSign", foot(18, 27), "California Black Oak",
 		"The oaks drop their acorns in fall. Ground and leached in running water, they were the Valley's main food.")
+	_valley_building("MedicalClinic", "medical_clinic", CLINIC_X, 21, "Yosemite Medical Clinic",
+		"The Valley's clinic, open to visitors and the people who live and work in the park. The building went up in 1929 as the Lewis Memorial Hospital, granite to the windowsills like the Museum.")
+	_valley_building("ValleySchool", "valley_school", SCHOOL_X, 21, "Yosemite Valley School",
+		"A small public school for the children of the families who live and work in the Valley, with a schoolyard under the oaks and the Royal Arches for a backdrop.")
 	_dress(70, 50)
+	marker("clinic", CLINIC_X, 23)
+	marker("school", SCHOOL_X, 23)
+	place("Yosemite Medical Clinic", CLINIC_X, 20, 4)
+	place("Yosemite Valley School", SCHOOL_X, 20, 4)
 	marker("arrival", 30, 15.5)
 	marker("west", 2, 15.5)
 	marker("east", 61, 15.5)
@@ -728,6 +761,9 @@ func _housekeeping_camp() -> void:
 	_path([Vector2(28, 16), Vector2(28, 18)], 2, Terrain.TRAIL)
 	_mark_open()
 
+	# Room for Valley shuttle stop 12.
+	clear_trees(18, 11, 22, 13)
+
 	start_region("HousekeepingCamp", "housekeeping_camp", "Housekeeping Camp", Vector2(-119.5800, 37.7420))
 	paint_ground()
 	_save_ground_art("ground_housekeeping_camp", 1926)
@@ -743,6 +779,8 @@ func _housekeeping_camp() -> void:
 		"Canvas-roofed cabins with concrete walls on the bank of the Merced, rented since the 1920s for campers who brought their own bedding and cooked for themselves.")
 	_dress(20, 50)
 	_river_rocks(river, 6)
+	shuttle("ShuttleHousekeeping", "Housekeeping Camp", foot(20, 13))
+	marker("shuttle", 20, 14.5)
 	marker("arrival", 30, 14.5)
 	marker("west", 2, 14.5)
 	marker("east", 61, 14.5)
@@ -770,6 +808,9 @@ func _upper_pines() -> void:
 	_path([Vector2(8, 26), Vector2(8, 16), Vector2(56, 16), Vector2(56, 26)], 1, Terrain.TRAIL, 0.3)
 	_mark_open()
 
+	# Room for Valley shuttle stop 15.
+	clear_trees(18, 23, 22, 25)
+
 	start_region("UpperPines", "upper_pines", "Upper Pines", Vector2(-119.5650, 37.7350))
 	paint_ground()
 	_save_ground_art("ground_upper_pines", 1964)
@@ -787,6 +828,8 @@ func _upper_pines() -> void:
 	_info_sign("UpperPinesSign", foot(10, 25), "Upper Pines",
 		"The Valley's biggest campground, under ponderosa pines and incense cedars. Keep every scrap of food in the bear box: black bears here know what a cooler looks like.")
 	_dress(10, 60)
+	shuttle("ShuttleUpperPines", "Upper Pines Campground", foot(20, 25))
+	marker("shuttle", 20, 26.5)
 	marker("arrival", 30, 27.5)
 	marker("west", 2, 27.5)
 	marker("east", 61, 27.5)

@@ -18,7 +18,7 @@ module.exports = {
     { id: 'bridalveil_fall', name: 'Bridalveil Fall', tier: 'fall', osm: 'Bridalveil Fall', label: [68, 176], blurb: 'Drops 620 feet and flows all year. On windy days its spray blows sideways.' },
     // Places (parchment signs)
     { id: 'yosemite_village', name: 'Yosemite Village', tier: 'place', osm: 'Yosemite Village', label: [300, 60], stop: 'Yosemite Village', blurb: 'The Welcome Center, store and museum. Camp 4 is a short walk west.' },
-    { id: 'lower_yosemite_fall', name: 'Lower Yosemite Fall', tier: 'place', osm: 'Lower Yosemite Falls Vista Point', label: [218, 68], blurb: 'Lower Fall drops 320 feet. Above it are the middle cascades and Upper Fall.' },
+    { id: 'lower_yosemite_fall', name: 'Lower Yosemite Fall', tier: 'place', osm: 'Lower Yosemite Falls Vista Point', label: [218, 68], stop: 'Lower Yosemite Fall', blurb: 'Lower Fall drops 320 feet. Above it are the middle cascades and Upper Fall. An easy loop trail circles to its foot.' },
     { id: 'camp_4', name: 'Camp 4', tier: 'place', osm: 'Camp 4', label: [204, 96], stop: 'Camp 4', blurb: 'Climbers have camped here since the 1950s. It joined the National Register in 2003.' },
     { id: 'cooks_meadow', name: "Cook's Meadow", tier: 'place', osm: "Cook's Meadow", label: [258, 103], blurb: 'Open meadow under Yosemite Falls, good for foraging in season.' },
     { id: 'ahwahnee', name: 'The Ahwahnee', tier: 'place', osm: 'Ahwahnee Hotel', label: [338, 80], stop: 'The Ahwahnee', blurb: 'Opened in 1927. Stone and concrete stained to look like redwood keep fire out.' },
@@ -27,6 +27,10 @@ module.exports = {
     { id: 'happy_isles', name: 'Happy Isles', tier: 'place', osm: 'Happy Isles Trailhead', label: [382, 140], stop: 'Happy Isles', blurb: 'The John Muir Trail starts here, about 211 miles from Mount Whitney.' },
     { id: 'mirror_lake', name: 'Mirror Lake', tier: 'place', osm: 'Mirror Lake', label: [398, 60], stop: 'Mirror Lake Trailhead', blurb: 'Tenaya Creek forms a seasonal lake below Half Dome. By late summer it is often a meadow.' },
     { id: 'el_capitan_meadow', name: 'El Capitan Meadow', tier: 'place', osm: 'El Capitan Meadow', label: [152, 176], stop: 'El Capitan Meadow', blurb: 'Open meadow at the foot of El Capitan, where climbers scan the wall.' },
+    // Valley shuttle stops with an area of their own; "at" is the area's spot (its geo_anchor).
+    { id: 'four_mile_trailhead', name: 'Four Mile Trailhead', tier: 'place', at: [-119.6030, 37.7330], label: [195, 154], stop: 'Four Mile Trailhead', blurb: 'The Four Mile Trail climbs 3,200 feet up the south wall to Glacier Point. Sentinel Beach is across the road.' },
+    { id: 'housekeeping_camp', name: 'Housekeeping Camp', tier: 'place', at: [-119.5800, 37.7420], label: [325, 101], stop: 'Housekeeping Camp', blurb: 'Canvas-roofed cabins on the Merced, rented since the 1920s.' },
+    { id: 'upper_pines', name: 'Upper Pines', tier: 'place', at: [-119.5650, 37.7350], label: [330, 152], stop: 'Upper Pines Campground', blurb: 'The Valley\'s biggest campground, in the pines between Curry Village and Happy Isles.' },
     { id: 'tunnel_view', name: 'Tunnel View', tier: 'place', osm: 'Tunnel View', label: [28, 200], blurb: 'El Capitan on the left, Bridalveil Fall on the right, Half Dome beyond.' },
   ],
   // Map kiosks (see the "travel" list in tools/mapgen/hub_content.gd).
