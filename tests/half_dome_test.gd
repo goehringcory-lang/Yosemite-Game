@@ -22,6 +22,8 @@ func said(lines: Array[Dictionary], text: String) -> bool:
 
 
 func _ready() -> void:
+	# These checks are about the gated progression, not the open world.
+	Park.open_world = false
 	await get_tree().process_frame
 	SaveManager.save_path = "user://half_dome_test_save.json"
 	SaveManager.delete_save()

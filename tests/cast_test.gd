@@ -24,6 +24,8 @@ func check(cond: bool, what: String) -> void:
 
 
 func _ready() -> void:
+	# These checks are about the gated progression, not the open world.
+	Park.open_world = false
 	_check_characters()
 	_check_visitors()
 	_check_quest_references()

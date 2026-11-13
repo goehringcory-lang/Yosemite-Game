@@ -52,6 +52,16 @@ const SEASONAL := {
 
 signal hub_unlocked(id: String)
 
+## Open world: every area is open from the first day. Glacier Point and
+## Tuolumne Meadows can be reached before their climbs, the roads and trails
+## that close for snow stay open all year, story-locked ways (the gap in the
+## talus) let you in, and the Half Dome cables need no permit. Climbs still
+## mark hubs unlocked (unlock_hub), so their story beats play as before.
+## Shop hours, the 1 AM curfew, rain on the cables and climbing gear still
+## apply: they aren't locks on an area. Set false for the original, gated
+## progression (the tests that check it do).
+var open_world := true
+
 var routes: Array[Dictionary] = []
 ## Ids of hubs opened during play (see HubData.starts_locked).
 var unlocked_hubs: Dictionary = {}
@@ -80,7 +90,7 @@ func get_hub(id: String) -> HubData:
 
 func is_hub_unlocked(id: String) -> bool:
 	var hub := get_hub(id)
-	return hub != null and (not hub.starts_locked or unlocked_hubs.has(id))
+	return hub != null and (open_world or not hub.starts_locked or unlocked_hubs.has(id))
 
 
 ## Opens a locked hub for travel, for example after the climb that leads there.
@@ -93,6 +103,8 @@ func unlock_hub(id: String) -> void:
 
 ## Is this seasonal road or trail open on the current game date?
 func is_open(closure: String) -> bool:
+	if open_world:
+		return true
 	var rule: Dictionary = SEASONAL.get(closure, {})
 	if rule.is_empty():
 		return true
