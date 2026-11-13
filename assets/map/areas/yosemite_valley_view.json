@@ -377,6 +377,51 @@
    "stop": "Upper Pines Campground"
   },
   {
+   "id": "el_capitan_picnic_area",
+   "name": "El Capitan Picnic Area",
+   "tier": "place",
+   "anchor": [
+    170,
+    157
+   ],
+   "label": [
+    176,
+    120
+   ],
+   "blurb": "Tables under the pines by the Merced, with El Capitan filling the sky to the west.",
+   "stop": "El Capitan Picnic Area"
+  },
+  {
+   "id": "cathedral_beach",
+   "name": "Cathedral Beach",
+   "tier": "place",
+   "anchor": [
+    168,
+    175
+   ],
+   "label": [
+    150,
+    204
+   ],
+   "blurb": "A picnic area and sandy beach on the Merced below Cathedral Rocks.",
+   "stop": "Cathedral Beach"
+  },
+  {
+   "id": "lower_pines",
+   "name": "Lower Pines",
+   "tier": "place",
+   "anchor": [
+    345,
+    101
+   ],
+   "label": [
+    390,
+    96
+   ],
+   "blurb": "The campground between the road and the Merced, just below Upper Pines. North Pines is across Clark's Bridge.",
+   "stop": "Lower Pines Campground"
+  },
+  {
    "id": "tunnel_view",
    "name": "Tunnel View",
    "tier": "place",

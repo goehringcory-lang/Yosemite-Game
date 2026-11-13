@@ -57,6 +57,12 @@
 		},
 		{
 			"hub": "yosemite_valley",
+			"key": "bridalveil_fall/Cathedral Beach",
+			"name": "Cathedral Beach",
+			"region": "bridalveil_fall"
+		},
+		{
+			"hub": "yosemite_valley",
 			"key": "crane_flat/Crane Flat",
 			"name": "Crane Flat",
 			"region": "crane_flat"
@@ -267,6 +273,12 @@
 		},
 		{
 			"hub": "yosemite_valley",
+			"key": "leidig_meadow/El Capitan Picnic Area",
+			"name": "El Capitan Picnic Area",
+			"region": "leidig_meadow"
+		},
+		{
+			"hub": "yosemite_valley",
 			"key": "little_yosemite_valley/Little Yosemite Valley",
 			"name": "Little Yosemite Valley",
 			"region": "little_yosemite_valley"
@@ -281,6 +293,12 @@
 			"hub": "yosemite_valley",
 			"key": "tenaya_creek/Tenaya Creek",
 			"name": "Tenaya Creek",
+			"region": "tenaya_creek"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "tenaya_creek/North Pines",
+			"name": "North Pines",
 			"region": "tenaya_creek"
 		},
 		{
@@ -407,6 +425,12 @@
 			"hub": "yosemite_valley",
 			"key": "upper_pines/Upper Pines",
 			"name": "Upper Pines",
+			"region": "upper_pines"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "upper_pines/Lower Pines",
+			"name": "Lower Pines",
 			"region": "upper_pines"
 		},
 		{

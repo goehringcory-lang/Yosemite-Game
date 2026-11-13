@@ -31,6 +31,10 @@ module.exports = {
     { id: 'four_mile_trailhead', name: 'Four Mile Trailhead', tier: 'place', at: [-119.6030, 37.7330], label: [195, 154], stop: 'Four Mile Trailhead', blurb: 'The Four Mile Trail climbs 3,200 feet up the south wall to Glacier Point. Sentinel Beach is across the road.' },
     { id: 'housekeeping_camp', name: 'Housekeeping Camp', tier: 'place', at: [-119.5800, 37.7420], label: [325, 101], stop: 'Housekeeping Camp', blurb: 'Canvas-roofed cabins on the Merced, rented since the 1920s.' },
     { id: 'upper_pines', name: 'Upper Pines', tier: 'place', at: [-119.5650, 37.7350], label: [330, 152], stop: 'Upper Pines Campground', blurb: 'The Valley\'s biggest campground, in the pines between Curry Village and Happy Isles.' },
+    // Anchored by "anchor" (picture pixels): estimated from the NPS shuttle map and the stops around them.
+    { id: 'el_capitan_picnic_area', name: 'El Capitan Picnic Area', tier: 'place', anchor: [170, 157], label: [176, 120], stop: 'El Capitan Picnic Area', blurb: 'Tables under the pines by the Merced, with El Capitan filling the sky to the west.' },
+    { id: 'cathedral_beach', name: 'Cathedral Beach', tier: 'place', anchor: [168, 175], label: [150, 204], stop: 'Cathedral Beach', blurb: 'A picnic area and sandy beach on the Merced below Cathedral Rocks.' },
+    { id: 'lower_pines', name: 'Lower Pines', tier: 'place', anchor: [345, 101], label: [390, 96], stop: 'Lower Pines Campground', blurb: 'The campground between the road and the Merced, just below Upper Pines. North Pines is across Clark\'s Bridge.' },
     { id: 'tunnel_view', name: 'Tunnel View', tier: 'place', osm: 'Tunnel View', label: [28, 200], blurb: 'El Capitan on the left, Bridalveil Fall on the right, Half Dome beyond.' },
   ],
   // Map kiosks (see the "travel" list in tools/mapgen/hub_content.gd).

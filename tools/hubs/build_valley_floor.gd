@@ -447,7 +447,10 @@ func _leidig_meadow() -> void:
 	_water(river, 3)
 	_path([Vector2(-1, 14), Vector2(20, 14), Vector2(40, 13), Vector2(65, 14)], 2, Terrain.ROAD)
 	_path([Vector2(52, 15), Vector2(50, 22), Vector2(46, 28)], 1, Terrain.TRAIL, 0.6)
+	# The El Capitan Picnic Area at the west end, between the road and the river.
+	_path([Vector2(7, 15), Vector2(7, 28)], 1, Terrain.TRAIL, 0.5)
 	_mark_open()
+	clear_trees(2, 16, 14, 26)
 
 	start_region("LeidigMeadow", "leidig_meadow", "Leidig Meadow", Vector2(-119.6000, 37.7410))
 	paint_ground()
@@ -457,6 +460,12 @@ func _leidig_meadow() -> void:
 		"Named for the Leidigs, who ran a hotel near here in the 1870s. Across the meadow: the Three Brothers to the north, and Sentinel Rock and Glacier Point to the south.")
 	_info_sign("ThreeBrothersSign", foot(12, 15), "Three Brothers",
 		"Three peaks stepping up one behind another, the highest Eagle Peak. In 1987 a rockfall here sent a cloud of granite dust across the Valley and closed Northside Drive.")
+	_picnic_tables("ElCapPicnic", [[5, 19], [10, 18], [9, 22]])
+	_info_sign("ElCapPicnicSign", foot(4, 16), "El Capitan Picnic Area",
+		"Tables under the pines between Northside Drive and the Merced, with El Capitan filling the sky to the west. Bring binoculars: the climbers on the Nose are tiny colored dots.")
+	shuttle("ShuttleElCapPicnic", "El Capitan Picnic Area", foot(17, 16))
+	marker("shuttle", 17, 14.5)
+	marker("picnic", 7, 20)
 	_dress(70, 50)
 	_river_rocks(river, 6)
 	marker("arrival", 30, 14.5)
@@ -466,6 +475,7 @@ func _leidig_meadow() -> void:
 	marker("river_bank", 46, 28)
 	place("Leidig Meadow", 30, 22, 16)
 	place("Three Brothers", 30, 2, 0)
+	place("El Capitan Picnic Area", 7, 20, 5)
 	region_exit("ToVillage", tile_pos(63.5, 14.5), Vector2(12, 48), "Yosemite Village and Camp 4", "yosemite_village", "west_road")
 	region_exit("ToElCapitan", tile_pos(-0.5, 14.5), Vector2(12, 48), "El Capitan Meadow", "el_capitan_meadow", "east")
 	_finish("leidig_meadow", 2.0)
@@ -555,7 +565,12 @@ func _bridalveil_fall() -> void:
 	# here the road ends at the south bank. It is crossed one way only, from
 	# El Capitan Meadow, so there is no exit back over it from this side.
 	fill(54, 23, 55, 30, Terrain.ROAD)
+	# Cathedral Beach: a picnic area off Southside Drive, and a sandy beach on
+	# the Merced below Cathedral Rocks.
+	fill(36, 29, 51, 30, Terrain.SAND)
+	_path([Vector2(42, 23), Vector2(43, 29)], 1, Terrain.TRAIL, 0.4)
 	_mark_open()
+	clear_trees(36, 23, 52, 30)
 
 	start_region("BridalveilFall", "bridalveil_fall", "Bridalveil Fall", Vector2(-119.6490, 37.7170))
 	paint_ground()
@@ -565,6 +580,12 @@ func _bridalveil_fall() -> void:
 		"Bridalveil Fall drops 620 feet and flows all year. On windy days its spray blows sideways across the cliff. The Ahwahneechee called it Pohono.")
 	_info_sign("CathedralSign", foot(46, 20), "Cathedral Rocks",
 		"Three buttresses stepping up the south wall, with Higher and Lower Cathedral Spires standing free beside them. The Higher Spire was first climbed in 1934 by the Sierra Club's first rock climbers.")
+	_picnic_tables("CathedralBeach", [[39, 26], [46, 25], [49, 27]])
+	_info_sign("CathedralBeachSign", foot(40, 24), "Cathedral Beach",
+		"A picnic area and a sandy beach on the Merced, with Cathedral Rocks straight above and El Capitan across the river. In late summer the river runs slow and shallow enough to wade.")
+	shuttle("ShuttleCathedralBeach", "Cathedral Beach", foot(50, 23))
+	marker("shuttle", 50, 21.5)
+	marker("cathedral_beach", 43, 28)
 	_dress(30, 70)
 	_river_rocks(river, 5)
 	marker("arrival", 36, 21.5)
@@ -576,6 +597,7 @@ func _bridalveil_fall() -> void:
 	marker("el_cap_bridge", 55, 21.5)
 	place("Bridalveil Fall", fall_x, 14, 9)
 	place("Cathedral Rocks", 46, 3, 0)
+	place("Cathedral Beach", 44, 27, 7)
 	region_exit("ToFourMile", tile_pos(63.5, 21.5), Vector2(12, 48), "Southside Drive east", "four_mile_trailhead", "west")
 	region_exit("ToTunnelView", tile_pos(-0.5, 21.5), Vector2(12, 48), "Wawona Road, up to Tunnel View", "tunnel_view", "east")
 	_finish("bridalveil_fall", 2.0)
@@ -687,6 +709,30 @@ const CLINIC_X := 6
 const SCHOOL_X := 16
 
 
+## Campsites (a tent, a picnic table and a bear box each) at [param sites]
+## ([x, y] tiles), named [param prefix]0, 1, ...
+func _campsites(prefix: String, sites: Array) -> void:
+	var tents := ["camp4_tent_dome_0", "camp4_tent_canvas", "camp4_tent_dome_1", "camp4_tent_dome_2", "camp4_tent_dome_3", "camp4_tent_dome_0"]
+	for i in sites.size():
+		var s: Array = sites[i]
+		var tent: String = tents[i % tents.size()]
+		decor("%sTent%d" % [prefix, i], B + tent + ".png", foot(s[0], s[1] - 1), Vector2(28, 8))
+		if _has(tent + "_glow", B):
+			var tex := texture(B + tent + ".png")
+			_glow(tent + "_glow", foot(s[0], s[1] - 1) - Vector2(tex.get_width() / 2.0, tex.get_height()), 1.0, B)
+		decor("%sTable%d" % [prefix, i], B + "camp4_table.png", foot(s[0] + 2, s[1] + 1), Vector2(30, 8))
+		decor("%sBearBox%d" % [prefix, i], B + "bear_box.png", foot(s[0] - 2, s[1] + 1), Vector2(14, 6))
+
+
+## Picnic tables at [param spots] ([x, y] tiles), with a bear box by the first.
+func _picnic_tables(prefix: String, spots: Array) -> void:
+	for i in spots.size():
+		var s: Array = spots[i]
+		decor("%sTable%d" % [prefix, i], B + "camp4_table.png", foot(s[0], s[1]), Vector2(30, 8))
+	var first: Array = spots[0]
+	decor(prefix + "BearBox", B + "bear_box.png", foot(first[0] - 3, first[1]), Vector2(14, 6))
+
+
 ## One of the Valley's buildings (valley_art.gd) on tile row [param base_y],
 ## centered on [param tile_x]: solid, with its sign, and its windows lit at dusk.
 func _valley_building(prop_name: String, sprite_name: String, tile_x: float, base_y: int, title: String, text: String) -> void:
@@ -795,17 +841,32 @@ func _housekeeping_camp() -> void:
 
 ## The campground between Curry Village and Happy Isles: sites in the pines,
 ## each with its tent, picnic table and bear box.
+## Lower Pines' sites, below the road in the Upper Pines scene.
+const LOWER_PINES_SITES := [[16, 33], [24, 32], [40, 33], [48, 32], [20, 40], [28, 40], [38, 40], [46, 40]]
+## The column of Lower Pines' shuttle stop (Valley shuttle stop 18).
+const LOWER_PINES_STOP_X := 32
+
+
 func _upper_pines() -> void:
-	_begin(64, 36, 1964)
+	# Taller than the other trail scenes: Upper Pines above the road (toward
+	# the south wall) and Lower Pines below it, on the Merced, as they lie
+	# either side of the road in the real Valley.
+	_begin(64, 48, 1964)
 	_wall(5.0, 1.5, 2)
 	_path([Vector2(-1, 26), Vector2(20, 27), Vector2(44, 26), Vector2(65, 27)], 2, Terrain.ROAD)
-	var river := [Vector2(-1, 33), Vector2(30, 33), Vector2(65, 34)]
+	var river := [Vector2(-1, 44), Vector2(30, 44), Vector2(65, 45)]
 	_water(river, 2)
 	var sites := [[10, 13], [18, 12], [26, 14], [34, 12], [42, 13], [50, 12], [14, 20], [24, 21], [36, 20], [46, 21], [54, 19]]
-	for s: Array in sites:
+	for s: Array in LOWER_PINES_SITES + sites:
 		fill(s[0] - 2, s[1] - 2, s[0] + 3, s[1] + 1, Terrain.CAMP)
 	_path([Vector2(8, 26), Vector2(8, 16), Vector2(56, 16), Vector2(56, 26)], 1, Terrain.TRAIL, 0.3)
+	# Lower Pines' loop, and a path on down to the river.
+	_path([Vector2(12, 28), Vector2(12, 37), Vector2(52, 37), Vector2(52, 28)], 1, Terrain.TRAIL, 0.3)
+	_path([Vector2(32, 37), Vector2(32, 42)], 1, Terrain.TRAIL, 0.4)
 	_mark_open()
+
+	# Room for Valley shuttle stop 18.
+	clear_trees(LOWER_PINES_STOP_X - 2, 28, LOWER_PINES_STOP_X + 2, 30)
 
 	# Room for Valley shuttle stop 15.
 	clear_trees(18, 23, 22, 25)
@@ -814,21 +875,20 @@ func _upper_pines() -> void:
 	paint_ground()
 	_save_ground_art("ground_upper_pines", 1964)
 	_place_wall("upper_pines", 107)
-	var tents := ["camp4_tent_dome_0", "camp4_tent_canvas", "camp4_tent_dome_1", "camp4_tent_dome_2", "camp4_tent_dome_3", "camp4_tent_dome_0"]
-	for i in sites.size():
-		var s: Array = sites[i]
-		var tent: String = tents[i % tents.size()]
-		decor("Tent%d" % i, B + tent + ".png", foot(s[0], s[1] - 1), Vector2(28, 8))
-		if _has(tent + "_glow", B):
-			var tex := texture(B + tent + ".png")
-			_glow(tent + "_glow", foot(s[0], s[1] - 1) - Vector2(tex.get_width() / 2.0, tex.get_height()), 1.0, B)
-		decor("Table%d" % i, B + "camp4_table.png", foot(s[0] + 2, s[1] + 1), Vector2(30, 8))
-		decor("BearBox%d" % i, B + "bear_box.png", foot(s[0] - 2, s[1] + 1), Vector2(14, 6))
+	_campsites("", sites)
+	_campsites("LowerPines", LOWER_PINES_SITES)
+	_info_sign("LowerPinesSign", foot(14, 29), "Lower Pines",
+		"The campground between the road and the Merced, under ponderosa pines, with Half Dome up the Valley and the river a short walk below the sites. Clark's Bridge crosses to North Pines.")
 	_info_sign("UpperPinesSign", foot(10, 25), "Upper Pines",
 		"The Valley's biggest campground, under ponderosa pines and incense cedars. Keep every scrap of food in the bear box: black bears here know what a cooler looks like.")
 	_dress(10, 60)
 	shuttle("ShuttleUpperPines", "Upper Pines Campground", foot(20, 25))
 	marker("shuttle", 20, 26.5)
+	shuttle("ShuttleLowerPines", "Lower Pines Campground", foot(LOWER_PINES_STOP_X, 30))
+	marker("shuttle_lower_pines", LOWER_PINES_STOP_X, 28.5)
+	marker("lower_pines", 32, 33)
+	marker("river_bank", 32, 42)
+	place("Lower Pines", 32, 34, 12)
 	marker("arrival", 30, 27.5)
 	marker("west", 2, 27.5)
 	marker("east", 61, 27.5)
@@ -896,6 +956,10 @@ func _happy_isles() -> void:
 
 ## The road and trail up Tenaya Creek from Happy Isles to Mirror Lake,
 ## through the oaks and boulders under the Half Dome side of the canyon.
+## North Pines' sites, north of the road in the Tenaya Creek scene.
+const NORTH_PINES_SITES := [[20, 17], [28, 16], [36, 17], [44, 16]]
+
+
 func _tenaya_creek() -> void:
 	_begin(64, 36, 1851 + 3)
 	_wall(5.0, 2.0, 3)
@@ -903,12 +967,19 @@ func _tenaya_creek() -> void:
 	_water(creek, 2, Terrain.CREEK, 0.4)
 	_path([Vector2(-1, 22), Vector2(22, 21), Vector2(42, 22), Vector2(65, 21)], 2, Terrain.ROAD)
 	_ellipse(30.0, 26.0, 8.0, 2.5, Terrain.MEADOW, 0.3)
+	# North Pines: campsites between the road and the wall, along the creek.
+	for s: Array in NORTH_PINES_SITES:
+		fill(s[0] - 2, s[1] - 2, s[0] + 3, s[1] + 1, Terrain.CAMP)
+	_path([Vector2(32, 20), Vector2(32, 13)], 1, Terrain.TRAIL, 0.3)
 	_mark_open()
 
 	start_region("TenayaCreek", "tenaya_creek", "Tenaya Creek", Vector2(-119.5580, 37.7400))
 	paint_ground()
 	_save_ground_art("ground_tenaya_creek", 1854)
 	_place_wall("tenaya", 109)
+	_campsites("NorthPines", NORTH_PINES_SITES)
+	_info_sign("NorthPinesSign", foot(12, 20), "North Pines",
+		"A campground in the pines on the north side of the Merced, where Tenaya Creek comes down toward the river. The trail to Mirror Lake starts just up the road.")
 	_info_sign("TenayaCreekSign", foot(26, 20), "Tenaya Creek",
 		"Tenaya Creek comes down Tenaya Canyon from Tenaya Lake, named for the Ahwahneechee leader Tenaya. It runs between Half Dome and Washington Column.")
 	_dress(30, 80)
@@ -918,6 +989,8 @@ func _tenaya_creek() -> void:
 	marker("east", 61, 21.5)
 	marker("creek", 30, 27)
 	place("Tenaya Creek", 30, 25, 14)
+	marker("north_pines", 32, 17)
+	place("North Pines", 32, 15, 10)
 	region_exit("ToHappyIsles", tile_pos(-0.5, 22.5), Vector2(12, 48), "Happy Isles", "happy_isles", "east")
 	region_exit("ToMirrorLake", tile_pos(63.5, 21.5), Vector2(12, 48), "Mirror Lake", "mirror_lake", "west")
 	_finish("tenaya_creek", 2.0)
