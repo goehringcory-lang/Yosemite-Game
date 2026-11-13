@@ -58,6 +58,15 @@ func has_fresh(seconds := 1.5) -> bool:
 	return _cards.any(func(entry: Dictionary) -> bool: return entry.time < seconds)
 
 
+## How wide the widest card showing is (at least CARD_WIDTH), so the HUD can
+## tell whether the place name banner would reach over them.
+func widest() -> float:
+	var width := CARD_WIDTH
+	for entry in _cards:
+		width = maxf(width, (entry.card as Control).size.x)
+	return width
+
+
 ## Number of cards showing (for tests).
 func count() -> int:
 	return _cards.size()

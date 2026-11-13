@@ -5,8 +5,8 @@ extends Node
 ## with the tally ("Discovered: Sentinel Beach, 12 of 140"), the Valley's area
 ## map turns its "?" into the place's name, and the Logbook counts it.
 ##
-## From a high lookout (VIEWPOINTS: Tunnel View, Glacier Point, the top of
-## Half Dome) the whole Valley lies spread out below, so arriving at one puts
+## From a high lookout (VIEWPOINTS: Tunnel View, Glacier Point, Half Dome's
+## shoulder and summit) the whole Valley lies spread out below, so arriving at one puts
 ## every place's name on the Valley's area map, still to be walked to.
 ##
 ## The list of places is res://data/park/places.json, written by

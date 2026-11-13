@@ -420,6 +420,8 @@
 			"camp_4@traveler_climber_lead|exit:NorthsideWest": [
 				728,
 				696,
+				60,
+				1220,
 				20,
 				1236,
 				16,
@@ -428,6 +430,8 @@
 			"camp_4@traveler_climber_second|exit:NorthsideWest": [
 				760,
 				668,
+				60,
+				1220,
 				20,
 				1236,
 				16,
@@ -486,8 +490,8 @@
 			"southside_east|ranger_station@traveler_ranger": [
 				3760,
 				1936,
-				3044,
-				1716,
+				3388,
+				1724,
 				2708,
 				1716,
 				2652,
@@ -506,8 +510,8 @@
 			"southside_east|village_store@traveler_camp_kid": [
 				3760,
 				1936,
-				3044,
-				1716,
+				3388,
+				1724,
 				2708,
 				1716,
 				2708,
@@ -538,6 +542,8 @@
 			"west_road|camp_4_fire@traveler_climber_second": [
 				80,
 				1232,
+				524,
+				812,
 				636,
 				764,
 				632,

@@ -6,6 +6,8 @@ extends Node
 ## Exit code is the number of failed checks.
 
 var failures := 0
+## How many times the homestead was announced as discovered.
+var _home_finds := 0
 
 
 func check(cond: bool, what: String) -> void:
@@ -121,10 +123,17 @@ func _check_cables() -> void:
 ## In the real game, ride the shuttle round the whole loop, stop to stop,
 ## from each stop's own sign.
 func _check_shuttle() -> void:
+	Discoveries.discovered.connect(func(entry: Dictionary) -> void:
+		if entry.region == Park.HOME_REGION:
+			_home_finds += 1)
 	var world: Node = load("res://scenes/world/world.tscn").instantiate()
 	add_child(world)
 	await get_tree().process_frame
 	await get_tree().process_frame
+	for _i in 3:
+		await get_tree().process_frame
+	check(Discoveries.count() == 1 and _home_finds == 1,
+		"a new game discovers your camp once (%d found, %d announced)" % [Discoveries.count(), _home_finds])
 	GameClock.minutes = 7 * 60
 	Discoveries.start_new_game()
 	var map: ParkMap = world.park_map

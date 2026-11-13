@@ -429,7 +429,7 @@ func _refresh_area_text() -> void:
 	var lines := ""
 	if not selected.is_empty():
 		var stop_name: String = selected.get("stop", "")
-		if _point_known(selected) or stop_name != "":
+		if _point_known(selected) or (_shuttle_from != "" and stop_name != ""):
 			lines = "%s. %s" % [selected.name, selected.blurb]
 		else:
 			lines = "Somewhere you haven't been yet. Go and find it, or see the Valley from a high lookout."
@@ -715,14 +715,18 @@ func _draw_point(canvas: Control, font: Font, index: int, selected: bool, dimmed
 	var text: String = point.name
 	# Places you haven't found keep their sign blank, unless the shuttle
 	# stops there (its stops are posted) and you're choosing one.
-	if not _point_known(point) and not (_shuttle_from != "" and point.has("stop")):
-		text = "???"
-		dimmed = true
+	var unknown := not _point_known(point) and not (_shuttle_from != "" and point.has("stop"))
 	var tier: String = point.tier
 	var ribbon := tier == "landmark" or tier == "fall"
 	var icon := 7.0 if ribbon else (8.0 if tier == "home" else 0.0)
 	var size := _sign_size(font, point)
 	var pos := _sign_at[index] if index < _sign_at.size() else _sign_home(font, point)
+	if unknown:
+		# a small blank sign in the middle of where the name will go
+		text = "???"
+		var small := Vector2(ceilf(font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x) + 7.0, size.y)
+		pos = (pos + Vector2((size.x - small.x) / 2.0, 0.0)).floor()
+		size = small
 	var fill := PARCHMENT
 	var shade := PARCHMENT_SHADE
 	var light := PARCHMENT_LIGHT

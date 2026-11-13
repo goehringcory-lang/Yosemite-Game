@@ -684,7 +684,7 @@ func _foot_of_talus(x: int) -> int:
 ## black oaks (they drop acorns), under the Royal Arches side of the Valley.
 ## The columns the clinic and the school stand on in Ahwahnee Meadow.
 const CLINIC_X := 6
-const SCHOOL_X := 15
+const SCHOOL_X := 16
 
 
 ## One of the Valley's buildings (valley_art.gd) on tile row [param base_y],
@@ -704,37 +704,36 @@ func _ahwahnee_meadow() -> void:
 	_path([Vector2(-1, 15), Vector2(20, 15), Vector2(44, 14), Vector2(65, 15)], 2, Terrain.ROAD)
 	_path([Vector2(-1, 33), Vector2(30, 33), Vector2(65, 32)], 1, Terrain.TRAIL, 0.6)
 	_path([Vector2(22, 16), Vector2(26, 24), Vector2(30, 33)], 1, Terrain.TRAIL, 0.6)
-	# The Yosemite Medical Clinic and the Yosemite Valley School stand on
-	# Ahwahnee Drive at the Village end, each up a short walk from the road.
-	for door_x: int in [CLINIC_X, SCHOOL_X]:
-		_path([Vector2(door_x, 16), Vector2(door_x, 22)], 1, Terrain.TRAIL, 0.6)
+	# The Yosemite Medical Clinic stands on the north side of the road at the
+	# Village end, just east of Degnan's (the NPS Yosemite Guide's Village
+	# map), with the Valley School beside it: level ground under the talus.
+	fill(CLINIC_X - 4, 11, SCHOOL_X + 4, 14, Terrain.FOREST)
 	_mark_open()
 	# Room under the oaks, and round the clinic and the school.
-	for o: Vector2i in [Vector2i(10, 30), Vector2i(20, 30), Vector2i(52, 22), Vector2i(56, 29)]:
+	for o: Vector2i in [Vector2i(14, 24), Vector2i(20, 30), Vector2i(52, 22), Vector2i(56, 29)]:
 		clear_trees(o.x - 3, o.y - 3, o.x + 3, o.y + 1)
-	for bx: int in [CLINIC_X, SCHOOL_X]:
-		clear_trees(bx - 4, 16, bx + 4, 23)
+	clear_trees(CLINIC_X - 4, 9, SCHOOL_X + 4, 14)
 
 	start_region("AhwahneeMeadow", "ahwahnee_meadow", "Ahwahnee Meadow", Vector2(-119.5790, 37.7470))
 	paint_ground()
 	_save_ground_art("ground_ahwahnee_meadow", 1927)
 	_place_wall("royal_arches", 105)
-	var oaks := [Vector2i(10, 30), Vector2i(20, 30), Vector2i(52, 22), Vector2i(56, 29)]
+	var oaks := [Vector2i(14, 24), Vector2i(20, 30), Vector2i(52, 22), Vector2i(56, 29)]
 	for i in oaks.size():
 		instance_scene("res://scenes/objects/black_oak.tscn", foot(oaks[i].x, oaks[i].y), "BlackOak%d" % (i + 1))
 	_info_sign("AhwahneeMeadowSign", foot(30, 16), "Ahwahnee Meadow",
 		"The Ahwahneechee lived in villages along the Valley's meadows, gathering acorns from the black oaks. Park staff now burn the meadows now and then, as they did, to keep the conifers from taking over.")
 	_info_sign("BlackOakSign", foot(18, 27), "California Black Oak",
 		"The oaks drop their acorns in fall. Ground and leached in running water, they were the Valley's main food.")
-	_valley_building("MedicalClinic", "medical_clinic", CLINIC_X, 21, "Yosemite Medical Clinic",
-		"The Valley's clinic, open to visitors and the people who live and work in the park. The building went up in 1929 as the Lewis Memorial Hospital, granite to the windowsills like the Museum.")
-	_valley_building("ValleySchool", "valley_school", SCHOOL_X, 21, "Yosemite Valley School",
-		"A small public school for the children of the families who live and work in the Valley, with a schoolyard under the oaks and the Royal Arches for a backdrop.")
+	_valley_building("MedicalClinic", "medical_clinic", CLINIC_X, 14, "Yosemite Medical Clinic",
+		"The Valley's clinic, just east of Degnan's: a small pharmacy and X-ray, and a paramedic ambulance on call day and night. In an emergency, call 911.")
+	_valley_building("ValleySchool", "valley_school", SCHOOL_X, 14, "Yosemite Valley School",
+		"A small public school for the children of the families who live and work in the Valley, with the Royal Arches for a backdrop.")
 	_dress(70, 50)
-	marker("clinic", CLINIC_X, 23)
-	marker("school", SCHOOL_X, 23)
-	place("Yosemite Medical Clinic", CLINIC_X, 20, 4)
-	place("Yosemite Valley School", SCHOOL_X, 20, 4)
+	marker("clinic", CLINIC_X, 15.5)
+	marker("school", SCHOOL_X, 15.5)
+	place("Yosemite Medical Clinic", CLINIC_X, 13, 4)
+	place("Yosemite Valley School", SCHOOL_X, 13, 4)
 	marker("arrival", 30, 15.5)
 	marker("west", 2, 15.5)
 	marker("east", 61, 15.5)

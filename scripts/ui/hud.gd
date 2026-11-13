@@ -211,7 +211,8 @@ func show_discovery(found: Dictionary) -> void:
 		return
 	if _discovery_icon == null:
 		_discovery_icon = Discoveries.icon()
-	toasts.notify("place:" + str(found.key), _discovery_icon, "Discovered: %s (%d/%d)" % [found.name, found.count, found.total], 1)
+	# each find its own card (a card with the same key would count up "x2")
+	toasts.notify("place:%s:%d" % [found.key, found.count], _discovery_icon, "Discovered: %s (%d/%d)" % [found.name, found.count, found.total], 1)
 	# one sting at a time: an area and a spot in it often come together
 	var now := Time.get_ticks_msec()
 	if now - _discovery_sting_at > DISCOVERY_STING_GAP_MS:
@@ -295,7 +296,7 @@ func _process(_delta: float) -> void:
 	# Cards drop below the place name while it's up, if it reaches over them.
 	toasts.top_margin = 4.0
 	var banner := location_panel.get_rect()
-	if location_panel.modulate.a > 0.0 and banner.position.x < 4.0 + ItemToasts.CARD_WIDTH:
+	if location_panel.modulate.a > 0.0 and banner.position.x < 4.0 + toasts.widest():
 		toasts.top_margin = banner.end.y + 2.0
 	if info_panel.visible and _player and _player.global_position.distance_to(_info_anchor) > INFO_CLOSE_DISTANCE:
 		hide_info()

@@ -52,6 +52,9 @@ var _crossed := false
 var _crossed_view := Vector2.ZERO
 ## Regions part way through their first set-up (see _set_up_step).
 var _setting_up: Dictionary = {}
+## Set once _ready has loaded the save or set up a new game: places are only
+## discovered from then on.
+var _started := false
 ## The region laid beside this one where a road runs off the map edge, while
 ## the player is near that edge (see Seam), so they walk across with no fade.
 var seam: Seam
@@ -146,6 +149,7 @@ func _ready() -> void:
 	# the camera Ansel Adams lends you, and the album its prints go in
 	add_child(CameraView.new())
 	add_child(PhotoAlbum.new())
+	_started = true
 	_update_location()
 
 
@@ -869,8 +873,10 @@ func _update_location() -> void:
 	if place and place.display_name != region.display_name:
 		parts.append(place.display_name)
 	hud.set_location(" · ".join(parts))
-	for found in Discoveries.visit(region, place):
-		hud.show_discovery(found)
+	# (not before the save has loaded or the new game is set up)
+	if _started:
+		for found in Discoveries.visit(region, place):
+			hud.show_discovery(found)
 
 
 func get_offstage_persist_nodes() -> Array[Node]:
