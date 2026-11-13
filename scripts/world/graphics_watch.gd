@@ -4,16 +4,25 @@ extends Node
 ## slow for High, switches to Low (see Settings.low) and says so. It looks at
 ## once for the plain signs of an old or weak computer (no Vulkan, so the game
 ## fell back to OpenGL, or no graphics card at all), and otherwise at the
-## frame times: if the typical frame takes longer than SLOW_MS for STRIKES
-## stretches of WINDOW seconds in a row, it's slow. The choice is saved, so
-## the next start begins on Low (with its lighter renderer); picking Auto again
-## in Settings looks afresh.
+## frame times: for STRIKES stretches of WINDOW seconds in a row, either the
+## typical frame takes longer than SLOW_MS, or more than MISSED_SHARE of the
+## frames do (see [method slow]). The choice is saved, so the next start
+## begins on Low (with its lighter renderer); picking Auto again in Settings
+## looks afresh.
 ##
 ## Only in the real game (the World as the running scene, with a window and
 ## the player's own settings), never in tests or screenshot tools.
 
-## A typical frame slower than this (40 frames a second) counts as slow.
+## A typical frame slower than this (40 frames a second) counts as slow. It is
+## also a missed frame on a 60 Hz screen: half again as long as a frame there.
 const SLOW_MS := 25.0
+## A share of missed frames (slower than SLOW_MS) that counts as slow even
+## when the typical frame is quick. With vsync a frame takes 16.7 or 33 ms on
+## a 60 Hz screen, so a graphics chip that just can't keep up (an older
+## laptop's) shows as one frame in three or four missed: a steady stutter
+## that the typical frame never shows. A judgment from the frame pattern,
+## not tuned on many computers.
+const MISSED_SHARE := 0.2
 ## Seconds of play in each look.
 const WINDOW := 4.0
 ## Looks in a row that must be slow.
@@ -86,10 +95,10 @@ func _process(_delta: float) -> void:
 	_elapsed += ms / 1000.0
 	if _elapsed < WINDOW:
 		return
-	var typical := median(_frames)
+	var was_slow := slow(_frames)
 	_frames.clear()
 	_elapsed = 0.0
-	_strikes = _strikes + 1 if typical > SLOW_MS else 0
+	_strikes = _strikes + 1 if was_slow else 0
 	if _strikes >= STRIKES:
 		_go_low()
 
@@ -101,7 +110,25 @@ func _go_low() -> void:
 	Settings.apply_graphics(get_window())
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud and hud.has_method("show_message"):
-		hud.show_message("Graphics set to Low to keep the game smooth")
+		# the lighter renderer only starts with the game (Settings.renderer)
+		hud.show_message("Graphics set to Low to keep the game smooth. Restart the game for the full effect.")
+
+
+## True when a look's frame times (in ms) are too slow for High: a slow
+## typical frame, or too many missed ones.
+static func slow(frames: PackedFloat32Array) -> bool:
+	return median(frames) > SLOW_MS or missed_share(frames) > MISSED_SHARE
+
+
+## The share of [param frames] (in ms) slower than SLOW_MS.
+static func missed_share(frames: PackedFloat32Array) -> float:
+	if frames.is_empty():
+		return 0.0
+	var missed := 0
+	for ms in frames:
+		if ms > SLOW_MS:
+			missed += 1
+	return float(missed) / frames.size()
 
 
 static func median(values: PackedFloat32Array) -> float:

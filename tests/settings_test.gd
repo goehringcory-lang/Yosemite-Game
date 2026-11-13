@@ -186,6 +186,23 @@ func test_graphics_watch() -> void:
 	check(GraphicsWatch.median(frames) < GraphicsWatch.SLOW_MS, "one long hitch isn't a slow computer")
 	frames = PackedFloat32Array([33.0, 34.0, 16.0, 33.5, 35.0])
 	check(GraphicsWatch.median(frames) > GraphicsWatch.SLOW_MS, "steady 30 frames a second is")
+	# a whole look's worth: 4 seconds at 60 a second, with one long hitch
+	frames = PackedFloat32Array()
+	for i in 240:
+		frames.append(400.0 if i == 120 else 16.7)
+	check(not GraphicsWatch.slow(frames), "a smooth look with one hitch isn't slow")
+	# vsync at 60 Hz on a chip that can't keep up: every third frame missed
+	frames = PackedFloat32Array()
+	for i in 240:
+		frames.append(33.3 if i % 3 == 0 else 16.7)
+	check(GraphicsWatch.median(frames) < GraphicsWatch.SLOW_MS, "the typical stuttering frame looks quick")
+	check(GraphicsWatch.slow(frames), "but a frame in three missed is slow")
+	# a missed frame now and then (one in twenty) is not
+	frames = PackedFloat32Array()
+	for i in 240:
+		frames.append(33.3 if i % 20 == 0 else 16.7)
+	check(not GraphicsWatch.slow(frames), "a missed frame now and then isn't slow")
+	check(is_equal_approx(GraphicsWatch.missed_share(PackedFloat32Array([30.0, 10.0, 10.0, 10.0])), 0.25), "the missed share counts frames over SLOW_MS")
 
 
 func test_bad_values() -> void:

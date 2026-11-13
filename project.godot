@@ -208,6 +208,10 @@ pause={
 2d_physics/layer_2="player"
 2d_physics/layer_3="interactable"
 
+[physics]
+
+common/physics_jitter_fix=0.0
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0

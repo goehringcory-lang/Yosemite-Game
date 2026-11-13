@@ -11,11 +11,20 @@ extends Node
 ##
 ## Moving the parent off the tick (a spawn, a door, a test) puts it straight
 ## there, with no glide.
+##
+## A light carried by the parent (the player's Lantern) glides too. A Light2D
+## hands the renderer its own place in the world rather than following its
+## parent's drawing, so without this the pool of lantern light stepped on
+## the tick while the player glided through it.
 
 var _parent: Node2D
 var _camera: Camera2D
 var _prev := Vector2.ZERO
 var _cur := Vector2.ZERO
+## The parent's lights (direct children), kept as they come and go.
+var _lights: Array[Light2D] = []
+## The glide each light was last moved by (see _glide_lights).
+var _light_offsets := {}
 
 
 func _ready() -> void:
@@ -26,6 +35,21 @@ func _ready() -> void:
 	_cur = _parent.position
 	# draw before the camera looks for where to be this frame
 	process_priority = -100
+	for child in _parent.get_children():
+		_on_child_entered(child)
+	_parent.child_entered_tree.connect(_on_child_entered)
+	_parent.child_exiting_tree.connect(_on_child_exiting)
+
+
+func _on_child_entered(child: Node) -> void:
+	if child is Light2D and not _lights.has(child):
+		_lights.append(child)
+
+
+func _on_child_exiting(child: Node) -> void:
+	if child is Light2D:
+		_lights.erase(child)
+		_light_offsets.erase(child)
 
 
 ## The parent moved by [param by] along with everything around it (the world
@@ -47,7 +71,24 @@ func _process(_delta: float) -> void:
 		_prev = _parent.position
 		_cur = _parent.position
 	var drawn := _prev.lerp(_cur, Engine.get_physics_interpolation_fraction())
-	RenderingServer.canvas_item_set_transform(_parent.get_canvas_item(),
-			Transform2D(_parent.rotation, _parent.scale, _parent.skew, drawn))
+	var local := Transform2D(_parent.rotation, _parent.scale, _parent.skew, drawn)
+	RenderingServer.canvas_item_set_transform(_parent.get_canvas_item(), local)
 	if _camera:
 		_camera.position = drawn - _parent.position
+	if not _lights.is_empty():
+		_glide_lights(_parent.transform.affine_inverse().basis_xform(drawn - _parent.position))
+
+
+## Moves each light by [param off] (the glide, in the parent's own frame) so
+## its pool of light sits on the drawn parent. Its drawing (and anything under
+## it, like a lamp's halo) already follows the drawn parent, so that stays
+## where the light was placed.
+func _glide_lights(off: Vector2) -> void:
+	for light in _lights:
+		if not is_instance_valid(light):
+			continue
+		var base: Vector2 = light.position - (_light_offsets.get(light, Vector2.ZERO) as Vector2)
+		light.position = base + off
+		_light_offsets[light] = off
+		RenderingServer.canvas_item_set_transform(light.get_canvas_item(),
+				Transform2D(light.rotation, light.scale, light.skew, base))
