@@ -166,6 +166,20 @@ func test_lamps() -> void:
 	GameClock.minutes = 23 * 60
 	await _frames(4)
 	check(lantern != null and lantern.energy > 0.3, "the lantern is lit at 11 PM")
+	# A lamp on a timer comes up over a moment, not in one frame.
+	var timed := NightLight.new()
+	timed.lit_hours = Vector2i(0, 4)
+	timed.halo = 0.0
+	world.region.entities.add_child(timed)
+	await _frames(2)
+	check(timed.energy == 0.0, "a lamp lit from midnight is out at 11 PM")
+	GameClock.minutes = 0
+	await _frames(1)
+	var first := timed.energy
+	await get_tree().create_timer(NightLight.HOURS_FADE + 0.3).timeout
+	check(first < timed.energy * 0.5 and timed.energy > 0.3,
+			"it comes up over a moment at midnight (%.2f, then %.2f)" % [first, timed.energy])
+	timed.queue_free()
 
 
 ## Curry Village's art has normal maps: its cabins, trees and ground are

@@ -28,6 +28,15 @@ var _kind := PackedInt32Array()
 var _depth := PackedFloat32Array()
 var _phase := PackedFloat32Array()
 var _color := PackedColorArray()
+## How far each one has faded in (0 to 1). A kind that comes or goes with
+## the light during the day (fireflies at dusk, motes in the afternoon sun)
+## fades over FADE seconds instead of every flake jumping at once.
+var _fade := PackedFloat32Array()
+## Kinds (KINDS indices) on their way out, fading to nothing.
+var _leaving := {}
+## The day part of the last key: a new day starts the air afresh.
+var _day_key := ""
+const FADE := 2.5
 var _time := 0.0
 var _key := ""
 var _view := Rect2()
@@ -104,6 +113,7 @@ func _process(delta: float) -> void:
 		_key = key
 		_populate()
 	_time += delta
+	_fade_kinds(delta)
 	var wind := 8.0 + 10.0 * sin(_time * 0.13) + 4.0 * sin(_time * 0.41 + 1.0)
 	var area := _view.grow(MARGIN)
 	for i in _pos.size():
@@ -155,15 +165,37 @@ func _populate() -> void:
 	if w.rain > 0.0:
 		counts["rain"] = w.rain
 		counts.erase("petal")
-	_pos.clear()
-	_kind.clear()
-	_depth.clear()
-	_phase.clear()
-	_color.clear()
+	var day_key := "%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day]
+	# Later in the same day (the light changed): keep what still belongs in
+	# the air, fade out what doesn't and fade in what's new.
+	var same_day := day_key == _day_key and not _pos.is_empty()
+	_day_key = day_key
+	var have := {}
+	if same_day:
+		for i in _pos.size():
+			var kind_name: String = KINDS[_kind[i]]
+			if counts.has(kind_name):
+				_leaving.erase(_kind[i])
+				have[kind_name] = true
+			else:
+				_leaving[_kind[i]] = true
+	else:
+		_pos.clear()
+		_kind.clear()
+		_depth.clear()
+		_phase.clear()
+		_color.clear()
+		_fade.clear()
+		_leaving.clear()
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(_key)
 	var area := _view.grow(MARGIN)
 	for kind_name: String in counts:
+		# wanted again: none of its flakes should fade out (even if it had
+		# all gone already)
+		_leaving.erase(KINDS.find(kind_name))
+		if have.has(kind_name):
+			continue
 		# Low graphics: half as many, for slower computers
 		var share := 0.5 if Settings.low() else 1.0
 		var n := mini(int(COUNTS[kind_name] * float(counts[kind_name]) * share), MAX_FLAKES - _pos.size())
@@ -173,6 +205,27 @@ func _populate() -> void:
 			_depth.append(rng.randf())
 			_phase.append(rng.randf() * TAU)
 			_color.append(_color_for(kind_name, rng))
+			_fade.append(0.0 if same_day else 1.0)
+
+
+## Fades each flake towards in (or out, for a kind that's leaving), and lets
+## go of those that have faded out.
+func _fade_kinds(delta: float) -> void:
+	var step := delta / FADE
+	var i := _pos.size() - 1
+	while i >= 0:
+		if _leaving.has(_kind[i]):
+			_fade[i] -= step
+			if _fade[i] <= 0.0:
+				_pos.remove_at(i)
+				_kind.remove_at(i)
+				_depth.remove_at(i)
+				_phase.remove_at(i)
+				_color.remove_at(i)
+				_fade.remove_at(i)
+		elif _fade[i] < 1.0:
+			_fade[i] = minf(_fade[i] + step, 1.0)
+		i -= 1
 
 
 func _color_for(kind_name: String, rng: RandomNumberGenerator) -> Color:
@@ -196,6 +249,7 @@ func _draw() -> void:
 	for i in _pos.size():
 		var p := _pos[i].floor()
 		var c := _color[i]
+		c.a *= _fade[i]
 		var d := _depth[i]
 		match _kind[i]:
 			0:
@@ -247,7 +301,7 @@ func _draw_fireflies() -> void:
 		if _kind[i] != 5:
 			continue
 		# Each one blinks on its own slow beat.
-		var blink := clampf(sin(_time * 1.7 + _phase[i] * 3.0) * 1.6 - 0.2, 0.0, 1.0)
+		var blink := clampf(sin(_time * 1.7 + _phase[i] * 3.0) * 1.6 - 0.2, 0.0, 1.0) * _fade[i]
 		if blink <= 0.0:
 			continue
 		var p := _pos[i].floor()

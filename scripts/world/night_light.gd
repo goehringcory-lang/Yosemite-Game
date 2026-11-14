@@ -25,6 +25,10 @@ static var _halo_tex: GradientTexture2D
 var _tint: CanvasModulate
 var _phase := 0.0
 var _halo: Sprite2D
+## 1 inside [member lit_hours], 0 outside, easing between over HOURS_FADE
+## seconds, so a lamp on a timer comes up or goes out rather than cutting.
+var _hours_level := 1.0
+const HOURS_FADE := 1.5
 
 
 func _ready() -> void:
@@ -49,6 +53,7 @@ func _ready() -> void:
 	height = 24.0
 	_phase = randf() * TAU
 	energy = 0.0
+	_hours_level = 1.0 if _in_hours() else 0.0
 	if halo > 0.0:
 		_add_halo()
 
@@ -73,9 +78,8 @@ func _process(delta: float) -> void:
 		dark = clampf((0.9 - lum) / 0.45, 0.0, 1.0)
 	elif not outdoor_only:
 		dark = RoomLight.level
-	var level := strength * dark
-	if lit_hours.x >= 0 and not GameClock.hour_in_range(lit_hours.x, lit_hours.y):
-		level = 0.0
+	_hours_level = move_toward(_hours_level, 1.0 if _in_hours() else 0.0, delta / HOURS_FADE)
+	var level := strength * dark * _hours_level
 	if flicker > 0.0 and level > 0.0:
 		_phase += delta * 9.0
 		level *= 1.0 - flicker * (0.5 + 0.5 * sin(_phase) * sin(_phase * 0.37 + 1.0))
@@ -87,6 +91,10 @@ func _process(delta: float) -> void:
 		_halo.visible = not AirGlow.active()
 		# Drawn bright, since the night tint dims it with everything else.
 		_halo.modulate = Color(color.r, color.g, color.b, 1.0) * Color(2.2, 2.2, 2.2, minf(level * halo * 0.5, 1.0))
+
+
+func _in_hours() -> bool:
+	return lit_hours.x < 0 or GameClock.hour_in_range(lit_hours.x, lit_hours.y)
 
 
 ## A soft additive glow round the lamp head, over everything near it.
