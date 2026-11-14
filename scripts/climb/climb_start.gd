@@ -53,10 +53,13 @@ func interact(player: Player) -> void:
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s (%s). You can't lead this alone: you need a partner with a rope to belay you. %s" % [
 			route.display_name, route.grade, "%s is looking for one." % partner if partner != "" else "Ask around."]}])
 		return
-	var missing := Gear.missing(route.required_gear)
+	var missing := Gear.missing_packed(route.required_gear)
 	if not missing.is_empty():
-		DialogueBox.say_to(player, [{"speaker": "", "text": "%s (%s). You need more gear to climb this: %s." % [
-			route.display_name, route.grade, ", ".join(missing)]}])
+		var text := "%s (%s). You need more gear to climb this: %s." % [route.display_name, route.grade, ", ".join(missing)]
+		var at_camp := Gear.at_camp_line(route.required_gear)
+		if at_camp != "":
+			text += " " + at_camp
+		DialogueBox.say_to(player, [{"speaker": "", "text": text}])
 		return
 	if ClimbState.starts_too_late(route, GameClock.minutes):
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s (%s). You'd still be on the wall at 2 AM. Start in the morning." % [route.display_name, route.grade]}])

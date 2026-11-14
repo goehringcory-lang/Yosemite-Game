@@ -363,9 +363,9 @@ func climb_to_party(player: Player, start: ClimbStart) -> void:
 	if ClimbState.starts_too_late(route, GameClock.minutes):
 		DialogueBox.say_to(player, [{"speaker": "", "text": "It's too late to start up %s. The night team will have to go." % route.display_name}])
 		return
-	var missing := Gear.missing(route.required_gear)
+	var missing := Gear.missing_packed(route.required_gear)
 	if not missing.is_empty():
-		DialogueBox.say_to(player, [{"speaker": "", "text": "You need more gear to climb to them: %s." % ", ".join(missing)}])
+		DialogueBox.say_to(player, [{"speaker": "", "text": ("You need more gear to climb to them: %s. " % ", ".join(missing) + Gear.at_camp_line(route.required_gear)).strip_edges()}])
 		return
 	player.can_act = false
 	var box := DialogueBox.open(player)

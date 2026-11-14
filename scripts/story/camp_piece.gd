@@ -91,7 +91,8 @@ func _ready() -> void:
 
 
 func is_shown() -> bool:
-	return Camp.has(piece.id)
+	# gear that went to camp needs somewhere to hang, rack or no rack yet
+	return Camp.has(piece.id) or (piece.id == "gear_rack" and Gear.any_cached())
 
 
 func _refresh() -> void:
@@ -114,6 +115,8 @@ func _refresh() -> void:
 func get_prompt() -> String:
 	if piece.id == "chest":
 		return "Open the chest"
+	if piece.id == "gear_rack":
+		return "Pack your gear bag"
 	return "Look at the %s" % str(piece.name).to_lower() if piece.id != "guardian_sign" else "Read the sign"
 
 
@@ -122,6 +125,9 @@ func interact(player: Player) -> void:
 		return
 	if piece.id == "chest":
 		await open_chest(player)
+		return
+	if piece.id == "gear_rack":
+		await open_rack(player)
 		return
 	get_tree().call_group("hud", "show_info", piece.name, Camp.describe(piece.id))
 
@@ -218,6 +224,193 @@ static func chest_menu(putting: bool, page := 0) -> Dictionary:
 		elif putting:
 			note += " Quests only count what's in your pack."
 		details.append({"title": item.display_name, "rows": [], "facts": facts, "note": note})
+		actions.append(id)
+	if pages > 1:
+		options.append("More (%d/%d)" % [page + 1, pages])
+		icons.append(null)
+		details.append(null)
+		actions.append("more")
+	options.append("Back")
+	icons.append(null)
+	details.append(null)
+	actions.append("back")
+	return {"options": options, "icons": icons, "details": details, "actions": actions, "ids": ids}
+
+
+# ---------------------------------------------------------------- the gear rack
+
+## The rack's menu: pack the gear bag from what hangs here, or hang things
+## up, until you walk off.
+func open_rack(player: Player) -> void:
+	_busy = true
+	player.can_act = false
+	var box := DialogueBox.open(player)
+	var cursor := 0
+	while true:
+		var details := [
+			{"title": "Pack for a climb", "rows": [], "facts": "", "note": "Pick a route from your guidebook: the bag gets everything it needs, and whatever else fits."},
+			{"title": "Pack your bag", "rows": [], "facts": "", "note": "Take gear off the rack and into your bag."},
+			{"title": "Hang gear up", "rows": [], "facts": "", "note": "Leave gear here at camp to make room in your bag."},
+			{"title": "Pack what fits", "rows": [], "facts": "", "note": "Fill the bag from the rack: your climbing rack first, then the wall and ice gear, then the rest."},
+			{"title": "Hang up everything", "rows": [], "facts": "", "note": "Empty the bag onto the rack, all but what takes no room."},
+			null,
+		]
+		var choice := await box.choose(rack_prompt(), ["Pack for a climb", "Pack your bag", "Hang gear up", "Pack what fits", "Hang up everything", "Done"], "", [], details, cursor)
+		if choice < 0 or choice == 5:
+			break
+		cursor = choice
+		match choice:
+			0:
+				await _route_menu(box)
+			1:
+				await _rack_menu(box, true)
+			2:
+				await _rack_menu(box, false)
+			3:
+				if Gear.pack_all() == 0:
+					await box.say([{"speaker": "", "text": "Nothing more fits, or nothing's hanging here." if Gear.any_cached() else "Nothing's hanging here."}])
+				else:
+					Sound.play("item_get", -10.0, 0.05)
+			4:
+				if Gear.unpack_all() > 0:
+					Sound.play("item_get", -10.0, 0.05)
+	box.close()
+	player.can_act = true
+	_busy = false
+
+
+static func rack_prompt() -> String:
+	return "Your gear rack. Gear bag: %d of %d room used." % [Gear.bag_used(), Gear.bag_room()]
+
+
+## Pick a route you own the gear for, and pack for it.
+func _route_menu(box: DialogueBox) -> void:
+	var page := 0
+	while true:
+		var menu := route_menu(page)
+		if menu.routes.is_empty():
+			await box.say([{"speaker": "", "text": "You don't have the gear for any route in your guidebook yet."}])
+			return
+		var choice := await box.choose("Pack for which climb?", menu.options, "", [], menu.details)
+		if choice < 0:
+			return
+		var action = menu.actions[choice]
+		if action is String and action == "back":
+			return
+		if action is String and action == "more":
+			page += 1
+			continue
+		var route: RouteData = action
+		if Gear.pack_for(route.required_gear):
+			Sound.play("item_get", -10.0, 0.05)
+			await box.say([{"speaker": "", "text": "Packed for %s. %s" % [route.display_name, rack_prompt().trim_prefix("Your gear rack. ")]}])
+		else:
+			await box.say([{"speaker": "", "text": "It won't all fit in your bag. A haul bag would carry the wall gear."}])
+		return
+
+
+## Routes in the guidebook you own the gear for: the one a main quest is
+## waiting on first, then the ones not ticked yet, then the rest. {"options",
+## "details", "actions", "routes"}, a page at a time.
+static func route_menu(page := 0) -> Dictionary:
+	var routes: Array[RouteData] = []
+	for entry: Dictionary in Guidebook.entries():
+		var route: RouteData = entry.route
+		if entry.ready and not route.required_gear.is_empty():
+			routes.append(route)
+	routes.sort_custom(func(a: RouteData, b: RouteData) -> bool:
+		var ka := (0 if Guidebook.main_quest_for(a.id) else 2) + (1 if QuestLog.has_climbed(a.id) else 0)
+		var kb := (0 if Guidebook.main_quest_for(b.id) else 2) + (1 if QuestLog.has_climbed(b.id) else 0)
+		return ka < kb or (ka == kb and a.guide_order < b.guide_order))
+	var options := []
+	var details := []
+	var actions := []
+	var pages := maxi(1, ceili(routes.size() / float(PAGE)))
+	page = posmod(page, pages)
+	for route: RouteData in routes.slice(page * PAGE, (page + 1) * PAGE):
+		options.append("%s (%s%s)" % [route.display_name, route.grade, (", ticked" if QuestLog.has_climbed(route.id) else "")])
+		var need := 0
+		for id: String in route.required_gear:
+			need += int(route.required_gear[id]) * Gear.bulk(id)
+		details.append({"title": route.display_name, "rows": [], "facts": "Needs %d room" % need, "note": "Takes: " + Guidebook.gear_text(route) + "."})
+		actions.append(route)
+	if pages > 1:
+		options.append("More (%d/%d)" % [page + 1, pages])
+		details.append(null)
+		actions.append("more")
+	options.append("Back")
+	details.append(null)
+	actions.append("back")
+	return {"options": options, "details": details, "actions": actions, "routes": routes}
+
+
+## A paged list of what hangs on the rack ([param packing]) or is in the bag;
+## pick one to move all of it, or one at a time.
+func _rack_menu(box: DialogueBox, packing: bool) -> void:
+	var page := 0
+	var cursor := 0
+	while true:
+		var menu := rack_menu(packing, page)
+		if menu.ids.is_empty():
+			await box.say([{"speaker": "", "text": "Nothing's hanging on the rack." if packing else "Nothing in your bag takes up room."}])
+			return
+		var choice := await box.choose(rack_prompt(), menu.options, "", menu.icons, menu.details, cursor)
+		if choice < 0:
+			return
+		cursor = choice
+		var action: String = menu.actions[choice]
+		if action == "back":
+			return
+		if action == "more":
+			page += 1
+			cursor = 0
+			continue
+		var id := action
+		var have := Gear.cached_count(id) if packing else Gear.carried(id)
+		var amount := have
+		if have > 1:
+			var how := await box.choose("How many?", ["All %d" % have, "Just one", "Back"])
+			if how < 0 or how == 2:
+				continue
+			amount = have if how == 0 else 1
+		var moved := Gear.pack(id, amount) if packing else Gear.unpack(id, amount)
+		if moved > 0:
+			Sound.play("item_get", -10.0, 0.05)
+		if packing and moved < amount:
+			await box.say([{"speaker": "", "text": ("Only %d fit. " % moved if moved > 0 else "") + "There's no more room in your bag. Hang something up first."}])
+		elif not packing and moved == 0 and id == "haul_bag":
+			await box.say([{"speaker": "", "text": "Your wall gear rides in the haul bag. Hang some of it up first."}])
+
+
+## The menu for the rack ([param packing]) or the bag: {"options", "icons",
+## "details", "actions", "ids"}, a page at a time.
+static func rack_menu(packing: bool, page := 0) -> Dictionary:
+	var ids: Array[String] = []
+	for gear: GearData in Gear.GEAR:
+		var n := Gear.cached_count(gear.id) if packing else Gear.carried(gear.id)
+		if n > 0 and (packing or Gear.bulk(gear.id) > 0 or gear.id == "haul_bag"):
+			ids.append(gear.id)
+	var options := []
+	var icons := []
+	var details := []
+	var actions := []
+	var pages := maxi(1, ceili(ids.size() / float(PAGE)))
+	page = posmod(page, pages)
+	for id: String in ids.slice(page * PAGE, (page + 1) * PAGE):
+		var gear := Gear.get_gear(id)
+		var n := Gear.cached_count(id) if packing else Gear.carried(id)
+		options.append("%s (%d)" % [gear.display_name, n])
+		icons.append(CamSizes.icon(0) if id == "cam" else gear.icon)
+		var room := Gear.bulk(id)
+		var facts := "Takes no room" if room == 0 else "Takes %d room%s" % [room, " each" if n > 1 else ""]
+		if id == "haul_bag":
+			facts = "Adds %d room" % Gear.HAUL_BAG_ROOM
+		var note := gear.description
+		if packing and Gear.carried(id) > 0:
+			note += " %d already in your bag." % Gear.carried(id)
+		elif not packing and Gear.cached_count(id) > 0:
+			note += " %d more on the rack." % Gear.cached_count(id)
+		details.append({"title": gear.display_name, "rows": [], "facts": facts, "note": note})
 		actions.append(id)
 	if pages > 1:
 		options.append("More (%d/%d)" % [page + 1, pages])
@@ -338,24 +531,25 @@ func _draw_gear_rack() -> void:
 	_post(16, -30)
 	draw_rect(Rect2(-19, -31, 38, 3).grow(1), INK)
 	draw_rect(Rect2(-19, -31, 38, 3), WOOD_HI)
-	if Gear.count("rope") > 0:
+	# what hangs here: the gear you left at camp
+	if Gear.cached_count("rope") > 0:
 		# a coiled rope hanging from the bar
 		for i in 4:
 			var y := -26.0 + i * 3.0
 			draw_arc(Vector2(-6, y), 6.0 - i * 0.5, 0.2, PI - 0.2, 8, INK, 2.0)
 			draw_arc(Vector2(-6, y), 6.0 - i * 0.5, 0.2, PI - 0.2, 8, ROPE_RED if i % 2 == 0 else ROPE_HI, 1.0)
 		draw_rect(Rect2(-7, -28, 2, 4), ROPE_RED)
-	var cams := mini(Gear.count("cam"), 6)
+	var cams := mini(Gear.cached_count("cam"), 6)
 	for i in cams:
 		var x := 2.0 + i * 2.5
 		draw_line(Vector2(x, -28), Vector2(x, -20), Color("8c877c"), 1.0)
 		draw_rect(Rect2(x - 1, -20, 2, 3), [Color("c83a2a"), Color("e8b83a"), Color("3a86a8"), Color("6aa84a"), Color("a84a8a"), Color("8c877c")][i % 6])
-	var draws := mini(Gear.count("quickdraw"), 5)
+	var draws := mini(Gear.cached_count("quickdraw"), 5)
 	for i in draws:
 		var x := -16.0 + i * 3.0
 		draw_rect(Rect2(x, -27, 1, 5), Color("b8b8a8"))
 		draw_rect(Rect2(x, -22, 1, 3), Color("3a86a8"))
-	if Gear.count("ice_axe") > 0:
+	if Gear.cached_count("ice_axe") > 0:
 		draw_line(Vector2(13, -8), Vector2(18, -29), INK, 2.0)
 		draw_line(Vector2(13, -8), Vector2(18, -29), Color("c8a46a"), 1.0)
 		draw_rect(Rect2(14, -31, 8, 2), IRON_HI)

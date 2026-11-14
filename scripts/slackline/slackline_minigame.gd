@@ -154,7 +154,7 @@ func _ready() -> void:
 	if not QuestLog.is_unlocked(GOLD) and SlacklineState.LINES.any(func(l: Dictionary) -> bool: return medal_for(l.id) >= 3):
 		QuestLog.unlocks.append(GOLD)
 		QuestLog.changed.emit()
-	_kit = {"climbing_shoes": int(Gear.owned.get("climbing_shoes", 0)), "chalk_bag": int(Gear.owned.get("chalk_bag", 0))}
+	_kit = {"climbing_shoes": Gear.carried("climbing_shoes"), "chalk_bag": Gear.carried("chalk_bag")}
 	_paint()
 	for i in ART.CROWD.size():
 		_crowd.append({"cheer": 0.0, "gasp": 0.0})
