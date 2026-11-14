@@ -310,6 +310,11 @@ static func apply_graphics(window: Window) -> void:
 	var mode := Window.CONTENT_SCALE_MODE_VIEWPORT if low() else Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
 	if window.content_scale_mode != mode:
 		window.content_scale_mode = mode
+	# On High the art is drawn at the window's size, so things glide in
+	# screen pixels (LandmarkFraming.set_offset_on_pixel keeps the view on them).
+	# On Low it's drawn at 960x540 and scaled up: there a sprite between two
+	# art pixels would sample on its texels' edges, so snap to whole ones.
+	RenderingServer.viewport_set_snap_2d_transforms_to_pixel(window.get_viewport_rid(), low())
 
 
 static func reset_defaults() -> void:

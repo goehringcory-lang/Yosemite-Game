@@ -81,20 +81,45 @@ func _process(delta: float) -> void:
 		tilt = target
 	_last_at = at
 	tilt = lerpf(tilt, target, 1.0 - exp(-SPEED * delta))
-	if absf(tilt - target) < 0.25:
+	if absf(tilt - target) < 0.05:
 		tilt = target
 	var want := lead_for(player, target)
 	if jumped:
 		lead = Vector2.ZERO
 	lead = lead.lerp(want, 1.0 - exp(-LEAD_SPEED * delta))
-	if lead.distance_to(want) < 0.25:
+	if lead.distance_to(want) < 0.05:
 		lead = want
 	if carry != Vector2.ZERO:
 		# Camera2D closes its lag by speed * delta of it each frame.
 		carry *= 1.0 - clampf(camera.position_smoothing_speed * delta, 0.0, 1.0)
 		if carry.length() < 0.05:
 			carry = Vector2.ZERO
-	camera.offset = Vector2(carry.x + lead.x, tilt + carry.y + lead.y)
+	set_offset_on_pixel(camera, Vector2(carry.x + lead.x, tilt + carry.y + lead.y))
+
+
+## Sets [param camera]'s offset to [param want], nudged by under a screen
+## pixel so the view's top-left corner lands on a whole screen pixel. The
+## view glides in screen pixels (half an art pixel on a 1920x1080 screen),
+## and with the view on the screen's grid every art pixel still covers whole
+## screen pixels, so the art stays crisp. On Low the game is drawn at
+## 960x540 and scaled up, so there the grid is the art's own pixels.
+static func set_offset_on_pixel(camera: Camera2D, want: Vector2) -> void:
+	# The first offset set in a frame moves the camera's smoothing on, so set
+	# it, see where the view is, then nudge (setting it again is only added).
+	camera.offset = want
+	var viewport := camera.get_viewport()
+	var s := camera.zoom
+	var window := viewport as Window
+	if window == null or window.content_scale_mode != Window.CONTENT_SCALE_MODE_VIEWPORT:
+		s *= viewport.get_screen_transform().get_scale()
+	if s.x <= 0.0 or s.y <= 0.0:
+		return
+	# a window smaller than the game (or a headless run's tiny one): no finer
+	# than the art's own pixels
+	s = s.max(Vector2.ONE)
+	var half := viewport.get_visible_rect().size / camera.zoom / 2.0
+	var corner := camera.get_screen_center_position() - half
+	camera.offset = want + ((corner * s).round() / s - corner)
 
 
 ## Where the camera leads to with [param player] walking as they are, under a

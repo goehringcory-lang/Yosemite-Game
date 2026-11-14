@@ -716,6 +716,7 @@ func _hand_camera_over() -> void:
 	framing.carry = (_crossed_view - target) * (1.0 - eased)
 	camera.offset = Vector2(framing.carry.x + framing.lead.x, framing.tilt + framing.carry.y + framing.lead.y)
 	camera.reset_smoothing()
+	LandmarkFraming.set_offset_on_pixel(camera, camera.offset)
 
 
 ## Remembers the seam back the way the player came, so it lines up exactly.
