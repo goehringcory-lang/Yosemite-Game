@@ -98,6 +98,8 @@ func _ready() -> void:
 	message_label.add_theme_stylebox_override("normal", card)
 	toasts = ItemToasts.new()
 	_screen.add_child(toasts)
+	# signs at the screen's edge toward landmarks and undiscovered places
+	_screen.add_child(Wayfinding.new())
 	_screen.move_child(toasts, fade.get_index()) # under the fade, so the black covers it
 	Inventory.added.connect(_on_item_added)
 	Gear.added.connect(_on_gear_added)

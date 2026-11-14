@@ -28,8 +28,8 @@ const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again 
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
 const TITLE_CONFIRM := "To the title? Progress since your last save is lost. Press again."
 const TITLE_SAVED := "To the title? Your game is saved. Press again."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, TIMING, HOLD_TAPS, VIBRATION, PAUSE_AWAY, FONT, GRAPHICS, WIND, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Activity timing", "Hold to tap", "Vibration", "Pause when away", "Font", "Graphics", "Wind", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, TIMING, HOLD_TAPS, VIBRATION, PAUSE_AWAY, FONT, GRAPHICS, WIND, WAYFINDING, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Activity timing", "Hold to tap", "Vibration", "Pause when away", "Font", "Graphics", "Wind", "Signposts", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill covers the whole screen. Pixel perfect keeps every pixel the same size, with a border where the screen isn't a whole multiple of 960 x 540.",
@@ -43,6 +43,7 @@ const SETTING_HELP := [
 	"Smooth letters are easiest to read; pixel letters match the art.",
 	"Low uses a simpler renderer for older computers. A change takes effect when you next start the game.",
 	"Trees and plants sway and gusts cross the grass. Off keeps them still.",
+	"Little signs at the screen's edge point to Half Dome, El Capitan and the other landmarks, and a ? to parts of the Valley you haven't found.",
 	"How loud the whole game is.",
 	"The songs for each season, the night, and the title screen.",
 	"Footsteps, climbing, and menus.",
@@ -914,6 +915,8 @@ func change_setting(which: int, step: int) -> void:
 			Settings.pause_away = not Settings.pause_away
 		Setting.WIND:
 			Settings.wind = not Settings.wind
+		Setting.WAYFINDING:
+			Settings.wayfinding = not Settings.wayfinding
 		Setting.MASTER_VOLUME:
 			Settings.master_volume = clampi(Settings.master_volume + step, 0, Settings.MAX_VOLUME)
 		Setting.MUSIC_VOLUME:
@@ -1092,6 +1095,8 @@ func _setting_value(which: int) -> String:
 			value = "On" if Settings.pause_away else "Off"
 		Setting.WIND:
 			value = "On" if Settings.wind else "Off"
+		Setting.WAYFINDING:
+			value = "On" if Settings.wayfinding else "Off"
 		Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME:
 			value = _volume_text(_volume(which))
 		_:

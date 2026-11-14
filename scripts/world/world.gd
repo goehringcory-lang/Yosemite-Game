@@ -20,6 +20,10 @@ const RETIRED_REGIONS := {"yosemite_valley": "yosemite_village"}
 ## pixels) to a seam, and taken away again past SEAM_FAR.
 const SEAM_NEAR := 720.0
 const SEAM_FAR := 960.0
+## The seam laid out now counts as this much nearer than another on the same
+## edge, so walking along an edge where two regions meet it doesn't flick
+## between them.
+const SEAM_SWAP := 160.0
 
 ## The region the player is in.
 var region: Region
@@ -252,9 +256,11 @@ func use_exit(exit: RegionExit) -> void:
 	if _busy or not player.can_act:
 		return
 	# The next region is laid out past this edge, or this is its own exit
-	# back: walk on across (see _physics_process).
+	# back: walk on across (see _physics_process). Called for an exit the
+	# player isn't standing at (from a script), it takes them there anyway.
 	if seam and (not region.is_ancestor_of(exit) or (exit.target_region == seam.neighbor.region_id \
-			and (region.to_local(exit.global_position) - seam.point).length() < Seam.CORRIDOR)):
+			and (region.to_local(exit.global_position) - seam.point).length() < Seam.CORRIDOR \
+			and player.global_position.distance_to(exit.global_position) < Seam.CORRIDOR)):
 		return
 	if not exit.is_open_now():
 		hud.show_message(exit.closed_message())
@@ -598,21 +604,23 @@ func _region_ready(id: String) -> bool:
 
 
 ## Lays the next region beside this one while the player is near a seam
-## (the nearest one, within SEAM_NEAR), and takes it away again once they
-## have walked off. Walking about, a region set up for the first time waits
-## for the next frame; [param now] (arriving behind a fade) does it all at once.
+## (the nearest open stretch of edge, within SEAM_NEAR; see Seam.span), and
+## takes it away again once they have walked off, past SEAM_FAR. Walking
+## about, a region set up for the first time waits for the next frame;
+## [param now] (arriving behind a fade) does it all at once.
 func _update_seam(now := false) -> void:
 	if region == null or (_busy and not now) or region.indoors:
 		return
 	var at := region.to_local(player.global_position)
-	if seam and (seam.point - at).length() < SEAM_FAR:
-		return
+	var bounds := region.get_bounds()
 	var best: Seam = null
 	var best_gap := SEAM_NEAR
 	var made := false
 	for exit in _seam_exits(region):
-		var gap := (region.to_local(exit.global_position) - at).length()
-		if gap >= best_gap or not (now or _region_ready(exit.target_region)):
+		# a rough guide first: is the player near that edge at all?
+		if Seam.edge_gap(bounds, region.to_local(exit.global_position), at) >= SEAM_FAR:
+			continue
+		if not (now or _region_ready(exit.target_region)):
 			continue
 		# Setting up a region for the first time takes a few frames: a
 		# step a frame, and it's laid out once it's ready.
@@ -622,10 +630,17 @@ func _update_seam(now := false) -> void:
 				_set_up_step(exit.target_region)
 			continue
 		var found := _seam_for(exit)
-		if found:
+		if found == null:
+			continue
+		var gap := found.gap_to(at)
+		# The one laid out now stays until the player is well away from it
+		# (SEAM_FAR), or clearly at another stretch of the same edge.
+		if _same_seam(found, seam):
+			gap = gap - SEAM_SWAP if gap < SEAM_FAR else INF
+		if gap < best_gap:
 			best = found
 			best_gap = gap
-	if best == seam:
+	if _same_seam(best, seam):
 		return
 	_drop_seam()
 	if best == null:
@@ -637,6 +652,14 @@ func _update_seam(now := false) -> void:
 	# behind the region the player is in, which draws over its own edges
 	move_child(seam.neighbor, 0)
 	_fit_camera()
+
+
+## Do [param a] and [param b] lay out the same neighbor through the same
+## exit? (The seam back after a crossing is a new Seam for the same edge.)
+static func _same_seam(a: Seam, b: Seam) -> bool:
+	if a == null or b == null:
+		return a == b
+	return a == b or (a.exit == b.exit and a.neighbor == b.neighbor)
 
 
 ## The walking exits on this region's edges that may be seams.
@@ -672,6 +695,19 @@ func _drop_seam() -> void:
 func _physics_process(_delta: float) -> void:
 	if seam and not _busy and seam.is_across(region.to_local(player.global_position), region.get_bounds()):
 		_cross_seam()
+	elif not _busy and region and not region.indoors and not _seam_exits(region).is_empty():
+		_keep_on_map()
+
+
+## Some map rims have gaps (where a river runs off the edge), and walking
+## off the map there before the region past it is ready would leave the
+## player in the void: hold them on the edge until it's laid out.
+func _keep_on_map() -> void:
+	var bounds := region.get_bounds()
+	var at := region.to_local(player.global_position)
+	if bounds.has_point(at) or (seam and seam.neighbor_bounds().has_point(at)):
+		return
+	player.global_position = region.to_global(at.clamp(bounds.position, bounds.end - Vector2.ONE))
 
 
 ## The player has walked over the seam: the neighbor becomes the region they
