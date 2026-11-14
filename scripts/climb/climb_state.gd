@@ -243,6 +243,10 @@ var has_haul_bag := false
 var has_portaledge := false
 var has_axe := false
 var has_crampons := false
+## The Mountain Shop's down puffy (quest "shop_puffy"): it keeps you warm
+## through a cold bivy and an afternoon of slush, like a Warming meal does.
+## It does nothing for a storm's wet and wind.
+var has_puffy := false
 ## Moves left that get the chalk bonus.
 var chalk_moves := 0
 var chalked_this_pitch := false
@@ -305,6 +309,7 @@ func _init(p_route: RouteData, cams: int, seed := -1, kit := {}) -> void:
 	has_portaledge = int(kit.get("portaledge", 0)) > 0
 	has_axe = int(kit.get("ice_axe", 0)) > 0
 	has_crampons = int(kit.get("crampons", 0)) > 0
+	has_puffy = int(kit.get("puffy_jacket", 0)) > 0
 	if seed >= 0:
 		_rng.seed = seed
 	else:
@@ -445,7 +450,7 @@ func move_cost(r: int, c: int) -> int:
 		cost += HEAT_PENALTY
 	cost += pump_cost()
 	# Slush and storms don't stack: a storm already makes the snow wet.
-	if is_snow() and not is_stormy() and hour() >= SLUSH_HOUR and hour() < 20.0 and not warm:
+	if is_snow() and not is_stormy() and hour() >= SLUSH_HOUR and hour() < 20.0 and not warm and not has_puffy:
 		cost += 1
 	if boosts.has("nimble"):
 		cost -= 1
@@ -1300,7 +1305,7 @@ func _bivy(place: String) -> bool:
 	if meal_id == "":
 		retreat("Night is falling and you have no real meal for the wall. You rappel down hungry.")
 		return false
-	var warmed := _warms(meal_id) or boosts.has("warming")
+	var warmed := _warms(meal_id) or boosts.has("warming") or has_puffy
 	Inventory.remove(meal_id)
 	nights_spent += 1
 	stamina = MAX_STAMINA if (not cold or warmed) else COLD_NIGHT_STAMINA
@@ -1309,6 +1314,10 @@ func _bivy(place: String) -> bool:
 	var item := ItemDB.get_item(meal_id)
 	var meal := item.display_name if item else meal_id
 	message = "You spend the night on the wall and eat %s. You wake up rested." % meal
+	if cold and not warmed:
+		message = "You spend a long cold night on the wall and eat %s. You wake up stiff. A down jacket would help." % meal
+	elif cold and has_puffy and not _warms(meal_id):
+		message = "You spend the night on the wall in your puffy and eat %s. You wake up warm and rested." % meal
 	events.append({"type": "bivy", "night": nights_spent, "place": place, "meal": meal})
 	return true
 

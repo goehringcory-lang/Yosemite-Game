@@ -470,6 +470,9 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 		message = "You stayed out too late and passed out..."
 	if message_extra != "":
 		message += "\n" + message_extra
+	var cold_note := Warmth.morning_note()
+	if cold_note != "":
+		message += "\n" + cold_note
 	if Larder.last_spoiled != "":
 		message += "\n" + Larder.last_spoiled
 	if Camp.last_spoiled != "":
@@ -529,6 +532,7 @@ func _enter_region(id: String, spawn_name := "") -> void:
 ## across a seam.
 func _arrive() -> void:
 	$DayNight.visible = not region.indoors
+	Warmth.outdoors = not region.indoors
 	if forage:
 		forage.refresh()
 	var plants := PlantSpawner.attach(region)

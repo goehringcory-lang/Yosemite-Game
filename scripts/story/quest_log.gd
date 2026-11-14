@@ -23,6 +23,7 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/clark_register.tres"),
 	preload("res://data/quests/shop_guidebook.tres"),
 	preload("res://data/quests/shop_outfit.tres"),
+	preload("res://data/quests/shop_puffy.tres"),
 	preload("res://data/quests/partner_apron.tres"),
 	preload("res://data/quests/lamon_orchard.tres"),
 	preload("res://data/quests/tenaya_ahwahnee.tres"),

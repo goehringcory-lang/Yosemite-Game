@@ -38,6 +38,8 @@ var _glance := Vector2i.ZERO
 var _glance_left := 0.0
 var _stretched := false
 var _asleep := false
+## Seconds until the next shiver while out in the winter cold (Warmth).
+var _shiver_left := Warmth.SHIVER_EVERY * 0.5
 
 
 func _ready() -> void:
@@ -93,7 +95,8 @@ func _physics_process(_delta: float) -> void:
 	if can_act:
 		input = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var running := input != Vector2.ZERO and Input.is_action_pressed("run")
-	velocity = input * SPEED * (1.0 + Perks.bonus("muirs_stride")) * (RUN_BOOST if running else 1.0) * Rescues.speed_factor()
+	velocity = input * SPEED * (1.0 + Perks.bonus("muirs_stride")) * (RUN_BOOST if running else 1.0) * Rescues.speed_factor() * Warmth.speed_factor()
+	_shiver(_delta)
 	move_and_slide()
 	if input != Vector2.ZERO and _action_left != 0.0:
 		# walking off ends a crouch or a wave
@@ -136,6 +139,17 @@ func lie_down(asleep := true) -> void:
 
 ## Picks the frame: the walk or run cycle, a held pose, or standing about
 ## (blinking, a look round, a stretch after a long wait).
+## Out in the winter cold without a jacket, a snowflake bubble now and then.
+func _shiver(delta: float) -> void:
+	if not can_act or not Warmth.is_cold():
+		_shiver_left = Warmth.SHIVER_EVERY * 0.5
+		return
+	_shiver_left -= delta
+	if _shiver_left <= 0.0:
+		_shiver_left = Warmth.SHIVER_EVERY
+		Emote.pop(self, "cold")
+
+
 func _animate(delta: float, moving: bool, running: bool) -> void:
 	if _asleep:
 		return
