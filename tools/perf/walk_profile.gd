@@ -10,7 +10,8 @@ extends Node
 ##                 over a seam, instead of round in a square
 ##   PERF_CSV      optional path for a per-frame CSV
 ##   PERF_SHOT     optional path for a screenshot taken mid-walk
-##   PERF_OFF      comma-separated node names or class_names to switch off
+##   PERF_OFF      comma-separated node names, class_names or engine classes
+##                 (PointLight2D) to switch off
 ##                 (hide and stop processing), to see what each one costs
 ## Run: xvfb-run godot --path . res://tools/perf/walk_profile.tscn
 
@@ -61,7 +62,7 @@ func _ready() -> void:
 	for off in _env("PERF_OFF", "").split(",", false):
 		for node in get_tree().root.find_children("*", "", true, false):
 			var scr: Script = node.get_script()
-			if not (node.name.match(off) or (scr and scr.get_global_name() == off)):
+			if not (node.name.match(off) or node.get_class() == off or (scr and scr.get_global_name() == off)):
 				continue
 			node.process_mode = Node.PROCESS_MODE_DISABLED
 			if node is CanvasItem or node is CanvasLayer:

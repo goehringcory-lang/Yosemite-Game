@@ -10,6 +10,9 @@ const Z := -40
 const FLOOR := Color(0.13, 0.17, 0.1)
 ## Trees stand on a jittered grid this many pixels apart.
 const SPACING := 44.0
+## Trees in each run of a row drawn as one canvas item.
+const RUN := 8
+const TINT := Color(0.82, 0.86, 0.8)
 const TREES: Array[Texture2D] = [
 	preload("res://assets/sprites/ahwahnee/tree_white_fir.png"),
 	preload("res://assets/sprites/ahwahnee/tree_incense_cedar_a.png"),
@@ -47,7 +50,9 @@ func cover(rect: Rect2, maps: Array[Rect2] = [], skies: Array = []) -> void:
 	_rect = rect
 	_maps = maps
 	_skies = skies
+	visible = rect.has_area()
 	queue_redraw()
+	_rebuild()
 
 
 ## The stretches of sky along the top of [param region]'s cliff wall
@@ -79,22 +84,61 @@ static func skies_of(region: Region, bounds: Rect2) -> Array:
 func _draw() -> void:
 	if not _rect.has_area():
 		return
+	draw_rect(_rect.grow(SPACING * 4.0), FLOOR)
+
+
+## Out of sight under a map while the view is all on one: the floor and the
+## woods would only be painted over.
+func _process(_delta: float) -> void:
+	if not _rect.has_area():
+		return
+	var view := _view_rect()
+	visible = not _maps.any(func(m: Rect2) -> bool: return m.encloses(view))
+
+
+func _view_rect() -> Rect2:
+	var size := get_viewport_rect().size
+	var camera := get_viewport().get_camera_2d()
+	var center := size / 2.0
+	if camera:
+		size /= camera.zoom
+		center = camera.get_screen_center_position()
+	return Rect2(center - size / 2.0, size)
+
+
+## Lays out the woods: the sky strips on one child, then the trees in short
+## runs of a row, one child each, back rows first so nearer trees overlap the
+## ones behind them. Each run is its own canvas item, so the renderer leaves
+## out the ones off screen (one item for all of them was drawn whole, about
+## 1300 trees, every frame).
+func _rebuild() -> void:
+	for child in get_children():
+		remove_child(child)
+		child.queue_free()
+	if not _rect.has_area():
+		return
 	var area := _rect.grow(SPACING * 4.0)
-	draw_rect(area, FLOOR)
 	# the sky going on up above a map whose cliffs stand against it
 	var skies: Array[Rect2] = []
+	var sky_colors: Array[Color] = []
 	for i in mini(_maps.size(), _skies.size()):
 		for span: Array in _skies[i]:
 			var above := Rect2(span[0], area.position.y, span[1] - span[0], _maps[i].position.y - area.position.y)
 			if above.has_area():
-				draw_rect(above, span[2])
 				skies.append(above)
-	# Back rows first, so nearer trees overlap the ones behind them.
+				sky_colors.append(span[2])
+	if not skies.is_empty():
+		add_child(_Run.new(skies, sky_colors))
 	var rows := int(area.size.y / SPACING) + 1
 	var cols := int(area.size.x / SPACING) + 1
 	var first := Vector2i((area.position / SPACING).floor())
 	for row in rows:
+		var run: _Run = null
 		for col in cols:
+			if col % RUN == 0:
+				if run and not run.trees.is_empty():
+					add_child(run)
+				run = _Run.new()
 			var cell := first + Vector2i(col, row)
 			var noise := _hash(cell)
 			var foot := (Vector2(cell) + Vector2(0.2 + 0.6 * fmod(noise * 7.0, 1.0), 0.2 + 0.6 * fmod(noise * 13.0, 1.0))) * SPACING
@@ -103,11 +147,30 @@ func _draw() -> void:
 				continue
 			var tree: Texture2D = TREES[int(noise * TREES.size()) % TREES.size()]
 			var size := tree.get_size()
-			draw_texture(tree, foot - Vector2(size.x * 0.5, size.y - 8.0), Color(0.82, 0.86, 0.8))
+			run.trees.append(tree)
+			run.at.append(foot - Vector2(size.x * 0.5, size.y - 8.0))
+		if run and not run.trees.is_empty():
+			add_child(run)
 
 
-## A steady pseudo-random number in [0, 1) for a grid cell, so the woods
-## look the same every time.
+## Some of the backdrop: trees, or (given rects) the sky strips.
+class _Run extends Node2D:
+	var trees: Array[Texture2D] = []
+	var at: PackedVector2Array = []
+	var rects: Array[Rect2] = []
+	var colors: Array[Color] = []
+
+	func _init(sky_rects: Array[Rect2] = [], sky_colors: Array[Color] = []) -> void:
+		rects = sky_rects
+		colors = sky_colors
+
+	func _draw() -> void:
+		for i in rects.size():
+			draw_rect(rects[i], colors[i])
+		for i in trees.size():
+			draw_texture(trees[i], at[i], TINT)
+
+
 static func _hash(cell: Vector2i) -> float:
 	var h := (cell.x * 73856093) ^ (cell.y * 19349663)
 	h = (h ^ (h >> 13)) * 1274126177

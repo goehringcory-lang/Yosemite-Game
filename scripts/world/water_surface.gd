@@ -30,6 +30,14 @@ var _tint: CanvasModulate
 var _water: Variant = null
 ## The parts of the view drawn this frame, in world pixels.
 var _draw_rects: Array[Rect2] = []
+## Copies just the part of the screen the water reads (its rects and the
+## banks above them) for the shader, not the whole screen.
+var _copy: BackBufferCopy
+## How far above the water the shader reads the screen, in world pixels: a
+## reflection reaches 30 art pixels below the bank and mirrors as far above
+## it, plus the ripples' sway.
+const READ_ABOVE := 128.0
+const READ_AROUND := 8.0
 
 
 func _ready() -> void:
@@ -39,6 +47,10 @@ func _ready() -> void:
 	_mat.shader = SHADER
 	material = _mat
 	visible = false
+	_copy = BackBufferCopy.new()
+	_copy.copy_mode = BackBufferCopy.COPY_MODE_RECT
+	_copy.show_behind_parent = true
+	add_child(_copy)
 
 
 func _process(_delta: float) -> void:
@@ -96,6 +108,7 @@ func _process(_delta: float) -> void:
 	if view != _view:
 		_view = view
 		_draw_rects = _rects_in_view(view)
+		_copy.rect = _copy_rect(_draw_rects, view)
 		queue_redraw()
 	# no water in view: skip the screen copy and the shader altogether
 	visible = not _draw_rects.is_empty()
@@ -108,6 +121,17 @@ func _draw() -> void:
 
 ## The parts of [param view] (world pixels) to draw: where the ground has
 ## water, or all of it if that isn't known.
+## The part of [param view] the shader reads for [param rects].
+static func _copy_rect(rects: Array[Rect2], view: Rect2) -> Rect2:
+	if rects.is_empty():
+		return Rect2()
+	var box := rects[0]
+	for rect in rects:
+		box = box.merge(rect)
+	box = box.grow_individual(READ_AROUND, READ_ABOVE, READ_AROUND, READ_AROUND)
+	return box.intersection(view)
+
+
 func _rects_in_view(view: Rect2) -> Array[Rect2]:
 	var out: Array[Rect2] = []
 	if _water == null:
