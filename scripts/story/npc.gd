@@ -132,6 +132,7 @@ const TALK_FPS := 7.0
 
 
 func _ready() -> void:
+	add_to_group(Footprints.GROUP)
 	if spot != "":
 		var region := _find_region()
 		var marker: Marker2D = region.get_spawn(spot) if region else null

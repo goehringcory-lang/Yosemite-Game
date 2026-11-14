@@ -31,6 +31,10 @@ var steps := 0.0
 var noticed := false
 
 
+func _init() -> void:
+	add_to_group(Footprints.GROUP)
+
+
 ## A shadow on the ground under it, [param w] wide.
 func draw_shadow(w: float) -> void:
 	draw_rect(Rect2(Vector2(-w / 2.0, -3), Vector2(w, 3)), Color(0, 0, 0, 0.18))

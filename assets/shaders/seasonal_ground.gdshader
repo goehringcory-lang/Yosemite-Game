@@ -55,6 +55,14 @@ uniform int seam_axis = 0;
 uniform vec2 seam_span = vec2(0.0);
 uniform vec2 seam_origin = vec2(0.0);
 uniform bool seam_flip = false;
+// Rain on the ground (Seasons.wetness, 0 dry to 1 soaked): paving, dirt and
+// sand darken and deepen in colour, puddles gather in blotches on the bare
+// ground (never on grass) holding a dull sky, and while it is still raining
+// (rain, how hard) rings spread on the puddles and on open water. Puddles
+// linger the morning after a rainy day and dry out by late morning.
+uniform float wet : hint_range(0.0, 1.0) = 0.0;
+uniform float rain : hint_range(0.0, 1.0) = 0.0;
+uniform vec3 puddle_sky : source_color = vec3(0.6, 0.63, 0.66);
 const vec3 SNOW = vec3(0.95, 0.97, 1.0);
 const vec3 SNOW_SHADE = vec3(0.76, 0.83, 0.93);
 // Moving light on the painted water: bands of brighter ripples drifting with
@@ -254,6 +262,57 @@ void fragment() {
 			vec3 s = edge < 0.05 ? SNOW_SHADE : mix(SNOW, SNOW_SHADE, floor(clamp(0.62 - d, 0.0, 0.6) * 5.0) / 3.0 * 0.45);
 			if (hash(px + 17.0) > 0.992) s = vec3(1.0);
 			rgb = s * (0.92 + lum * 0.1);
+		}
+	}
+	if (wet > 0.0 && snow < 0.05) {
+		float bare = (1.0 - grass) * (1.0 - water);
+		// soaked ground: darker and a little richer (grass hardly)
+		float soak = wet * (0.35 + 0.65 * bare);
+		float l2 = dot(rgb, vec3(0.299, 0.587, 0.114));
+		rgb = mix(vec3(l2), rgb, 1.0 + 0.25 * soak) * (1.0 - 0.2 * soak);
+		// puddles: rounded pools in whole art pixels of the world (so they
+		// line up across a seam), on bare, not-too-vivid ground, more of them
+		// the wetter it is; a darker rim of mud round each, and the top row
+		// of a pool catches the sky (that bright edge is what reads as water)
+		vec2 wpx = floor(world_px * 0.5);
+		float pd = vnoise(wpx * vec2(1.0, 1.5) / 12.0) * 0.97 + vnoise(wpx / 4.0) * 0.03;
+		float level = 0.88 - 0.1 * wet;
+		bool can_pool = grass < 0.3 && water < 0.3 && sat < 0.5;
+		if (can_pool && pd > level) {
+			float pd_up = vnoise((wpx - vec2(0.0, 1.0)) * vec2(1.0, 1.5) / 12.0) * 0.97 + vnoise((wpx - vec2(0.0, 1.0)) / 4.0) * 0.03;
+			vec3 deepened = rgb * 0.7;
+			vec3 pool = mix(deepened, puddle_sky * 0.8, 0.28);
+			if (pd_up <= level) pool = mix(pool, puddle_sky, 0.6);
+			rgb = pool;
+			// rain rings: in each 8 art pixel cell now and then a drop lands and
+			// a one-pixel ring spreads out from it
+			if (rain > 0.0) {
+				vec2 cell = floor(wpx / 8.0);
+				float ph = hash(cell + 3.1);
+				float cycle = floor(TIME * 1.6 + ph);
+				float t = fract(TIME * 1.6 + ph);
+				vec2 drop = cell * 8.0 + 3.0 + floor(vec2(hash(cell + cycle), hash(cell + cycle + 9.0)) * 2.0);
+				float d = length(wpx - drop);
+				if (hash(cell + cycle * 1.37) < 0.35 + 0.5 * rain && abs(d - t * 2.5) < 0.55 && t < 0.85) {
+					rgb = mix(rgb, puddle_sky * 1.15, 0.6 * (1.0 - t));
+				}
+			}
+		} else if (can_pool && pd > level - 0.025) {
+			// a dark wet rim of mud round each puddle
+			rgb *= 0.85;
+		}
+		if (rain > 0.0 && water > 0.5) {
+			vec2 wpx = floor(world_px * 0.5);
+			vec2 cell = floor(wpx / 8.0);
+			float ph = hash(cell + 5.7);
+			float cycle = floor(TIME * 1.3 + ph);
+			float t = fract(TIME * 1.3 + ph);
+			vec2 drop = cell * 8.0 + 3.0 + floor(vec2(hash(cell + cycle), hash(cell + cycle + 4.0)) * 2.0);
+			float r = t * 2.5;
+			float d = length(wpx - drop);
+			if (hash(cell + cycle * 1.71) < 0.25 + 0.45 * rain && abs(d - r) < 0.55 && t < 0.85) {
+				rgb += vec3(0.09, 0.11, 0.12) * (1.0 - t);
+			}
 		}
 	}
 	if (water_shimmer > 0.0 && water > 0.5) {
