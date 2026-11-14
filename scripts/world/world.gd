@@ -107,6 +107,8 @@ func _ready() -> void:
 	# people walking between the Valley's areas on days of their own
 	add_child(Travelers.new())
 	add_child(Rustle.new())
+	add_child(Footprints.new())
+	add_child(Breath.new())
 	add_child(Wind.new())
 	add_child(StringLights.new())
 	player.add_child(Lantern.new())

@@ -59,6 +59,8 @@ var _caps: Array[Sprite2D] = []
 static var _cap_material: ShaderMaterial
 var _names: Array[String] = []
 var _grounds: Array[CanvasItem] = []
+var _wet := 0.0
+var _wet_wait := 0.0
 
 
 func _ready() -> void:
@@ -97,9 +99,32 @@ func _ready() -> void:
 	apply()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _date_key() != _key:
 		apply()
+	_wet_wait -= delta
+	if _wet_wait <= 0.0:
+		_wet_wait = 0.5
+		apply_wet()
+
+
+## Rain on the painted ground (see the shader): how wet it is, whether rain
+## is still falling, and the dull sky the puddles hold. Twice a second, since
+## the puddles dry out through the morning after rain.
+func apply_wet() -> void:
+	var wet := Seasons.wetness()
+	if wet <= 0.0 and _wet <= 0.0:
+		return
+	_wet = wet
+	var rain: float = Weather.today().rain
+	var pal := ClimbSky.palette(Sun.hour_now())
+	var sky: Color = (pal.mid as Color).lerp(pal.low, 0.35)
+	sky = sky.lerp(Color(0.6, 0.63, 0.66), 0.7 if rain > 0.0 else 0.35)
+	for ground in _grounds:
+		var mat := ground.material as ShaderMaterial
+		mat.set_shader_parameter("wet", wet)
+		mat.set_shader_parameter("rain", rain)
+		mat.set_shader_parameter("puddle_sky", sky)
 
 
 func _date_key() -> String:
@@ -128,6 +153,7 @@ func apply() -> void:
 		mat.set_shader_parameter("desaturate", g["desat"])
 		mat.set_shader_parameter("frost", g["frost"])
 		mat.set_shader_parameter("flower_fill", g["fill"])
+	_wet_wait = 0.0
 	var snow := Seasons.snow_cover()
 	for ground in _grounds:
 		(ground.material as ShaderMaterial).set_shader_parameter("snow", snow)

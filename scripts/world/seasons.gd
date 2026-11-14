@@ -115,3 +115,41 @@ static func horsetail_running(season := -1, day := -1) -> bool:
 		season = GameClock.season
 		day = GameClock.day
 	return season == GameClock.Season.WINTER or (season == GameClock.Season.SPRING and day <= HORSETAIL_SPRING_DAYS)
+
+
+## How wet the ground is, 0 (dry) to 1 (soaked, puddles everywhere): soaked
+## all day while it rains, and the morning after a rainy day it is still wet
+## at dawn and dries out by late morning. Leave the hour out for now.
+static func wetness(hour := -1.0) -> float:
+	var weather := Weather.today()
+	if weather.snow > 0.0:
+		return 0.0
+	if weather.rain > 0.0:
+		return clampf(0.55 + weather.rain * 0.6, 0.0, 1.0)
+	var yesterday := Weather.on_day(GameClock.year, GameClock.season, GameClock.day - 1)
+	if GameClock.day <= 1:
+		# the last day of the season before
+		var before := posmod(GameClock.season - 1, 4)
+		var year := GameClock.year - (1 if GameClock.season == 0 else 0)
+		yesterday = Weather.on_day(year, before, GameClock.DAYS_PER_SEASON) if year >= 1 else {"rain": 0.0}
+	if yesterday.rain <= 0.0:
+		return 0.0
+	if hour < 0.0:
+		hour = Sun.hour_now()
+	# wet at dawn, puddles shrinking through the morning, dry by 11
+	var dry := clampf((fposmod(hour, 24.0) - 6.0) / 5.0, 0.0, 1.0)
+	return 0.8 * (1.0 - dry)
+
+
+## True when the air is cold enough to see your breath: all winter, on any
+## day with snow lying, and on spring and fall mornings and nights while the
+## sun is down or still low.
+static func cold(hour := -1.0) -> bool:
+	if GameClock.season == GameClock.Season.WINTER or snow_cover() > 0.05:
+		return true
+	if GameClock.season == GameClock.Season.SUMMER:
+		return false
+	if hour < 0.0:
+		hour = Sun.hour_now()
+	var h := fposmod(hour, 24.0)
+	return h < 12.0 and Sun.height(hour) < 12.0 or Sun.height(hour) < -6.0
