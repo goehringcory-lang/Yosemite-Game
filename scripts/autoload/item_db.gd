@@ -61,6 +61,7 @@ const ITEMS := [
 	preload("res://data/story_items/sequoia_cone.tres"),
 	preload("res://data/story_items/flour_sack.tres"),
 	preload("res://data/story_items/rental_shoes.tres"),
+	preload("res://data/story_items/torn_puffy.tres"),
 	preload("res://data/story_items/chongo_book.tres"),
 	preload("res://data/story_items/travel_slackline.tres"),
 	preload("res://data/story_items/greg_fly_box.tres"),

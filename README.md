@@ -580,6 +580,19 @@ The hand-built areas follow the seasons too, without being rebuilt. When a regio
 ![Mirror Lake shrinking in late summer and a meadow in fall](docs/seasons_mirror_lake.png)
 ![Horsetail Fall lit at sunset in February](docs/seasons_horsetail_fall.png)
 
+**A down jacket before the snow.** Winter is cold, and Marty at the Mountain Shop wants you ready for it. Once he's fitted you out ("Fitted Out"), he offers **Down Before the Snow** from summer on (`data/quests/shop_puffy.tres`): the shop's last demo Patagonia down puffy went up to Camp 4 on loan and never came back. Find it torn at the foot of Midnight Lightning (`Camp4TornPuffy` in the Yosemite Village overlay), bring him three wood rose hips for his mending tea, and trade food worth 50 energy for the mended jacket (gear `puffy_jacket`). What it does lives in `Warmth` (`scripts/story/warmth.gd`):
+
+- **Without it, winter is harder but never dangerous.** Outdoors in winter you walk 15% slower, hunched against the cold, and now and then a snowflake bubble pops up over your head (`Warmth.speed_factor()`, the `cold` emote). Indoors you're warm.
+- **On the wall it keeps you warm.** A night on a wall without a portaledge leaves you at 70 stamina unless you ate a Warming meal; in the puffy you wake up rested. The afternoon slush on snow and ice costs nothing extra (`ClimbState.has_puffy`). A storm's wet and wind still bite.
+- **Hard to miss.** The good-morning message nudges you on fall days 15 and 24 and on the first morning of winter while you have no jacket (`Warmth.morning_note()`), and Marty keeps offering it all winter, so missing the snow never locks you out. In spring he tells you to come back when the dogwoods turn.
+
+The jacket's name is the one `display_name` in `data/gear/puffy_jacket.tres` (plus a line in the quest and the torn jacket's description), so it can be renamed in one place. Its icons are drawn by `tools/npcgen/puffy_icons.gd`.
+
+![Marty sets a down jacket aside](docs/puffy_ask.png)
+![The torn puffy at the foot of Midnight Lightning](docs/puffy_camp4.png)
+![Cold in the Village without a jacket](docs/puffy_cold.png)
+![The mended puffy, handed over](docs/puffy_received.png)
+
 **Living water and sky.** The painted rivers, creeks and lakes move and mirror the world around them, and the night sky on the climbing screens is a real Sierra sky:
 
 - **Reflections.** `scripts/world/water_surface.gd` (with `assets/shaders/water_surface.gdshader`) draws one view-sized rectangle just under the cloud shadows that reads the screen. The region's painted ground says where the water is, and a pixel only counts as water while the screen still shows that water, so people, boulders and anything else in front of it are left alone. Below each bank it mirrors whatever stands there (cattails, trees, rocks, people), pulled side to side by ripples and broken into rows, fading out a few dozen pixels from shore. The flat bank itself is not mirrored: the shader grades the painted ground as the season does (`seasonal_ground`'s tint, with lying snow) and leaves out what still matches it, since mirrored grass and sand washed the water pale. Its `light()` adds nothing, because the colours it reads from the screen are already lit; on High the lamps and the sun were being added a second time, which bleached the water in tile-edged patches. Open water takes the sky's colour from `ClimbSky.palette` (blue by day, purple and gold at dusk, with sun glints in the sun's colour), dulls on overcast days, and on clear nights holds twinkling stars. It works in art pixels (2 world pixels) so it stays crisp, and is off indoors.
@@ -959,6 +972,7 @@ godot --headless --path . res://tests/valley_life_test.tscn   # the bulletin boa
 godot --headless --path . res://tests/wildlife_test.tscn   # squirrels, peregrines, great gray owls, the bobcat, the Wildlife journal
 godot --headless --path . res://tests/fishing_test.tscn   # the cast meter, the flies, and Greg's quest and trades
 godot --headless --path . res://tests/seasons_test.tscn   # snow on the ground, the falls and Mirror Lake drying, Horsetail Fall
+godot --headless --path . res://tests/puffy_test.tscn   # Marty's down jacket quest, the winter cold, and warmth on the wall
 godot --headless --path . res://tests/lighting_test.tscn   # the seasonal sun, cast shadows, lamps, the lantern, morning mist
 godot --headless --path . res://tests/rescue_test.tscn   # search and rescue: Jo, the calls, prints, carrying, the lower
 godot --headless --path . res://tests/playthrough_test.tscn   # a bot plays every quest from a new game to the Guardian's Year

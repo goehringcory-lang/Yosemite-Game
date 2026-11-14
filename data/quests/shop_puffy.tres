@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "shop_puffy"
+title = "Down Before the Snow"
+giver = "mountain_shop"
+requires = PackedStringArray("shop_outfit")
+offered_in = 14
+out_of_season = PackedStringArray("Nobody thinks about down jackets in May. Come and see me when the dogwoods turn. I'll have something set aside for you.")
+intro = PackedStringArray("You know what January is like on this side of the Valley? The sun clears the south wall for about four hours. Then it's cold till morning.", "Your shoes and your harness won't keep you warm. You need a proper puffy: a Patagonia down jacket, the kind the Camp 4 crowd sleeps in on the wall.", "I had one in your size, the last one, and I lent it out as a demo. The fellow took it up to Camp 4, bivied in it under the boulders, and came back without it. Typical.", "Find it and bring it back. It'll want mending, and the mending's a trade, same as everything here. Get it done before the snow flies.")
+steps = [{"type": "have", "item": "torn_puffy", "count": 1, "consume": true, "objective": "Find the Mountain Shop's demo puffy up at Camp 4", "reminder": "He said he slept under the big boulder at Camp 4, the one they call Midnight Lightning. Look round the foot of it.", "done": ["That's her. One baffle split, and feathers in everything. Nothing a needle can't fix."]}, {"type": "have", "item": "wood_rose_hips", "count": 3, "consume": true, "objective": "Bring Marty 3 wood rose hips for his mending tea", "reminder": "Wild rose grows along the river. The hips go red after the first frost and hang on all winter. Three's plenty.", "done": ["Rose hip tea. I can't sew with cold fingers, and I can't sew without tea. Hold the light, would you?"]}, {"type": "pay", "energy": 50, "objective": "Trade Marty food worth 50 energy for the mended puffy", "reminder": "Fifty energy of food and it's yours. That's a gift, the price these things go for.", "done": ["There. Patched, zipped, and it fits. Lift your arms. See? Room for a harness underneath.", "Now you look like you live here."]}]
+outro = PackedStringArray("Wear it on the long nights. A cold bivy on the wall costs you half your strength by morning, and the snow goes to slush in the afternoon. In this, you'll hardly notice either.", "And down in the Valley, when the snow's on the ground, you won't walk around hunched up like a heron any more.")
+reward_gear = {"puffy_jacket": 1}
