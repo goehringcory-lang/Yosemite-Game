@@ -62,10 +62,11 @@ func test_el_capitan(world: Node) -> void:
 	check(nose.y - _screen_top(world) <= height - LandmarkFraming.MARGIN + 1.0, "the player stays on screen, above the margin")
 	var meadow := Vector2(nose.x, world.region.get_bounds().end.y - 200.0)
 	await _stand(world, meadow)
-	check(camera.offset.y == 0.0, "down by the river the camera doesn't tilt")
+	# (under a pixel: the view is nudged onto the screen's pixels)
+	check(absf(camera.offset.y) < 1.0, "down by the river the camera doesn't tilt (offset %.2f)" % camera.offset.y)
 	await world.go_to_region("curry_store", "arrival")
 	await _stand(world, world.player.global_position)
-	check(camera.offset.y == 0.0, "rooms don't tilt")
+	check(absf(camera.offset.y) < 1.0, "rooms don't tilt (offset %.2f)" % camera.offset.y)
 
 
 func test_yosemite_falls(world: Node) -> void:

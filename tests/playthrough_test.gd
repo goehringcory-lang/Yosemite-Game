@@ -277,6 +277,9 @@ func _climb(quest: QuestData, route_id: String) -> bool:
 		_buy(id, int(route.required_gear[id]))
 	if not Gear.has_all(route.required_gear):
 		return false
+	# packing at the gear rack gets it all into the bag (Gear.BAG_ROOM)
+	if not Gear.packed_all(route.required_gear) and not Gear.pack_for(route.required_gear):
+		check(false, "the kit for %s fits in the gear bag: %s" % [route.id, ", ".join(Gear.missing_packed(route.required_gear))])
 	QuestLog.record_climb(route.id)
 	if route.destination_hub != "":
 		Park.unlock_hub(route.destination_hub)

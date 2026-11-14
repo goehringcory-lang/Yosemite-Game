@@ -42,9 +42,20 @@ var _blended_b: Region
 const OVERLAP := 64.0
 
 ## Each map is ringed by blocker cells just past its edge. Across a seam
-## they are taken out for this many pixels either side of the road, so the
-## road walks on; further along the edge the rims stay, like a hedge.
+## they are taken out all along the stretch of edge the two maps share (see
+## span), so you can wander over a meadow or along a riverbank into the next
+## area, not only walk the road. At least this many pixels either side of the
+## road are always open.
 const CORRIDOR := 192.0
+## Where one edge meets two regions (the Village's west edge meets Leidig
+## Meadow and Four Mile), each seam's stretch stops this far short of the
+## point halfway between their roads, and the rim between stays a hedge.
+const SPLIT_GAP := 96.0
+
+## The stretch of the edge that is open while the seam is: from x to y along
+## the edge (y for an east or west edge, x for a north or south one), in this
+## region's coordinates.
+var span := Vector2.ZERO
 
 
 ## The exits in [param region] that could be seams, before the regions they
@@ -84,7 +95,70 @@ static func make(region: Region, exit: RegionExit, neighbor: Region, nudged := t
 	if nudged:
 		seam.offset += Vector2(absf(side.y), absf(side.x)) * nudge(region.region_id, exit.name)
 		seam.offset -= Vector2(side) * OVERLAP
+	seam.span = seam._shared_span(region, bounds)
 	return seam
+
+
+## How far along the edge [param pos] is: y on an east or west edge, x on a
+## north or south one.
+func _along(pos: Vector2) -> float:
+	return pos.y if side.x != 0 else pos.x
+
+
+## The stretch of edge both maps cover, cut short where the edge also meets
+## another region by another road (see SPLIT_GAP), and never less than the
+## road's own CORRIDOR.
+func _shared_span(region: Region, bounds: Rect2) -> Vector2:
+	var nb := neighbor_bounds()
+	var axis := 1 if side.x != 0 else 0
+	var lo := maxf(bounds.position[axis], nb.position[axis])
+	var hi := minf(bounds.end[axis], nb.end[axis])
+	var mine := _along(point)
+	# Other roads off this edge, and off the neighbor's facing edge, in this
+	# region's coordinates.
+	var others: Array[float] = []
+	for other in candidates(region):
+		var at := region.to_local(other.global_position)
+		if other != exit and other.target_region != exit.target_region and _side_of(bounds, at, EXIT_SLACK) == side:
+			others.append(_along(at))
+	var theirs_bounds := neighbor.get_bounds()
+	for other in candidates(neighbor):
+		var at := neighbor.to_local(other.global_position)
+		if other.target_region != region.region_id and _side_of(theirs_bounds, at, EXIT_SLACK) == -side:
+			others.append(_along(at + offset))
+	for theirs in others:
+		var middle := (mine + theirs) * 0.5
+		if theirs > mine:
+			hi = minf(hi, middle - SPLIT_GAP)
+		else:
+			lo = maxf(lo, middle + SPLIT_GAP)
+	lo = minf(lo, mine - CORRIDOR)
+	hi = maxf(hi, mine + CORRIDOR)
+	return Vector2(maxf(lo, maxf(bounds.position[axis], nb.position[axis])), minf(hi, minf(bounds.end[axis], nb.end[axis])))
+
+
+## How far [param pos] (in this region's coordinates) is from the open
+## stretch of the edge.
+func gap_to(pos: Vector2) -> float:
+	var on_edge := point
+	var along := clampf(_along(pos), span.x, span.y)
+	if side.x != 0:
+		on_edge.y = along
+	else:
+		on_edge.x = along
+	return pos.distance_to(on_edge)
+
+
+## How far [param pos] is from the edge of [param bounds] that [param exit_at]
+## sits on, as the crow flies to the edge's line: a rough guide, before the
+## region past it is loaded, to whether its seam might be near.
+static func edge_gap(bounds: Rect2, exit_at: Vector2, pos: Vector2) -> float:
+	match _side_of(bounds, exit_at, EXIT_SLACK):
+		Vector2i.LEFT: return absf(pos.x - bounds.position.x)
+		Vector2i.RIGHT: return absf(bounds.end.x - pos.x)
+		Vector2i.UP: return absf(pos.y - bounds.position.y)
+		Vector2i.DOWN: return absf(bounds.end.y - pos.y)
+	return INF
 
 
 ## The measured slide along the edge for [param region]'s [param exit_name].
@@ -152,8 +226,9 @@ func open(region: Region) -> void:
 	var mine := region.get_bounds()
 	mine.position -= offset
 	_blend(neighbor, point - offset - Vector2(side) * _overlap(), -side, mine, point - offset)
-	_open_rim(region, point, side, neighbor_bounds())
-	_open_rim(neighbor, point - offset - Vector2(side) * _overlap(), -side, mine)
+	var shift := _along(offset)
+	_open_rim(region, point, side, neighbor_bounds(), span)
+	_open_rim(neighbor, point - offset - Vector2(side) * _overlap(), -side, mine, span - Vector2(shift, shift))
 
 
 ## Puts the rims back and the grounds' edges as they were.
@@ -209,9 +284,10 @@ static func _grounds(r: Region) -> Array[Sprite2D]:
 	return found
 
 
-## Takes out [param r]'s rim cells near [param at] on [param edge] that
-## stand on [param other]'s ground, in r's coordinates.
-func _open_rim(r: Region, at: Vector2, edge: Vector2i, other: Rect2) -> void:
+## Takes out [param r]'s rim cells on [param edge] (through [param at]) from
+## [param stretch].x to .y along it that stand on [param other]'s ground, in
+## r's coordinates.
+func _open_rim(r: Region, at: Vector2, edge: Vector2i, other: Rect2, stretch: Vector2) -> void:
 	var layer := r.get_node_or_null("Blocker") as TileMapLayer
 	if r.map:
 		layer = r.map.get_node_or_null("Blocker") as TileMapLayer
@@ -220,10 +296,12 @@ func _open_rim(r: Region, at: Vector2, edge: Vector2i, other: Rect2) -> void:
 	var bounds := r.get_bounds()
 	var along := Vector2(absf(edge.y), absf(edge.x))
 	var tile := Vector2(layer.tile_set.tile_size)
-	var steps := ceili(CORRIDOR / tile.dot(along))
+	var step_px := tile.dot(along)
+	var start := at - along * at.dot(along) + along * stretch.x
+	var steps := ceili((stretch.y - stretch.x) / step_px)
 	for depth in 2:
-		for step in range(-steps, steps + 1):
-			var spot := at + along * tile * step + Vector2(edge) * tile * (depth + 0.5)
+		for step in range(0, steps + 1):
+			var spot := start + along * step_px * step + Vector2(edge) * tile * (depth + 0.5)
 			var cell := layer.local_to_map(layer.to_local(r.to_global(spot)))
 			var source := layer.get_cell_source_id(cell)
 			var middle := r.to_local(layer.to_global(layer.map_to_local(cell)))
@@ -241,6 +319,8 @@ func reversed(region: Region) -> Seam:
 	back.side = -side
 	# the neighbor's own edge, OVERLAP back from this one's
 	back.point = point - offset - Vector2(side) * _overlap()
+	var shift := _along(offset)
+	back.span = span - Vector2(shift, shift)
 	for node in neighbor.find_children("*", "RegionExit", true, false):
 		var candidate := node as RegionExit
 		if candidate.target_region == region.region_id and (neighbor.to_local(candidate.global_position) - back.point).length() < SPAWN_SLACK * 2.0:

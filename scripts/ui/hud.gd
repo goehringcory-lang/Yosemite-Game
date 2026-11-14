@@ -98,9 +98,12 @@ func _ready() -> void:
 	message_label.add_theme_stylebox_override("normal", card)
 	toasts = ItemToasts.new()
 	_screen.add_child(toasts)
+	# signs at the screen's edge toward landmarks and undiscovered places
+	_screen.add_child(Wayfinding.new())
 	_screen.move_child(toasts, fade.get_index()) # under the fade, so the black covers it
 	Inventory.added.connect(_on_item_added)
 	Gear.added.connect(_on_gear_added)
+	Gear.sent_to_camp.connect(_on_gear_sent_to_camp)
 	QuestLog.quest_completed.connect(_on_quest_done)
 	var panel := PanelContainer.new()
 	_status = ButtonHints.new()
@@ -228,6 +231,14 @@ func _on_gear_added(id: String, amount: int) -> void:
 		var icon := CamSizes.icon(Gear.count(id) - 1) if id == "cam" else gear.icon
 		toasts.notify("gear:" + id, icon, gear.display_name, amount)
 		Sound.play("item_get", 0.0, 0.0)
+
+
+## New gear that didn't fit in the bag: say where it went.
+func _on_gear_sent_to_camp(id: String, amount: int) -> void:
+	var gear := Gear.get_gear(id)
+	if gear:
+		var what := gear.display_name if amount == 1 else ItemDB.count_name(amount, gear.display_name)
+		show_message("No room in your gear bag: %s went to the gear rack at camp." % what)
 
 
 ## The location banner at the top of the screen.

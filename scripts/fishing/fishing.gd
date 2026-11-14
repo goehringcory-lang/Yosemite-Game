@@ -217,7 +217,7 @@ static func get_fish(id: String) -> Dictionary:
 ## True if you can cast from where [param player] stands: rod in the pack,
 ## outdoors where fish bite this season, and water just in front.
 static func can_fish(player: Player) -> bool:
-	if Gear.count(ROD) <= 0:
+	if Gear.carried(ROD) <= 0:
 		return false
 	var world := player.get_tree().get_first_node_in_group("world")
 	var region: Region = world.region if world and "region" in world else null
@@ -273,7 +273,7 @@ static func _ground(world: Node) -> TileMapLayer:
 static func tied_fly() -> Dictionary:
 	for i in range(FLIES.size() - 1, -1, -1):
 		var fly: Dictionary = FLIES[i]
-		if Gear.count(fly.id) > 0:
+		if Gear.carried(fly.id) > 0:
 			var tied := fly.duplicate()
 			tied["name"] = Gear.get_gear(fly.id).display_name
 			return tied

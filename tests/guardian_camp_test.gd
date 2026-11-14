@@ -132,7 +132,10 @@ func test_rewards() -> void:
 	check(Camp.describe("fish_board").contains("17-inch"), "the fish board shows your biggest catch")
 	finish(["leonard_belay"])
 	Gear.add("rope")
-	check(Camp.describe("gear_rack").contains("Rope"), "the gear rack shows your rope (%s)" % Camp.describe("gear_rack"))
+	check(not Camp.describe("gear_rack").contains("Hanging here"), "a rope in your bag isn't on the rack (%s)" % Camp.describe("gear_rack"))
+	Gear.unpack("rope")
+	check(Camp.describe("gear_rack").contains("Hanging here: Rope"), "the gear rack shows the rope you hung up (%s)" % Camp.describe("gear_rack"))
+	Gear.pack("rope")
 
 
 func test_chest() -> void:

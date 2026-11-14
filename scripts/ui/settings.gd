@@ -79,6 +79,9 @@ static var pause_away := true
 ## Trees and plants sway and gusts cross the grass (see Wind). Off stills
 ## them, for anyone the movement bothers.
 static var wind := true
+## Small signs at the screen's edge point toward the great landmarks and
+## the parts of the Valley you haven't found yet (see Wayfinding).
+static var wayfinding := true
 ## Volume of everything, of one-shot sounds (steps, climbing, menus), and of
 ## the ambience (birds, wind, rain, campfires, waterfalls); 0 to MAX_VOLUME.
 static var master_volume := 8
@@ -209,6 +212,7 @@ static func load_settings() -> void:
 	vibration = bool(config.get_value("input", "vibration", vibration))
 	pause_away = bool(config.get_value("input", "pause_away", pause_away))
 	wind = bool(config.get_value("display", "wind", wind))
+	wayfinding = bool(config.get_value("display", "wayfinding", wayfinding))
 	master_volume = clampi(int(config.get_value("audio", "master", master_volume)), 0, MAX_VOLUME)
 	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
 	music_volume = clampi(int(config.get_value("audio", "music", music_volume)), 0, MAX_VOLUME)
@@ -243,6 +247,7 @@ static func save() -> Error:
 	config.set_value("input", "vibration", vibration)
 	config.set_value("input", "pause_away", pause_away)
 	config.set_value("display", "wind", wind)
+	config.set_value("display", "wayfinding", wayfinding)
 	config.set_value("audio", "master", master_volume)
 	config.set_value("audio", "effects", effects_volume)
 	config.set_value("audio", "music", music_volume)
@@ -310,6 +315,11 @@ static func apply_graphics(window: Window) -> void:
 	var mode := Window.CONTENT_SCALE_MODE_VIEWPORT if low() else Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
 	if window.content_scale_mode != mode:
 		window.content_scale_mode = mode
+	# On High the art is drawn at the window's size, so things glide in
+	# screen pixels (LandmarkFraming.set_offset_on_pixel keeps the view on them).
+	# On Low it's drawn at 960x540 and scaled up: there a sprite between two
+	# art pixels would sample on its texels' edges, so snap to whole ones.
+	RenderingServer.viewport_set_snap_2d_transforms_to_pixel(window.get_viewport_rid(), low())
 
 
 static func reset_defaults() -> void:

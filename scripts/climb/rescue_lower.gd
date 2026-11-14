@@ -252,7 +252,7 @@ func _paint(route: RouteData, who: Texture2D) -> void:
 		_paint_snag(im, colors, int(_rope_y(SNAGS[i][0])), int(_rope_y(SNAGS[i][1]) - _rope_y(SNAGS[i][0])), seed_value + i)
 	_wall_tex = ClimbHiRes.wall_texture(im, rock, 0.0, seed_value + 31)
 	_them = ClimbSprites.belayer(_look_of(who), "sit")
-	_kit = Gear.owned.duplicate()
+	_kit = Gear.carried_all()
 
 
 ## A bulge of rock across the rope's line, [param tall] picture px high from

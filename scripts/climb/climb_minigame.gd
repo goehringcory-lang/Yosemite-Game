@@ -132,8 +132,8 @@ var _roof_info := {}
 func setup(p_route: RouteData, seed := -1) -> void:
 	route = p_route
 	_seed = seed
-	_kit = Gear.owned.duplicate()
-	state = ClimbState.new(route, Gear.count("cam"), seed, Gear.owned)
+	_kit = Gear.carried_all()
+	state = ClimbState.new(route, Gear.carried("cam"), seed, _kit)
 	state.interactive = true
 	state.conditions = WallWeather.today(route.id)
 

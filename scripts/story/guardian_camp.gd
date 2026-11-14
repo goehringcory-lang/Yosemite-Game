@@ -40,7 +40,7 @@ const PIECES: Array[Dictionary] = [
 		"text": "A canvas camp stool with one leg splinted with tape. Wren says it's been to the top of more routes than she has."},
 	{"id": "gear_rack", "name": "Gear rack", "quest": "leonard_belay", "from": "dick_leonard", "pos": Vector2(226, 266),
 		"got": "a peg rack for your rope and gear, from the Rock Climbing Section",
-		"text": "Two pegs and a crossbar, lashed the Sierra Club way. Your rope hangs here when you're home, and whatever rack you've got."},
+		"text": "Two pegs and a crossbar, lashed the Sierra Club way. Your gear bag only holds so much: hang up what today's climb doesn't need, and pack what it does."},
 	{"id": "lantern", "name": "Ranger's lantern", "quest": "hodges_patrol", "from": "clare_hodges", "pos": Vector2(352, 334),
 		"got": "a ranger's lantern on a post, for your camp",
 		"text": "A kerosene lantern from the ranger station, on an oak post. Hodges says a camp with a light in it looks lived in, and bears agree."},
@@ -216,12 +216,13 @@ func describe(id: String) -> String:
 			text += " %d of %d plants in your press book." % [Herbarium.count(), Herbarium.total()]
 		"gear_rack":
 			var rack := PackedStringArray()
-			for gear_id in ["rope", "cam", "quickdraw", "ice_axe"]:
-				if Gear.count(gear_id) > 0:
-					var gear := Gear.get_gear(gear_id)
-					rack.append(ItemDB.count_name(Gear.count(gear_id), gear.display_name) if Gear.count(gear_id) > 1 else gear.display_name)
+			for gear: GearData in Gear.GEAR:
+				var n := Gear.cached_count(gear.id)
+				if n > 0:
+					rack.append(ItemDB.count_name(n, gear.display_name) if n > 1 else gear.display_name)
+			text += " Your gear bag: %d of %d room used." % [Gear.bag_used(), Gear.bag_room()]
 			if not rack.is_empty():
-				text += " On it: %s." % ", ".join(rack)
+				text += " Hanging here: %s." % ", ".join(rack)
 		"chest":
 			text += " %d of %d spaces used." % [chest.size(), chest_spaces()]
 	var who := giver_name(piece)

@@ -74,6 +74,18 @@ func _ready() -> void:
 	_check_blend(world, true)
 	await _walk_across(world, "move_left", "leidig_meadow")
 	await _walk_across(world, "move_right", "yosemite_village")
+	# Off the road: the whole stretch of edge two maps share is open, so you
+	# can wander over Leidig Meadow into El Capitan Meadow, well north of
+	# Northside Drive, and back over the grass further south.
+	await world.go_to_region("leidig_meadow", "arrival")
+	for i in 30:
+		await get_tree().process_frame
+	world.player.global_position = world.region.to_global(Vector2(200, 96))
+	await _walk_across(world, "move_left", "el_capitan_meadow")
+	var off_road: Seam = world.seam
+	check(off_road != null and absf(world.region.to_local(world.player.global_position).y - off_road.point.y) > Seam.CORRIDOR,
+			"el_capitan_meadow: crossed well away from the road")
+	_check_spans()
 	# A north-south seam: from the hotel down the trail by Stoneman Bridge.
 	await world.go_to_region("the_ahwahnee", "south_entry")
 	# stepping in through a gate there's no fade to settle behind
@@ -135,6 +147,28 @@ func _check_all_seams() -> void:
 						"%s: %s lines up with the seam back" % [id, exit_name])
 	for region: Region in regions.values():
 		region.free()
+
+
+## Each seam opens more of its edge than the road's corridor, and where one
+## edge meets two regions (the Village's west and east edges, Curry
+## Village's east edge) their stretches don't overlap.
+func _check_spans() -> void:
+	var village: Region = (load("res://scenes/regions/yosemite_village.tscn") as PackedScene).instantiate()
+	var spans := {}
+	for exit_name in SEAMS["yosemite_village"]:
+		var exit: RegionExit = village.find_child(exit_name, true, false)
+		var neighbor: Region = (load("res://scenes/regions/%s.tscn" % exit.target_region) as PackedScene).instantiate()
+		var seam := Seam.make(village, exit, neighbor)
+		spans[exit_name] = seam.span
+		# Southside Drive runs off near the map's foot, so there the stretch
+		# is the road's corridor, cut by the map's corner.
+		var least := 2.0 * Seam.CORRIDOR + 64.0 if exit_name.begins_with("Northside") else village.get_bounds().end.y - seam.point.y + Seam.CORRIDOR
+		check(seam.span.y - seam.span.x >= least,
+				"yosemite_village: %s opens %d px of edge (at least %d)" % [exit_name, seam.span.y - seam.span.x, least])
+		neighbor.free()
+	check(spans.NorthsideWest.y < spans.SouthsideWest.x and spans.NorthsideEast.y < spans.SouthsideEast.x,
+			"yosemite_village: the two areas off each side get their own stretch of edge")
+	village.free()
 
 
 ## The grounds on both sides of the open seam blend into each other.

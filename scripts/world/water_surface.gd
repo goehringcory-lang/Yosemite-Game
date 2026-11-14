@@ -41,6 +41,9 @@ const READ_AROUND := 8.0
 
 
 func _ready() -> void:
+	# after the camera and LandmarkFraming (10) have placed the view this
+	# frame, so reflections read where the screen is now, not a frame behind
+	process_priority = 20
 	z_index = 14
 	z_as_relative = false
 	_mat = ShaderMaterial.new()
@@ -89,7 +92,9 @@ func _process(_delta: float) -> void:
 	_mat.set_shader_parameter("view_size", size)
 	var tint := _tint_color()
 	_mat.set_shader_parameter("tint", Vector3(tint.r, tint.g, tint.b))
-	var hour := GameClock.minutes / 60.0
+	# smooth minutes: the clock ticks every ten, which stepped the sky colour
+	# and stars in the water at dusk
+	var hour := GameClock.smooth_minutes() / 60.0
 	var weather := Weather.today()
 	var pal := ClimbSky.palette(hour)
 	var overcast := clampf(maxf(weather.clouds - 0.4, 0.0) / 0.6 + weather.rain + weather.snow, 0.0, 1.0)
