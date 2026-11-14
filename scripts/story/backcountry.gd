@@ -61,7 +61,7 @@ static func has_permit() -> bool:
 
 
 static func has_canister() -> bool:
-	return Gear.count(CANISTER) > 0
+	return Gear.carried(CANISTER) > 0
 
 
 ## Marks a first (one of the constants above) as done. True the first time.
