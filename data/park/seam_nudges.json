@@ -34,11 +34,11 @@
 		"ToVillage": -32
 	},
 	"mirror_lake": {
-		"ToTenayaCreek": -14
+		"ToTenayaCreek": -13
 	},
 	"tenaya_creek": {
 		"ToHappyIsles": 6,
-		"ToMirrorLake": 14
+		"ToMirrorLake": 13
 	},
 	"the_ahwahnee": {
 		"NorthsideDriveWest": 36,
