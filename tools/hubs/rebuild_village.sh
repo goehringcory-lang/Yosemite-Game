@@ -8,6 +8,10 @@
 #
 #   tools/hubs/rebuild_village.sh
 #   GODOT=/path/to/godot tools/hubs/rebuild_village.sh
+#
+# The builder leaves the Village its own 16px ground, so follow this with
+# tools/hubs/finish_valley_floor.sh yosemite_village (native ground, the
+# Merced meeting the next areas' at the seams, Sentinel Hole).
 set -eu
 cd "$(dirname "$0")/../.."
 GODOT="${GODOT:-godot}"
@@ -20,3 +24,5 @@ python3 tools/art32/upgrade.py --fresh "${fresh[@]}"
 python3 tools/art32/migrate_built.py scenes/regions/yosemite_village.tscn scenes/objects/shuttle_stop.tscn --fresh "${fresh[@]}"
 git checkout -- data/
 "$GODOT" --headless --path . --import > /dev/null 2>&1 || true
+echo "Rebuilt. Now put the finish back (native ground, rivers meeting at the seams, fishing holes):"
+echo "  tools/hubs/finish_valley_floor.sh yosemite_village"

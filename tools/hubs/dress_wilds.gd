@@ -330,8 +330,12 @@ func _solid(root: Node2D, sprite_name: String, dir: String, at: Vector2, foot: V
 func _campsites(root: Node2D) -> int:
 	var anchors: Array[Node2D] = []
 	var climbers: Array[bool] = []
+	# A campground's sites are Table3, or LowerPinesTable3 where a scene
+	# holds a second campground (build_valley_floor.gd's _campsites). A
+	# picnic area's tables (CathedralBeachTable0) have no camp out.
+	var table := RegEx.create_from_string("^(\\w*Pines)?Table\\d+$")
 	for node in _region.entities.get_children():
-		if node is Node2D and String(node.name).begins_with("Table"):
+		if node is Node2D and table.search(String(node.name)) != null:
 			anchors.append(node)
 			climbers.append(false)
 	# Camp 4's walk-in sites are SiteNTent... (build_yosemite_village.gd)

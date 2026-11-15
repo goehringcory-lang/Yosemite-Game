@@ -10,6 +10,10 @@
 #   ONLY=mirror_lake,crows_camp tools/hubs/rebuild_valley_floor.sh   # just these
 #
 # The Python steps need Pillow and numpy.
+#
+# The builder leaves each area its own 16px ground and lays its river out on
+# its own, so follow this with tools/hubs/finish_valley_floor.sh AREA...
+# (native ground, rivers meeting at the seams, fishing holes).
 set -eu
 cd "$(dirname "$0")/../.."
 GODOT="${GODOT:-godot}"
@@ -28,3 +32,5 @@ if [[ -n "${ONLY:-}" ]]; then
 fi
 "$PYTHON" tools/art32/migrate_built.py $(printf "scenes/regions/%s.tscn " "${SCENES[@]}") --fresh "${fresh[@]}"
 "$GODOT" --headless --path . --import > /dev/null 2>&1 || true
+echo "Rebuilt. Now put the finish back (native ground, rivers meeting at the seams, fishing holes):"
+echo "  tools/hubs/finish_valley_floor.sh $(printf "%s " "${SCENES[@]}")"

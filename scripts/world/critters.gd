@@ -18,6 +18,10 @@ extends Node2D
 ## ground squirrels sleep through the winter. A squirrel sits up to nibble,
 ## scampers a little way, sits up again, and dashes off when you come close.
 
+const Terrain := preload("res://tools/mapgen/terrain.gd")
+## The Ground layer's tiles that are the park's terrain (the row is its kind).
+const SOURCE_TERRAIN := 1
+
 ## Most birds and butterflies about at once.
 const MAX_BIRDS := 5
 const MAX_BUTTERFLIES := 4
@@ -170,13 +174,39 @@ func _player_position() -> Vector2:
 	return world.player.global_position if world and "player" in world and world.player else Vector2.INF
 
 
-## True if [param at] is open ground: nothing solid there.
+## True if [param at] is open ground: on a map, not out on the water or up a
+## cliff, and nothing solid there.
 func _open(at: Vector2) -> bool:
+	if not _on_land(at):
+		return false
 	var query := PhysicsPointQueryParameters2D.new()
 	query.position = at
 	query.collision_mask = 1
 	query.collide_with_areas = false
 	return get_world_2d().direct_space_state.intersect_point(query, 1).is_empty()
+
+
+## True if [param at] is on the ground of the region the player is in, or of
+## the one laid beside it at a seam: not in the woods or the sky past the
+## maps' edges (see SeamBackdrop), nor in a river, a lake or on a cliff
+## (their rims are solid but their middles aren't). Without a World, anywhere.
+func _on_land(at: Vector2) -> bool:
+	var world := _world()
+	if world == null or not "region" in world or world.region == null:
+		return true
+	var maps: Array[Region] = [world.region]
+	if "seam" in world and world.seam != null and is_instance_valid(world.seam.neighbor) and world.seam.neighbor.is_inside_tree():
+		maps.append(world.seam.neighbor)
+	for map in maps:
+		var ground := map.get_ground()
+		if ground == null:
+			continue
+		var cell := ground.local_to_map(ground.to_local(at))
+		var source := ground.get_cell_source_id(cell)
+		if source == -1:
+			continue
+		return not (source == SOURCE_TERRAIN and Terrain.is_solid(ground.get_cell_atlas_coords(cell).y))
+	return false
 
 
 func _process(delta: float) -> void:
