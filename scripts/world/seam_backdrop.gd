@@ -92,6 +92,11 @@ var _skies: Array = []
 ## Under the maps, and over them.
 var _under: Array = []
 var _fringe: Array = []
+## The child canvas items they're drawn by (see _chunk).
+var _under_chunks: Array[Node2D] = []
+var _fringe_chunks: Array[Node2D] = []
+## Pictures to a child canvas item: nearby ones in the back-to-front order.
+const CHUNK := 16
 ## The shade on the maps' ground along their edges: [rect, alpha] each.
 var _shade_rects: Array = []
 var _snowy := false
@@ -130,7 +135,6 @@ func _ready() -> void:
 	_over.name = "Fringe"
 	_over.z_index = FRINGE_Z
 	_over.z_as_relative = false
-	_over.draw.connect(_draw_fringe)
 	add_child(_over)
 	_shadow.name = "Shade"
 	_shadow.z_index = SHADE_Z
@@ -204,6 +208,8 @@ static func skies_of(region: Region, bounds: Rect2) -> Array:
 func _lay_out() -> void:
 	_under.clear()
 	_fringe.clear()
+	_chunk(self, [], _under_chunks)
+	_chunk(_over, [], _fringe_chunks)
 	_shade_rects.clear()
 	_sky_rects.clear()
 	_look = _look_key()
@@ -277,6 +283,33 @@ func _lay_out() -> void:
 		_line_edges(_maps[i], brush, over)
 	_under = _back_to_front(under)
 	_fringe = _back_to_front(over)
+	_chunk(self, _under, _under_chunks)
+	_chunk(_over, _fringe, _fringe_chunks)
+
+
+## Hands [param items] to child canvas items of CHUNK each, in order, under
+## [param layer] (after its old ones in [param chunks] are freed). The
+## renderer leaves out a child whose pictures are all off screen; one item
+## drawing them all was sent whole every frame (some 550 pictures in
+## Yosemite Village).
+func _chunk(layer: Node2D, items: Array, chunks: Array[Node2D]) -> void:
+	for old in chunks:
+		old.queue_free()
+	chunks.clear()
+	for from in range(0, items.size(), CHUNK):
+		var part := _Chunk.new()
+		part.items = items.slice(from, from + CHUNK)
+		layer.add_child(part)
+		chunks.append(part)
+
+
+## Some of a layer's trees and brush, back to front.
+class _Chunk extends Node2D:
+	var items: Array = []
+
+	func _draw() -> void:
+		for item: Array in items:
+			draw_texture(item[0], item[1], item[2])
 
 
 ## The grid cells of row [param row], from column [param from] for
@@ -575,16 +608,6 @@ func _draw_floor() -> void:
 	_behind.draw_texture_rect(_floor, _area, true)
 	for sky: Array in _sky_rects:
 		_behind.draw_rect(sky[0], sky[1])
-
-
-func _draw() -> void:
-	for item: Array in _under:
-		draw_texture(item[0], item[1], item[2])
-
-
-func _draw_fringe() -> void:
-	for item: Array in _fringe:
-		_over.draw_texture(item[0], item[1], item[2])
 
 
 func _draw_shade() -> void:
