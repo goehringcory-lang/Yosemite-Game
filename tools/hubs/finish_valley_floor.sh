@@ -9,9 +9,12 @@
 #      the seams again (tools/seams/morph_seams.py), until nothing more bends;
 #   2. paints the named areas' ground natively at 32px
 #      (tools/art32/ground32/dump.tscn and paint.py);
-#   3. paints their fishing holes back into the new river
-#      (tools/fishing/river_pools.py --repaint);
-#   4. refreshes the grounds' normal maps (tools/normals/normals.py), the
+#   3. lays their ground clutter out again round whatever the builders
+#      moved or added (tools/hubs/dress_wilds.tscn; the campers' gear at any
+#      new campsite comes with it);
+#   4. paints their fishing holes back into the new river and clears the
+#      clutter out of them (tools/fishing/river_pools.py --repaint);
+#   5. refreshes the grounds' normal maps (tools/normals/normals.py), the
 #      water cells (tools/perf/water_cells.py) and the seams' nudges
 #      (tools/seams/measure_seams.tscn), and re-imports.
 #
@@ -46,6 +49,9 @@ done
 echo "== Ground"
 "$GODOT" --headless --path . res://tools/art32/ground32/dump.tscn -- "$tmp/dump" "$@" 2> /dev/null | grep dumped
 "$PYTHON" tools/art32/ground32/paint.py "$tmp/dump" "$@" | grep wrote
+
+echo "== Ground clutter and fishing holes"
+"$GODOT" --headless --path . res://tools/hubs/dress_wilds.tscn -- "$@" 2> /dev/null | grep dressed
 "$PYTHON" tools/fishing/river_pools.py --repaint "$@"
 
 echo "== Normal maps, water cells and seam nudges"

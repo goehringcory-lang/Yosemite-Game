@@ -22,8 +22,9 @@ don't).
 Run it once on the committed pictures: cutting a pool twice paints it twice.
 --repaint is for an area whose tiles already hold its hole but whose ground
 picture has just been painted afresh (tools/art32/ground32/paint.py paints the
-river from the tiles, without the hole's oval shore and dark heart): it only
-paints, and the same way each time.
+river from the tiles, without the hole's oval shore and dark heart): it
+paints, the same way each time, and takes up any clutter laid in the hole
+since (tools/hubs/dress_wilds.gd), leaving the tiles alone.
 The FishingWater nodes in the story overlays (scenes/story/content/) mark
 the same ovals as holes for the fish (scripts/fishing/fishing_water.gd);
 tests/fishing_test.gd checks the two agree. Needs Pillow and numpy.
@@ -273,27 +274,35 @@ def cut(area: str, center, radii, rng) -> None:
     img = np.array(Image.open(art).convert("RGBA"))
     paint(img, center, radii, rng)
     Image.fromarray(img).save(art)
-    # ground clutter in the new water goes
-    dressing = os.path.join(ROOT, "scenes", "regions", "dressing", "wild", area + ".tscn")
-    if os.path.exists(dressing):
-        dtext = open(dressing).read()
-        blocks = re.split(r"(?=\n\[node )", dtext)
-        kept = []
-        gone = 0
-        for block in blocks:
-            pos = re.search(r"^position = Vector2\(([-\d.]+), ([-\d.]+)\)", block, re.M)
-            if block.startswith("\n[node") and pos and inside(float(pos.group(1)), float(pos.group(2)), center, radii, 12):
-                gone += 1
-                continue
-            kept.append(block)
-        open(dressing, "w").write("".join(kept))
-        print("  took up %d bits of clutter" % gone)
+    clear_clutter(area, center, radii)
     print("cut a hole in %s at %s" % (area, center))
 
 
+def clear_clutter(area: str, center, radii) -> None:
+    """Takes up the ground clutter (the area's wild dressing) lying in the
+    hole."""
+    dressing = os.path.join(ROOT, "scenes", "regions", "dressing", "wild", area + ".tscn")
+    if not os.path.exists(dressing):
+        return
+    dtext = open(dressing).read()
+    blocks = re.split(r"(?=\n\[node )", dtext)
+    kept = []
+    gone = 0
+    for block in blocks:
+        pos = re.search(r"^position = Vector2\(([-\d.]+), ([-\d.]+)\)", block, re.M)
+        if block.startswith("\n[node") and pos and inside(float(pos.group(1)), float(pos.group(2)), center, radii, 12):
+            gone += 1
+            continue
+        kept.append(block)
+    if gone:
+        open(dressing, "w").write("".join(kept))
+    print("  took up %d bits of clutter" % gone)
+
+
 def repaint(areas: list[str]) -> None:
-    """Paints the holes of [param areas] into their ground pictures again,
-    leaving the tiles and the clutter as they are."""
+    """Paints the holes of [param areas] into their ground pictures again
+    and takes up any clutter laid in them since, leaving the tiles as they
+    are."""
     for index, (area, center, radii) in enumerate(POOLS):
         if area not in areas:
             continue
@@ -302,6 +311,7 @@ def repaint(areas: list[str]) -> None:
         paint(img, center, radii, np.random.default_rng(1868 + index))
         Image.fromarray(img).save(art)
         print("painted the hole in %s at %s" % (area, center))
+        clear_clutter(area, center, radii)
 
 
 def find(area: str) -> None:
