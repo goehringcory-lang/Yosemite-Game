@@ -16,8 +16,14 @@ don't).
     python3 tools/fishing/river_pools.py                 # cut every pool
     python3 tools/fishing/river_pools.py --check         # only check them
     python3 tools/fishing/river_pools.py --find AREA     # suggest places
+    python3 tools/fishing/river_pools.py --repaint AREA...
+                                                         # paint these areas' holes again
 
 Run it once on the committed pictures: cutting a pool twice paints it twice.
+--repaint is for an area whose tiles already hold its hole but whose ground
+picture has just been painted afresh (tools/art32/ground32/paint.py paints the
+river from the tiles, without the hole's oval shore and dark heart): it only
+paints, and the same way each time.
 The FishingWater nodes in the story overlays (scenes/story/content/) mark
 the same ovals as holes for the fish (scripts/fishing/fishing_water.gd);
 tests/fishing_test.gd checks the two agree. Needs Pillow and numpy.
@@ -285,6 +291,19 @@ def cut(area: str, center, radii, rng) -> None:
     print("cut a hole in %s at %s" % (area, center))
 
 
+def repaint(areas: list[str]) -> None:
+    """Paints the holes of [param areas] into their ground pictures again,
+    leaving the tiles and the clutter as they are."""
+    for index, (area, center, radii) in enumerate(POOLS):
+        if area not in areas:
+            continue
+        art = art_path(open(scene_path(area)).read())
+        img = np.array(Image.open(art).convert("RGBA"))
+        paint(img, center, radii, np.random.default_rng(1868 + index))
+        Image.fromarray(img).save(art)
+        print("painted the hole in %s at %s" % (area, center))
+
+
 def find(area: str) -> None:
     text = open(scene_path(area)).read()
     _, ground = read_layer(text, "Ground")
@@ -309,6 +328,9 @@ def main() -> None:
     args = sys.argv[1:]
     if args and args[0] == "--find":
         find(args[1])
+        return
+    if args and args[0] == "--repaint":
+        repaint(args[1:])
         return
     bad = False
     for area, center, radii in POOLS:
