@@ -1,5 +1,5 @@
 class_name SunShadows
-extends CanvasGroup
+extends Node2D
 ## The shadows things cast on the ground: trees, boulders, buildings, signs,
 ## people. Each one's sprite is laid flat along the ground, away from the sun
 ## (see Sun), so the shadows swing west to east through the day, stretch long
@@ -8,8 +8,8 @@ extends CanvasGroup
 ## ones of its own. Clouds and rain wash them out.
 ##
 ## World adds one to each outdoor region, drawn over the ground and under the
-## Entities. It's a CanvasGroup, so where two shadows overlap the ground is no
-## darker than under one. Nothing is added to the region's scene: the casters
+## Entities. Where two shadows overlap the ground is no darker than under
+## one. Nothing is added to the region's scene: the casters
 ## are found by looking for upright sprites (their feet on the node's origin)
 ## under Entities, again every couple of seconds for anyone who walks in.
 ##
@@ -18,6 +18,14 @@ extends CanvasGroup
 ## shift a shadow's tip, the view nears the edge of what was painted, or one
 ## of them changes (hidden, freed, new art). Only the people walking about
 ## (and anything else seen to move) are painted every frame.
+##
+## The still shadows are baked into a picture (a SubViewport at the window's
+## own resolution, rendered only when they're painted again) and laid on the
+## ground as one sprite, so a frame draws one picture, not every tree's
+## shadow again. The moving ones are drawn in a small CanvasGroup on top,
+## left out wherever a still shadow already lies, so a person walking under a
+## tree's shadow doesn't darken it twice. (One CanvasGroup over all the
+## shadows cost a full-screen pass every frame.)
 
 ## Colour and strength of a midday shadow (a cool, blue-grey shade).
 const SHADE := Color(0.1, 0.11, 0.22)
@@ -36,6 +44,9 @@ const MARGIN := 192.0
 ## How much the lean may change before the still shadows are painted again:
 ## the tip of a 200 pixel tall tree's shadow moves half a pixel.
 const LEAN_STEP := 0.0025
+## Widest the baked still shadows get, in pixels (a texture any graphics card
+## takes).
+const MAX_BAKE := 4096
 
 var region: Region
 var _casters: Array[CanvasItem] = []
@@ -49,6 +60,17 @@ var _placed := {}
 var _scan_in := 0.0
 var _painter: Node2D
 var _still_painter: Node2D
+## The baked still shadows (white where a shadow lies), its picture on the
+## ground, and the group the movers' shadows are drawn in.
+var _bake: SubViewport
+var _still_sprite: Sprite2D
+var _movers_group: CanvasGroup
+var _mover_mat: ShaderMaterial
+## Window pixels per world pixel the bake was made at.
+var _bake_scale := 0.0
+## Which casters were still at the last scan: only a change there paints the
+## still shadows again.
+var _still_ids := PackedInt64Array()
 ## The still shadows need painting again.
 var _dirty := true
 ## What the still shadows were last painted for.
@@ -63,16 +85,43 @@ var _across := Vector2.RIGHT
 var _view := Rect2()
 
 
+const STILL_SHADER := preload("res://assets/shaders/shadow_still.gdshader")
+const MOVER_SHADER := preload("res://assets/shaders/shadow_mover.gdshader")
+
+
 func _ready() -> void:
 	name = "SunShadows"
-	fit_margin = 0.0
-	clear_margin = 0.0
+	_bake = SubViewport.new()
+	_bake.transparent_bg = true
+	_bake.disable_3d = true
+	_bake.snap_2d_transforms_to_pixel = true
+	_bake.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+	_bake.render_target_update_mode = SubViewport.UPDATE_DISABLED
+	_bake.size = Vector2i(2, 2)
+	add_child(_bake)
 	_still_painter = Node2D.new()
 	_still_painter.draw.connect(_paint_still)
-	add_child(_still_painter)
+	_bake.add_child(_still_painter)
+	_still_sprite = Sprite2D.new()
+	_still_sprite.centered = false
+	_still_sprite.texture = _bake.get_texture()
+	_still_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	var still_mat := ShaderMaterial.new()
+	still_mat.shader = STILL_SHADER
+	still_mat.set_shader_parameter("shade", SHADE)
+	_still_sprite.material = still_mat
+	add_child(_still_sprite)
+	_movers_group = CanvasGroup.new()
+	_movers_group.fit_margin = 0.0
+	_movers_group.clear_margin = 0.0
+	add_child(_movers_group)
 	_painter = Node2D.new()
 	_painter.draw.connect(_paint)
-	add_child(_painter)
+	_mover_mat = ShaderMaterial.new()
+	_mover_mat.shader = MOVER_SHADER
+	_mover_mat.set_shader_parameter("still", _bake.get_texture())
+	_painter.material = _mover_mat
+	_movers_group.add_child(_painter)
 
 
 func _process(delta: float) -> void:
@@ -85,22 +134,55 @@ func _process(delta: float) -> void:
 		return
 	if not was_visible:
 		_dirty = true
-	self_modulate = Color(1, 1, 1, strength)
+	_still_sprite.self_modulate = Color(1, 1, 1, strength)
+	_movers_group.self_modulate = Color(1, 1, 1, strength)
 	_scan_in -= delta
 	if _scan_in <= 0.0:
 		_scan_in = RESCAN
 		_scan()
 	_view = _view_rect()
+	var scale_now := _window_scale()
 	if (_lean - _painted_lean).length() > LEAN_STEP or not _painted_view.encloses(_view) \
-			or _still_painter.global_position != _painted_at:
+			or global_position != _painted_at or scale_now != _bake_scale:
 		_dirty = true
 	if _dirty:
 		_dirty = false
 		_painted_lean = _lean
-		_painted_view = _view.grow(MARGIN)
-		_painted_at = _still_painter.global_position
-		_still_painter.queue_redraw()
+		# whole world pixels, so the baked picture lies on the art's grid
+		var grown := _view.grow(MARGIN)
+		_painted_view = Rect2(grown.position.floor(), grown.size.ceil())
+		_painted_at = global_position
+		_bake_scale = scale_now
+		_rebake()
 	_painter.queue_redraw()
+
+
+## Window pixels per world pixel: 2 for a 1920x1080 window over the 960x540
+## view (the canvas is drawn at the window's size), 1 on Low (drawn at
+## 960x540 and scaled up), more when the camera zooms in.
+func _window_scale() -> float:
+	var k := get_viewport().get_final_transform().get_scale().x
+	var camera := get_viewport().get_camera_2d()
+	if camera:
+		k *= camera.zoom.x
+	return clampf(k, 0.25, 8.0)
+
+
+## Paints the still shadows again into the bake, and lays it where they lie.
+func _rebake() -> void:
+	var k := _bake_scale
+	var size := Vector2i((_painted_view.size * k).ceil())
+	if size.x > MAX_BAKE or size.y > MAX_BAKE:
+		k = minf(k * MAX_BAKE / float(size.x), k * MAX_BAKE / float(size.y))
+		size = Vector2i((_painted_view.size * k).ceil())
+	_bake.size = size.max(Vector2i(2, 2))
+	# bake pixels from the canvas's (world) coordinates
+	_bake.canvas_transform = Transform2D(0.0, Vector2(k, k), 0.0, -_painted_view.position * k)
+	_still_sprite.global_transform = Transform2D(0.0, Vector2(1.0 / k, 1.0 / k), 0.0, _painted_view.position)
+	_mover_mat.set_shader_parameter("still_origin", _painted_view.position)
+	_mover_mat.set_shader_parameter("still_size", Vector2(_bake.size) / k)
+	_still_painter.queue_redraw()
+	_bake.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 
 ## How dark the shadows are now: full in clear sunshine, faint under thin
@@ -157,9 +239,15 @@ func _scan() -> void:
 			for signal_name in ["texture_changed", "frame_changed"]:
 				if caster.has_signal(signal_name) and not caster.is_connected(signal_name, _animated.bind(caster)):
 					caster.connect(signal_name, _animated.bind(caster), CONNECT_ONE_SHOT)
-	# The still ones are painted again every scan in any case, so a change
-	# nothing announced (a flip, a new caster) shows within RESCAN.
-	_dirty = true
+	# Paint the still ones again only when they've changed: one came or
+	# went, or one moved (and so is a mover now). A change nothing
+	# announced (a flip) shows the next time they're painted.
+	var ids := PackedInt64Array()
+	for caster in _still:
+		ids.append(caster.get_instance_id())
+	if ids != _still_ids:
+		_still_ids = ids
+		_dirty = true
 	_placed = placed
 
 
@@ -241,20 +329,16 @@ func _view_rect() -> Rect2:
 
 ## The moving casters' shadows, every frame.
 func _paint() -> void:
-	_paint_casters(_painter, _movers, _view)
-	# A clear rectangle over everything the still shadows cover: the group
-	# sizes its picture by what its children drew this frame, and without it
-	# the still shadows (not drawn again this frame) would be cut off.
-	_painter.draw_rect(_painter.get_global_transform().affine_inverse() * _painted_view, Color(0, 0, 0, 0))
+	_paint_casters(_painter.get_global_transform().affine_inverse(), _painter, _movers, _view, SHADE)
 
 
-## The still casters' shadows, over the view and a margin round it.
+## The still casters' shadows, over the view and a margin round it, in white
+## into the bake (whose canvas transform takes world pixels to its own).
 func _paint_still() -> void:
-	_paint_casters(_still_painter, _still, _painted_view)
+	_paint_casters(Transform2D.IDENTITY, _still_painter, _still, _painted_view, Color.WHITE)
 
 
-func _paint_casters(painter: Node2D, casters: Array[CanvasItem], view: Rect2) -> void:
-	var to_local := painter.get_global_transform().affine_inverse()
+func _paint_casters(to_local: Transform2D, painter: Node2D, casters: Array[CanvasItem], view: Rect2, color: Color) -> void:
 	for caster in casters:
 		if not is_instance_valid(caster) or not caster.is_visible_in_tree():
 			continue
@@ -295,9 +379,9 @@ func _paint_casters(painter: Node2D, casters: Array[CanvasItem], view: Rect2) ->
 			lay = lay * Transform2D(Vector2(-1, 0), Vector2(0, 1), Vector2(2.0 * mid, 0))
 		painter.draw_set_transform_matrix(to_local * xform * lay)
 		if caster is Sprite2D:
-			painter.draw_texture_rect_region(tex, rect, src, SHADE)
+			painter.draw_texture_rect_region(tex, rect, src, color)
 		else:
-			painter.draw_texture_rect(tex, rect, false, SHADE)
+			painter.draw_texture_rect(tex, rect, false, color)
 	painter.draw_set_transform_matrix(Transform2D.IDENTITY)
 
 
