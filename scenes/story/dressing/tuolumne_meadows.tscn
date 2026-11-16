@@ -1,0 +1,1329 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/tree_lodgepole_sapling_1.png" id="sap1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/tree_lodgepole_sapling_2.png" id="sap2"]
+[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="info"]
+[ext_resource type="Script" path="res://scripts/world/night_light.gd" id="light"]
+[ext_resource type="Script" path="res://scripts/world/ambient_fx.gd" id="fx"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tuolumne/lamp_post.png" id="lamp_post"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tuolumne/entrance_sign.png" id="entrance_sign"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tuolumne/porch_bench.png" id="porch_bench"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tuolumne/ice_chest.png" id="ice_chest"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tuolumne/firewood_rack.png" id="firewood_rack"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tuolumne/gas_pump.png" id="gas_pump"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tuolumne/woodpile.png" id="woodpile"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tuolumne/junction_sign.png" id="junction_sign"]
+
+[sub_resource type="RectangleShape2D" id="sap_shape"]
+size = Vector2(10, 6)
+
+[sub_resource type="RectangleShape2D" id="lamp_shape"]
+size = Vector2(8, 6)
+
+[sub_resource type="RectangleShape2D" id="EntranceSign_shape"]
+size = Vector2(120, 12)
+
+[sub_resource type="RectangleShape2D" id="EntranceSign_reach"]
+size = Vector2(128, 28)
+
+[sub_resource type="RectangleShape2D" id="StorePorchBench_shape"]
+size = Vector2(52, 8)
+
+[sub_resource type="RectangleShape2D" id="StoreIceChest_shape"]
+size = Vector2(48, 10)
+
+[sub_resource type="RectangleShape2D" id="StoreIceChest_reach"]
+size = Vector2(56, 28)
+
+[sub_resource type="RectangleShape2D" id="StoreFirewood_shape"]
+size = Vector2(68, 10)
+
+[sub_resource type="RectangleShape2D" id="StoreFirewood_reach"]
+size = Vector2(76, 28)
+
+[sub_resource type="RectangleShape2D" id="GasPump_shape"]
+size = Vector2(24, 10)
+
+[sub_resource type="RectangleShape2D" id="GasPump_reach"]
+size = Vector2(32, 28)
+
+[sub_resource type="RectangleShape2D" id="LodgeWoodpile_shape"]
+size = Vector2(72, 10)
+
+[sub_resource type="RectangleShape2D" id="LodgeWoodpile_reach"]
+size = Vector2(80, 28)
+
+[sub_resource type="RectangleShape2D" id="LyellJunctionSign_shape"]
+size = Vector2(12, 8)
+
+[sub_resource type="RectangleShape2D" id="LyellJunctionSign_reach"]
+size = Vector2(20, 28)
+
+[node name="TuolumneMeadowsDressing" type="Node2D"]
+
+[node name="TreeLodgepoleSapling0" type="StaticBody2D" parent="."]
+position = Vector2(2380, 380)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling0"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling0"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling1" type="StaticBody2D" parent="."]
+position = Vector2(3588, 1172)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling1"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling1"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling2" type="StaticBody2D" parent="."]
+position = Vector2(1092, 468)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling2"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling2"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling3" type="StaticBody2D" parent="."]
+position = Vector2(3924, 796)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling3"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling3"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling4" type="StaticBody2D" parent="."]
+position = Vector2(3212, 484)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling4"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling4"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling5" type="StaticBody2D" parent="."]
+position = Vector2(820, 580)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling5"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling5"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling6" type="StaticBody2D" parent="."]
+position = Vector2(1180, 476)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling6"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling6"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling7" type="StaticBody2D" parent="."]
+position = Vector2(2828, 468)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling7"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling7"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling8" type="StaticBody2D" parent="."]
+position = Vector2(3172, 1292)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling8"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling8"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling9" type="StaticBody2D" parent="."]
+position = Vector2(3156, 500)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling9"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling9"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling10" type="StaticBody2D" parent="."]
+position = Vector2(740, 612)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling10"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling10"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling11" type="StaticBody2D" parent="."]
+position = Vector2(1012, 1268)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling11"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling11"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling12" type="StaticBody2D" parent="."]
+position = Vector2(2732, 1356)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling12"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling12"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling13" type="StaticBody2D" parent="."]
+position = Vector2(356, 740)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling13"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling13"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling14" type="StaticBody2D" parent="."]
+position = Vector2(2436, 1388)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling14"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling14"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling15" type="StaticBody2D" parent="."]
+position = Vector2(2532, 604)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling15"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling15"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling16" type="StaticBody2D" parent="."]
+position = Vector2(812, 1188)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling16"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling16"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling17" type="StaticBody2D" parent="."]
+position = Vector2(1276, 460)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling17"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling17"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling18" type="StaticBody2D" parent="."]
+position = Vector2(1420, 436)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling18"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling18"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling19" type="StaticBody2D" parent="."]
+position = Vector2(1644, 420)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling19"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling19"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling20" type="StaticBody2D" parent="."]
+position = Vector2(452, 1124)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling20"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling20"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling21" type="StaticBody2D" parent="."]
+position = Vector2(852, 532)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling21"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling21"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling22" type="StaticBody2D" parent="."]
+position = Vector2(3276, 524)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling22"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling22"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling23" type="StaticBody2D" parent="."]
+position = Vector2(348, 860)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling23"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling23"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling24" type="StaticBody2D" parent="."]
+position = Vector2(2612, 548)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling24"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling24"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling25" type="StaticBody2D" parent="."]
+position = Vector2(428, 756)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling25"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling25"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling26" type="StaticBody2D" parent="."]
+position = Vector2(3028, 476)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling26"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling26"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling27" type="StaticBody2D" parent="."]
+position = Vector2(1068, 1292)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling27"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling27"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling28" type="StaticBody2D" parent="."]
+position = Vector2(2628, 1372)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling28"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling28"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling29" type="StaticBody2D" parent="."]
+position = Vector2(652, 1204)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling29"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling29"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling30" type="StaticBody2D" parent="."]
+position = Vector2(3780, 1116)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling30"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling30"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling31" type="StaticBody2D" parent="."]
+position = Vector2(884, 1268)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling31"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling31"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling32" type="StaticBody2D" parent="."]
+position = Vector2(476, 676)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling32"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling32"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling33" type="StaticBody2D" parent="."]
+position = Vector2(1804, 412)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling33"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling33"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling34" type="StaticBody2D" parent="."]
+position = Vector2(1388, 1356)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling34"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling34"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling35" type="StaticBody2D" parent="."]
+position = Vector2(2756, 540)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling35"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling35"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling36" type="StaticBody2D" parent="."]
+position = Vector2(988, 516)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling36"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling36"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling37" type="StaticBody2D" parent="."]
+position = Vector2(1860, 428)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling37"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling37"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling38" type="StaticBody2D" parent="."]
+position = Vector2(2972, 460)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling38"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling38"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling39" type="StaticBody2D" parent="."]
+position = Vector2(2708, 428)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling39"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling39"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling40" type="StaticBody2D" parent="."]
+position = Vector2(372, 796)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling40"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling40"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling41" type="StaticBody2D" parent="."]
+position = Vector2(1348, 452)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling41"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling41"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling42" type="StaticBody2D" parent="."]
+position = Vector2(3052, 1300)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling42"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling42"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling43" type="StaticBody2D" parent="."]
+position = Vector2(2772, 452)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling43"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling43"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling44" type="StaticBody2D" parent="."]
+position = Vector2(1292, 1340)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling44"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling44"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling45" type="StaticBody2D" parent="."]
+position = Vector2(2460, 420)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling45"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling45"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling46" type="StaticBody2D" parent="."]
+position = Vector2(1756, 1268)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling46"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling46"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling47" type="StaticBody2D" parent="."]
+position = Vector2(3836, 1068)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling47"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling47"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling48" type="StaticBody2D" parent="."]
+position = Vector2(3020, 604)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling48"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling48"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling49" type="StaticBody2D" parent="."]
+position = Vector2(2564, 1372)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling49"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling49"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling50" type="StaticBody2D" parent="."]
+position = Vector2(3236, 1308)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling50"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling50"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling51" type="StaticBody2D" parent="."]
+position = Vector2(1868, 1412)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling51"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling51"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling52" type="StaticBody2D" parent="."]
+position = Vector2(540, 1124)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling52"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling52"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling53" type="StaticBody2D" parent="."]
+position = Vector2(2324, 396)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling53"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling53"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling54" type="StaticBody2D" parent="."]
+position = Vector2(372, 676)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling54"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling54"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling55" type="StaticBody2D" parent="."]
+position = Vector2(948, 1260)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling55"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling55"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling56" type="StaticBody2D" parent="."]
+position = Vector2(2892, 452)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling56"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling56"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling57" type="StaticBody2D" parent="."]
+position = Vector2(3340, 548)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling57"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling57"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling58" type="StaticBody2D" parent="."]
+position = Vector2(700, 1236)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling58"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling58"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling59" type="StaticBody2D" parent="."]
+position = Vector2(3548, 1252)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling59"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling59"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling60" type="StaticBody2D" parent="."]
+position = Vector2(1660, 1388)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling60"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling60"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling61" type="StaticBody2D" parent="."]
+position = Vector2(3852, 796)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling61"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling61"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling62" type="StaticBody2D" parent="."]
+position = Vector2(668, 596)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling62"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling62"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling63" type="StaticBody2D" parent="."]
+position = Vector2(1212, 428)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling63"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling63"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling64" type="StaticBody2D" parent="."]
+position = Vector2(3060, 428)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling64"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling64"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling65" type="StaticBody2D" parent="."]
+position = Vector2(284, 788)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling65"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling65"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling66" type="StaticBody2D" parent="."]
+position = Vector2(3980, 788)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling66"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling66"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling67" type="StaticBody2D" parent="."]
+position = Vector2(3692, 796)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling67"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling67"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling68" type="StaticBody2D" parent="."]
+position = Vector2(1044, 436)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling68"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling68"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling69" type="StaticBody2D" parent="."]
+position = Vector2(2180, 1436)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling69"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling69"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling70" type="StaticBody2D" parent="."]
+position = Vector2(3308, 1324)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling70"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling70"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling71" type="StaticBody2D" parent="."]
+position = Vector2(820, 1244)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling71"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling71"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling72" type="StaticBody2D" parent="."]
+position = Vector2(2436, 1444)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling72"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling72"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling73" type="StaticBody2D" parent="."]
+position = Vector2(3908, 740)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling73"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling73"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling74" type="StaticBody2D" parent="."]
+position = Vector2(1140, 436)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling74"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling74"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling75" type="StaticBody2D" parent="."]
+position = Vector2(3268, 468)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling75"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling75"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling76" type="StaticBody2D" parent="."]
+position = Vector2(3788, 1172)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling76"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling76"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling77" type="StaticBody2D" parent="."]
+position = Vector2(1308, 404)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling77"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling77"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling78" type="StaticBody2D" parent="."]
+position = Vector2(1588, 1420)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling78"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling78"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling79" type="StaticBody2D" parent="."]
+position = Vector2(2668, 1412)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling79"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling79"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling80" type="StaticBody2D" parent="."]
+position = Vector2(1012, 1324)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling80"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling80"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling81" type="StaticBody2D" parent="."]
+position = Vector2(2756, 364)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling81"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling81"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling82" type="StaticBody2D" parent="."]
+position = Vector2(644, 1260)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling82"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling82"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling83" type="StaticBody2D" parent="."]
+position = Vector2(724, 556)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling83"]
+texture = ExtResource("sap1")
+offset = Vector2(0, -44)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling83"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling84" type="StaticBody2D" parent="."]
+position = Vector2(892, 1324)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling84"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling84"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling85" type="StaticBody2D" parent="."]
+position = Vector2(2340, 332)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling85"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling85"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="TreeLodgepoleSapling86" type="StaticBody2D" parent="."]
+position = Vector2(860, 468)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="TreeLodgepoleSapling86"]
+texture = ExtResource("sap2")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="TreeLodgepoleSapling86"]
+position = Vector2(0, -3)
+shape = SubResource("sap_shape")
+
+[node name="EntranceSign" type="StaticBody2D" parent="."]
+position = Vector2(1300, 1380)
+collision_mask = 0
+script = ExtResource("info")
+title = "Tuolumne Meadows"
+text = "Elevation 8,600 feet. The largest subalpine meadow in the Sierra Nevada, ringed by lodgepole pine and granite domes. Snow covers it half the year; the Tioga Road over it is closed from about November to May or June."
+
+[node name="Sprite" type="Sprite2D" parent="EntranceSign"]
+texture = ExtResource("entrance_sign")
+offset = Vector2(0, -32)
+
+[node name="Collision" type="CollisionShape2D" parent="EntranceSign"]
+position = Vector2(0, -6)
+shape = SubResource("EntranceSign_shape")
+
+[node name="Hitbox" type="Area2D" parent="EntranceSign"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="EntranceSign/Hitbox"]
+position = Vector2(0, -12)
+shape = SubResource("EntranceSign_reach")
+
+[node name="StorePorchBench" type="StaticBody2D" parent="."]
+position = Vector2(2714, 1690)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="StorePorchBench"]
+texture = ExtResource("porch_bench")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="StorePorchBench"]
+position = Vector2(0, -4)
+shape = SubResource("StorePorchBench_shape")
+
+[node name="StoreIceChest" type="StaticBody2D" parent="."]
+position = Vector2(2826, 1690)
+collision_mask = 0
+script = ExtResource("info")
+title = "Ice"
+text = "Block and cubed ice, for the coolers of the campground across the road. Ask inside."
+
+[node name="Sprite" type="Sprite2D" parent="StoreIceChest"]
+texture = ExtResource("ice_chest")
+offset = Vector2(0, -20)
+
+[node name="Collision" type="CollisionShape2D" parent="StoreIceChest"]
+position = Vector2(0, -5)
+shape = SubResource("StoreIceChest_shape")
+
+[node name="Hitbox" type="Area2D" parent="StoreIceChest"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="StoreIceChest/Hitbox"]
+position = Vector2(0, -12)
+shape = SubResource("StoreIceChest_reach")
+
+[node name="StoreFirewood" type="StaticBody2D" parent="."]
+position = Vector2(2640, 1692)
+collision_mask = 0
+script = ExtResource("info")
+title = "Firewood"
+text = "Bundles of split wood for campfires. Gather only dead and down wood yourself, and never above 9,600 feet: up there, wood rots so slowly that every stick matters."
+
+[node name="Sprite" type="Sprite2D" parent="StoreFirewood"]
+texture = ExtResource("firewood_rack")
+offset = Vector2(0, -26)
+
+[node name="Collision" type="CollisionShape2D" parent="StoreFirewood"]
+position = Vector2(0, -5)
+shape = SubResource("StoreFirewood_shape")
+
+[node name="Hitbox" type="Area2D" parent="StoreFirewood"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="StoreFirewood/Hitbox"]
+position = Vector2(0, -12)
+shape = SubResource("StoreFirewood_reach")
+
+[node name="GasPump" type="StaticBody2D" parent="."]
+position = Vector2(2580, 1684)
+collision_mask = 0
+script = ExtResource("info")
+title = "Gas pump"
+text = "An old pump like the ones at the little gas station beside the store, the last fuel before the long climb over Tioga Pass."
+
+[node name="Sprite" type="Sprite2D" parent="GasPump"]
+texture = ExtResource("gas_pump")
+offset = Vector2(0, -34)
+
+[node name="Collision" type="CollisionShape2D" parent="GasPump"]
+position = Vector2(0, -5)
+shape = SubResource("GasPump_shape")
+
+[node name="Hitbox" type="Area2D" parent="GasPump"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="GasPump/Hitbox"]
+position = Vector2(0, -12)
+shape = SubResource("GasPump_reach")
+
+[node name="LodgeWoodpile" type="StaticBody2D" parent="."]
+position = Vector2(4300, 1750)
+collision_mask = 0
+script = ExtResource("info")
+title = "Woodpile"
+text = "Lodgepole rounds for the wood stoves in the tent cabins. Nights at 8,600 feet go below freezing even in July."
+
+[node name="Sprite" type="Sprite2D" parent="LodgeWoodpile"]
+texture = ExtResource("woodpile")
+offset = Vector2(0, -22)
+
+[node name="Collision" type="CollisionShape2D" parent="LodgeWoodpile"]
+position = Vector2(0, -5)
+shape = SubResource("LodgeWoodpile_shape")
+
+[node name="Hitbox" type="Area2D" parent="LodgeWoodpile"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="LodgeWoodpile/Hitbox"]
+position = Vector2(0, -12)
+shape = SubResource("LodgeWoodpile_reach")
+
+[node name="LyellJunctionSign" type="StaticBody2D" parent="."]
+position = Vector2(4060, 2044)
+collision_mask = 0
+script = ExtResource("info")
+title = "Trail junction"
+text = "South up Lyell Canyon, the John Muir Trail and the Pacific Crest Trail share the same path for miles. Hikers walking from Mexico to Canada pass the lodge here, often stopping at the store for their resupply box."
+
+[node name="Sprite" type="Sprite2D" parent="LyellJunctionSign"]
+texture = ExtResource("junction_sign")
+offset = Vector2(0, -36)
+
+[node name="Collision" type="CollisionShape2D" parent="LyellJunctionSign"]
+position = Vector2(0, -4)
+shape = SubResource("LyellJunctionSign_shape")
+
+[node name="Hitbox" type="Area2D" parent="LyellJunctionSign"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="LyellJunctionSign/Hitbox"]
+position = Vector2(0, -12)
+shape = SubResource("LyellJunctionSign_reach")
+
+[node name="LodgeLampWest" type="StaticBody2D" parent="."]
+position = Vector2(4088, 1780)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="LodgeLampWest"]
+texture = ExtResource("lamp_post")
+offset = Vector2(0, -36)
+
+[node name="Collision" type="CollisionShape2D" parent="LodgeLampWest"]
+position = Vector2(-10, -3)
+shape = SubResource("lamp_shape")
+
+[node name="NightLight" type="PointLight2D" parent="LodgeLampWest"]
+position = Vector2(10, -50)
+script = ExtResource("light")
+strength = 0.8
+radius = 72.0
+flicker = 0.3
+
+[node name="LodgeLampEast" type="StaticBody2D" parent="."]
+position = Vector2(4200, 1780)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="LodgeLampEast"]
+texture = ExtResource("lamp_post")
+offset = Vector2(0, -36)
+
+[node name="Collision" type="CollisionShape2D" parent="LodgeLampEast"]
+position = Vector2(-10, -3)
+shape = SubResource("lamp_shape")
+
+[node name="NightLight" type="PointLight2D" parent="LodgeLampEast"]
+position = Vector2(10, -50)
+script = ExtResource("light")
+strength = 0.8
+radius = 72.0
+flicker = 0.3
+
+[node name="StoreLamp" type="StaticBody2D" parent="."]
+position = Vector2(2900, 1690)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="StoreLamp"]
+texture = ExtResource("lamp_post")
+offset = Vector2(0, -36)
+
+[node name="Collision" type="CollisionShape2D" parent="StoreLamp"]
+position = Vector2(-10, -3)
+shape = SubResource("lamp_shape")
+
+[node name="NightLight" type="PointLight2D" parent="StoreLamp"]
+position = Vector2(10, -50)
+script = ExtResource("light")
+strength = 0.8
+radius = 72.0
+flicker = 0.3
+
+[node name="StoreSmoke" type="CPUParticles2D" parent="."]
+position = Vector2(2834, 1542)
+script = ExtResource("fx")
+area = Vector2(2, 1)
+
+[node name="LodgeSmoke" type="CPUParticles2D" parent="."]
+position = Vector2(4198, 1618)
+script = ExtResource("fx")
+area = Vector2(2, 1)

@@ -9,6 +9,9 @@ extends RefCounted
 
 const DIR := "res://scenes/story/content/%s.tscn"
 const DOORS_DIR := "res://scenes/story/doors/%s.tscn"
+## Hand-placed scenery a region's builder doesn't make (young trees, props,
+## lamps), written by tools such as tools/hubs/tuolumne_dressing.py.
+const DRESSING_DIR := "res://scenes/story/dressing/%s.tscn"
 
 
 static func path_for(region_id: String) -> String:
@@ -29,7 +32,7 @@ static func attach(region: Region) -> void:
 	# Wren's slackline can be rigged between trees in any outdoor region.
 	if not region.indoors:
 		region.add_child(TravelSlackline.new())
-	for path in [path_for(region.region_id), doors_path_for(region.region_id)]:
+	for path in [path_for(region.region_id), doors_path_for(region.region_id), DRESSING_DIR % region.region_id]:
 		if not ResourceLoader.exists(path):
 			continue
 		var overlay: Node = load(path).instantiate()

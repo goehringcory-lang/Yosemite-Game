@@ -15,6 +15,7 @@ extends Node
 ##                  runs match)
 ##   SHOT_POINTS    "name:x,y;..." spots (region pixels) to stand the player
 ##                  on instead of spawns, for views no spawn looks at
+##   SHOT_AT        the same, but in world pixels; names go in the file name
 ##   SHOT_PREFIX    put before every file name (default none)
 ##   SHOT_RENDERER  if set, quit with an error unless this renderer is the
 ##                  one running (forward_plus, mobile or gl_compatibility)
@@ -55,11 +56,13 @@ func _ready() -> void:
 	var regions: PackedStringArray = _env("SHOT_REGIONS", ",".join(TOUR)).split(",", false)
 	var hours: PackedStringArray = _env("SHOT_HOURS", "10,19.5,22").split(",", false)
 	var spawns: PackedStringArray = OS.get_environment("SHOT_SPAWNS").split(",", false)
+	# name -> [position, true when it is in region pixels]
 	var points := {}
-	for spec in OS.get_environment("SHOT_POINTS").split(";", false):
-		var parts := spec.split(":")
-		var xy := parts[1].split(",")
-		points[parts[0]] = Vector2(float(xy[0]), float(xy[1]))
+	for pair in [["SHOT_POINTS", true], ["SHOT_AT", false]]:
+		for spec in OS.get_environment(pair[0]).split(";", false):
+			var parts := spec.split(":")
+			var xy := parts[1].split(",")
+			points[parts[0]] = [Vector2(float(xy[0]), float(xy[1])), pair[1]]
 	if not points.is_empty():
 		spawns = PackedStringArray(points.keys())
 	var prefix := OS.get_environment("SHOT_PREFIX")
@@ -67,7 +70,8 @@ func _ready() -> void:
 		for spawn in (spawns if not spawns.is_empty() else PackedStringArray(["arrival"])):
 			await world.go_to_region(region_id, "arrival" if points.has(spawn) else spawn)
 			if points.has(spawn):
-				world.player.global_position = (world.region as Node2D).to_global(points[spawn])
+				var at: Vector2 = points[spawn][0]
+				world.player.global_position = (world.region as Node2D).to_global(at) if points[spawn][1] else at
 				world._camera().reset_smoothing()
 			elif world.region.get_spawn(spawn) == null:
 				# a room or an area without one: where the first spawn puts you
