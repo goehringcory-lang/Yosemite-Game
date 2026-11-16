@@ -30,11 +30,18 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	var weather := Weather.today()
 	var clouds: float = weather.clouds
+	var world := get_parent()
+	var strength := STRENGTH
+	# In the high country the afternoon cumulus build over the domes (see
+	# HighCountry): more of the meadow in shadow, and darker under them.
+	if world and "region" in world and world.region and HighCountry.is_high(world.region.region_id) and clouds < 1.0:
+		var build := HighCountry.cloud_build()
+		clouds = lerpf(clouds, 0.72, build)
+		strength *= 1.0 + build * 0.6
 	# Overcast skies cast no separate shadows.
 	var sun := 1.0 - _darkness() * 1.6
 	if clouds >= 1.0:
 		sun = 0.0
-	var world := get_parent()
 	if world and "region" in world and world.region and world.region.indoors:
 		sun = 0.0
 	visible = sun > 0.02
@@ -43,7 +50,7 @@ func _process(delta: float) -> void:
 	_drift += WIND * delta
 	_mat.set_shader_parameter("drift", _drift)
 	_mat.set_shader_parameter("coverage", clampf(clouds, 0.0, 0.75))
-	_mat.set_shader_parameter("strength", STRENGTH * clampf(sun, 0.0, 1.0))
+	_mat.set_shader_parameter("strength", strength * clampf(sun, 0.0, 1.0))
 	var size := get_viewport_rect().size
 	var camera := get_viewport().get_camera_2d()
 	var center := size / 2.0

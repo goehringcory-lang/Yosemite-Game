@@ -84,6 +84,8 @@ func _process(_delta: float) -> void:
 	_mat.set_shader_parameter("season_amount", float(season_amount) if season_amount != null else 0.0)
 	_mat.set_shader_parameter("season_desaturate", float(season_desat) if season_desat != null else 0.0)
 	_mat.set_shader_parameter("snow", float(snow) if snow != null else 0.0)
+	var flow: Variant = grade.get_shader_parameter("flow") if grade else null
+	_mat.set_shader_parameter("river_runs", flow is Vector2 and flow != Vector2.ZERO)
 	var xf := get_viewport().get_canvas_transform()
 	var scale_k := xf.get_scale()
 	var size := get_viewport_rect().size / scale_k

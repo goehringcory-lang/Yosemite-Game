@@ -85,6 +85,8 @@ func _ready() -> void:
 			(ground.material as ShaderMaterial).shader = GROUND_SHADER
 			# a region whose painted river runs (see the shader)
 			(ground.material as ShaderMaterial).set_shader_parameter("flow", region.get_meta("water_flow", Vector2.ZERO))
+			if region is Region:
+				RiverFlow.apply(ground.material as ShaderMaterial, (region as Region).region_id)
 			# and the rest shimmer (STILL_WATER keeps theirs as painted)
 			var still: bool = region is Region and (region as Region).region_id in STILL_WATER
 			(ground.material as ShaderMaterial).set_shader_parameter("water_shimmer", 0.0 if still else 1.0)

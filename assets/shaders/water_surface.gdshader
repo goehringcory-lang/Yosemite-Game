@@ -44,6 +44,8 @@ uniform vec3 season_tint : source_color = vec3(1.0);
 uniform float season_amount : hint_range(0.0, 1.0) = 0.0;
 uniform float season_desaturate : hint_range(0.0, 1.0) = 0.0;
 uniform float snow : hint_range(0.0, 1.0) = 0.0;
+// The ground draws a running river over its painted water (its "flow").
+uniform bool river_runs = false;
 
 varying vec2 world_pos;
 
@@ -112,7 +114,9 @@ void fragment() {
 	vec2 wp = ap * 2.0 + 1.0;
 	vec4 g = ground_at(wp);
 	vec3 here = untint(screen_at(wp));
-	bool open = g.a > 0.5 && waterness(g.rgb) > 0.5 && distance(here, g.rgb) < 0.2;
+	// a running river (river_flow.gdshaderinc) redraws its painted water in
+	// other blues, so there any water still showing counts
+	bool open = g.a > 0.5 && waterness(g.rgb) > 0.5 && (distance(here, g.rgb) < 0.2 || (river_runs && waterness(here) > 0.5));
 	if (!open) {
 		COLOR = vec4(0.0);
 	} else {

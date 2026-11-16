@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/hiker_postcard.png" id="1_icon"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[resource]
+script = ExtResource("2_item")
+id = "hiker_postcard"
+display_name = "Switchback's Postcard"
+description = "A postcard of Lembert Dome, addressed to Switchback's mother. \"Dear Mom. Got the box. Got lost. Got found. Love, S.\" It needs a stamp and a Tuolumne postmark."
+icon = ExtResource("1_icon")

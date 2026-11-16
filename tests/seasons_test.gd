@@ -45,6 +45,7 @@ func _ready() -> void:
 	await test_mirror_lake()
 	await test_horsetail()
 	await test_rainbow_and_water()
+	await test_running_river()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
 
@@ -288,3 +289,36 @@ func test_rainbow_and_water() -> void:
 				and is_equal_approx(float(shader.get_shader_parameter("season_amount")), float(grade.get_shader_parameter("tint_amount"))),
 				"and it knows the season's grade on the ground, so it mirrors what stands on the bank and not the bank")
 		check(shader.shader.code.contains("void light()"), "and no lamp or sun is added to it a second time")
+
+
+## Tuolumne's river runs (assets/shaders/river_flow.gdshaderinc): its ground
+## knows the flow, the forks and pond that run otherwise, and where the banks
+## lie; the Valley's ground has none of it.
+func test_running_river() -> void:
+	set_date(SUMMER, 10, 12)
+	world._enter_region("tuolumne_meadows", "meadow")
+	await get_tree().process_frame
+	var ground := WaterSurface._find_ground(world.region)
+	var mat := (ground.material as ShaderMaterial) if ground else null
+	check(mat != null and mat.get_shader_parameter("flow") != Vector2.ZERO, "the Tuolumne runs")
+	if mat == null:
+		return
+	var zones: PackedVector4Array = mat.get_shader_parameter("flow_zone")
+	var dirs: PackedVector4Array = mat.get_shader_parameter("flow_zone_dir")
+	var box: Vector4 = mat.get_shader_parameter("river_box")
+	check(zones.size() == 4 and dirs.size() == 4 and zones[0].z > 0.0, "its forks and pond have their own flow")
+	var still := false
+	var rough := false
+	for i in zones.size():
+		if zones[i].z > 0.0 and dirs[i] == Vector4.ZERO:
+			still = true
+		if dirs[i].z > 0.0:
+			rough = true
+	check(still and rough, "a still pond, and white water where the forks meet")
+	check(box.z > 0.0 and box.w > 0.0, "and it knows where the banks lie")
+	check(mat.shader.code.contains("river_flow.gdshaderinc"), "the ground draws the river")
+	for node in world.get_children():
+		if node is WaterSurface:
+			await get_tree().process_frame
+			check(bool((node as WaterSurface).material.get_shader_parameter("river_runs")), "and the water's surface knows it runs, so it still mirrors the banks")
+

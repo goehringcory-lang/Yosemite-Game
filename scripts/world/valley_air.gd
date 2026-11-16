@@ -38,7 +38,8 @@ func _process(delta: float) -> void:
 	var mist := 0.0
 	var rays := 0.0
 	if region and not region.indoors:
-		mist = mist_now() * (1.0 if _damp(region.region_id) else 0.6)
+		var high := HighCountry.is_high(region.region_id)
+		mist = mist_now(high) * (1.0 if _damp(region.region_id) else 0.6)
 		var weather := Weather.today()
 		rays = Sun.golden() * (1.0 - smoothstep(0.6, 0.9, weather.clouds))
 	visible = mist > 0.01 or rays > 0.01
@@ -52,8 +53,11 @@ func _process(delta: float) -> void:
 	_mat.set_shader_parameter("mist", mist)
 	_mat.set_shader_parameter("rays", rays)
 	_mat.set_shader_parameter("ray_dir", Vector2(away.x, away.y * 0.62 + 0.25))
-	# Mist catches the colour of the low sun.
-	_mat.set_shader_parameter("mist_color", Color(0.86, 0.9, 0.97).lerp(Color(1.0, 0.88, 0.78), Sun.golden() * 0.6))
+	# Mist catches the colour of the low sun. Up in the high country the dawn
+	# is colder: the mist is whiter and bluer and the sun warms it less.
+	var high_air := region != null and HighCountry.is_high(region.region_id)
+	var cold := Color(0.9, 0.94, 1.0) if high_air else Color(0.86, 0.9, 0.97)
+	_mat.set_shader_parameter("mist_color", cold.lerp(Color(1.0, 0.88, 0.78), Sun.golden() * (0.4 if high_air else 0.6)))
 	var size := get_viewport_rect().size
 	var camera := get_viewport().get_camera_2d()
 	var center := size / 2.0
@@ -71,7 +75,9 @@ func _draw() -> void:
 
 
 ## How thick the morning mist is right now, before the place is counted (0..1).
-static func mist_now() -> float:
+## [param high]: in the high country, where cold air pools on the meadows on
+## summer nights too (HighCountry.MIST_CHANCE).
+static func mist_now(high := false) -> float:
 	var season := clampi(GameClock.season, 0, 3)
 	var weather := Weather.today()
 	if weather.snow > 0.0:
@@ -79,7 +85,8 @@ static func mist_now() -> float:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("mist:%d:%d:%d" % [GameClock.year, season, GameClock.day])
 	var thick: float = MIST_THICKNESS[season] * rng.randf_range(0.6, 1.0)
-	var misty: bool = rng.randf() < MIST_CHANCE[season]
+	var chance: float = HighCountry.MIST_CHANCE[season] if high else MIST_CHANCE[season]
+	var misty: bool = rng.randf() < chance
 	# The ground is wet after rain, and the mist comes up thick the next morning.
 	var yesterday: Dictionary = Weather.on_day(GameClock.year, season, GameClock.day - 1) if GameClock.day > 1 else {}
 	if yesterday.get("rain", 0.0) > 0.0:

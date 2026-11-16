@@ -1,0 +1,75 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/staff/michael_kochakji.tres" id="2_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/crates.png" id="3_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interiors/props/postcards.png" id="4_r"]
+[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="5_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/info_sign.png" id="6_r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_crates"]
+size = Vector2(60, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cards"]
+size = Vector2(20, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sign"]
+size = Vector2(24, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_signhit"]
+size = Vector2(36, 28)
+
+[node name="TuolumneStoreStory" type="Node2D"]
+
+[node name="PostOfficeBoxes" type="StaticBody2D" parent="."]
+position = Vector2(92, 190)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="PostOfficeBoxes"]
+texture = ExtResource("3_r")
+offset = Vector2(0, -30)
+
+[node name="Collision" type="CollisionShape2D" parent="PostOfficeBoxes"]
+position = Vector2(0, -8)
+shape = SubResource("RectangleShape2D_crates")
+
+[node name="MichaelKochakji" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "door"
+offset = Vector2(-310, -306)
+
+[node name="PostcardRack" type="StaticBody2D" parent="."]
+position = Vector2(244, 186)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="PostcardRack"]
+texture = ExtResource("4_r")
+offset = Vector2(0, -40)
+
+[node name="Collision" type="CollisionShape2D" parent="PostcardRack"]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_cards")
+
+[node name="PostOfficeSign" type="StaticBody2D" parent="."]
+position = Vector2(300, 186)
+collision_mask = 0
+script = ExtResource("5_r")
+title = "Tuolumne Meadows Post Office"
+text = "A post office in the corner of a store, open while the Tioga Road is. Pacific Crest Trail and John Muir Trail hikers mail themselves food here, General Delivery, Tuolumne Meadows, CA 95389, and pick it up on the way through. Boxes are held for thirty days."
+
+[node name="Sprite" type="Sprite2D" parent="PostOfficeSign"]
+texture = ExtResource("6_r")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="PostOfficeSign"]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_sign")
+
+[node name="Hitbox" type="Area2D" parent="PostOfficeSign"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="PostOfficeSign/Hitbox"]
+position = Vector2(0, -14)
+shape = SubResource("RectangleShape2D_signhit")

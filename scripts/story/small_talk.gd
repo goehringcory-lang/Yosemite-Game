@@ -461,6 +461,23 @@ const LINES := {
 		},
 		"loved": "That's going straight in my pack. Thanks!",
 	},
+	"michael_kochakji": {
+		"spring": "Spring's for sorting. Boxes start arriving in May, and the hikers won't be here till July.",
+		"summer": "Summer's the rush. Forty boxes a day some weeks, and every one of them has somebody hungry walking toward it.",
+		"fall": "Fall's the stragglers. Southbound hikers racing the snow, and the last boxes nobody came for.",
+		"winter": "Winter? The store's packed up and the road's shut. I sort mail down in the Valley and dream about this counter.",
+		"rain": "Afternoon thunderstorm. Every hiker in the meadow is about to come in here to stand under the canvas.",
+		"snow": "Snow in the meadow. Any box still on that wall now, I'm sending home with a note.",
+		"morning": "Morning. Mail truck's due at ten. Till then it's just me, the coffee and the boxes.",
+		"evening": "Closing up. I count the boxes on the wall every night. I like to know who's still out there.",
+		"friend": "You're one of the regulars now. I don't even ask for your name at the window any more.",
+		"close": "I hand people the food that gets them to Canada. But you're the one who walked it out to somebody. I won't forget that.",
+		"news": {
+			"climb": "Word at the grill is you sent %s. I'd put it on a postcard, if I were you.",
+			"rescue": "Heard about %s. The hikers have been talking about it all day.",
+		},
+		"loved": "Oh, now that's a care package. Usually it's me handing them out!",
+	},
 }
 
 

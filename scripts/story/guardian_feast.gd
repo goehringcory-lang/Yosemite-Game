@@ -44,13 +44,14 @@ const LINES := [
 	["greg", "Your fish board's coming along. Next season we'll fill it."],
 	["jo_tolliver", "Everybody gets found. The Guardian too. Eat something, you look like you walked the whole park."],
 	["mateo_reyes", "I brought the first-aid kit to a supper. Old habit. Pass me a roll."],
+	["michael_kochakji", "I closed the post office early for this. First time in nine summers. The boxes can wait."],
 ]
 ## The ring of guests round the campfire (offsets from the fire).
 const SEATS := [
 	Vector2(-64, -40), Vector2(-20, -60), Vector2(28, -58), Vector2(70, -36), Vector2(84, 6), Vector2(70, 46),
 	Vector2(30, 66), Vector2(-14, 70), Vector2(-60, 54), Vector2(-88, 14), Vector2(-112, -32), Vector2(-68, -84),
 	Vector2(-14, -100), Vector2(44, -96), Vector2(102, -70), Vector2(128, -18), Vector2(126, 40), Vector2(96, 92),
-	Vector2(40, 108), Vector2(-24, 112), Vector2(-86, 98), Vector2(-130, 60), Vector2(-150, 4),
+	Vector2(40, 108), Vector2(-24, 112), Vector2(-86, 98), Vector2(-130, 60), Vector2(-150, 4), Vector2(-138, -66),
 ]
 const FIRE := Vector2(420, 400)
 
