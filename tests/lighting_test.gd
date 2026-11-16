@@ -38,6 +38,7 @@ func _ready() -> void:
 	test_sun_path()
 	test_gradient()
 	test_mist()
+	test_high_country_air()
 	world = load("res://scenes/world/world.tscn").instantiate()
 	get_tree().root.add_child(world)
 	await get_tree().process_frame
@@ -46,6 +47,7 @@ func _ready() -> void:
 	await test_lamps()
 	await test_lit_sprites()
 	await test_lit_park()
+	await test_high_country_grade()
 	test_fire_outshines_lamps()
 	await test_indoors()
 	await test_room_windows()
@@ -122,6 +124,49 @@ func test_mist() -> void:
 			check(false, "the mist has burned off by 1 PM (fall day %d)" % d)
 			return
 	check(seen >= 6, "mist lies on many fall mornings (%d of 28)" % seen)
+
+
+## Tuolumne's thin air: mist on more summer mornings than in the Valley,
+## afternoon clouds that build to the storm the climbs warn of, then clear.
+func test_high_country_air() -> void:
+	var high := 0
+	var low := 0
+	var storms := 0
+	for d in range(1, 29):
+		set_date(SUMMER, d)
+		var t := Sun.times()
+		GameClock.minutes = int((t.x + 0.3) * 60.0)
+		if ValleyAir.mist_now(true) > 0.0:
+			high += 1
+		if ValleyAir.mist_now() > 0.0:
+			low += 1
+		var storm := HighCountry.storm_hour()
+		if storm < 0.0:
+			continue
+		storms += 1
+		if HighCountry.cloud_build(storm - 0.25) < 0.9 or HighCountry.cloud_build(9.0) > 0.0 or HighCountry.cloud_build(storm + 3.5) > 0.5:
+			check(false, "the clouds build to the %.1f storm and clear after (summer day %d)" % [storm, d])
+			return
+		if HighCountry.storm_gloom(storm) < 0.99 or HighCountry.storm_gloom(storm - 2.0) > 0.0:
+			check(false, "the light dims only as the storm breaks (summer day %d)" % d)
+			return
+	check(high > low, "mist lies on more summer mornings at Tuolumne than in the Valley (%d vs %d)" % [high, low])
+	check(storms > 10, "most summer afternoons storm in the high country (%d of 28)" % storms)
+	set_date(SUMMER, 14, 12)
+
+
+## Tuolumne gets the outdoor grade with its own high-country air.
+func test_high_country_grade() -> void:
+	set_date(SUMMER, 14, 12)
+	var atmosphere := world.get_node("Atmosphere") as CanvasLayer
+	var mat := (atmosphere.get_child(0) as ColorRect).material as ShaderMaterial
+	await world.go_to_region("tuolumne_meadows", "")
+	await _frames(2)
+	check(atmosphere.visible, "Tuolumne gets the outdoor light grade")
+	check(float(mat.get_shader_parameter("alpine")) == 1.0, "...with its high-country air")
+	await world.go_to_region("wawona", "")
+	await _frames(2)
+	check(atmosphere.visible and float(mat.get_shader_parameter("alpine")) == 0.0, "Wawona keeps the valley air")
 
 
 func test_shadows() -> void:

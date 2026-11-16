@@ -6,9 +6,11 @@ extends CanvasLayer
 ## only lamplight keeps its colour, and a haze in the summer heat and the fall
 ## smoke. Off indoors, where each room is painted with its own light, and in
 ## the regions listed in SKIP. It sits just above the world and below every
-## menu.
+## menu. The high country (HighCountry) gets its own air: clear and nearly
+## haze-free, blue in the shade, alpenglow strong on the domes, the light
+## dimming under the afternoon storm, and darker, bluer nights.
 
-const SKIP := ["tuolumne_meadows"]
+const SKIP: Array[String] = []
 ## How hazy the air gets in each season, at its haziest (afternoon), before
 ## the day's own roll: summer heat, and the smoke of fall's fires.
 const SEASON_HAZE := [0.12, 0.35, 0.5, 0.04]
@@ -16,6 +18,7 @@ const SEASON_HAZE := [0.12, 0.35, 0.5, 0.04]
 var _rect: ColorRect
 var _mat: ShaderMaterial
 var _tint: CanvasModulate
+var _high := false
 
 
 func _ready() -> void:
@@ -36,6 +39,8 @@ func _ready() -> void:
 
 func _on_region_changed(region: Region) -> void:
 	visible = not region.indoors and region.region_id not in SKIP
+	_high = HighCountry.is_high(region.region_id)
+	_mat.set_shader_parameter("alpine", 1.0 if _high else 0.0)
 
 
 func _process(_delta: float) -> void:
@@ -43,6 +48,11 @@ func _process(_delta: float) -> void:
 		return
 	var weather := Weather.today()
 	var clear: float = 1.0 - weather.clouds * 0.75
+	var gloom := 0.0
+	if _high:
+		gloom = HighCountry.storm_gloom() * (1.0 - Sun.night())
+		clear *= 1.0 - gloom * 0.85
+	_mat.set_shader_parameter("gloom", gloom)
 	if _tint:
 		_mat.set_shader_parameter("tint", _tint.color)
 	_mat.set_shader_parameter("golden", Sun.golden() * clear)
@@ -50,7 +60,10 @@ func _process(_delta: float) -> void:
 	var night := Sun.night()
 	_mat.set_shader_parameter("night", night)
 	_mat.set_shader_parameter("moon_color", Color(0.5, 0.6, 1.0).lerp(Color(0.72, 0.8, 1.0), Sun.moon()))
-	_mat.set_shader_parameter("haze", haze() * (1.0 - night))
+	var air := haze()
+	if _high:
+		air *= HighCountry.HAZE[clampi(GameClock.season, 0, 3)]
+	_mat.set_shader_parameter("haze", air * (1.0 - night))
 
 
 ## How hazy the valley air is now (0..1): a little each day by season, more
