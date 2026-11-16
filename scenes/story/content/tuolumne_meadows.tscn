@@ -8,6 +8,7 @@
 [ext_resource type="Resource" path="res://data/routes/lyell_glacier.tres" id="6_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_backpacker.tres" id="7_r"]
 [ext_resource type="Resource" path="res://data/characters/hikers/switchback.tres" id="8_r"]
+[ext_resource type="PackedScene" path="res://scenes/world/tuolumne_skyline.tscn" id="skyline_r"]
 
 [node name="TuolumneMeadowsStory" type="Node2D"]
 
@@ -42,3 +43,5 @@ spot = "lembert_dome"
 offset = Vector2(560, -360)
 wander_radius = 24
 only_on_step = "kochakji_general_delivery:0"
+
+[node name="TuolumneSkyline" parent="." instance=ExtResource("skyline_r")]

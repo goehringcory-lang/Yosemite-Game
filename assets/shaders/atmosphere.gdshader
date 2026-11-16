@@ -9,6 +9,10 @@ shader_type canvas_item;
 //  - at night the unlit world goes silver-blue (the eye loses colour in the
 //    dark), while lamplight keeps its warmth;
 //  - haze (summer heat, fall smoke) softens the blacks.
+// In the high country (alpine = 1, scripts/world/high_country.gd) the thin air
+// is clearer: colour a touch richer, shade lit by a deep blue sky, alpenglow
+// stronger on the domes, nights darker and bluer; and before the afternoon
+// storm (gloom) the light goes slate grey under the clouds.
 // It reads the screen pixel for pixel, so the art stays crisp. (The halos
 // round lamps and fires are NightLight's own.)
 
@@ -29,6 +33,8 @@ uniform float night : hint_range(0.0, 1.0) = 0.0;
 uniform vec3 moon_color : source_color = vec3(0.62, 0.72, 1.0);
 uniform float haze : hint_range(0.0, 1.0) = 0.0;
 uniform vec3 haze_color : source_color = vec3(0.78, 0.82, 0.9);
+uniform float alpine : hint_range(0.0, 1.0) = 0.0;
+uniform float gloom : hint_range(0.0, 1.0) = 0.0;
 
 float luma(vec3 c) {
 	return dot(c, vec3(0.299, 0.587, 0.114));
@@ -63,14 +69,30 @@ void fragment() {
 	vec3 sky_lit = base * tint_lum * vec3(0.88, 0.95, 1.16);
 	g = mix(g, mix(sky_lit, sky_lit * sky_lit * (3.0 - 2.0 * sky_lit), 0.18), warmth * shade * low_sun * (1.0 - lit));
 
+	// High country by day: clear air, so colour is a touch richer, and the
+	// shade (lit by the deep blue sky overhead, not the sun) leans blue.
+	float day = 1.0 - night;
+	float al = luma(g);
+	g = mix(g, mix(vec3(al), g, 1.1), alpine * day * (1.0 - gloom));
+	float shadow = 1.0 - smoothstep(0.1, 0.42, base_lum);
+	g = mix(g, g * vec3(0.88, 0.95, 1.14), alpine * shadow * day * 0.4 * (1.0 - lit));
+
 	// Alpenglow on pale, colourless things: granite, snow, pale sand.
 	float rock = smoothstep(0.4, 0.62, base_lum) * (1.0 - smoothstep(0.1, 0.24, base_sat));
-	g = mix(g, g * alpen_color * 1.4, rock * alpenglow * 0.62);
+	g = mix(g, g * alpen_color * 1.4, rock * alpenglow * (0.62 + alpine * 0.2));
 
-	// Night: colour drains from what the lamps don't reach.
+	// Storm light: under the thunderheads the colour goes out of the meadow
+	// and the light turns slate.
+	float sl = luma(g);
+	g = mix(g, vec3(sl) * vec3(0.82, 0.88, 0.97), gloom * 0.38 * (1.0 - lit));
+	g *= 1.0 - gloom * 0.1 * (1.0 - lit);
+
+	// Night: colour drains from what the lamps don't reach. Up high the
+	// starlight is darker and bluer, with no valley haze to lift it.
 	float nl = luma(g);
-	vec3 moonlit = vec3(nl) * moon_color * 1.08 + vec3(0.012, 0.016, 0.03);
-	g = mix(g, moonlit, night * 0.55 * (1.0 - lit));
+	vec3 moon = moon_color * mix(vec3(1.0), vec3(0.88, 0.95, 1.12), alpine);
+	vec3 moonlit = vec3(nl) * moon * (1.08 - alpine * 0.14) + vec3(0.012, 0.016, 0.03);
+	g = mix(g, moonlit, night * (0.55 + alpine * 0.15) * (1.0 - lit));
 
 	// Haze: the blacks lift toward the colour of the air.
 	g = mix(g, max(g, haze_color * 0.32), haze * 0.5);
