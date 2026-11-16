@@ -7,6 +7,7 @@
 [ext_resource type="Resource" path="res://data/characters/carrie_bethel.tres" id="5_r"]
 [ext_resource type="Resource" path="res://data/routes/lyell_glacier.tres" id="6_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_backpacker.tres" id="7_r"]
+[ext_resource type="Resource" path="res://data/characters/hikers/switchback.tres" id="8_r"]
 
 [node name="TuolumneMeadowsStory" type="Node2D"]
 
@@ -34,3 +35,10 @@ character = ExtResource("7_r")
 spot = "arrival"
 offset = Vector2(80, 0)
 wander_radius = 96
+
+[node name="Switchback" parent="." instance=ExtResource("1_r")]
+character = ExtResource("8_r")
+spot = "lembert_dome"
+offset = Vector2(560, -360)
+wander_radius = 24
+only_on_step = "kochakji_general_delivery:0"

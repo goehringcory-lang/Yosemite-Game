@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/resupply_box.png" id="1_icon"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[resource]
+script = ExtResource("2_item")
+id = "resupply_box"
+display_name = "Resupply Box"
+description = "A taped-up cardboard box: \"SWITCHBACK, c/o General Delivery, Tuolumne Meadows, CA 95389. PCT HIKER, PLEASE HOLD.\" Her mother wrote PLEASE HOLD three times. It's heavy, and it smells of cookies."
+icon = ExtResource("1_icon")

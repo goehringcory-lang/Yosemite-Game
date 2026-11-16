@@ -74,7 +74,7 @@ func _new_game() -> void:
 
 func _people() -> Array[String]:
 	var ids: Array[String] = []
-	for c: CharacterData in QuestLog.CHARACTERS + QuestLog.STAFF:
+	for c: CharacterData in QuestLog.CHARACTERS + QuestLog.STAFF + QuestLog.ONE_OFF:
 		ids.append(c.id)
 	for shop in shops:
 		if shop.talk_target != "" and not shop.talk_target in ids:

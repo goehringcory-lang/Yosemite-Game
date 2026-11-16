@@ -39,6 +39,7 @@ const GATHERING := [
 	["greg", "Two clean stops, every time. I could tell from your first back cast."],
 	["jo_tolliver", "Everybody gets found. I told you. Even the Guardian."],
 	["mateo_reyes", "I brought a litter, just in case. Old habit."],
+	["michael_kochakji", "Somebody's always looking for somebody. I just never thought it'd be the whole park."],
 	["", "[Placeholder pending tribal review: what Tenaya, Tabuce, Lucy Telles, Maria Lebrado and Carrie Bethel say here, and whether they are part of this scene.]"],
 	["galen_clark", "Every one of us kept this valley for a while, and every one of us was afraid there'd be nobody after. We were all looking for the Guardian, and the whole time you were the one doing the looking."],
 	["galen_clark", "You had to do all of it to find this out. The quests were never a test. They were the work, and the work is what a Guardian is."],

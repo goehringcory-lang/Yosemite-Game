@@ -99,7 +99,8 @@ func _check_quest_references() -> void:
 		for s: Dictionary in quest.steps:
 			match s.type:
 				"talk":
-					if QuestLog.get_character(s.target) == null and not _shop_targets().has(s.target):
+					if QuestLog.get_character(s.target) == null and not _shop_targets().has(s.target) \
+							and not QuestLog.ONE_OFF.any(func(c: CharacterData) -> bool: return c.id == s.target):
 						problems.append("talk " + s.target)
 				"have":
 					if ItemDB.get_item(s.item) == null or not obtainable.has(s.item):
@@ -139,6 +140,12 @@ func _obtainable_items() -> Dictionary:
 	for quest: QuestData in QuestLog.QUESTS:
 		for id in quest.reward_items:
 			result[id] = true
+		# handed over when it starts, or by someone along the way
+		for id in quest.start_items:
+			result[id] = true
+		for s: Dictionary in quest.steps:
+			for id in s.get("items", {}):
+				result[id] = true
 	# fish you keep, caught on a fly rod
 	for fish: Dictionary in Fishing.FISH:
 		if fish.keep != "":

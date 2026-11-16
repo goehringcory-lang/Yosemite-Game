@@ -39,6 +39,8 @@ extends Resource
 ##   "unlock": ability id (for example "guidebook")
 ##   "gear":   gear id -> count
 ##   "items":  item id -> count
+## and take something back the moment it's done:
+##   "take":   item id -> count (a parcel you carried to someone, handed over)
 ## Main-line quests (see [member main_line]) end on a "climbed" step, so they
 ## finish only after the route is ticked in the guidebook.
 
@@ -78,6 +80,9 @@ extends Resource
 ## Abilities handed over the moment the quest starts, such as the plant
 ## press that Enid Michael's first quest is about.
 @export var start_unlocks: PackedStringArray
+## Items handed over the moment the quest starts (item id -> count), such as
+## the parcel Michael Kochakji asks you to carry out to a lost hiker.
+@export var start_items: Dictionary = {}
 @export var steps: Array = []
 @export var outro: PackedStringArray
 

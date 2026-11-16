@@ -599,6 +599,12 @@ The jacket's name is the one `display_name` in `data/gear/puffy_jacket.tres` (pl
 ![Cold in the Village without a jacket](docs/puffy_cold.png)
 ![The mended puffy, handed over](docs/puffy_received.png)
 
+**A box for a lost hiker.** In the corner of the Tuolumne Meadows Store is the little summer post office (`scenes/story/content/tuolumne_store.tscn`: a stack of parcels, a postcard rack and a sign), kept by **Michael Kochakji**, invented staff like the Mountain Shop's (`data/characters/staff/michael_kochakji.tres`, with everyday talk, two heart scenes, gifts he loves and a line at the Guardian's supper). Once Tuolumne is open he offers **General Delivery** in summer and fall (`data/quests/kochakji_general_delivery.tres`): a Pacific Crest Trail hiker who goes by Switchback never came for the food she mailed herself, and someone at the grill saw her past Lembert Dome, lost on the Dog Lake trail. He hands you her resupply box as the quest starts (`QuestData.start_items`); Switchback (`data/characters/hikers/switchback.tres`) stands by Dog Lake only while the box is on its way (`only_on_step`), takes it (a step's `"take"`) and gives you a postcard home, and Michael postmarks it and lets you pick through the hiker box (trail mix, chocolate and pilot bread). She's met once, so she isn't in the cast and keeps no hearts. The box and postcard icons are drawn by `tools/npcgen/post_icons.gd`; screenshots by `tools/shots/postman_shot.tscn`.
+
+![Michael Kochakji at the Tuolumne post office](docs/postman_ask.png)
+![Switchback, lost by Dog Lake, gets her box](docs/postman_found.png)
+![The postcard home, postmarked](docs/postman_postcard.png)
+
 **Living water and sky.** The painted rivers, creeks and lakes move and mirror the world around them, and the night sky on the climbing screens is a real Sierra sky:
 
 - **Reflections.** `scripts/world/water_surface.gd` (with `assets/shaders/water_surface.gdshader`) draws one view-sized rectangle just under the cloud shadows that reads the screen. The region's painted ground says where the water is, and a pixel only counts as water while the screen still shows that water, so people, boulders and anything else in front of it are left alone. Below each bank it mirrors whatever stands there (cattails, trees, rocks, people), pulled side to side by ripples and broken into rows, fading out a few dozen pixels from shore. The flat bank itself is not mirrored: the shader grades the painted ground as the season does (`seasonal_ground`'s tint, with lying snow) and leaves out what still matches it, since mirrored grass and sand washed the water pale. Its `light()` adds nothing, because the colours it reads from the screen are already lit; on High the lamps and the sun were being added a second time, which bleached the water in tile-edged patches. Open water takes the sky's colour from `ClimbSky.palette` (blue by day, purple and gold at dusk, with sun glints in the sun's colour), dulls on overcast days, and on clear nights holds twinkling stars. It works in art pixels (2 world pixels) so it stays crisp, and is off indoors.
@@ -984,6 +990,7 @@ godot --headless --path . res://tests/wildlife_test.tscn   # squirrels, peregrin
 godot --headless --path . res://tests/fishing_test.tscn   # the cast meter, the flies, and Greg's quest and trades
 godot --headless --path . res://tests/seasons_test.tscn   # snow on the ground, the falls and Mirror Lake drying, Horsetail Fall
 godot --headless --path . res://tests/puffy_test.tscn   # Marty's down jacket quest, the winter cold, and warmth on the wall
+godot --headless --path . res://tests/postman_test.tscn # Michael Kochakji's General Delivery quest and the lost PCT hiker
 godot --headless --path . res://tests/lighting_test.tscn   # the seasonal sun, cast shadows, lamps, the lantern, morning mist
 godot --headless --path . res://tests/rescue_test.tscn   # search and rescue: Jo, the calls, prints, carrying, the lower
 godot --headless --path . res://tests/playthrough_test.tscn   # a bot plays every quest from a new game to the Guardian's Year
