@@ -1,0 +1,54 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/seasonal_backdrop.gd" id="1_sky"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tuolumne/skyline_summer.png" id="2_sky"]
+[ext_resource type="Script" path="res://scripts/world/landmark_view.gd" id="3_view"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tuolumne/unicorn_peak.png" id="4_uni"]
+[ext_resource type="Shader" path="res://assets/shaders/backdrop_unlit.gdshader" id="5_unlit"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_unlit"]
+shader = ExtResource("5_unlit")
+
+[node name="TuolumneSkyline" type="Node2D"]
+y_sort_enabled = true
+
+[node name="HighSierraBackdrop" type="Sprite2D" parent="."]
+z_index = -9
+position = Vector2(0, -344)
+texture = ExtResource("2_sky")
+centered = false
+material = SubResource("ShaderMaterial_unlit")
+script = ExtResource("1_sky")
+summer = "res://assets/sprites/tuolumne/skyline_summer.png"
+winter = "res://assets/sprites/tuolumne/skyline_winter.png"
+
+[node name="HighSierraView" type="Node2D" parent="."]
+script = ExtResource("3_view")
+area = Rect2(0, 0, 4480, 520)
+top = -300.0
+feather = 200.0
+landmark = "high_sierra"
+
+[node name="LembertDomeView" type="Node2D" parent="."]
+script = ExtResource("3_view")
+area = Rect2(3080, 560, 1040, 360)
+top = 150.0
+landmark = "lembert_dome"
+
+[node name="CathedralPeakView" type="Node2D" parent="."]
+script = ExtResource("3_view")
+area = Rect2(360, 2400, 760, 352)
+top = 2120.0
+margin = 48.0
+landmark = "cathedral_peak"
+
+[node name="UnicornPeak" type="StaticBody2D" parent="."]
+position = Vector2(900, 2400)
+collision_mask = 0
+
+[node name="Sprite" type="Sprite2D" parent="UnicornPeak"]
+texture = ExtResource("4_uni")
+offset = Vector2(0, -124)
+
+[node name="Collision" type="CollisionPolygon2D" parent="UnicornPeak"]
+polygon = PackedVector2Array(-175, -2, 176, -2, 176, -150, 60, -150, -160, -60)

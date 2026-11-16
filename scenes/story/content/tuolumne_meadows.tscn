@@ -7,6 +7,7 @@
 [ext_resource type="Resource" path="res://data/characters/carrie_bethel.tres" id="5_r"]
 [ext_resource type="Resource" path="res://data/routes/lyell_glacier.tres" id="6_r"]
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_backpacker.tres" id="7_r"]
+[ext_resource type="PackedScene" path="res://scenes/world/tuolumne_skyline.tscn" id="skyline_r"]
 
 [node name="TuolumneMeadowsStory" type="Node2D"]
 
@@ -34,3 +35,5 @@ character = ExtResource("7_r")
 spot = "arrival"
 offset = Vector2(80, 0)
 wander_radius = 96
+
+[node name="TuolumneSkyline" parent="." instance=ExtResource("skyline_r")]
