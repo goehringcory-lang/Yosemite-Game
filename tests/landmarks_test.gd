@@ -3,7 +3,8 @@ extends Node
 ## Capitan the screen reaches the rim (so the Nose and Horsetail Fall are in
 ## view) with the player still on screen, out in the meadow it doesn't tilt,
 ## and rooms never tilt. Also checks the Yosemite Falls backdrop above the
-## Village and the views placed by story overlays.
+## Village, the High Sierra skyline above Tuolumne Meadows (and its winter
+## snow), Unicorn Peak, and the views placed by story overlays.
 ## Run: godot --headless --path . res://tests/landmarks_test.tscn
 ## Exit code is the number of failed checks. Uses its own save file.
 
@@ -26,6 +27,7 @@ func _ready() -> void:
 	GameClock.paused = true
 	await test_el_capitan(world)
 	await test_yosemite_falls(world)
+	await test_tuolumne(world)
 	SaveManager.delete_save()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
@@ -92,3 +94,35 @@ func test_yosemite_falls(world: Node) -> void:
 		if child is SeasonalFalls:
 			falls = child
 	check(falls != null and upper in falls._falls, "Upper Yosemite Fall runs and dries with the Lower Fall")
+
+
+func test_tuolumne(world: Node) -> void:
+	GameClock.season = GameClock.Season.SUMMER
+	await world.go_to_region("tuolumne_meadows", "arrival")
+	var region: Node = world.region
+	var sky := region.find_child("HighSierraBackdrop", true, false) as SeasonalBackdrop
+	check(sky != null and sky.position.y < 0.0, "Tuolumne hangs the High Sierra skyline above the map")
+	if sky == null:
+		return
+	check(sky.texture != null and sky.texture.resource_path.ends_with("skyline_summer.png"), "in summer the far peaks wear their summer snow")
+	check(sky.texture.get_width() >= region.get_bounds().size.x, "the skyline spans the whole map")
+	var view: LandmarkView = null
+	for node in get_tree().get_nodes_in_group("landmark_views"):
+		if node is LandmarkView and node.landmark == "high_sierra" and region.is_ancestor_of(node):
+			view = node
+	check(view != null and view.top >= sky.position.y, "the view up at the skyline stays on the backdrop")
+	await _stand(world, Vector2(3900, 200))
+	check(_screen_top(world) < -200.0, "at the north edge the screen looks up at the peaks (top at %d)" % _screen_top(world))
+	if view:
+		check(_screen_top(world) >= view.top - 0.5, "the screen never goes above the skyline")
+	await _stand(world, Vector2(2400, 1500))
+	check(_screen_top(world) >= -0.5, "out in the meadow the camera doesn't look up")
+	GameClock.season = GameClock.Season.WINTER
+	sky._dress()
+	check(sky.texture.resource_path.ends_with("skyline_winter.png"), "in winter the peaks are deep in snow")
+	GameClock.season = GameClock.Season.SPRING
+	var unicorn := region.find_child("UnicornPeak", true, false) as Node2D
+	check(unicorn != null and unicorn.get_parent().get_parent() == region.entities, "Unicorn Peak stands among the meadow's things, sorted with them")
+	var cathedral := region.find_child("CathedralPeak", true, false) as Node2D
+	if unicorn and cathedral:
+		check(unicorn.global_position.y < cathedral.global_position.y, "Unicorn Peak stands behind Cathedral Peak")
