@@ -75,6 +75,7 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/anderson_cables.tres"),
 	preload("res://data/quests/ansel_diving_board.tres"),
 	preload("res://data/quests/muir_south_dome.tres"),
+	preload("res://data/quests/kochakji_general_delivery.tres"),
 	# The rest of Ansel's shot list (Photos), after his other stories.
 	preload("res://data/quests/ansel_exhibition.tres"),
 	# The press book (QuestData.press_line): plants for the naturalists and
@@ -129,7 +130,8 @@ const CHARACTERS: Array[CharacterData] = [
 ## Invented staff (CharacterData.staff): the Mountain Shop's two, the
 ## Ahwahnee's head chef, Greg, Curry Village's fishing guide, and Jo
 ## Tolliver, who runs the Camp 4 rescue site (Rescues), with Mateo Reyes,
-## who keeps its cache. They give quests (and Wren partners on climbs, and
+## who keeps its cache, and Michael Kochakji at the Tuolumne Meadows post
+## office. They give quests (and Wren partners on climbs, and
 ## Greg trades flies), but they aren't in the Register's cast above. The clerk's id is the shop's
 ## talk_target, so talking at the counter reaches them.
 const STAFF: Array[CharacterData] = [
@@ -139,6 +141,14 @@ const STAFF: Array[CharacterData] = [
 	preload("res://data/characters/staff/greg.tres"),
 	preload("res://data/characters/staff/jo_tolliver.tres"),
 	preload("res://data/characters/staff/mateo_reyes.tres"),
+	preload("res://data/characters/staff/michael_kochakji.tres"),
+]
+
+## People met once, on one quest (a "talk" step's target), like the lost Pacific
+## Crest Trail hiker Michael Kochakji sends you to. They aren't in the cast: no
+## hearts, no Register page, no everyday talk (get_character doesn't find them).
+const ONE_OFF: Array[CharacterData] = [
+	preload("res://data/characters/hikers/switchback.tres"),
 ]
 
 ## What the player can write on the Register's last page, after The Last Page.
@@ -708,6 +718,9 @@ func talk_to(character_id: String, speaker_name := "", places := PackedStringArr
 				if ability == Photos.ABILITY:
 					got += " Raise it with %s (RB on a gamepad), move the frame over what you want, and press the shutter." % Settings.key_label(Settings.key_for("camera"))
 				lines.append({"speaker": "", "text": got})
+		var handed := _give_step_rewards({"items": offer.start_items})
+		if handed != "":
+			lines.append({"speaker": "", "text": handed})
 		lines.append({"speaker": "", "text": "New quest: %s. %s" % [offer.title, current_step(offer).get("objective", "")]})
 		quest_started.emit(offer)
 		changed.emit()
@@ -765,10 +778,18 @@ func _advance(quest: QuestData, lines: Array[Dictionary]) -> void:
 	changed.emit()
 
 
-## Gifts a step hands over when it's done ("unlock", "gear", "items").
-## Returns a line describing them, or "".
+## Gifts a step hands over when it's done ("unlock", "gear", "items"), after
+## taking back what it asks for ("take"). Returns a line describing them, or "".
 func _give_step_rewards(step: Dictionary) -> String:
 	var got := PackedStringArray()
+	var gave := PackedStringArray()
+	var taken: Dictionary = step.get("take", {})
+	for id: String in taken:
+		var amount := mini(int(taken[id]), Inventory.count(id))
+		if amount > 0:
+			Inventory.remove(id, amount)
+			var item := ItemDB.get_item(id)
+			gave.append(ItemDB.count_name(amount, item.display_name if item else id))
 	var ability: String = step.get("unlock", "")
 	if ability != "" and not is_unlocked(ability):
 		unlocks.append(ability)
@@ -784,7 +805,10 @@ func _give_step_rewards(step: Dictionary) -> String:
 		Inventory.add(id, int(items[id]))
 		var item := ItemDB.get_item(id)
 		got.append(ItemDB.count_name(int(items[id]), item.display_name if item else id))
-	return "Received %s." % ", ".join(got) if not got.is_empty() else ""
+	var said := "You hand over %s." % ", ".join(gave) if not gave.is_empty() else ""
+	if not got.is_empty():
+		said += (" " if said != "" else "") + "Received %s." % ", ".join(got)
+	return said
 
 
 ## Hands out the rewards and returns a "Quest complete" line describing them.

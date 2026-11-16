@@ -615,7 +615,8 @@ func interact(player: Player) -> void:
 	if quest_marker:
 		quest_marker.hidden_while_talking = true
 		quest_marker.refresh()
-	if character and not character.visitor:
+	# someone met once on a quest (not in the cast) keeps no hearts
+	if character and not character.visitor and QuestLog.get_character(character.id):
 		Friendship.note_talk(character.id)
 	if character and not say_instead.is_empty():
 		var said: Array[Dictionary] = []
@@ -629,7 +630,10 @@ func interact(player: Player) -> void:
 		var lines := Festivals.talk_to(character.id)
 		lines.append_array(BoardRequests.deliver(character.id))
 		lines.append_array(Rescues.talk_to(character.id))
-		lines.append_array(QuestLog.talk_to(character.id, "", places()))
+		lines.append_array(QuestLog.talk_to(character.id, character.display_name, places()))
+		# someone met once on a quest, with no errand for you now, just chats
+		if lines.is_empty() and QuestLog.get_character(character.id) == null and not character.idle_lines.is_empty():
+			lines.append({"speaker": character.display_name, "text": character.idle_lines[_rng.randi() % character.idle_lines.size()]})
 		# with nothing else to say, a friend shares what they've been saving up
 		var scene := HeartScenes.ready_for(character.id) if lines.is_empty() else 0
 		var trading := shop != null and not Vendor.offers_open(shop).is_empty()
@@ -672,7 +676,8 @@ func places() -> PackedStringArray:
 
 ## True if this person keeps friendship hearts (visitors just pass through).
 func can_receive_gift() -> bool:
-	return character != null and not character.visitor and GiftGiving.possible(character.id)
+	return character != null and not character.visitor and QuestLog.get_character(character.id) != null \
+			and GiftGiving.possible(character.id)
 
 
 func receive_gift(player: Player) -> void:

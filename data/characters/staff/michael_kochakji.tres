@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/michael_kochakji.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "michael_kochakji"
+display_name = "Michael Kochakji"
+years = "1970s"
+affiliation = "Tuolumne Meadows Post Office"
+bio = "Runs the little summer post office in the corner of the Tuolumne Meadows Store, where Pacific Crest Trail and John Muir Trail hikers pick up the food they mailed to themselves. Knows every hiker by their trail name. An invented character, not a historical figure."
+idle_lines = PackedStringArray("Tuolumne Meadows, California, 95389. Best postmark in the Sierra. Ask anybody.", "Every box on that wall has a hungry person walking toward it. Some of them are still in Mexico.", "Stamps, postcards, general delivery. And directions. Mostly directions.", "Hikers write their trail names on the boxes. I've got a Moonpie, two Gandalfs and somebody called Soggy Biscuit.", "The mail truck comes up the Tioga Road once a day. If it's late, the whole meadow knows.")
+rare_lines = PackedStringArray("I walked the John Muir Trail once, the summer I turned twenty. Picked up my box at this very counter.", "Never left, really. I just moved to the other side of it.")
+rare_after_quest = "kochakji_general_delivery"
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.604, 0.722, 0.847, 1)
+home = "Tuolumne Meadows Store, at the post office counter"
+staff = true
+sources = "Invented for the game. The Tuolumne Meadows Post Office really is a small seasonal counter inside the Tuolumne Meadows Store, open while the Tioga Road is, and it holds General Delivery resupply boxes for Pacific Crest Trail and John Muir Trail hikers, who share the trail through Lyell Canyon."

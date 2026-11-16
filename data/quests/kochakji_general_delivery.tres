@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "kochakji_general_delivery"
+title = "General Delivery"
+giver = "michael_kochakji"
+requires = PackedStringArray("harding_summit")
+offered_in = 6
+out_of_season = PackedStringArray("The hikers don't come through till the snow's off the passes. Come and see me in the summer. That's when this counter earns its keep.")
+intro = PackedStringArray("You've got the look of somebody who walks a lot. Good. I need a favour, and I can't leave the counter.", "See that wall of boxes? Pacific Crest Trail hikers, walking Mexico to Canada. They mail themselves food, General Delivery, Tuolumne Meadows, and pick it up on the way through.", "This one's for a hiker who goes by Switchback. Her mother wrote PLEASE HOLD on it three times. She was due here last week.", "Fellow at the grill says he passed her up by Lembert Dome, turning her map round and round. The trail north goes down the river past Soda Springs, not up there. She's lost, and she's out of food.", "Take her the box, would you? She'll be easy to spot. Big green pack, and the look of somebody who's been eating dry noodles for two days.")
+start_items = {"resupply_box": 1}
+steps = [{"type": "talk", "target": "switchback", "objective": "Take Switchback her resupply box. She's lost somewhere past Lembert Dome, on the trail to Dog Lake", "reminder": "Up past Lembert Dome, on the Dog Lake trail. Look for a big green pack and somebody arguing with a map.", "done": ["Is that... my box? With my name on it? You carried it all the way up here?", "I took the trail by the dome thinking it was the PCT. It was not the PCT. Two days on dry ramen.", "Peanut butter, tortillas, my mom's oatmeal cookies... and clean socks! She sent clean socks!", "Okay. Down past Soda Springs, follow the river to Glen Aulin, then north. I've got it now.", "Would you take this to the post office for me? It's for my mom. It says I'm alive."], "take": {"resupply_box": 1}, "items": {"hiker_postcard": 1}}, {"type": "have", "item": "hiker_postcard", "count": 1, "consume": true, "objective": "Bring Switchback's postcard back to Michael Kochakji to mail", "reminder": "Did you find her? If she wrote anything home, bring it here. I've got the only postmark for forty miles.", "done": ["\"Dear Mom. Got the box. Got lost. Got found. Love, S.\" Ha! That's the whole Pacific Crest Trail on one postcard.", "One stamp, and a Tuolumne Meadows postmark. There. It goes down the Tioga Road on tomorrow's truck."]}]
+outro = PackedStringArray("Thru-hikers leave what they can't carry in the hiker box by the door: extra oatmeal, trail mix, more chocolate than they'll admit to. Help yourself. You've earned it.", "And if you ever walk to Canada, mail your boxes here. I'll hold them for you. PLEASE HOLD, three times.")
+reward_items = {"trail_mix": 3, "chocolate_bar": 2, "pilot_bread": 2}

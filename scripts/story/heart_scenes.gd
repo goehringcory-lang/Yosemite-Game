@@ -856,6 +856,42 @@ const SCENES := {
 			"saved": "Found this in the cache with your name on it. Weird, huh?",
 		},
 	},
+	"michael_kochakji": {
+		3: {
+			"lines": [
+				"Want to see something? This is the box that's been here longest. Mailed in June, to a hiker called Mosquito.",
+				"Thirty days and it goes back. But Mosquito's mother put a letter in with the food, I can feel it through the cardboard.",
+				"So I keep it a little longer every year. Nobody's ever told me not to.",
+			],
+			"ask": "Would you send it back?",
+			"options": ["Keep holding it", "Send it home", "Go and find them"],
+			"replies": [
+				"That's what I'll do, then. One more week. Every year, one more week.",
+				"You're right. Her mother should know it never got opened. That's news too.",
+				"Ha! Once was enough for you, was it? No. Maybe. I'll ask at the grill.",
+			],
+			"end": "Here. Out of the hiker box. Somebody left far too much of this behind.",
+			"gift": {"trail_mix": 2},
+		},
+		5: {
+			"lines": [
+				"I walked the John Muir Trail at twenty. Picked up my box at this counter, and the postmaster that summer was a woman called June.",
+				"She gave me a cup of coffee and asked where I was headed after. I said I didn't know. She said: well, I need help sorting.",
+				"That was a long time ago. I think about her every time somebody comes in lost and leaves knowing where they're going.",
+			],
+			"ask": "Will you ever walk it again?",
+			"options": ["You should go", "You're needed here", "Walk it with me"],
+			"replies": [
+				"Maybe I will. I'd have to mail my boxes to myself. I'd sort them very well.",
+				"That's what June said, too. I think she was right.",
+				"...You mean that. Then I'll put in for a week off next August. Somebody else can hold the boxes.",
+			],
+			"end": "From now on there'll be something in the hiker box set aside for you. Don't tell the hikers.",
+			"gift": {"chocolate_bar": 2},
+			"saves": ["trail_mix", "chocolate_bar", "pilot_bread"],
+			"saved": "Hiker box had a good week. I put these aside with your name on them.",
+		},
+	},
 }
 
 

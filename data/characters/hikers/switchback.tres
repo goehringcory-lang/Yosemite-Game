@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/switchback.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "switchback"
+display_name = "Switchback"
+years = "1970s"
+affiliation = "Pacific Crest Trail thru-hiker"
+bio = "A thru-hiker walking the Pacific Crest Trail from Mexico to Canada, known on the trail only by her trail name. She took a wrong turn by Lembert Dome. An invented character, not a historical figure."
+idle_lines = PackedStringArray("The map says north is that way. The sun says otherwise. I'm starting to side with the sun.", "Mexico was in April. Canada is... somewhere up there.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.878, 0.416, 0.227, 1)
+home = "Lost, somewhere past Lembert Dome"
+sources = "Invented for the game. Thru-hikers on the Pacific Crest Trail go by trail names and mail themselves boxes of food, General Delivery, to post offices along the way. Northbound from Tuolumne Meadows the trail runs down the Tuolumne River past Soda Springs to Glen Aulin; the trail up past Lembert Dome goes to Dog Lake instead."

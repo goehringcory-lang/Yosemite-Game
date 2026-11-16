@@ -259,6 +259,20 @@ const LOOKS := {
 		"top": "e8b820", "top_style": "shirt", "top2": "b88a10", "bottom": "6a5a42",
 		"shoes": "4a3020", "pack": "frame_pack", "pack_color": "3a5a8a", "carry": ["map"],
 	},
+	# ------------------------------------------------ Tuolumne Meadows post office (invented, not historical)
+	# The postmaster wears the post office's light blue shirt and a navy cap.
+	"michael_kochakji": {
+		"skin": SKIN_TAN, "hair": "2a1e18", "hair_style": "short", "beard": "mustache", "beard_color": "2a1e18",
+		"hat": "cap", "hat_color": "2a3a5a", "glasses": true,
+		"top": "9ab8d8", "top_style": "shirt", "top2": "6a88a8", "bottom": "2a3a5a", "belt": "2a1f1a",
+		"badge": true, "shoes": "2a1f1a", "carry": ["notebook"],
+	},
+	# A Pacific Crest Trail thru-hiker, lost on the way north (one quest).
+	"switchback": {
+		"skin": SKIN_FAIR, "hair": "b87838", "hair_style": "braid", "hat": "wide", "hat_color": "d8c898",
+		"top": "e06a3a", "top_style": "shirt", "top2": "a84a28", "bottom": "5a5a4a", "bottom_style": "knickers",
+		"socks": "8a8a8a", "shoes": "6a6a5a", "pack": "frame_pack", "pack_color": "3a6a5a", "carry": ["map"],
+	},
 	# ------------------------------------------------ Ahwahnee staff (invented, not historical)
 	"ahwahnee_chef": {
 		"skin": SKIN_FAIR, "hair": "4a3a2e", "beard": "mustache", "beard_color": "4a3a2e",
