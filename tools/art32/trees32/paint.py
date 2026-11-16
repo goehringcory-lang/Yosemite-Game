@@ -49,6 +49,9 @@ for _v in "ab":
     _add(f"tree_sugar_pine_{_v}", A, lambda w, h, s, v=_v: pines.sugar_pine(w, h, v))
 for _v in "abcd":
     _add(f"tree_lodgepole_{_v}", A, lambda w, h, s, v=_v: pines.lodgepole(w, h, v))
+# young lodgepoles at Tuolumne's forest edges (canvas 36x96 and 32x76)
+for _v in "12":
+    _add(f"tree_lodgepole_sapling_{_v}", A, lambda w, h, s, v=_v: pines.lodgepole(w, h, "s" + v))
 for _v in "ab":
     _add(f"tree_gray_pine_{_v}", A, lambda w, h, s, v=_v: pines.gray_pine(w, h, v))
 for _v in "abc":

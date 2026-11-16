@@ -239,18 +239,24 @@ def lodgepole(W: int, H: int, variant: str) -> Art:
     and slender, thin scaly bark, dead twig stubs low down, and a narrow,
     ragged crown of short limbs tipped with yellow-green needle tufts."""
     spec = {
-        # an old tree: tall, the crown in its upper half
-        "a": dict(seed=7101, top=3, crown_bottom=62, env=[(0, 9), (0.4, 11), (0.75, 9), (1.0, 4)], r_base=2.4,
-                  stubs=7, spacing=3.0),
+        # an old tree: tall, the crown down over its upper two thirds
+        "a": dict(seed=7101, top=3, crown_bottom=80, env=[(0, 9), (0.3, 11), (0.7, 9), (1.0, 3.5)], r_base=2.4,
+                  stubs=5, spacing=2.2),
         # a mature tree
-        "b": dict(seed=7202, top=4, crown_bottom=60, env=[(0, 10), (0.4, 10), (0.8, 7), (1.0, 3)], r_base=2.2,
-                  stubs=5, spacing=2.8),
+        "b": dict(seed=7202, top=4, crown_bottom=82, env=[(0, 10), (0.35, 10.5), (0.75, 7.5), (1.0, 3)], r_base=2.2,
+                  stubs=4, spacing=2.1),
         # a young tree, limbs nearly to the ground
-        "c": dict(seed=7303, top=4, crown_bottom=66, env=[(0, 10), (0.3, 9), (0.7, 6), (1.0, 2.5)], r_base=1.8,
-                  stubs=1, spacing=2.4),
+        "c": dict(seed=7303, top=4, crown_bottom=88, env=[(0, 11.5), (0.35, 8.5), (0.75, 5), (1.0, 2)], r_base=1.8,
+                  stubs=1, spacing=2.3),
         # a tall, thin tree from a crowded stand
-        "d": dict(seed=7404, top=3, crown_bottom=58, env=[(0, 6), (0.4, 7), (0.8, 6), (1.0, 3)], r_base=1.8,
-                  stubs=9, spacing=3.2),
+        "d": dict(seed=7404, top=3, crown_bottom=70, env=[(0, 6.5), (0.4, 7.5), (0.8, 6), (1.0, 3)], r_base=1.8,
+                  stubs=7, spacing=2.4),
+        # saplings coming up where the meadow meets the forest: the lodgepoles
+        # are slowly closing in on Tuolumne's meadows
+        "s1": dict(seed=7611, top=3, crown_bottom=40, env=[(0, 8.5), (0.4, 6), (0.8, 3), (1.0, 1.5)], r_base=0.9,
+                   stubs=0, spacing=1.8),
+        "s2": dict(seed=7622, top=4, crown_bottom=31, env=[(0, 7), (0.45, 5), (0.8, 2.5), (1.0, 1.2)], r_base=0.8,
+                   stubs=0, spacing=1.7),
         # Glacier Point's
         "gp": dict(seed=7505, top=3, crown_bottom=40, env=[(0, 7), (0.4, 7.5), (0.8, 5.5), (1.0, 2.5)], r_base=1.6,
                    stubs=4, spacing=2.6),

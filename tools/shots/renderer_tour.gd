@@ -13,6 +13,9 @@ extends Node
 ##                  the Compatibility renderer
 ##   SHOT_WIND      1 to let the wind blow (default: still air, so two
 ##                  runs match)
+##   SHOT_AT        "name:x,y;..." world positions to stand the player at
+##                  instead of spawns (one region only); names go in the
+##                  file name
 ##   SHOT_PREFIX    put before every file name (default none)
 ##   SHOT_RENDERER  if set, quit with an error unless this renderer is the
 ##                  one running (forward_plus, mobile or gl_compatibility)
@@ -53,11 +56,21 @@ func _ready() -> void:
 	var regions: PackedStringArray = _env("SHOT_REGIONS", ",".join(TOUR)).split(",", false)
 	var hours: PackedStringArray = _env("SHOT_HOURS", "10,19.5,22").split(",", false)
 	var spawns: PackedStringArray = OS.get_environment("SHOT_SPAWNS").split(",", false)
+	var spots := {}
+	for spec in OS.get_environment("SHOT_AT").split(";", false):
+		var parts := spec.split(":")
+		var xy := parts[1].split(",")
+		spots[parts[0]] = Vector2(float(xy[0]), float(xy[1]))
+	if not spots.is_empty():
+		spawns = PackedStringArray(spots.keys())
 	var prefix := OS.get_environment("SHOT_PREFIX")
 	for region_id in regions:
 		for spawn in (spawns if not spawns.is_empty() else PackedStringArray(["arrival"])):
-			await world.go_to_region(region_id, spawn)
-			if world.region.get_spawn(spawn) == null:
+			await world.go_to_region(region_id, "arrival" if spots.has(spawn) else spawn)
+			if spots.has(spawn):
+				world.player.global_position = spots[spawn]
+				world._camera().reset_smoothing()
+			elif world.region.get_spawn(spawn) == null:
 				# a room or an area without one: where the first spawn puts you
 				var first: Marker2D = null
 				for parent_path in ["Markers", "Map/Spawns", "Spawns"]:
