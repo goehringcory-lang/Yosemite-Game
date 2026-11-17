@@ -40,63 +40,90 @@ float luma(vec3 c) {
 	return dot(c, vec3(0.299, 0.587, 0.114));
 }
 
+// Each step below only runs when its uniform is on (most are off at any one
+// hour: no golden hour at noon, no night by day, no alpine air in the
+// Valley); a step that is off would leave the colour exactly as it was, so
+// skipping it changes nothing but the cost.
 void fragment() {
 	vec3 c = texture(screen, SCREEN_UV).rgb;
 	float lum = luma(c);
-	float tint_lum = max(luma(tint), 0.05);
-	// The colour of the thing itself, with today's light taken back out.
-	vec3 base = c / max(tint, vec3(0.05));
-	float base_lum = luma(base);
-	float base_sat = max(base.r, max(base.g, base.b)) - min(base.r, min(base.g, base.b));
-	// Lit by a lamp or fire: much brighter than the light around it.
-	float lit = smoothstep(1.15, 1.7, lum / tint_lum);
+	float day = 1.0 - night;
+	float warmth = smoothstep(0.12, 0.45, (tint.r - tint.b) / max(tint.r, 0.05));
+	bool low = warmth * low_sun > 0.0;
+	bool high = alpine * day > 0.0;
+	// The colour of the thing itself, with today's light taken back out, and
+	// whether a lamp or fire lights it (much brighter than the light around
+	// it); only the steps below that need them work them out.
+	vec3 base = vec3(0.0);
+	float base_lum = 0.0;
+	float lit = 0.0;
+	if (low || high || alpenglow > 0.0 || gloom > 0.0 || night > 0.0) {
+		float tint_lum = max(luma(tint), 0.05);
+		base = c / max(tint, vec3(0.05));
+		base_lum = luma(base);
+		lit = smoothstep(1.15, 1.7, lum / tint_lum);
+	}
 
 	vec3 g = mix(c, c * c * (3.0 - 2.0 * c), 0.18);
 	vec3 tone = mix(cool, warm, smoothstep(0.15, 0.75, lum));
 	g = mix(g, g * tone * 1.04, 0.32);
 
 	// Golden hour: warmer and a little richer.
-	float gl = luma(g);
-	g = mix(g, mix(vec3(gl), g, 1.1) * vec3(1.05, 1.0, 0.94), golden * 0.4);
+	if (golden > 0.0) {
+		float gl = luma(g);
+		g = mix(g, mix(vec3(gl), g, 1.1) * vec3(1.05, 1.0, 0.94), golden * 0.4);
+	}
 
 	// Low sun: the day's tint lays its orange over everything alike, but the
 	// low sun only reaches what stands in its light. What it doesn't (the
 	// dark of the trees, asphalt, the long shadows) is lit by the blue sky
 	// overhead, so the darks give the orange back and lean cool, and the
 	// evening reads as warm light and cool shade, not as a pink wash.
-	float warmth = smoothstep(0.12, 0.45, (tint.r - tint.b) / max(tint.r, 0.05));
-	float shade = 1.0 - smoothstep(0.12, 0.5, base_lum);
-	vec3 sky_lit = base * tint_lum * vec3(0.88, 0.95, 1.16);
-	g = mix(g, mix(sky_lit, sky_lit * sky_lit * (3.0 - 2.0 * sky_lit), 0.18), warmth * shade * low_sun * (1.0 - lit));
+	if (low) {
+		float tint_lum = max(luma(tint), 0.05);
+		float shade = 1.0 - smoothstep(0.12, 0.5, base_lum);
+		vec3 sky_lit = base * tint_lum * vec3(0.88, 0.95, 1.16);
+		g = mix(g, mix(sky_lit, sky_lit * sky_lit * (3.0 - 2.0 * sky_lit), 0.18), warmth * shade * low_sun * (1.0 - lit));
+	}
 
 	// High country by day: clear air, so colour is a touch richer, and the
 	// shade (lit by the deep blue sky overhead, not the sun) leans blue.
-	float day = 1.0 - night;
-	float al = luma(g);
-	g = mix(g, mix(vec3(al), g, 1.1), alpine * day * (1.0 - gloom));
-	float shadow = 1.0 - smoothstep(0.1, 0.42, base_lum);
-	g = mix(g, g * vec3(0.88, 0.95, 1.14), alpine * shadow * day * 0.4 * (1.0 - lit));
+	if (high) {
+		float al = luma(g);
+		g = mix(g, mix(vec3(al), g, 1.1), alpine * day * (1.0 - gloom));
+		float shadow = 1.0 - smoothstep(0.1, 0.42, base_lum);
+		g = mix(g, g * vec3(0.88, 0.95, 1.14), alpine * shadow * day * 0.4 * (1.0 - lit));
+	}
 
 	// Alpenglow on pale, colourless things: granite, snow, pale sand.
-	float rock = smoothstep(0.4, 0.62, base_lum) * (1.0 - smoothstep(0.1, 0.24, base_sat));
-	g = mix(g, g * alpen_color * 1.4, rock * alpenglow * (0.62 + alpine * 0.2));
+	if (alpenglow > 0.0) {
+		float base_sat = max(base.r, max(base.g, base.b)) - min(base.r, min(base.g, base.b));
+		float rock = smoothstep(0.4, 0.62, base_lum) * (1.0 - smoothstep(0.1, 0.24, base_sat));
+		g = mix(g, g * alpen_color * 1.4, rock * alpenglow * (0.62 + alpine * 0.2));
+	}
 
 	// Storm light: under the thunderheads the colour goes out of the meadow
 	// and the light turns slate.
-	float sl = luma(g);
-	g = mix(g, vec3(sl) * vec3(0.82, 0.88, 0.97), gloom * 0.38 * (1.0 - lit));
-	g *= 1.0 - gloom * 0.1 * (1.0 - lit);
+	if (gloom > 0.0) {
+		float sl = luma(g);
+		g = mix(g, vec3(sl) * vec3(0.82, 0.88, 0.97), gloom * 0.38 * (1.0 - lit));
+		g *= 1.0 - gloom * 0.1 * (1.0 - lit);
+	}
 
 	// Night: colour drains from what the lamps don't reach. Up high the
 	// starlight is darker and bluer, with no valley haze to lift it.
-	float nl = luma(g);
-	vec3 moon = moon_color * mix(vec3(1.0), vec3(0.88, 0.95, 1.12), alpine);
-	vec3 moonlit = vec3(nl) * moon * (1.08 - alpine * 0.14) + vec3(0.012, 0.016, 0.03);
-	g = mix(g, moonlit, night * (0.55 + alpine * 0.15) * (1.0 - lit));
+	if (night > 0.0) {
+		float nl = luma(g);
+		vec3 moon = moon_color * mix(vec3(1.0), vec3(0.88, 0.95, 1.12), alpine);
+		vec3 moonlit = vec3(nl) * moon * (1.08 - alpine * 0.14) + vec3(0.012, 0.016, 0.03);
+		g = mix(g, moonlit, night * (0.55 + alpine * 0.15) * (1.0 - lit));
+	}
 
 	// Haze: the blacks lift toward the colour of the air.
-	g = mix(g, max(g, haze_color * 0.32), haze * 0.5);
-	g = mix(g, haze_color * tint, haze * 0.06);
+	if (haze > 0.0) {
+		g = mix(g, max(g, haze_color * 0.32), haze * 0.5);
+		g = mix(g, haze_color * tint, haze * 0.06);
+	}
 
 	vec2 d = (SCREEN_UV - 0.5) * vec2(1.0, 0.78);
 	float v = smoothstep(0.28, 0.72, length(d));

@@ -227,3 +227,11 @@ wind_strength={
 "type": "float",
 "value": 1.0
 }
+sun_toward={
+"type": "vec2",
+"value": Vector2(0, -1)
+}
+sun_light={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}

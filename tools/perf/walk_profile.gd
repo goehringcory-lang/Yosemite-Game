@@ -10,6 +10,8 @@ extends Node
 ##                 over a seam, instead of round in a square
 ##   PERF_CSV      optional path for a per-frame CSV
 ##   PERF_SHOT     optional path for a screenshot taken mid-walk
+##   PERF_SEED     seed the random numbers (the same clouds), so screenshots
+##                 of two versions can be compared
 ##   PERF_OFF      comma-separated node names, class_names or engine classes
 ##                 (PointLight2D) to switch off
 ##                 (hide and stop processing), to see what each one costs
@@ -48,6 +50,8 @@ func _ready() -> void:
 	var end := _End.new()
 	end.profile = self
 	add_child(end)
+	if _env("PERF_SEED", "") != "":
+		seed(int(_env("PERF_SEED", "")))
 	SaveManager.save_path = "user://walk_profile_save.json"
 	SaveManager.delete_save()
 	_world = load("res://scenes/world/world.tscn").instantiate()
@@ -57,6 +61,7 @@ func _ready() -> void:
 	var region_id := _env("PERF_REGION", "curry_village")
 	await _world.go_to_region(region_id, _env("PERF_SPAWN", "arrival"))
 	GameClock.minutes = int(_env("PERF_HOUR", "12")) * 60
+	GameClock.time_changed.emit(GameClock.hour, GameClock.minute)
 	for i in 30:
 		await get_tree().process_frame
 	for off in _env("PERF_OFF", "").split(",", false):
