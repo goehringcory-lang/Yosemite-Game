@@ -158,6 +158,7 @@ func test_screen_details() -> void:
 	game._crux.center = 0.6
 	press(game, "use_tool")
 	check(game._phase == ClimbMinigame.Phase.CRUX and game._crux.kind == "pumped" and game.state.slipped_cruxes == 2, "a miss with food in the pack leaves you pumped")
+	check(game.flow == 0, "a miss ends the flow")
 	game._update_crux(ClimbMinigame.CRUX_GRACE + 0.05)
 	press(game, "use_tool")
 	check(game._crux.kind == "pumped" and Inventory.count("dried_apples") == 1, "Space doesn't eat by accident")
@@ -177,6 +178,7 @@ func test_screen_details() -> void:
 	game._crux.charge = game._crux.center
 	release(game, "use_tool")
 	check(game._phase == ClimbMinigame.Phase.CLIMB and game.state.perfect_cruxes == 2, "let go in the green and you lunge to the slot")
+	check(game.flow == 2 and game.best_flow == 2 and game._hitstop > 0.0, "two perfects in a row are a flow of 2, and the moment holds")
 	# Hold on too long and the wing slips out.
 	Inventory.add("dried_apples", 1)
 	game.state.pending = {"kind": "dyno", "name": "Chicken wing dyno", "window": 0.3, "row": 3, "cell": Vector2i(2, 3)}

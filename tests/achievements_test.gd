@@ -113,6 +113,20 @@ func test_sends() -> void:
 	Achievements.sent(NOSE, _state(NOSE, 3, 3000))
 	QuestLog.record_climb(NOSE.id)
 	check(Achievements.has("five_twelve") and (NOSE.nights == 0 or Achievements.has("wall_night")), "the Nose earns the 5.12 one and a night on the wall")
+	# Medals: Firefall went clean (no falls, no aid, no missed crux), the
+	# Nose with falls.
+	check(Achievements.medal(FIREFALL.id) == Achievements.GOLD and Achievements.medal(NOSE.id) == Achievements.BRONZE
+		and Achievements.medal("no_such_route") == Achievements.NO_MEDAL, "a clean send earns Gold, one with falls Bronze")
+	var missed := _state(ASTROMAN, 0, 500)
+	missed.slipped_cruxes = 1
+	check(Achievements.medal_for(missed) == Achievements.SILVER, "no falls but a missed crux is Silver")
+	var aided := _state(ASTROMAN, 0, 500)
+	aided.aid_moves = 2
+	check(Achievements.medal_for(aided) == Achievements.BRONZE, "pulling on gear is Bronze")
+	Achievements.sent(NOSE, _state(NOSE, 4, 3000))
+	check(Achievements.medal(NOSE.id) == Achievements.BRONZE, "a worse send never takes a medal away")
+	check(Achievements.next_medal_text(NOSE, Achievements.SILVER) != "" and Achievements.next_medal_text(NOSE, Achievements.GOLD) == "",
+		"each medal but Gold names the next")
 
 
 func test_summits() -> void:
@@ -225,11 +239,13 @@ func test_save_and_load() -> void:
 	var earned := Achievements.count()
 	var sends := Achievements.send_count()
 	var fish := Achievements.fish_count()
+	var gold := Achievements.medal_count(Achievements.GOLD)
 	Achievements.start_new_game()
 	check(Achievements.count() == 0, "a new game clears the logbook")
 	Achievements.load_data(json)
 	check(Achievements.count() == earned and Achievements.send_count() == sends and Achievements.fish_count() == fish
 		and Achievements.summit_count() == Achievements.SUMMITS.size(), "the logbook saves and loads")
+	check(gold > 0 and Achievements.medal_count(Achievements.GOLD) == gold, "medals save and load")
 	Achievements.settle()
 	check(Achievements.count() == earned and Achievements.pending_toasts().is_empty(), "settling a loaded game changes nothing and says nothing")
 
