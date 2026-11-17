@@ -14,6 +14,8 @@ shader_type canvas_item;
 //
 // Works in art pixels (2 world pixels), so the reflections stay crisp.
 
+// the sun's lift on the canvas modulate (scripts/world/sun_light.gd)
+global uniform vec3 sun_light;
 uniform sampler2D screen : hint_screen_texture, filter_nearest;
 uniform sampler2D ground_tex : filter_nearest, repeat_disable;
 // The ground texture's top-left in world pixels and its size in pixels.
@@ -170,7 +172,10 @@ void fragment() {
 				c = mix(c, sc / max(tint, vec3(0.15)), stars * tw * 0.85);
 			}
 		}
-		COLOR = vec4(c, 1.0);
+		// SunLight lifts the canvas modulate by 1 + the sun (see
+		// lit.gdshaderinc) to stand in for the light's add, which this
+		// shader never took (its light() adds nothing): take the lift out
+		COLOR = vec4(c / (1.0 + sun_light), 1.0);
 	}
 }
 

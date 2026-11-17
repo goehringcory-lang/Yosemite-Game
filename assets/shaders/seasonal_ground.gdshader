@@ -112,6 +112,7 @@ bool seam_keeps(vec2 tpx) {
 
 void vertex() {
 	world_px = (MODEL_MATRIX * vec4(VERTEX, 0.0, 1.0)).xy;
+	LIT_SUN_VERTEX
 }
 
 void fragment() {
@@ -282,10 +283,11 @@ void fragment() {
 	if (flower > 0.5 && flower_fill.a > 0.0) {
 		rgb = flower_fill.rgb * (0.9 + 0.2 * hash(px));
 	}
-	COLOR = vec4(rgb, c.a);
+	lit_sun_gain = lit_sun(NORMAL_MAP);
+	COLOR = vec4(rgb * lit_sun_gain, c.a);
 }
 
 
 void light() {
-	LIGHT = lit_light(NORMAL, LIGHT_DIRECTION, LIGHT_IS_DIRECTIONAL, LIGHT_COLOR, LIGHT_ENERGY, COLOR);
+	LIGHT = lit_light(NORMAL, LIGHT_DIRECTION, LIGHT_IS_DIRECTIONAL, LIGHT_COLOR, LIGHT_ENERGY, vec4(COLOR.rgb / lit_sun_gain, COLOR.a));
 }
