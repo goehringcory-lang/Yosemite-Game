@@ -19,6 +19,13 @@ A climb is a short sequence of decisions: read the wall, choose a line, decide w
 9. **Nights.** On a wall, a night needs a real meal (30+ energy; the smallest is eaten); the night scene plays, and you wake rested at 6:30 the next morning. Each night is a new day on the calendar (fresh food keeps spoiling), and a night falls where the route's profile says (`bivy`), not at a fixed time.
 10. **Top out or retreat.** The result card shows time, falls, style (onsight, hard-won, aided), how the cruxes went and a fact about the route. Retreating keeps your gear; the tick only comes with the top. The caller records the tick once and applies the elapsed time once.
 
+## Medals, records and flow
+
+- **Medals.** Each route keeps the best medal you've earned on it (`Achievements.sends[id].medal`, `Achievements.medal_for(state)`): Bronze for any send, Silver for no falls and no aid, Gold for that and no missed crux (a boulder problem: a flash with every crux perfect). Jugging fixed lines (`jug_moves`) doesn't count against a medal. A worse send never takes one away; saves from before medals load as Bronze.
+- **Records.** The route card shows your medal, sends, best wall time and the next medal's ask, once you've sent the route. The result card adds the medal and calls out "First send!", "New medal!", "New best time!" and "Fewest falls yet!", comparing against the record as it stood when the climb began (`ClimbMinigame._record_before`). Wall time is game minutes, so it rewards fewer rests and fiddles, not hurrying.
+- **Crux feedback.** The result stamps over the climber and pops in. Perfect: a 0.08 s hit-stop, sparks, the chime. Good: a softer, lower chime. A miss: a scrape, a jolt, grit, and the stamp shakes.
+- **Flow.** `ClimbMinigame.flow` counts perfect cruxes in a row (a good, a miss or a fall ends it); each rings a little higher, the stamp shows "Flow xN" from 2, the belayer has a `flow` line at 3, and the result card gives `best_flow`. It is all on the screen; the rules in `ClimbState` don't change, so the bots' tuning is the same.
+
 ## Gear and what it does
 
 | Gear | When you get it | In the climb |

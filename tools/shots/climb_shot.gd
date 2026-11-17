@@ -20,6 +20,14 @@ func _env(key: String, fallback: String) -> String:
 	return OS.get_environment(key) if OS.get_environment(key) != "" else fallback
 
 
+## The name the pitch gives the crux point nearest above the climber.
+func _crux_name(state: ClimbState) -> String:
+	for r: int in state.crux_rows():
+		if r > state.row:
+			return ClimbProfiles.crux_at(state.spec, r).name
+	return ClimbProfiles.crux_at(state.spec, state.row).name
+
+
 func _ready() -> void:
 	LitSprites.enabled = OS.get_environment("SHOT_UNLIT") != "1"
 	if _env("SHOT_PAD", "0") == "1":
@@ -70,11 +78,11 @@ func _ready() -> void:
 			game._events()
 		match _env("SHOT_SPECIAL", ""):
 			"crux":
-				game.state.pending = {"kind": "timing", "name": "The crux", "window": 0.3}
+				game.state.pending = {"kind": "timing", "name": _crux_name(game.state), "window": 0.3}
 				game._start_crux()
 			"pumped":
 				Inventory.add("trail_mix", 1)
-				game.state.pending = {"kind": "timing", "name": "The crux", "window": 0.3, "pumped": true}
+				game.state.pending = {"kind": "timing", "name": _crux_name(game.state), "window": 0.3, "pumped": true}
 				game._start_pumped()
 			"rhythm", "mash":
 				game.state.pending = {"kind": _env("SHOT_SPECIAL", ""), "name": "The Narrows", "window": 0.3}
@@ -126,6 +134,32 @@ func _ready() -> void:
 				game.state.status = ClimbState.Status.TOPPED_OUT
 				game._phase = ClimbMinigame.Phase.RESULT
 				game._result_age = 2.0
+			"medal":
+				# A clean, flawless repeat of a route sent once before with a
+				# fall: the result card's new medal and best time.
+				game._record_before = {"count": 1, "falls": 1, "minutes": game.state.minutes + 40, "medal": Achievements.BRONZE}
+				game.state.perfect_cruxes = 3
+				game.best_flow = 3
+				game.state.status = ClimbState.Status.TOPPED_OUT
+				game._phase = ClimbMinigame.Phase.RESULT
+				game._result_age = 2.0
+			"record":
+				# The route card of a route you've sent: your medal and the next.
+				game._record_before = {"count": 3, "falls": 0, "minutes": 95, "medal": Achievements.SILVER}
+				game._phase = ClimbMinigame.Phase.INTRO
+				game._card_age = 2.0
+			"perfect":
+				# A third perfect crux in a row, caught as the stamp pops.
+				game.flow = 2
+				game.best_flow = 2
+				game.state.pending = {"kind": "timing", "name": _crux_name(game.state), "window": 0.3}
+				game._start_crux()
+				game._resolve_crux("perfect")
+				for f in 4:
+					await get_tree().process_frame
+				game._crux_result_age = 0.12
+				game.set_process(false)
+				game._canvas.queue_redraw()
 			"pause":
 				game._phase = ClimbMinigame.Phase.PAUSE
 			"falcon":
