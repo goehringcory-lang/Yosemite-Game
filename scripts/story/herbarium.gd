@@ -28,6 +28,8 @@ const VALLEY := "yosemite_valley"
 const VALLEY_AREAS := ["yosemite_village", "curry_village", "the_ahwahnee", "ahwahnee_trail", "lamon_homestead",
 	"el_capitan_meadow", "tunnel_view", "happy_isles", "mirror_lake", "leidig_meadow", "four_mile_trailhead",
 	"bridalveil_fall", "housekeeping_camp", "ahwahnee_meadow", "upper_pines", "tenaya_creek"]
+## Tenaya Lake, down the Tioga Road, counts as Tuolumne Meadows.
+const HIGH_COUNTRY_AREAS := ["tenaya_lake"]
 const HUB_NAMES := {"yosemite_valley": "the Valley floor", "el_portal": "El Portal", "wawona": "Wawona",
 	"glacier_point": "Glacier Point", "tuolumne_meadows": "Tuolumne Meadows"}
 ## How rare a plant is. Rarer plants grow in fewer patches, and glint gold.
@@ -458,11 +460,11 @@ const PLANTS: Array[Dictionary] = [
 	{"id": "lodgepole_pine", "name": "Lodgepole Pine", "latin": "Pinus contorta",
 		"note": "Needles in twos, bark in thin scales like cornflakes. It rings every high meadow.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.HIGH_COUNTRY,
-		"grows": {"tuolumne_meadows": "arrival"}},
+		"grows": {"tuolumne_meadows": "arrival", "tenaya_lake": ""}},
 	{"id": "sierra_juniper", "name": "Sierra Juniper", "latin": "Juniperus grandis",
 		"note": "Cinnamon bark and a trunk as thick as it is tall, rooted in a crack in a granite dome.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.HIGH_COUNTRY,
-		"grows": {"tuolumne_meadows": "lembert_dome"}},
+		"grows": {"tuolumne_meadows": "lembert_dome", "tenaya_lake": "overlook"}},
 	{"id": "white_heather", "name": "White Mountain Heather", "latin": "Cassiope mertensiana",
 		"note": "Cassiope: tiny white bells on red stalks, over leaves pressed tight as braid. Muir's favorite.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.HIGH_COUNTRY,
@@ -482,7 +484,7 @@ const PLANTS: Array[Dictionary] = [
 	{"id": "pussypaws", "name": "Pussypaws", "latin": "Calyptridium umbellatum",
 		"note": "Fuzzy pink pads on granite sand. They lie down in the cool of morning and rise in the heat.",
 		"seasons": SUMMER, "habitat": ItemData.Habitat.HIGH_COUNTRY,
-		"grows": {"tuolumne_meadows": "lembert_dome"}},
+		"grows": {"tuolumne_meadows": "lembert_dome", "tenaya_lake": "olmsted_point"}},
 	{"id": "mule_ears", "name": "Mountain Mule Ears", "latin": "Wyethia mollis",
 		"note": "Big woolly leaves like a mule's ears and yellow sunflowers. The leaves rattle in the wind.",
 		"seasons": SUMMER, "habitat": ItemData.Habitat.HIGH_COUNTRY,
@@ -502,7 +504,7 @@ const PLANTS: Array[Dictionary] = [
 	{"id": "lemmons_willow", "name": "Lemmon's Willow", "latin": "Salix lemmonii",
 		"note": "A shrubby willow in thickets by the Tuolumne. Its catkins feed the first bees of the year.",
 		"seasons": GROWING, "habitat": ItemData.Habitat.RIVERSIDE,
-		"grows": {"tuolumne_meadows": ""}},
+		"grows": {"tuolumne_meadows": "", "tenaya_lake": "east_beach"}},
 	{"id": "mountain_hemlock", "name": "Mountain Hemlock", "latin": "Tsuga mertensiana",
 		"note": "Its top always nods over, as if bowing. Muir thought it the most beautiful conifer of all.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.HIGH_COUNTRY, "rarity": UNCOMMON,
@@ -514,7 +516,7 @@ const PLANTS: Array[Dictionary] = [
 	{"id": "labrador_tea", "name": "Western Labrador Tea", "latin": "Rhododendron columbianum",
 		"note": "White flower clusters over leathery leaves rolled under at the edges, in cold bogs.",
 		"seasons": SUMMER, "habitat": ItemData.Habitat.RIVERSIDE, "rarity": UNCOMMON,
-		"grows": {"tuolumne_meadows": ""}},
+		"grows": {"tuolumne_meadows": "", "tenaya_lake": "outlet"}},
 	{"id": "alpine_laurel", "name": "Alpine Laurel", "latin": "Kalmia microphylla",
 		"note": "Pink cups whose stamens are tucked in like sprung traps. A bee lands, and they flick pollen.",
 		"seasons": SUMMER, "habitat": ItemData.Habitat.RIVERSIDE, "rarity": UNCOMMON,
@@ -538,7 +540,7 @@ const PLANTS: Array[Dictionary] = [
 	{"id": "whitebark_pine", "name": "Whitebark Pine", "latin": "Pinus albicaulis",
 		"note": "Wind-bent at timberline. Nutcrackers bury its seeds by the thousand and forget a few.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.HIGH_COUNTRY, "rarity": RARE,
-		"grows": {"tuolumne_meadows": "lembert_dome"}},
+		"grows": {"tuolumne_meadows": "lembert_dome", "tenaya_lake": "overlook"}},
 	{"id": "sierra_gentian", "name": "Sierra Gentian", "latin": "Gentianopsis holopetala",
 		"note": "Deep blue trumpets that twist shut at night and in shade, late in a meadow's summer.",
 		"seasons": SUMMER | FALL, "habitat": ItemData.Habitat.MEADOW, "rarity": RARE,
@@ -667,7 +669,7 @@ func total(hub := "") -> int:
 static func hubs_of(plant: Dictionary) -> Array[String]:
 	var result: Array[String] = []
 	for region_id: String in plant.get("grows", {}):
-		var hub: String = VALLEY if region_id in VALLEY_AREAS else region_id
+		var hub: String = VALLEY if region_id in VALLEY_AREAS else ("tuolumne_meadows" if region_id in HIGH_COUNTRY_AREAS else region_id)
 		if not hub in result:
 			result.append(hub)
 	return result

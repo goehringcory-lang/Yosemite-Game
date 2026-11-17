@@ -57,6 +57,8 @@ const LANDMARKS := {
 	"echo_peaks": {"w": 130, "h": 96, "trees": false, "snow": true, "lr": 1.8, "flute": 0.7},
 	"matthes_crest": {"w": 170, "h": 70, "trees": false, "lr": 1.6, "flute": 0.7},
 	"mt_lyell": {"w": 150, "h": 128, "trees": false, "snow": true, "glacier": true, "lr": 1.8, "flute": 0.6},
+	# Seen from Olmsted Point's viewer (BinocularView "olmsted_point").
+	"tenaya_peak": {"w": 150, "h": 84, "trees": false, "lr": 1.6, "flute": 0.5},
 	"mt_maclure": {"w": 116, "h": 104, "trees": false, "snow": true, "glacier": true, "lr": 1.8, "flute": 0.6},
 	"donohue_pass": {"w": 200, "h": 56, "trees": false, "snow": true, "lr": 1.8},
 	"sierra_crest": {"w": 480, "h": 70, "trees": false, "snow": true, "lr": 1.6, "flute": 0.6},
@@ -78,7 +80,37 @@ const LANDMARKS := {
 static func shape_of(kind: String, vantage := "") -> Dictionary:
 	if vantage != "" and Shapes.SHAPES.has(kind + "@" + vantage):
 		return Shapes.SHAPES[kind + "@" + vantage]
+	if vantage != "" and MIRRORED.has(kind + "@" + vantage):
+		return mirrored(Shapes.SHAPES[MIRRORED[kind + "@" + vantage]])
 	return Shapes.SHAPES.get(kind, {})
+
+
+## Landmarks seen from the far side of where a measured skyline was taken
+## from, drawn as that skyline flipped left to right: Half Dome from Olmsted
+## Point is Half Dome from Glacier Point turned round, the rounded back on
+## the left and the sheer face in profile on the right.
+const MIRRORED := {"half_dome@olmsted_point": "half_dome@glacier_point"}
+
+
+## [param shape] flipped left to right: its faces that took the light from
+## the upper left now turn away from it.
+static func mirrored(shape: Dictionary) -> Dictionary:
+	var out := shape.duplicate(true)
+	for key: String in ["top", "steep"]:
+		(out[key] as Array).reverse()
+	var tone: Array = out.tone
+	tone.reverse()
+	for i in tone.size():
+		tone[i] = clampf(1.05 - float(tone[i]), 0.15, 0.95)
+	var falls: Array = []
+	for f: float in shape.falls:
+		falls.append(1.0 - f)
+	out.falls = falls
+	var marks := {}
+	for m: String in shape.marks:
+		marks[m] = 1.0 - float(shape.marks[m])
+	out.marks = marks
+	return out
 
 
 ## A shape's [param key] row (0..1 across) at [param f], eased between steps.
@@ -867,6 +899,10 @@ static func _profile(kind: String, u: float, i: int, rng: RandomNumberGenerator)
 			var walls := smoothstep(-1.0, -0.6, u) * (1.0 - smoothstep(0.6, 1.0, u))
 			var cleft := 0.5 * (1.0 - smoothstep(0.0, 0.3, absf(u)))
 			return maxf(walls * (0.9 + 0.1 * u) - cleft, 0.0)
+		"tenaya_peak":
+			# A broad granite peak, its north face steep above the lake.
+			var tp := pow(maxf(1.0 - absf(u - 0.15) * (1.0 if u < 0.15 else 1.35), 0.0), 1.1) * (0.94 + 0.06 * sin(u * 15.0))
+			return maxf(tp, 0.12 * (1.0 - absf(u)))
 		"sierra_crest":
 			var t := 0.42 + 0.22 * sin(u * 7.0) + 0.12 * sin(u * 17.0 + 1.0) + 0.2 * _teeth(i, 17.0, 2)
 			return clampf(t, 0.05, 1.0)

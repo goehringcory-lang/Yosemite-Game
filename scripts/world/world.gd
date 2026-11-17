@@ -284,11 +284,11 @@ func use_exit(exit: RegionExit) -> void:
 
 ## A road some way to the next region, like Big Oak Flat Road up to Crane
 ## Flat: the clock moves on by the drive.
-func _drive_road(exit: RegionExit, spawn: String) -> void:
+func _drive_road(exit: RegionExit, spawn: String, to_region := "") -> void:
 	if GameClock.is_too_late_for(exit.minutes):
 		hud.show_message("It's too late to set out on %s tonight." % exit.label)
 		return
-	await go_to_region(exit.target_region, spawn, exit.minutes)
+	await go_to_region(to_region if to_region != "" else exit.target_region, spawn, exit.minutes)
 	hud.show_message("You drove %s miles to %s (%s)." % [str(exit.miles), region.display_name, Park.format_minutes(exit.minutes)])
 
 
@@ -302,6 +302,9 @@ func _drive_on(exit: RegionExit) -> void:
 		return
 	if not leg.open:
 		hud.show_message(leg.closed_reason)
+		return
+	if exit.stop_region != "":
+		_drive_road(exit, exit.stop_spawn, exit.stop_region)
 		return
 	if exit.minutes > 0:
 		leg.minutes = exit.minutes

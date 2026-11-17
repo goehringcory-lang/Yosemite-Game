@@ -302,6 +302,30 @@
 			"region": "tenaya_creek"
 		},
 		{
+			"hub": "tuolumne_meadows",
+			"key": "tenaya_lake/Tenaya Lake",
+			"name": "Tenaya Lake",
+			"region": "tenaya_lake"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tenaya_lake/Olmsted Point",
+			"name": "Olmsted Point",
+			"region": "tenaya_lake"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tenaya_lake/East Beach",
+			"name": "East Beach",
+			"region": "tenaya_lake"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "tenaya_lake/Sunrise Lakes Trailhead",
+			"name": "Sunrise Lakes Trailhead",
+			"region": "tenaya_lake"
+		},
+		{
 			"hub": "yosemite_valley",
 			"key": "the_ahwahnee/The Ahwahnee",
 			"name": "The Ahwahnee",

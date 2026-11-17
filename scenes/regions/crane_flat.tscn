@@ -4662,8 +4662,10 @@ position = Vector2(2048, 672)
 script = ExtResource("46_dq7cb")
 label = "Tioga Road"
 drive_to = "tuolumne_meadows"
-minutes = 70
-miles = 38.1
+stop_region = "tenaya_lake"
+stop_spawn = "west"
+minutes = 55
+miles = 30.0
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/TiogaRoad" unique_id=1058756974]
 shape = SubResource("RectangleShape2D_5q4ip")

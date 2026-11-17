@@ -144,6 +144,26 @@ const VIEWS := {
 				"text": "Down from its falls, the Merced winds slow through the Valley's meadows, and on west to the San Joaquin."},
 		],
 	},
+	"olmsted_point": {
+		"title": "Olmsted Point", "elevation": "8,400 ft", "vantage": "olmsted_point",
+		"hint": "Pan along the skyline: down Tenaya Canyon to the south, round to Tenaya Lake and the high country east. Hold a peak in the crosshairs to name it.",
+		"from": 170.0, "to": 440.0, "ground": "valley_forest",
+		"density": [[170, 8], [178, 12], [192, 12], [200, 14], [224, 14], [232, 6], [246, 2.5], [316, 2.5], [324, 9], [338, 9],
+			[346, 2.5], [404, 2.5], [412, 10], [436, 10], [440, 8]],
+		"backdrop": [{"k": "sierra_crest", "b": 420.0, "s": 0.9, "l": 0}, {"k": "sierra_crest", "b": 186.0, "s": 0.7, "l": 0}],
+		"targets": [
+			{"id": "clouds_rest", "name": "Clouds Rest", "k": "clouds_rest", "l": 1, "s": 1.45, "bearing": 185, "stat": "9,926 ft", "mi": 3.0,
+				"text": "From here you see its whole north side: one sweep of bare granite falling more than 4,000 feet into Tenaya Canyon. The trail to its summit starts at Tenaya Lake."},
+			{"id": "half_dome", "name": "Half Dome", "k": "half_dome", "l": 0, "s": 0.72, "bearing": 211, "stat": "8,842 ft", "mi": 5.2,
+				"text": "Seen from behind: the rounded back the cables climb, with the sheer northwest face in profile on the right. The Valley sees only its cut face."},
+			{"id": "mt_watkins", "name": "Mount Watkins", "k": "mt_watkins", "l": 1, "s": 1.1, "bearing": 218, "stat": "8,500 ft", "mi": 3.5,
+				"text": "Across Tenaya Canyon from Half Dome, above Mirror Lake. Named for Carleton Watkins, whose photographs in the 1860s helped win the Valley its protection."},
+			{"id": "mt_hoffmann", "name": "Mount Hoffmann", "k": "mt_hoffmann", "l": 1, "s": 1.2, "bearing": 331, "stat": "10,850 ft", "mi": 2.8,
+				"text": "Near the geographic center of the park. Named for Charles Hoffmann, the topographer of the California Geological Survey, who climbed it in 1863."},
+			{"id": "tenaya_peak", "name": "Tenaya Peak", "k": "tenaya_peak", "l": 1, "s": 1.0, "bearing": 71, "stat": "10,301 ft", "mi": 2.3,
+				"text": "The granite peak over Tenaya Lake. Its slabs sweep straight down toward the water, and the lake fills the basin the glacier scooped out at its foot."},
+		],
+	},
 }
 
 var view_id := "glacier_point"
@@ -1083,7 +1103,7 @@ func _draw_plaque(c: CanvasItem, font: Font) -> void:
 		_label(c, font, "Keep it in the crosshairs to name it.", Vector2(26, y + 40), 8, Color(PAPER, 0.7))
 	else:
 		_label(c, font, "%s  ·  %s" % [spec.title, spec.elevation], Vector2(26, y + 15), 10, Color(GOLD, 0.9))
-		var hint := "Pan along the skyline, or tilt down to the Valley floor 3,200 feet below. Hold a peak or a waterfall in the crosshairs to name it."
+		var hint: String = spec.get("hint", "Pan along the skyline, or tilt down to the Valley floor 3,200 feet below. Hold a peak or a waterfall in the crosshairs to name it.")
 		if _pal.night:
 			hint = "The peaks are dark shapes against the stars tonight. Hold one in the crosshairs to name it, or come back by daylight."
 		c.draw_multiline_string(font, Vector2(26, y + 28), hint, HORIZONTAL_ALIGNMENT_LEFT, 428, 8, 2, Color(PAPER, 0.8))
