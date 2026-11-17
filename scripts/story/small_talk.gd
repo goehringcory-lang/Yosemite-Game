@@ -4,9 +4,10 @@ extends RefCounted
 ## of the story and no hint (QuestLog.talk_to). Each person has a line for
 ## each season, for rain and for snow, for the morning and the evening, for
 ## where they're standing ("places": a spot, a timetable stop or a region),
-## and more as they get to know you (FRIEND_HEARTS, CLOSE_HEARTS). Their
-## usual lines (CharacterData.idle_lines) stay in the mix, and they never say
-## the same line twice running. Lines that fit right now are weighted
+## and more as they get to know you (FRIEND_HEARTS, CLOSE_HEARTS), and for
+## the side stories you've finished with them ("after": quest id -> lines,
+## the latest one done counting). Their usual lines (CharacterData.idle_lines)
+## stay in the mix, and they never say the same line twice running. Lines that fit right now are weighted
 ## (WEIGHTS), so a wet day mostly gets talk about the rain.
 ##
 ## They also pass on what you've been up to (Friendship.news): a first
@@ -32,7 +33,7 @@ const EVENING_FROM := 18
 const NIGHT_FROM := 22
 const SEASON_KEYS := ["spring", "summer", "fall", "winter"]
 ## How likely each kind of line is to be picked, against the others that fit.
-const WEIGHTS := {"snow": 4, "rain": 4, "places": 3, "morning": 2, "evening": 2, "season": 2, "friend": 2, "close": 2, "usual": 1}
+const WEIGHTS := {"snow": 4, "rain": 4, "places": 3, "morning": 2, "evening": 2, "season": 2, "friend": 2, "close": 2, "after": 3, "usual": 1}
 ## What news each person can pass on is in their "news": climb (a first
 ## ascent), rescue (who you found), fish (a first of its kind or a trophy) and
 ## sighting (Friendship.SIGHTINGS), each with a %s for the thing itself.
@@ -353,6 +354,11 @@ const LINES := {
 		"loved": "Ah, mountaineer's fare! You've been listening. Thank you.",
 	},
 	"wren_alvarez": {
+		"after": {
+			"wren_reference": "I check the guide board every morning. The list isn't up. I know the list isn't up. I check anyway.",
+			"wren_first_client": "I keep replaying it. The clouds, the mantel, him yelling. I'd turn him round again. I think that's the bad part.",
+			"wren_long_way": ["Had two clients this morning on Swan Slab. One cried at the top. Good crying! I gave her your speech about trusting the rubber.", "Back by one? I'm a guide now. I'm back whenever the client's back. Which is never one."],
+		},
 		"spring": "Spring on the Apron! The slabs are dry, the dogwoods are out, and I'm late back from lunch again.",
 		"summer": "Too hot for slab after ten. The rubber gets greasy and my shoes turn into frying pans.",
 		"fall": "Fall friction! Cool rock and sticky rubber. I'd climb all day if Marty let me.",
@@ -392,6 +398,10 @@ const LINES := {
 		"loved": "Ah! Now this is an ingredient. Thank you, truly.",
 	},
 	"mountain_shop": {
+		"after": {
+			"wren_first_client": "Wren's been re-soling shoes all week. Nobody re-soles that many shoes. She's hiding in here.",
+			"wren_long_way": "Wren's guiding again. I put her name on the board by the door, and she's taken it down twice because she's embarrassed. I keep putting it back.",
+		},
 		"spring": "Spring rush. Everybody wants new shoes, and nobody wants to break them in.",
 		"summer": "Summer's busy. Half my customers want rope, half want directions, and one wants to know where the bears are.",
 		"fall": "Fall's for the serious climbers. They don't browse. They come in with a list.",
@@ -428,6 +438,9 @@ const LINES := {
 		"loved": "Oh, now that's a guide's tip! Thanks, partner.",
 	},
 	"jo_tolliver": {
+		"after": {
+			"wren_long_way": "Your friend Wren turned a party round on the Apron last week when the rain came in. Walked them all home. That's two parties I never had to go and get.",
+		},
 		"spring": "Spring's when the snow bridges give way and people go through them. We'll be busy.",
 		"summer": "Summer's our busiest season: heat, crowds, and people who think a water bottle is optional.",
 		"fall": "Fall's quieter, but the short days catch people out. Carry a light.",
@@ -561,6 +574,15 @@ static func choices(character: CharacterData, places := PackedStringArray()) -> 
 		var weight: int = WEIGHTS.get("season" if key in SEASON_KEYS else key, 1)
 		for text in _texts(own.get(key)):
 			out.append([text, weight])
+	# what they say once a side story of theirs is done: the latest one's lines
+	var after: Dictionary = own.get("after", {})
+	var latest := ""
+	for quest_id: String in after:
+		if QuestLog.is_completed(quest_id):
+			latest = quest_id
+	if latest != "":
+		for text in _texts(after[latest]):
+			out.append([text, WEIGHTS.after])
 	var at: Dictionary = own.get("places", {})
 	for place: String in places:
 		if at.has(place):
@@ -578,6 +600,9 @@ static func all_lines(character_id: String) -> PackedStringArray:
 		if key == "news" or key == "places":
 			for sub: String in own[key]:
 				out.append(own[key][sub])
+		elif key == "after":
+			for sub: String in own[key]:
+				out.append_array(_texts(own[key][sub]))
 		else:
 			out.append_array(_texts(own[key]))
 	return out

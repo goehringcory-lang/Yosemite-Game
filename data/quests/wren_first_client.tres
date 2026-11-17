@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "wren_first_client"
+title = "First Client"
+giver = "wren_alvarez"
+requires = PackedStringArray("wren_reference", "harding_summit")
+offered_in = 3
+out_of_season = PackedStringArray("The school posts the guide list in spring, when the snow's off the Apron. I check the board every single day anyway.")
+intro = PackedStringArray("THE LIST WENT UP. I'm on it. Me. Guide Alvarez. Well, assistant guide. Assistant guide Alvarez!", "And you're my first client. Free of charge, forever. That's a rule now.", "Meet me at the bottom of Firefall Slab in the morning, and be a normal client. Ask me dumb questions. Pretend you've never seen a rope. I need the practice before the real ones start.")
+steps = [{"type": "time", "from": 6, "to": 9, "objective": "Meet Wren at Firefall Slab in the morning (6 to 9 AM) for your guided climb", "reminder": "Mornings! Six to nine, before it's too hot for slab. Bring your shoes and your worst questions.", "done": ["Good morning and welcome to the Yosemite Mountaineering School! My name is Wren and I'll be your guide today.", "This is a rope. This is a harness. And this is a carabiner, which you... know what a carabiner is. You've climbed the Nose. I'm explaining carabiners to somebody who climbed the Nose.", "Okay. Okay. Climbing! You're on belay. Heels low, trust the rubber. That's all slab is.", "...", "That was perfect. You were a perfect client. I'm never going to get a client like you again, am I.", "My first real one's right after you. He wants Nutcracker. I'll tell you how it goes."]}, {"type": "talk", "target": "mountain_shop", "objective": "Ask Marty Kessler at the Mountain Shop how Wren's first real client went", "reminder": "Don't ask me how it went. Ask Marty. Or don't. Actually, don't.", "done": ["She didn't tell you? No, she wouldn't.", "Her client wanted Nutcracker. Nice day, until about noon. Thunderheads came up over the Cathedrals, the way they do.", "She turned him round below the mantel, one pitch from the top, and walked him off in the first drops of rain. He came back in here soaking wet and wanted his money back. Said she lost her nerve.", "I've been selling ropes for a lot of years. That wasn't nerve she lost. Go and tell her that, would you? She won't hear it from me."]}, {"type": "return", "objective": "Go and find Wren", "reminder": "You talked to Marty, didn't you. I can tell.", "done": ["He wrote a letter. To the school. A whole letter, about me.", "Everyone keeps saying I did the right thing. Marty, the head guide, the lady in the store who heard about it somehow.", "It doesn't feel like the right thing when someone's yelling at you on a ledge. It feels like you're the one who's wrong and everybody's being nice about it.", "Maybe I'm a good climber and a bad guide. Maybe that's a thing."]}]
+outro = PackedStringArray("Thanks for being my first client. Only good one so far.", "Partner rule still counts. Take the snacks. I'm not hungry.")
+reward_items = {"chocolate_bar": 2}

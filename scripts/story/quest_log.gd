@@ -69,6 +69,10 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/ahwahnee_chef_larder.tres"),
 	preload("res://data/quests/wren_slackline.tres"),
 	preload("res://data/quests/wren_lightning.tres"),
+	# Wren's own story: the climbing school, her first client, and the Arches
+	preload("res://data/quests/wren_reference.tres"),
+	preload("res://data/quests/wren_first_client.tres"),
+	preload("res://data/quests/wren_long_way.tres"),
 	preload("res://data/quests/greg_first_rod.tres"),
 	# The first night out, and Half Dome from the back (Backcountry).
 	preload("res://data/quests/hodges_first_night.tres"),

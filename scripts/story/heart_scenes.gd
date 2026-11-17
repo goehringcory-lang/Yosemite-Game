@@ -659,11 +659,17 @@ const SCENES := {
 		},
 		5: {
 			"lines": [
-				"So, I applied to guide for the climbing school next season. Like, actually applied. With a form.",
-				"I wouldn't have even tried if you hadn't kept dragging me up stuff. You make me braver.",
-				"If I get it, you're my first client. Free of charge. Forever.",
+				"So, I keep thinking about guiding for the climbing school. Like, actually doing it. Taking strangers up rock.",
+				"I wouldn't even think about it if you hadn't kept dragging me up stuff. You make me braver.",
+				"If I ever do it, you're my first client. Free of charge. Forever.",
 			],
-			"ask": "Do you think I'll get it?",
+			"ask": "Do you think I'd be any good?",
+			# once she's applied to the school, she says so instead
+			"since": {"quest": "wren_reference", "lines": [
+				"So, I'm really doing it. The school, the form, strangers on my rope.",
+				"I wouldn't have even tried if you hadn't kept dragging me up stuff. You make me braver.",
+				"You're my first client. Free of charge. Forever.",
+			], "ask": "Do you think I'm any good at it?"},
 			"options": ["Definitely", "They'd be crazy not to", "Only if you're back by one"],
 			"replies": [
 				"You're just saying that. ...Say it again.",
@@ -924,7 +930,7 @@ static func play(box: DialogueBox, character_id: String, speaker: String, anchor
 	var level := ready_for(character_id)
 	if level == 0:
 		return
-	var scene: Dictionary = SCENES[character_id][level]
+	var scene := scene_now(SCENES[character_id][level])
 	Friendship.scenes[character_id] = level
 	if level == LEVELS.back():
 		# the first thing they save for you comes a week from now
@@ -945,6 +951,20 @@ static func play(box: DialogueBox, character_id: String, speaker: String, anchor
 		Hearts.pop(anchor)
 	Sound.play("heart", 0.0, 0.0)
 	await box.say(after)
+
+
+## [param scene] as it plays now: a scene with a "since" (quest id, and the
+## "lines" and "ask" to use once that quest is under way or done) says those
+## instead, so a friend's news never runs behind their story.
+static func scene_now(scene: Dictionary) -> Dictionary:
+	var since: Dictionary = scene.get("since", {})
+	if since.is_empty() or not (QuestLog.active.has(since.quest) or QuestLog.is_completed(since.quest)):
+		return scene
+	var out := scene.duplicate()
+	for key: String in ["lines", "ask"]:
+		if since.has(key):
+			out[key] = since[key]
+	return out
 
 
 ## Hands over what [param scene] gives you and returns "Received ..." (or "").
@@ -989,6 +1009,10 @@ static func all_lines(character_id: String) -> PackedStringArray:
 		var scene: Dictionary = scenes[level]
 		out.append_array(PackedStringArray(scene.get("lines", [])))
 		out.append_array(PackedStringArray(scene.get("replies", [])))
+		var since: Dictionary = scene.get("since", {})
+		out.append_array(PackedStringArray(since.get("lines", [])))
+		if since.get("ask", "") != "":
+			out.append(since.ask)
 		for key: String in ["ask", "end", "saved"]:
 			if scene.get(key, "") != "":
 				out.append(scene[key])
