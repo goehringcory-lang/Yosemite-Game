@@ -14,7 +14,7 @@ extends Node
 
 const PALETTE_PATH := "res://tools/art32/valley_days.gpl"
 ## Areas that keep a ground of their own (see paint.py's SKIP).
-const OWN_GROUND := ["tuolumne_meadows"]
+const OWN_GROUND := ["tuolumne_meadows", "tenaya_lake"]
 ## Every this many pixels across and down is looked at.
 const STEP := 16
 ## A native ground is off the palette nearly everywhere; a builder's nowhere.

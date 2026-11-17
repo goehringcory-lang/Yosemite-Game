@@ -14127,6 +14127,9 @@ amount_scale = 3.0
 [node name="arrival" type="Marker2D" parent="Markers" unique_id=772271155]
 position = Vector2(1296, 1600)
 
+[node name="west" type="Marker2D" parent="Markers" unique_id=1851081500]
+position = Vector2(80, 1504)
+
 [node name="cathedral_lakes_trailhead" type="Marker2D" parent="Markers" unique_id=729693686]
 position = Vector2(1008, 1584)
 
@@ -14250,8 +14253,11 @@ show_on_map = true
 [node name="TiogaRoadWest" type="Area2D" parent="Exits" unique_id=1593196567]
 position = Vector2(16, 1504)
 script = ExtResource("64_5fc0e")
-label = "Tioga Road"
-travel_to = "yosemite_valley"
+label = "Tioga Road, to Tenaya Lake"
+target_region = "tenaya_lake"
+target_spawn = "east"
+minutes = 15
+miles = 8.1
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/TiogaRoadWest" unique_id=646247330]
 shape = SubResource("RectangleShape2D_hst42")

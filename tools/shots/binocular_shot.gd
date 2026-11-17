@@ -1,10 +1,11 @@
 extends Node
-## Saves screenshots of Glacier Point's viewers (scripts/ui/binocular_view.gd)
+## Saves screenshots of Glacier Point's (and Olmsted Point's) viewers (scripts/ui/binocular_view.gd)
 ## at a few bearings, hours and powers. Needs a window (not --headless).
 ##   SHOT_DIR=/tmp/shots xvfb-run -a godot --path . res://tools/shots/binocular_shot.tscn
 ##   SHOT_ONLY=half_dome ...   (one shot)
 
-## name, bearing, hour, zoom index, tilt, season
+## name, bearing, hour, zoom index, tilt, season, and the view if it isn't
+## Glacier Point's
 const SHOTS := [
 	["half_dome", 65.0, 11.0, 0, 0.0, GameClock.Season.SUMMER],
 	["half_dome_16x", 65.0, 11.0, 1, NAN, GameClock.Season.SUMMER],
@@ -14,6 +15,9 @@ const SHOTS := [
 	["curry_village", 9.0, 13.0, 0, 0.72, GameClock.Season.SUMMER],
 	["night", 65.0, 22.5, 0, 0.0, GameClock.Season.SUMMER],
 	["first_look", 65.0, 11.0, 0, 0.0, GameClock.Season.SUMMER],
+	["olmsted_half_dome", 198.0, 10.0, 0, 0.0, GameClock.Season.SUMMER, "olmsted_point"],
+	["olmsted_half_dome_16x", 211.0, 10.0, 1, NAN, GameClock.Season.SUMMER, "olmsted_point"],
+	["olmsted_tenaya_peak", 70.0, 18.5, 0, 0.0, GameClock.Season.SUMMER, "olmsted_point"],
 ]
 
 
@@ -28,13 +32,14 @@ func _ready() -> void:
 		GameClock.minutes = int(shot[2] * 60.0)
 		# the last shot is a first visit: nothing named yet, mid-lock
 		Park.spotted_peaks.clear()
+		var view_id: String = shot[6] if shot.size() > 6 else "glacier_point"
 		if shot[0] != "first_look":
-			for t: Dictionary in BinocularView.VIEWS.glacier_point.targets:
+			for t: Dictionary in BinocularView.VIEWS[view_id].targets:
 				Park.spotted_peaks[t.id] = true
 			Park.spotted_peaks.erase("mt_clark")
 			Park.spotted_peaks.erase("basket_dome")
 		var view := BinocularView.new()
-		view.setup("glacier_point", shot[1])
+		view.setup(view_id, shot[1])
 		add_child(view)
 		view.tilt = 0.0 if is_nan(shot[4]) else shot[4]
 		await get_tree().create_timer(0.3).timeout

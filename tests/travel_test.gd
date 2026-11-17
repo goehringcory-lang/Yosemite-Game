@@ -154,8 +154,30 @@ func _ready() -> void:
 	clock = GameClock.minutes
 	world.use_exit(world.region.get_node("Exits/TiogaRoad"))
 	await _settle(world)
-	check(world.region.region_id == "tuolumne_meadows" and GameClock.minutes == clock + 70,
-		"the Tioga Road drives on from Crane Flat to Tuolumne Meadows (%d min)" % (GameClock.minutes - clock))
+	check(world.region.region_id == "tenaya_lake" and GameClock.minutes == clock + 55,
+		"the Tioga Road drives on from Crane Flat to Tenaya Lake (%d min)" % (GameClock.minutes - clock))
+	check(world.player.global_position.distance_to(world.region.get_spawn("west").global_position) < 64.0,
+		"the drive comes in at Tenaya Lake's west end, by Olmsted Point")
+	clock = GameClock.minutes
+	world.use_exit(world.region.get_node("Exits/TiogaRoadEast"))
+	await _settle(world)
+	check(world.region.region_id == "tuolumne_meadows" and GameClock.minutes == clock + 15,
+		"the Tioga Road goes on along the lake to Tuolumne Meadows (%d min)" % (GameClock.minutes - clock))
+	clock = GameClock.minutes
+	world.use_exit(world.region.get_node("Exits/TiogaRoadWest"))
+	await _settle(world)
+	check(world.region.region_id == "tenaya_lake" and GameClock.minutes == clock + 15,
+		"west from Tuolumne, the Tioga Road comes back to Tenaya Lake (%d min)" % (GameClock.minutes - clock))
+	GameClock.season = GameClock.Season.WINTER
+	world.use_exit(world.region.get_node("Exits/TiogaRoadWest"))
+	await _settle(world)
+	check(world.region.region_id == "tenaya_lake", "the Tioga Road west of Tenaya Lake is shut in winter too")
+	GameClock.season = GameClock.Season.SUMMER
+	clock = GameClock.minutes
+	world.use_exit(world.region.get_node("Exits/TiogaRoadWest"))
+	await _settle(world)
+	check(world.region.region_id == "crane_flat" and GameClock.minutes == clock + 55,
+		"and drives back down to Crane Flat (%d min)" % (GameClock.minutes - clock))
 	await world.go_to_region("big_oak_flat_junction", "east")
 	clock = GameClock.minutes
 	world.use_exit(world.region.get_node("Exits/ElPortalRoad"))

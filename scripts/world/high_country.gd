@@ -1,6 +1,7 @@
 class_name HighCountry
 extends RefCounted
-## The light and air of the high country (Tuolumne Meadows, 8,600 feet),
+## The light and air of the high country (Tuolumne Meadows, 8,600 feet, and
+## Tenaya Lake down the Tioga Road),
 ## shared by the outdoor grade (Atmosphere), the mist (ValleyAir) and the
 ## cloud shadows (CloudShadows):
 ##  - the air is thin and clean, so there's little haze (except the smoke of
@@ -12,7 +13,7 @@ extends RefCounted
 ##    light dims before it breaks, then the air clears;
 ##  - nights are darker and colder blue, with no valley haze.
 
-const REGIONS := ["tuolumne_meadows"]
+const REGIONS := ["tuolumne_meadows", "tenaya_lake"]
 ## A climb in the high country, whose weather (WallWeather) names the hour the
 ## afternoon storm breaks, so the sky over the meadow agrees with the guidebook.
 const STORM_ROUTE := "cathedral_peak"

@@ -61,7 +61,7 @@ from ramps import COLORS, RAMPS  # noqa: E402
 WATER_SET = (RIVER, LAKE, CREEK, FALLS)
 PAVE_SET = (PARKING, PAVED, BUILT, BRIDGE)
 
-SKIP = {"tuolumne_meadows"}
+SKIP = {"tuolumne_meadows", "tenaya_lake"}
 
 # Per-area settings: what the forest kind is in that place, and the shapes
 # the 16px builders drew over the tile ground.
