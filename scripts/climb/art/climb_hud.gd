@@ -300,17 +300,44 @@ const RESULT_TEXT := {
 }
 
 
-static func crux_result(ci: CanvasItem, result: String, age: float) -> void:
+## The stamp rises from over the climber ([param at], the torso): it pops in
+## big and settles; a miss shakes. [param flow] perfect cruxes in a row add
+## "Flow x3" under a perfect.
+static func crux_result(ci: CanvasItem, result: String, age: float, at := Vector2(SCREEN.x * 0.5, 130.0), flow := 0) -> void:
 	if age > 1.4:
 		return
 	var text: String = RESULT_TEXT.get(result, "")
 	var col: Color = UI.CREAM
-	if result.begins_with("slip") or result in ["nail_over", "nail_slip", "haul_slip"]:
+	var miss := result.begins_with("slip") or result in ["nail_over", "nail_slip", "haul_slip"]
+	if miss:
 		col = UI.WARN
 	elif result in ["perfect", "nail_perfect", "haul_perfect"]:
 		col = UI.GOLD
-	var y := 100.0 - age * 30.0
-	UI.text(ci, Vector2(SCREEN.x * 0.5, y), text, col, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER, clampf(1.4 - age, 0.0, 1.0))
+	var alpha := clampf(1.4 - age, 0.0, 1.0)
+	# Over the climber, kept clear of the screen's edges and the plates at the top.
+	var pos := Vector2(clampf(at.x, 80.0, SCREEN.x - 120.0), clampf(at.y - 36.0 - age * 24.0, 52.0, SCREEN.y - 60.0))
+	if miss and age < 0.3:
+		pos.x += roundf(sin(age * 70.0) * 3.0 * (1.0 - age / 0.3))
+	# Pop: 1.6x at once, down to 1x over the first 0.15 s (an ease-out).
+	var pop := 1.0 + 0.6 * pow(clampf(1.0 - age / 0.15, 0.0, 1.0), 2.0)
+	ci.draw_set_transform(pos.round(), 0.0, Vector2(pop, pop))
+	UI.outlined(ci, Vector2.ZERO, text, col, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER, alpha)
+	ci.draw_set_transform(Vector2.ZERO)
+	if flow >= 2 and result == "perfect":
+		UI.outlined(ci, pos.round() + Vector2(0, 13), "Flow x%d" % flow, UI.CREAM, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER, alpha)
+
+
+## A medal: a little disc with a ribbon, [param medal] from Achievements.MEDALS.
+static func medal(ci: CanvasItem, center: Vector2, medal_id: int) -> void:
+	if medal_id <= 0:
+		return
+	var c := center.round()
+	var col: Color = Achievements.MEDAL_COLORS[medal_id]
+	ci.draw_rect(Rect2(c + Vector2(-3, -8), Vector2(2, 4)), Color("3a6fa8"))
+	ci.draw_rect(Rect2(c + Vector2(1, -8), Vector2(2, 4)), Color("b3362b"))
+	ci.draw_circle(c, 4.5, col.darkened(0.45))
+	ci.draw_circle(c, 3.5, col)
+	ci.draw_rect(Rect2(c + Vector2(-1, -2), Vector2(2, 1)), col.lightened(0.5))
 
 
 # ---------------------------------------------------------------- cards
@@ -364,11 +391,27 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 	var text_w := 452.0 - 32.0
 	var lines := UI.wrap_lines(route.description, text_w, 10)
 	var tip := UI.wrap_lines("Tip: " + route.guide_tip, text_w, 10) if route.guide_tip != "" else PackedStringArray()
+	# Your record here: the medal, your best, and what the next medal asks.
+	var record: Dictionary = view.get("record", {})
+	var medal_have := int(record.get("medal", 1)) if not record.is_empty() else 0
+	var record_text := ""
+	if not record.is_empty():
+		record_text = "Your record: %s, sent %s" % [Achievements.MEDALS[medal_have], "once" if int(record.count) == 1 else "%d times" % int(record.count)]
+		var fastest := int(record.get("minutes", 0))
+		if fastest > 0:
+			record_text += ", best %dh %02dm" % [fastest / 60, fastest % 60]
+		record_text += "."
+	var goal := Achievements.next_medal_text(route, medal_have)
+	if goal != "" and record_text != "":
+		record_text += " Next: " + goal
+	# A route you haven't sent has no record yet (the result card brings the
+	# medals up), which keeps the tallest cards, like the Nose's, on screen.
+	var record_h := 15.0 if record_text != "" else 0.0
 	var band_at := 49.0 # from the top of the card
 	var bottom := maxf(band_at + 61.0, maxf(band_at + 3 + facts.size() * 11, band_at + 19 + (n - 1) * row_h + 3.0))
 	var text_at := bottom + 12.0
 	var last_line := text_at + (lines.size() - 1) * 11 + (4 + tip.size() * 11 if not tip.is_empty() else 0)
-	var gear_at := last_line + 17.0
+	var gear_at := last_line + 17.0 + record_h
 	var height := gear_at + 25.0
 	var slide := minf(age * 4.0, 1.0)
 	var r := Rect2(14, lerpf(280.0, (SCREEN.y - height) * 0.5, 1.0 - pow(1.0 - slide, 3.0)), 452, height)
@@ -415,6 +458,12 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 		UI.ink(ci, Vector2(x, ty + i * 11), lines[i], UI.INK, 10)
 	for i in tip.size():
 		UI.ink(ci, Vector2(x, ty + lines.size() * 11 + 4 + i * 11), tip[i], UI.WARN_DARK, 10)
+	# The record line, with its medal.
+	var ry := r.position.y + gear_at - record_h - 2.0
+	var rx := x + (12.0 if medal_have > 0 else 0.0)
+	if medal_have > 0:
+		medal(ci, Vector2(x + 4, ry - 3), medal_have)
+	UI.ink(ci, Vector2(rx, ry), record_text, UI.GOOD_DARK if medal_have == Achievements.GOLD else UI.INK_SOFT, 10, text_w - 12.0)
 	# Gear you need, with what you have.
 	var gy := r.position.y + gear_at
 	UI.ink(ci, Vector2(x, gy), "GEAR", UI.WARN_DARK, 10)
@@ -434,7 +483,7 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 	UI.keys(ci, Vector2(r.end.x - 16, fy), ("[%s] Not yet" % UI.button(ci, "Esc", "B")) if too_late else "[%s] Start climbing    [%s] Not yet" % [UI.button(ci, "E", "A"), UI.button(ci, "Esc", "B")], UI.INK_SOFT, 10, HORIZONTAL_ALIGNMENT_RIGHT)
 
 
-static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, belayer_line: String, age: float, won: bool) -> void:
+static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, belayer_line: String, age: float, won: bool, extra := {}) -> void:
 	ci.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0.03, 0.03, 0.06, 0.6 * minf(age * 3.0, 1.0)))
 	var width := 340.0
 	var inner := width - 36.0
@@ -454,6 +503,30 @@ static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, 
 			rows.append("A free ascent! No pulling on gear.")
 		if state.jug_moves > 0:
 			rows.append("Jugged %d fixed-rope moves" % state.jug_moves)
+		if int(extra.get("best_flow", 0)) >= 2:
+			rows.append("Best flow: %d perfect cruxes in a row" % int(extra.best_flow))
+	# The medal, and what's new against your record on this route.
+	var record: Dictionary = extra.get("record", {})
+	var earned := Achievements.medal_for(state) if won else 0
+	var had := int(record.get("medal", 1)) if not record.is_empty() else 0
+	var news := PackedStringArray()
+	if won:
+		if record.is_empty():
+			news.append("First send!")
+		else:
+			if earned > had:
+				news.append("New medal!")
+			if state.minutes > 0 and int(record.get("minutes", 0)) > 0 and state.minutes < int(record.minutes):
+				news.append("New best time!")
+			if int(record.get("falls", -1)) > 0 and state.falls < int(record.falls):
+				news.append("Fewest falls yet!")
+		var medal_row := "Medal: %s" % Achievements.MEDALS[earned]
+		if had > earned:
+			medal_row += " (best: %s)" % Achievements.MEDALS[had]
+		var next := Achievements.next_medal_text(state.route, maxi(earned, had))
+		if next != "":
+			medal_row += "  (%s)" % next
+		rows.append(medal_row)
 	var quote := PackedStringArray()
 	if belayer_line != "":
 		quote = UI.wrap_lines("\"%s\"" % belayer_line, inner, 10)
@@ -478,6 +551,11 @@ static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, 
 	ci.draw_rect(Rect2(x, y + 20, r.size.x - 36, 1), UI.PAPER_DARK)
 	for i in rows.size():
 		UI.ink(ci, Vector2(x, y + 36 + i * 12), rows[i], UI.INK, 10)
+	if won:
+		medal(ci, Vector2(x + UI.text_width(rows[rows.size() - 1], 10) + 9, y + 36 + (rows.size() - 1) * 12 - 3), earned)
+	if not news.is_empty():
+		var pulse := 0.75 + 0.25 * sin(age * 6.0)
+		UI.outlined(ci, Vector2(r.position.x + r.size.x * 0.5, r.position.y - 6), "  ".join(news), Color(UI.GOLD, pulse), 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER, minf(age * 2.0, 1.0))
 	# Stars: a rating for the style.
 	if won:
 		var stars := 3

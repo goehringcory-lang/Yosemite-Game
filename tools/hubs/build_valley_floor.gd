@@ -5,7 +5,7 @@ extends AhwahneeStyle
 ## neighbors. Each place is in one scene only; the trails between them are
 ## for walking, like the Stoneman Meadow trail.
 ##
-##        [drive: Tuolumne] - Crane Flat
+##  [drive: Tenaya Lake, Tuolumne] - Crane Flat
 ##                                 |  (Big Oak Flat Road, Highway 120)
 ##       [drive: El Portal] - Big Oak Flat Road Junction
 ##                                         |
@@ -430,7 +430,11 @@ func _crane_flat() -> void:
 	_long_road("BigOakFlatRoadDown", tile_pos(32.5, 35.5), Vector2(48, 12), "Big Oak Flat Road", "big_oak_flat_junction", "north", 20, 9.2)
 	region_exit("BigOakFlatRoadWest", tile_pos(-0.5, 22.5), Vector2(12, 48), "Big Oak Flat Road", "", "") \
 		.set("message", "Big Oak Flat Road goes on west out of the park, past the Big Oak Flat Entrance to Groveland.")
-	_drive_on("TiogaRoad", tile_pos(63.5, 20.5), Vector2(12, 48), "Tioga Road", "tuolumne_meadows", 70, 38.1)
+	# The Tioga Road east: the drive to Tuolumne (its closure and lock hold
+	# as on the map), with its first stop at Tenaya Lake (build_tenaya_lake.gd).
+	_drive_on("TiogaRoad", tile_pos(63.5, 20.5), Vector2(12, 48), "Tioga Road", "tuolumne_meadows", 55, 30.0)
+	_exits.get_node("TiogaRoad").set("stop_region", "tenaya_lake")
+	_exits.get_node("TiogaRoad").set("stop_spawn", "west")
 	_finish("crane_flat", 2.0)
 
 

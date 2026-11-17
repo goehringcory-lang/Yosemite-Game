@@ -43,6 +43,10 @@ const HAUL_DROP := 64.0
 ## A dyno's fill rises this fraction as fast as the timing marker moves:
 ## you're reading one rise, not a sweep you can watch go by.
 const DYNO_SPEED := 0.7
+## Seconds a perfect crux holds still, and the run of perfects that has the
+## belayer call out the flow.
+const HITSTOP := 0.08
+const FLOW_CALL := 3
 ## The top of the gear tray along the bottom. A belayer whose feet sink below
 ## this is off the bottom of the picture, not half hidden behind the tray.
 const TRAY_TOP := 237.0
@@ -122,6 +126,14 @@ var _falcon_wait := 0.0
 var _falcon_t := -1.0
 var _falcon_from := Vector2.ZERO
 var _won_line := ""
+## Perfect cruxes in a row ("Flow"), and the longest run this climb.
+var flow := 0
+var best_flow := 0
+## A beat's pause on a perfect crux: the climber and the sparks hold still.
+var _hitstop := 0.0
+## The route's record before this climb (Achievements.sends), for "New best"
+## on the result card.
+var _record_before := {}
 var _seed := -1
 ## True while a roof pitch is showing: the picture runs sideways.
 var _roof := false
@@ -136,6 +148,7 @@ func setup(p_route: RouteData, seed := -1) -> void:
 	state = ClimbState.new(route, Gear.carried("cam"), seed, _kit)
 	state.interactive = true
 	state.conditions = WallWeather.today(route.id)
+	_record_before = Achievements.sends.get(route.id, {}).duplicate()
 
 
 func _ready() -> void:
@@ -200,8 +213,13 @@ func _process(delta: float) -> void:
 	_shake = maxf(_shake - delta * 18.0, 0.0)
 	_act_t = minf(_act_t + delta / 0.35, 1.0)
 	_lightning = maxf(_lightning - delta * 5.0, 0.0)
+	# The hit-stop: a perfect crux holds the moment for a beat.
+	var anim_delta := delta
+	if _hitstop > 0.0:
+		_hitstop -= delta
+		anim_delta = 0.0
 	if _move_t < 1.0:
-		_move_t = minf(_move_t + delta / _move_dur, 1.0)
+		_move_t = minf(_move_t + anim_delta / _move_dur, 1.0)
 		var t := _move_t * _move_t * (3.0 - 2.0 * _move_t)
 		_shown = _from.lerp(Vector2(state.col, state.row), t)
 	else:
@@ -220,7 +238,7 @@ func _process(delta: float) -> void:
 	if _phase == Phase.RESULT:
 		_result_age += delta
 	_weather(delta)
-	_fx.update(delta)
+	_fx.update(anim_delta)
 	# Low stamina: the climber sweats.
 	if _phase == Phase.CLIMB and state.stamina <= 25 and state.status == ClimbState.Status.CLIMBING and fmod(_time, 0.9) < delta:
 		_fx.sweat(_torso() + Vector2(4, -16))
@@ -431,6 +449,7 @@ func _events() -> void:
 				if randf() < 0.4:
 					_speak("rest")
 			"fall":
+				flow = 0
 				Sound.play("climb_fall", 0.0, 0.03)
 				Rumble.play("fall")
 				_fell = true
@@ -440,13 +459,28 @@ func _events() -> void:
 			"crux":
 				_crux_result = e.result
 				_crux_result_age = 0.0
-				if e.result == "slip":
-					Rumble.play("miss")
-				if e.result == "perfect":
-					Sound.play("climb_crux", 0.0, 0.0)
-					Rumble.play("crux")
-					_fx.sparks(_torso() + Vector2(0, -16), 16)
-					_speak("crux")
+				match e.result:
+					"perfect":
+						flow += 1
+						best_flow = maxi(best_flow, flow)
+						# Each perfect in a row rings a little higher.
+						Sound.play("climb_crux", 0.0, 0.0, 1.0 + 0.06 * mini(flow - 1, 6))
+						Rumble.play("crux")
+						_fx.sparks(_torso() + Vector2(0, -16), 16 + 4 * mini(flow - 1, 4))
+						_hitstop = HITSTOP
+						_shake = maxf(_shake, 1.5)
+						_speak("flow" if flow == FLOW_CALL else "crux")
+					"good":
+						flow = 0
+						Sound.play("climb_crux", -9.0, 0.0, 0.8)
+						_fx.sparks(_torso() + Vector2(0, -16), 5)
+					_:
+						flow = 0
+						Rumble.play("miss")
+						Sound.play("climb_move", 0.0, 0.0, 0.55)
+						Sound.play("climb_fall", -14.0, 0.0, 1.5)
+						_shake = maxf(_shake, 3.0)
+						_fx.dust(_torso() + Vector2(0, 20), _dust_color(), 6)
 			"aid", "jug":
 				Sound.play("climb_jug")
 				_fx.sparks(_torso() + Vector2(6, -14), 6)
@@ -926,13 +960,14 @@ func _draw_screen() -> void:
 		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0, 0, 0, _fade))
 	match _phase:
 		Phase.INTRO:
-			ClimbHud.route_card(_canvas, state, profile, belayer_look, _recommended_food(), _card_age, {"sky": _sky_tex, "layers": _layers})
+			ClimbHud.route_card(_canvas, state, profile, belayer_look, _recommended_food(), _card_age, {"sky": _sky_tex, "layers": _layers, "record": _record_before})
 		Phase.CRUX:
 			ClimbHud.crux(_canvas, _crux.kind, _crux.name, _crux, _time)
 		Phase.PAUSE:
 			ClimbHud.pause_card(_canvas, state)
 		Phase.RESULT:
-			ClimbHud.result_card(_canvas, state, profile, _won_line, _result_age, state.status == ClimbState.Status.TOPPED_OUT)
+			ClimbHud.result_card(_canvas, state, profile, _won_line, _result_age, state.status == ClimbState.Status.TOPPED_OUT,
+				{"record": _record_before, "best_flow": best_flow})
 
 
 ## About how much food energy this route wants, for the route card.
@@ -1578,4 +1613,4 @@ func _draw_hud(height: float) -> void:
 		ClimbHud.toast(_canvas, _toast_text, _toast_age)
 		ClimbHud.pitch_banner(_canvas, state, _banner_age)
 	if _phase == Phase.CRUX or _crux_result_age < 1.4:
-		ClimbHud.crux_result(_canvas, _crux_result, _crux_result_age)
+		ClimbHud.crux_result(_canvas, _crux_result, _crux_result_age, _torso() + _shake_offset(), flow)

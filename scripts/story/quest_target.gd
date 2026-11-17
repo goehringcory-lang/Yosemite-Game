@@ -113,11 +113,12 @@ static func hub_of(region_id: String) -> String:
 	var path := "res://scenes/regions/%s.tscn" % region_id
 	if FileAccess.file_exists(path):
 		var file := FileAccess.open(path, FileAccess.READ)
-		# hub_id sits near the top, on the root node
-		for i in 400:
-			if file.eof_reached():
-				break
+		# hub_id sits on the root node, after the resources (which can run to
+		# hundreds of lines) and before the first child node
+		while not file.eof_reached():
 			var line := file.get_line()
+			if line.begins_with("[node ") and "parent=" in line:
+				break
 			if line.begins_with("hub_id = "):
 				hub = line.trim_prefix("hub_id = ").trim_prefix("\"").trim_suffix("\"")
 				break

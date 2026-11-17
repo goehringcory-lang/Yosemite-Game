@@ -281,13 +281,16 @@ func _place_lodge() -> void:
 
 
 func _place_roads() -> void:
-	region_exit("TiogaRoadWest", tile_pos(0, 46.5), Vector2(16, 40), "Tioga Road", "", "").set("travel_to", "yosemite_valley")
+	# West along the Tioga Road to Tenaya Lake (build_tenaya_lake.gd), and on
+	# from there to Crane Flat.
+	_long_road("TiogaRoadWest", tile_pos(0, 46.5), Vector2(16, 40), "Tioga Road, to Tenaya Lake", "tenaya_lake", "east", 15, 8.1)
 	_road_out("TiogaRoadEast", tile_pos(139, 45.5), Vector2(16, 40), "Tioga Road",
 		"Tioga Road climbs east over Tioga Pass toward Lee Vining and Mono Lake.")
 
 
 func _place_markers() -> void:
 	marker("arrival", 40, 49.5)
+	marker("west", 2, 46.5)
 	marker("cathedral_lakes_trailhead", 31, 49)
 	marker("soda_springs", 66, 19.5)
 	marker("lembert_dome", 108, 22)

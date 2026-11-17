@@ -464,6 +464,7 @@ func _draw() -> void:
 		"wall_tent": _draw_wall_tent()
 		"print": _draw_print()
 		"hammock": _draw_hammock()
+		"chalk_peg": _draw_chalk_peg()
 		"bird_bath": _draw_bird_bath()
 		"woodpile": _draw_woodpile()
 		"pot_crane": _draw_pot_crane()
@@ -645,6 +646,27 @@ func _draw_hammock() -> void:
 	draw_polyline(points, WEBBING, 4.0)
 	for i in range(1, 16, 3):
 		draw_rect(Rect2(points[i] - Vector2(1, 2), Vector2(2, 4)), WEBBING_HI)
+
+
+## Wren's chalk bag and a hook for yours, on a peg by the fire.
+func _draw_chalk_peg() -> void:
+	_shadow(14, 4)
+	_post(0, -26, 3.0)
+	# the crossbar with two hooks
+	draw_rect(Rect2(-10, -26, 20, 3).grow(1), INK)
+	draw_rect(Rect2(-10, -26, 20, 3), WOOD)
+	draw_rect(Rect2(-10, -26, 20, 1), WOOD_HI)
+	for x in [-7, 6]:
+		draw_rect(Rect2(x, -23, 1, 3), IRON)
+	# Wren's teal bag, chalky at the rim
+	var teal := Color("4a8a8a")
+	draw_rect(Rect2(-10, -20, 7, 8).grow(1), INK)
+	draw_rect(Rect2(-10, -20, 7, 8), teal)
+	draw_rect(Rect2(-10, -13, 7, 1), teal.darkened(0.3))
+	draw_rect(Rect2(-10, -20, 7, 2), PAPER)
+	draw_rect(Rect2(-9, -21, 5, 1), PAPER)
+	# and the empty hook, for yours
+	draw_rect(Rect2(6, -20, 1, 1), IRON)
 
 
 func _draw_bird_bath() -> void:

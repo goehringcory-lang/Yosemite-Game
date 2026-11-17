@@ -211,6 +211,7 @@ Ranger's lantern . Hodges, her patrol .................... lit at night
 Canvas tent ...... Jennie Curry, her errand .............. replaces the little tent; 3 apples instead of 6
 Half Dome print .. Ansel Adams, Monolith
 Webbing hammock .. Wren, the rest of the Apron ........... instead of chocolate and apricots
+Two chalk bags ... Wren, Swinging Leads .................. her old chalk bag on a peg, and a hook for yours; with a cam
 Bird bath ........ Enid Michael, the dawn chorus ......... instead of strawberries
 Woodpile ......... Lamon, laying food by for winter ...... instead of 3 fresh apples
 Pot crane ........ Salathé, Hard Steel
@@ -262,6 +263,16 @@ After Swan Slab:
   Wren Alvarez: The Rest of the Apron ... food, then climb the Apron with Wren → chocolate, apricots
   Wren Alvarez: Gold on the Line ... win a gold medal on a Camp 4 slackline → Wren's Slackline (rig it between two trees anywhere)
                                           (pays off Wren's promise; the same tick finishes Eichorn's quest)
+Wren's own story (invented, like Wren; Marty and Jo have parts in it):
+  Wren Alvarez: With a Form ....... (after Robbins's clean climb and joining Jo's team) carry her climbing-school
+                                    application to Marty and Jo for references; Jo asks when she'd turn a client
+                                    round; lunch for her check-out climb → trail mix
+  Wren Alvarez: First Client ...... (after the Nose; spring or summer, when the guide list goes up) a guided
+                                    morning on Firefall Slab (6 to 9 AM); Marty tells how she turned her first
+                                    real client round below Nutcracker's mantel in a storm → chocolate
+  Wren Alvarez: Swinging Leads .... (after Royal Arches and your first call-out) ask Jo whether she's ever had
+                                    to fetch somebody who turned round; food for a long day; Royal Arches at
+                                    dawn (5 to 8 AM), swinging leads → a cam, her chalk bag for your camp
   Ansel Adams: Monolith ........... climb the Apron to the rim, report back → 2 quickdraws
   Anderson: Anderson's Iron ....... food worth 60 energy → Anderson's eyebolt (keepsake)
 After the Apron:

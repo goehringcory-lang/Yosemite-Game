@@ -52,9 +52,16 @@ const CRUXES_BY_DIFF: Array[int] = [0, 0, 1, 2, 3]
 const CRUX_GAP := 2
 const CRUX_FIRST := 3
 ## What the crux points a pitch gets for its grade are called, by style.
+## Names for the crux points a pitch's grade adds, by style. A pitch with
+## several takes them in turn, so the Nose's twenty aren't all "Thin jams".
 const CRUX_NAMES := {
-	"slab": "Thin smears", "crack": "Thin jams", "flake": "The layback", "chimney": "The squeeze",
-	"roof": "Roof jams", "dike": "The blank step", "knobs": "The long reach", "snow": "Steep snow", "ice": "Blue ice",
+	"slab": ["Thin smears", "A blank patch", "Polished friction", "The high step"],
+	"crack": ["Thin jams", "A flared bit", "Fingerlocks", "The pin scars", "A thin seam"],
+	"flake": ["The layback"], "chimney": ["The squeeze", "A flaring slot", "The chockstone"],
+	"roof": ["Roof jams", "Feet cut loose", "The undercling"],
+	"dike": ["The blank step", "Off the dike", "A thin bulge"],
+	"knobs": ["The long reach", "A wobbly knob", "The steep step"],
+	"snow": ["Steep snow", "Sun cups", "The rime band"], "ice": ["Blue ice", "A brittle step", "The water ice"],
 }
 ## The route card asks for one spare snack for every few crux points.
 const CRUXES_PER_SNACK := 4
@@ -76,17 +83,17 @@ const BELAYERS := {
 
 ## What a belayer says now and then. Keys are the events ClimbState reports.
 const BANTER := {
-	"wren_alvarez": {"start": "On belay! Smear with your feet, not your hands.", "clip": "Nice clip!", "fall": "Got you! Breathe.", "crux": "You've got this!", "top": "Off belay! That's a tick!", "rest": "Shake it out."},
-	"dick_leonard": {"start": "I have you from above. You can't fall far.", "clip": "", "fall": "Rope's tight. Take your time.", "crux": "Trust your feet.", "top": "Well climbed. Come on down.", "rest": "Rest on the rope if you need to."},
-	"jules_eichorn": {"start": "On belay. Watch your feet.", "clip": "Good piece.", "fall": "Caught you. Easy, now.", "crux": "Steady, steady.", "top": "That's it! Off belay.", "rest": "Plenty of time."},
-	"royal_robbins": {"start": "Climb clean. Every piece comes out again.", "clip": "That one's solid.", "fall": "Caught. Clean climbers fall gracefully.", "crux": "Commit to it.", "top": "Clean. Not a scar on the rock.", "rest": "Breathe."},
-	"bestor_robinson": {"start": "Ready when you are. It's a long way up.", "clip": "Sound.", "fall": "Held. Try that again.", "crux": "Easy does it.", "top": "A fine lead.", "rest": "Plenty of daylight yet."},
-	"john_salathe": {"start": "Slow and steady. The rock will wait.", "clip": "Good iron.", "fall": "The rope held. Good.", "crux": "Squeeze. Breathe out.", "top": "Hm. Not bad.", "rest": "Eat something."},
-	"beverly_johnson": {"start": "On belay. Climb like you're alone up there.", "clip": "Good.", "fall": "I've got you. Get back on it.", "crux": "Be bold!", "top": "That's the way.", "rest": "Rest, then go."},
-	"warren_harding": {"start": "Belay's on. Sure you don't want a drink first?", "clip": "Bolt? Beautiful.", "fall": "Whoa, got you! Hang there.", "crux": "Send it, you crazy kid!", "top": "You freed it. I'll be damned.", "rest": "Hang in there. Literally."},
-	"george_anderson": {"start": "I've drilled holes steeper than this. Go on.", "clip": "Solid.", "fall": "Held. Mind the runout.", "crux": "One move at a time.", "top": "Top of the dome, near enough.", "rest": "Take a breath."},
-	"chongo": {"start": "Spotting! Hands up. Fall like a cat, not like a piano.", "clip": "", "fall": "Got you. Pad did its job. Impulse!", "crux": "Go, go, go!", "top": "You did the mantel! Nobody does the mantel!", "rest": "Breathe. Gravity's patient."},
-	"john_muir": {"start": "Go up, and the mountains will show you things.", "clip": "", "fall": "Steady! The mountain isn't going anywhere.", "crux": "Mind your feet.", "top": "Ah! What a temple.", "rest": "Look around. Look!"},
+	"wren_alvarez": {"start": "On belay! Smear with your feet, not your hands.", "clip": "Nice clip!", "fall": "Got you! Breathe.", "crux": "You've got this!", "top": "Off belay! That's a tick!", "flow": "You're in the zone! Keep it going!", "rest": "Shake it out."},
+	"dick_leonard": {"start": "I have you from above. You can't fall far.", "clip": "", "fall": "Rope's tight. Take your time.", "crux": "Trust your feet.", "top": "Well climbed. Come on down.", "flow": "Smooth. You're climbing like it's easy.", "rest": "Rest on the rope if you need to."},
+	"jules_eichorn": {"start": "On belay. Watch your feet.", "clip": "Good piece.", "fall": "Caught you. Easy, now.", "crux": "Steady, steady.", "top": "That's it! Off belay.", "flow": "That's the rhythm. Don't think, climb.", "rest": "Plenty of time."},
+	"royal_robbins": {"start": "Climb clean. Every piece comes out again.", "clip": "That one's solid.", "fall": "Caught. Clean climbers fall gracefully.", "crux": "Commit to it.", "top": "Clean. Not a scar on the rock.", "flow": "Now you're climbing. Every move precise.", "rest": "Breathe."},
+	"bestor_robinson": {"start": "Ready when you are. It's a long way up.", "clip": "Sound.", "fall": "Held. Try that again.", "crux": "Easy does it.", "top": "A fine lead.", "flow": "Very tidy work up there.", "rest": "Plenty of daylight yet."},
+	"john_salathe": {"start": "Slow and steady. The rock will wait.", "clip": "Good iron.", "fall": "The rope held. Good.", "crux": "Squeeze. Breathe out.", "top": "Hm. Not bad.", "flow": "Ja. Like a goat.", "rest": "Eat something."},
+	"beverly_johnson": {"start": "On belay. Climb like you're alone up there.", "clip": "Good.", "fall": "I've got you. Get back on it.", "crux": "Be bold!", "top": "That's the way.", "flow": "That's it. You're dancing now.", "rest": "Rest, then go."},
+	"warren_harding": {"start": "Belay's on. Sure you don't want a drink first?", "clip": "Bolt? Beautiful.", "fall": "Whoa, got you! Hang there.", "crux": "Send it, you crazy kid!", "top": "You freed it. I'll be damned.", "flow": "Look at you go! Save some for the rest of us.", "rest": "Hang in there. Literally."},
+	"george_anderson": {"start": "I've drilled holes steeper than this. Go on.", "clip": "Solid.", "fall": "Held. Mind the runout.", "crux": "One move at a time.", "top": "Top of the dome, near enough.", "flow": "Steady as a drill bit.", "rest": "Take a breath."},
+	"chongo": {"start": "Spotting! Hands up. Fall like a cat, not like a piano.", "clip": "", "fall": "Got you. Pad did its job. Impulse!", "crux": "Go, go, go!", "top": "You did the mantel! Nobody does the mantel!", "flow": "Flow state! The rock is talking to you!", "rest": "Breathe. Gravity's patient."},
+	"john_muir": {"start": "Go up, and the mountains will show you things.", "clip": "", "fall": "Steady! The mountain isn't going anywhere.", "crux": "Mind your feet.", "top": "Ah! What a temple.", "flow": "Ha! You move like water down the rock.", "rest": "Look around. Look!"},
 }
 
 const PROFILES := {
@@ -604,7 +611,15 @@ static func crux_at(spec: Dictionary, row: int) -> Dictionary:
 		return {"kind": spec.get("crux_kind", "timing"), "name": spec.get("crux_name", "The crux")}
 	var style: String = spec.get("style", "crack")
 	var kind: String = spec.get("crux_default", "layback" if style == "flake" else "timing")
-	return {"kind": kind, "name": "The layback" if kind == "layback" else CRUX_NAMES.get(style, "The crux")}
+	if kind == "layback":
+		return {"kind": kind, "name": "The layback"}
+	var names: Array = CRUX_NAMES.get(style, ["The crux"])
+	# Which added crux point this is on the pitch, so each gets its own name.
+	var nth := 0
+	for r: int in spec.get("cruxes", []):
+		if r < row and r != int(spec.get("crux", 0)):
+			nth += 1
+	return {"kind": kind, "name": names[(nth + int(spec.get("diff", 0))) % names.size()]}
 
 
 ## Every crux point on [param route].

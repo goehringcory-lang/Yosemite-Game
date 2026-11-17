@@ -592,7 +592,11 @@ func _guidebook() -> void:
 			chapter = route.guide_chapter
 			_line(chapter.to_upper(), DIM)
 		var star := " *" if entry.main else ""
-		_check_line(entry.ticked, "%s%s  %s" % [route.display_name, star, route.grade], Color(0.827, 0.894, 0.541) if entry.ticked else Color.WHITE)
+		var medal := Achievements.medal(route.id)
+		var medal_text := "  · %s" % Achievements.MEDALS[medal] if entry.ticked and medal > 0 else ""
+		_check_line(entry.ticked, "%s%s  %s%s" % [route.display_name, star, route.grade, medal_text], Color(0.827, 0.894, 0.541) if entry.ticked else Color.WHITE)
+		if entry.ticked and medal < Achievements.GOLD:
+			_line("     Next: %s" % Achievements.next_medal_text(route, medal), DIM)
 		if not entry.ticked:
 			var need: String = Guidebook.gear_text(route)
 			if entry.ready:
@@ -946,8 +950,8 @@ func _sends() -> void:
 	for route in Guidebook.routes():
 		if Achievements.sends.has(route.id):
 			routes += 1
-	_heading("Climbs sent: %d %s, %d route%s" % [Achievements.send_count(), "send" if Achievements.send_count() == 1 else "sends",
-		routes, "" if routes == 1 else "s"])
+	_heading("Climbs sent: %d %s, %d route%s · %d gold" % [Achievements.send_count(), "send" if Achievements.send_count() == 1 else "sends",
+		routes, "" if routes == 1 else "s", Achievements.medal_count(Achievements.GOLD)])
 	if routes == 0:
 		_line("Top out on a route and it goes in here, with how many times you've sent it, your cleanest go and your fastest.", DIM)
 		return
@@ -956,7 +960,8 @@ func _sends() -> void:
 			continue
 		var entry: Dictionary = Achievements.sends[route.id]
 		var times := int(entry.count)
-		_check_line(true, "%s  %s · %s" % [route.display_name, route.grade, "sent once" if times == 1 else "sent %d times" % times], DONE)
+		_check_line(true, "%s  %s · %s · %s" % [route.display_name, route.grade, "sent once" if times == 1 else "sent %d times" % times,
+			Achievements.MEDALS[clampi(int(entry.get("medal", Achievements.BRONZE)), Achievements.BRONZE, Achievements.GOLD)]], DONE)
 		var facts := PackedStringArray()
 		var falls := int(entry.falls)
 		if falls == 0:

@@ -43,6 +43,7 @@ func _ready() -> void:
 	get_tree().root.add_child(world)
 	await get_tree().process_frame
 	GameClock.paused = true
+	test_dusk_colours()
 	await test_shadows()
 	await test_lamps()
 	await test_lit_sprites()
@@ -107,6 +108,22 @@ func test_gradient() -> void:
 	set_date(SUMMER, 14, 19)
 	var summer_evening := Sun.gradient_progress()
 	check(winter_evening > Sun.GRADIENT_SUNSET + 0.03 and summer_evening < Sun.GRADIENT_SUNSET, "7 PM is after dark in winter, before sunset in summer")
+
+
+func test_dusk_colours() -> void:
+	# After sunset the light is the sky's blue, not mauve: on pale paving a
+	# pink dusk tint read as a colour filter over the screen.
+	var gradient: Gradient = (world.get_node("DayNight") as CanvasModulate).gradient
+	var p := 0.81
+	while p <= 0.9:
+		var c := gradient.sample(p)
+		check(c.g >= c.r - 0.01 and c.b > c.g, "dusk at %.2f is blue, not pink (%s)" % [p, c])
+		p += 0.01
+	# Lamps come on by the tint's brightness, so the dusk stops keep theirs.
+	var golden := gradient.sample(0.77)
+	var blue := gradient.sample(0.81)
+	check(absf((golden.r + golden.g + golden.b) / 3.0 - 0.693) < 0.01 and absf((blue.r + blue.g + blue.b) / 3.0 - 0.585) < 0.01,
+		"the evening tint is as bright as before, so lamps light at the same time")
 
 
 func test_mist() -> void:

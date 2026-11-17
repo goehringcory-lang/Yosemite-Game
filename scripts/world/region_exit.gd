@@ -14,6 +14,12 @@ extends Area2D
 ## road, where the way you turn is the choice). The drive's closures and
 ## locks still hold.
 @export var drive_to := ""
+## A stop partway along a [member drive_to] road (Tenaya Lake, on the Tioga
+## Road from Crane Flat to Tuolumne): the drive's closures and locks hold as
+## on the map, but it ends in this region, at [member stop_spawn], after
+## [member minutes].
+@export var stop_region := ""
+@export var stop_spawn := ""
 ## A road some way to the next place: the minutes and miles of the drive.
 ## For [member drive_to] they are what is left of it from here; for
 ## [member target_region] the clock moves on by them.

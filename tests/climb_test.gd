@@ -428,6 +428,20 @@ func test_crux_progression() -> void:
 			for s: ClimbState in [state, bare]:
 				slowest = minf(slowest, s.crux_window() / s.crux_speed())
 		check(slowest >= ClimbState.CRUX_MIN_GREEN_SECONDS - 0.001, "%s: the marker is never too fast to stop in the green (%.0f ms at worst)" % [r.id, slowest * 1000.0])
+	# The crux points a grade adds take turns with their names, so a pitch
+	# with three of them doesn't read "Thin jams" three times.
+	var named_apart := true
+	for r in Guidebook.routes():
+		for p in r.pitches.size():
+			var spec := ClimbProfiles.pitch_spec(r, p)
+			var seen := {}
+			for row: int in spec.cruxes:
+				var crux := ClimbProfiles.crux_at(spec, row)
+				if crux.kind == "layback" or spec.has("crux_points"):
+					continue
+				named_apart = named_apart and not seen.has(crux.name) and crux.name != "The crux"
+				seen[crux.name] = true
+	check(named_apart, "no pitch repeats a crux name")
 	check(counts.swan_slab == 1 and counts.firefall_slab == 1, "the first climbs have a single crux")
 	check(counts.glacier_point_apron < counts.higher_cathedral_spire and counts.higher_cathedral_spire < counts.steck_salathe \
 		and counts.steck_salathe < counts.astroman and counts.astroman < counts.the_nose, "crux points grow with the grade (Apron %d, Spire %d, Steck-Salathe %d, Astroman %d, the Nose %d)" % [counts.glacier_point_apron, counts.higher_cathedral_spire, counts.steck_salathe, counts.astroman, counts.the_nose])

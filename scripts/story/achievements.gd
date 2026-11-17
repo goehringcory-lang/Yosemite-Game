@@ -154,7 +154,8 @@ var earned: Dictionary = {}
 ## logbook was kept).
 var summits: Dictionary = {}
 ## Route id -> {"count", "first_day", "falls" (fewest in a send), "minutes"
-## (fastest send, game minutes on the wall), "clean" (a send with no falls)}.
+## (fastest send, game minutes on the wall), "clean" (a send with no falls),
+## "medal" (the best of [constant MEDALS] earned on it)}.
 var sends: Dictionary = {}
 ## Fish id -> {"count", "biggest" (inches, 0 if unknown), "trophies",
 ## "first_day", "where"}.
@@ -205,7 +206,7 @@ func settle() -> void:
 	_fresh_state = false
 	for route_id: String in QuestLog.climbed:
 		if not sends.has(route_id):
-			sends[route_id] = {"count": 1, "first_day": -1, "falls": -1, "minutes": 0, "clean": false}
+			sends[route_id] = {"count": 1, "first_day": -1, "falls": -1, "minutes": 0, "clean": false, "medal": BRONZE}
 	for entry: Dictionary in Fishing.FISH:
 		if FieldLog.has(entry.id) and not fish.has(entry.id):
 			var seen: Dictionary = FieldLog.seen[entry.id]
@@ -242,8 +243,9 @@ func total() -> int:
 
 ## A route topped out (ClimbStart). [param state] is the finished ClimbState.
 func sent(route: RouteData, state: ClimbState) -> void:
-	var entry: Dictionary = sends.get(route.id, {"count": 0, "first_day": Friendship.today(), "falls": -1, "minutes": 0, "clean": false})
+	var entry: Dictionary = sends.get(route.id, {"count": 0, "first_day": Friendship.today(), "falls": -1, "minutes": 0, "clean": false, "medal": NO_MEDAL})
 	entry.count = int(entry.count) + 1
+	entry.medal = maxi(int(entry.get("medal", BRONZE)), medal_for(state))
 	if int(entry.falls) < 0 or state.falls < int(entry.falls):
 		entry.falls = state.falls
 	if state.minutes > 0 and (int(entry.minutes) <= 0 or state.minutes < int(entry.minutes)):
@@ -252,6 +254,55 @@ func sent(route: RouteData, state: ClimbState) -> void:
 		entry.clean = true
 	sends[route.id] = entry
 	_on_progress()
+
+
+# ---------------------------------------------------------------- medals
+
+## A medal for each route, the best you've earned on it: a goal for going back
+## to a route you've already ticked. Bronze is any send; Silver a send with no
+## falls and no pulling on gear; Gold that and no missed crux either (on a
+## boulder problem, where a miss is a fall: a flash with every crux perfect).
+const NO_MEDAL := 0
+const BRONZE := 1
+const SILVER := 2
+const GOLD := 3
+const MEDALS := ["", "Bronze", "Silver", "Gold"]
+const MEDAL_COLORS := [Color(0, 0, 0, 0), Color("c07a3e"), Color("c9c9c4"), Color("e8c050")]
+
+
+## The medal a send earns ([param state] is a climb that topped out).
+static func medal_for(state: ClimbState) -> int:
+	if state.falls > 0 or state.aid_moves > 0:
+		return BRONZE
+	if state.route.boulder:
+		return GOLD if state.perfect_cruxes >= ClimbProfiles.crux_count(state.route) else SILVER
+	return GOLD if state.slipped_cruxes == 0 else SILVER
+
+
+## The best medal earned on [param route_id] (NO_MEDAL if never sent).
+func medal(route_id: String) -> int:
+	return int(sends.get(route_id, {}).get("medal", NO_MEDAL))
+
+
+## What the next medal on [param route] asks for, after [param have]; "" at Gold.
+static func next_medal_text(route: RouteData, have: int) -> String:
+	match have:
+		NO_MEDAL:
+			return "Top out for Bronze."
+		BRONZE:
+			return "Flash it for Silver." if route.boulder else "No falls, no aid for Silver."
+		SILVER:
+			return "Every crux perfect for Gold." if route.boulder else "No missed cruxes for Gold."
+	return ""
+
+
+## How many routes have [param at_least] this medal.
+func medal_count(at_least: int) -> int:
+	var n := 0
+	for id: String in sends:
+		if int(sends[id].get("medal", BRONZE)) >= at_least:
+			n += 1
+	return n
 
 
 ## A fish on the bank (Fishing.land()), as Fishing.hooked() made it.
@@ -495,7 +546,8 @@ func load_data(data: Dictionary) -> void:
 		var entry = saved[key]
 		if entry is Dictionary:
 			sends[str(key)] = {"count": int(entry.get("count", 1)), "first_day": int(entry.get("first_day", -1)),
-				"falls": int(entry.get("falls", -1)), "minutes": int(entry.get("minutes", 0)), "clean": bool(entry.get("clean", false))}
+				"falls": int(entry.get("falls", -1)), "minutes": int(entry.get("minutes", 0)), "clean": bool(entry.get("clean", false)),
+				"medal": clampi(int(entry.get("medal", BRONZE)), BRONZE, GOLD)}
 	saved = data.get("fish", {})
 	for key in saved:
 		var entry = saved[key]

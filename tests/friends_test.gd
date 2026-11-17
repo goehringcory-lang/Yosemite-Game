@@ -10,7 +10,7 @@ extends Node
 ## Run: godot --headless --path . res://tests/friends_test.tscn
 ## Exit code is the number of failed checks. Uses its own save file.
 
-const KEYS := ["spring", "summer", "fall", "winter", "rain", "snow", "morning", "evening", "friend", "close", "places", "news", "loved"]
+const KEYS := ["spring", "summer", "fall", "winter", "rain", "snow", "morning", "evening", "friend", "close", "places", "news", "loved", "after"]
 
 var failures := 0
 ## What the dialogue box has shown, as it tells whoever is speaking (on_line).
