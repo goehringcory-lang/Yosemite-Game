@@ -97,6 +97,20 @@ func _refresh() -> void:
 		_guests.clear()
 
 
+## A guest's line changes if a side story of theirs is done: character id ->
+## [quest id, line]. Wren, once she's guiding, says so at the supper.
+const LINES_AFTER := {
+	"wren_alvarez": ["wren_long_way", "Assistant guide Alvarez, reporting for supper. My first client gets the best seat. ...You're already in it. Good."],
+}
+
+
+## What [param entry]'s guest says at the supper.
+static func line_for(entry: Array) -> String:
+	var after: Array = LINES_AFTER.get(entry[0], [])
+	if not after.is_empty() and QuestLog.is_completed(after[0]):
+		return after[1]
+	return entry[1]
+
 ## Seats everyone with a line round the campfire, facing it.
 func _seat_guests() -> void:
 	var entities := get_parent()
@@ -115,7 +129,7 @@ func _seat_guests() -> void:
 		npc.position = at
 		var toward := FIRE - at
 		npc.facing = Vector2i(signi(int(toward.x)), 0) if absf(toward.x) > absf(toward.y) else Vector2i(0, signi(int(toward.y)))
-		npc.say_instead = PackedStringArray([entry[1]])
+		npc.say_instead = PackedStringArray([line_for(entry)])
 		npc.add_to_group("feast_guest")
 		npc.talked_to.connect(func() -> void: talked[character.id] = true)
 		entities.add_child.call_deferred(npc)
