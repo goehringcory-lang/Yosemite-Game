@@ -36,6 +36,7 @@ uniform float clear : hint_range(0.0, 1.0) = 1.0;
 // The sun's colour, and 0..1 how low and golden it is (more glints at dusk).
 uniform vec3 sun : source_color = vec3(1.0, 0.97, 0.85);
 uniform float glow : hint_range(0.0, 1.0) = 0.0;
+uniform float daylight : hint_range(0.0, 1.0) = 1.0;
 // How far below the bank the reflections reach, in art pixels.
 uniform float reach = 30.0;
 uniform float strength : hint_range(0.0, 1.0) = 0.78;
@@ -124,6 +125,12 @@ void fragment() {
 	} else {
 		float t = TIME;
 		vec3 c = here;
+		// Long, broken wave fronts. The same moving slope bends the bank
+		// reflection and catches the light along its crest.
+		float bend = sin(ap.x * 0.065 + ap.y * 0.093 - t * 0.52);
+		float wave = sin(ap.y * 0.74 + ap.x * 0.038 + 1.8 * bend - t * 1.8);
+		float cross_wave = sin(ap.x * 0.17 - ap.y * 0.23 + t * 0.81);
+		float crest = smoothstep(0.76, 0.99, wave) * smoothstep(0.32, 0.91, cross_wave);
 		// how far below the bank this is: walk up the painted water
 		float d = 0.0;
 		bool found = false;
@@ -141,15 +148,12 @@ void fragment() {
 		if (found) {
 			// the reflection: the bank's own pixels mirrored about the waterline,
 			// pulled side to side by the ripples (more the further out)
-			float wob = sin(ap.y * 0.9 - t * 2.6 + sin(ap.x * 0.13 + t * 0.7) * 1.4);
-			float sway = floor(wob * (0.6 + d * 0.06) + 0.5);
+			float sway = floor(wave * (0.6 + d * 0.06) + 0.5);
 			vec2 bank = wp - vec2(0.0, d * 2.0);
 			vec2 src = bank - vec2(-sway * 2.0, (d - 1.0) * 2.0);
 			vec3 r = untint(screen_at(src));
-			// broken into rows by the ripples: every few rows a row goes missing
-			float row = hash(vec2(floor(ap.y), floor(t * 3.0 + ap.y * 0.37)));
 			float fade = 1.0 - smoothstep(reach * 0.45, reach, d);
-			float a = strength * fade * mix(0.55, 1.0, clear) * (row < 0.12 + d / reach * 0.25 ? 0.35 : 1.0);
+			float a = strength * fade * mix(0.55, 1.0, clear) * (1.0 - crest * 0.65);
 			// reflections are darker than what they mirror and take the water's colour
 			vec3 refl = mix(r * vec3(0.74, 0.8, 0.84), c, 0.16);
 			c = mix(c, refl, a * standing(src, r));
@@ -158,9 +162,11 @@ void fragment() {
 				c = mix(c, vec3(0.85, 0.95, 0.95), 0.25 * clear * a);
 			}
 		}
-		// sparkles of sun moving with the ripples
-		float glint = step(0.993 - glow * 0.014, hash(ap + vec2(floor(t * 2.0 + hash(ap) * 3.0), 0.0)));
-		c += sun * (0.34 + glow * 0.2) * glint * clear * (1.0 - stars);
+		// A few crests in each patch face the sun. Build up a streak of
+		// colour and a short bright tip as the light travels over them.
+		float patch = sin(ap.x * 0.033 + ap.y * 0.059 - t * 0.33 + bend);
+		float sheen = crest * smoothstep(0.12, 0.96, patch);
+		c += sun * (sheen * 0.10 + smoothstep(0.8, 0.99, sheen) * (0.15 + glow * 0.19)) * clear * daylight;
 		// stars on still water after dark, each twinkling on its own beat
 		if (stars > 0.0) {
 			vec2 cell = floor(ap / 3.0);

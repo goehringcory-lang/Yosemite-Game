@@ -106,6 +106,7 @@ func _process(_delta: float) -> void:
 	# The sky shows most in the water at either end of the day.
 	_mat.set_shader_parameter("sky_amount", 0.12 + 0.22 * float(pal.glow))
 	_mat.set_shader_parameter("clear", 1.0 - overcast)
+	_mat.set_shader_parameter("daylight", Sun.daylight(hour))
 	var sun: Color = pal.sun
 	_mat.set_shader_parameter("sun", Vector3(sun.r, sun.g, sun.b))
 	_mat.set_shader_parameter("glow", float(pal.glow))

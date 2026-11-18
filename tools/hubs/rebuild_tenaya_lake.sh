@@ -4,8 +4,8 @@
 # this area to the 32px palette art (tools/art32/upgrade.py --fresh), moves the
 # scene onto the 32px grid (tools/art32/migrate_built.py), puts back the
 # shared flora it redrew on the way (load_flora draws every tree; the game's
-# trees were repainted since by tools/art32/trees32), paints the ground's
-# normal map, notes where its water is (tools/perf/water_cells.py), and
+# trees were repainted since by tools/art32/trees32), paints the lake bed and
+# its normal map, notes where its water is (tools/perf/water_cells.py), and
 # re-imports.
 #
 #   tools/hubs/rebuild_tenaya_lake.sh
@@ -28,6 +28,7 @@ mapfile -t fresh < <(find assets -name '*.png' -newer "$stamp")
 for f in "${fresh[@]}"; do
 	case " ${mine[*]} " in *" $f "*) ;; *) git checkout -q -- "$f" "$f.import" 2>/dev/null || git checkout -q -- "$f" 2>/dev/null || true ;; esac
 done
+"$PYTHON" tools/art32/ground32/tenaya_water.py
 "$PYTHON" tools/normals/normals.py "${mine[@]}"
 # Note where its water is, and leave every other ground's entry as it was.
 cp data/park/water_cells.json "$stamp.cells"
