@@ -66,8 +66,7 @@ uniform float rain : hint_range(0.0, 1.0) = 0.0;
 uniform vec3 puddle_sky : source_color = vec3(0.6, 0.63, 0.66);
 const vec3 SNOW = vec3(0.95, 0.97, 1.0);
 const vec3 SNOW_SHADE = vec3(0.76, 0.83, 0.93);
-// Moving light on the painted water: bands of brighter ripples drifting with
-// the current and glints that wink on and off (0 leaves the water still).
+// Refracted light on the painted bed (0 leaves the water still).
 uniform float water_shimmer : hint_range(0.0, 1.0) = 0.0;
 uniform vec2 flow = vec2(0.0);
 
@@ -272,13 +271,16 @@ void fragment() {
 			}
 		}
 	}
-	if (water_shimmer > 0.0 && water > 0.5) {
-		float t = TIME;
-		float band = sin(px.x * 0.19 - t * 1.4 + sin(px.y * 0.31 + t * 0.5) * 2.2) * sin(px.y * 0.47 + t * 0.8 + px.x * 0.05);
-		float lit = step(0.8, band) * (0.5 + 0.5 * step(0.5, hash(px + floor(t * 3.0))));
-		float dark = step(band, -0.88);
-		float glint = step(0.996, hash(px + vec2(floor(t * 2.5), 0.0))) * step(0.38, lum);
-		rgb += (vec3(0.07, 0.09, 0.08) * lit - vec3(0.025) * dark + vec3(0.35) * glint) * water_shimmer;
+	if (water_shimmer > 0.0 && water > 0.5 && sun_light.r > 0.0) {
+		// Crossing ripples focus the light into thin, wandering lines on
+		// the pale stones. In the dark channel only surface reflections show.
+		vec2 ap = floor(world_px * 0.5);
+		float swell = sin(ap.x * 0.057 + ap.y * 0.073 + TIME * 0.48);
+		float a = sin(ap.x * 0.17 + ap.y * 0.12 + swell * 2.3 - TIME * 0.85);
+		float b = sin(ap.y * 0.32 - ap.x * 0.09 + swell * 1.7 + TIME * 0.63);
+		float caustic = 1.0 - smoothstep(0.055, 0.23, abs(a + b * 0.76));
+		float bed = smoothstep(0.27, 0.62, lum);
+		rgb += sun_light * vec3(0.19, 0.21, 0.16) * caustic * bed * water_shimmer;
 	}
 	if (flower > 0.5 && flower_fill.a > 0.0) {
 		rgb = flower_fill.rgb * (0.9 + 0.2 * hash(px));
