@@ -4,7 +4,7 @@ extends RefCounted
 ## starter art; replace the PNGs with hand-drawn versions (same layout) at
 ## any time.
 
-const Terrain = preload("res://tools/mapgen/terrain.gd")
+const Terrain = preload("res://scripts/world/terrain.gd")
 const FloraHd = preload("res://tools/mapgen/flora_hd.gd")
 
 const T := 16

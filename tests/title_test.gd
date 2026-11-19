@@ -160,8 +160,20 @@ func test_slots() -> void:
 	check(SaveManager.slot == 3 and title._starting, "Continue carries on the newest game")
 	title.queue_free()
 	await get_tree().process_frame
+	# Rolling backup: overwriting a valid save keeps a .bak copy that recovers if primary corrupts.
+	SaveManager.slot = 1
+	GameClock.day = 7
+	check(SaveManager.save_game(), "first save writes slot 1")
+	GameClock.day = 8
+	check(SaveManager.save_game() and FileAccess.file_exists(SaveManager.backup_path(1)), "second save keeps a .bak copy of the previous valid save")
+	FileAccess.open(SaveManager.slot_path(1), FileAccess.WRITE).store_string("{corrupt")
+	var recovered_info := SaveManager.slot_info(1)
+	check(not recovered_info.get("broken", false) and str(recovered_info.get("date", "")).contains(" 7 "), "slot_info falls back to the backup save when primary is corrupt (%s)" % recovered_info)
+	GameClock.day = 1
+	check(SaveManager.load_game() and GameClock.day == 7, "load_game recovers from the backup save when primary is corrupt")
 	for n in range(1, SaveManager.SLOTS + 1):
 		SaveManager.delete_slot(n)
+	check(not FileAccess.file_exists(SaveManager.backup_path(1)), "delete_slot removes the backup file too")
 	SaveManager.save_path = SAVE_PATH
 
 

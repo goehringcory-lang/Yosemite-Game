@@ -6,7 +6,7 @@ extends Node
 ## builder has its own copy of most of this; Curry Village and its shops use
 ## this one.
 
-const Terrain = preload("res://tools/mapgen/terrain.gd")
+const Terrain = preload("res://scripts/world/terrain.gd")
 const Art = preload("res://tools/mapgen/art.gd")
 const TILESET := preload("res://assets/tiles/world_tileset.tres")
 const T := 16

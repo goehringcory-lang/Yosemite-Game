@@ -5,7 +5,7 @@ extends Node
 ## Run: godot --headless --path . res://tests/climb_access_test.tscn
 ## Exit code is the number of failed checks.
 
-const Terrain = preload("res://tools/mapgen/terrain.gd")
+const Terrain = preload("res://scripts/world/terrain.gd")
 const CONTENT_DIR := "res://scenes/story/content/"
 ## The walk is tried on a grid this fine, so a one-tile gap still counts.
 const STEP := 8.0

@@ -9,7 +9,7 @@ extends Node
 ## `godot --headless --path . --import` afterwards.
 
 const Ground = preload("res://tools/hubs/ahwahnee_ground.gd")
-const Terrain = preload("res://tools/mapgen/terrain.gd")
+const Terrain = preload("res://scripts/world/terrain.gd")
 ## [picture, seed, optional tile rect painted as mown lawn]. Curry Village's
 ## green is meadow in the terrain grid (it drives foraging) but lawn in the
 ## picture, as in build_curry_village.gd.

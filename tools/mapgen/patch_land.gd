@@ -11,7 +11,7 @@ extends Node
 ## and copies just that part into the map's ground picture. With "dry" it
 ## changes nothing and only paints (to check the picture matches).
 
-const Terrain = preload("res://tools/mapgen/terrain.gd")
+const Terrain = preload("res://scripts/world/terrain.gd")
 const Art = preload("res://tools/mapgen/art.gd")
 const HubContent = preload("res://tools/mapgen/hub_content.gd")
 const LandPatches = preload("res://tools/mapgen/land_patches.gd")

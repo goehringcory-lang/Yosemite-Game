@@ -18,7 +18,7 @@ extends Node2D
 ## ground squirrels sleep through the winter. A squirrel sits up to nibble,
 ## scampers a little way, sits up again, and dashes off when you come close.
 
-const Terrain := preload("res://tools/mapgen/terrain.gd")
+const Terrain := preload("res://scripts/world/terrain.gd")
 ## The Ground layer's tiles that are the park's terrain (the row is its kind).
 const SOURCE_TERRAIN := 1
 

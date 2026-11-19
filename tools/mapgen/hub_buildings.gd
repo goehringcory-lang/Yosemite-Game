@@ -16,7 +16,7 @@ extends RefCounted
 ## Used by region_builder.gd when it writes a map, and by rebuild_buildings.gd
 ## to redo the maps already in the project.
 
-const Terrain = preload("res://tools/mapgen/terrain.gd")
+const Terrain = preload("res://scripts/world/terrain.gd")
 const Art = preload("res://tools/mapgen/hub_building_art.gd")
 
 const T := 16

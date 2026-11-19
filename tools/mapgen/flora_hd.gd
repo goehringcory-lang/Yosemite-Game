@@ -13,7 +13,7 @@ extends RefCounted
 ##
 ## Called from Art.paint_flora(). Light comes from the upper left.
 
-const Terrain = preload("res://tools/mapgen/terrain.gd")
+const Terrain = preload("res://scripts/world/terrain.gd")
 const K = preload("res://tools/hubs/pixel_kit.gd")
 const W := 32
 const H := 48

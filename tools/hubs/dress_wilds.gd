@@ -20,7 +20,7 @@ extends Node
 ## door, sign, exit or story spot (nothing within SPOT_CLEAR of them). The
 ## layout is seeded, so a re-run gives the same scene.
 
-const Terrain := preload("res://tools/mapgen/terrain.gd")
+const Terrain := preload("res://scripts/world/terrain.gd")
 const WildArt := preload("res://tools/hubs/wild_clutter_art.gd")
 const ART := "res://assets/sprites/clutter/"
 const FLORA := "res://assets/sprites/ahwahnee/"

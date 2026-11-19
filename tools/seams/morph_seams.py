@@ -64,7 +64,7 @@ WAY_SLACK = 2.0
 # Features further apart than this along the edge aren't the same one.
 FARTHEST = 22
 
-# Ground rows (tools/mapgen/terrain.gd)
+# Ground rows (scripts/world/terrain.gd)
 CLIFF, TALUS, SCREE, RIVER, LAKE, CREEK, FALLS, SAND = 8, 9, 10, 11, 12, 13, 14, 15
 ROAD, PARKING, BRIDGE, TRAIL, PAVED = 16, 17, 18, 19, 20
 SOLID = {CLIFF, TALUS, SCREE, RIVER, LAKE, FALLS}
