@@ -41,8 +41,10 @@ var _pending: Dictionary = {}
 var _fresh := false
 
 
+## True when the current slot holds a game, counting a backup copy left
+## without its main file.
 func has_save() -> bool:
-	return FileAccess.file_exists(save_path)
+	return slot_used(slot)
 
 
 ## The file for save slot [param n] (1 to SLOTS).
