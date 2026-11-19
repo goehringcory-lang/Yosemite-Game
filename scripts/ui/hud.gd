@@ -86,15 +86,13 @@ func _ready() -> void:
 	_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_screen.add_child(_dim)
 	_screen.move_child(_dim, 0)
-	# Messages ("You fell asleep at...", what a find is) sit on a dark card
-	# rather than floating over the world.
-	var card := StyleBoxFlat.new()
-	card.bg_color = Color(0.165, 0.106, 0.078, 0.72)
-	card.border_color = Color(0.573, 0.412, 0.239, 0.9)
-	card.set_border_width_all(1)
-	card.set_content_margin_all(3)
-	card.content_margin_left = 5
-	card.content_margin_right = 5
+	# Messages ("You fell asleep at...", what a find is) sit on a crisp
+	# beveled wood pill rather than floating over the world.
+	var card := MenuInput.nine_slice("res://assets/ui/prompt_pill.png", 4.0)
+	card.content_margin_left = 6.0
+	card.content_margin_right = 6.0
+	card.content_margin_top = 3.0
+	card.content_margin_bottom = 3.0
 	message_label.add_theme_stylebox_override("normal", card)
 	toasts = ItemToasts.new()
 	_screen.add_child(toasts)
@@ -113,11 +111,17 @@ func _ready() -> void:
 	var plaque := clock_panel.get_theme_stylebox("panel", "PanelContainer").duplicate() as StyleBoxTexture
 	plaque.texture = load("res://assets/ui/plaque.png")
 	clock_panel.add_theme_stylebox_override("panel", plaque)
+	# A subtle brass divider between the date and the sky dial + time below it.
+	var labels := time_label.get_parent()
+	var divider := ColorRect.new()
+	divider.color = Color(0.84, 0.66, 0.34, 0.55)
+	divider.custom_minimum_size = Vector2(0, 1)
+	labels.add_child(divider)
+	labels.move_child(divider, time_label.get_index())
 	# The sky dial sits on the time's row, under the date, so the plaque
 	# grows down rather than out toward the place name.
-	var labels := time_label.get_parent()
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 4)
+	row.add_theme_constant_override("separation", 5)
 	labels.add_child(row)
 	labels.move_child(row, time_label.get_index())
 	labels.remove_child(time_label)
@@ -126,13 +130,24 @@ func _ready() -> void:
 	row.add_child(dial)
 	time_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var right := VBoxContainer.new()
-	right.add_theme_constant_override("separation", 0)
+	right.add_theme_constant_override("separation", 1)
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	right.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(right)
 	right.add_child(time_label)
-	# The food you carry, which is what you trade with, under the time, as
-	# Stardew Valley keeps your gold under its clock.
+	# The food you carry, which is what you trade with, sits in a recessed
+	# slot under the time, as Stardew Valley keeps your gold under its clock.
+	var purse_box := PanelContainer.new()
+	var purse_style := StyleBoxFlat.new()
+	purse_style.bg_color = Color(0.11, 0.068, 0.045, 0.85)
+	purse_style.border_color = Color(0.55, 0.38, 0.21, 0.9)
+	purse_style.set_border_width_all(1)
+	purse_style.content_margin_left = 3.0
+	purse_style.content_margin_right = 3.0
+	purse_style.content_margin_top = 0.0
+	purse_style.content_margin_bottom = 0.0
+	purse_style.anti_aliasing = false
+	purse_box.add_theme_stylebox_override("panel", purse_style)
 	var purse := HBoxContainer.new()
 	purse.alignment = BoxContainer.ALIGNMENT_END
 	purse.add_theme_constant_override("separation", 2)
@@ -145,24 +160,21 @@ func _ready() -> void:
 	apple.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	purse.add_child(apple)
 	food_label = Label.new()
-	food_label.add_theme_color_override("font_color", Color(1, 0.831, 0.541))
+	food_label.add_theme_color_override("font_color", Color(1, 0.85, 0.56))
 	food_label.tooltip_text = "Food energy you carry (what you trade with)"
 	purse.add_child(food_label)
-	right.add_child(purse)
+	purse_box.add_child(purse)
+	right.add_child(purse_box)
 	Inventory.changed.connect(_refresh_food)
 	_refresh_food()
 	location_panel.add_theme_stylebox_override("panel", plaque)
-	# The use prompt is a slim bubble, not a full frame, so it doesn't cover
+	# The use prompt is a slim pixel-art beveled pill, so it doesn't cover
 	# the person or the sign you're facing.
-	var bubble := StyleBoxFlat.new()
-	bubble.bg_color = Color(0.165, 0.106, 0.078, 0.82)
-	bubble.border_color = Color(0.69, 0.573, 0.373, 0.9)
-	bubble.set_border_width_all(1)
-	bubble.set_corner_radius_all(2)
-	bubble.content_margin_left = 4.0
-	bubble.content_margin_right = 4.0
-	bubble.content_margin_top = 0.0
-	bubble.content_margin_bottom = 1.0
+	var bubble := MenuInput.nine_slice("res://assets/ui/prompt_pill.png", 4.0)
+	bubble.content_margin_left = 5.0
+	bubble.content_margin_right = 5.0
+	bubble.content_margin_top = 1.0
+	bubble.content_margin_bottom = 2.0
 	prompt_panel.add_theme_stylebox_override("panel", bubble)
 
 

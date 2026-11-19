@@ -560,7 +560,8 @@ func test_day_log(world: Node) -> void:
 
 
 ## The panels' nine-slice middle is one color, so no stripe grows with the
-## panel and cuts through its first line of text.
+## panel and cuts through its first line of text. Also checks that the
+## crafted UI nine-slices exist and full hearts carry 3-tone shading.
 func test_panel_stretch() -> void:
 	for name in ["panel", "panel_banner"]:
 		var image: Image = load("res://assets/ui/%s.png" % name).get_image()
@@ -571,6 +572,16 @@ func test_panel_stretch() -> void:
 				if not image.get_pixel(x, y).is_equal_approx(fill):
 					flat = false
 		check(flat, "the %s's stretched middle is one color" % name)
+	for asset in ["portrait_frame", "slot", "slot_chosen", "card", "tab_idle", "prompt_pill"]:
+		check(load("res://assets/ui/%s.png" % asset) is Texture2D, "UI art asset %s.png loads" % asset)
+	var heart_img: Image = Hearts.texture(true).get_image()
+	var tones := {}
+	for y in heart_img.get_height():
+		for x in heart_img.get_width():
+			var c := heart_img.get_pixel(x, y)
+			if c.a > 0.5 and not c.is_equal_approx(Hearts.INK):
+				tones[c.to_html(false)] = true
+	check(tones.size() >= 3, "full friendship hearts have multi-tone shading (%d tones)" % tones.size())
 
 
 ## Hints draw their keys as buttons: the text stays plain, every hint is at

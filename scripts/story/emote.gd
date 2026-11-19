@@ -14,6 +14,9 @@ extends Node2D
 ## the two never overlap (the marker hides while you talk).
 
 const INK := Color("2a1b14")
+const BUBBLE := Color("faf3e0")
+const BUBBLE_SHADE := Color("dfd0b4")
+const SHADOW := Color(0.08, 0.05, 0.04, 0.25)
 const HEIGHT := -64.0
 ## How long the bubble stays up, after popping in.
 const HOLD := 1.3
@@ -97,16 +100,22 @@ func _draw() -> void:
 	if glyph.is_empty():
 		return
 	var top := -10.0
-	# the bubble: an outlined rounded box, 20 x 18 inside, and a tail
+	# soft drop shadow and warm-parchment rounded bubble with lower-right bevel
+	draw_rect(Rect2(-8, top + 20, 18, 2), SHADOW)
 	draw_rect(Rect2(-10, top - 2, 20, 22), INK)
 	draw_rect(Rect2(-12, top, 24, 18), INK)
-	draw_rect(Rect2(-10, top, 20, 18), Color.WHITE)
+	draw_rect(Rect2(-10, top, 20, 18), BUBBLE)
+	draw_rect(Rect2(-10, top + 16, 20, 2), BUBBLE_SHADE)
+	draw_rect(Rect2(8, top + 2, 2, 14), BUBBLE_SHADE)
 	draw_rect(Rect2(-2, top + 20, 6, 2), INK)
-	draw_rect(Rect2(0, top + 18, 2, 4), Color.WHITE)
+	draw_rect(Rect2(0, top + 18, 2, 4), BUBBLE_SHADE)
 	draw_rect(Rect2(0, top + 22, 2, 2), INK)
 	for y in glyph.size():
 		var row: String = glyph[y]
 		for x in row.length():
 			var cell := row[x]
 			if cell != "." and COLORS.has(cell):
-				draw_rect(Rect2(-7 + x * 2, top + 2 + y * 2, 2, 2), COLORS[cell])
+				var col: Color = COLORS[cell]
+				if cell != "w":
+					col = col.lightened(0.22) if y <= 1 else (col.darkened(0.14) if y >= 5 else col)
+				draw_rect(Rect2(-7 + x * 2, top + 2 + y * 2, 2, 2), col)

@@ -37,13 +37,18 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	if _age < 0.0:
 		return
-	# grows to a cross of light and shrinks back
+	# grows to a sparkling golden-white star and shrinks back
 	var t := _age / LENGTH
 	var reach := roundf(sin(t * PI) * 3.0)
-	var c := Color(1.0, 0.98, 0.88, 0.9)
-	draw_rect(Rect2(-1, -1, 2, 2), c)
+	var core := Color(1.0, 0.99, 0.92, 0.95)
+	var gold := Color(1.0, 0.88, 0.54, 0.72)
+	draw_rect(Rect2(-1, -1, 2, 2), core)
 	if reach >= 1.0:
-		draw_rect(Rect2(-1, -1 - reach, 2, reach), Color(c, 0.7))
-		draw_rect(Rect2(-1, 1, 2, reach), Color(c, 0.7))
-		draw_rect(Rect2(-1 - reach, -1, reach, 2), Color(c, 0.7))
-		draw_rect(Rect2(1, -1, reach, 2), Color(c, 0.7))
+		draw_rect(Rect2(-1, -1 - reach, 2, reach), gold)
+		draw_rect(Rect2(-1, 1, 2, reach), gold)
+		draw_rect(Rect2(-1 - reach, -1, reach, 2), gold)
+		draw_rect(Rect2(1, -1, reach, 2), gold)
+	if reach >= 2.0:
+		var halo := Color(1.0, 0.92, 0.62, 0.45)
+		for d in [Vector2(-2, -2), Vector2(1, -2), Vector2(-2, 1), Vector2(1, 1)]:
+			draw_rect(Rect2(d, Vector2(1, 1)), halo)

@@ -90,6 +90,8 @@ func _draw() -> void:
 	var color := get_theme_color("font_color")
 	var outline := get_theme_constant("outline_size")
 	var outline_color := get_theme_color("font_outline_color")
+	var shadow_color := get_theme_color("font_shadow_color")
+	var shadow_offset := Vector2(get_theme_constant("shadow_offset_x"), get_theme_constant("shadow_offset_y"))
 	var box := get_theme_stylebox("normal")
 	var inner := Rect2(Vector2.ZERO, size)
 	if box:
@@ -112,7 +114,7 @@ func _draw() -> void:
 				x += floorf((inner.size.x - width) / 2.0)
 			HORIZONTAL_ALIGNMENT_RIGHT:
 				x += inner.size.x - width
-		_draw_items(self, line, font, font_size, Vector2(x, y), line_height, color, outline, outline_color, pad)
+		_draw_items(self, line, font, font_size, Vector2(x, y), line_height, color, outline, outline_color, pad, shadow_offset, shadow_color)
 		y += line_height
 
 
@@ -203,7 +205,7 @@ static func _item_width(item: Variant, font: Font, font_size: int) -> float:
 	return key_width(item.key, font) + CAP_GAP
 
 
-static func _draw_items(ci: CanvasItem, line: Array, font: Font, font_size: int, at: Vector2, line_height: float, color: Color, outline: int, outline_color: Color, pad: bool) -> void:
+static func _draw_items(ci: CanvasItem, line: Array, font: Font, font_size: int, at: Vector2, line_height: float, color: Color, outline: int, outline_color: Color, pad: bool, shadow_offset := Vector2.ZERO, shadow_color := Color(0, 0, 0, 0)) -> void:
 	var x := at.x
 	var ascent := font.get_ascent(font_size)
 	var baseline := at.y + roundf((line_height - font.get_height(font_size)) / 2.0) + ascent
@@ -211,6 +213,8 @@ static func _draw_items(ci: CanvasItem, line: Array, font: Font, font_size: int,
 		if item is String:
 			if outline > 0:
 				ci.draw_string_outline(font, Vector2(x, baseline), item, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, outline, outline_color)
+			elif shadow_color.a > 0.0 and shadow_offset != Vector2.ZERO:
+				ci.draw_string(font, Vector2(x, baseline) + shadow_offset, item, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(shadow_color, shadow_color.a * color.a))
 			ci.draw_string(font, Vector2(x, baseline), item, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
 			x += font.get_string_size(item, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
 		else:

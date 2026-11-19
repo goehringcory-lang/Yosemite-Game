@@ -1,12 +1,14 @@
 class_name Hearts
 extends RefCounted
-## Little pixel hearts for friendship: full and empty 7x6 pictures for the
-## Register, and the heart that floats up when someone's fondness grows.
+## Little pixel hearts for friendship: shaded 7x6 pictures (full ruby red
+## with a glossy highlight, or carved recessed empty) for the Register, and
+## the hearts that float up when someone's fondness grows.
 
-const RED := Color("b3362b")
-const LIGHT := Color("d47a9b")
-const DARK := Color("b3362b")
-const EMPTY := Color("5e4a38")
+const RED := Color("e03c3c")
+const LIGHT := Color("ffa8b0")
+const DARK := Color("9e212b")
+const EMPTY := Color("574131")
+const EMPTY_SHADE := Color("3e2d21")
 const INK := Color("2a1b14")
 const SHAPE := [
 	".##.##.",
@@ -21,7 +23,7 @@ static var _full: ImageTexture
 static var _empty: ImageTexture
 
 
-## A heart picture: full (red) or empty (an outline).
+## A heart picture: full (shaded crimson) or empty (carved recess).
 static func texture(full: bool) -> Texture2D:
 	if full and _full:
 		return _full
@@ -31,9 +33,15 @@ static func texture(full: bool) -> Texture2D:
 	for y in SHAPE.size():
 		for x in 7:
 			if SHAPE[y][x] == "#":
-				var color := (RED if y < 3 else DARK) if full else EMPTY
-				if full and (x == 1 or x == 4) and y == 1:
-					color = LIGHT
+				var color: Color
+				if full:
+					color = RED if (y < 3 and x < 5) else DARK
+					if (x == 1 and y == 1) or (x == 2 and y == 1) or (x == 1 and y == 2):
+						color = LIGHT
+					elif x == 4 and y == 1:
+						color = RED.lightened(0.22)
+				else:
+					color = EMPTY_SHADE if y <= 1 else EMPTY
 				im.set_pixel(x + 1, y + 1, color)
 	# a dark rim
 	var rim: Array[Vector2i] = []

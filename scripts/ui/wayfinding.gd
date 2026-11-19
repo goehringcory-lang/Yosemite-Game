@@ -249,11 +249,20 @@ func _draw() -> void:
 		card.a *= _alpha
 		var edge := EDGE
 		edge.a *= _alpha
+		var rim := Color(0.1, 0.06, 0.04, 0.9 * _alpha)
+		var hi := Color(0.86, 0.68, 0.38, 0.85 * _alpha)
+		var shadow := Color(0.06, 0.04, 0.03, 0.75 * _alpha)
 		ink.a *= _alpha
+		draw_rect(Rect2(box.position + Vector2(1, 1), box.size), Color(0.05, 0.03, 0.02, 0.35 * _alpha))
+		draw_rect(box.grow(1.0), rim)
 		draw_rect(box, card)
-		draw_rect(box, edge, false, 1.0)
+		draw_rect(Rect2(box.position, Vector2(box.size.x, 1)), hi)
+		draw_rect(Rect2(box.position, Vector2(1, box.size.y)), hi)
+		draw_rect(Rect2(box.position + Vector2(0, box.size.y - 1), Vector2(box.size.x, 1)), edge)
+		draw_rect(Rect2(box.position + Vector2(box.size.x - 1, 0), Vector2(1, box.size.y)), edge)
+		draw_string(font, Vector2(box.position.x + 4.0, box.position.y + 9.0), text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, shadow)
 		draw_string(font, Vector2(box.position.x + 3.0, box.position.y + 8.0), text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, ink)
-		_draw_arrow(at.round(), dir, edge)
+		_draw_arrow(at.round(), dir, hi, rim)
 
 
 ## The HUD's own panels that are showing, in UI pixels.
@@ -268,9 +277,12 @@ func _keep_clear() -> Array[Rect2]:
 	return clear
 
 
-## A small pointed arrow at [param at] aimed along [param dir].
-func _draw_arrow(at: Vector2, dir: Vector2, col: Color) -> void:
+## A small pointed arrow at [param at] aimed along [param dir], rimmed so it
+## stays crisp over sunlit granite and snow.
+func _draw_arrow(at: Vector2, dir: Vector2, col: Color, rim: Color) -> void:
 	var side := Vector2(-dir.y, dir.x)
 	var tip := at + dir * 3.0
+	var outer := PackedVector2Array([tip + dir, at - dir * 3.0 + side * 3.5, at - dir * 3.0 - side * 3.5])
+	draw_colored_polygon(outer, rim)
 	var points := PackedVector2Array([tip, at - dir * 2.0 + side * 2.5, at - dir * 2.0 - side * 2.5])
 	draw_colored_polygon(points, col)

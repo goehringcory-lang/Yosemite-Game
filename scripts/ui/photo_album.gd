@@ -52,7 +52,7 @@ var _panel: PanelContainer
 var _page := Page.ALBUM
 var _tab_labels: Array[Label] = []
 var _tab_style: StyleBoxTexture
-var _plain_style: StyleBoxEmpty
+var _plain_style: StyleBoxTexture
 var _album_page: HBoxContainer
 var _sheet_scroll: ScrollContainer
 var _sheet: GridContainer
@@ -96,15 +96,22 @@ func _ready() -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 2)
 	_panel.add_child(column)
+	var tab_strip := VBoxContainer.new()
+	tab_strip.add_theme_constant_override("separation", 0)
+	column.add_child(tab_strip)
 	var tabs := HBoxContainer.new()
-	tabs.add_theme_constant_override("separation", 4)
-	column.add_child(tabs)
+	tabs.add_theme_constant_override("separation", 3)
+	tab_strip.add_child(tabs)
 	for i in PAGE_NAMES.size():
 		var label := Label.new()
 		label.mouse_filter = Control.MOUSE_FILTER_STOP
 		label.gui_input.connect(_on_tab_input.bind(i))
 		tabs.add_child(label)
 		_tab_labels.append(label)
+	var tab_rule := ColorRect.new()
+	tab_rule.color = Color(0.84, 0.66, 0.34, 0.72)
+	tab_rule.custom_minimum_size = Vector2(PANEL_SIZE.x - 16, 1)
+	tab_strip.add_child(tab_rule)
 	_build_album_page(column)
 	_build_list_page(column)
 	_footer = ButtonHints.new()
@@ -117,15 +124,16 @@ func _ready() -> void:
 
 
 func _build_styles() -> void:
-	_tab_style = StyleBoxTexture.new()
-	_tab_style.texture = load("res://assets/ui/tag.png")
-	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
-		_tab_style.set_texture_margin(side, 4.0)
+	_tab_style = MenuInput.nine_slice("res://assets/ui/tag.png", 4.0)
 	_tab_style.content_margin_left = 6.0
 	_tab_style.content_margin_right = 6.0
-	_plain_style = StyleBoxEmpty.new()
+	_tab_style.content_margin_top = 1.0
+	_tab_style.content_margin_bottom = 2.0
+	_plain_style = MenuInput.nine_slice("res://assets/ui/tab_idle.png", 4.0)
 	_plain_style.content_margin_left = 6.0
 	_plain_style.content_margin_right = 6.0
+	_plain_style.content_margin_top = 1.0
+	_plain_style.content_margin_bottom = 2.0
 
 
 ## The sheet of small prints on the left, the chosen one and what's written

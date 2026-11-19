@@ -151,6 +151,8 @@ func _populate() -> void:
 	match GameClock.season:
 		GameClock.Season.SPRING:
 			counts["petal"] = 1.0
+			if _motes_on():
+				counts["mote"] = 0.65
 		GameClock.Season.SUMMER:
 			if _darkness() > 0.35:
 				counts["firefly"] = 1.0
@@ -160,6 +162,8 @@ func _populate() -> void:
 					counts["mote"] = 1.0
 		GameClock.Season.FALL:
 			counts["leaf"] = 1.0
+			if _motes_on():
+				counts["mote"] = 0.75
 	if w.snow > 0.0:
 		counts["snow"] = w.snow
 	if w.rain > 0.0:
@@ -262,16 +266,21 @@ func _draw() -> void:
 				else:
 					draw_rect(Rect2(p, Vector2(2, 2)), c)
 			1:
-				# A thin streak along the fall direction.
+				# A tapered rain streak along the fall direction, with occasional ground splash ticks.
 				draw_rect(Rect2(p, Vector2(2, 2)), c)
-				draw_rect(Rect2(p + Vector2(-2, -4), Vector2(2, 2)), c)
-				if d > 0.5:
-					draw_rect(Rect2(p + Vector2(-2, -8), Vector2(2, 2)), Color(c, c.a * 0.6))
+				draw_rect(Rect2(p + Vector2(-2, -4), Vector2(2, 2)), Color(c, c.a * 0.85))
+				if d > 0.45:
+					draw_rect(Rect2(p + Vector2(-2, -8), Vector2(2, 2)), Color(c, c.a * 0.5))
+				if d > 0.82 and fposmod(_time * 4.5 + _phase[i] * 3.0, 1.0) < 0.16:
+					var sp := Color(0.86, 0.93, 1.0, c.a * 0.85)
+					draw_rect(Rect2(p + Vector2(-2, 2), Vector2(2, 2)), sp)
+					draw_rect(Rect2(p + Vector2(2, 2), Vector2(2, 2)), sp)
 			2:
-				# Petals turn over: wide, then edge-on.
+				# Petals turn over: sunlit edge + blush shadow, then edge-on.
 				if fmod(_time * 2.0 + _phase[i], TAU) < PI:
 					draw_rect(Rect2(p, Vector2(4, 4)), c)
-					draw_rect(Rect2(p + Vector2(2, 2), Vector2(2, 2)), c.darkened(0.15))
+					draw_rect(Rect2(p, Vector2(2, 2)), c.lightened(0.22))
+					draw_rect(Rect2(p + Vector2(2, 2), Vector2(2, 2)), c.darkened(0.16))
 				else:
 					draw_rect(Rect2(p, Vector2(4, 2)), c.darkened(0.08))
 			3:
@@ -305,12 +314,12 @@ func _draw_fireflies() -> void:
 		if blink <= 0.0:
 			continue
 		var p := _pos[i].floor()
-		_fireflies.draw_rect(Rect2(p, Vector2(2, 2)), Color(0.85, 1.0, 0.3, blink))
-		var halo := Color(0.55, 0.7, 0.12, blink * 0.4)
+		_fireflies.draw_rect(Rect2(p, Vector2(2, 2)), Color(0.95, 1.0, 0.52, blink))
+		var halo := Color(0.68, 0.82, 0.16, blink * 0.44)
 		_fireflies.draw_rect(Rect2(p + Vector2(-2, 0), Vector2(6, 2)), halo)
 		_fireflies.draw_rect(Rect2(p + Vector2(0, -2), Vector2(2, 6)), halo)
-		# A faint outer glow on the corners, so the glow is round, not a plus.
-		var corner := Color(0.5, 0.66, 0.1, blink * 0.14)
+		# A faint golden outer glow on the corners, so the glow is round, not a plus.
+		var corner := Color(0.62, 0.72, 0.12, blink * 0.18)
 		for d in [Vector2(-2, -2), Vector2(2, -2), Vector2(-2, 2), Vector2(2, 2)]:
 			_fireflies.draw_rect(Rect2(p + d, Vector2(2, 2)), corner)
 
@@ -331,10 +340,13 @@ func _outdoors() -> bool:
 	return true
 
 
-## True in the summer afternoon sun, when the light motes drift about.
+## True on fair sunlit hours (spring, summer and fall), when warm light motes
+## drift through the Valley air.
 func _motes_on() -> bool:
-	return GameClock.season == GameClock.Season.SUMMER and _darkness() <= 0.35 \
-			and GameClock.hour >= 12 and GameClock.hour < 18
+	var w := today()
+	return GameClock.season != GameClock.Season.WINTER and _darkness() <= 0.35 \
+			and w.rain <= 0.0 and w.snow <= 0.0 and w.clouds < 0.7 \
+			and GameClock.hour >= 8 and GameClock.hour < 19
 
 
 ## 0 in daylight, 1 at full night, from the world's day and night tint.

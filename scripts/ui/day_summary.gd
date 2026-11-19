@@ -78,6 +78,16 @@ func _build(log: DayLog) -> void:
 	var sub := _label("The day's page", DIM)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_column.add_child(sub)
+	var ornament := Control.new()
+	ornament.custom_minimum_size = Vector2(PANEL_SIZE.x - 16, 7)
+	ornament.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ornament.draw.connect(func() -> void:
+		var mid := floorf(ornament.size.x / 2.0)
+		var rule_col := Color(0.84, 0.66, 0.34, 0.65)
+		ornament.draw_rect(Rect2(12, 3, mid - 20, 1), rule_col)
+		ornament.draw_rect(Rect2(mid + 8, 3, ornament.size.x - mid - 20, 1), rule_col)
+		ornament.draw_colored_polygon(PackedVector2Array([Vector2(mid, 0), Vector2(mid + 3, 3), Vector2(mid, 6), Vector2(mid - 3, 3)]), HEADING))
+	_column.add_child(ornament)
 	if log == null or log.is_empty():
 		var quiet := _label("A quiet day in the Valley.")
 		quiet.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -153,11 +163,14 @@ func _chips(heading: String, counts: Dictionary, describe: Callable) -> void:
 	flow.add_theme_constant_override("v_separation", 2)
 	flow.custom_minimum_size.x = PANEL_SIZE.x - 16
 	_column.add_child(flow)
+	var badge_style := MenuInput.card_style(4.0, 5.0, 2.0, 2.0)
 	for id: String in counts:
 		var info: Array = describe.call(id)
+		var badge := PanelContainer.new()
+		badge.add_theme_stylebox_override("panel", badge_style)
+		badge.tooltip_text = info[1]
 		var chip := HBoxContainer.new()
-		chip.add_theme_constant_override("separation", 2)
-		chip.tooltip_text = info[1]
+		chip.add_theme_constant_override("separation", 3)
 		if info[0]:
 			var picture := TextureRect.new()
 			picture.texture = info[0]
@@ -166,11 +179,10 @@ func _chips(heading: String, counts: Dictionary, describe: Callable) -> void:
 			picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 			chip.add_child(picture)
-			chip.add_child(_label("%s x%d" % [info[1], counts[id]]))
-		else:
-			chip.add_child(_label("%s x%d" % [info[1], counts[id]]))
-		flow.add_child(chip)
-		_hide(chip)
+		chip.add_child(_label("%s x%d" % [info[1], counts[id]]))
+		badge.add_child(chip)
+		flow.add_child(badge)
+		_hide(badge)
 
 
 func _hide(control: Control) -> void:

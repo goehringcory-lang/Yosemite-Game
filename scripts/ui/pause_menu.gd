@@ -164,7 +164,7 @@ func _ready() -> void:
 	_title.add_theme_stylebox_override("normal", _title_style)
 	_title.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN # the tab hugs the title
 	column.add_child(_title)
-	_select_style = _style("res://assets/ui/select.png", 2.0)
+	_select_style = _style("res://assets/ui/select.png", 3.0)
 	_select_style.content_margin_left = 2.0
 	_select_style.expand_margin_top = 1.0
 	_select_style.expand_margin_bottom = 1.0
@@ -224,27 +224,13 @@ func _build_main() -> Control:
 ## The card beside the pause menu, like the player's page in Stardew Valley's
 ## menu: your face, the day, and how your time in the Valley is going.
 func _build_card() -> Control:
-	var card := PanelContainer.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.082, 0.078, 0.11, 0.2)
-	style.border_color = Color(0.69, 0.573, 0.373, 0.55)
-	style.border_width_left = 1
-	style.content_margin_left = 8.0
-	style.content_margin_right = 4.0
-	style.content_margin_top = 4.0
-	style.content_margin_bottom = 4.0
-	card.add_theme_stylebox_override("panel", style)
+	var card := _card_panel()
 	card.custom_minimum_size.x = CARD_WIDTH
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 1)
+	column.add_theme_constant_override("separation", 2)
 	card.add_child(column)
 	var frame := PanelContainer.new()
-	var frame_style := StyleBoxFlat.new()
-	frame_style.bg_color = Color("5e4a38")
-	frame_style.border_color = Color("b0925f")
-	frame_style.set_border_width_all(1)
-	frame_style.set_content_margin_all(1)
-	frame.add_theme_stylebox_override("panel", frame_style)
+	frame.add_theme_stylebox_override("panel", MenuInput.portrait_frame(3.0))
 	frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var face := TextureRect.new()
 	_card_face = face
@@ -340,15 +326,7 @@ func _build_settings() -> Control:
 ## The framed card used beside the pause menu's and settings' lists.
 func _card_panel() -> PanelContainer:
 	var card := PanelContainer.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.082, 0.078, 0.11, 0.2)
-	style.border_color = Color(0.69, 0.573, 0.373, 0.55)
-	style.border_width_left = 1
-	style.content_margin_left = 8.0
-	style.content_margin_right = 4.0
-	style.content_margin_top = 4.0
-	style.content_margin_bottom = 4.0
-	card.add_theme_stylebox_override("panel", style)
+	card.add_theme_stylebox_override("panel", MenuInput.card_style(7.0, 5.0, 5.0, 5.0))
 	return card
 
 
@@ -1104,17 +1082,25 @@ func _setting_value(which: int) -> String:
 	return "‹  %s  ›" % value
 
 
-## A volume's slider: ten notches, gold up to the level on the chosen row.
+## A volume's slider: ten beveled notches in a brass-rimmed track, gold up to
+## the level on the chosen row.
 func _draw_slider(bar: Control, which: int) -> void:
 	var level := _volume(which)
 	var chosen := which == _settings_cursor
-	var on := Color(1, 0.831, 0.541) if chosen else Color(0.894, 0.867, 0.8)
-	bar.draw_rect(Rect2(0, 0, 52, 8), Color("2a1b14"))
+	var on := Color(0.98, 0.82, 0.48) if chosen else Color(0.84, 0.78, 0.68)
+	var off := Color(0.28, 0.2, 0.14)
+	bar.draw_rect(Rect2(0, 0, 52, 8), Color("160e08"))
+	bar.draw_rect(Rect2(0, 7, 52, 1), Color("5c4229"))
+	bar.draw_rect(Rect2(51, 0, 1, 8), Color("5c4229"))
 	for n in Settings.MAX_VOLUME:
 		var notch := Rect2(1 + n * 5, 1, 4, 6)
-		bar.draw_rect(notch, on if n < level else Color(0.369, 0.29, 0.22))
 		if n < level:
-			bar.draw_rect(Rect2(notch.position, Vector2(4, 1)), on.lightened(0.4))
+			bar.draw_rect(notch, on)
+			bar.draw_rect(Rect2(notch.position, Vector2(4, 1)), on.lightened(0.38))
+			bar.draw_rect(Rect2(notch.position + Vector2(0, 5), Vector2(4, 1)), on.darkened(0.3))
+		else:
+			bar.draw_rect(notch, off)
+			bar.draw_rect(Rect2(notch.position, Vector2(4, 1)), off.darkened(0.28))
 
 
 ## The level of volume setting [param which] (0 to Settings.MAX_VOLUME).

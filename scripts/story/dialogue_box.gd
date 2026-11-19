@@ -27,7 +27,7 @@ const BOX_WIDTH_CARD := 464.0
 ## Room the box's frame takes on the left and right (the panel's margins),
 ## and the portrait with the gap before it.
 const FRAME_SIDES := 16.0
-const PORTRAIT_ROOM := 88.0
+const PORTRAIT_ROOM := 92.0
 ## The card beside a list of choices that tells about the one picked, like
 ## Stardew Valley's crafting and shop menus (see choose's details).
 const DETAIL_WIDTH := 168.0
@@ -135,15 +135,7 @@ func _ready() -> void:
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(column)
 	_portrait_frame = PanelContainer.new()
-	var frame := StyleBoxFlat.new()
-	frame.bg_color = Color("5e4a38")
-	frame.border_color = Color("b0925f")
-	frame.set_border_width_all(1)
-	frame.set_content_margin_all(1)
-	frame.shadow_color = Color(0.082, 0.078, 0.11, 0.35)
-	frame.shadow_offset = Vector2(1, 1)
-	frame.shadow_size = 1
-	_portrait_frame.add_theme_stylebox_override("panel", frame)
+	_portrait_frame.add_theme_stylebox_override("panel", MenuInput.portrait_frame(3.0))
 	_portrait_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_portrait_frame.visible = false
 	row.add_child(_portrait_frame)
@@ -172,15 +164,7 @@ func _ready() -> void:
 	_options_box.add_theme_constant_override("separation", 0)
 	column.add_child(_options_box)
 	_detail_panel = PanelContainer.new()
-	var card := StyleBoxFlat.new()
-	card.bg_color = Color(0.082, 0.078, 0.11, 0.22)
-	card.border_color = Color(0.69, 0.573, 0.373, 0.55)
-	card.border_width_left = 1
-	card.content_margin_left = 6.0
-	card.content_margin_right = 4.0
-	card.content_margin_top = 3.0
-	card.content_margin_bottom = 3.0
-	_detail_panel.add_theme_stylebox_override("panel", card)
+	_detail_panel.add_theme_stylebox_override("panel", MenuInput.card_style(6.0, 5.0, 3.0, 3.0))
 	_detail_panel.custom_minimum_size.x = DETAIL_WIDTH
 	_detail_panel.visible = false
 	row.add_child(_detail_panel)
@@ -205,7 +189,7 @@ func _ready() -> void:
 	_arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_arrow.visible = false
 	root.add_child(_arrow)
-	_select_style = _style("res://assets/ui/select.png", 2.0)
+	_select_style = _style("res://assets/ui/select.png", 3.0)
 	_select_style.content_margin_left = 2.0
 	_select_style.expand_margin_top = 1.0
 	_select_style.expand_margin_bottom = 1.0
@@ -301,6 +285,10 @@ func _show(speaker: String, text: String, options: Array, mood := "neutral") -> 
 	var face := Portraits.for_speaker(speaker, mood)
 	_portrait.texture = face
 	_portrait_frame.visible = face != null
+	if face != null and text != "":
+		_portrait.pivot_offset = PORTRAIT_SIZE / 2.0
+		_portrait.scale = Vector2(1.03, 0.97)
+		_portrait.create_tween().tween_property(_portrait, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	var card := not _details.is_empty()
 	var width := BOX_WIDTH_CARD if card else BOX_WIDTH
 	_text_label.custom_minimum_size.x = width - FRAME_SIDES - (PORTRAIT_ROOM if face else 0.0) - (DETAIL_WIDTH + 6.0 if card else 0.0)
@@ -479,7 +467,7 @@ func _refresh_detail() -> void:
 		var note := Label.new()
 		note.text = card.note
 		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		note.custom_minimum_size.x = DETAIL_WIDTH - 10.0
+		note.custom_minimum_size.x = DETAIL_WIDTH - 12.0
 		note.add_theme_color_override("font_color", DETAIL_DIM)
 		_detail_column.add_child(note)
 

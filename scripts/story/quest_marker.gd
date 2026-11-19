@@ -12,9 +12,12 @@ const CHECK := 0.5
 const HEIGHT := -68.0
 const BOB := 3.0
 const INK := Color("2a1b14")
-const NEW := Color("f7a64a")
-const DONE := Color("3a86a8")
-const HEART := Color("e0607e")
+const BUBBLE := Color("faf3e0")
+const BUBBLE_SHADE := Color("dfd0b4")
+const SHADOW := Color(0.08, 0.05, 0.04, 0.25)
+const NEW := Color("e88a2a")
+const DONE := Color("2f7ca3")
+const HEART := Color("df4c6b")
 ## Glyphs five cells high (each cell drawn 2x2 px) for the bubble.
 const GLYPHS := {
 	"!": ["010", "010", "010", "000", "010"],
@@ -62,18 +65,24 @@ func _draw() -> void:
 	if marker == "":
 		return
 	var top := HEIGHT
-	# an outlined, rounded bubble with a tail pointing down
+	# soft shadow beneath the bubble
+	draw_rect(Rect2(-6, top + 16, 16, 2), SHADOW)
+	# an outlined, rounded warm-parchment bubble with a shaded lower lip and tail
 	draw_rect(Rect2(-8, top - 2, 18, 18), INK)
 	draw_rect(Rect2(-10, top, 22, 14), INK)
-	draw_rect(Rect2(-8, top, 18, 14), Color.WHITE)
+	draw_rect(Rect2(-8, top, 18, 14), BUBBLE)
+	draw_rect(Rect2(-8, top + 12, 18, 2), BUBBLE_SHADE)
+	draw_rect(Rect2(8, top + 2, 2, 10), BUBBLE_SHADE)
 	draw_rect(Rect2(-2, top + 16, 6, 2), INK)
-	draw_rect(Rect2(0, top + 14, 2, 4), Color.WHITE)
+	draw_rect(Rect2(0, top + 14, 2, 4), BUBBLE_SHADE)
 	draw_rect(Rect2(0, top + 18, 2, 2), INK)
 	var glyph: Array = GLYPHS[marker]
 	var ink: Color = {"!": NEW, "?": DONE, "heart": HEART}[marker]
+	var hi := ink.lightened(0.28)
 	# centered in the bubble, which is centered on x = 1
 	var left := 1 - String(glyph[0]).length()
 	for y in glyph.size():
 		for x in String(glyph[y]).length():
 			if glyph[y][x] == "1":
-				draw_rect(Rect2(left + x * 2, top + 2 + y * 2, 2, 2), ink)
+				var col := hi if y == 0 else (ink.darkened(0.14) if y >= glyph.size() - 1 else ink)
+				draw_rect(Rect2(left + x * 2, top + 2 + y * 2, 2, 2), col)

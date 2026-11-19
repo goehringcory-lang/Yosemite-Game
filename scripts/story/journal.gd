@@ -72,9 +72,10 @@ var _open := false
 var _more: Label
 var _repeat := 0.0
 var _tab_style: StyleBoxTexture
-var _plain_style: StyleBoxEmpty
-var _slot_style: StyleBoxFlat
-var _slot_chosen_style: StyleBoxFlat
+var _tab_idle_style: StyleBoxTexture
+var _card_style: StyleBoxTexture
+var _slot_style: StyleBoxTexture
+var _slot_chosen_style: StyleBoxTexture
 
 
 func _ready() -> void:
@@ -91,15 +92,22 @@ func _ready() -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 2)
 	_panel.add_child(column)
+	var tab_strip := VBoxContainer.new()
+	tab_strip.add_theme_constant_override("separation", 0)
+	column.add_child(tab_strip)
 	var tabs := HBoxContainer.new()
-	tabs.add_theme_constant_override("separation", 4)
-	column.add_child(tabs)
+	tabs.add_theme_constant_override("separation", 3)
+	tab_strip.add_child(tabs)
 	for i in TAB_NAMES.size():
 		var label := ButtonHints.new()
 		label.mouse_filter = Control.MOUSE_FILTER_STOP
 		label.gui_input.connect(_on_tab_input.bind(i))
 		tabs.add_child(label)
 		_tab_labels.append(label)
+	var tab_rule := ColorRect.new()
+	tab_rule.color = Color(0.84, 0.66, 0.34, 0.72)
+	tab_rule.custom_minimum_size = Vector2(LINE_WIDTH + 8, 1)
+	tab_strip.add_child(tab_rule)
 	_scroll = ScrollContainer.new()
 	_scroll.custom_minimum_size.x = LINE_WIDTH + 8
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -150,27 +158,20 @@ func _ready() -> void:
 
 
 func _build_styles() -> void:
-	# The open tab sits on a brass tag, like the pause menu's title.
-	_tab_style = StyleBoxTexture.new()
-	_tab_style.texture = load("res://assets/ui/tag.png")
-	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
-		_tab_style.set_texture_margin(side, 4.0)
-	_tab_style.content_margin_left = 6.0
-	_tab_style.content_margin_right = 6.0
-	_plain_style = StyleBoxEmpty.new()
-	_plain_style.content_margin_left = 6.0
-	_plain_style.content_margin_right = 6.0
-	_slot_style = StyleBoxFlat.new()
-	_slot_style.bg_color = SLOT_FILL
-	_slot_style.border_color = SLOT_EDGE
-	_slot_style.set_border_width_all(1)
-	_slot_style.set_content_margin_all(2.0)
-	_slot_style.anti_aliasing = false
-	_slot_chosen_style = _slot_style.duplicate()
-	_slot_chosen_style.bg_color = SLOT_FILL_CHOSEN
-	_slot_chosen_style.border_color = SLOT_EDGE_CHOSEN
-	_slot_chosen_style.set_border_width_all(2)
-	_slot_chosen_style.set_content_margin_all(2.0)
+	# The open tab sits on a brass tag, and inactive tabs sit recessed behind the rule.
+	_tab_style = MenuInput.nine_slice("res://assets/ui/tag.png", 4.0)
+	_tab_style.content_margin_left = 5.0
+	_tab_style.content_margin_right = 5.0
+	_tab_style.content_margin_top = 1.0
+	_tab_style.content_margin_bottom = 2.0
+	_tab_idle_style = MenuInput.nine_slice("res://assets/ui/tab_idle.png", 4.0)
+	_tab_idle_style.content_margin_left = 5.0
+	_tab_idle_style.content_margin_right = 5.0
+	_tab_idle_style.content_margin_top = 1.0
+	_tab_idle_style.content_margin_bottom = 2.0
+	_card_style = MenuInput.card_style(6.0, 6.0, 4.0, 4.0)
+	_slot_style = MenuInput.nine_slice("res://assets/ui/slot.png", 4.0, 3.0, 3.0)
+	_slot_chosen_style = MenuInput.nine_slice("res://assets/ui/slot_chosen.png", 4.0, 3.0, 3.0)
 
 
 func is_open() -> bool:
@@ -334,7 +335,7 @@ func _refresh_hints() -> void:
 		var label := _tab_labels[i]
 		label.text = TAB_NAMES[i] if gamepad else "[%s] %s" % [TAB_KEYS[i], TAB_NAMES[i]]
 		label.add_theme_color_override("font_color", HEADING if i == _tab else DIM)
-		label.add_theme_stylebox_override("normal", _tab_style if i == _tab else _plain_style)
+		label.add_theme_stylebox_override("normal", _tab_style if i == _tab else _tab_idle_style)
 	var move := "[%s] Choose" % MenuInput.button(tree, "Arrows", "Stick") if _uses_slots() \
 			else "[%s] Scroll" % MenuInput.button(tree, "Up/Down", "Stick")
 	var close_key := "Y/B" if _tab == Tab.JOURNAL else "B"
@@ -719,17 +720,17 @@ func _note_card(entry: Dictionary) -> void:
 	var title := Label.new()
 	title.text = "\"%s\"" % note.text
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	title.custom_minimum_size.x = LINE_WIDTH - 40
+	title.custom_minimum_size.x = LINE_WIDTH - 56
 	title.add_theme_color_override("font_color", HEADING)
 	words.add_child(title)
 	var objective := Label.new()
 	objective.text = BoardRequests.objective(entry)
 	objective.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	objective.custom_minimum_size.x = LINE_WIDTH - 40
+	objective.custom_minimum_size.x = LINE_WIDTH - 56
 	objective.add_theme_color_override("font_color", Color(0.827, 0.894, 0.541) if entry.have >= int(note.count) else DIM)
 	words.add_child(objective)
 	row.add_child(words)
-	_body.add_child(row)
+	_add_card(row)
 
 
 ## How many of the Guardian's Year's four seasons of work are done.
@@ -755,10 +756,10 @@ func _rescue_card(call: Dictionary) -> void:
 	var step := Label.new()
 	step.text = Rescues.objective() + " The team takes over at %d PM." % (Rescues.NIGHTFALL - 12)
 	step.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	step.custom_minimum_size.x = LINE_WIDTH - 40
+	step.custom_minimum_size.x = LINE_WIDTH - 56
 	words.add_child(step)
 	row.add_child(words)
-	_body.add_child(row)
+	_add_card(row)
 
 
 ## A quest as a card: the face of whoever gave it, its title, and what to do
@@ -778,20 +779,29 @@ func _quest_card(quest: QuestData, objective: String) -> void:
 	var step := Label.new()
 	step.text = objective
 	step.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	step.custom_minimum_size.x = LINE_WIDTH - 40
+	step.custom_minimum_size.x = LINE_WIDTH - 56
 	words.add_child(step)
 	row.add_child(words)
-	_body.add_child(row)
+	_add_card(row)
+
+
+## Wraps a quest, note or rescue row inside a recessed dark-wood card.
+func _add_card(content: Control) -> void:
+	var card := PanelContainer.new()
+	card.add_theme_stylebox_override("panel", _card_style)
+	card.custom_minimum_size.x = LINE_WIDTH
+	card.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	card.add_child(content)
+	_body.add_child(card)
+	var gap := Control.new()
+	gap.custom_minimum_size.y = 3
+	_body.add_child(gap)
 
 
 ## A small framed portrait of [param speaker] (blank if they have none).
 func _face(speaker: String, side: int) -> Control:
 	var frame := PanelContainer.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color("5e4a38")
-	style.border_color = Color("b0925f")
-	style.set_border_width_all(1)
-	frame.add_theme_stylebox_override("panel", style)
+	frame.add_theme_stylebox_override("panel", MenuInput.portrait_frame(2.0 if side <= 24 else 3.0))
 	frame.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	var picture := TextureRect.new()
 	picture.texture = Portraits.for_speaker(speaker)
