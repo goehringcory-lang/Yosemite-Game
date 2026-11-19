@@ -235,15 +235,6 @@ func restore(root: Node) -> void:
 			_pending.erase(node.name)
 
 
-## Stashes persist nodes under [param root] into [member _pending] before an
-## offstage region is evicted from memory, so its state survives re-entry and
-## future saves.
-func stash(root: Node) -> void:
-	for node in root.find_children("*", "", true, false):
-		if node.is_in_group("persist"):
-			_pending[node.name] = node.save_data()
-
-
 ## Forgets saved data that hasn't been restored yet, for a new game.
 func clear_pending() -> void:
 	_pending.clear()
