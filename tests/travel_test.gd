@@ -268,7 +268,6 @@ func _check_spawns_are_free(world: Node) -> void:
 			stuck.append(key)
 	check(targets.size() > 20, "checked %d arrival spots" % targets.size())
 	check(stuck.is_empty(), "no arrival spot is inside a tree or wall (%s)" % ", ".join(stuck))
-	check(world._regions.size() <= world.MAX_CACHED_REGIONS, "region cache stays bounded (%d <= %d)" % [world._regions.size(), world.MAX_CACHED_REGIONS])
 	world._enter_region(Park.HOME_REGION, Park.HOME_SPAWN)
 
 

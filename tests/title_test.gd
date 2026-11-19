@@ -171,6 +171,9 @@ func test_slots() -> void:
 	check(not recovered_info.get("broken", false) and str(recovered_info.get("date", "")).contains(" 7 "), "slot_info falls back to the backup save when primary is corrupt (%s)" % recovered_info)
 	GameClock.day = 1
 	check(SaveManager.load_game() and GameClock.day == 7, "load_game recovers from the backup save when primary is corrupt")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(SaveManager.slot_path(1)))
+	GameClock.day = 1
+	check(SaveManager.has_save() and SaveManager.load_game() and GameClock.day == 7, "a slot with only its backup left still loads")
 	for n in range(1, SaveManager.SLOTS + 1):
 		SaveManager.delete_slot(n)
 	check(not FileAccess.file_exists(SaveManager.backup_path(1)), "delete_slot removes the backup file too")

@@ -41,8 +41,10 @@ var _pending: Dictionary = {}
 var _fresh := false
 
 
+## True when the current slot holds a game, counting a backup copy left
+## without its main file.
 func has_save() -> bool:
-	return FileAccess.file_exists(save_path)
+	return slot_used(slot)
 
 
 ## The file for save slot [param n] (1 to SLOTS).
@@ -231,15 +233,6 @@ func restore(root: Node) -> void:
 		if node.is_in_group("persist") and _pending.has(node.name):
 			node.load_data(_pending[node.name])
 			_pending.erase(node.name)
-
-
-## Stashes persist nodes under [param root] into [member _pending] before an
-## offstage region is evicted from memory, so its state survives re-entry and
-## future saves.
-func stash(root: Node) -> void:
-	for node in root.find_children("*", "", true, false):
-		if node.is_in_group("persist"):
-			_pending[node.name] = node.save_data()
 
 
 ## Forgets saved data that hasn't been restored yet, for a new game.

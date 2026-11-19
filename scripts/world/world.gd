@@ -38,20 +38,9 @@ var forage: ForageSpawner:
 				return child
 		return null
 
-## Maximum visited regions kept in memory at once. Older offstage regions
-## have their persist state stashed in SaveManager and are freed so session
-## memory stays bounded.
-const MAX_CACHED_REGIONS := 12
-## Maximum background-loaded normal maps held in [member _warm] before older
-## references are dropped (LitSprites keeps references for attached materials).
-const MAX_WARM_RESOURCES := 64
-
 ## Regions visited this session, by id. They stay in memory while the player
-## is elsewhere (up to MAX_CACHED_REGIONS), so returning nearby is instant;
-## older offstage regions are stashed in SaveManager and evicted.
+## is elsewhere, so anything that changed in them is still there on return.
 var _regions: Dictionary = {}
-## Visited region ids ordered from oldest to most recently used.
-var _region_order: Array[String] = []
 ## Region scenes loaded in the background before the player needs them, so
 ## walking through a door or driving to a hub doesn't stall on reading the
 ## scene: paths waiting their turn, the one loading now, and the finished
@@ -554,9 +543,6 @@ func _enter_region(id: String, spawn_name := "") -> void:
 ## Everything that follows the player into a region, by a door or a fade or
 ## across a seam.
 func _arrive() -> void:
-	_touch_region(region.region_id)
-	if seam and seam.neighbor:
-		_touch_region(seam.neighbor.region_id)
 	$DayNight.visible = not region.indoors
 	Warmth.outdoors = not region.indoors
 	if forage:
@@ -569,7 +555,6 @@ func _arrive() -> void:
 	RoomWindows.attach(region)
 	region_changed.emit(region)
 	_update_location()
-	_trim_region_cache()
 	_preload_neighbors()
 
 
@@ -578,45 +563,7 @@ func _arrive() -> void:
 func _get_region(id: String) -> Region:
 	while not _regions.has(id):
 		_set_up_step(id)
-	_touch_region(id)
 	return _regions[id]
-
-
-## Moves [param id] to the back of [member _region_order] (most recently used).
-func _touch_region(id: String) -> void:
-	if id == "":
-		return
-	_region_order.erase(id)
-	_region_order.append(id)
-
-
-## Evicts the least recently used offstage regions past MAX_CACHED_REGIONS,
-## stashing their persist state in SaveManager so nothing is lost on return.
-func _trim_region_cache() -> void:
-	var seam_id := seam.neighbor.region_id if seam and seam.neighbor else ""
-	while _regions.size() > MAX_CACHED_REGIONS:
-		var evict_id := ""
-		for candidate in _region_order:
-			if candidate == region.region_id or candidate == seam_id:
-				continue
-			var cached: Region = _regions.get(candidate)
-			if cached and not cached.is_inside_tree():
-				evict_id = candidate
-				break
-		if evict_id == "":
-			break
-		var evicted: Region = _regions[evict_id]
-		SaveManager.stash(evicted)
-		_regions.erase(evict_id)
-		_region_order.erase(evict_id)
-		_seams.erase(evict_id)
-		for from_id in _seams:
-			var known: Dictionary = _seams[from_id]
-			for exit_name in known.keys():
-				var cached_seam: Seam = known[exit_name]
-				if cached_seam and cached_seam.neighbor == evicted:
-					known.erase(exit_name)
-		evicted.free()
 
 
 ## Sets region [param id] up for its first visit a step at a time, one step a
@@ -647,9 +594,6 @@ func _set_up_step(id: String) -> void:
 			made.remove_meta("set_up_step")
 			_setting_up.erase(id)
 			_regions[id] = made
-			_touch_region(id)
-			if _setting_up.is_empty() and _preloading == "" and _preload_queue.is_empty():
-				_warm.clear()
 			return
 	made.set_meta("set_up_step", step + 1)
 
@@ -887,8 +831,6 @@ func _pump_preload() -> void:
 							_preload_queue.push_front(normal)
 				else:
 					_warm.append(loaded)
-					if _warm.size() > MAX_WARM_RESOURCES:
-						_warm.pop_front()
 		_preloading = ""
 	while _preloading == "" and not _preload_queue.is_empty():
 		var path: String = _preload_queue.pop_front()
