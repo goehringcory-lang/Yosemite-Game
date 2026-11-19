@@ -81,10 +81,7 @@ func _ready() -> void:
 		_rows.append({"kind": Row.PART, "id": part.id})
 	_rows.append({"kind": Row.SURPRISE})
 	_rows.append({"kind": Row.START})
-	_select_style = StyleBoxTexture.new()
-	_select_style.texture = load("res://assets/ui/select.png")
-	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
-		_select_style.set_texture_margin(side, 2.0)
+	_select_style = MenuInput.nine_slice("res://assets/ui/select.png", 3.0)
 	_select_style.content_margin_left = 2.0
 	# no taller than a plain line, so the list doesn't shift under the cursor
 	_select_style.content_margin_top = 0.0
@@ -190,27 +187,14 @@ func _build_list() -> Control:
 
 func _build_preview() -> Control:
 	var card := PanelContainer.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.082, 0.078, 0.11, 0.2)
-	style.border_color = Color(0.69, 0.573, 0.373, 0.55)
-	style.border_width_left = 1
-	style.content_margin_left = 10.0
-	style.content_margin_right = 4.0
-	style.content_margin_top = 4.0
-	style.content_margin_bottom = 4.0
-	card.add_theme_stylebox_override("panel", style)
+	card.add_theme_stylebox_override("panel", MenuInput.card_style(6.0, 5.0, 3.0, 3.0))
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 4)
+	column.add_theme_constant_override("separation", 2)
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
 	card.add_child(column)
 	var frame := PanelContainer.new()
-	var frame_style := StyleBoxFlat.new()
-	frame_style.bg_color = Color("5e4a38")
-	frame_style.border_color = Color("b0925f")
-	frame_style.set_border_width_all(1)
-	frame_style.set_content_margin_all(1)
-	frame.add_theme_stylebox_override("panel", frame_style)
+	frame.add_theme_stylebox_override("panel", MenuInput.portrait_frame(2.0))
 	frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_face = TextureRect.new()
 	_face.custom_minimum_size = Vector2(80, 80)
@@ -219,13 +203,14 @@ func _build_preview() -> Control:
 	_face.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	frame.add_child(_face)
 	column.add_child(frame)
-	# a patch of meadow to stand on, so the figure reads as in the world
+	# a patch of meadow framed in wood to stand on, so the figure reads as in the world
 	var ground := PanelContainer.new()
 	var ground_style := StyleBoxFlat.new()
-	ground_style.bg_color = Color("84b04a")
-	ground_style.border_color = Color("5c8f3c")
+	ground_style.bg_color = Color("7aa546")
+	ground_style.border_color = Color("b0884a")
 	ground_style.set_border_width_all(1)
-	ground_style.set_content_margin_all(3)
+	ground_style.set_content_margin_all(2)
+	ground_style.anti_aliasing = false
 	ground.add_theme_stylebox_override("panel", ground_style)
 	ground.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_figure = TextureRect.new()

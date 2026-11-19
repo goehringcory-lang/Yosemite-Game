@@ -79,9 +79,10 @@ static func pop_out(panel: Control) -> void:
 
 
 static func _stop(panel: Control) -> void:
-	var running: Tween = panel.get_meta("menu_tween", null)
-	if running and running.is_valid():
-		running.kill()
+	if panel.has_meta("menu_tween"):
+		var running: Tween = panel.get_meta("menu_tween")
+		if running and running.is_valid():
+			running.kill()
 
 
 ## Fades a page's new content in, for a tab or page turned in place.
@@ -155,9 +156,10 @@ static func mark(label: Control, chosen: bool) -> void:
 static func press(line: Control) -> void:
 	if line == null or not line.is_inside_tree():
 		return
-	var running: Tween = line.get_meta("press_tween", null)
-	if running and running.is_valid():
-		running.kill()
+	if line.has_meta("press_tween"):
+		var running: Tween = line.get_meta("press_tween")
+		if running and running.is_valid():
+			running.kill()
 	line.modulate = Color(1.6, 1.5, 1.25)
 	var tween := line.create_tween()
 	tween.tween_property(line, "modulate", Color.WHITE, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
@@ -222,7 +224,7 @@ static func badge(label: Control, texture: Texture2D, right := false, flip := fa
 ## scroll bar clear.
 static func edge_fade(holder: Control, top: bool, right_gap := 0.0) -> TextureRect:
 	var gradient := Gradient.new()
-	var paper := Color(37 / 255.0, 27 / 255.0, 20 / 255.0) if not top else Color(52 / 255.0, 36 / 255.0, 22 / 255.0)
+	var paper := Color("231a14")
 	gradient.set_color(0, Color(paper, 1.0 if top else 0.0))
 	gradient.set_color(1, Color(paper, 0.0 if top else 1.0))
 	gradient.add_point(0.35 if top else 0.65, Color(paper, 1.0))
@@ -248,3 +250,36 @@ static func edge_fade(holder: Control, top: bool, right_gap := 0.0) -> TextureRe
 	fade.visible = false
 	holder.add_child(fade)
 	return fade
+
+
+## Shared nine-slice StyleBoxTexture helper for crafted UI art.
+static func nine_slice(path: String, margin: float, content_x := -1.0, content_y := -1.0) -> StyleBoxTexture:
+	var style := StyleBoxTexture.new()
+	style.texture = load(path)
+	style.texture_margin_left = margin
+	style.texture_margin_top = margin
+	style.texture_margin_right = margin
+	style.texture_margin_bottom = margin
+	if content_x >= 0.0:
+		style.content_margin_left = content_x
+		style.content_margin_right = content_x
+	if content_y >= 0.0:
+		style.content_margin_top = content_y
+		style.content_margin_bottom = content_y
+	return style
+
+
+## The carved wood-and-brass frame worn by every portrait across the game.
+static func portrait_frame(padding := 3.0) -> StyleBoxTexture:
+	return nine_slice("res://assets/ui/portrait_frame.png", 6.0, padding, padding)
+
+
+## The recessed dark-wood nested card for quest entries, shop/campfire details,
+## and pause/settings side cards.
+static func card_style(left := 6.0, right := 5.0, top := 4.0, bottom := 4.0) -> StyleBoxTexture:
+	var style := nine_slice("res://assets/ui/card.png", 5.0)
+	style.content_margin_left = left
+	style.content_margin_right = right
+	style.content_margin_top = top
+	style.content_margin_bottom = bottom
+	return style

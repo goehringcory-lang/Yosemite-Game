@@ -213,16 +213,20 @@ func _build_title() -> void:
 	_on_band(tagline, LOGO_TOP + 63, _logo)
 
 
-## Sets [param label] on a soft dark band across the picture at [param y], so
-## its letters stay crisp over the busy painting without a heavy outline.
+## Sets [param label] on a carved dark band with brass trim across the picture
+## at [param y], so its letters stay crisp over the painting without a heavy outline.
 func _on_band(label: Label, y: float, parent: Node = self) -> PanelContainer:
 	var band := PanelContainer.new()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.165, 0.106, 0.078, 0.62)
-	style.content_margin_left = 8.0
-	style.content_margin_right = 8.0
-	style.content_margin_top = 0.0
+	style.bg_color = Color(0.14, 0.09, 0.065, 0.72)
+	style.border_color = Color(0.76, 0.58, 0.3, 0.75)
+	style.border_width_top = 1
+	style.border_width_bottom = 1
+	style.content_margin_left = 10.0
+	style.content_margin_right = 10.0
+	style.content_margin_top = 1.0
 	style.content_margin_bottom = 1.0
+	style.anti_aliasing = false
 	band.add_theme_stylebox_override("panel", style)
 	label.add_theme_color_override("font_outline_color", Color(0.165, 0.106, 0.078))
 	label.add_theme_constant_override("outline_size", 2)
@@ -238,10 +242,7 @@ func _on_band(label: Label, y: float, parent: Node = self) -> PanelContainer:
 
 
 func _build_menu() -> void:
-	_select_style = StyleBoxTexture.new()
-	_select_style.texture = load("res://assets/ui/select.png")
-	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
-		_select_style.set_texture_margin(side, 2.0)
+	_select_style = MenuInput.nine_slice("res://assets/ui/select.png", 3.0)
 	_select_style.content_margin_left = 2.0
 	_select_style.expand_margin_top = 1.0
 	_select_style.expand_margin_bottom = 1.0

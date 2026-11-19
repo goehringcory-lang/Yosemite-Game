@@ -130,14 +130,10 @@ func _build() -> void:
 	_card = PanelContainer.new()
 	_card.name = "FirstDayCard"
 	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.165, 0.106, 0.078, 0.78)
-	style.border_color = Color(0.573, 0.412, 0.239, 0.9)
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(2)
-	style.content_margin_left = 5
-	style.content_margin_right = 5
-	style.content_margin_top = 2
+	var style := MenuInput.nine_slice("res://assets/ui/prompt_pill.png", 4.0)
+	style.content_margin_left = 6
+	style.content_margin_right = 6
+	style.content_margin_top = 3
 	style.content_margin_bottom = 3
 	_card.add_theme_stylebox_override("panel", style)
 	var rows := VBoxContainer.new()
