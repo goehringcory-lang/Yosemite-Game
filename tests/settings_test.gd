@@ -58,9 +58,10 @@ func test_persistence() -> void:
 	Settings.fullscreen = true
 	Settings.window_scale = 2
 	Settings.prompts = Settings.Prompts.GAMEPAD
+	Settings.wayfinding = false
 	check(Settings.save() == OK and FileAccess.file_exists(TEST_PATH), "settings save to user://")
 	Settings.reset_defaults()
-	check(Settings.text_speed == Settings.TextSpeed.NORMAL, "reset puts the defaults back")
+	check(Settings.text_speed == Settings.TextSpeed.NORMAL and Settings.wayfinding, "reset puts the defaults back")
 	Settings.load_settings()
 	check(Settings.text_speed == Settings.TextSpeed.FAST, "text speed loads back")
 	check(Settings.fullscreen, "full screen loads back")
@@ -386,6 +387,10 @@ func test_rebind(pause: PauseMenu) -> void:
 	_press("interact")
 	check(Settings.keys.is_empty() and _has_key("interact", KEY_E) and _has_key("gift", KEY_G), "Reset keys puts every key back")
 	check(world.hud.prompt("E", "A") == "E", "and the hints with them")
+	check(Settings.key_for("wildlife") == KEY_N and Settings.key_for("logbook") == KEY_L, "Wildlife (N) and Logbook (L) are rebindable in Controls")
+	check(Settings.set_key("wildlife", KEY_U) and _has_key("wildlife", KEY_U) and not _has_key("wildlife", KEY_N), "Wildlife can be rebound to another key")
+	Settings.reset_keys()
+	check(_has_key("wildlife", KEY_N) and _has_key("logbook", KEY_L), "and resets back to N and L")
 
 
 func _has_key(action: String, physical: int) -> bool:

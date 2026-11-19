@@ -41,7 +41,7 @@ import osm as O  # noqa: E402
 import paint as PT  # noqa: E402
 
 
-GRANITE, CLIFF = 7, 8  # tools/mapgen/terrain.gd
+GRANITE, CLIFF = 7, 8  # scripts/world/terrain.gd
 FOOT = 3.0  # art rows of the canvas under the rock's foot
 
 

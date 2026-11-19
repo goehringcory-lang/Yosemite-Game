@@ -9,7 +9,7 @@ extends RefCounted
 ##
 ## Palettes are mid-day values; the world's day/night tint darkens them.
 
-const Terrain = preload("res://tools/mapgen/terrain.gd")
+const Terrain = preload("res://scripts/world/terrain.gd")
 const T := 16
 const FORMAL := [Terrain.PAVED, Terrain.PARKING, Terrain.ROAD, Terrain.BRIDGE, Terrain.BUILT]
 ## Formal groups that get a smoothed outline of their own in paint().

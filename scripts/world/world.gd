@@ -38,9 +38,20 @@ var forage: ForageSpawner:
 				return child
 		return null
 
+## Maximum visited regions kept in memory at once. Older offstage regions
+## have their persist state stashed in SaveManager and are freed so session
+## memory stays bounded.
+const MAX_CACHED_REGIONS := 12
+## Maximum background-loaded normal maps held in [member _warm] before older
+## references are dropped (LitSprites keeps references for attached materials).
+const MAX_WARM_RESOURCES := 64
+
 ## Regions visited this session, by id. They stay in memory while the player
-## is elsewhere, so anything that changed in them is still there on return.
+## is elsewhere (up to MAX_CACHED_REGIONS), so returning nearby is instant;
+## older offstage regions are stashed in SaveManager and evicted.
 var _regions: Dictionary = {}
+## Visited region ids ordered from oldest to most recently used.
+var _region_order: Array[String] = []
 ## Region scenes loaded in the background before the player needs them, so
 ## walking through a door or driving to a hub doesn't stall on reading the
 ## scene: paths waiting their turn, the one loading now, and the finished
@@ -466,13 +477,14 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	player.interaction_area.position = Vector2(player.facing) * 24.0
 	await _unstick_player()
 	_camera().reset_smoothing()
-	SaveManager.save_game()
+	var saved := SaveManager.save_game()
 
 	await hud.fade_from_black()
 	player.pose("arms_up", 1.0) # a morning stretch
-	var message := "Good morning! Your game was saved."
+	var save_status := "Your game was saved." if saved else "Couldn't save. Check that the game can write to its save folder."
+	var message := "Good morning! " + save_status
 	if night_out != "":
-		message = "Good morning in %s! Your game was saved.\n%s" % [region.display_name, night_out]
+		message = "Good morning in %s! %s\n%s" % [region.display_name, save_status, night_out]
 	elif passed_out and fell_asleep_at.begins_with("backcountry:"):
 		message = "You fell asleep on the trail at %s. A ranger on patrol walked you down and drove you back to camp." % fell_asleep_at.trim_prefix("backcountry:")
 	elif passed_out and fell_asleep_at != "":
@@ -542,6 +554,9 @@ func _enter_region(id: String, spawn_name := "") -> void:
 ## Everything that follows the player into a region, by a door or a fade or
 ## across a seam.
 func _arrive() -> void:
+	_touch_region(region.region_id)
+	if seam and seam.neighbor:
+		_touch_region(seam.neighbor.region_id)
 	$DayNight.visible = not region.indoors
 	Warmth.outdoors = not region.indoors
 	if forage:
@@ -554,6 +569,7 @@ func _arrive() -> void:
 	RoomWindows.attach(region)
 	region_changed.emit(region)
 	_update_location()
+	_trim_region_cache()
 	_preload_neighbors()
 
 
@@ -562,7 +578,45 @@ func _arrive() -> void:
 func _get_region(id: String) -> Region:
 	while not _regions.has(id):
 		_set_up_step(id)
+	_touch_region(id)
 	return _regions[id]
+
+
+## Moves [param id] to the back of [member _region_order] (most recently used).
+func _touch_region(id: String) -> void:
+	if id == "":
+		return
+	_region_order.erase(id)
+	_region_order.append(id)
+
+
+## Evicts the least recently used offstage regions past MAX_CACHED_REGIONS,
+## stashing their persist state in SaveManager so nothing is lost on return.
+func _trim_region_cache() -> void:
+	var seam_id := seam.neighbor.region_id if seam and seam.neighbor else ""
+	while _regions.size() > MAX_CACHED_REGIONS:
+		var evict_id := ""
+		for candidate in _region_order:
+			if candidate == region.region_id or candidate == seam_id:
+				continue
+			var cached: Region = _regions.get(candidate)
+			if cached and not cached.is_inside_tree():
+				evict_id = candidate
+				break
+		if evict_id == "":
+			break
+		var evicted: Region = _regions[evict_id]
+		SaveManager.stash(evicted)
+		_regions.erase(evict_id)
+		_region_order.erase(evict_id)
+		_seams.erase(evict_id)
+		for from_id in _seams:
+			var known: Dictionary = _seams[from_id]
+			for exit_name in known.keys():
+				var cached_seam: Seam = known[exit_name]
+				if cached_seam and cached_seam.neighbor == evicted:
+					known.erase(exit_name)
+		evicted.free()
 
 
 ## Sets region [param id] up for its first visit a step at a time, one step a
@@ -593,6 +647,9 @@ func _set_up_step(id: String) -> void:
 			made.remove_meta("set_up_step")
 			_setting_up.erase(id)
 			_regions[id] = made
+			_touch_region(id)
+			if _setting_up.is_empty() and _preloading == "" and _preload_queue.is_empty():
+				_warm.clear()
 			return
 	made.set_meta("set_up_step", step + 1)
 
@@ -830,6 +887,8 @@ func _pump_preload() -> void:
 							_preload_queue.push_front(normal)
 				else:
 					_warm.append(loaded)
+					if _warm.size() > MAX_WARM_RESOURCES:
+						_warm.pop_front()
 		_preloading = ""
 	while _preloading == "" and not _preload_queue.is_empty():
 		var path: String = _preload_queue.pop_front()
@@ -934,7 +993,7 @@ func get_offstage_persist_nodes() -> Array[Node]:
 		if int(made.get_meta("set_up_step", 0)) >= 2:
 			offstage.append(made)
 	for cached: Region in offstage:
-		if cached != region:
+		if cached != region and not cached.is_inside_tree():
 			for node in cached.find_children("*", "", true, false):
 				if node.is_in_group("persist"):
 					nodes.append(node)

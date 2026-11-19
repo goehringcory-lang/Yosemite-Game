@@ -43,7 +43,7 @@ from PIL import Image
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 TILE = 32
-# Ground terrain rows (tools/mapgen/terrain.gd).
+# Ground terrain rows (scripts/world/terrain.gd).
 RIVER = 11
 WATER_ROWS = (11, 12, 13)
 # Ground a pool may be cut into: forest, meadow, wet meadow, foothill, fir,

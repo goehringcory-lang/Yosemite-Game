@@ -13,7 +13,7 @@ extends RefCounted
 ## region_builder.gd applies them when it generates a map, ground_upgrade.gd
 ## paints the slabs, and patch_land.gd applies them to a map already built.
 
-const Terrain = preload("res://tools/mapgen/terrain.gd")
+const Terrain = preload("res://scripts/world/terrain.gd")
 ## Ground that the slabs and the talus can cover.
 const NATURAL := [Terrain.FOREST, Terrain.FOOTHILL, Terrain.FIR, Terrain.SCRUB, Terrain.MEADOW]
 ## How far from the cliff (in tiles) each reaches.

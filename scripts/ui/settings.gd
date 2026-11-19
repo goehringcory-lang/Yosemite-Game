@@ -124,6 +124,8 @@ const BINDINGS := [
 	{"id": "quests", "name": "Quests", "actions": ["quests"], "key": KEY_Q, "pad": "Y, then RB"},
 	{"id": "backpack", "name": "Backpack", "actions": ["backpack"], "key": KEY_B, "pad": "Y, then RB"},
 	{"id": "press", "name": "Press book", "actions": ["press_book"], "key": KEY_P, "pad": "Y, then RB"},
+	{"id": "wildlife", "name": "Wildlife", "actions": ["wildlife"], "key": KEY_N, "pad": "Y, then RB"},
+	{"id": "logbook", "name": "Logbook", "actions": ["logbook"], "key": KEY_L, "pad": "Y, then RB"},
 	{"id": "camera", "name": "Camera", "actions": ["camera"], "key": KEY_F, "pad": "RB"},
 ]
 ## Keys the menus need, so they can't be given to anything else.
@@ -334,6 +336,7 @@ static func reset_defaults() -> void:
 	vibration = true
 	pause_away = true
 	wind = true
+	wayfinding = true
 	master_volume = 8
 	effects_volume = MAX_VOLUME
 	music_volume = 8

@@ -5,7 +5,7 @@ extends RefCounted
 ## assets/map/areas/<hub>.png (the area map), and, only if missing, the
 ## hand-editable wrapper scenes/regions/<hub>.tscn.
 
-const Terrain = preload("res://tools/mapgen/terrain.gd")
+const Terrain = preload("res://scripts/world/terrain.gd")
 const Art = preload("res://tools/mapgen/art.gd")
 const Buildings = preload("res://tools/mapgen/hub_buildings.gd")
 const Dem = preload("res://tools/mapgen/dem.gd")

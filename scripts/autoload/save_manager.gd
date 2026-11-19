@@ -52,8 +52,13 @@ func slot_path(n: int) -> String:
 	return "%s_%d.%s" % [base_path.get_basename(), n, base_path.get_extension()]
 
 
+## The backup copy of slot [param n] (the last known-good save before overwrite).
+func backup_path(n: int) -> String:
+	return slot_path(n) + ".bak"
+
+
 func slot_used(n: int) -> bool:
-	return FileAccess.file_exists(slot_path(n))
+	return FileAccess.file_exists(slot_path(n)) or FileAccess.file_exists(backup_path(n))
 
 
 ## True when any slot holds a game.
@@ -75,7 +80,8 @@ func latest_slot() -> int:
 			continue
 		var at := int(info.get("saved_at", 0))
 		if at <= 0:
-			at = FileAccess.get_modified_time(slot_path(n))
+			var path := slot_path(n) if FileAccess.file_exists(slot_path(n)) else backup_path(n)
+			at = FileAccess.get_modified_time(path)
 		if at > best_time:
 			best = n
 			best_time = at
@@ -97,9 +103,10 @@ func first_empty_slot() -> int:
 func slot_info(n: int) -> Dictionary:
 	if not slot_used(n):
 		return {}
-	var data = JSON.parse_string(FileAccess.get_file_as_string(slot_path(n)))
-	if typeof(data) != TYPE_DICTIONARY:
+	var loaded := _read_slot_data(n)
+	if loaded.is_empty():
 		return {"broken": true}
+	var data: Dictionary = loaded.data
 	var clock: Dictionary = data.get("clock", {}) if typeof(data.get("clock")) == TYPE_DICTIONARY else {}
 	var season := clampi(int(clock.get("season", 0)), 0, GameClock.SEASON_NAMES.size() - 1)
 	var day := maxi(int(clock.get("day", 1)), 1)
@@ -116,10 +123,11 @@ func slot_info(n: int) -> Dictionary:
 	}
 
 
-## Removes the game in slot [param n].
+## Removes the game (and any backup copy) in slot [param n].
 func delete_slot(n: int) -> void:
-	if slot_used(n):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(slot_path(n)))
+	for path in [slot_path(n), backup_path(n)]:
+		if FileAccess.file_exists(path):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 
 ## Makes the next World start a new game even though a save exists.
@@ -160,6 +168,14 @@ func save_game() -> bool:
 		push_error("Could not write save file: the copy on disk is incomplete (is the disk full?)")
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(temp))
 		return false
+	# Keep a rolling backup of the previous valid save before replacing it.
+	if FileAccess.file_exists(save_path):
+		var existing = JSON.parse_string(FileAccess.get_file_as_string(save_path))
+		if typeof(existing) == TYPE_DICTIONARY:
+			DirAccess.copy_absolute(
+				ProjectSettings.globalize_path(save_path),
+				ProjectSettings.globalize_path(backup_path(slot))
+			)
 	var moved := DirAccess.rename_absolute(ProjectSettings.globalize_path(temp), ProjectSettings.globalize_path(save_path))
 	if moved != OK:
 		push_error("Could not write save file: %s" % error_string(moved))
@@ -172,10 +188,16 @@ func save_game() -> bool:
 func load_game() -> bool:
 	if _fresh or not has_save():
 		return false
-	var data = JSON.parse_string(FileAccess.get_file_as_string(save_path))
-	if typeof(data) != TYPE_DICTIONARY:
+	var loaded := _read_slot_data(slot)
+	if loaded.is_empty():
 		push_warning("Save file is corrupt; starting a new game.")
 		return false
+	if loaded.from_backup:
+		push_warning("Save file is corrupt; loaded backup save instead.")
+	var data: Dictionary = loaded.data
+	var version := int(data.get("version", 1))
+	if version > SAVE_VERSION:
+		push_warning("Save file version %d is newer than supported version %d." % [version, SAVE_VERSION])
 	GameClock.load_data(data.get("clock", {}))
 	Inventory.load_data(data.get("inventory", {}))
 	# a game saved before you could choose a look loads as the look it had
@@ -194,10 +216,10 @@ func load_game() -> bool:
 func peek_node(node_name: String) -> Dictionary:
 	if _fresh or not has_save():
 		return {}
-	var data = JSON.parse_string(FileAccess.get_file_as_string(save_path))
-	if typeof(data) != TYPE_DICTIONARY:
+	var loaded := _read_slot_data(slot)
+	if loaded.is_empty():
 		return {}
-	var nodes: Dictionary = data.get("nodes", {})
+	var nodes: Dictionary = loaded.data.get("nodes", {})
 	var node_data = nodes.get(node_name, {})
 	return node_data if typeof(node_data) == TYPE_DICTIONARY else {}
 
@@ -211,9 +233,32 @@ func restore(root: Node) -> void:
 			_pending.erase(node.name)
 
 
+## Stashes persist nodes under [param root] into [member _pending] before an
+## offstage region is evicted from memory, so its state survives re-entry and
+## future saves.
+func stash(root: Node) -> void:
+	for node in root.find_children("*", "", true, false):
+		if node.is_in_group("persist"):
+			_pending[node.name] = node.save_data()
+
+
 ## Forgets saved data that hasn't been restored yet, for a new game.
 func clear_pending() -> void:
 	_pending.clear()
+
+
+## Reads the save Dictionary for slot [param n], falling back to its backup
+## copy if the primary file is missing or corrupt. Returns {} when neither can
+## be parsed.
+func _read_slot_data(n: int) -> Dictionary:
+	for attempt in [[slot_path(n), false], [backup_path(n), true]]:
+		var path: String = attempt[0]
+		if not FileAccess.file_exists(path):
+			continue
+		var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+		if typeof(data) == TYPE_DICTIONARY:
+			return {"data": data, "from_backup": attempt[1]}
+	return {}
 
 
 ## A little about the game for the save menus, so they needn't load it.
@@ -233,5 +278,4 @@ func _persist_nodes() -> Array[Node]:
 
 
 func delete_save() -> void:
-	if has_save():
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path))
+	delete_slot(slot)

@@ -7,13 +7,13 @@ extends Node2D
 ## - Hand-made areas (the Lamon Homestead), painted with the starter atlas:
 ##   forage lands on tiles with the "open_ground" flag.
 ## - Generated hubs: forage lands on walkable natural terrain, read from the
-##   terrain type of each Ground tile (see tools/mapgen/terrain.gd). Black oaks
+##   terrain type of each Ground tile (see scripts/world/terrain.gd). Black oaks
 ##   are the cells of the OakCanopy layer, and manzanita is a Flora tile.
 ##
 ## Forage refreshes once per game day. At home that happens when you sleep;
 ## in a hub, it happens the first time you arrive on a new day (refresh()).
 
-const Terrain := preload("res://tools/mapgen/terrain.gd")
+const Terrain := preload("res://scripts/world/terrain.gd")
 const FORAGEABLE := preload("res://scenes/objects/forageable.tscn")
 ## Starter-atlas tiles (source 0) used by the hand-made areas.
 const MANZANITA_TILE := Vector2i(7, 0)

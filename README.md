@@ -1045,13 +1045,13 @@ The maps are made from data under these licenses. The credit is on the game's cr
 
 ## Builds
 
-`export_presets.cfg` has three presets: **Windows** (x86_64), **macOS** (universal, ad-hoc signed) and **Linux** (x86_64, which also covers the Steam Deck). Each packs the game into one file, leaves out `docs/` and `tests/`, and carries the font's license text for the Licenses page. To build locally, install the Godot 4.7 export templates (Editor > Manage Export Templates), then:
+`export_presets.cfg` has three presets: **Windows** (x86_64), **macOS** (universal, ad-hoc signed) and **Linux** (x86_64, which also covers the Steam Deck). Each packs the game into one file, leaves out `docs/`, `tests/`, and `tools/`, and carries the font's license text for the Licenses page. To build locally, install the Godot 4.7 export templates (Editor > Manage Export Templates), then:
 
 ```bash
 mkdir -p build/windows build/macos build/linux
 godot --headless --path . --export-release "Windows" "build/windows/Valley Days.exe"
 godot --headless --path . --export-release "macOS" "build/macos/Valley Days.zip"
-godot --headless --path . --export-release "Linux" "build/linux/YosemiteGame.x86_64"
+godot --headless --path . --export-release "Linux" "build/linux/ValleyDays.x86_64"
 ```
 
 On GitHub, run the **Build** workflow from the Actions tab (`.github/workflows/build.yml`) to get all three as downloadable artifacts. Pushing a tag such as `v0.1.0` does the same and also drafts a GitHub release with the three zips; nothing is published until you publish the draft. The macOS build isn't notarized, so the first time players open it with right-click > Open; notarizing needs an Apple Developer account (the `codesign/` and `notarization/` options in the macOS preset). The Windows build keeps Godot's icon, since setting the .exe icon needs rcedit (`application/modify_resources`).

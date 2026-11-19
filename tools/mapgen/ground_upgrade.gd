@@ -7,7 +7,7 @@ extends RefCounted
 ## Run through tools/mapgen/upgrade_hubs.tscn (see there), or call apply()
 ## after a hub's map scene has been regenerated.
 
-const Terrain = preload("res://tools/mapgen/terrain.gd")
+const Terrain = preload("res://scripts/world/terrain.gd")
 const Ground = preload("res://tools/hubs/ahwahnee_ground.gd")
 const HubContent = preload("res://tools/mapgen/hub_content.gd")
 const LandPatches = preload("res://tools/mapgen/land_patches.gd")

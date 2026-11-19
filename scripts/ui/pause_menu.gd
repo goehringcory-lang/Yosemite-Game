@@ -53,7 +53,7 @@ const SETTING_HELP := [
 ]
 ## The Controls page's rows after the keys.
 ## How many keys the Controls page lists in its left column.
-const CONTROLS_PER_COLUMN := 7
+const CONTROLS_PER_COLUMN := 8
 const CONTROLS_RESET := "Reset keys"
 const CONTROLS_BACK := "Back"
 const CONTROLS_NOTE := "Menus also take the arrows, Enter, and Esc. Climbing: E eats or chalks up, Esc retreats."
@@ -739,9 +739,13 @@ func choose_slot(n: int) -> void:
 				_refresh()
 				return
 			_slot_confirm = 0
+			var previous_slot := SaveManager.slot
 			SaveManager.slot = n
 			Sound.play("ui_select")
 			save_game()
+			if not _just_saved:
+				SaveManager.slot = previous_slot
+				_refresh()
 		SlotMode.LOAD:
 			if not used:
 				Sound.play("ui_back")

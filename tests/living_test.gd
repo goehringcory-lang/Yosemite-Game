@@ -327,4 +327,4 @@ func test_rivers(world: Node) -> void:
 	check(world.region.find_children("Sound_river*", "", true, false).is_empty(), "indoors there's no river")
 
 
-const Terrain := preload("res://tools/mapgen/terrain.gd")
+const Terrain := preload("res://scripts/world/terrain.gd")

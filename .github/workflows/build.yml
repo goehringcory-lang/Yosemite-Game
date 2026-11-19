@@ -52,29 +52,29 @@ jobs:
       - name: Export Windows
         run: |
           mkdir -p build/windows
-          ~/godot/godot --headless --path . --export-release "Windows" "build/windows/Yosemite Game.exe"
+          ~/godot/godot --headless --path . --export-release "Windows" "build/windows/Valley Days.exe"
 
       - name: Export macOS
         run: |
           mkdir -p build/macos
-          ~/godot/godot --headless --path . --export-release "macOS" "build/macos/Yosemite Game.zip"
+          ~/godot/godot --headless --path . --export-release "macOS" "build/macos/Valley Days.zip"
 
       - name: Export Linux
         run: |
           mkdir -p build/linux
-          ~/godot/godot --headless --path . --export-release "Linux" "build/linux/YosemiteGame.x86_64"
+          ~/godot/godot --headless --path . --export-release "Linux" "build/linux/ValleyDays.x86_64"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: yosemite-game-windows
+          name: valley-days-windows
           path: build/windows/
       - uses: actions/upload-artifact@v4
         with:
-          name: yosemite-game-macos
+          name: valley-days-macos
           path: build/macos/
       - uses: actions/upload-artifact@v4
         with:
-          name: yosemite-game-linux
+          name: valley-days-linux
           path: build/linux/
 
       - name: Draft a release
@@ -83,8 +83,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cd build
-          (cd windows && zip -q -r "../yosemite-game-${GITHUB_REF_NAME}-windows.zip" .)
-          (cd linux && zip -q -r "../yosemite-game-${GITHUB_REF_NAME}-linux.zip" .)
-          cp "macos/Yosemite Game.zip" "yosemite-game-${GITHUB_REF_NAME}-macos.zip"
-          gh release create "$GITHUB_REF_NAME" --draft --title "Yosemite Game $GITHUB_REF_NAME" \
-            --notes "Builds for Windows, macOS and Linux (also Steam Deck)." yosemite-game-*.zip
+          (cd windows && zip -q -r "../valley-days-${GITHUB_REF_NAME}-windows.zip" .)
+          (cd linux && zip -q -r "../valley-days-${GITHUB_REF_NAME}-linux.zip" .)
+          cp "macos/Valley Days.zip" "valley-days-${GITHUB_REF_NAME}-macos.zip"
+          gh release create "$GITHUB_REF_NAME" --draft --title "Valley Days $GITHUB_REF_NAME" \
+            --notes "Builds for Windows, macOS and Linux (also Steam Deck)." valley-days-*.zip

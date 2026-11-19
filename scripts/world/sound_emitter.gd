@@ -49,7 +49,7 @@ static func attach_waterfalls(region: Region) -> void:
 const RIVER_BLOCK := 14
 const RIVER_REACH := 460.0
 const RIVER_LEVEL := 0.6
-const _Terrain := preload("res://tools/mapgen/terrain.gd")
+const _Terrain := preload("res://scripts/world/terrain.gd")
 
 
 static func attach_rivers(region: Region) -> void:
