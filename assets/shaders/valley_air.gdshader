@@ -14,6 +14,10 @@ uniform vec3 ray_color : source_color = vec3(1.0, 0.86, 0.6);
 // The way the light travels across the ground (away from the sun).
 uniform vec2 ray_dir = vec2(-1.0, -0.3);
 uniform float time = 0.0;
+// Where the world's origin was when the air was laid down: World moves the
+// world under it at a seam, and the air moves with it, so the mist and the
+// shafts don't change all at once as you walk over the edge.
+uniform vec2 anchor = vec2(0.0);
 
 varying vec2 world;
 
@@ -43,7 +47,7 @@ void vertex() {
 }
 
 void fragment() {
-	vec2 px = floor(world * 0.5) * 2.0;
+	vec2 px = floor((world - anchor) * 0.5) * 2.0;
 
 	// Mist: long, low banks stretched east-west, thinning at their edges, with
 	// slower wisps rolling through them.

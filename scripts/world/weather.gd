@@ -100,6 +100,17 @@ func _ready() -> void:
 	_fireflies.modulate = Color(1.9, 1.9, 1.9)
 	_fireflies.draw.connect(_draw_fireflies)
 	add_child(_fireflies)
+	var world := get_parent()
+	if world and world.has_signal("seam_crossed"):
+		world.seam_crossed.connect(shift)
+
+
+## Moves every flake by [param by], with the world over a seam, so the snow
+## falls on where it was instead of the whole sky jumping at once.
+func shift(by: Vector2) -> void:
+	for i in _pos.size():
+		_pos[i] += by
+	_view.position += by
 
 
 func _process(delta: float) -> void:

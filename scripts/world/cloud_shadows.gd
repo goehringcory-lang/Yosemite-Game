@@ -48,6 +48,16 @@ func _ready() -> void:
 	_viewport.add_child(_cells)
 	add_child(_viewport)
 	_drift = Vector2(randf() * 4000.0, randf() * 4000.0)
+	var world := get_parent()
+	if world and world.has_signal("seam_crossed"):
+		world.seam_crossed.connect(shift)
+
+
+## Over a seam the world moved by [param by]: the clouds' shadows move with
+## it, instead of the whole pattern changing at once.
+func shift(by: Vector2) -> void:
+	_drift -= by
+	_view = Rect2()
 
 
 func _process(delta: float) -> void:
