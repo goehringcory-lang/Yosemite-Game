@@ -47,4 +47,10 @@ func interact(_player: Player) -> void:
 	if minutes > 0 and GameClock.is_too_late_for(minutes):
 		get_tree().call_group("hud", "show_message", "It's too late to start on the trail tonight.")
 		return
-	get_tree().call_group("world", "go_to_region", target_region, target_spawn, minutes)
+	get_tree().call_group("world", "go_to_region", target_region, target_spawn, minutes, {"title": _trail_name(), "on_foot": true})
+
+
+## "Mist Trail and Panorama Trail" from "Mist Trail and Panorama Trail, up to
+## Glacier Point": the way's own name, for the trip map.
+func _trail_name() -> String:
+	return label.get_slice(",", 0).strip_edges()
