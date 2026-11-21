@@ -76,6 +76,11 @@ var _door_back := {}
 ## The clock hit the pass-out hour while World or a dialogue was busy; the
 ## player passes out as soon as both are done.
 var _curfew_pending := false
+## Trips that take clock time play on the park map (see Journey) instead of
+## fading to black. Shot tools turn it off; headless runs never show it.
+var journeys := true
+## Tests set this to run the trip map headless too (it never draws there).
+var journeys_headless := false
 
 @onready var player: Player = $Player
 @onready var hud: HUD = $HUD
@@ -239,7 +244,7 @@ func open_shuttle_map(stop_name: String) -> void:
 
 
 func _on_shuttle_requested(stop: Dictionary) -> void:
-	go_to_region(stop.region, stop.spawn, ShuttleStop.RIDE_MINUTES)
+	go_to_region(stop.region, stop.spawn, ShuttleStop.RIDE_MINUTES, {"title": "Valley shuttle"})
 
 
 ## Called by a BuildingDoor the player is going through. A second door into
@@ -288,7 +293,8 @@ func _drive_road(exit: RegionExit, spawn: String, to_region := "") -> void:
 	if GameClock.is_too_late_for(exit.minutes):
 		hud.show_message("It's too late to set out on %s tonight." % exit.label)
 		return
-	await go_to_region(to_region if to_region != "" else exit.target_region, spawn, exit.minutes)
+	var to := to_region if to_region != "" else exit.target_region
+	await go_to_region(to, spawn, exit.minutes, {"title": exit.label, "miles": exit.miles})
 	hud.show_message("You drove %s miles to %s (%s)." % [str(exit.miles), region.display_name, Park.format_minutes(exit.minutes)])
 
 
@@ -317,11 +323,21 @@ func _drive_on(exit: RegionExit) -> void:
 ## new. A way that takes no time (a door, a gate) steps straight through
 ## (see _step_through); one that takes [param minutes] fades, and advances
 ## the clock.
-func go_to_region(id: String, spawn_name := "arrival", minutes := 0) -> void:
+##
+## [param trip] describes a trip with minutes for the map that shows it (see
+## _journey): {title, miles, on_foot, path}. Without it the trip is a walk.
+func go_to_region(id: String, spawn_name := "arrival", minutes := 0, trip := {}) -> void:
 	if _busy:
 		return
 	if minutes == 0:
 		await _step_through(id, spawn_name)
+		return
+	if _journeys_on():
+		var info := trip.duplicate()
+		if not info.has("title"):
+			info.title = "On the trail"
+			info.on_foot = true
+		await _journey(id, spawn_name, minutes, info)
 		return
 	_busy = true
 	_set_paused(true)
@@ -331,6 +347,45 @@ func go_to_region(id: String, spawn_name := "arrival", minutes := 0) -> void:
 	_enter_region(id, spawn_name)
 	await _unstick_player()
 	await hud.fade_from_black()
+	_set_paused(false)
+	_busy = false
+
+
+func _journeys_on() -> bool:
+	return journeys and Settings.journeys and (journeys_headless or DisplayServer.get_name() != "headless")
+
+
+## A trip that takes [param minutes]: the park map opens over the world and
+## a marker runs the road or trail while the clock runs (see Journey). The
+## clock moves on once, by all of it, and the new place is laid out under
+## the map, which then lifts off it. No black screen.
+func _journey(id: String, spawn_name: String, minutes: int, info: Dictionary) -> void:
+	_busy = true
+	_set_paused(true)
+	var from_region := region.region_id
+	var from := Wayfinding.lonlat_of(region, region.to_local(player.global_position))
+	var start := GameClock.minutes
+	var journey := Journey.new()
+	add_child(journey)
+	await journey.cover()
+	# The HUD's clock would jump straight to the end; the map has its own.
+	hud.visible = false
+	GameClock.advance_minutes(minutes)
+	_enter_region(id, spawn_name)
+	info.merge({
+		"from": from,
+		"to": Wayfinding.lonlat_of(region, region.to_local(player.global_position)),
+		"from_region": from_region,
+		"to_region": id,
+		"start_minutes": start,
+		"minutes": minutes,
+		"subtitle": "%s to %s" % [Journey.place_name(from_region), Journey.place_name(id)],
+	})
+	await journey.travel(info)
+	await _unstick_player()
+	hud.visible = true
+	await journey.lift()
+	journey.queue_free()
 	_set_paused(false)
 	_busy = false
 
@@ -406,12 +461,17 @@ func travel(leg: Dictionary) -> void:
 	if GameClock.is_too_late_for(int(leg.minutes)):
 		hud.show_message("It's too late to set out for %s tonight." % hub.display_name)
 		return
+	# Some hubs greet drivers in a smaller area, like Yosemite Village.
+	var arrive_in: String = hub.arrival_region if hub.arrival_region != "" else leg.to
+	if _journeys_on():
+		await _journey(arrive_in, leg.spawn, int(leg.minutes), {"title": str(leg.get("via", "")), "miles": float(leg.miles), "path": leg.get("path", [])})
+		hud.show_message("You drove %s miles to %s (%s)." % [str(leg.miles), hub.display_name, Park.format_minutes(leg.minutes)])
+		return
 	_busy = true
 	_set_paused(true)
 	await hud.fade_to_black()
 	GameClock.advance_minutes(leg.minutes)
-	# Some hubs greet drivers in a smaller area, like Yosemite Village.
-	_enter_region(hub.arrival_region if hub.arrival_region != "" else leg.to, leg.spawn)
+	_enter_region(arrive_in, leg.spawn)
 	await _unstick_player()
 	await hud.fade_from_black()
 	hud.show_message("You drove %s miles to %s (%s)." % [str(leg.miles), hub.display_name, Park.format_minutes(leg.minutes)])
