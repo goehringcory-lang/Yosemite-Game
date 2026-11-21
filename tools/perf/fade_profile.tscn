@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://tools/perf/transition_profile.gd" id="1"]
+[ext_resource type="Script" path="res://tools/perf/fade_profile.gd" id="1"]
 
 [node name="TransitionProfile" type="Node"]
 script = ExtResource("1")

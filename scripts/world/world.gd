@@ -190,11 +190,13 @@ func _process(delta: float) -> void:
 		_hand_camera_over()
 	if _curfew_pending and not _busy and not _dialogue_open():
 		sleep(true)
-	# Loading and laying out what's next waits while a transition plays, so
-	# none of its long frames land in the middle of the wipe.
+	# Loading what's next in the background waits while a transition plays,
+	# so none of its long frames land in the middle of the wipe. Laying out
+	# the next area at a seam carries on: it is staged a step a frame, and
+	# the view across the edge should be there when the cover lifts.
 	if not _transitioning:
 		_pump_preload()
-		_update_seam()
+	_update_seam()
 	_place_check -= delta
 	if _place_check <= 0.0:
 		_place_check = 0.25

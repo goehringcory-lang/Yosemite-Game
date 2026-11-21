@@ -4,7 +4,7 @@ extends Node
 ## took and how far the cover over the screen had got, so a transition that
 ## skips ahead after a long frame, or cuts, shows up in numbers.
 ## Needs a window (not --headless):
-##   xvfb-run godot --path . res://tools/perf/transition_profile.tscn
+##   xvfb-run godot --path . res://tools/perf/fade_profile.tscn
 ## Environment: TRANS_ONLY (one kind: door, fade, journey, drive),
 ## TRANS_CSV (a path for every frame's numbers).
 
@@ -19,7 +19,7 @@ func _ready() -> void:
 	process_priority = 1 << 30
 	# a way out if something hangs
 	get_tree().create_timer(240.0, true, false, true).timeout.connect(get_tree().quit.bind(1))
-	SaveManager.save_path = "user://transition_profile_save.json"
+	SaveManager.save_path = "user://fade_profile_save.json"
 	SaveManager.delete_save()
 	_world = load("res://scenes/world/world.tscn").instantiate()
 	add_child(_world)
