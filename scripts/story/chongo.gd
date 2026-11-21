@@ -215,11 +215,11 @@ func _pitch(player: Player) -> void:
 		await box.say(_lines([["No worries. The universe isn't going anywhere. Me neither. Well, I'm going to a different rock. But you'll find me.", "happy"]]))
 		box.close()
 		return
-	if not Barter.can_afford(BOOK_PRICE):
+	if not Barter.can_afford_food(BOOK_PRICE):
 		await box.say(_lines([["Oh, man. You're running on empty. Eat something, friend. The book'll keep. Physics is pretty stable.", "sad"]]))
 		box.close()
 		return
-	var paid := Barter.pay(BOOK_PRICE)
+	var paid := Barter.pay_food(BOOK_PRICE)
 	QuestLog.heard_beats.append(SOLD)
 	Inventory.add(BOOK)
 	Sound.play("item_get")

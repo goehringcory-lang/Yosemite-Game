@@ -37,4 +37,5 @@ max_owned = 1
 [resource]
 script = ExtResource("2_shop")
 keeper = "Greg"
+tastes = "angler"
 offers = Array[ExtResource("1_offer")]([SubResource("Resource_adams"), SubResource("Resource_bugger"), SubResource("Resource_wulff")])

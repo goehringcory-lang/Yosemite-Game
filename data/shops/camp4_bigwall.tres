@@ -34,6 +34,7 @@ max_owned = 1
 [resource]
 script = ExtResource("2_xqrmw")
 keeper = "Big-wall climber"
-greeting = "Just down off El Cap. Everything I hauled up there is for trade, for food."
+tastes = "climber"
+greeting = "Just down off El Cap. Everything I hauled up there is for trade. Food, candy bars, a cold King Cobra..."
 nothing_yet = "Big-wall gear won't do you any good until someone teaches you to aid climb."
 offers = Array[ExtResource("1_4pgxb")]([SubResource("Resource_b5h5j"), SubResource("Resource_y3yve"), SubResource("Resource_65ape")])

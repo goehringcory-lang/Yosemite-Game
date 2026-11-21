@@ -264,7 +264,7 @@ static func card_text() -> PackedStringArray:
 		if h > 0:
 			friends += 1
 	return PackedStringArray([
-		"Food: %d energy" % Barter.purse(),
+		"Food: %d energy" % Barter.food_purse(),
 		"Gear: %d piece%s" % [gear, "" if gear == 1 else "s"],
 		"Friends: %d (%d hearts)" % [friends, hearts],
 		"Quests done: %d" % QuestLog.completed.size(),
