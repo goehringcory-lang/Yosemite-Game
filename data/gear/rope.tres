@@ -10,3 +10,4 @@ display_name = "Rope"
 description = "A dynamic rope. Its length sets how far you can climb before a belay."
 icon = ExtResource("2_icon")
 tier = 1
+trade_value = 70

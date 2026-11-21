@@ -10,3 +10,4 @@ display_name = "Royal Wulff"
 description = "Red silk, peacock herl and white calf-tail wings. Greg's own favorite, and the brook trout up at Tuolumne go crazy for it. The best fly in his box."
 icon = ExtResource("2_icon")
 tier = 4
+trade_value = 30

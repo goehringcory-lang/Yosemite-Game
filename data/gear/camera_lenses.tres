@@ -10,3 +10,5 @@ display_name = "Ansel's Lenses"
 description = "Two lenses out of Ansel Adams's bag: a wide one for when the cliff won't fit in the frame, and a long one for anything with legs or wings. With the camera raised, change lens to fit them."
 icon = ExtResource("2_icon")
 tier = 0
+trade_value = 0
+keepsake = true

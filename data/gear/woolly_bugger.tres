@@ -10,3 +10,4 @@ display_name = "Woolly Bugger"
 description = "Olive chenille and a black marabou tail that swims like a leech. The big browns come out from under the banks for it, and it sets the hook hard."
 icon = ExtResource("2_icon")
 tier = 3
+trade_value = 24

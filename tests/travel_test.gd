@@ -514,7 +514,9 @@ func _check_central_hub(world: Node) -> void:
 	Gear.owned = {"approach_shoes": 1, "chalk_bag": 1}
 	check(rack.available_offers().is_empty(), "the Camp 4 trader has nothing until you have a rope and two cams")
 	Gear.owned = {"rope": 1, "harness": 1, "cam": 2}
-	check(rack.available_offers().size() == 2, "with a starter rack the trader offers cams and draws (the belay device comes from Royal Robbins)")
+	var for_food := rack.available_offers().filter(func(o: ShopOffer) -> bool: return o.trade.is_empty())
+	var for_cans := rack.available_offers().filter(func(o: ShopOffer) -> bool: return o.trade.has("king_cobra"))
+	check(for_food.size() == 2 and for_cans.size() == 2, "with a starter rack the trader offers cams and draws, for food or King Cobra (the belay device comes from Royal Robbins)")
 	Inventory.items = {}
 	var cam_offer: ShopOffer = rack.available_offers()[0]
 	check(rack.buy(cam_offer).is_empty() and Gear.count("cam") == 2, "no food, no trade")

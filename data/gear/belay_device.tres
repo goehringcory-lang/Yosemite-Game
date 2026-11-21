@@ -10,3 +10,4 @@ display_name = "Belay & Rappel Device"
 description = "For belaying your partner and rappelling back down."
 icon = ExtResource("2_icon")
 tier = 2
+trade_value = 20

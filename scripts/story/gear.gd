@@ -113,6 +113,25 @@ func add(id: String, amount := 1) -> void:
 		sent_to_camp.emit(id, sent)
 
 
+## Takes [param amount] of [param id] away (sold to a climber, GearSale):
+## from the rack at camp first, where the spares hang, then the bag.
+## Returns how many were taken.
+func remove(id: String, amount := 1) -> int:
+	var taken := mini(amount, count(id))
+	if taken <= 0:
+		return 0
+	var from_rack := mini(taken, cached_count(id))
+	if from_rack > 0:
+		cached[id] = cached_count(id) - from_rack
+		if cached[id] <= 0:
+			cached.erase(id)
+	owned[id] = count(id) - taken
+	if owned[id] <= 0:
+		owned.erase(id)
+	changed.emit()
+	return taken
+
+
 ## True if the player owns everything in [param required] (gear id -> count).
 func has_all(required: Dictionary) -> bool:
 	return missing(required).is_empty()

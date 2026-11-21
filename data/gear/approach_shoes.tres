@@ -10,3 +10,4 @@ display_name = "Approach Shoes"
 description = "Sticky rubber for scrambling and bouldering."
 icon = ExtResource("2_icon")
 tier = 0
+trade_value = 35

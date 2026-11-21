@@ -21,9 +21,39 @@ requires = {
 }
 max_owned = 8
 
+[sub_resource type="Resource" id="Resource_kc_draws"]
+script = ExtResource("1_qsj76")
+id = "quickdraw"
+amount = 3
+trade = {
+"king_cobra": 1
+}
+requires = {
+"rope": 1
+}
+max_owned = 8
+once_a_day = true
+
+[sub_resource type="Resource" id="Resource_kc_cam"]
+script = ExtResource("1_qsj76")
+id = "cam"
+trade = {
+"king_cobra": 2
+}
+requires = {
+"cam": 2
+}
+max_owned = 6
+once_a_day = true
+
 [resource]
 script = ExtResource("2_akkmp")
 keeper = "Camp 4 climber"
 greeting = "Hey. Rope, cams, draws... everything's for trade, and I'm always hungry."
 nothing_yet = "Come back once you've got a rope and a couple of cams. Then I can help fill out your rack."
-offers = Array[ExtResource("1_qsj76")]([SubResource("Resource_xqpua"), SubResource("Resource_nphu2")])
+offers = Array[ExtResource("1_qsj76")]([SubResource("Resource_xqpua"), SubResource("Resource_nphu2"), SubResource("Resource_kc_draws"), SubResource("Resource_kc_cam")])
+buys_gear = PackedStringArray("cam", "quickdraw", "belay_device", "climbing_shoes", "chalk_bag", "harness")
+buy_rate = 0.65
+pays_with = PackedStringArray("beef_jerky", "trail_mix", "dried_apples")
+wants = PackedStringArray("cam", "quickdraw", "belay_device")
+toasts = true
