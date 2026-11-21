@@ -21,12 +21,15 @@ static func reset() -> void:
 	Rescues.start_new_game()
 	FieldLog.start_new_game()
 	Discoveries.start_new_game()
+	Finds.start_new_game()
 	Festivals.start_new_game()
 	Stewardship.start_new_game()
 	Achievements.start_new_game()
 	Camp.start_new_game()
 	Photos.start_new_game()
 	Happenings.start_new_game()
+	Market.start_new_game()
+	GearSale.start_new_game()
 	Crow.paper_day = ""
 
 

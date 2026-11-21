@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/railroad_spike.png" id="1_icon"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[resource]
+script = ExtResource("2_item")
+id = "railroad_spike"
+display_name = "Railroad Spike"
+description = "A spike from the Yosemite Valley Railroad, which ran up the Merced canyon from Merced to El Portal from 1907 until 1945. Collectors in the Valley trade for them."
+icon = ExtResource("1_icon")

@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tests/climber_trades_test.gd" id="1"]
+
+[node name="ClimberTradesTest" type="Node"]
+script = ExtResource("1")

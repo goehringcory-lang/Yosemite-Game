@@ -10,3 +10,4 @@ display_name = "Parachute Adams"
 description = "Grey body, white post, a hackle wound flat round it. You can see it on the water in any light, and so can every trout. Widens the green and brings more fish up."
 icon = ExtResource("2_icon")
 tier = 2
+trade_value = 18

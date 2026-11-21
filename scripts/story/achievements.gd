@@ -120,6 +120,10 @@ const ACHIEVEMENTS: Array[Dictionary] = [
 		"unlock": {"type": "places", "count": 25}, "how": "Discover 25 places in the park."},
 	{"id": "every_corner", "name": "Every Corner", "group": "Valley life",
 		"unlock": {"type": "places", "count": "all"}, "how": "Discover every place in the park."},
+	{"id": "finders_keepers", "name": "Finders Keepers", "group": "Valley life",
+		"unlock": {"type": "finds", "count": 1}, "how": "Find something hidden off the beaten path."},
+	{"id": "every_find", "name": "Off the Beaten Path", "group": "Valley life",
+		"unlock": {"type": "finds", "count": "all"}, "how": "Find everything hidden off the paths in the park."},
 	{"id": "night_out", "name": "Under the Stars", "group": "Valley life",
 		"unlock": {"type": "unlock", "id": Backcountry.NIGHT_OUT}, "how": "Spend a night in the backcountry with your food in a bear canister."},
 	{"id": "slackline_gold", "name": "Gold on the Line", "group": "Valley life",
@@ -176,6 +180,7 @@ func _ready() -> void:
 	QuestLog.changed.connect(_on_progress)
 	FieldLog.changed.connect(_on_progress)
 	Discoveries.changed.connect(_on_progress)
+	Finds.changed.connect(_on_progress)
 	Perks.changed.connect(_on_progress)
 	Herbarium.changed.connect(_on_progress)
 	Rescues.changed.connect(_on_progress)
@@ -402,6 +407,9 @@ func progress(achievement: Dictionary) -> Array[int]:
 		"places":
 			have = Discoveries.count()
 			need = Discoveries.total() if str(unlock.count) == "all" else int(unlock.count)
+		"finds":
+			have = Finds.count()
+			need = Finds.total() if str(unlock.count) == "all" else int(unlock.count)
 		"animals":
 			have = FieldLog.count()
 			need = FieldLog.total() if str(unlock.count) == "all" else int(unlock.count)

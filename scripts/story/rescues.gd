@@ -334,8 +334,8 @@ func reach() -> Array[Dictionary]:
 		_advance()
 		at = current_stage()
 	if at == "feed":
-		if Barter.can_afford(int(call.feed)):
-			var paid := Barter.pay(int(call.feed))
+		if Barter.can_afford_food(int(call.feed)):
+			var paid := Barter.pay_food(int(call.feed))
 			lines.append({"speaker": "", "text": "You share %s. Color comes back into %s's face." % [Barter.describe(paid), call.who]})
 			_advance()
 		else:

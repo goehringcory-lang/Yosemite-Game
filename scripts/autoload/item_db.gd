@@ -68,6 +68,12 @@ const ITEMS := [
 	preload("res://data/story_items/wilderness_permit.tres"),
 	preload("res://data/story_items/resupply_box.tres"),
 	preload("res://data/story_items/hiker_postcard.tres"),
+	# Curios: hidden finds off the paths (Finds), worth trading
+	preload("res://data/story_items/rusty_piton.tres"),
+	preload("res://data/story_items/railroad_spike.tres"),
+	preload("res://data/story_items/ski_wax_tin.tres"),
+	preload("res://data/story_items/glass_insulator.tres"),
+	preload("res://data/story_items/lost_headlamp.tres"),
 	# Village Store trail food (see data/shops/village_store.tres)
 	preload("res://data/food/trail_mix.tres"),
 	preload("res://data/food/dried_apples.tres"),

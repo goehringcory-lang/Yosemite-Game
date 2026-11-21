@@ -82,6 +82,10 @@ static var wind := true
 ## Small signs at the screen's edge point toward the great landmarks and
 ## the parts of the Valley you haven't found yet (see Wayfinding).
 static var wayfinding := true
+## Trips that take clock time (drives, long trails, the shuttle) play on the
+## park map, a marker running the route, instead of fading to black (see
+## Journey).
+static var journeys := true
 ## Volume of everything, of one-shot sounds (steps, climbing, menus), and of
 ## the ambience (birds, wind, rain, campfires, waterfalls); 0 to MAX_VOLUME.
 static var master_volume := 8
@@ -215,6 +219,7 @@ static func load_settings() -> void:
 	pause_away = bool(config.get_value("input", "pause_away", pause_away))
 	wind = bool(config.get_value("display", "wind", wind))
 	wayfinding = bool(config.get_value("display", "wayfinding", wayfinding))
+	journeys = bool(config.get_value("display", "journeys", journeys))
 	master_volume = clampi(int(config.get_value("audio", "master", master_volume)), 0, MAX_VOLUME)
 	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
 	music_volume = clampi(int(config.get_value("audio", "music", music_volume)), 0, MAX_VOLUME)
@@ -250,6 +255,7 @@ static func save() -> Error:
 	config.set_value("input", "pause_away", pause_away)
 	config.set_value("display", "wind", wind)
 	config.set_value("display", "wayfinding", wayfinding)
+	config.set_value("display", "journeys", journeys)
 	config.set_value("audio", "master", master_volume)
 	config.set_value("audio", "effects", effects_volume)
 	config.set_value("audio", "music", music_volume)
@@ -337,6 +343,7 @@ static func reset_defaults() -> void:
 	pause_away = true
 	wind = true
 	wayfinding = true
+	journeys = true
 	master_volume = 8
 	effects_volume = MAX_VOLUME
 	music_volume = 8

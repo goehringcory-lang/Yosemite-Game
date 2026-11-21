@@ -1,8 +1,9 @@
 class_name Wayfinding
 extends Control
-## Small signs at the edge of the screen on the Valley floor that point the
-## way to what's out of sight: the great landmarks (Half Dome, El Capitan,
-## Yosemite Falls, Glacier Point) while they're a long walk off, and a "?"
+## Small signs at the edge of the screen outdoors that point the way to
+## what's out of sight: the great landmarks (Half Dome, El Capitan, Yosemite
+## Falls, Glacier Point, and up in the high country Clouds Rest, Tenaya Peak,
+## Cathedral Peak, Lembert Dome) while they're a long walk off, and a "?"
 ## toward a part of the Valley you haven't walked into yet, or a named place
 ## nearby you haven't found (see Discoveries). They make the separate areas
 ## read as one valley you can head across, and give a reason to walk on.
@@ -13,11 +14,17 @@ extends Control
 ## Landmark -> real longitude/latitude (x/y), roughly the summit or the
 ## brink of the fall.
 ## "over" lists the areas it towers straight over, where it gets no sign.
+## "high" ones are signed only outside the Valley, where they're what you
+## steer by (from the Valley floor the rim hides them).
 const LANDMARKS := [
-	{"name": "Half Dome", "at": Vector2(-119.5332, 37.7459), "over": ["mirror_lake"]},
+	{"name": "Half Dome", "at": Vector2(-119.5332, 37.7459), "over": ["mirror_lake", "half_dome"]},
 	{"name": "El Capitan", "at": Vector2(-119.6377, 37.7340), "over": ["el_capitan_meadow"]},
 	{"name": "Yosemite Falls", "at": Vector2(-119.5966, 37.7566), "over": []},
-	{"name": "Glacier Point", "at": Vector2(-119.5735, 37.7302), "over": ["curry_village", "lamon_homestead"]},
+	{"name": "Glacier Point", "at": Vector2(-119.5735, 37.7302), "over": ["curry_village", "lamon_homestead", "glacier_point", "glacier_snack_stand"]},
+	{"name": "Clouds Rest", "at": Vector2(-119.4895, 37.7676), "over": [], "high": true},
+	{"name": "Tenaya Peak", "at": Vector2(-119.4626, 37.8350), "over": ["tenaya_lake"], "high": true},
+	{"name": "Cathedral Peak", "at": Vector2(-119.4060, 37.8476), "over": [], "high": true},
+	{"name": "Lembert Dome", "at": Vector2(-119.3548, 37.8786), "over": [], "high": true},
 ]
 ## A landmark gets a sign only between these distances, in meters: nearer,
 ## its wall fills the view already; further, it's out of the Valley.
@@ -61,7 +68,7 @@ func _process(delta: float) -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	var world := get_tree().get_first_node_in_group("world")
 	var shown: bool = Settings.wayfinding and world != null and hud != null and not hud.is_covered() \
-			and _in_valley(world) and not _hud_talking(hud)
+			and _outdoors(world) and not _hud_talking(hud)
 	_alpha = move_toward(_alpha, 1.0 if shown else 0.0, delta * 3.0)
 	if _alpha <= 0.0:
 		if not _signs.is_empty():
@@ -87,10 +94,9 @@ static func _hud_talking(hud: Node) -> bool:
 
 
 ## Outdoors on the Valley floor, walking about.
-static func _in_valley(world: Node) -> bool:
+static func _outdoors(world: Node) -> bool:
 	var region: Region = world.region
-	return region != null and not region.indoors and region.hub_id == "yosemite_valley" \
-			and world.player != null and world.player.can_act
+	return region != null and not region.indoors and world.player != null and world.player.can_act
 
 
 ## Where the signs go this time: a direction from the middle of the screen
@@ -121,8 +127,9 @@ func _place_signs(world: Node) -> void:
 func _landmarks(region: Region, at: Vector2) -> Array[Dictionary]:
 	var here := lonlat_of(region, at)
 	var found: Array[Dictionary] = []
+	var valley := region.hub_id == "yosemite_valley"
 	for landmark: Dictionary in LANDMARKS:
-		if region.region_id in landmark.over:
+		if region.region_id in landmark.over or (valley and landmark.get("high", false)):
 			continue
 		var away := meters_between(here, landmark.at)
 		var meters := away.length()

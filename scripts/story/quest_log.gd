@@ -579,7 +579,7 @@ func is_step_done(step: Dictionary) -> bool:
 		"have_food":
 			return FoodDB.carried_energy() >= int(step.energy)
 		"pay":
-			return Barter.can_afford(int(step.energy))
+			return Barter.can_afford(int(step.energy), _buyer(step)) if step.has("shop") else Barter.can_afford_food(int(step.energy))
 		"chuckah":
 			return Granary.chuckahs_built >= int(step.get("count", 1))
 		"stored":
@@ -695,7 +695,7 @@ func talk_to(character_id: String, speaker_name := "", places := PackedStringArr
 			if step.get("type") == "have" and step.get("consume", false):
 				Inventory.remove(step.item, int(step.get("count", 1)))
 			if step.get("type") == "pay":
-				var paid := Barter.pay(int(step.energy))
+				var paid := Barter.pay(int(step.energy), _buyer(step)) if step.has("shop") else Barter.pay_food(int(step.energy))
 				lines.append({"speaker": "", "text": "You hand over %s." % Barter.describe(paid)})
 			_add_lines(lines, speaker, step.get("done", []))
 			_advance(quest, lines)
@@ -852,6 +852,12 @@ func _add_lines(lines: Array[Dictionary], speaker: String, texts) -> void:
 	for text: String in texts:
 		if text != "":
 			lines.append({"speaker": speaker, "text": text})
+
+
+## The shop a "pay" step trades with (its "shop" key), or null.
+func _buyer(step: Dictionary) -> ShopData:
+	var path := "res://data/shops/%s.tres" % step.get("shop", "")
+	return load(path) as ShopData if ResourceLoader.exists(path) else null
 
 
 func save_data() -> Dictionary:

@@ -10,3 +10,4 @@ display_name = "Crampons"
 description = "Steel spikes that grip glacier ice."
 icon = ExtResource("2_icon")
 tier = 4
+trade_value = 60

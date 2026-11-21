@@ -31,9 +31,50 @@ requires = {
 }
 max_owned = 1
 
+[sub_resource type="Resource" id="Resource_kc_asc"]
+script = ExtResource("1_4pgxb")
+id = "ascenders"
+trade = {
+"king_cobra": 2
+}
+requires = {
+"aiders": 1
+}
+max_owned = 1
+once_a_day = true
+
+[sub_resource type="Resource" id="Resource_kc_haul"]
+script = ExtResource("1_4pgxb")
+id = "haul_bag"
+trade = {
+"king_cobra": 3
+}
+requires = {
+"aiders": 1
+}
+max_owned = 1
+once_a_day = true
+
+[sub_resource type="Resource" id="Resource_kc_ledge"]
+script = ExtResource("1_4pgxb")
+id = "portaledge"
+trade = {
+"king_cobra": 5
+}
+requires = {
+"ascenders": 1,
+"haul_bag": 1
+}
+max_owned = 1
+once_a_day = true
+
 [resource]
 script = ExtResource("2_xqrmw")
 keeper = "Big-wall climber"
-greeting = "Just down off El Cap. Everything I hauled up there is for trade, for food."
+tastes = "climber"
+greeting = "Just down off El Cap. Everything I hauled up there is for trade. Food, candy bars, a cold King Cobra..."
 nothing_yet = "Big-wall gear won't do you any good until someone teaches you to aid climb."
-offers = Array[ExtResource("1_4pgxb")]([SubResource("Resource_b5h5j"), SubResource("Resource_y3yve"), SubResource("Resource_65ape")])
+offers = Array[ExtResource("1_4pgxb")]([SubResource("Resource_b5h5j"), SubResource("Resource_y3yve"), SubResource("Resource_65ape"), SubResource("Resource_kc_asc"), SubResource("Resource_kc_haul"), SubResource("Resource_kc_ledge")])
+buys_gear = PackedStringArray("haul_bag", "portaledge", "aiders", "ascenders", "rope")
+buy_rate = 0.65
+pays_with = PackedStringArray("pilot_bread", "beef_jerky", "dried_apples")

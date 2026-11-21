@@ -53,4 +53,4 @@ func interact(_player: Player) -> void:
 
 
 func ride(stop: Dictionary) -> void:
-	get_tree().call_group("world", "go_to_region", stop.region, stop.spawn, RIDE_MINUTES)
+	get_tree().call_group("world", "go_to_region", stop.region, stop.spawn, RIDE_MINUTES, {"title": "Valley shuttle"})

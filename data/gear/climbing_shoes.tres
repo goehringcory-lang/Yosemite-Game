@@ -10,3 +10,4 @@ display_name = "Climbing Shoes"
 description = "Tight, thin, and sticky. They smear on granite that approach shoes would skate off. Every move costs a little less stamina."
 icon = ExtResource("2_icon")
 tier = 1
+trade_value = 45

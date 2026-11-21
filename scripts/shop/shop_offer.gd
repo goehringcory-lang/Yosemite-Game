@@ -21,3 +21,5 @@ extends Resource
 @export var requires: Dictionary = {}
 ## Largest number you can own through trades (0 = no limit).
 @export var max_owned := 0
+## Only once a day (the King Cobra swaps: "one's plenty before a climb").
+@export var once_a_day := false

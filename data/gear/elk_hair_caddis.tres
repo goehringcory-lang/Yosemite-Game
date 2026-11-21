@@ -10,3 +10,4 @@ display_name = "Elk Hair Caddis"
 description = "A tan caddis with a wing of elk hair, tied by Greg. It floats high and the Merced's rainbows can't leave it alone. Widens the green on your cast a little."
 icon = ExtResource("2_icon")
 tier = 1
+trade_value = 12
