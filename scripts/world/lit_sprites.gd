@@ -31,8 +31,24 @@ static func active() -> bool:
 static func attach(region: Node) -> void:
 	if not active():
 		return
+	for sprite in sprites_in(region):
+		attach_sprite(sprite)
+	attach_ground(region)
+
+
+## The sprites in [param region] that attach() goes over (World gives them
+## their material a slice a frame while a region is set up beside a seam).
+static func sprites_in(region: Node) -> Array[Sprite2D]:
+	var sprites: Array[Sprite2D] = []
 	for node in region.find_children("*", "Sprite2D", true, false):
-		attach_sprite(node as Sprite2D)
+		sprites.append(node as Sprite2D)
+	return sprites
+
+
+## The normal map on [param region]'s painted ground, the rest of attach().
+static func attach_ground(region: Node) -> void:
+	if not active():
+		return
 	for ground_name in ["GroundArt", "GroundPainting"]:
 		var ground := region.get_node_or_null(ground_name) as Sprite2D
 		if ground and ground.material is ShaderMaterial and ground.texture:

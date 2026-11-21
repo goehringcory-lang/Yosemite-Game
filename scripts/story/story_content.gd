@@ -34,15 +34,24 @@ static func attach(region: Region) -> void:
 	# Wren's slackline can be rigged between trees in any outdoor region.
 	if not region.indoors:
 		region.add_child(TravelSlackline.new())
-	for path in [path_for(region.region_id), doors_path_for(region.region_id), DRESSING_DIR % region.region_id]:
-		if not ResourceLoader.exists(path):
-			continue
+	for path in overlay_paths(region.region_id):
 		var overlay: Node = load(path).instantiate()
 		for child in overlay.get_children():
 			overlay.remove_child(child)
 			child.owner = null
 			region.entities.add_child(child)
 		overlay.free()
+
+
+## The scenes laid over region [param region_id] that exist: its story, the
+## doors into its buildings, its dressing. (World reads them in the
+## background with the region.)
+static func overlay_paths(region_id: String) -> Array[String]:
+	var paths: Array[String] = []
+	for path in [path_for(region_id), doors_path_for(region_id), DRESSING_DIR % region_id]:
+		if ResourceLoader.exists(path):
+			paths.append(path)
+	return paths
 
 
 ## The doors into a region's buildings, and the spots outside them, written by

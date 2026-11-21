@@ -144,7 +144,9 @@ func travel(info: Dictionary) -> void:
 	var t := 0.0
 	while t < seconds and not _skip:
 		await get_tree().process_frame
-		t += get_process_delta_time()
+		# a slow frame (the new place drawing under the map) doesn't make
+		# the marker jump ahead
+		t += minf(get_process_delta_time(), 1.0 / 30.0)
 		_progress = ease_trip(clampf(t / seconds, 0.0, 1.0))
 		_canvas.queue_redraw()
 	_progress = 1.0
