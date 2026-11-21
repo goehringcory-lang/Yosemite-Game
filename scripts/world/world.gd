@@ -24,6 +24,9 @@ const SEAM_FAR := 960.0
 ## edge, so walking along an edge where two regions meet it doesn't flick
 ## between them.
 const SEAM_SWAP := 160.0
+## Arriving within this many pixels of the way back, the player faces away
+## from it (see _face_away_from_way_back).
+const FACE_AWAY_NEAR := 160.0
 
 ## The region the player is in.
 var region: Region
@@ -169,6 +172,11 @@ func _ready() -> void:
 		first_day.start_new_game()
 		if forage:
 			forage.respawn()
+	else:
+		# the save put the player back where they were, off the fallback spawn
+		_update_seam(true)
+		_fit_camera()
+		_settle_view()
 	Achievements.settle()
 	player.apply_look() # the look saved with the game just loaded, if any
 	hud.bind_player(player)
@@ -565,8 +573,10 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	player.lie_down(false)
 	player.facing = Vector2i.DOWN
 	player.interaction_area.position = Vector2(player.facing) * 24.0
+	_update_seam(true)
+	_fit_camera()
+	_settle_view()
 	await _unstick_player()
-	_camera().reset_smoothing()
 	var saved := SaveManager.save_game()
 	await _settle()
 
@@ -622,6 +632,7 @@ func _show_bear_tracks() -> void:
 ## [param staged_seams] a region beside the spot that isn't set up yet is
 ## left for _settle_seams to lay out over the next frames.
 func _enter_region(id: String, spawn_name := "", staged_seams := false) -> void:
+	var left := region.region_id if region else ""
 	_drop_seam()
 	if player.get_parent():
 		player.get_parent().remove_child(player)
@@ -636,12 +647,53 @@ func _enter_region(id: String, spawn_name := "", staged_seams := false) -> void:
 		player.global_position = spawn.global_position
 	elif spawn_name != "":
 		push_warning("Region %s has no spawn point named %s" % [id, spawn_name])
+	if spawn:
+		_face_away_from_way_back(left)
 	# Beside a seam, lay the next region out now, while the screen is dark,
 	# so the camera starts out looking over the edge.
 	_update_seam(not staged_seams, staged_seams)
 	_fit_camera()
-	_camera().reset_smoothing()
+	_settle_view()
 	_arrive()
+
+
+## Frames the view where the player has just arrived, so it shows settled
+## from the first frame: the drawn player on the player (no glide from the
+## place left behind), the tilt for here and no lead, the camera's smoothing
+## caught up, and the view moved there this frame (not on the camera's next
+## turn, which a door's wipe or a fade would show as a slide).
+func _settle_view() -> void:
+	var camera := _camera()
+	(player.get_node("SmoothMotion") as SmoothMotion).settle()
+	framing.settle(region, player, camera)
+	camera.reset_smoothing()
+	camera.force_update_scroll()
+	LandmarkFraming.set_offset_on_pixel(camera, camera.offset)
+
+
+## Through a door or along a way, the player arrives facing on into the new
+## place, away from the way back to [param left] beside them, instead of
+## however they faced when they left (often into the wall by the door).
+func _face_away_from_way_back(left: String) -> void:
+	if left == "" or left == region.region_id:
+		return
+	var at := player.global_position
+	var nearest := FACE_AWAY_NEAR
+	var away := Vector2.ZERO
+	for node in region.find_children("*", "", true, false):
+		if not (node is RegionDoor or node is RegionExit) or node.target_region != left:
+			continue
+		var gap := at - (node as Node2D).global_position
+		if gap.length() < nearest and gap.length() > 1.0:
+			nearest = gap.length()
+			away = gap
+	if away == Vector2.ZERO:
+		return
+	if absf(away.x) > absf(away.y):
+		player.facing = Vector2i.RIGHT if away.x > 0.0 else Vector2i.LEFT
+	else:
+		player.facing = Vector2i.DOWN if away.y > 0.0 else Vector2i.UP
+	player.interaction_area.position = Vector2(player.facing) * 24.0
 
 
 ## Everything that follows the player into a region, by a door or a fade or
@@ -812,7 +864,7 @@ func _settle_seams() -> void:
 		await get_tree().process_frame
 	_update_seam(true)
 	_fit_camera()
-	_camera().reset_smoothing()
+	_settle_view()
 
 
 ## The regions past the seams near the player that aren't set up yet.
@@ -1092,7 +1144,10 @@ func _unstick_player() -> void:
 			var spot := origin + Vector2.from_angle(dir * TAU / 8.0) * radius
 			if not player.test_move(Transform2D(0.0, spot), Vector2.ZERO):
 				player.global_position = spot
-				_camera().reset_smoothing()
+				# the seam and limits were picked for the spawn
+				_update_seam(true)
+				_fit_camera()
+				_settle_view()
 				return
 
 

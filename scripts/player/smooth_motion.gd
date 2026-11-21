@@ -17,6 +17,9 @@ extends Node
 ## parent's drawing, so without this the pool of lantern light stepped on
 ## the tick while the player glided through it.
 
+## A move of more than this many pixels in one tick is a jump, not a walk.
+const TELEPORT := 64.0
+
 var _parent: Node2D
 var _camera: Camera2D
 var _prev := Vector2.ZERO
@@ -59,10 +62,27 @@ func shift(by: Vector2) -> void:
 	_cur += by
 
 
+## Puts the drawing (and the camera, and the lights) straight on the parent
+## where it is now, with no glide left over: an arrival somewhere new, so
+## the first frame there is already where it will stay.
+func settle() -> void:
+	_prev = _parent.position
+	_cur = _parent.position
+	RenderingServer.canvas_item_set_transform(_parent.get_canvas_item(), _parent.get_transform())
+	if _camera:
+		_camera.position = Vector2.ZERO
+	if not _lights.is_empty():
+		_glide_lights(Vector2.ZERO)
+
+
 ## Runs after the parent's own tick (a child ticks after its parent).
 func _physics_process(_delta: float) -> void:
 	_prev = _cur
 	_cur = _parent.position
+	# Further than any walk goes in a tick: it was put there (a spawn, a
+	# door, a ride), not walked there, so no glide across the gap.
+	if _prev.distance_to(_cur) > TELEPORT:
+		_prev = _cur
 
 
 func _process(_delta: float) -> void:
