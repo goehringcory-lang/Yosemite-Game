@@ -368,6 +368,7 @@ func _journal_page() -> void:
 	_camp()
 	_keepers()
 	_friends()
+	_heard_today()
 	_calendar()
 	_field_log()
 	_photographs()
@@ -516,6 +517,26 @@ static func friend_note(character_id: String) -> String:
 	if HeartScenes.close(character_id):
 		return "saves you something each week"
 	return ""
+
+
+## What's going on around the park today that you've heard about
+## (Happenings.rumors): where, and the hours, and a word that there's more
+## out there for anyone who wanders.
+func _heard_today() -> void:
+	var heard := Happenings.rumors()
+	if heard.is_empty():
+		return
+	_heading("Heard around the park")
+	for happening: Dictionary in heard:
+		var done := Happenings.is_done(happening.id)
+		_check_line(done, "\"%s\"" % happening.rumor, DONE if done else Color.WHITE)
+		_line("     %s, %s." % [_area_name(happening.region), Happenings.hours_text(happening)], DIM)
+	if Happenings.today().size() > heard.size():
+		_line("And something else going on somewhere, for whoever wanders by.", DIM)
+
+
+static func _area_name(region_id: String) -> String:
+	return region_id.capitalize().replace("Of ", "of ")
 
 
 ## The festivals (Festivals), soonest first.
@@ -894,6 +915,7 @@ func _logged(animal: Dictionary) -> Dictionary:
 func _logbook_page() -> void:
 	_achievements()
 	_places_found()
+	_happenings_seen()
 	_summits()
 	_sends()
 	_fish()
@@ -938,6 +960,29 @@ func _places_found() -> void:
 			DONE if area[0] == area[1] else DIM)
 	if not any:
 		_line("Walk somewhere new and it goes in here. From a high lookout the whole Valley shows on your area map.", DIM)
+
+
+## The Happenings you've seen through (Happenings), area by area: the
+## ones seen by name, and how many more each area has.
+func _happenings_seen() -> void:
+	_heading("Happenings: %d of %d" % [Happenings.count(), Happenings.total()])
+	if Happenings.count() == 0:
+		_line("Things go on around the park that no quest sends you to. Wander, and see what's up.", DIM)
+		return
+	var areas: Dictionary = {}
+	for happening: Dictionary in Happenings.HAPPENINGS:
+		var area: Array = areas.get_or_add(happening.region, [0, 0, PackedStringArray()])
+		area[1] += 1
+		if Happenings.has_seen(happening.id):
+			area[0] += 1
+			area[2].append(happening.title)
+	for region_id: String in areas:
+		var area: Array = areas[region_id]
+		if area[0] == 0:
+			continue
+		var titles: PackedStringArray = area[2]
+		_check_line(area[0] == area[1], "%s (%d of %d): %s" % [_area_name(region_id), area[0], area[1], ", ".join(titles)],
+			DONE if area[0] == area[1] else DIM)
 
 
 ## The summits you've stood on, highest first, and how to reach the rest.
