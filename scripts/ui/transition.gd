@@ -33,9 +33,12 @@ const MAX_STEP := 1.0 / 30.0
 const SETTLED_MS := 25.0
 ## Settled frames in a row before the reveal begins.
 const SETTLED_FRAMES := 3
-## Whether [method run] holds a long frame to MAX_STEP. Without a screen
-## (the tests) nothing is seen, and the tests wait on game-time timers that
-## a held-back wipe would outlast, so there it runs on the clock as tweens do.
+## Whether transitions hold for a slow frame: [method run] keeps a long
+## frame to MAX_STEP and [method settle] waits for even frames. Without a
+## screen (the tests) nothing is seen, and the tests wait on game-time timers
+## that a held-back wipe would outlast, so there they run on the clock as
+## tweens do. Tools that take pictures turn it off too, so a slow software
+## renderer doesn't stretch the time between arriving and the picture.
 static var hold_long_frames := DisplayServer.get_name() != "headless"
 
 ## Frames to wait whatever happens, and the longest wait (seconds).
@@ -80,13 +83,12 @@ static func run(node: Node, seconds: float, apply: Callable) -> void:
 
 ## Waits, behind a cover, until frames are drawing evenly again: at least
 ## LEAST_FRAMES, then SETTLED_FRAMES quick ones in a row, or MOST_WAIT at
-## most. Without a screen (the tests) there is nothing to see, so only one
-## frame passes.
+## most. With hold_long_frames off (the tests) only one frame passes.
 static func settle(node: Node) -> void:
 	if node == null or not node.is_inside_tree():
 		return
 	var tree := node.get_tree()
-	if DisplayServer.get_name() == "headless":
+	if not hold_long_frames:
 		await tree.process_frame
 		return
 	var start := Time.get_ticks_usec()

@@ -42,6 +42,8 @@ func _ready() -> void:
 		get_tree().quit(1)
 		return
 	LitSprites.enabled = OS.get_environment("SHOT_UNLIT") != "1"
+	# the same moment after arriving under both renderers, however slow
+	Transition.hold_long_frames = false
 	# still air, so two runs of the tour give the same picture
 	Wind.enabled = OS.get_environment("SHOT_WIND") == "1"
 	SaveManager.save_path = "user://renderer_tour_save.json"
