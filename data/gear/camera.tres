@@ -10,3 +10,5 @@ display_name = "Box Brownie"
 description = "Ansel Adams's first camera, a Kodak Box Brownie from 1916, on loan. Press the camera key to raise it, move the frame over what you want, and press the shutter. Prints go in the album, with Ansel's list of pictures he'd like to see."
 icon = ExtResource("2_icon")
 tier = 0
+trade_value = 0
+keepsake = true

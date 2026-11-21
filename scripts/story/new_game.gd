@@ -28,6 +28,7 @@ static func reset() -> void:
 	Photos.start_new_game()
 	Happenings.start_new_game()
 	Market.start_new_game()
+	GearSale.start_new_game()
 	Crow.paper_day = ""
 
 

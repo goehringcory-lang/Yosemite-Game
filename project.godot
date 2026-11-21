@@ -45,6 +45,7 @@ Camp="*res://scripts/story/guardian_camp.gd"
 Photos="*res://scripts/story/photos.gd"
 Happenings="*res://scripts/story/happenings.gd"
 Market="*res://scripts/shop/market.gd"
+GearSale="*res://scripts/shop/gear_sale.gd"
 Sound="*res://scripts/autoload/sound.gd"
 
 [display]

@@ -10,3 +10,4 @@ display_name = "Bear Canister"
 description = "A hard plastic drum with a lid a bear's claws can't open, lent by the ranger station. On a night out in the backcountry, everything you carry to eat goes in it, and it sits away from your tent."
 icon = ExtResource("2_icon")
 tier = 0
+trade_value = 40

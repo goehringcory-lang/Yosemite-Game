@@ -10,3 +10,4 @@ display_name = "Harness"
 description = "Ties you to the rope. You can't lead a pitch without one."
 icon = ExtResource("2_icon")
 tier = 1
+trade_value = 30
