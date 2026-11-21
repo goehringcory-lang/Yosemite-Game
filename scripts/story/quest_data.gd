@@ -12,7 +12,9 @@ extends Resource
 ##   "have"       item, count, consume (bool): carry this many of an item
 ##   "have_food"  energy: carry edible food worth at least this much energy
 ##   "pay"        energy: trade food worth this much energy (it's taken, the
-##                soonest to spoil first, when you turn the step in)
+##                soonest to spoil first, when you turn the step in). With
+##                shop (a data/shops file name), it's a trade with that shop
+##                instead: any goods worth this much to them (Barter.pay).
 ##   "talk"       target (character id): go and talk to someone
 ##   "chuckah"    count: have built this many chuckahs
 ##   "stored"     count: have this many acorns stored in your chuckahs

@@ -101,6 +101,7 @@ func _shop(keeper: String, greeting: String, nothing_yet: String, offers: Array,
 	var shop := ShopData.new()
 	shop.keeper = keeper
 	shop.talk_target = talk_target
+	shop.tastes = "outfitter" if talk_target == "mountain_shop" else "store"
 	shop.greeting = greeting
 	shop.nothing_yet = nothing_yet
 	for offer: ShopOffer in offers:
@@ -108,7 +109,7 @@ func _shop(keeper: String, greeting: String, nothing_yet: String, offers: Array,
 	return shop
 
 
-## Prices are food energy. The store swaps fresh forage for food that keeps;
+## Prices are trade value (1 = 1 energy of food; see TradeValues). The store swaps fresh forage for food that keeps;
 ## the Mountain Shop rounds out a rack, but the piece that opens a new climbing
 ## tier still comes from a quest (docs/DESIGN.md).
 func _build_shops() -> void:
@@ -121,7 +122,7 @@ func _build_shops() -> void:
 		"res://data/shops/curry_store.tres")
 	# The clerk, Marty Kessler, is also a quest giver (data/characters/staff/).
 	save_resource(_shop("Marty Kessler",
-		"Welcome to the Mountain Shop. We outfit half the climbers in the Valley. Rope, cams, draws... we take food in trade, same as everyone up here.",
+		"Welcome to the Mountain Shop. We outfit half the climbers in the Valley. Rope, cams, draws... we take food and goods in trade, same as everyone up here. Food that keeps goes furthest.",
 		"That's all I can trade you today. Once you've got a rope of your own, come back and I'll round out your rack.",
 		[_offer("gear", "quickdraw", 28, {"rope": 1}, 12, 2),
 		_offer("gear", "cam", 48, {"cam": 2}, 10),

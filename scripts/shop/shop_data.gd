@@ -10,3 +10,6 @@ extends Resource
 ## A quest "talk" target id for this keeper, so a quest can send the player
 ## here (the Mountain Shop clerk hands over the guidebook this way).
 @export var talk_target := ""
+## What they want most and least in trade (TradeValues.TASTES): "climber",
+## "store", "outfitter", "angler", or "" for anyone's tastes.
+@export var tastes := ""

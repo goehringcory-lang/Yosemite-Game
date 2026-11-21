@@ -110,6 +110,7 @@ func _offer(kind_name: String, id: String, price: int, requires := {}, max_owned
 func _shop(keeper: String, greeting: String, nothing_yet: String, offers: Array) -> ShopData:
 	var shop := ShopData.new()
 	shop.keeper = keeper
+	shop.tastes = "store" if keeper.ends_with("Store clerk") else "climber"
 	shop.greeting = greeting
 	shop.nothing_yet = nothing_yet
 	for offer: ShopOffer in offers:
@@ -126,14 +127,14 @@ func _build_shops() -> void:
 		[_offer("item", "trail_mix", 40), _offer("item", "dried_apples", 20)]),
 		"res://data/shops/village_store.tres")
 	_save(_shop("Camp 4 climber",
-		"Hey. Rope, cams, draws... everything's for trade, and I'm always hungry.",
+		"Hey. Rope, cams, draws... everything's for trade, and I'm always hungry. Thirsty, too, if you've got a King Cobra.",
 		"Come back once you've got a rope and a couple of cams. Then I can help fill out your rack.",
 		[_offer("gear", "cam", 50, {"cam": 2}, 6),
 		_offer("gear", "quickdraw", 30, {"rope": 1}, 8, 2),
 		_offer("gear", "belay_device", 40, {"rope": 1, "harness": 1}, 1)]),
 		"res://data/shops/camp4_rack.tres")
 	_save(_shop("Big-wall climber",
-		"Just down off El Cap. Everything I hauled up there is for trade, for food.",
+		"Just down off El Cap. Everything I hauled up there is for trade. Food, candy bars, a cold King Cobra...",
 		"Big-wall gear won't do you any good until someone teaches you to aid climb.",
 		[_offer("gear", "haul_bag", 80, {"aiders": 1}, 1),
 		_offer("gear", "cam", 55, {"cam": 4}, 8),

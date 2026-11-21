@@ -453,7 +453,7 @@ func fade_from_black() -> void:
 
 
 func _refresh_food() -> void:
-	food_label.text = "%d energy" % Barter.purse()
+	food_label.text = "%d energy" % Barter.food_purse()
 
 
 func _refresh_clock() -> void:

@@ -24,6 +24,7 @@ max_owned = 8
 [resource]
 script = ExtResource("2_akkmp")
 keeper = "Camp 4 climber"
-greeting = "Hey. Rope, cams, draws... everything's for trade, and I'm always hungry."
+tastes = "climber"
+greeting = "Hey. Rope, cams, draws... everything's for trade, and I'm always hungry. Thirsty, too, if you've got a King Cobra."
 nothing_yet = "Come back once you've got a rope and a couple of cams. Then I can help fill out your rack."
 offers = Array[ExtResource("1_qsj76")]([SubResource("Resource_xqpua"), SubResource("Resource_nphu2")])

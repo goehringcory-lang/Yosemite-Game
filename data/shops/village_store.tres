@@ -18,6 +18,7 @@ price = 20
 [resource]
 script = ExtResource("2_8jobk")
 keeper = "Village Store clerk"
+tastes = "store"
 greeting = "Welcome to the Village Store. We'll swap you trail food that keeps for your fresh forage."
 nothing_yet = "We're sold out today."
 offers = Array[ExtResource("1_ks2gc")]([SubResource("Resource_u0nlw"), SubResource("Resource_kqhn6")])

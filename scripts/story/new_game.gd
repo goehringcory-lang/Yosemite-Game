@@ -26,6 +26,7 @@ static func reset() -> void:
 	Achievements.start_new_game()
 	Camp.start_new_game()
 	Photos.start_new_game()
+	Market.start_new_game()
 	Crow.paper_day = ""
 
 
