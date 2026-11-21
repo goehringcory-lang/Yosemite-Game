@@ -236,6 +236,7 @@ const FULL_UP_LINES := {
 	"fish": "No more fish for a bit, please. The whole place smells like the river.",
 	"cooked": "That's plenty of campfire cooking for now. Ask me again in a couple of days.",
 	"store": "I've had my fill of store food this week.",
+	"curio": "My shelf's full of old junk already. Bring me more in a few days.",
 	"cobra": "Okay, okay, that's enough King Cobra for one day. Ask me tomorrow, I'll be thirsty again.",
 }
 

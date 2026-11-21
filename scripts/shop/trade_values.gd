@@ -31,7 +31,11 @@ const MEAL_SHARE := 0.8
 ## Hand-set values for things the rules above can't price.
 const ACORN_CHAIN := {"black_oak_acorn": 3, "acorn_flour": 8, "leached_acorn_meal": 15}
 ## Items with a value of their own, whatever else they are.
-const SET_VALUES := {"king_cobra": 20, "litter": 0}
+const SET_VALUES := {"king_cobra": 20, "litter": 0,
+	# Curios found off the trail (hidden finds): odd old things people
+	# collect. Climbers want the piton and the headlamp.
+	"rusty_piton": 18, "lost_headlamp": 25, "railroad_spike": 10, "ski_wax_tin": 8, "glass_insulator": 14}
+const CURIOS := ["rusty_piton", "lost_headlamp", "railroad_spike", "ski_wax_tin", "glass_insulator"]
 ## Fish caught on the fly rod (Fishing).
 const FISH := ["brown_trout", "brook_trout"]
 ## The climber's favorite snacks off the store shelf.
@@ -41,20 +45,21 @@ const CLIMBER_SNACKS := ["chocolate_bar", "beef_jerky", "cheddar_wedge"]
 const GIFT_FOODS := ["lamon_apple", "degnan_loaf", "pine_nuts"]
 
 ## Buyers' tastes, by ShopData.tastes: a multiplier per sort of thing
-## ([method sort_of]: "fresh", "wild", "fish", "cooked", "store", "cobra")
+## ([method sort_of]: "fresh", "wild", "fish", "cooked", "store", "cobra",
+## "curio")
 ## or per item id (an id wins over its sort). Unlisted = 1.0. They stay
 ## between 0.5 and 1.5, so no one buyer makes a thing worthless or a gold
 ## mine.
 const TASTES := {
 	# Camp 4: hungry, broke, and short on stoves. Cans and candy bars, please.
 	"climber": {"cobra": 1.5, "chocolate_bar": 1.15, "beef_jerky": 1.15, "cheddar_wedge": 1.15,
-		"fresh": 0.6, "wild": 0.7, "fish": 0.7},
+		"fresh": 0.6, "wild": 0.7, "fish": 0.7, "rusty_piton": 1.4, "lost_headlamp": 1.5, "curio": 0.8},
 	# The stores swap fresh forage for food that keeps (it's what they're
 	# for), but buy their own kind of goods back cheap, and never over half
 	# their own price for what they stock (STORE_BUYBACK).
 	"store": {"fresh": 0.9, "wild": 0.8, "fish": 0.7, "cooked": 0.8, "store": 0.6, "cobra": 0.6},
 	# Marty outfits climbers: he'll take fresh food, but not your fish.
-	"outfitter": {"fish": 0.8},
+	"outfitter": {"fish": 0.8, "rusty_piton": 1.2, "lost_headlamp": 1.2},
 	# Greg: a fisherman who'd rather not catch his own supper every night.
 	"angler": {"fish": 1.5, "fresh": 0.8, "wild": 0.8, "cooked": 0.8, "store": 0.8, "cobra": 0.8},
 }
@@ -104,6 +109,7 @@ static func keep_factor(shelf_life: int) -> float:
 
 
 ## Which sort of thing [param id] is, for tastes and gluts: "cobra",
+## "curio" (odd old finds),
 ## "fish", "fresh" (wild food that spoils within 4 days), "wild" (wild food
 ## that keeps), "cooked" (made at a campfire or the pot), "store" (bought or
 ## given), or "" (not for trade).
@@ -112,6 +118,8 @@ static func sort_of(id: String) -> String:
 		return ""
 	if id == "king_cobra":
 		return "cobra"
+	if id in CURIOS:
+		return "curio"
 	if id in FISH:
 		return "fish"
 	if id.begins_with(Cooking.PREFIX) or ACORN_CHAIN.has(id) and id != "black_oak_acorn":
