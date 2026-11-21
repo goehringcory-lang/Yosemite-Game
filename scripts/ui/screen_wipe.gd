@@ -15,7 +15,7 @@ extends CanvasLayer
 ##   ScreenWipe.attach(minigame)
 
 ## How long the diamonds take to clear, in seconds.
-const TIME := 0.36
+const TIME := Transition.SCREEN_TIME
 ## Above every screen and menu (the pause menu is 28).
 const LAYER := 40
 
@@ -59,7 +59,10 @@ func _ready() -> void:
 	_rect.material = wipe
 	_rect.color = Color(HUD.WIPE_COLOR, 1.0)
 	add_child(_rect)
-	var tween := create_tween()
-	tween.tween_property(_rect, "color:a", 0.0, _time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_callback(queue_free)
+	_clear()
+
+
+func _clear() -> void:
+	await Transition.run(self, _time, func(t: float) -> void: _rect.color.a = 1.0 - t)
+	queue_free()
 

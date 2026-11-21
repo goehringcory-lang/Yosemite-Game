@@ -21,8 +21,12 @@ const PARK_MAP: Texture2D = preload("res://assets/map/park_map.png")
 ## The frame's picture, in UI pixels (480x270, see UiScale).
 const PICTURE := Rect2(92, 46, 296, 168)
 ## Seconds the map takes to open and to lift.
-const COVER_TIME := 0.3
-const LIFT_TIME := 0.4
+const COVER_TIME := Transition.MAP_COVER_TIME
+const LIFT_TIME := Transition.MAP_LIFT_TIME
+## The veil going fully dark for the swap (hold), and thinning again as the
+## marker sets off.
+const HOLD_TIME := 0.15
+const THIN_TIME := 0.3
 ## How long the marker takes: BASE_TIME plus PER_ROOT_MINUTE for each square
 ## root of the trip's minutes (a 15-minute ride ~1.7 s, a 5-hour hike ~3.9 s).
 const BASE_TIME := 1.0
@@ -88,6 +92,8 @@ const TRAIL_BENDS := {
 
 var _canvas: Control
 var _alpha := 0.0
+## 0 the veil is its usual BACKING, 1 it is fully dark (see hold).
+var _solid := 0.0
 ## What is being drawn: the route in UI pixels, how far along (0..1).
 var _points := PackedVector2Array()
 var _lengths: Array[float] = []
@@ -126,6 +132,14 @@ func cover() -> void:
 	await _fade_to(1.0, COVER_TIME)
 
 
+## The veil goes fully dark, so the world can change under it unseen; it
+## thins again as the marker sets off (see travel).
+func hold() -> void:
+	await Transition.run(self, HOLD_TIME, func(t: float) -> void:
+		_solid = t
+		_canvas.queue_redraw())
+
+
 ## Runs the marker along the trip in [param info]:
 ## {from, to (longitude/latitude), from_region, to_region, title, subtitle,
 ## start_minutes, minutes, miles, on_foot, path (optional longitude/latitude
@@ -142,12 +156,21 @@ func travel(info: Dictionary) -> void:
 	_running = true
 	var seconds := BASE_TIME + PER_ROOT_MINUTE * sqrt(maxf(_minutes, 1))
 	var t := 0.0
+	var last := Time.get_ticks_usec()
+	var from_solid := _solid
 	while t < seconds and not _skip:
 		await get_tree().process_frame
-		t += get_process_delta_time()
+		# Never more than a short step a frame, so a long frame doesn't
+		# jump the marker along (see Transition.run).
+		var now := Time.get_ticks_usec()
+		var real := (now - last) / 1000000.0
+		t += (minf(real, Transition.MAX_STEP) if Transition.hold_long_frames else real) * Engine.time_scale
+		last = now
 		_progress = ease_trip(clampf(t / seconds, 0.0, 1.0))
+		_solid = from_solid * (1.0 - Transition.smooth(t / THIN_TIME))
 		_canvas.queue_redraw()
 	_progress = 1.0
+	_solid = 0.0
 	_canvas.queue_redraw()
 	# A moment at the end to read where you are.
 	if not _skip:
@@ -169,11 +192,10 @@ func _input(event: InputEvent) -> void:
 
 
 func _fade_to(alpha: float, seconds: float) -> void:
-	var tween := create_tween()
-	tween.tween_method(func(a: float) -> void:
-		_alpha = a
-		_canvas.queue_redraw(), _alpha, alpha, seconds).set_trans(Tween.TRANS_SINE)
-	await tween.finished
+	var from := _alpha
+	await Transition.run(self, seconds, func(t: float) -> void:
+		_alpha = lerpf(from, alpha, t)
+		_canvas.queue_redraw())
 
 
 ## Slow away, steady, slow in: the clock and marker move like a drive.
@@ -331,7 +353,7 @@ func _draw_journey() -> void:
 		return
 	var c := _canvas
 	c.modulate.a = _alpha
-	c.draw_rect(Rect2(Vector2.ZERO, UiScale.SCREEN), BACKING)
+	c.draw_rect(Rect2(Vector2.ZERO, UiScale.SCREEN), Color(BACKING, lerpf(BACKING.a, 1.0, _solid)))
 	var outer := PICTURE.grow(6)
 	outer.position.y -= 22
 	outer.size.y += 22 + 16

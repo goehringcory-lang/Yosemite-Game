@@ -66,8 +66,9 @@ var seam: Seam
 ## the exit turned out not to meet the next map edge to edge.
 var _seams: Dictionary = {}
 var _busy := false
-## Seconds the place left behind takes to open away going through a door.
-const DOOR_TIME := 0.45
+## True while a transition plays out (see _reveal): background loading waits.
+var _transitioning := false
+## Opens the place left behind away going through a door.
 const DOOR_WIPE := preload("res://assets/shaders/door_wipe.gdshader")
 var _place_check := 0.0
 ## The door the player last went through into a room, when it was a second
@@ -181,8 +182,11 @@ func _process(delta: float) -> void:
 		_hand_camera_over()
 	if _curfew_pending and not _busy and not _dialogue_open():
 		sleep(true)
-	_pump_preload()
-	_update_seam()
+	# Loading and laying out what's next waits while a transition plays, so
+	# none of its long frames land in the middle of the wipe.
+	if not _transitioning:
+		_pump_preload()
+		_update_seam()
 	_place_check -= delta
 	if _place_check <= 0.0:
 		_place_check = 0.25
@@ -348,9 +352,18 @@ func go_to_region(id: String, spawn_name := "arrival", minutes := 0, trip := {})
 		GameClock.advance_minutes(minutes)
 	_enter_region(id, spawn_name)
 	await _unstick_player()
-	await hud.fade_from_black()
+	await _reveal()
 	_set_paused(false)
 	_busy = false
+
+
+## Under the cover, waits for the new place to draw evenly, then wipes the
+## cover away (see Transition).
+func _reveal() -> void:
+	_transitioning = true
+	await Transition.settle(self)
+	await hud.fade_from_black()
+	_transitioning = false
 
 
 func _journeys_on() -> bool:
@@ -369,11 +382,18 @@ func _journey(id: String, spawn_name: String, minutes: int, info: Dictionary) ->
 	var start := GameClock.minutes
 	var journey := Journey.new()
 	add_child(journey)
-	await journey.cover()
+	_transitioning = true
 	# The HUD's clock would jump straight to the end; the map has its own.
+	# The HUD fades out under the veil rather than vanishing in a frame.
+	_fade_hud(0.0, Transition.MAP_COVER_TIME)
+	await journey.cover()
+	# Fully dark for the swap, so the old place never cuts to the new one
+	# through the veil.
+	await journey.hold()
 	hud.visible = false
 	GameClock.advance_minutes(minutes)
 	_enter_region(id, spawn_name)
+	await Transition.settle(self)
 	info.merge({
 		"from": from,
 		"to": Wayfinding.lonlat_of(region, region.to_local(player.global_position)),
@@ -386,10 +406,19 @@ func _journey(id: String, spawn_name: String, minutes: int, info: Dictionary) ->
 	await journey.travel(info)
 	await _unstick_player()
 	hud.visible = true
+	_fade_hud(1.0, Transition.MAP_LIFT_TIME)
 	await journey.lift()
 	journey.queue_free()
+	hud.opacity = 1.0
+	_transitioning = false
 	_set_paused(false)
 	_busy = false
+
+
+## Fades the HUD to [param alpha] over [param seconds], not waiting on it.
+func _fade_hud(alpha: float, seconds: float) -> void:
+	var from: float = hud.opacity
+	Transition.run(hud, seconds, func(t: float) -> void: hud.opacity = lerpf(from, alpha, t))
 
 
 ## Goes through a door, gate or short way that takes no time: the new place
@@ -405,18 +434,23 @@ func _step_through(id: String, spawn_name: String) -> void:
 		cover = _door_cover(picture)
 	_enter_region(id, spawn_name)
 	await _unstick_player()
+	if cover == null:
+		_set_paused(false)
+		_busy = false
+		return
+	# The picture of the old place stays up until the new one draws evenly,
+	# then opens over smooth frames (see Transition).
+	_transitioning = true
+	await Transition.settle(self)
 	_set_paused(false)
 	_busy = false
-	if cover == null:
-		return
 	var wipe := (cover.get_child(0) as CanvasItem).material as ShaderMaterial
 	var at := player.get_global_transform_with_canvas().origin / get_viewport().get_visible_rect().size
 	wipe.set_shader_parameter("center", at.clamp(Vector2.ZERO, Vector2.ONE))
-	var tween := create_tween()
-	tween.tween_method(func(t: float) -> void: wipe.set_shader_parameter("progress", t), 0.0, 1.0, DOOR_TIME) \
-			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	await tween.finished
-	cover.queue_free()
+	await Transition.run(cover, Transition.DOOR_TIME, func(t: float) -> void: wipe.set_shader_parameter("progress", t))
+	_transitioning = false
+	if is_instance_valid(cover):
+		cover.queue_free()
 
 
 ## The last frame drawn, as a texture, once it is drawn, or null where
@@ -475,7 +509,7 @@ func travel(leg: Dictionary) -> void:
 	GameClock.advance_minutes(leg.minutes)
 	_enter_region(arrive_in, leg.spawn)
 	await _unstick_player()
-	await hud.fade_from_black()
+	await _reveal()
 	hud.show_message("You drove %s miles to %s (%s)." % [str(leg.miles), hub.display_name, Park.format_minutes(leg.minutes)])
 	_set_paused(false)
 	_busy = false
@@ -530,7 +564,7 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	_camera().reset_smoothing()
 	var saved := SaveManager.save_game()
 
-	await hud.fade_from_black()
+	await _reveal()
 	player.pose("arms_up", 1.0) # a morning stretch
 	var save_status := "Your game was saved." if saved else "Couldn't save. Check that the game can write to its save folder."
 	var message := "Good morning! " + save_status
