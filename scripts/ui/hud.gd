@@ -235,6 +235,13 @@ func show_discovery(found: Dictionary) -> void:
 		Sound.play("story_sting", -6.0, 0.0)
 
 
+## A hidden find taken (FindSpot): its little story, with what you took, and
+## the story sting. The reward's own toast comes from Inventory or Gear.
+func show_find(find: Dictionary) -> void:
+	show_info(str(find.get("title", "")), "%s\n\nYou take: %s." % [str(find.get("text", "")), Finds.reward_text(find)])
+	Sound.play("story_sting", -6.0, 0.0)
+
+
 ## New gear is a bigger moment than a berry: it gets the brighter chime.
 func _on_gear_added(id: String, amount: int) -> void:
 	var gear := Gear.get_gear(id)

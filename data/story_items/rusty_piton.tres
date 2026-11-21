@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/rusty_piton.png" id="1_icon"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[resource]
+script = ExtResource("2_item")
+id = "rusty_piton"
+display_name = "Rusty Piton"
+description = "A soft-iron piton from the days when climbers hammered their protection into the cracks and left it there. Climbers trade for them as keepsakes; nobody would clip one now."
+icon = ExtResource("1_icon")

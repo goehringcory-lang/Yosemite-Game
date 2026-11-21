@@ -894,6 +894,7 @@ func _logged(animal: Dictionary) -> Dictionary:
 func _logbook_page() -> void:
 	_achievements()
 	_places_found()
+	_finds()
 	_summits()
 	_sends()
 	_fish()
@@ -938,6 +939,39 @@ func _places_found() -> void:
 			DONE if area[0] == area[1] else DIM)
 	if not any:
 		_line("Walk somewhere new and it goes in here. From a high lookout the whole Valley shows on your area map.", DIM)
+
+
+## Hidden finds off the paths (Finds): each area you've found one in, with
+## how many of its finds you have and what they were, then a few rumors
+## heard about finds in areas you've been to. Never a spot.
+func _finds() -> void:
+	_heading("Hidden finds: %d" % Finds.count())
+	var areas: Dictionary = {}
+	for find: Dictionary in Finds.all():
+		var area: Array = areas.get_or_add(find.region, [0, 0, PackedStringArray()])
+		area[1] += 1
+		if Finds.is_found(find.id):
+			area[0] += 1
+			area[2].append(find.title)
+	for region_id: String in areas:
+		var area: Array = areas[region_id]
+		if area[0] == 0:
+			continue
+		_check_line(area[0] == area[1], "%s (%d of %d): %s" % [_area_name(region_id), area[0], area[1], ", ".join(area[2])],
+			DONE if area[0] == area[1] else DIM)
+	var rumors := Finds.rumors()
+	if Finds.count() == 0 and rumors.is_empty():
+		_line("Things turn up off the beaten path: stuck gear at the foot of a wall, something left behind in the trees. Wander, and look closely.", DIM)
+	for find: Dictionary in rumors:
+		_line("Heard: " + str(find.rumor), DIM)
+
+
+## An area's name from the place list, or its id.
+func _area_name(region_id: String) -> String:
+	for place: Dictionary in Discoveries.places():
+		if place.region == region_id:
+			return place.name
+	return region_id
 
 
 ## The summits you've stood on, highest first, and how to reach the rest.
