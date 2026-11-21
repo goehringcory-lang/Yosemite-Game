@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/ski_wax_tin.png" id="1_icon"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[resource]
+script = ExtResource("2_item")
+id = "ski_wax_tin"
+display_name = "Tin of Ski Wax"
+description = "A dented tin of green kick wax, for cold snow. Badger Pass, up the Glacier Point Road, was one of California's first ski areas, opened in 1935. Somebody will want it come winter."
+icon = ExtResource("1_icon")

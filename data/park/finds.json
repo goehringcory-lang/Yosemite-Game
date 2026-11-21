@@ -1,0 +1,416 @@
+{
+	"_note": "Hidden finds (Finds). 'spot' says what tools/discovery/find_spots.tscn looked for when it chose 'pos'; FIND_PLACE=1 places any find without a pos. tests/finds_test.tscn checks every one.",
+	"finds": [
+		{
+			"id": "el_cap_booty_cam",
+			"region": "el_capitan_meadow",
+			"title": "Booty Cam",
+			"text": "A cam, walked deep into a crack at the foot of the wall. Somebody spent a long time on it with a nut tool before they gave up. It comes out for you on the second wiggle. Climbers call this booty: stuck gear is finders keepers.",
+			"rumor": "Word around Camp 4: somebody bailed off the bottom of El Cap and couldn't get their cam back out. It's still in a crack near the base, off the meadow paths.",
+			"reward": {
+				"cam": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				1616.0,
+				472.0
+			]
+		},
+		{
+			"id": "camp4_buried_cobra",
+			"region": "yosemite_village",
+			"title": "Six-Pack Under the Needles",
+			"text": "In the shade behind a boulder, a pile of pine needles that's too neat. Under it, a six-pack ring with three cans of King Cobra still in it, buried to keep cool. Somebody's idea of a fridge. Somebody's loss.",
+			"rumor": "Somebody at Camp 4 buried a six-pack in the shade behind the boulders to keep it cool, then moved camp. In summer and fall, when the climbers are in, look off the paths.",
+			"reward": {
+				"king_cobra": 3.0
+			},
+			"seasons": [
+				"summer",
+				"fall"
+			],
+			"spot": {
+				"near": "rock",
+				"place": "Camp 4",
+				"off": 1.0
+			},
+			"pos": [
+				280.0,
+				280.0
+			]
+		},
+		{
+			"id": "camp4_boulder_stash",
+			"region": "yosemite_village",
+			"title": "Chalky Stash",
+			"text": "Wedged under a boulder, a zip-top bag gone white with chalk. Inside: a chocolate bar, a little soft. A boulderer's emergency ration.",
+			"rumor": "Boulderers stash snacks under the Camp 4 boulders and forget them. Look off the path, around the rocks.",
+			"reward": {
+				"chocolate_bar": 1.0
+			},
+			"spot": {
+				"near": "rock",
+				"place": "Camp 4",
+				"off": 1.0
+			},
+			"pos": [
+				656.0,
+				280.0
+			]
+		},
+		{
+			"id": "slabs_bail_biner",
+			"region": "half_dome",
+			"title": "Bail Biner",
+			"text": "A quickdraw hanging from a bolt low on the slabs, where somebody turned around and lowered off. You reach it from the ground on tiptoe.",
+			"rumor": "A party bailed off the slabs below Half Dome and left a quickdraw on a bolt. It's off the trail, along the rock.",
+			"reward": {
+				"quickdraw": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				792,
+				1216
+			]
+		},
+		{
+			"id": "lyv_stuff_sack",
+			"region": "little_yosemite_valley",
+			"title": "Forgotten Stuff Sack",
+			"text": "Under a fallen log, a small stuff sack. Two bags of trail mix and a chocolate bar, all sealed. Somebody's summit snacks, left at camp on the way up and forgotten on the way down. Lucky the bears didn't find it first.",
+			"rumor": "A backpacker lost a food sack around Little Yosemite Valley, off the trail in the trees. The bears haven't found it yet. Somebody should, before they do.",
+			"reward": {
+				"trail_mix": 2.0,
+				"chocolate_bar": 1.0
+			},
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				1504.0,
+				736.0
+			]
+		},
+		{
+			"id": "leidig_fly_box",
+			"region": "leidig_meadow",
+			"title": "Lost Fly",
+			"text": "On a gravel bar the low river has left dry, a fly hooked through a scrap of fleece: a Parachute Adams, the post still white. It must have fallen out of someone's fly patch.",
+			"rumor": "Greg lost a fly off his vest along the river at Leidig Meadow. When the water drops in summer and fall the gravel bars come up dry.",
+			"reward": {
+				"parachute_adams": 1.0
+			},
+			"seasons": [
+				"summer",
+				"fall"
+			],
+			"spot": {
+				"near": "water"
+			},
+			"pos": [
+				1736.0,
+				840.0
+			]
+		},
+		{
+			"id": "bridalveil_piton",
+			"region": "bridalveil_fall",
+			"title": "Old Piton",
+			"text": "In a crack at the foot of the rock, an old soft-iron piton, rusted orange, its eye still bright where a carabiner rubbed it. Somebody hammered it in fifty years ago. It comes out with a tug.",
+			"rumor": "There's an old piton in a crack near Bridalveil, from before anybody's time. In spring the spray soaks everything; look when it's dry.",
+			"reward": {
+				"rusty_piton": 1.0
+			},
+			"seasons": [
+				"summer",
+				"fall",
+				"winter"
+			],
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				488.0,
+				472.0
+			]
+		},
+		{
+			"id": "royal_arches_piton",
+			"region": "the_ahwahnee",
+			"title": "Royal Arches Piton",
+			"text": "Below the Royal Arches, half buried in the leaves, a piton that fell out of a crack after seventy years of freeze and thaw. Climbers have been going up the Arches since 1936.",
+			"rumor": "Pitons work loose up on the Royal Arches and fall. Somebody found one in the leaves at the foot of the rock, behind The Ahwahnee.",
+			"reward": {
+				"rusty_piton": 1.0
+			},
+			"spot": {
+				"near": "rock",
+				"place": "Royal Arches"
+			},
+			"pos": [
+				2432.0,
+				536.0
+			]
+		},
+		{
+			"id": "el_portal_spike",
+			"region": "el_portal",
+			"title": "Railroad Spike",
+			"text": "In the weeds on the old rail grade, a railroad spike, square and rust-brown. The Yosemite Valley Railroad brought visitors up the Merced canyon to El Portal from 1907 until 1945; the rails are long gone, and now and then a spike turns up.",
+			"rumor": "The old railroad grade at El Portal still turns up a spike now and then, in the weeds off the road.",
+			"reward": {
+				"railroad_spike": 1.0
+			},
+			"spot": {
+				"place": "Yosemite Valley Railroad"
+			},
+			"pos": [
+				1632.0,
+				1312.0
+			]
+		},
+		{
+			"id": "crane_flat_wax",
+			"region": "crane_flat",
+			"title": "Tin of Ski Wax",
+			"text": "The last of the snow has melted out from under the firs and left a dented tin of green kick wax behind, dropped by a skier touring the meadow in winter.",
+			"rumor": "Skiers tour around Crane Flat all winter and drop things in the snow. Come spring, when it melts out under the trees, things turn up.",
+			"reward": {
+				"ski_wax_tin": 1.0
+			},
+			"seasons": [
+				"spring"
+			],
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				600.0,
+				536.0
+			]
+		},
+		{
+			"id": "wawona_insulator",
+			"region": "wawona",
+			"title": "Glass Insulator",
+			"text": "At the foot of an old pine, half sunk in needles, a blue-green glass insulator. The telephone line it held came down long ago; the nail scar is still on the trunk above you.",
+			"rumor": "An old telephone line ran through the woods around Wawona. Collectors say the glass insulators still turn up under the trees.",
+			"reward": {
+				"glass_insulator": 1.0
+			},
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				3248.0,
+				2352.0
+			]
+		},
+		{
+			"id": "mirror_lake_headlamp",
+			"region": "mirror_lake",
+			"title": "Light in the Brush",
+			"text": "A small light glowing low in the brush: a headlamp, still switched on, dropped on somebody's moonlight walk around the lake. You turn it off to save what's left of the battery.",
+			"rumor": "Somebody lost a headlamp walking around Mirror Lake in the dark. They say you can still see it shining at night, off the path.",
+			"reward": {
+				"lost_headlamp": 1.0
+			},
+			"hours": [
+				20.0,
+				5.0
+			],
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				1608.0,
+				704.0
+			]
+		},
+		{
+			"id": "tunnel_view_snacks",
+			"region": "tunnel_view",
+			"title": "Photographer's Snack Bag",
+			"text": "On a rock below the wall, a little snack bag, left by someone who set up a tripod here for sunset and packed out everything but this: two handfuls of dried apricots.",
+			"rumor": "Photographers wait for the light at Tunnel View all afternoon and leave things on the rocks below the wall.",
+			"reward": {
+				"dried_apricots": 2.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				488.0,
+				656.0
+			]
+		},
+		{
+			"id": "sentinel_jerky",
+			"region": "glacier_point",
+			"title": "Dropped Jerky",
+			"text": "In the shade of the firs, a resealable bag of beef jerky, still sealed. Fell out of a hip pocket on the way to Sentinel Dome, by the look of it.",
+			"rumor": "Hikers going up Sentinel Dome drop things in the trees off the trail.",
+			"reward": {
+				"beef_jerky": 2.0
+			},
+			"spot": {
+				"near": "woods",
+				"place": "Sentinel Dome"
+			},
+			"pos": [
+				896.0,
+				1528.0
+			]
+		},
+		{
+			"id": "lembert_booty_cam",
+			"region": "tuolumne_meadows",
+			"title": "Lembert Booty",
+			"text": "A cam left in a flake at the foot of Lembert Dome, its sling sun-faded to pink. Whoever placed it lowered off and couldn't reach it again. Booty.",
+			"rumor": "Some climber left a cam at the bottom of Lembert Dome. Tuolumne climbers say it's still there, along the rock off the trail.",
+			"reward": {
+				"cam": 1.0
+			},
+			"spot": {
+				"near": "rock",
+				"place": "Lembert Dome"
+			},
+			"pos": [
+				3832,
+				336
+			]
+		},
+		{
+			"id": "dog_lake_cobra",
+			"region": "tuolumne_meadows",
+			"title": "Snowbank Cobras",
+			"text": "Where the last snowbank melted in the trees, two cans of King Cobra, buried to keep cold and never dug up. They're still cold.",
+			"rumor": "Somebody buried two cans in a snowbank up toward Dog Lake to keep them cold, and left. When the snow's gone in summer they'll show.",
+			"reward": {
+				"king_cobra": 2.0
+			},
+			"seasons": [
+				"summer"
+			],
+			"spot": {
+				"near": "woods",
+				"place": "Dog Lake"
+			},
+			"pos": [
+				4160.0,
+				448.0
+			]
+		},
+		{
+			"id": "tenaya_quickdraw",
+			"region": "tenaya_lake",
+			"title": "Quickdraw on the Slab",
+			"text": "A quickdraw lying on the granite at the foot of the slabs, dropped from somewhere high. The gate still snaps shut.",
+			"rumor": "Somebody dropped a quickdraw off the domes above Tenaya Lake. It's down at the foot of the slabs somewhere, off the beach.",
+			"reward": {
+				"quickdraw": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				800,
+				736
+			]
+		},
+		{
+			"id": "happy_isles_trail_mix",
+			"region": "happy_isles",
+			"title": "Soggy Pack Pocket",
+			"text": "Caught in the roots at the river's edge, a mesh pack pocket torn off at the seam. Two bags of trail mix inside, sealed and dry.",
+			"rumor": "Somebody's pack pocket tore off by the river at Happy Isles. Folks say there was trail mix in it.",
+			"reward": {
+				"trail_mix": 2.0
+			},
+			"spot": {
+				"near": "water"
+			},
+			"pos": [
+				1624.0,
+				680.0
+			]
+		},
+		{
+			"id": "four_mile_apples",
+			"region": "four_mile_trailhead",
+			"title": "Water Stop",
+			"text": "Behind a tree off the path, somebody's cache for the walk down the Four Mile: an empty bottle and a bag of dried apples they never came back for.",
+			"rumor": "Hikers coming down the Four Mile Trail leave caches in the trees at the bottom and forget them.",
+			"reward": {
+				"dried_apples": 2.0
+			},
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				624.0,
+				536.0
+			]
+		},
+		{
+			"id": "big_oak_boletes",
+			"region": "big_oak_flat_junction",
+			"title": "Bolete Ring",
+			"text": "Under the firs, a ring of fat king boletes pushing up through the duff, more than you'd ever find in one place.",
+			"rumor": "In fall, after the first rain, the king boletes come up in rings under the firs off the Big Oak Flat Road.",
+			"reward": {
+				"king_bolete": 3.0
+			},
+			"seasons": [
+				"fall"
+			],
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				584.0,
+				568.0
+			]
+		},
+		{
+			"id": "curry_cooler_bag",
+			"region": "curry_village",
+			"title": "Forgotten Cooler Bag",
+			"text": "Behind the tent cabins, a soft cooler bag somebody set down while they packed the car and drove off without. A wedge of cheddar and two pilot bread, still good.",
+			"rumor": "People packing up their tent cabins at Curry Village leave things behind the rows.",
+			"reward": {
+				"cheddar_wedge": 1.0,
+				"pilot_bread": 2.0
+			},
+			"spot": {
+				"place": "Tent cabins"
+			},
+			"pos": [
+				760.0,
+				1056.0
+			]
+		},
+		{
+			"id": "stoneman_streamer",
+			"region": "ahwahnee_trail",
+			"title": "Fly in the Willows",
+			"text": "Snagged in a willow on the far bank, a Woolly Bugger, its marabou tail still fluffy. Somebody's back cast found the tree.",
+			"rumor": "Fly fishers lose flies in the willows along the Merced by Stoneman Meadow, on the far bank.",
+			"reward": {
+				"woolly_bugger": 1.0
+			},
+			"spot": {
+				"near": "water",
+				"place": "Far bank"
+			},
+			"pos": [
+				1608.0,
+				696.0
+			]
+		}
+	]
+}

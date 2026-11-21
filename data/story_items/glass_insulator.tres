@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/glass_insulator.png" id="1_icon"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_item"]
+
+[resource]
+script = ExtResource("2_item")
+id = "glass_insulator"
+display_name = "Glass Insulator"
+description = "A blue-green glass insulator from an old telephone line strung through the trees. The glass turns a little more purple each year it sits in the sun. Collectors prize them."
+icon = ExtResource("1_icon")
