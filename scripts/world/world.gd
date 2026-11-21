@@ -69,7 +69,7 @@ var seam: Seam
 ## the exit turned out not to meet the next map edge to edge.
 var _seams: Dictionary = {}
 var _busy := false
-## True while a transition plays out (see _reveal): background loading waits.
+## True while a transition plays out (see _reveal, _step_through, _journey).
 var _transitioning := false
 ## Opens the place left behind away going through a door.
 const DOOR_WIPE := preload("res://assets/shaders/door_wipe.gdshader")
@@ -190,12 +190,7 @@ func _process(delta: float) -> void:
 		_hand_camera_over()
 	if _curfew_pending and not _busy and not _dialogue_open():
 		sleep(true)
-	# Loading what's next in the background waits while a transition plays,
-	# so none of its long frames land in the middle of the wipe. Laying out
-	# the next area at a seam carries on: it is staged a step a frame, and
-	# the view across the edge should be there when the cover lifts.
-	if not _transitioning:
-		_pump_preload()
+	_pump_preload()
 	_update_seam()
 	_place_check -= delta
 	if _place_check <= 0.0:
