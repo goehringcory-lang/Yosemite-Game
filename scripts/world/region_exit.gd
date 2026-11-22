@@ -32,7 +32,12 @@ extends Area2D
 @export_range(0, 24) var close_hour := 24
 
 
+## A player physics reported in here who wasn't really (see touches).
+var _waiting: Node2D = null
+
+
 func _ready() -> void:
+	set_physics_process(false)
 	collision_layer = 0
 	collision_mask = 2 # player
 	monitorable = false
@@ -42,6 +47,40 @@ func _ready() -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if body is Player:
 		get_tree().call_group("world", "use_exit", self)
+
+
+## Physics said [param body] came in, but it isn't really here (see
+## touches): watch, and go once they really walk in.
+func watch(body: Node2D) -> void:
+	_waiting = body
+	set_physics_process(true)
+
+
+func _physics_process(_delta: float) -> void:
+	if not is_instance_valid(_waiting) or not overlaps_body(_waiting):
+		_waiting = null
+		set_physics_process(false)
+	elif touches(_waiting):
+		_waiting = null
+		set_physics_process(false)
+		get_tree().call_group("world", "use_exit", self)
+
+
+## Is [param player]'s body really in this exit now? Just after the player
+## arrives somewhere, physics can still report them overlapping where they
+## stood in the last place (an exit at that same spot, like the rooms' doors,
+## which all sit at the bottom middle), and the exit would fire at once (see
+## World.use_exit).
+func touches(player: Node2D) -> bool:
+	var body := player.get_node_or_null("Collision") as CollisionShape2D
+	if body == null or body.shape == null:
+		return true
+	for node in get_children():
+		var shape := node as CollisionShape2D
+		if shape and shape.shape and not shape.disabled \
+				and shape.shape.collide(shape.global_transform, body.shape, body.global_transform):
+			return true
+	return false
 
 
 func is_open_now() -> bool:
