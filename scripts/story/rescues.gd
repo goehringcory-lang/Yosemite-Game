@@ -124,6 +124,41 @@ const CALLS: Array[Dictionary] = [
 		"done": "Both Petes were lowered off the arches, and promised never to drop a rope again.",
 		"thanks": "Thank you for the lower off Royal Arches. We have bought a new rope and named it after you. -Pete and Pete Harmon",
 		"gift": {"beef_jerky": 1}},
+	{"id": "tenaya_lake_hypothermia", "title": "Chilled by Tenaya Lake", "who": "Maren Lind", "look": "visitor_backpacker",
+		"stages": ["search", "feed", "report"], "feed": 12, "seasons": [1, 2], "hub": "tuolumne_meadows",
+		"region": "tenaya_lake", "start": "east_beach", "near": "east_beach", "offset": Vector2(-320, 120),
+		"place": "Tenaya Lake East Beach",
+		"radio": "Hiker swam out at Tenaya Lake after an afternoon squall and wandered into the lodgepoles shivering. Follow her tracks west from East Beach with hot food.",
+		"found": ["That water looked so blue. It is basically liquid snow.", "My hands wouldn't open my pack. Thank you."],
+		"done": "Maren warmed up fast with hot rations, and a patrol car gave her a ride back to Tuolumne.",
+		"thanks": "To Camp 4 SAR: I have learned that 8,150 feet is not beach weather. Thank you for finding me! -Maren Lind",
+		"gift": {"beef_jerky": 2, "whitebark_pine_nuts": 2}},
+	{"id": "cathedral_peak_stranded", "title": "Benighted on Cathedral Peak", "who": "Owen Cho", "look": "visitor_shop_climber",
+		"stages": ["climb", "report"], "route": "cathedral_peak", "seasons": [1, 2], "hub": "tuolumne_meadows",
+		"region": "tuolumne_meadows", "place": "Cathedral Peak",
+		"radio": "Solo climber stuck below the summit block of Cathedral Peak after his rope jammed on rappel. Head up to Tuolumne, climb the southeast buttress, and get him down.",
+		"found": ["The knot wedged right behind a flake! Best view in the Sierra, worst place to spend the night."],
+		"done": "Owen touched down at the base of the spire grinning ear to ear, and promised to bring a partner next time.",
+		"thanks": "Thank you for coming all the way up to Cathedral Peak for me. Next round at Camp 4 is on me. -Owen Cho",
+		"gift": {"acorn_cake": 2, "king_cobra": 1}},
+	{"id": "wawona_grove_lost", "title": "Off trail in Mariposa Grove", "who": "Arthur Finch", "look": "visitor_tourist",
+		"stages": ["search", "feed", "report"], "feed": 10, "seasons": [0, 1, 2], "hub": "wawona",
+		"region": "wawona", "start": "mariposa_grove", "near": "mariposa_grove", "offset": Vector2(440, 220),
+		"place": "Mariposa Grove",
+		"radio": "Older visitor wandered off the Mariposa Grove loop looking for a quiet sequoia to sketch and missed the last stage back to Wawona Hotel. Follow his prints from the grove trailhead.",
+		"found": ["Every giant tree looks like the last one once the shadows get long.", "I didn't notice I'd missed lunch until my knees told me."],
+		"done": "Arthur ate half your trail food, finished his sketch, and walked right back to the Wawona Hotel porch.",
+		"thanks": "Thank you for tracking me through the big trees. I left plums and pudding at the board for you. -Arthur Finch",
+		"gift": {"sierra_plum": 2, "bread_pudding": 1}},
+	{"id": "crane_flat_snowbound", "title": "Snowbound at Crane Flat", "who": "Nora Delgado", "look": "visitor_camper",
+		"stages": ["search", "feed", "report"], "feed": 10, "seasons": [3],
+		"region": "crane_flat", "start": "arrival", "near": "meadow", "offset": Vector2(-180, -60),
+		"place": "Crane Flat",
+		"radio": "Cross-country skier overdue at Crane Flat Meadow as the snow picks up. Her ski tracks head north from the turnout. Take extra food before dark.",
+		"found": ["A binding snapped on the far side of the meadow and the drifts swallowed my tracks.", "I've never been so glad to see a yellow shirt."],
+		"done": "Nora warmed up on trail rations and caught a lift down Big Oak Flat Road with the plow crew.",
+		"thanks": "Thank you for breaking trail through the Crane Flat drifts for me. -Nora Delgado",
+		"gift": {"degnan_loaf": 1, "chocolate_bar": 2}},
 ]
 
 ## What Jo says as the radio calls come in, and when there's nothing on it.
@@ -142,7 +177,7 @@ const WELL_DONE := ["Nice work. Everybody's down, everybody's fine. That's the j
 ## When a call runs past nightfall.
 const WRAPPED_UP := "It's dark. The night team found %s by headlamp. Everyone's fine, and Jo says there's always another call."
 ## What Jo hands over for a rescue.
-const REWARD := {"trail_mix": 1}
+const REWARD := {"trail_mix": 2, "beef_jerky": 1}
 
 ## The call on the radio today, waiting to be taken ("" for none), and the
 ## day it came in.
@@ -227,6 +262,8 @@ func eligible() -> Array[Dictionary]:
 	var last: String = history[-1].id if not history.is_empty() else ""
 	for call: Dictionary in CALLS:
 		if call.id == FIRST_CALL or call.id == last or not GameClock.season in call.seasons:
+			continue
+		if call.has("hub") and not Park.is_hub_unlocked(call.hub):
 			continue
 		if call.has("route") and (wet or not QuestLog.has_climbed(call.route)):
 			continue
@@ -452,7 +489,10 @@ func _finish() -> String:
 	Perks.note(STAT)
 	rescued.emit(call)
 	changed.emit()
-	return "Rescue logged: %s. Jo hands you %s." % [call.title, ", ".join(got)]
+	var line := "Rescue logged: %s. Jo hands you %s." % [call.title, ", ".join(got)]
+	if count() == Backcountry.SAR_PACK_RESCUES:
+		line += " Jo issues you a Search-and-Rescue Pack: your bear canister now holds %d items overnight." % Backcountry.SAR_CANISTER_HOLDS
+	return line
 
 
 ## Jo's first quest starts the first call.

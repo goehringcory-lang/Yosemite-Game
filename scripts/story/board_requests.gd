@@ -91,6 +91,18 @@ const NOTES := [
 	{"id": "muir_pine_nuts", "giver": "john_muir", "item": "whitebark_pine_nuts", "count": 3, "seasons": [2], "hub": "tuolumne_meadows",
 		"text": "Whitebark pine nuts from timberline, if the nutcrackers have spared any. J.M.",
 		"thanks": "Mountain bread! I have lived a week on less, and been the happier for it.", "reward": {"dry_crusts": 2}},
+	{"id": "kochakji_bilberries", "giver": "michael_kochakji", "item": "sierra_bilberry", "count": 4, "seasons": [1, 2], "hub": "tuolumne_meadows",
+		"text": "Tuolumne Post Office: fresh bilberries wanted for the hikers waiting on General Delivery boxes.",
+		"thanks": "You just made three thru-hikers' whole week. Take these from the counter.", "reward": {"trail_mix": 2, "chocolate_bar": 1}},
+	{"id": "kochakji_brook_trout", "giver": "michael_kochakji", "item": "brook_trout", "count": 2, "seasons": [1, 2], "hub": "tuolumne_meadows",
+		"text": "Anyone fishing Tenaya Lake or the Tuolumne: two brook trout wanted for the store supper.",
+		"thanks": "High-country trout! Nothing tastes finer after a long day sorting resupply boxes.", "reward": {"beef_jerky": 2, "dried_apricots": 2}},
+	{"id": "clark_wawona_plums", "giver": "galen_clark", "item": "sierra_plum", "count": 4, "seasons": [1, 2], "hub": "wawona",
+		"text": "Wawona board: wild plums from the South Fork thickets wanted for the cabin pantry. G.C.",
+		"thanks": "Those bring back my old station days at Wawona. Much obliged, friend.", "reward": {"degnan_loaf": 1, "cheddar_wedge": 2}},
+	{"id": "hodges_wawona_boletes", "giver": "clare_hodges", "item": "king_bolete", "count": 2, "seasons": [2], "hub": "wawona",
+		"text": "South Fork patrol: two king boletes from the Wawona pines wanted for the ranger stove.",
+		"thanks": "Solid caps, not a worm in them. Here's something from the station rations.", "reward": {"bread_pudding": 1, "trail_mix": 2}},
 ]
 
 ## Note ids on the board, waiting to be read.

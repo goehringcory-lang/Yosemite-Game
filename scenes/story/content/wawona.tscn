@@ -6,6 +6,14 @@
 [ext_resource type="PackedScene" path="res://scenes/story/pickup.tscn" id="4_r"]
 [ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="fw_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/wawona/road_bridge.png" id="rb_tex"]
+[ext_resource type="Script" path="res://scripts/objects/bulletin_board.gd" id="board_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_board.png" id="board_tex"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_board_col"]
+size = Vector2(72, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_board_hit"]
+size = Vector2(84, 32)
 
 [node name="WawonaStory" type="Node2D"]
 
@@ -38,3 +46,27 @@ position = Vector2(1260, 904)
 texture = ExtResource("rb_tex")
 centered = false
 offset = Vector2(0, -144)
+
+[node name="WawonaBoard" type="StaticBody2D" parent="."]
+position = Vector2(600, 1440)
+collision_mask = 0
+script = ExtResource("board_script")
+title = "Wawona Bulletin Board"
+text = "Stage schedules for the Mariposa Grove, notices from the Yosemite History Center, South Fork fishing notes, and local requests from the hotel porch."
+
+[node name="Sprite" type="Sprite2D" parent="WawonaBoard"]
+texture = ExtResource("board_tex")
+offset = Vector2(0, -50)
+
+[node name="Collision" type="CollisionShape2D" parent="WawonaBoard"]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_board_col")
+
+[node name="Hitbox" type="Area2D" parent="WawonaBoard"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="WawonaBoard/Hitbox"]
+position = Vector2(0, -16)
+shape = SubResource("RectangleShape2D_board_hit")

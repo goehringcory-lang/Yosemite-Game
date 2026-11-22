@@ -378,6 +378,70 @@
 				1352
 			]
 		},
+		"tuolumne_meadows": {
+			"arrival@traveler_thru_hiker|soda_springs@traveler_thru_hiker": [
+				1248,
+				1636,
+				1420,
+				1564,
+				1604,
+				1388,
+				1636,
+				1388,
+				1812,
+				1244,
+				2028,
+				1036,
+				2092,
+				668,
+				2088,
+				664
+			],
+			"soda_springs@traveler_thru_hiker|tuolumne_lodge@traveler_thru_hiker": [
+				2088,
+				664,
+				2068,
+				908,
+				2068,
+				1012,
+				2316,
+				1132,
+				2540,
+				1172,
+				2940,
+				1356,
+				2980,
+				1388,
+				3476,
+				1596,
+				3532,
+				1644,
+				3820,
+				1740,
+				4068,
+				1868,
+				4064,
+				1868
+			],
+			"tuolumne_lodge@traveler_thru_hiker|cathedral_lakes_trailhead@traveler_thru_hiker": [
+				4064,
+				1868,
+				3412,
+				1812,
+				2908,
+				1804,
+				2380,
+				1788,
+				2356,
+				1780,
+				1252,
+				1700,
+				1060,
+				1612,
+				1056,
+				1608
+			]
+		},
 		"upper_pines": {
 			"campground|exit:ToHappyIsles": [
 				976,
@@ -402,6 +466,44 @@
 				564,
 				976,
 				560
+			]
+		},
+		"wawona": {
+			"history_center@traveler_wawona_walker|mariposa_grove@traveler_wawona_walker": [
+				2380,
+				536,
+				2364,
+				948,
+				2356,
+				1516,
+				2212,
+				2100,
+				2020,
+				2252,
+				2016,
+				2248
+			],
+			"mariposa_grove@traveler_wawona_walker|wawona_hotel@traveler_wawona_walker": [
+				2016,
+				2248,
+				828,
+				1468,
+				772,
+				1444,
+				768,
+				1440
+			],
+			"wawona_hotel@traveler_wawona_walker|history_center@traveler_wawona_walker": [
+				768,
+				1440,
+				1756,
+				916,
+				1932,
+				916,
+				2380,
+				540,
+				2380,
+				536
 			]
 		},
 		"yosemite_village": {
@@ -596,10 +698,42 @@
 				1352
 			]
 		},
+		"tuolumne_meadows": {
+			"arrival@traveler_thru_hiker": [
+				1248,
+				1636
+			],
+			"cathedral_lakes_trailhead@traveler_thru_hiker": [
+				1056,
+				1608
+			],
+			"soda_springs@traveler_thru_hiker": [
+				2088,
+				664
+			],
+			"tuolumne_lodge@traveler_thru_hiker": [
+				4064,
+				1868
+			]
+		},
 		"upper_pines": {
 			"campground": [
 				976,
 				560
+			]
+		},
+		"wawona": {
+			"history_center@traveler_wawona_walker": [
+				2380,
+				536
+			],
+			"mariposa_grove@traveler_wawona_walker": [
+				2016,
+				2248
+			],
+			"wawona_hotel@traveler_wawona_walker": [
+				768,
+				1440
 			]
 		},
 		"yosemite_village": {

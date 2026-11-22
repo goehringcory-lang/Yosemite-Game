@@ -9,6 +9,8 @@ extends StaticBody2D
 
 ## The spot (a Marker2D in the region) you wake up on.
 @export var wake_spot := "camp"
+## Place name shown in the camp prompt.
+@export var place_name := "Little Yosemite Valley"
 
 const STONE := Color("8a8478")
 const STONE_DARK := Color("4e4a44")
@@ -36,9 +38,9 @@ func interact(player: Player) -> void:
 		return
 	player.can_act = false
 	var box := DialogueBox.open(player)
-	var note := "Your tent, pitched in Little Yosemite Valley. Sleep out here tonight? You'll wake up in camp."
+	var note := "Your tent, pitched at %s. Sleep out here tonight? You'll wake up in camp." % place_name
 	if Backcountry.has_canister():
-		note += " Your food goes in the bear canister (it holds %d things to eat)." % Backcountry.CANISTER_HOLDS
+		note += " Your food goes in the bear canister (it holds %d things to eat)." % Backcountry.canister_capacity()
 	var choice := await box.choose(note, ["Sleep", "Not yet"])
 	box.close()
 	player.can_act = true

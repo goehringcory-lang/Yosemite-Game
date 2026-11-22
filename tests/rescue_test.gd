@@ -76,7 +76,7 @@ func test_data() -> void:
 	check(mateo != null and mateo.staff and mateo in QuestLog.STAFF and mateo.sprite_sheet != null and CharacterSheet.has_poses(mateo.sprite_sheet), "Mateo Reyes is invented staff with every pose")
 	check(Portraits.for_speaker("Mateo Reyes") != null and Friendship.LOVES.has(MATEO) and GuardianMirror.GATHERING.any(func(e: Array) -> bool: return e[0] == MATEO), "with a portrait, favorite gifts and a line in the cave")
 	check(first != null and first.giver == JO and Rescues.JOIN_QUEST in first.requires and first.steps[0].ability == Rescues.FIRST_DONE, "Jo's first quest waits on your first rescue")
-	check(Rescues.CALLS.size() >= 6 and Rescues.CALLS.size() <= 8, "six to eight kinds of call (%d)" % Rescues.CALLS.size())
+	check(Rescues.CALLS.size() >= 6 and Rescues.CALLS.size() <= 14, "six to fourteen kinds of call (%d)" % Rescues.CALLS.size())
 	var stages := {}
 	var bad: Array[String] = []
 	for call: Dictionary in Rescues.CALLS:

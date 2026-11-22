@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="1_door"]
+
+[node name="LittleYosemiteValleyStory" type="Node2D"]
+
+[node name="SunriseTrailUp" parent="." instance=ExtResource("1_door")]
+position = Vector2(1856, 416)
+label = "Sunrise Trail, over Clouds Rest shoulder to Tenaya Lake"
+target_region = "tenaya_lake"
+target_spawn = "sunrise_trailhead"
+minutes = 180
+closure = "tioga_road"

@@ -371,6 +371,16 @@ const LOOKS := {
 		"hat_band": "4a6a9a", "top": "8aa0c8", "top_style": "blouse", "top2": "e8e4d8", "bottom_style": "skirt",
 		"bottom": "3a4a6a", "shoes": "3a2a20", "carry": ["parasol"],
 	},
+	"traveler_thru_hiker": {
+		"skin": SKIN_TAN, "hair": "5a3a22", "hair_style": "short", "hat": "cap", "hat_color": "3a6a5a",
+		"top": "c86a3a", "top_style": "shirt", "top2": "8a4624", "bottom": "5a5244", "bottom_style": "knickers",
+		"socks": "d8cfa8", "shoes": "4a3525", "pack": "pack", "pack_color": "3c5a7a", "carry": ["stick"],
+	},
+	"traveler_wawona_walker": {
+		"skin": SKIN_LIGHT, "hair": "6a523c", "hair_style": "short", "hat": "wide", "hat_color": "8a7254",
+		"hat_band": "4a6a4a", "top": "6a8058", "top_style": "jacket", "top2": "4a5e3c", "bottom": "4e463a",
+		"belt": "3a2a1a", "shoes": "4a3222", "carry": ["map"],
+	},
 }
 
 ## Icons in assets/sprites/story_items.png, left to right.

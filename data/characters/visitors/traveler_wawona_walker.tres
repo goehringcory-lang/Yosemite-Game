@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/traveler_wawona_walker.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "traveler_wawona_walker"
+display_name = "Wawona naturalist"
+years = "1920s"
+bio = "A seasonal trail walker staying by the Wawona Hotel who makes a daily loop across the covered bridge to the Mariposa Grove. Not a historical figure."
+idle_lines = PackedStringArray("Wawona moves slower than the Valley floor. You hear the river all morning.", "Every sequoia in the grove has weathered more fires than I've had birthdays.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Wawona"
+visitor = true
