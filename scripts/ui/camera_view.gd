@@ -282,7 +282,8 @@ func _lens_turn(event: InputEvent) -> int:
 
 ## Changes to the next film.
 func next_film() -> void:
-	Photos.film = Photos.FILMS[(Photos.FILMS.find(Photos.film) + 1) % Photos.FILMS.size()]
+	var avail := Photos.available_films()
+	Photos.film = avail[(avail.find(Photos.film) + 1) % avail.size()]
 	Sound.play("ui_move")
 	_refresh_status()
 	_refresh_hints()

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/francois_matthes.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "francois_matthes"
+display_name = "François Matthes"
+years = "1874–1948"
+affiliation = "U.S. Geological Survey"
+bio = "Dutch-born topographer and geologist who mapped Yosemite Valley for the U.S. Geological Survey in 1905–1906 and spent decades deciphering how rivers and at least three separate ice ages carved its granite walls."
+legacy = "Authored the landmark 1930 USGS Professional Paper 160, Geologic History of the Yosemite Valley, reconciling John Muir's glacial theory with river erosion."
+legacy_year = 1930
+idle_lines = PackedStringArray("Look at the walls, not the floor. Every bench and joint tells you how high the ice stood.", "John Muir had the eyes of a poet and the legs of a goat. He was mostly right about the glaciers, too.", "Give me a plane table, an alidade, and a clear rim morning, and I am a happy man.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.541, 0.494, 0.361, 1)
+home = "Geology Hut, Glacier Point"
+needs_tribal_review = false
+sources = "Documented: François E. Matthes, Geologic History of the Yosemite Valley, USGS Professional Paper 160 (1930); Fritiof Fryxell, François Matthes and the Marks of Time (Sierra Club, 1962)."

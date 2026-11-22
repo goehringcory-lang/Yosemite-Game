@@ -109,6 +109,13 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/clark_grove_fire.tres"),
 	preload("res://data/quests/hodges_bear_boxes.tres"),
 	preload("res://data/quests/clark_guardian_year.tres"),
+	# The Outer Keepers: seasonal and natural-event stories in Wawona, Glacier Point, and El Portal.
+	preload("res://data/quests/hill_painters_light.tres"),
+	preload("res://data/quests/hill_last_canvas.tres"),
+	preload("res://data/quests/matthes_reading_ice.tres"),
+	preload("res://data/quests/matthes_glacial_erratic.tres"),
+	preload("res://data/quests/bellamy_first_bloom.tres"),
+	preload("res://data/quests/bellamy_winter_train.tres"),
 ]
 
 const CHARACTERS: Array[CharacterData] = [
@@ -134,6 +141,8 @@ const CHARACTERS: Array[CharacterData] = [
 	preload("res://data/characters/beverly_johnson.tres"),
 	preload("res://data/characters/john_muir.tres"),
 	preload("res://data/characters/carrie_bethel.tres"),
+	preload("res://data/characters/thomas_hill.tres"),
+	preload("res://data/characters/francois_matthes.tres"),
 ]
 
 ## Invented staff (CharacterData.staff): the Mountain Shop's two, the
@@ -151,6 +160,7 @@ const STAFF: Array[CharacterData] = [
 	preload("res://data/characters/staff/jo_tolliver.tres"),
 	preload("res://data/characters/staff/mateo_reyes.tres"),
 	preload("res://data/characters/staff/michael_kochakji.tres"),
+	preload("res://data/characters/staff/arthur_bellamy.tres"),
 ]
 
 ## People met once, on one quest (a "talk" step's target), like the lost Pacific

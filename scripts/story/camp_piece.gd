@@ -44,6 +44,7 @@ const FOOTPRINT := {
 	"guardian_sign": Vector2(10, 6), "lantern": Vector2(6, 6),
 	"field_table": Vector2(34, 10), "string_lights": Vector2(0, 0),
 	"workbench": Vector2(38, 10), "hearth_kettle": Vector2(12, 6),
+	"guardian_sign": Vector2(10, 6), "lantern": Vector2(6, 6), "hill_study": Vector2(14, 6),
 }
 
 
@@ -487,6 +488,7 @@ func _draw() -> void:
 		"string_lights": _draw_string_lights()
 		"workbench": _draw_workbench()
 		"hearth_kettle": _draw_hearth_kettle()
+		"hill_study": _draw_hill_study()
 
 
 func _shadow(width: float, height := 6.0) -> void:
@@ -636,6 +638,26 @@ func _draw_print() -> void:
 	draw_rect(Rect2(-6, -23, 12, 4), Color("5a5a5a"))
 	draw_colored_polygon(PackedVector2Array([Vector2(-4, -13), Vector2(-3, -21), Vector2(1, -22), Vector2(4, -18), Vector2(3, -13)]), Color("a8a8a8"))
 	draw_line(Vector2(1, -22), Vector2(1, -14), Color("d8d8d8"), 1.0)
+
+
+func _draw_hill_study() -> void:
+	_shadow(16, 4)
+	# painter's easel legs
+	draw_line(Vector2(-6, 0), Vector2(0, -26), INK, 2.0)
+	draw_line(Vector2(6, 0), Vector2(0, -26), INK, 2.0)
+	draw_line(Vector2(-6, 0), Vector2(0, -26), WOOD_HI, 1.0)
+	draw_line(Vector2(6, 0), Vector2(0, -26), WOOD, 1.0)
+	# gilt frame and sunset canyon oil study
+	draw_rect(Rect2(-9, -26, 18, 16).grow(1), INK)
+	draw_rect(Rect2(-9, -26, 18, 16), Color("c89b3c"))
+	draw_rect(Rect2(-8, -25, 16, 2), Color("ebd078"))
+	draw_rect(Rect2(-7, -24, 14, 12), Color("f2b866"))
+	draw_rect(Rect2(-7, -24, 14, 5), Color("e07b54"))
+	# canyon walls and golden Bridalveil mist
+	draw_colored_polygon(PackedVector2Array([Vector2(-7, -12), Vector2(-7, -21), Vector2(-2, -19), Vector2(-1, -12)]), Color("52433a"))
+	draw_colored_polygon(PackedVector2Array([Vector2(1, -12), Vector2(3, -20), Vector2(7, -21), Vector2(7, -12)]), Color("6b5446"))
+	draw_line(Vector2(3, -19), Vector2(3, -13), Color("f7e4b5"), 1.0)
+	draw_rect(Rect2(-7, -14, 14, 2), Color("3c5434"))
 
 
 func _draw_hammock() -> void:

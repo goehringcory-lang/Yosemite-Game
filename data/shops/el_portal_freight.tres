@@ -1,0 +1,66 @@
+[gd_resource type="Resource" script_class="ShopData" format=3]
+
+[ext_resource type="Script" path="res://scripts/shop/shop_offer.gd" id="1_offer"]
+[ext_resource type="Script" path="res://scripts/shop/shop_data.gd" id="2_shop"]
+
+[sub_resource type="Resource" id="Resource_loaf"]
+script = ExtResource("1_offer")
+kind = "item"
+id = "degnan_loaf"
+price = 22
+requires_quest = "bellamy_first_bloom"
+
+[sub_resource type="Resource" id="Resource_apple"]
+script = ExtResource("1_offer")
+kind = "item"
+id = "lamon_apple"
+price = 16
+requires_quest = "bellamy_first_bloom"
+
+[sub_resource type="Resource" id="Resource_cobra"]
+script = ExtResource("1_offer")
+kind = "item"
+id = "king_cobra"
+price = 18
+once_a_day = true
+requires_quest = "bellamy_first_bloom"
+
+[sub_resource type="Resource" id="Resource_draw"]
+script = ExtResource("1_offer")
+kind = "gear"
+id = "quickdraw"
+price = 32
+requires = {"harness": 1}
+max_owned = 10
+requires_quest = "bellamy_first_bloom"
+
+[sub_resource type="Resource" id="Resource_pudding"]
+script = ExtResource("1_offer")
+kind = "item"
+id = "bread_pudding"
+price = 28
+requires_quest = "bellamy_winter_train"
+
+[sub_resource type="Resource" id="Resource_cake"]
+script = ExtResource("1_offer")
+kind = "item"
+id = "acorn_cake"
+price = 24
+requires_quest = "bellamy_winter_train"
+
+[sub_resource type="Resource" id="Resource_cam"]
+script = ExtResource("1_offer")
+kind = "gear"
+id = "cam"
+price = 52
+requires = {"rope": 1}
+max_owned = 8
+requires_quest = "bellamy_winter_train"
+
+[resource]
+script = ExtResource("2_shop")
+keeper = "Arthur Bellamy"
+tastes = "store"
+greeting = "Express freight off the morning train! Station rate for a friend of the canyon."
+nothing_yet = "No surplus freight on the manifest today. Check back after the next canyon run."
+offers = Array[ExtResource("1_offer")]([SubResource("Resource_loaf"), SubResource("Resource_apple"), SubResource("Resource_cobra"), SubResource("Resource_draw"), SubResource("Resource_pudding"), SubResource("Resource_cake"), SubResource("Resource_cam")])

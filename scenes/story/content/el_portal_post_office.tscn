@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_npc"]
+[ext_resource type="Resource" path="res://data/characters/staff/arthur_bellamy.tres" id="2_bellamy"]
+[ext_resource type="Resource" path="res://data/shops/el_portal_freight.tres" id="3_shop"]
+
+[node name="ElPortalPostOfficeStory" type="Node2D"]
+
+[node name="ArthurBellamy" parent="." instance=ExtResource("1_npc")]
+character = ExtResource("2_bellamy")
+spot = "door"
+offset = Vector2(-56, -132)
+wander_radius = 20
+shop = ExtResource("3_shop")

@@ -490,6 +490,8 @@ func pump_change(hold: Dictionary) -> int:
 		change += PUMP_CRUX
 	if boosts.has("steady") and change > 0:
 		change -= 1
+	if Perks.has("granite_reader") and change > 0:
+		change -= 1
 	return change
 
 
@@ -765,6 +767,7 @@ func crux_window() -> float:
 	if route.top_rope:
 		window += 0.12
 	window += Perks.bonus("steady_breath")
+	window += Perks.bonus("granite_reader")
 	if boosts.has("keen"):
 		window += KEEN_WINDOW
 	window += CRUX_MERCY_WINDOW * _crux_mercy()

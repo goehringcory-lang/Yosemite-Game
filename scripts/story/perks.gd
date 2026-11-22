@@ -135,6 +135,11 @@ const PERKS: Array[Dictionary] = [
 		"how": "See 5 unscripted happenings through around the park.",
 		"effect": "Earns a wearable Trail Headlamp that lights dark paths at night and lets you set out on trips an hour later.",
 		"flavor": "Help enough strangers on Yosemite's roads and trails, and someone always hands you a spare lamp for the walk home."},
+	{"id": "granite_reader", "name": "Granite Reader", "amount": 0.04,
+		"unlock": {"quest": "matthes_glacial_erratic"},
+		"how": "Study granite exfoliation and joints with François Matthes at Glacier Point.",
+		"effect": "Crux timing windows are wider, and steep holds build less forearm pump.",
+		"flavor": "François Matthes spent decades mapping Yosemite's exfoliation shells and joint fractures; once you see how the granite split, every hold makes sense."},
 ]
 
 ## How long the HUD must be free before a "New perk" message shows, so it

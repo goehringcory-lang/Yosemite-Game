@@ -898,6 +898,114 @@ const SCENES := {
 			"saved": "Hiker box had a good week. I put these aside with your name on them.",
 		},
 	},
+	"thomas_hill": {
+		3: {
+			"lines": [
+				"People think an oil painter sits still and waits for the valley to pose. Not Yosemite. The light moves faster than my brush ever could.",
+				"So I paint the cliff first while the shadow is long, and I catch the mist in three strokes before the wind carries it up the canyon.",
+				"You have the same eye, you know. You stop at the railing when everybody else has already walked back to their wagon.",
+			],
+			"ask": "What do you look at first in a new place?",
+			"options": ["The light on the rock", "The water and mist", "The people standing there"],
+			"replies": [
+				"Ha! Then you're half a painter already. Granite is just a mirror for the sky.",
+				"The hardest thing in the Sierra to get onto canvas. Every drop moves.",
+				"A landscape without someone to wonder at it is only half a picture. Well answered.",
+			],
+			"end": "Here, take a cup of cider from the studio shelf. Good for cold fingers on a sketching morning.",
+			"gift": {"manzanita_cider": 1},
+		},
+		5: {
+			"lines": [
+				"I have painted Bridalveil Fall more times than I care to count. Critics in San Francisco ask why I do not find a fresh subject.",
+				"I tell them the fall is never the same twice. Spring snowmelt, autumn smoke, winter ice — a man could spend forty years at one railing and still miss a morning.",
+				"When I am gone, the studio will be quiet. I am glad someone else is watching the light turn gold down the canyon.",
+			],
+			"ask": "Will you keep looking once the register is full?",
+			"options": ["Every season", "Whenever the light turns", "I'll bring a camera"],
+			"replies": [
+				"Good. Spring, summer, fall, winter — the canyon pays you back for every one.",
+				"That is the whole secret of Wawona. Five minutes before sunset, drop whatever you're holding.",
+				"Ha! Tell young Adams his box is clever, but it still needs a little gold in the glaze.",
+			],
+			"end": "I'll keep something warm for you by the studio stove now and then. For a fellow watcher of the light.",
+			"gift": {"elderberry_sauce": 1},
+			"saves": ["manzanita_cider", "elderberry_sauce"],
+			"saved": "Left this by the studio stove for you. Take it before the evening chill sets in.",
+		},
+	},
+	"francois_matthes": {
+		3: {
+			"lines": [
+				"When the Survey sent me here in 1905, they only wanted a contour map. Draw the lines, pack the plane table, go home.",
+				"Instead I looked at the side valleys hanging two thousand feet above the Merced and realized the map was trying to tell a story.",
+				"Rivers cut the first notch, yes, and then the ice came down like a giant carpenter's plane. Once you see the tool marks, you can't stop reading them.",
+			],
+			"ask": "What do you see when you look across from Glacier Point?",
+			"options": ["The path of the ice", "A thousand climbs", "Home"],
+			"replies": [
+				"Precisely! Look at the polished shoulder on Half Dome — the ice reached nearly that high.",
+				"Ha! Well, every crack you jam a hand into is a joint the granite chose millions of years ago.",
+				"A fine answer. Geology is only the very long story of how a home got built.",
+			],
+			"end": "Here, cheese from my survey pack. You can't read a canyon on an empty stomach.",
+			"gift": {"cheddar_wedge": 1},
+		},
+		5: {
+			"lines": [
+				"Muir saw the glaciers with his heart before any geologist believed him. Whitney laughed at him, and Whitney was wrong.",
+				"My job was the slow part: measuring erratics, pacing moraines, checking every elevation twice so nobody could laugh again.",
+				"You walk the park the same way — curious enough to wonder, patient enough to look twice. That is the best kind of science.",
+			],
+			"ask": "What still puzzles you about these mountains?",
+			"options": ["How much time it took", "Why the domes peel", "What comes next"],
+			"replies": [
+				"Millions of years, and we only get a single season at a time to notice. It keeps a person humble.",
+				"Exfoliation! Take the weight off granite and it breathes outward in great curved shells. Like Royal Arches.",
+				"More frost, more water, more rockfall. The Sierra is not finished yet — not by a long way.",
+			],
+			"end": "I'll set aside some trail rations at the hut for you now and then. Survey issue, for a colleague.",
+			"gift": {"yerba_buena_tea": 2},
+			"saves": ["cheddar_wedge", "yerba_buena_tea", "dried_apricots"],
+			"saved": "Survey rations from the hut, set aside for a colleague.",
+		},
+	},
+	"arthur_bellamy": {
+		3: {
+			"lines": [
+				"Folks rush right past El Portal with their eyes already up on El Capitan. I don't blame them — the canyon opens like a curtain just past the arch.",
+				"Still, somebody has to sign for the flour, grease the handcart, and tell the engineer when the bridge timbers are iced over.",
+				"Every loaf of bread and coil of rope in that valley passed over my platform first. Makes a station agent proud.",
+			],
+			"ask": "What's the best thing that ever came off the train?",
+			"options": ["Winter flour", "Mail from home", "Fresh climbers"],
+			"replies": [
+				"Mrs. Degnan would agree with you! When the snow's deep, a sack of flour is worth more than gold.",
+				"Nothing beats watching somebody tear open a letter right there on the planks.",
+				"Ha! They step off looking up at the cliffs and nearly trip over their own rucksacks. Every single time.",
+			],
+			"end": "Here — pilot bread from the express crate. Keeps forever, tastes best with company.",
+			"gift": {"pilot_bread": 3},
+		},
+		5: {
+			"lines": [
+				"My wife says I should retire down to Merced where the winter canyon doesn't freeze the switch locks solid.",
+				"Maybe one day. But then spring comes, the redbud lights up the riverbanks, and the first train whistles through the gorge, and I forget all about retiring.",
+				"Having you stop by the platform in good weather and foul makes the canyon feel half as steep. I mean that.",
+			],
+			"ask": "What keeps you coming back down to the station?",
+			"options": ["The redbud in spring", "Good conversation", "The express shelf"],
+			"replies": [
+				"Best show in the lower canyon, and half the park drives right past it.",
+				"Well, the kettle's always warm behind the counter whenever you've got five minutes.",
+				"Ha! An honest customer. Don't worry, I'll keep the good stuff on the bottom shelf for you.",
+			],
+			"end": "From now on I'll tuck an extra packet behind the freight ledger for you now and then. Station regular's perk.",
+			"gift": {"chocolate_bar": 1},
+			"saves": ["pilot_bread", "chocolate_bar", "beef_jerky"],
+			"saved": "Tucked this behind the freight ledger for you. Station regular's share.",
+		},
+	},
 }
 
 

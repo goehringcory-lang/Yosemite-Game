@@ -80,7 +80,10 @@ const PAGES: Array[Dictionary] = [
 	{"quest": "muir_cathedral", "by": "John Muir",
 		"text": "Cathedral Peak, 1869. This, I may say, is the first time I have been at church in California."},
 	{"quest": "muir_glacier", "by": "John Muir",
-		"text": "Glaciers made this valley. I didn't always see the people who lived here, and they saw a great deal I missed."},
+		"text": "Glaciers made this valley. I didn't always see the people who lived here, and they saw a great deal I missed.",
+		"notes": [
+			{"quest": "matthes_reading_ice", "text": "In the margin, in François Matthes's neat surveyor's hand: Three ice ages, Mr. Muir—and the Merced River cutting deep between them. Your boots read the granite better than the professors did."},
+		]},
 	{"quest": "bethel_trade", "by": "Carrie Bethel",
 		"text": "The valley was never cut off. People came and went over the passes long before any road."},
 	# Side stories for the seasons, the hours, and the hubs past the Valley.
@@ -97,6 +100,17 @@ const PAGES: Array[Dictionary] = [
 		"text": "Winter: the stage roads close, but the railroad runs. The flour comes up the canyon to El Portal."},
 	{"quest": "muir_soda_springs", "by": "John Muir",
 		"text": "Soda Springs, 1889: a campfire with Robert Underwood Johnson. He asked why this country wasn't a park. In 1890 it was."},
+	{"quest": "hill_painters_light", "by": "Thomas Hill",
+		"text": "Wawona Studio, 1886: Bridalveil Fall in spring mist takes the warm afternoon sun like spun gold. Paint what the air is doing, and the cliffs paint themselves.",
+		"notes": [
+			{"quest": "hill_painters_light", "text": "Below, from Ansel Adams: Silver gelatin needs no paint, Mr. Hill—though I confess I mixed a warm filter just to see what you saw."},
+		]},
+	{"quest": "hill_last_canvas", "by": "Thomas Hill",
+		"text": "A clearing storm at Tunnel View: cold slate cloud above, warm granite below, and ten minutes before the sun goes. Forty years of Yosemite, and I am still hurrying to finish the glaze."},
+	{"quest": "matthes_reading_ice", "by": "François Matthes",
+		"text": "Glacier Point, 1930: The valley is neither cataclysm nor ice alone. Three times glaciers filled this trough nearly to the rim, widening the river's canyon into a cathedral of sheer granite."},
+	{"quest": "matthes_glacial_erratic", "by": "François Matthes",
+		"text": "Exfoliation shells and vertical joints: Half Dome and the Apron peel like giant granite onions as the load above them erodes away. Read the joints, and the rock tells you where to climb."},
 	# The press book: what the naturalists and rangers added along the way.
 	{"quest": "enid_press", "by": "Enid Michael",
 		"text": "A plant press, and a stack of old sheets labeled 'Collected for the Guardian of Yosemite.' All of them bare. Take one sprig, never the plant."},
@@ -200,6 +214,10 @@ const HISTORY := {
 	"curry_summer_firefall": "Real: Camp Curry celebrated the Fourth of July with outdoor suppers and the nightly Firefall of red-fir bark embers pushed off Glacier Point until 1968, and Sierra summer afternoons regularly build cumulus storms over the high country. Dramatized: the cobbler errand and McCauley tending the coals alongside Jennie Curry.",
 	"lamon_fall_meadow": "Real: Mirror Lake fills with spring snowmelt from Tenaya Creek and dries back into a sandy meadow by fall, and since 2004 volunteers have gathered each autumn for the Yosemite Facelift park cleanup. Dramatized: James Lamon, who died in 1875, cooking for the Facelift crew and building the workbench with Wren.",
 	"ansel_winter_horsetail": "Real: the Ahwahnee's Bracebridge Dinner has been staged at Christmas since 1927, directed for decades by Ansel Adams, and on clear evenings in mid-to-late February the setting sun lights Horsetail Fall on El Capitan's east shoulder like glowing embers (first widely photographed by Galen Rowell in 1973). Dramatized: the wassail errand and hearth kettle.",
+	"hill_painters_light": "Documented: Thomas Hill (1829–1908) built his Wawona studio in 1886 and painted Yosemite for decades, returning again and again to Bridalveil Fall and the view down the canyon. Dramatized: his errand for spring mist, and the golden warmth filter for your camera.",
+	"hill_last_canvas": "Documented: Hill kept painting at Wawona into his final years and left hundreds of Yosemite oils and field studies; his studio still stands in the Pioneer Yosemite History Center. Dramatized: the oil study he gives you for camp.",
+	"matthes_reading_ice": "Documented: François Matthes (1874–1948) mapped Yosemite Valley for the U.S. Geological Survey in 1905–1906 and published Geologic History of the Yosemite Valley (Professional Paper 160) in 1930, showing that both rivers and glaciers carved the valley. Dramatized: his hut at Glacier Point and sending you to sketch the valley walls.",
+	"matthes_glacial_erratic": "Documented: Matthes traced glacial erratics perched high on Yosemite's granite domes and ridges to prove how deep the Pleistocene ice had stood. Dramatized: his rock-reading lessons and your granite-reader skill.",
 }
 
 
