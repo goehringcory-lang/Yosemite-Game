@@ -533,6 +533,12 @@ func _check_central_hub(world: Node) -> void:
 	var before := GameClock.minutes
 	stop.ride(stop.destinations().filter(func(d: Dictionary) -> bool: return d.name == "Happy Isles")[0])
 	await get_tree().create_timer(2.5).timeout
+	# Laying Happy Isles out the first time can outlast the timer; wait for
+	# the ride to finish rather than for a fixed time.
+	for i in 600:
+		if not world._busy:
+			break
+		await get_tree().process_frame
 	check(world.region.region_id == "happy_isles" and world.player.position == world.region.get_spawn("shuttle").position,
 		"the shuttle drops you at Happy Isles")
 	check(GameClock.minutes - before == ShuttleStop.RIDE_MINUTES, "the shuttle ride takes %d minutes" % ShuttleStop.RIDE_MINUTES)

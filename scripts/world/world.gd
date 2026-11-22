@@ -78,24 +78,18 @@ var seam: Seam
 ## the exit turned out not to meet the next map edge to edge.
 var _seams: Dictionary = {}
 var _busy := false
-## Seconds the place left behind takes to open away going through a door.
-const DOOR_TIME := 0.45
+## True while a transition plays out (see _reveal, _step_through, _journey).
+var _transitioning := false
 ## Behind a cover (the door's picture, the trip map), a new place is set up
 ## a few steps a frame, up to this many microseconds of steps a frame, so
 ## the window keeps drawing; and the cover waits at most PREPARE_WAIT
 ## seconds on the disk before setting the rest up at once.
 const PREPARE_BUDGET_USEC := 12000
 const PREPARE_WAIT := 3.0
-## After a new place is laid out, its first frames are slow (everything in
-## it is drawn for the first time). A cover waits for SETTLE_FRAMES frames
-## in a row quicker than SETTLE_FRAME_MS (at most SETTLE_MOST seconds) before
-## it moves, so the door's wipe and the trip's marker don't jump.
-const SETTLE_FRAMES := 2
-const SETTLE_FRAME_MS := 50.0
-const SETTLE_MOST := 0.4
 ## Walking toward a seam, the next region's sprites get their lit material
 ## this many microseconds' worth a frame (see _set_up_step).
 const LIT_BUDGET_USEC := 3000
+## Opens the place left behind away going through a door.
 const DOOR_WIPE := preload("res://assets/shaders/door_wipe.gdshader")
 var _place_check := 0.0
 ## The door the player last went through into a room, when it was a second
@@ -385,10 +379,18 @@ func go_to_region(id: String, spawn_name := "arrival", minutes := 0, trip := {})
 		GameClock.advance_minutes(minutes)
 	_enter_region(id, spawn_name)
 	await _unstick_player()
-	await _settle()
-	await hud.fade_from_black()
+	await _reveal()
 	_set_paused(false)
 	_busy = false
+
+
+## Under the cover, waits for the new place to draw evenly, then wipes the
+## cover away (see Transition).
+func _reveal() -> void:
+	_transitioning = true
+	await _settle()
+	await hud.fade_from_black()
+	_transitioning = false
 
 
 func _journeys_on() -> bool:
@@ -409,8 +411,14 @@ func _journey(id: String, spawn_name: String, minutes: int, info: Dictionary) ->
 	_want_loaded(id)
 	var journey := Journey.new()
 	add_child(journey)
-	await journey.cover()
+	_transitioning = true
 	# The HUD's clock would jump straight to the end; the map has its own.
+	# The HUD fades out under the veil rather than vanishing in a frame.
+	_fade_hud(0.0, Transition.MAP_COVER_TIME)
+	await journey.cover()
+	# Fully dark for the swap, so the old place never cuts to the new one
+	# through the veil.
+	await journey.hold()
 	hud.visible = false
 	# (the map drawn fully open first)
 	await get_tree().process_frame
@@ -433,10 +441,19 @@ func _journey(id: String, spawn_name: String, minutes: int, info: Dictionary) ->
 	await journey.travel(info)
 	await _unstick_player()
 	hud.visible = true
+	_fade_hud(1.0, Transition.MAP_LIFT_TIME)
 	await journey.lift()
 	journey.queue_free()
+	hud.opacity = 1.0
+	_transitioning = false
 	_set_paused(false)
 	_busy = false
+
+
+## Fades the HUD to [param alpha] over [param seconds], not waiting on it.
+func _fade_hud(alpha: float, seconds: float) -> void:
+	var from: float = hud.opacity
+	Transition.run(hud, seconds, func(t: float) -> void: hud.opacity = lerpf(from, alpha, t))
 
 
 ## Goes through a door, gate or short way that takes no time: the new place
@@ -457,20 +474,23 @@ func _step_through(id: String, spawn_name: String) -> void:
 	if cover:
 		await _settle_seams()
 	await _unstick_player()
-	if cover:
-		await _settle()
+	if cover == null:
+		_set_paused(false)
+		_busy = false
+		return
+	# The picture of the old place stays up until the new one draws evenly,
+	# then opens over smooth frames (see Transition).
+	_transitioning = true
+	await _settle()
 	_set_paused(false)
 	_busy = false
-	if cover == null:
-		return
 	var wipe := (cover.get_child(0) as CanvasItem).material as ShaderMaterial
 	var at := player.get_global_transform_with_canvas().origin / get_viewport().get_visible_rect().size
 	wipe.set_shader_parameter("center", at.clamp(Vector2.ZERO, Vector2.ONE))
-	var tween := create_tween()
-	tween.tween_method(func(t: float) -> void: wipe.set_shader_parameter("progress", t), 0.0, 1.0, DOOR_TIME) \
-			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	await tween.finished
-	cover.queue_free()
+	await Transition.run(cover, Transition.DOOR_TIME, func(t: float) -> void: wipe.set_shader_parameter("progress", t))
+	_transitioning = false
+	if is_instance_valid(cover):
+		cover.queue_free()
 
 
 ## The last frame drawn, as a texture, once it is drawn, or null where
@@ -529,8 +549,7 @@ func travel(leg: Dictionary) -> void:
 	GameClock.advance_minutes(leg.minutes)
 	_enter_region(arrive_in, leg.spawn)
 	await _unstick_player()
-	await _settle()
-	await hud.fade_from_black()
+	await _reveal()
 	hud.show_message("You drove %s miles to %s (%s)." % [str(leg.miles), hub.display_name, Park.format_minutes(leg.minutes)])
 	_set_paused(false)
 	_busy = false
@@ -586,9 +605,8 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	_settle_view()
 	await _unstick_player()
 	var saved := SaveManager.save_game()
-	await _settle()
 
-	await hud.fade_from_black()
+	await _reveal()
 	player.pose("arms_up", 1.0) # a morning stretch
 	var save_status := "Your game was saved." if saved else "Couldn't save. Check that the game can write to its save folder."
 	var message := "Good morning! " + save_status
@@ -893,19 +911,10 @@ func _seam_targets_pending() -> Array[String]:
 	return pending
 
 
-## Waits for the frames after a new place is laid out to come quick again
-## (SETTLE_FRAMES in a row under SETTLE_FRAME_MS), at most SETTLE_MOST seconds.
+## Waits for the frames after a new place is laid out to come quick again,
+## the one settle step every transition uses (see Transition.settle).
 func _settle() -> void:
-	if DisplayServer.get_name() == "headless" and not journeys_headless:
-		return
-	var calm := 0
-	var started := Time.get_ticks_usec()
-	var last := started
-	while calm < SETTLE_FRAMES and Time.get_ticks_usec() - started < SETTLE_MOST * 1000000.0:
-		await get_tree().process_frame
-		var now := Time.get_ticks_usec()
-		calm = calm + 1 if (now - last) / 1000.0 < SETTLE_FRAME_MS else 0
-		last = now
+	await Transition.settle(self)
 
 
 ## Lays the next region beside this one while the player is near a seam

@@ -14,8 +14,6 @@ const LOCATION_SHOWN := 4.0
 ## Seconds the hint line naming the book's keys stays up after you arrive
 ## somewhere or close a menu, before it fades to leave the view clear.
 const HINTS_SHOWN := 8.0
-## Seconds the wipe between places takes each way.
-const WIPE_TIME := 0.5
 ## The wipe's color: the deep night of the palette, not flat black.
 const WIPE_COLOR := Color(0.067, 0.059, 0.09)
 const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary", "photo_album"]
@@ -450,13 +448,33 @@ func _on_quest_done(_quest: QuestData) -> void:
 
 
 ## Covers the screen with the pixel-diamond wipe (see pixel_wipe.gdshader).
+## How much the HUD shows, 0 to 1 (a CanvasLayer has no modulate of its
+## own), so it can fade out under the trip map rather than vanish.
+var opacity: float:
+	get:
+		return _screen.modulate.a if _screen else 1.0
+	set(value):
+		if _screen:
+			_screen.modulate.a = value
+
+
+## Timed and eased as every transition is (see Transition).
 func fade_to_black() -> void:
-	await create_tween().tween_property(fade, "color:a", 1.0, WIPE_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN).finished
+	await _fade_to(1.0, Transition.COVER_TIME)
 
 
 ## Wipes the cover away the same way, a touch slower, so the new place opens up.
+## The place name shows again as it opens, so none of its time was spent
+## under the cover.
 func fade_from_black() -> void:
-	await create_tween().tween_property(fade, "color:a", 0.0, WIPE_TIME * 1.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT).finished
+	if location_panel.modulate.a > 0.0:
+		_show_location_banner()
+	await _fade_to(0.0, Transition.REVEAL_TIME)
+
+
+func _fade_to(alpha: float, seconds: float) -> void:
+	var from := fade.color.a
+	await Transition.run(self, seconds, func(t: float) -> void: fade.color.a = lerpf(from, alpha, t))
 
 
 func _refresh_food() -> void:
