@@ -76,8 +76,10 @@ func advance_minutes(amount: int) -> void:
 
 
 ## True if a trip of [param trip_minutes] would arrive after the travel cutoff.
+## Carrying a Trail Headlamp lets you travel an hour later into the evening.
 func is_too_late_for(trip_minutes: int) -> bool:
-	return minutes + trip_minutes > (PASS_OUT_HOUR - TRAVEL_CUTOFF_HOURS) * 60
+	var cutoff := maxi(0, TRAVEL_CUTOFF_HOURS - (1 if Gear.count("headlamp") > 0 else 0))
+	return minutes + trip_minutes > (PASS_OUT_HOUR - cutoff) * 60
 
 
 ## Moves the clock on after a climb that took [param elapsed] minutes and spent

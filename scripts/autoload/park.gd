@@ -133,13 +133,15 @@ func legs_from(hub_id: String) -> Array[Dictionary]:
 			path.append(Vector2(point[0], point[1]))
 		if not forward:
 			path.reverse()
+		var base_minutes := int(route.minutes_ab if forward else route.minutes_ba)
+		var travel_minutes := maxi(5, roundi(base_minutes * (1.0 - Perks.bonus("trail_sense"))))
 		legs.append({
 			"id": route.id,
 			"to": destination,
 			"mode": route.mode,
 			"via": route.via,
 			"miles": route.miles,
-			"minutes": int(route.minutes_ab if forward else route.minutes_ba),
+			"minutes": travel_minutes,
 			"open": reason == "",
 			"locked": locked,
 			"closed_reason": reason,

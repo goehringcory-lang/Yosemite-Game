@@ -535,6 +535,9 @@ func _show_card(photo: Dictionary) -> void:
 	var logged: Array = photo.get("logged", [])
 	if not logged.is_empty():
 		notes.append("New in the field log: %s" % ", ".join(PackedStringArray(logged)))
+	var credit := int(photo.get("gallery_credit", 0))
+	if credit > 0:
+		notes.append("Gallery Eye: +%d Village Store tab credit" % credit)
 	_card_note.text = "\n".join(notes)
 	_card_note.visible = _card_note.text != ""
 	_card.visible = true

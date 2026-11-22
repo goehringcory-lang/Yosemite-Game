@@ -206,10 +206,13 @@ func load_game() -> bool:
 	PlayerLook.load_data(data.get("player", {}) if typeof(data.get("player")) == TYPE_DICTIONARY else {})
 	var nodes: Dictionary = data.get("nodes", {})
 	_pending = nodes.duplicate()
+	Perks.resetting = true
 	for node in get_tree().get_nodes_in_group("persist"):
 		if nodes.has(node.name):
 			node.load_data(nodes[node.name])
 			_pending.erase(node.name)
+	Perks.resetting = false
+	Perks.check(false)
 	return true
 
 

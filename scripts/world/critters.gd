@@ -274,16 +274,35 @@ func _running() -> bool:
 	return walker != null and walker.velocity != Vector2.ZERO and Input.is_action_pressed("run")
 
 
+## Effective spook and spot distances, tuned by the Quiet Step perk.
+static func flee_distance() -> float:
+	return FLEE_DISTANCE * (1.0 - Perks.bonus("quiet_step"))
+
+
+static func squirrel_flee() -> float:
+	return SQUIRREL_FLEE * (1.0 - Perks.bonus("quiet_step"))
+
+
+static func spot_distance() -> float:
+	return SPOT_DISTANCE * (1.3 if Perks.has("quiet_step") else 1.0)
+
+
+static func spot_butterfly() -> float:
+	return SPOT_BUTTERFLY * (1.3 if Perks.has("quiet_step") else 1.0)
+
+
 ## Logs the birds and butterflies close enough to get a good look at.
 func _spot(player: Vector2) -> void:
+	var reach := spot_distance()
+	var fly_reach := spot_butterfly()
 	for bird in _birds:
-		if bird.state != "fly" and bird.pos.distance_to(player) < SPOT_DISTANCE:
+		if bird.state != "fly" and bird.pos.distance_to(player) < reach:
 			FieldLog.spot(bird.kind)
 	for fly in _flies:
-		if fly.pos.distance_to(player) < SPOT_BUTTERFLY:
+		if fly.pos.distance_to(player) < fly_reach:
 			FieldLog.spot("butterfly_%d" % fly.wings)
 	for squirrel in _squirrels:
-		if squirrel.state != "flee" and squirrel.pos.distance_to(player) < SPOT_DISTANCE:
+		if squirrel.state != "flee" and squirrel.pos.distance_to(player) < reach:
 			FieldLog.spot(squirrel.kind)
 
 
@@ -332,7 +351,7 @@ func _update_bird(bird: Dictionary, delta: float, player: Vector2) -> void:
 	bird.flap += delta
 	match bird.state:
 		"peck", "hop":
-			if bird.pos.distance_to(player) < FLEE_DISTANCE:
+			if bird.pos.distance_to(player) < flee_distance():
 				_take_off(bird, player)
 				return
 			if bird.state == "hop":
@@ -382,15 +401,16 @@ func _take_off(bird: Dictionary, player: Vector2, loud := true) -> void:
 ## sits up again; come close and it dashes off, away from you, at a run.
 func _update_squirrel(squirrel: Dictionary, delta: float, player: Vector2, active: bool) -> void:
 	squirrel.time -= delta
+	var flee := squirrel_flee()
 	match squirrel.state:
 		"sit":
-			if squirrel.pos.distance_to(player) < SQUIRREL_FLEE or not active:
+			if squirrel.pos.distance_to(player) < flee or not active:
 				_squirrel_flee(squirrel, player)
 				return
 			if squirrel.time <= 0.0:
 				if _rng.randf() < 0.5:
 					var step := Vector2(_rng.randf_range(-1.0, 1.0), _rng.randf_range(-0.6, 0.6)).normalized() * _rng.randf_range(24.0, 56.0)
-					if _open(squirrel.pos + step) and (squirrel.pos + step).distance_to(player) > SQUIRREL_FLEE + 10.0:
+					if _open(squirrel.pos + step) and (squirrel.pos + step).distance_to(player) > flee + 10.0:
 						squirrel.state = "run"
 						squirrel.vel = step.normalized() * SQUIRREL_RUN
 						squirrel.time = step.length() / SQUIRREL_RUN
@@ -407,7 +427,7 @@ func _update_squirrel(squirrel: Dictionary, delta: float, player: Vector2, activ
 			squirrel.pos = next
 			squirrel.steps += delta
 			if squirrel.state == "run":
-				if squirrel.pos.distance_to(player) < SQUIRREL_FLEE:
+				if squirrel.pos.distance_to(player) < flee:
 					_squirrel_flee(squirrel, player)
 				elif squirrel.time <= 0.0:
 					squirrel.state = "sit"

@@ -85,6 +85,36 @@ const PERKS: Array[Dictionary] = [
 		"how": "Answer 5 rescue calls from the Camp 4 rescue site.",
 		"effect": "You walk faster while carrying someone out.",
 		"flavor": "Since the 1970s, climbers camped at the Camp 4 rescue site have helped the park's search and rescue team, hauling litters down trails and lowering people off the walls."},
+	{"id": "trail_sense", "name": "Trail Sense", "amount": 0.15,
+		"unlock": {"stat": "places", "count": 25},
+		"how": "Discover 25 named places around the park.",
+		"effect": "Trips between hubs take 15% less time, and the Logbook passes on 2 more hidden-find rumors.",
+		"flavor": "Once you know the passes, turnouts, and river crossings by heart, every road across Yosemite feels shorter."},
+	{"id": "park_walker", "name": "Park Walker", "amount": 0.08,
+		"unlock": {"stat": "places", "count": 60},
+		"how": "Discover 60 named places around the park.",
+		"effect": "You walk even faster across trails and meadows.",
+		"flavor": "Walking every corner of Yosemite, from El Portal's foothills to Tuolumne's granite, builds legs that never tire."},
+	{"id": "quiet_step", "name": "Quiet Step", "amount": 0.5,
+		"unlock": {"stat": "animals", "count": 10},
+		"how": "Log 10 different animals in your wildlife field log.",
+		"effect": "Birds and squirrels spook at half the usual distance, and you spot them from farther away.",
+		"flavor": "Enid Michael wrote that wildlife never flees someone who walks slow enough to listen first."},
+	{"id": "master_fly_box", "name": "Master Fly Box", "amount": 0.25,
+		"unlock": {"stat": "fish_caught", "count": 10},
+		"how": "Land 10 fish on the fly.",
+		"effect": "Bigger fish and trophies rise more often across every river, and each cast takes 10 minutes instead of 15.",
+		"flavor": "Reading riffles, seams, and deep Merced holes turns a slow afternoon on the bank into a steady rise."},
+	{"id": "gallery_eye", "name": "Gallery Eye", "amount": 0.15,
+		"unlock": {"stat": "shot_list", "count": 8},
+		"how": "Photograph 8 subjects on Ansel Adams's shot list.",
+		"effect": "Valley and Curry stores pay 15% more for everything you trade, and every 3-star photograph earns +10 Village Store tab credit.",
+		"flavor": "Best's Studio and the Valley stores have traded prints and postcards since 1902; a sharp eye for light is currency of its own."},
+	{"id": "night_trail", "name": "Night Trail", "amount": 1, "grant_gear": "headlamp",
+		"unlock": {"stat": "happenings", "count": 5},
+		"how": "See 5 unscripted happenings through around the park.",
+		"effect": "Earns a wearable Trail Headlamp that lights dark paths at night and lets you set out on trips an hour later.",
+		"flavor": "Help enough strangers on Yosemite's roads and trails, and someone always hands you a spare lamp for the walk home."},
 ]
 
 ## How long the HUD must be free before a "New perk" message shows, so it
@@ -102,6 +132,9 @@ var _by_id: Dictionary = {}
 ## Messages waiting for the HUD.
 var _toasts: PackedStringArray = []
 var _toast_wait := TOAST_DELAY
+## True while a full reset or save load is in progress, so intermediate
+## changed signals don't re-earn perks or queue toasts.
+var resetting := false
 
 
 func _ready() -> void:
@@ -111,13 +144,21 @@ func _ready() -> void:
 	QuestLog.changed.connect(check)
 	Recipes.made.connect(check.unbind(1))
 	GameClock.day_started.connect(_on_day_started.unbind(3))
+	Discoveries.changed.connect(check)
+	FieldLog.changed.connect(check)
+	Achievements.changed.connect(check)
+	Photos.changed.connect(check)
+	Happenings.changed.connect(check)
 
 
 func start_new_game() -> void:
+	var was := resetting
+	resetting = true
 	earned = []
 	stats = {}
 	_toasts = []
 	changed.emit()
+	resetting = was
 
 
 func get_perk(id: String) -> Dictionary:
@@ -176,6 +217,17 @@ func progress(perk: Dictionary) -> Array[int]:
 			have = int(Recipes.times_made.get("acorn_mush", 0)) + int(Recipes.times_made.get("acorn_cake", 0))
 		"ticks":
 			have = QuestLog.climbed.size()
+		"places":
+			have = Discoveries.count()
+		"animals":
+			have = FieldLog.count()
+		"fish_caught":
+			for id: String in Achievements.fish:
+				have += int(Achievements.fish[id].get("count", 0))
+		"shot_list":
+			have = Photos.listed_count()
+		"happenings":
+			have = Happenings.count()
 		_:
 			have = stat(unlock.stat)
 	return [mini(have, need), need]
@@ -189,11 +241,16 @@ func is_ready(perk: Dictionary) -> bool:
 ## Earns every perk whose condition is met. [param announce] queues a HUD
 ## message for each (a loaded save catches up quietly).
 func check(announce := true) -> void:
+	if resetting:
+		return
 	var any := false
 	for perk: Dictionary in PERKS:
 		if has(perk.id) or not is_ready(perk):
 			continue
 		earned.append(perk.id)
+		var gear_id: String = perk.get("grant_gear", "")
+		if gear_id != "" and Gear.get_gear(gear_id) != null and Gear.count(gear_id) == 0:
+			Gear.add(gear_id)
 		any = true
 		if announce:
 			_toasts.append("New perk: %s. %s" % [perk.name, perk.effect])
