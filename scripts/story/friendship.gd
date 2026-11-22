@@ -57,7 +57,7 @@ const LOVES := {
 	"michael_kochakji": ["chocolate_bar", "dried_apples"],
 	"thomas_hill": ["bread_pudding", "wild_strawberry"],
 	"francois_matthes": ["cheddar_wedge", "beef_jerky"],
-	"arthur_bellamy": ["degnan_loaf", "dried_apricots"],
+	"arthur_bellamy": ["pilot_bread", "dried_apricots"],
 }
 const LOVED_LINES := [
 	"Oh! For me? I love these. Thank you!",
