@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "bellamy_first_bloom"
+title = "First Bloom in the Canyon"
+giver = "arthur_bellamy"
+requires = PackedStringArray("clark_register")
+offered_in = 1
+out_of_season = PackedStringArray("Come back down to El Portal in spring! We're two thousand feet lower than the Valley, so the canyon blooms weeks before the snow melts upstairs.")
+intro = PackedStringArray("Morning! Arthur Bellamy, El Portal station agent. Down here in the Merced canyon spring arrives while the Valley's still shoveling walks.", "The morning freight just rolled in from Merced. Bring me three sprigs of fresh miner's lettuce from the canyon banks, then let Bridget Degnan know her spring freight is ready for the stage.")
+steps = [{"type": "have", "item": "miners_lettuce", "count": 3, "consume": true, "objective": "Bring 3 miner's lettuce to Arthur Bellamy at El Portal Post Office", "reminder": "Three sprigs of miner's lettuce from the warm banks along the river.", "done": ["Crisp as April! Now run word up to Bridget Degnan at Degnan's Bakery that her spring flour and spice crates are on the platform."]}, {"type": "talk", "target": "bridget_degnan", "objective": "Tell Bridget Degnan at Degnan's Bakery that the spring freight is in", "reminder": "Bridget Degnan is at Degnan's Bakery in Yosemite Village. Tell her the El Portal freight is ready.", "done": ["The spring freight's in at El Portal already? Bless Arthur Bellamy! Tell him I'm sending down two warm loaves on the afternoon stage."]}, {"type": "return", "objective": "Return to Arthur Bellamy at the El Portal Post Office", "reminder": "Head back down the canyon to Arthur Bellamy at the El Portal Post Office.", "done": ["Two loaves from Degnan's? Now that's how you run a railroad."]}]
+outro = PackedStringArray("You've earned station rates on the El Portal Express Supply! Talk to me anytime to trade for canyon freight—Degnan loaves, Lamon apples, cold King Cobra, and spare quickdraws off the shipping manifest.", "Take two loaves and some dried apricots on the house.")
+reward_items = {"degnan_loaf": 2, "dried_apricots": 2}

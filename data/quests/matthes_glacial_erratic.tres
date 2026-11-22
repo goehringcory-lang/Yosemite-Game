@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "matthes_glacial_erratic"
+title = "The Glacial Erratic"
+giver = "francois_matthes"
+requires = PackedStringArray("matthes_reading_ice")
+offered_in = 6
+out_of_season = PackedStringArray("Return in summer or fall, when Glacier Point's rim and the granite aprons are clear of snow.")
+intro = PackedStringArray("Climbers think granite is solid. A geologist knows it is full of hidden seams—vertical joints, exfoliation shells, and glacial polish left behind when the ice retreated.", "Climb the Glacier Point Apron to feel those exfoliation sheets under your shoes, then meet me here in the afternoon shadows so I can show you how to read every crack before you pull on it.")
+steps = [{"type": "climbed", "route": "glacier_point_apron", "objective": "Climb the Glacier Point Apron and report back to François Matthes", "reminder": "Climb the Glacier Point Apron to feel the granite exfoliation sheets firsthand.", "done": ["You topped out the Apron! Every sweeping arch on that slab is a shell of granite lifting free as the weight above it eroded away."]}, {"type": "time", "from": 13, "to": 18, "objective": "Study the afternoon shadows with François Matthes at the Geology Hut (1 to 6 PM)", "reminder": "Come back between one and six in the afternoon, when raking light shows every joint on Half Dome and the Apron.", "done": ["Look closely at the shadows on the granite. Once you see the dip of the joints and the grain of the feldspar, your hands find the rests automatically."]}]
+outro = PackedStringArray("You have a geologist's eye for granite now—Granite Reader. You'll find wider timing on every crux and less pump on steep rock holds across the whole park.", "I'll write a page on Yosemite's granite shells for the Guardian's Register.")
+reward_items = {"trail_mix": 2, "dried_apricots": 2}

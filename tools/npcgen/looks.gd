@@ -371,6 +371,22 @@ const LOOKS := {
 		"hat_band": "4a6a9a", "top": "8aa0c8", "top_style": "blouse", "top2": "e8e4d8", "bottom_style": "skirt",
 		"bottom": "3a4a6a", "shoes": "3a2a20", "carry": ["parasol"],
 	},
+	"thomas_hill": {
+		"skin": SKIN_FAIR, "hair": "c8c2b4", "hair_style": "long", "beard": "c8c2b4",
+		"top": "5a3828", "top_style": "jacket", "top2": "e0d8c8", "bottom": "3a342e",
+		"belt": "2e2218", "shoes": "2c2018", "carry": ["palette"],
+	},
+	"francois_matthes": {
+		"skin": SKIN_LIGHT, "hair": "5a5248", "hair_style": "short", "mustache": "5a5248",
+		"hat": "wide", "hat_color": "7a6a50", "hat_band": "3c3024",
+		"top": "8a7e5c", "top_style": "jacket", "top2": "d8d0b8", "bottom": "4e4838",
+		"belt": "3a2a1a", "shoes": "3e2c1e", "carry": ["map"],
+	},
+	"arthur_bellamy": {
+		"skin": SKIN_TAN, "hair": "3c2e24", "hair_style": "short", "hat": "cap", "hat_color": "283854",
+		"top": "2c3c58", "top_style": "jacket", "top2": "e4dfd2", "bottom": "263044",
+		"belt": "282018", "badge": "d8b454", "shoes": "241e1a",
+	},
 }
 
 ## Icons in assets/sprites/story_items.png, left to right.

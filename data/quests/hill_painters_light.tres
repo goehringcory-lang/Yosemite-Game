@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hill_painters_light"
+title = "The Painter's Light"
+giver = "thomas_hill"
+requires = PackedStringArray("clark_register")
+offered_in = 3
+out_of_season = PackedStringArray("Wait for spring or summer when Bridalveil Fall throws mist clear across the meadow. That is the light I paint.")
+intro = PackedStringArray("Welcome to Wawona! Come in, mind the wet canvases. Every spring and summer I sketch Bridalveil Fall when the wind turns its spray to gold.", "A young fellow down at Best's Studio—Ansel Adams—claims a glass lens can catch that mist better than hog bristle. I'd like a second opinion.", "Bring me three wild strawberries for my afternoon basket, then go ask Mr. Adams what he thinks of a painter's warmth.")
+steps = [{"type": "have", "item": "wild_strawberry", "count": 3, "consume": true, "objective": "Bring 3 wild strawberries to Thomas Hill in Wawona", "reminder": "Three wild strawberries from the meadow edges, if you please. A painter shouldn't skip lunch.", "done": ["Sweet as June! Now take my regards down to Ansel Adams at Best's Studio in the Valley. Ask him whether black and white can ever catch Bridalveil's amber mist."]}, {"type": "talk", "target": "ansel_adams", "objective": "Talk to Ansel Adams at Best's Studio about Thomas Hill's light", "reminder": "Ansel Adams is at Best's Studio in Yosemite Village. Ask him about Bridalveil's golden mist.", "done": ["Thomas Hill sent you? Tell the old master his color sense is unmatched—even if I prefer silver gelatin myself.", "Here, tell him I mixed a warm amber filter formula in his honor. A camera can borrow a painter's warmth now and then."]}, {"type": "return", "objective": "Return to Thomas Hill at his studio in Wawona", "reminder": "Go back to Thomas Hill in Wawona with Ansel Adams's reply.", "done": ["Ha! A warm filter formula, did he? That's the closest a photographer will ever come to admitting oil paint wins."]}]
+outro = PackedStringArray("Keep that warm tone in your camera bag—Painter's Warmth, let's call it. Try it on Bridalveil or Tunnel View at sunset.", "And take a slice of bread pudding and some dried apples for the road back up the hill.")
+reward_items = {"bread_pudding": 1, "dried_apples": 2}
+reward_unlocks = PackedStringArray("warmth_film")

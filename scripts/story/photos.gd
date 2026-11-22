@@ -45,8 +45,8 @@ const REAL_DIR := "user://photos/"
 const REAL_SAVE := "user://save.json"
 
 ## The films, and what the camera calls them.
-const FILMS := ["color", "silver", "sepia"]
-const FILM_NAMES := {"color": "Color", "silver": "Black and white", "sepia": "Sepia"}
+const FILMS := ["color", "silver", "sepia", "warmth"]
+const FILM_NAMES := {"color": "Color", "silver": "Black and white", "sepia": "Sepia", "warmth": "Painter's warmth"}
 ## The lenses: how much of the 960x540 view the frame takes, in view pixels.
 ## Each is PRINT_SIZE times a whole number or half of it, so a print is made
 ## of whole pixels of the picture.
@@ -246,6 +246,11 @@ func has_lenses() -> bool:
 ## The lenses you can fit now.
 func lenses() -> Array:
 	return LENSES if has_lenses() else ["normal"]
+
+
+## The films you can load right now ("warmth" unlocks via Thomas Hill's quest).
+func available_films() -> Array:
+	return FILMS if QuestLog.is_unlocked("warmth_film") else ["color", "silver", "sepia"]
 
 
 ## The camera goes in the Backpack (as gear) when a quest hands it over.
@@ -746,12 +751,20 @@ func blank_print(title := "") -> Image:
 
 ## Tones [param image] for [param film_id] in place: "silver" is black and
 ## white with the contrast pulled out, the blacks left deep; "sepia" is the
-## same print warmed to brown. "color" is left alone.
+## same print warmed to brown; "warmth" keeps color under a golden oil-glaze
+## tint from Thomas Hill's palette. "color" is left alone.
 static func tone(image: Image, film_id: String) -> void:
 	if film_id == "color" or image == null or image.is_empty():
 		return
 	image.convert(Image.FORMAT_RGB8)
 	var data := image.get_data()
+	if film_id == "warmth":
+		for i in range(0, data.size(), 3):
+			data[i] = mini(255, (data[i] * 286 >> 8) + 10)
+			data[i + 1] = mini(255, (data[i + 1] * 266 >> 8) + 4)
+			data[i + 2] = maxi(0, (data[i + 2] * 220 >> 8) - 2)
+		image.set_data(image.get_width(), image.get_height(), false, Image.FORMAT_RGB8, data)
+		return
 	var sepia := film_id == "sepia"
 	# A lookup for the contrast curve, so the loop is three reads and writes.
 	var curve := PackedByteArray()

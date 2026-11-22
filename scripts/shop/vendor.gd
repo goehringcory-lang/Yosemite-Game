@@ -89,6 +89,8 @@ func buy(offer: ShopOffer) -> Dictionary:
 static func offers_open(data: ShopData) -> Array[ShopOffer]:
 	var result: Array[ShopOffer] = []
 	for offer in data.offers:
+		if offer.requires_quest != "" and not QuestLog.is_completed(offer.requires_quest):
+			continue
 		if not Gear.has_all(offer.requires):
 			continue
 		if offer.max_owned > 0 and _owned(offer) >= offer.max_owned:

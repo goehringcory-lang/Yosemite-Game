@@ -41,7 +41,7 @@ const FOOTPRINT := {
 	"keepsake_shelf": Vector2(44, 8), "print": Vector2(14, 6), "hammock": Vector2(70, 10),
 	"bird_bath": Vector2(22, 8), "woodpile": Vector2(40, 12), "bear_box": Vector2(30, 10),
 	"fish_board": Vector2(8, 6), "press_frames": Vector2(80, 6), "summit_cairn": Vector2(22, 8),
-	"guardian_sign": Vector2(10, 6), "lantern": Vector2(6, 6),
+	"guardian_sign": Vector2(10, 6), "lantern": Vector2(6, 6), "hill_study": Vector2(14, 6),
 }
 
 
@@ -475,6 +475,7 @@ func _draw() -> void:
 		"keepsake_shelf": _draw_keepsake_shelf()
 		"summit_cairn": _draw_cairn()
 		"guardian_sign": _draw_sign()
+		"hill_study": _draw_hill_study()
 
 
 func _shadow(width: float, height := 6.0) -> void:
@@ -624,6 +625,26 @@ func _draw_print() -> void:
 	draw_rect(Rect2(-6, -23, 12, 4), Color("5a5a5a"))
 	draw_colored_polygon(PackedVector2Array([Vector2(-4, -13), Vector2(-3, -21), Vector2(1, -22), Vector2(4, -18), Vector2(3, -13)]), Color("a8a8a8"))
 	draw_line(Vector2(1, -22), Vector2(1, -14), Color("d8d8d8"), 1.0)
+
+
+func _draw_hill_study() -> void:
+	_shadow(16, 4)
+	# painter's easel legs
+	draw_line(Vector2(-6, 0), Vector2(0, -26), INK, 2.0)
+	draw_line(Vector2(6, 0), Vector2(0, -26), INK, 2.0)
+	draw_line(Vector2(-6, 0), Vector2(0, -26), WOOD_HI, 1.0)
+	draw_line(Vector2(6, 0), Vector2(0, -26), WOOD, 1.0)
+	# gilt frame and sunset canyon oil study
+	draw_rect(Rect2(-9, -26, 18, 16).grow(1), INK)
+	draw_rect(Rect2(-9, -26, 18, 16), Color("c89b3c"))
+	draw_rect(Rect2(-8, -25, 16, 2), Color("ebd078"))
+	draw_rect(Rect2(-7, -24, 14, 12), Color("f2b866"))
+	draw_rect(Rect2(-7, -24, 14, 5), Color("e07b54"))
+	# canyon walls and golden Bridalveil mist
+	draw_colored_polygon(PackedVector2Array([Vector2(-7, -12), Vector2(-7, -21), Vector2(-2, -19), Vector2(-1, -12)]), Color("52433a"))
+	draw_colored_polygon(PackedVector2Array([Vector2(1, -12), Vector2(3, -20), Vector2(7, -21), Vector2(7, -12)]), Color("6b5446"))
+	draw_line(Vector2(3, -19), Vector2(3, -13), Color("f7e4b5"), 1.0)
+	draw_rect(Rect2(-7, -14, 14, 2), Color("3c5434"))
 
 
 func _draw_hammock() -> void:

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hill_last_canvas"
+title = "The Last Canvas"
+giver = "thomas_hill"
+requires = PackedStringArray("hill_painters_light")
+offered_in = 12
+out_of_season = PackedStringArray("Come back in autumn or winter, when storms sweep through Tunnel View and clear off the granite. That is when I finish my big canvases.")
+intro = PackedStringArray("Autumn and winter are when Yosemite shows its bones: storm clouds tearing off El Capitan and a ribbon of gold underneath.", "I am laying the final glazes on a study of a clearing storm at Tunnel View. Bring me three toyon berries—red as vermilion—and sit with me in the afternoon light while it dries.")
+steps = [{"type": "have", "item": "toyon_berries", "count": 3, "consume": true, "objective": "Bring 3 toyon berries to Thomas Hill in Wawona", "reminder": "Three red toyon berries from the canyon brush, whenever you pass them.", "done": ["Look at that scarlet! No, don't worry—I won't crush them into my oil paint. They're for the kettle while we work."]}, {"type": "time", "from": 14, "to": 18, "objective": "Meet Thomas Hill at his Wawona studio between 2 and 6 PM to finish the study", "reminder": "Come by between two and six in the afternoon, when the north skylight hits the easel just right.", "done": ["There—one warm glaze along the cloud rim, and El Capitan steps right out of the canvas.", "Forty years of painting this valley, and the light still surprises me every time."]}]
+outro = PackedStringArray("I've sent a small framed oil study of the Valley over to your camp at the Lamon Homestead.", "Hang it by your shelf. People warm up faster to someone who notices the light—any gift you share around the park will mean a quarter more.")

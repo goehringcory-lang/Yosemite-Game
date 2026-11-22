@@ -85,6 +85,11 @@ const PERKS: Array[Dictionary] = [
 		"how": "Answer 5 rescue calls from the Camp 4 rescue site.",
 		"effect": "You walk faster while carrying someone out.",
 		"flavor": "Since the 1970s, climbers camped at the Camp 4 rescue site have helped the park's search and rescue team, hauling litters down trails and lowering people off the walls."},
+	{"id": "granite_reader", "name": "Granite Reader", "amount": 0.04,
+		"unlock": {"quest": "matthes_glacial_erratic"},
+		"how": "Study granite exfoliation and joints with François Matthes at Glacier Point.",
+		"effect": "Crux timing windows are wider, and steep holds build less forearm pump.",
+		"flavor": "François Matthes spent decades mapping Yosemite's exfoliation shells and joint fractures; once you see how the granite split, every hold makes sense."},
 ]
 
 ## How long the HUD must be free before a "New perk" message shows, so it
