@@ -42,7 +42,7 @@ func _ready() -> void:
 		get_tree().quit(1)
 		return
 	LitSprites.enabled = OS.get_environment("SHOT_UNLIT") != "1"
-	# the same moment after arriving under both renderers, however slow
+	# a wipe takes the same real time under both renderers, however slow
 	Transition.hold_long_frames = false
 	# still air, so two runs of the tour give the same picture
 	Wind.enabled = OS.get_environment("SHOT_WIND") == "1"
@@ -86,15 +86,6 @@ func _ready() -> void:
 					world.player.global_position = first.global_position
 					world._camera().reset_smoothing()
 			world.hud.visible = false
-			# Wait for the background loading and the next area's set-up at
-			# a seam to finish, so what's laid out across an edge doesn't
-			# depend on how fast this renderer happens to draw.
-			for i in 600:
-				if world._preload_queue.is_empty() and world._preloading == "" and world._setting_up.is_empty():
-					break
-				await get_tree().process_frame
-			for i in 4:
-				await get_tree().process_frame
 			var place := region_id if spawns.is_empty() else "%s_%s" % [region_id, spawn]
 			for hour in hours:
 				GameClock.minutes = roundi(float(hour) * 60.0)
