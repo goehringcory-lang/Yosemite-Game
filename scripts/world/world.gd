@@ -7,6 +7,13 @@ extends Node2D
 ##   get_tree().call_group("world", "go_to_region", "glacier_point", "apron_top")
 
 signal region_changed(region: Region)
+## The player walked over a seam into the region laid beside theirs: it and
+## everything with it moved by [param shift] to put the new one at the
+## origin, so nothing moved on screen. Anything kept in world pixels outside
+## the regions (weather, birds, prints in the snow, calls) moves with it, and
+## keeps what's on screen instead of starting afresh as at a door. Sent just
+## before region_changed.
+signal seam_crossed(shift: Vector2)
 
 ## Seen the morning after the player passes out (an Easter egg): the bears
 ## came by, and the pack was zipped, so nothing is lost.
@@ -138,6 +145,7 @@ func _ready() -> void:
 	add_child(HappeningField.new())
 	# people walking between the Valley's areas on days of their own
 	add_child(Travelers.new())
+	seam_crossed.connect(Sound.shift_calls)
 	add_child(Rustle.new())
 	add_child(Footprints.new())
 	add_child(Breath.new())
@@ -632,6 +640,8 @@ func _show_bear_tracks() -> void:
 ## [param staged_seams] a region beside the spot that isn't set up yet is
 ## left for _settle_seams to lay out over the next frames.
 func _enter_region(id: String, spawn_name := "", staged_seams := false) -> void:
+	# the fires and falls here fade out instead of stopping dead
+	Sound.let_go(region)
 	var left := region.region_id if region else ""
 	_drop_seam()
 	if player.get_parent():
@@ -1038,6 +1048,7 @@ func _cross_seam() -> void:
 	(player.get_node("SmoothMotion") as SmoothMotion).shift(shift)
 	_fit_camera()
 	framing.crossed(region, shift)
+	seam_crossed.emit(shift)
 	_arrive()
 
 
