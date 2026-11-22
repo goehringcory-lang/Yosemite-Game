@@ -85,6 +85,26 @@ const PERKS: Array[Dictionary] = [
 		"how": "Answer 5 rescue calls from the Camp 4 rescue site.",
 		"effect": "You walk faster while carrying someone out.",
 		"flavor": "Since the 1970s, climbers camped at the Camp 4 rescue site have helped the park's search and rescue team, hauling litters down trails and lowering people off the walls."},
+	{"id": "botanists_glint", "name": "Botanist's Glint", "amount": 1,
+		"unlock": {"quest": "enid_spring_moonbow"},
+		"how": "Watch the spring moonbow for Enid Michael.",
+		"effect": "Another wild find turns up each morning, and unpressed plants and hidden finds glint brighter and more often.",
+		"flavor": "Enid Michael walked Yosemite's meadows every spring for twenty years, learning where the rarest blooms hid in the wet grass."},
+	{"id": "high_country_timing", "name": "High-Country Timing", "amount": 0.2,
+		"unlock": {"quest": "curry_summer_firefall"},
+		"how": "Carry Jennie Curry's summer Firefall call up to Glacier Point.",
+		"effect": "Trips between hubs take a fifth less time, and summer mornings warn when high-country storms will break.",
+		"flavor": "Camp Curry's crews watched the clouds over the rim every summer afternoon, timing the long haul up Glacier Point before the thunderheads broke."},
+	{"id": "clean_pack", "name": "Clean Pack", "amount": 4,
+		"unlock": {"quest": "lamon_fall_meadow"},
+		"how": "Help James Lamon and Wren Alvarez prepare for the fall Facelift.",
+		"effect": "Your gear bag holds 4 more bulk of equipment.",
+		"flavor": "Since 2004, Yosemite Facelift volunteers have packed thousands of pounds of litter out of the talus each fall. You learn how to make a pack carry more."},
+	{"id": "winter_hearth", "name": "Winter Hearth", "amount": 0.5,
+		"unlock": {"quest": "ansel_winter_horsetail"},
+		"how": "Witness Horsetail Fall's winter glow for Ansel Adams.",
+		"effect": "Winter cold slows you half as much without a jacket, and first and last light last half an hour longer for photographs.",
+		"flavor": "Ansel Adams called winter his favorite season in Yosemite, waiting out the cold for the brief shafts of low light between storms."},
 ]
 
 ## How long the HUD must be free before a "New perk" message shows, so it
@@ -131,6 +151,16 @@ func has(id: String) -> bool:
 ## The perk's effect if the player has earned it, otherwise 0.
 func bonus(id: String) -> float:
 	return float(get_perk(id).get("amount", 0)) if has(id) else 0.0
+
+
+## The line a finished quest adds to its rewards ("New perk: ..."), or ""
+## if finishing [param quest_id] unlocks no perk.
+func quest_perk_line(quest_id: String) -> String:
+	var parts := PackedStringArray()
+	for perk: Dictionary in PERKS:
+		if perk.unlock.get("quest", "") == quest_id:
+			parts.append("%s (%s)" % [perk.name, perk.effect])
+	return "New perk: %s" % "; ".join(parts) if not parts.is_empty() else ""
 
 
 ## How long a recipe takes, after Tabuce's Patience (mortar and basin only).

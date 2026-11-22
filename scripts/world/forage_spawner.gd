@@ -91,7 +91,7 @@ func respawn() -> void:
 					taken[cell] = true
 					spawn(item.id, cell)
 					break
-	for i in int(Perks.bonus("enids_eye")):
+	for i in int(Perks.bonus("enids_eye")) + int(Perks.bonus("botanists_glint")):
 		_spawn_extra(habitats, taken)
 	_spawn_litter(habitats, taken)
 

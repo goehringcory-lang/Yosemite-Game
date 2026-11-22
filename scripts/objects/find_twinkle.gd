@@ -22,7 +22,8 @@ func _process(delta: float) -> void:
 		_age += delta
 		if _age >= LENGTH:
 			_age = -1.0
-			_wait = EVERY * (0.8 + randf() * 0.5)
+			var base := EVERY * 0.55 if Perks.has("botanists_glint") else EVERY
+			_wait = base * (0.8 + randf() * 0.5)
 		queue_redraw()
 		return
 	_wait -= delta
@@ -35,7 +36,8 @@ func _draw() -> void:
 	if _age < 0.0:
 		return
 	var t := _age / LENGTH
-	var reach := roundf(sin(t * PI) * 2.0)
+	var max_reach := 3.0 if Perks.has("botanists_glint") else 2.0
+	var reach := roundf(sin(t * PI) * max_reach)
 	var core := Color(0.92, 0.97, 1.0, 0.9)
 	var blue := Color(0.62, 0.8, 1.0, 0.6)
 	draw_rect(Rect2(0, 0, 1, 1), core)

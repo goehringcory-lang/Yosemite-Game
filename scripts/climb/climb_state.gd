@@ -702,9 +702,10 @@ func _step(dx: int, cost: int, mins: int, safe := false) -> void:
 		events.append({"type": "pumped"})
 	if hold.get("rest", false) and row < top_row and not _rested_rows.has(row):
 		_rested_rows[row] = true
-		stamina = mini(stamina + REST_STANCE, MAX_STAMINA)
+		var rest := REST_STANCE + (Camp.STRING_LIGHTS_REST if Camp.has("string_lights") else 0)
+		stamina = mini(stamina + rest, MAX_STAMINA)
 		pump = 0
-		message = "A good stance. You shake out (+%d)." % REST_STANCE
+		message = "A good stance. You shake out (+%d)." % rest
 		events.append({"type": "rest"})
 	if hold.get("crux", false) and row < top_row and not safe:
 		var crux := ClimbProfiles.crux_at(spec, row)
@@ -1267,7 +1268,7 @@ func _next_pitch(haul_minutes: int) -> void:
 	if _night_after(finished_spec):
 		if not _bivy(finished_spec.get("bivy", "ledge")):
 			return
-	stamina = mini(stamina + BELAY_REST + (DEVICE_REST if has_device else 0) + int(Perks.bonus("leonards_belay")), MAX_STAMINA)
+	stamina = mini(stamina + BELAY_REST + (DEVICE_REST if has_device else 0) + int(Perks.bonus("leonards_belay")) + (Camp.STRING_LIGHTS_REST if Camp.has("string_lights") else 0), MAX_STAMINA)
 	_start_pitch()
 	message = ("Belay ledge. Pitch %d of %d." % [pitch + 1, route.pitches.size()] + haul_note) if message == "" else message + haul_note
 

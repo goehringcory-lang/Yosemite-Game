@@ -131,6 +131,15 @@ const PAGES: Array[Dictionary] = [
 		"text": "Winter: steel lockers at Camp 4, Curry Village, Upper Pines and Housekeeping Camp. Store it or lose it, and the bear loses more."},
 	{"quest": "clark_guardian_year", "by": "The Guardian (you)",
 		"text": "A year of it. None of it stays done, and none of it was mine alone."},
+	# Seasonal festivity and natural-event stories, one a season.
+	{"quest": "enid_spring_moonbow", "by": "Enid Michael",
+		"text": "Spring: snowmelt roaring down Lower Yosemite Fall, and a pale silver moonbow arching through the spray under the full moon. The Wildflower Walk begins where the mist lands."},
+	{"quest": "curry_summer_firefall", "by": "Jennie Curry",
+		"text": "Summer: long tables on the Camp Curry lawn for the Fourth, thunderheads clearing off the rim, and nine o'clock sharp when the embers poured three thousand feet down the wall."},
+	{"quest": "lamon_fall_meadow", "by": "James Lamon",
+		"text": "Fall: hazelnuts in the shady woods, Mirror Lake dried back to sand and willow grass, and a valley getting ready for winter."},
+	{"quest": "ansel_winter_horsetail", "by": "Ansel Adams",
+		"text": "Winter: Bracebridge Hall lit at the Ahwahnee, and a late-February sunset turning Horsetail Fall to molten orange on El Capitan's east shoulder."},
 ]
 
 
@@ -187,6 +196,10 @@ const HISTORY := {
 	"clark_grove_fire": "Documented: giant sequoias need fire. Its heat opens their cones and a burn clears the litter down to the bare mineral soil their seedlings need, which studies in the 1960s showed, and the Park Service has set prescribed fires in the Mariposa Grove since the early 1970s. For most of Clark's life fires were put out wherever they could be. Dramatized: Clark at a burn. The people who lived here burned these woods and meadows long before the park; how the game tells that history waits on tribal review.",
 	"hodges_bear_boxes": "Documented: Yosemite's black bears den in winter but can wake and forage on warm days. Steel food lockers now stand at campsites across the park, and after the park's bear program took hold, bear incidents fell sharply from their peak in the late 1990s. Dramatized: Hodges, a ranger in 1918, putting them in.",
 	"clark_guardian_year": "Invented for the game: the Guardian's Year. Documented: trail crews, restoration crews, fire crews and wildlife staff do this work in Yosemite every year, with volunteers and partners, the traditionally associated tribes among them.",
+	"enid_spring_moonbow": "Real: full-moon lunar rainbows form in the spray of Lower Yosemite Fall during spring snowmelt, and Enid Michael led spring wildflower walks as a ranger-naturalist from 1921. Dramatized: her wildflower honey cake, the field table, and sending you to Hodges.",
+	"curry_summer_firefall": "Real: Camp Curry celebrated the Fourth of July with outdoor suppers and the nightly Firefall of red-fir bark embers pushed off Glacier Point until 1968, and Sierra summer afternoons regularly build cumulus storms over the high country. Dramatized: the cobbler errand and McCauley tending the coals alongside Jennie Curry.",
+	"lamon_fall_meadow": "Real: Mirror Lake fills with spring snowmelt from Tenaya Creek and dries back into a sandy meadow by fall, and since 2004 volunteers have gathered each autumn for the Yosemite Facelift park cleanup. Dramatized: James Lamon, who died in 1875, cooking for the Facelift crew and building the workbench with Wren.",
+	"ansel_winter_horsetail": "Real: the Ahwahnee's Bracebridge Dinner has been staged at Christmas since 1927, directed for decades by Ansel Adams, and on clear evenings in mid-to-late February the setting sun lights Horsetail Fall on El Capitan's east shoulder like glowing embers (first widely photographed by Galen Rowell in 1973). Dramatized: the wassail errand and hearth kettle.",
 }
 
 

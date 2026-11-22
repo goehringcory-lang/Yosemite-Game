@@ -42,6 +42,8 @@ const FOOTPRINT := {
 	"bird_bath": Vector2(22, 8), "woodpile": Vector2(40, 12), "bear_box": Vector2(30, 10),
 	"fish_board": Vector2(8, 6), "press_frames": Vector2(80, 6), "summit_cairn": Vector2(22, 8),
 	"guardian_sign": Vector2(10, 6), "lantern": Vector2(6, 6),
+	"field_table": Vector2(34, 10), "string_lights": Vector2(0, 0),
+	"workbench": Vector2(38, 10), "hearth_kettle": Vector2(12, 6),
 }
 
 
@@ -72,14 +74,14 @@ func _ready() -> void:
 		shape.position = Vector2(0, -14)
 		_hitbox.add_child(shape)
 		add_child(_hitbox)
-	if piece.id == "lantern":
+	if piece.id == "lantern" or piece.id == "string_lights":
 		var light := PointLight2D.new()
 		light.name = "NightLight"
 		light.set_script(load("res://scripts/world/night_light.gd"))
 		light.position = Vector2(0, -34)
-		light.set("radius", 110.0)
-		light.set("strength", 0.9)
-		light.set("flicker", 0.12)
+		light.set("radius", 145.0 if piece.id == "string_lights" else 110.0)
+		light.set("strength", 0.95 if piece.id == "string_lights" else 0.9)
+		light.set("flicker", 0.05 if piece.id == "string_lights" else 0.12)
 		add_child(light)
 	Camp.changed.connect(_refresh)
 	QuestLog.changed.connect(_refresh)
@@ -117,6 +119,8 @@ func get_prompt() -> String:
 		return "Open the chest"
 	if piece.id == "gear_rack":
 		return "Pack your gear bag"
+	if piece.id == "hearth_kettle" and Camp.can_pour_kettle():
+		return "Pour hot spiced wassail"
 	return "Look at the %s" % str(piece.name).to_lower() if piece.id != "guardian_sign" else "Read the sign"
 
 
@@ -128,6 +132,10 @@ func interact(player: Player) -> void:
 		return
 	if piece.id == "gear_rack":
 		await open_rack(player)
+		return
+	if piece.id == "hearth_kettle" and Camp.pour_kettle():
+		Sound.play("item_get", -6.0, 0.05)
+		get_tree().call_group("hud", "show_message", "Poured a steaming mug of Bracebridge Spiced Wassail from the hearth kettle.")
 		return
 	get_tree().call_group("hud", "show_info", piece.name, Camp.describe(piece.id))
 
@@ -475,6 +483,10 @@ func _draw() -> void:
 		"keepsake_shelf": _draw_keepsake_shelf()
 		"summit_cairn": _draw_cairn()
 		"guardian_sign": _draw_sign()
+		"field_table": _draw_field_table()
+		"string_lights": _draw_string_lights()
+		"workbench": _draw_workbench()
+		"hearth_kettle": _draw_hearth_kettle()
 
 
 func _shadow(width: float, height := 6.0) -> void:
@@ -861,3 +873,84 @@ func _draw_sign() -> void:
 	# a little flag on top
 	draw_line(Vector2(18, -36), Vector2(18, -48), INK, 1.0)
 	draw_colored_polygon(PackedVector2Array([Vector2(19, -48), Vector2(27, -45), Vector2(19, -42)]), Color("3a7a4a"))
+
+
+func _draw_field_table() -> void:
+	_shadow(38, 7)
+	# cedar legs
+	for x in [-14, 14]:
+		draw_rect(Rect2(x - 2, -16, 4, 16).grow(1), INK)
+		draw_rect(Rect2(x - 2, -16, 4, 16), WOOD)
+		draw_rect(Rect2(x - 2, -16, 1, 16), WOOD_HI)
+	# tabletop
+	_plank_box(Rect2(-18, -20, 36, 5), WOOD_HI)
+	# plant press and drying wildflower sheet on top
+	draw_rect(Rect2(-13, -25, 11, 5).grow(1), INK)
+	draw_rect(Rect2(-13, -25, 11, 5), WOOD)
+	draw_rect(Rect2(-12, -23, 9, 2), PAPER)
+	draw_rect(Rect2(-10, -25, 1, 5), IRON)
+	draw_rect(Rect2(-5, -25, 1, 5), IRON)
+	draw_rect(Rect2(2, -23, 12, 3), PAPER)
+	draw_rect(Rect2(5, -22, 2, 1), Color("5a9a42"))
+	draw_rect(Rect2(8, -23, 2, 2), Color("d86a9a"))
+	draw_rect(Rect2(11, -22, 2, 1), Color("e8c24a"))
+
+
+func _draw_string_lights() -> void:
+	_shadow(64, 5)
+	_post(-30, -36, 3.0)
+	_post(30, -36, 3.0)
+	var lit := _night()
+	var cord := PackedVector2Array()
+	for i in 13:
+		var t := i / 12.0
+		cord.append(Vector2(lerpf(-29.0, 29.0, t), -34.0 + sin(t * PI) * 8.0))
+	draw_polyline(cord, INK, 2.0)
+	for i in range(1, 12, 2):
+		var p := cord[i] + Vector2(0, 2)
+		if lit:
+			draw_circle(p, 4.0, Color(1.0, 0.86, 0.48, 0.35))
+		draw_rect(Rect2(p - Vector2(1.5, 1.5), Vector2(3, 3)).grow(1), INK)
+		draw_rect(Rect2(p - Vector2(1.5, 1.5), Vector2(3, 3)), FLAME_HI if lit else GLASS)
+
+
+func _draw_workbench() -> void:
+	_shadow(42, 8)
+	# heavy timber legs and lower shelf
+	for x in [-16, 16]:
+		draw_rect(Rect2(x - 2, -18, 4, 18).grow(1), INK)
+		draw_rect(Rect2(x - 2, -18, 4, 18), WOOD_DARK)
+	draw_rect(Rect2(-15, -7, 30, 3).grow(1), INK)
+	draw_rect(Rect2(-15, -7, 30, 3), WOOD)
+	_plank_box(Rect2(-20, -22, 40, 5), WOOD)
+	# vise on the left, coiled cord and rock hammer on top
+	draw_rect(Rect2(-18, -25, 6, 4).grow(1), INK)
+	draw_rect(Rect2(-18, -25, 6, 4), IRON_HI)
+	draw_circle(Vector2(8, -24), 3.0, ROPE_RED)
+	draw_circle(Vector2(8, -24), 1.5, ROPE_HI)
+	draw_rect(Rect2(-4, -24, 7, 2), Color("c8a46a"))
+	draw_rect(Rect2(-6, -26, 3, 4), IRON)
+
+
+func _draw_hearth_kettle() -> void:
+	_shadow(16, 4)
+	# glowing coals beneath the copper kettle
+	for x in [-4, 0, 3]:
+		draw_rect(Rect2(x, -2, 3, 2), Color("e86a2a"))
+	# copper kettle body and spout
+	var copper := Color("c8743c")
+	var copper_hi := Color("ecc08a")
+	var copper_dark := Color("7a3c1c")
+	draw_rect(Rect2(-6, -12, 12, 9).grow(1), INK)
+	draw_rect(Rect2(-6, -12, 12, 9), copper)
+	draw_rect(Rect2(-5, -11, 3, 6), copper_hi)
+	draw_rect(Rect2(2, -12, 4, 9), copper_dark)
+	draw_rect(Rect2(-4, -14, 8, 2).grow(1), INK)
+	draw_rect(Rect2(-4, -14, 8, 2), copper_hi)
+	draw_line(Vector2(6, -8), Vector2(10, -12), copper, 2.0)
+	draw_arc(Vector2(0, -13), 6.0, PI, TAU, 8, IRON, 1.0)
+	# steam when a fresh mug is ready to pour today
+	if Camp.can_pour_kettle():
+		draw_rect(Rect2(-1, -18, 2, 2), Color(1, 1, 1, 0.55))
+		draw_rect(Rect2(1, -21, 2, 2), Color(1, 1, 1, 0.35))
+

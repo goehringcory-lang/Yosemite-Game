@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://assets/sprites/food_items.png" id="food_icons"]
+
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("food_icons")
+region = Rect2(384, 0, 32, 32)
+
+[resource]
+script = ExtResource("1_item")
+id = "wildflower_honey_cake"
+display_name = "Wildflower Honey Cake"
+description = "A golden skillet cake baked with spring strawberries, clover blossoms, and yerba buena. Enid Michael's recipe for the Wildflower Walk."
+icon = SubResource("icon")

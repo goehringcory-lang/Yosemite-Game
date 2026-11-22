@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/recipe_data.gd" id="1_recipe"]
+
+[resource]
+script = ExtResource("1_recipe")
+id = "autumn_hand_pie"
+display_name = "Chanterelle Hand Pie"
+station = "campfire"
+inputs = {"chanterelle": 2, "hazelnut": 2}
+output_id = "autumn_hand_pie"
+output_count = 2
+minutes = 55
+description = "Golden chanterelles and hazelnuts baked into two sturdy hand pies that keep two weeks in a pack."

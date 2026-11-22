@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "lamon_fall_meadow"
+title = "After the Flood, Before the Snow"
+giver = "james_lamon"
+requires = PackedStringArray("lamon_orchard", "lamon_winter")
+offered_in = 4
+out_of_season = PackedStringArray("The hazelnuts drop, Mirror Lake dries back to sand, and the climbers hold their Facelift cleanup in the fall. Come and see me when the oaks turn gold.")
+intro = PackedStringArray("Fall's the honest season in this valley. The crowds thin out, the black oaks turn gold, and every creature here is putting things in order before snow flies.", "Wren Alvarez and the climbers are getting ready for the Facelift cleanup, and they'll need something hearty in their pockets. Bring me three handfuls of wild hazelnuts from the shady woods.", "Then carry word to Wren at the foot of the Apron, and take a walk up Tenaya Creek to see what fall does to Mirror Lake.")
+steps = [{"type": "have", "item": "hazelnut", "count": 3, "consume": true, "objective": "Gather 3 hazelnuts for James Lamon and the fall Facelift crew", "reminder": "Check the shady woods in fall for three handfuls of hazelnuts, before the squirrels beat you to them.", "done": ["Sound nuts, every one of them. They'll keep till spring if the climbers don't eat them first.", "Go let Wren Alvarez know we've got supper and timber ready for the Facelift crew."]}, {"type": "talk", "target": "wren_alvarez", "objective": "Check in with Wren Alvarez about the fall Facelift cleanup", "reminder": "Wren is waiting over by Firefall Slab at Curry Village.", "done": ["Lamon sent hazelnuts and seasoned oak planks? That man's a legend. Facelift day is my favorite day in the Valley—hundreds of us hauling trash out of the talus and leaving the rock better than we found it.", "While you're out walking today, head up Tenaya Creek to Mirror Lake. Folks who only come in spring never believe it turns right back into a sandy meadow by fall."]}, {"type": "unlocked", "ability": "saw_dry_mirror_lake", "objective": "Walk to Mirror Lake in fall to see the spring lake dried back into a meadow, then tell James Lamon", "reminder": "Head up Tenaya Creek to Mirror Lake in fall and see how the lakebed rests until spring snowmelt.", "done": ["Just sand and willow grass where the water stood waist-deep in May. The valley takes back what it lends, season by season.", "That's why we clean up after ourselves and pack tight before winter."]}]
+outro = PackedStringArray("Here's my autumn hand pie recipe—chanterelles and hazelnuts in a crust that lasts two weeks in a pack—and two hot ones to start you off. Wren and I also set a sturdy trail-crew workbench down at your camp.", "Keep your rack tidy on that bench and the Camp 4 climbers will pay better for everything you bring to trade. You'll find room for more gear in your bag, too.")
+reward_items = {"autumn_hand_pie": 2}
+reward_recipes = PackedStringArray("autumn_hand_pie")
