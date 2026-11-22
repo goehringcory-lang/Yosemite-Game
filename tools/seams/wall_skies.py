@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Notes where each cliff wall painting meets the sky along its top edge,
-for SeamBackdrop (scripts/world/seam_backdrop.gd): above a map whose cliffs
-stand against the sky, the sky goes on up past the map's top, not woods.
-Reading the paintings in the game would mean fetching them back from the
-graphics card, which stalls a frame.
+"""Notes how deep the painted sky runs down from the top of each cliff wall
+painting, column by column, for SeamBackdrop (scripts/world/seam_backdrop.gd):
+where the woods stand past a map's top edge, it lays forest floor over that
+band of sky, so the woods meet the cliff tops instead of a strip of blue that
+reads as a river. Reading the paintings in the game would mean fetching them
+back from the graphics card, which stalls a frame.
 
     python3 tools/seams/wall_skies.py      # writes data/park/wall_skies.json
 """
@@ -35,24 +36,23 @@ def main() -> None:
             if not res or res.group(1) in skies:
                 continue
             image = Image.open(os.path.join(ROOT, res.group(1)[len("res://"):])).convert("RGBA")
+            # [from x, to x, rows of sky down from the top] each, for runs
+            # of columns with the same depth
             spans = []
-            start = None
-            sky = None
             for x in range(image.width):
-                px = image.getpixel((x, 0))
-                if is_sky(px):
-                    if start is None:
-                        start = x
-                        sky = px
-                elif start is not None:
-                    spans.append([start, x])
-                    start = None
-            if start is not None:
-                spans.append([start, image.width])
+                depth = 0
+                while depth < image.height and is_sky(image.getpixel((x, depth))):
+                    depth += 1
+                if depth == 0:
+                    continue
+                if spans and spans[-1][1] == x and spans[-1][2] == depth:
+                    spans[-1][1] = x + 1
+                else:
+                    spans.append([x, x + 1, depth])
             if spans:
-                skies[res.group(1)] = {"color": "#%02x%02x%02x" % sky[:3], "spans": spans}
+                skies[res.group(1)] = spans
     with open(OUT, "w") as f:
-        json.dump(skies, f, indent="\t")
+        f.write("{\n" + ",\n".join("\t%s: %s" % (json.dumps(k), json.dumps(v, separators=(",", ":"))) for k, v in skies.items()) + "\n}")
         f.write("\n")
     print("wrote %d walls to %s" % (len(skies), OUT))
 
