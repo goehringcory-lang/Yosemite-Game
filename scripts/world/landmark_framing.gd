@@ -145,6 +145,21 @@ func lead_for(player: Node2D, target_tilt: float) -> Vector2:
 	return Vector2(heading.x * LEAD.x, heading.y * LEAD.y * free).round()
 
 
+## The player has just arrived in [param region] (a door, a trip, a night's
+## sleep, a loaded game): frames the view for where they stand at once, with
+## no lead or carried lag from the place they left, and sets the camera's
+## offset to it. The camera's limits must be the new region's already.
+func settle(region: Node, player: Node2D, camera: Camera2D) -> void:
+	_region = region
+	_walls = _wall_feet(region)
+	var at := player.global_position
+	_last_at = at
+	tilt = target_tilt(camera, at)
+	lead = Vector2.ZERO
+	carry = Vector2.ZERO
+	camera.offset = Vector2(0.0, tilt)
+
+
 ## The player walked over a seam into [param region] and everything shifted
 ## by [param by] (see World._cross_seam): not an arrival, so the tilt keeps
 ## easing from where it was instead of jumping.

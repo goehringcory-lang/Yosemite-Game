@@ -27,6 +27,9 @@ const SEAM_SWAP := 160.0
 ## Walking into a seam whose region past it is still loading, the player
 ## waits at the edge this long (ms) for it before it's set up all at once.
 const SEAM_WAIT_MS := 1500
+## Arriving within this many pixels of the way back, the player faces away
+## from it (see _face_away_from_way_back).
+const FACE_AWAY_NEAR := 160.0
 
 ## The region the player is in.
 var region: Region
@@ -54,6 +57,8 @@ var _regions: Dictionary = {}
 var _preload_queue: Array[String] = []
 var _preloading := ""
 var _preloaded: Dictionary = {}
+## What is read with each region scene (see _extra_loads), by scene path.
+var _extra: Dictionary = {}
 ## Normal maps loaded in the background, held until used (see LitSprites).
 var _warm: Array[Resource] = []
 ## A seam crossed this tick, and where the camera's smoothing had got to,
@@ -74,6 +79,22 @@ var _seams: Dictionary = {}
 var _busy := false
 ## Seconds the place left behind takes to open away going through a door.
 const DOOR_TIME := 0.45
+## Behind a cover (the door's picture, the trip map), a new place is set up
+## a few steps a frame, up to this many microseconds of steps a frame, so
+## the window keeps drawing; and the cover waits at most PREPARE_WAIT
+## seconds on the disk before setting the rest up at once.
+const PREPARE_BUDGET_USEC := 12000
+const PREPARE_WAIT := 3.0
+## After a new place is laid out, its first frames are slow (everything in
+## it is drawn for the first time). A cover waits for SETTLE_FRAMES frames
+## in a row quicker than SETTLE_FRAME_MS (at most SETTLE_MOST seconds) before
+## it moves, so the door's wipe and the trip's marker don't jump.
+const SETTLE_FRAMES := 2
+const SETTLE_FRAME_MS := 50.0
+const SETTLE_MOST := 0.4
+## Walking toward a seam, the next region's sprites get their lit material
+## this many microseconds' worth a frame (see _set_up_step).
+const LIT_BUDGET_USEC := 3000
 const DOOR_WIPE := preload("res://assets/shaders/door_wipe.gdshader")
 var _place_check := 0.0
 ## The door the player last went through into a room, when it was a second
@@ -157,6 +178,11 @@ func _ready() -> void:
 		first_day.start_new_game()
 		if forage:
 			forage.respawn()
+	else:
+		# the save put the player back where they were, off the fallback spawn
+		_update_seam(true)
+		_fit_camera()
+		_settle_view()
 	Achievements.settle()
 	player.apply_look() # the look saved with the game just loaded, if any
 	hud.bind_player(player)
@@ -222,8 +248,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			go_to_region("glacier_point", "arrival")
 
 
+const REGION_DIR := "res://scenes/regions/"
+
+
 static func region_scene_path(id: String) -> String:
-	return "res://scenes/regions/%s.tscn" % id
+	return REGION_DIR + "%s.tscn" % id
 
 
 ## Opens the map to look around. Travel starts from kiosks and road exits.
@@ -407,6 +436,7 @@ func go_to_region(id: String, spawn_name := "arrival", minutes := 0, trip := {})
 		GameClock.advance_minutes(minutes)
 	_enter_region(id, spawn_name)
 	await _unstick_player()
+	await _settle()
 	await hud.fade_from_black()
 	_set_paused(false)
 	_busy = false
@@ -426,13 +456,22 @@ func _journey(id: String, spawn_name: String, minutes: int, info: Dictionary) ->
 	var from_region := region.region_id
 	var from := Wayfinding.lonlat_of(region, region.to_local(player.global_position))
 	var start := GameClock.minutes
+	# start reading the new place off the disk now, while the map opens
+	_want_loaded(id)
 	var journey := Journey.new()
 	add_child(journey)
 	await journey.cover()
 	# The HUD's clock would jump straight to the end; the map has its own.
 	hud.visible = false
+	# (the map drawn fully open first)
+	await get_tree().process_frame
+	# The map is open and still: set the new place up under it, a few steps
+	# a frame, and lay it out, before the marker sets off.
+	await _prepare_region(id)
 	GameClock.advance_minutes(minutes)
-	_enter_region(id, spawn_name)
+	_enter_region(id, spawn_name, true)
+	await _settle_seams()
+	await _settle()
 	info.merge({
 		"from": from,
 		"to": Wayfinding.lonlat_of(region, region.to_local(player.global_position)),
@@ -462,8 +501,15 @@ func _step_through(id: String, spawn_name: String) -> void:
 	var cover: CanvasLayer = null
 	if picture:
 		cover = _door_cover(picture)
-	_enter_region(id, spawn_name)
+		# Under the still picture: set the new place up, lay it out, and let
+		# its first slow frames pass before the picture opens away.
+		await _prepare_region(id)
+	_enter_region(id, spawn_name, cover != null)
+	if cover:
+		await _settle_seams()
 	await _unstick_player()
+	if cover:
+		await _settle()
 	_set_paused(false)
 	_busy = false
 	if cover == null:
@@ -534,6 +580,7 @@ func travel(leg: Dictionary) -> void:
 	GameClock.advance_minutes(leg.minutes)
 	_enter_region(arrive_in, leg.spawn)
 	await _unstick_player()
+	await _settle()
 	await hud.fade_from_black()
 	hud.show_message("You drove %s miles to %s (%s)." % [str(leg.miles), hub.display_name, Park.format_minutes(leg.minutes)])
 	_set_paused(false)
@@ -585,9 +632,12 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	player.lie_down(false)
 	player.facing = Vector2i.DOWN
 	player.interaction_area.position = Vector2(player.facing) * 24.0
+	_update_seam(true)
+	_fit_camera()
+	_settle_view()
 	await _unstick_player()
-	_camera().reset_smoothing()
 	var saved := SaveManager.save_game()
+	await _settle()
 
 	await hud.fade_from_black()
 	player.pose("arms_up", 1.0) # a morning stretch
@@ -637,8 +687,11 @@ func _show_bear_tracks() -> void:
 
 
 ## Swaps regions right away (no fade). The player lands on [param spawn_name]
-## if that spot exists, and otherwise keeps their position.
-func _enter_region(id: String, spawn_name := "") -> void:
+## if that spot exists, and otherwise keeps their position. With
+## [param staged_seams] a region beside the spot that isn't set up yet is
+## left for _settle_seams to lay out over the next frames.
+func _enter_region(id: String, spawn_name := "", staged_seams := false) -> void:
+	var left := region.region_id if region else ""
 	_drop_seam()
 	var at := player.global_position
 	if player.get_parent():
@@ -660,12 +713,53 @@ func _enter_region(id: String, spawn_name := "") -> void:
 	region.entities.add_child(player)
 	player.global_position = at
 	_arrived_at = at
+	if spawn:
+		_face_away_from_way_back(left)
 	# Beside a seam, lay the next region out now, while the screen is dark,
 	# so the camera starts out looking over the edge.
-	_update_seam(true)
+	_update_seam(not staged_seams, staged_seams)
 	_fit_camera()
-	_camera().reset_smoothing()
+	_settle_view()
 	_arrive()
+
+
+## Frames the view where the player has just arrived, so it shows settled
+## from the first frame: the drawn player on the player (no glide from the
+## place left behind), the tilt for here and no lead, the camera's smoothing
+## caught up, and the view moved there this frame (not on the camera's next
+## turn, which a door's wipe or a fade would show as a slide).
+func _settle_view() -> void:
+	var camera := _camera()
+	(player.get_node("SmoothMotion") as SmoothMotion).settle()
+	framing.settle(region, player, camera)
+	camera.reset_smoothing()
+	camera.force_update_scroll()
+	LandmarkFraming.set_offset_on_pixel(camera, camera.offset)
+
+
+## Through a door or along a way, the player arrives facing on into the new
+## place, away from the way back to [param left] beside them, instead of
+## however they faced when they left (often into the wall by the door).
+func _face_away_from_way_back(left: String) -> void:
+	if left == "" or left == region.region_id:
+		return
+	var at := player.global_position
+	var nearest := FACE_AWAY_NEAR
+	var away := Vector2.ZERO
+	for node in region.find_children("*", "", true, false):
+		if not (node is RegionDoor or node is RegionExit) or node.target_region != left:
+			continue
+		var gap := at - (node as Node2D).global_position
+		if gap.length() < nearest and gap.length() > 1.0:
+			nearest = gap.length()
+			away = gap
+	if away == Vector2.ZERO:
+		return
+	if absf(away.x) > absf(away.y):
+		player.facing = Vector2i.RIGHT if away.x > 0.0 else Vector2i.LEFT
+	else:
+		player.facing = Vector2i.DOWN if away.y > 0.0 else Vector2i.UP
+	player.interaction_area.position = Vector2(player.facing) * 24.0
 
 
 ## Everything that follows the player into a region, by a door or a fade or
@@ -696,9 +790,10 @@ func _get_region(id: String) -> Region:
 
 ## Sets region [param id] up for its first visit a step at a time, one step a
 ## call, so walking up to a seam never stalls a frame on it: makes it, then
-## gives it its story, saved state and sounds, then its light. Once done it
-## is in [member _regions].
-func _set_up_step(id: String) -> void:
+## gives it its story, saved state and sounds, then its light (a slice of
+## its sprites a call, LIT_BUDGET_USEC long, unless [param all_at_once]).
+## Once done it is in [member _regions].
+func _set_up_step(id: String, all_at_once := true) -> void:
 	var made: Region = _setting_up.get(id)
 	var step: int = made.get_meta("set_up_step", 0) if made else 0
 	match step:
@@ -716,8 +811,25 @@ func _set_up_step(id: String) -> void:
 			SunShadows.attach(made)
 			LampLights.attach(made)
 			remove_child(made)
+		2:
+			# the lit material, sprite by sprite (most of the sprites in a
+			# big region), a slice a call while walking
+			if not made.has_meta("lit_sprites"):
+				made.set_meta("lit_sprites", LitSprites.sprites_in(made))
+			var sprites: Array = made.get_meta("lit_sprites")
+			var from: int = made.get_meta("lit_next", 0)
+			var until := Time.get_ticks_usec() + LIT_BUDGET_USEC
+			while from < sprites.size() and (all_at_once or Time.get_ticks_usec() < until):
+				if is_instance_valid(sprites[from]):
+					LitSprites.attach_sprite(sprites[from])
+				from += 1
+			if from < sprites.size():
+				made.set_meta("lit_next", from)
+				return
+			made.remove_meta("lit_sprites")
+			made.remove_meta("lit_next")
 		_:
-			LitSprites.attach(made)
+			LitSprites.attach_ground(made)
 			Wind.attach(made)
 			made.remove_meta("set_up_step")
 			_setting_up.erase(id)
@@ -732,16 +844,134 @@ func _region_ready(id: String) -> bool:
 	var path := region_scene_path(id)
 	# Part way set up counts: its first step takes the background-loaded
 	# scene, which then isn't cached any more, and the rest never came.
-	return _regions.has(id) or _setting_up.has(id) or _preloaded.has(path) or ResourceLoader.has_cached(path)
+	return _regions.has(id) or _setting_up.has(id) or (_preloaded.has(path) or ResourceLoader.has_cached(path)) and not _loading(id)
+
+
+## Is the disk still being read for region [param id]: its scene, or the
+## normal maps and story scenes that go with it, waiting or loading now?
+func _loading(id: String) -> bool:
+	var path := region_scene_path(id)
+	if _preloading == path or path in _preload_queue:
+		return true
+	for extra in _extra_loads(path):
+		if _preloading == extra or extra in _preload_queue:
+			return true
+	return false
+
+
+## What else is read for the region scene at [param path] once it's loaded:
+## the story scenes laid over it (StoryContent) and the normal maps of the
+## sprites in both (LitSprites). Worked out once, after the scene is read.
+func _extra_loads(path: String) -> Array[String]:
+	var known: Array[String] = []
+	if _extra.has(path):
+		known.assign(_extra[path])
+		return known
+	if not (_preloaded.has(path) or ResourceLoader.has_cached(path)):
+		return known
+	for scene in [path] + StoryContent.overlay_paths(path.get_file().get_basename()):
+		if scene != path:
+			known.append(scene)
+		for normal in LitSprites.normals_for_scene(scene):
+			if not normal in known:
+				known.append(normal)
+	_extra[path] = known
+	return known
+
+
+## Puts region [param id] at the front of the background loads, if it isn't
+## loaded or set up yet.
+func _want_loaded(id: String) -> void:
+	var path := region_scene_path(id)
+	if id == "" or _regions.has(id) or _setting_up.has(id) or _preloaded.has(path) or _preloading == path \
+			or ResourceLoader.has_cached(path) or not ResourceLoader.exists(path):
+		return
+	_preload_queue.erase(path)
+	_preload_queue.push_front(path)
+
+
+## Sets region [param id] up behind a cover (the door's picture or the trip
+## map): waits for the background load of it (at most PREPARE_WAIT
+## seconds), then sets it up a few steps a frame. Done at once if there is
+## nothing to wait for.
+func _prepare_region(id: String) -> void:
+	if _regions.has(id) or not ResourceLoader.exists(region_scene_path(id)):
+		return
+	_want_loaded(id)
+	var started := Time.get_ticks_msec()
+	while not _regions.has(id):
+		if _loading(id) and Time.get_ticks_msec() - started < PREPARE_WAIT * 1000.0:
+			await get_tree().process_frame
+			continue
+		var until := Time.get_ticks_usec() + PREPARE_BUDGET_USEC
+		while not _regions.has(id) and Time.get_ticks_usec() < until:
+			_set_up_step(id)
+		if not _regions.has(id):
+			await get_tree().process_frame
+
+
+## After _enter_region(..., true): lays out the region beside the arrival
+## spot, if one is near and wasn't set up yet, setting it up a step a frame
+## behind the cover; then snaps the camera to the view it gives.
+func _settle_seams() -> void:
+	var started := Time.get_ticks_msec()
+	while Time.get_ticks_msec() - started < PREPARE_WAIT * 1000.0:
+		var pending := _seam_targets_pending()
+		if pending.is_empty():
+			break
+		for id in pending:
+			_want_loaded(id)
+		var until := Time.get_ticks_usec() + PREPARE_BUDGET_USEC
+		for id in pending:
+			if not _region_ready(id):
+				continue
+			while not _regions.has(id) and Time.get_ticks_usec() < until:
+				_set_up_step(id)
+		await get_tree().process_frame
+	_update_seam(true)
+	_fit_camera()
+	_settle_view()
+
+
+## The regions past the seams near the player that aren't set up yet.
+func _seam_targets_pending() -> Array[String]:
+	var pending: Array[String] = []
+	if region == null or region.indoors:
+		return pending
+	var at := region.to_local(player.global_position)
+	var bounds := region.get_bounds()
+	for exit in _seam_exits(region):
+		var id: String = exit.target_region
+		if _regions.has(id) or id in pending or not ResourceLoader.exists(region_scene_path(id)):
+			continue
+		if Seam.edge_gap(bounds, region.to_local(exit.global_position), at) < SEAM_FAR:
+			pending.append(id)
+	return pending
+
+
+## Waits for the frames after a new place is laid out to come quick again
+## (SETTLE_FRAMES in a row under SETTLE_FRAME_MS), at most SETTLE_MOST seconds.
+func _settle() -> void:
+	if DisplayServer.get_name() == "headless" and not journeys_headless:
+		return
+	var calm := 0
+	var started := Time.get_ticks_usec()
+	var last := started
+	while calm < SETTLE_FRAMES and Time.get_ticks_usec() - started < SETTLE_MOST * 1000000.0:
+		await get_tree().process_frame
+		var now := Time.get_ticks_usec()
+		calm = calm + 1 if (now - last) / 1000.0 < SETTLE_FRAME_MS else 0
+		last = now
 
 
 ## Lays the next region beside this one while the player is near a seam
 ## (the nearest open stretch of edge, within SEAM_NEAR; see Seam.span), and
 ## takes it away again once they have walked off, past SEAM_FAR. Walking
 ## about, a region set up for the first time waits for the next frame;
-## [param now] (arriving behind a fade) does it all at once.
-func _update_seam(now := false) -> void:
-	if region == null or (_busy and not now) or region.indoors:
+## [param now] (arriving behind a fade) does it all at once. [param busy_ok]
+## lays out only regions already set up, even while World is busy.
+func _update_seam(now := false, busy_ok := false) -> void:
+	if region == null or (_busy and not now and not busy_ok) or region.indoors:
 		return
 	var at := region.to_local(player.global_position)
 	var bounds := region.get_bounds()
@@ -757,9 +987,9 @@ func _update_seam(now := false) -> void:
 		# Setting up a region for the first time takes a few frames: a
 		# step a frame, and it's laid out once it's ready.
 		if not _regions.has(exit.target_region) and not now:
-			if not made:
+			if not made and not busy_ok:
 				made = true
-				_set_up_step(exit.target_region)
+				_set_up_step(exit.target_region, false)
 			continue
 		var found := _seam_for(exit)
 		if found == null:
@@ -956,15 +1186,16 @@ func _pump_preload() -> void:
 				return
 			ResourceLoader.THREAD_LOAD_LOADED:
 				var loaded := ResourceLoader.load_threaded_get(_preloading)
-				if loaded is PackedScene:
+				if loaded is PackedScene and _preloading.begins_with(REGION_DIR):
 					_preloaded[_preloading] = loaded
-					# its normal maps next, ahead of the other regions
-					var normals := LitSprites.normals_for_scene(_preloading)
-					normals.reverse()
-					for normal in normals:
-						if not normal in _preload_queue:
-							_preload_queue.push_front(normal)
-				else:
+					# its story scenes and normal maps next, ahead of the
+					# other regions
+					var extra := _extra_loads(_preloading).duplicate()
+					extra.reverse()
+					for path in extra:
+						if not path in _preload_queue and not ResourceLoader.has_cached(path):
+							_preload_queue.push_front(path)
+				elif loaded:
 					_warm.append(loaded)
 		_preloading = ""
 	while _preloading == "" and not _preload_queue.is_empty():
@@ -987,7 +1218,10 @@ func _unstick_player() -> void:
 			if not player.test_move(Transform2D(0.0, spot), Vector2.ZERO):
 				player.global_position = spot
 				_arrived_at = spot
-				_camera().reset_smoothing()
+				# the seam and limits were picked for the spawn
+				_update_seam(true)
+				_fit_camera()
+				_settle_view()
 				return
 
 
