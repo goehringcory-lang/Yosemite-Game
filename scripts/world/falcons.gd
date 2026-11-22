@@ -46,6 +46,18 @@ func _ready() -> void:
 	z_index = 30
 	_rng.randomize()
 	add_to_group("photo_subjects")
+	var world := _world()
+	if world and world.has_signal("seam_crossed"):
+		world.seam_crossed.connect(_on_seam_crossed)
+
+
+## Over a seam a falcon in the sky stays there (moved with the world), and
+## flies off in its own time if it doesn't belong over the new place.
+func _on_seam_crossed(shift: Vector2) -> void:
+	Critters.shift_places(_falcons, shift)
+	Critters.shift_places(_prey, shift)
+	Critters.shift_places(_puffs, shift)
+	_last_region = _region()
 
 
 ## What a camera pointed this way sees (Photos): each falcon, up where it flies.

@@ -51,6 +51,19 @@ var _last_region: Node
 func _ready() -> void:
 	_rng.randomize()
 	add_to_group("photo_subjects")
+	var world := _world()
+	if world and world.has_signal("seam_crossed"):
+		world.seam_crossed.connect(_on_seam_crossed)
+
+
+## Over a seam the animals in view stay: they're in the area behind, which
+## moved with the world, so only where they're heading (in world pixels)
+## moves too. They go once they're out of sight (_retire), not at once.
+func _on_seam_crossed(shift: Vector2) -> void:
+	for animal in _animals:
+		if is_instance_valid(animal):
+			animal.target += shift
+	_last_region = _region()
 
 
 ## What a camera pointed this way sees (Photos): each animal about.
@@ -199,7 +212,7 @@ func _process(delta: float) -> void:
 	var player := walker.global_position if walker else Vector2.INF
 	var running := _running()
 	for animal in _animals:
-		if is_instance_valid(animal):
+		if is_instance_valid(animal) and animal.is_inside_tree():
 			_update(animal, delta, player, running)
 	_retire()
 
@@ -357,8 +370,13 @@ func _retire() -> void:
 		if not is_instance_valid(animal):
 			continue
 		var lead: Wanderer = animal.leader if animal.leader and is_instance_valid(animal.leader) else animal
+		# left behind in an area taken away (a seam the player walked off)
+		if not lead.is_inside_tree() or not animal.is_inside_tree():
+			animal.queue_free()
+			continue
 		var gone := lead.state == "leave" and not view.has_point(lead.global_position)
-		gone = gone or (region != null and not bounds.has_point(lead.global_position))
+		# off the map (left behind over a seam): gone once out of sight
+		gone = gone or (region != null and not bounds.has_point(lead.global_position) and not view.has_point(lead.global_position))
 		if gone:
 			animal.queue_free()
 		else:

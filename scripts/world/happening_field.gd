@@ -15,10 +15,19 @@ var figures: Dictionary = {}
 var things: Dictionary = {}
 var _region: Region
 var _check := 0.0
+## Seconds someone takes to fade in when they're put out.
+const FADE_IN := 0.4
+## Who was out in the area left behind over a seam: still in view, they
+## stay until you've walked on out of sight of them.
+var _behind: Array[Node2D] = []
+var _crossed := false
 
 
 func _ready() -> void:
 	Happenings.changed.connect(refresh)
+	var world := _world()
+	if world and world.has_signal("seam_crossed"):
+		world.seam_crossed.connect(func(_shift: Vector2) -> void: _crossed = true)
 
 
 func _world() -> Node:
@@ -30,9 +39,15 @@ func _process(delta: float) -> void:
 	var region: Region = world.region if world and "region" in world else null
 	if region != _region:
 		_region = region
-		_clear()
+		if _crossed:
+			_leave_behind()
+		else:
+			_clear()
+		_crossed = false
 		refresh()
 		return
+	_crossed = false
+	_retire_behind()
 	_check -= delta
 	if _check <= 0.0:
 		_check = CHECK_EVERY
@@ -83,6 +98,7 @@ func _place_figure(happening: Dictionary) -> void:
 	_region.entities.add_child(figure)
 	figure.global_position = at
 	figures[happening.id] = figure
+	_fade_in(figure)
 
 
 func _place_thing(happening: Dictionary) -> void:
@@ -96,6 +112,14 @@ func _place_thing(happening: Dictionary) -> void:
 	_region.entities.add_child(node)
 	node.global_position = at
 	things[happening.id] = node
+	_fade_in(node)
+
+
+## Someone (or something) put out where you might be looking comes in
+## softly, not all at once.
+func _fade_in(node: CanvasItem) -> void:
+	node.modulate.a = 0.0
+	node.create_tween().tween_property(node, "modulate:a", 1.0, FADE_IN)
 
 
 func _drop(from: Dictionary, id: String) -> void:
@@ -110,3 +134,34 @@ func _clear() -> void:
 		_drop(figures, id)
 	for id: String in things.keys():
 		_drop(things, id)
+	for node in _behind:
+		if is_instance_valid(node):
+			node.queue_free()
+	_behind.clear()
+
+
+## Over a seam: who's out in the area behind stays there for now.
+func _leave_behind() -> void:
+	for from: Dictionary in [figures, things]:
+		for id: String in from.keys():
+			if is_instance_valid(from[id]):
+				_behind.append(from[id])
+		from.clear()
+
+
+## Those left behind go once they're out of sight, or their area is.
+func _retire_behind() -> void:
+	if _behind.is_empty():
+		return
+	var view := get_viewport().get_visible_rect()
+	var camera := get_viewport().get_camera_2d()
+	if camera:
+		var size := view.size / camera.zoom
+		view = Rect2(camera.get_screen_center_position() - size / 2.0, size).grow(64.0)
+	for i in range(_behind.size() - 1, -1, -1):
+		var node := _behind[i]
+		if not is_instance_valid(node):
+			_behind.remove_at(i)
+		elif not node.is_inside_tree() or not view.has_point(node.global_position):
+			node.queue_free()
+			_behind.remove_at(i)

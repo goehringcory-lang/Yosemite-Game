@@ -74,6 +74,11 @@ const BED_FADE := 1.5
 ## Hubs high enough that the wind is always up.
 const HIGH_COUNTRY := ["glacier_point", "tuolumne_meadows"]
 const POOL_SIZE := 10
+## Seconds a fire, fall or river you've just left (by a door, a trip or a
+## night's sleep) takes to fade out, instead of stopping dead (let_go).
+const TAIL_FADE := 0.6
+## Quieter than this where you stood, it just stops.
+const TAIL_QUIET := 0.02
 
 var _pool: Array[AudioStreamPlayer] = []
 var _next := 0
@@ -89,6 +94,8 @@ var _next_call := 0
 var _call_wait := 2.0
 ## The last call played, so the same bird doesn't answer itself.
 var _last_call := ""
+## Copies of the place sounds left behind, fading out: [player, fade per second].
+var _tails: Array = []
 
 
 func _ready() -> void:
@@ -138,6 +145,10 @@ func _exit_tree() -> void:
 	for call in _calls:
 		call.stop()
 		call.stream = null
+	for tail: Array in _tails:
+		(tail[0] as AudioStreamPlayer).stop()
+		(tail[0] as AudioStreamPlayer).stream = null
+	_tails.clear()
 	_streams.clear()
 	# The audio thread lets go of a stopped sound on its next mix; give it time
 	# for one before the engine checks for leaks (40 ms wasn't always enough).
@@ -437,6 +448,55 @@ func play_call(id: String) -> AudioStreamPlayer2D:
 	return call
 
 
+## Over a seam World moved everything by [param by]: the calls playing now
+## move with it, so a bird mid-song doesn't jump to the other ear or fall
+## silent (thunder too).
+func shift_calls(by: Vector2) -> void:
+	for call in _calls:
+		if call.playing:
+			call.global_position += by
+
+
+## [param root] (a region) is about to be taken away: each SoundEmitter in it
+## you can hear goes on as a copy at the level it had where you stood, and
+## fades out over TAIL_FADE, so leaving a campfire or a waterfall by a door
+## or a trip doesn't cut it off. Returns how many fade out (for tests).
+func let_go(root: Node) -> int:
+	if root == null or not root.is_inside_tree() or not is_inside_tree():
+		return 0
+	var here := _listener_center()
+	var count := 0
+	for node in root.find_children("Sound_*", "", true, false):
+		var emitter := node as SoundEmitter
+		if emitter == null or not emitter.playing or emitter.stream == null:
+			continue
+		var gain := emitter.volume_linear
+		if emitter.max_distance > 0.0:
+			var near := clampf(1.0 - emitter.global_position.distance_to(here) / emitter.max_distance, 0.0, 1.0)
+			gain *= pow(near, emitter.attenuation)
+		if gain < TAIL_QUIET:
+			continue
+		var tail := AudioStreamPlayer.new()
+		tail.bus = emitter.bus
+		tail.stream = emitter.stream
+		tail.volume_linear = gain
+		add_child(tail)
+		tail.play(emitter.get_playback_position())
+		_tails.append([tail, gain / TAIL_FADE])
+		count += 1
+	return count
+
+
+func _fade_tails(delta: float) -> void:
+	for i in range(_tails.size() - 1, -1, -1):
+		var tail: AudioStreamPlayer = _tails[i][0]
+		tail.volume_linear = maxf(tail.volume_linear - float(_tails[i][1]) * delta, 0.0)
+		if tail.volume_linear <= 0.0:
+			tail.stop()
+			tail.queue_free()
+			_tails.remove_at(i)
+
+
 ## Where the 2D listener is: the middle of what the camera sees.
 func _listener_center() -> Vector2:
 	var viewport := get_viewport()
@@ -454,6 +514,7 @@ func _indoors() -> bool:
 func _process(delta: float) -> void:
 	_update_music(delta)
 	_update_calls(delta)
+	_fade_tails(delta)
 	var targets := bed_targets()
 	var k := 1.0 - exp(-delta * 3.0 / BED_FADE)
 	for bed: String in BEDS:

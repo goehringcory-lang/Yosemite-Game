@@ -88,6 +88,28 @@ func _ready() -> void:
 	z_index = 4
 	_rng.randomize()
 	add_to_group("photo_subjects")
+	var world := _world()
+	if world and world.has_signal("seam_crossed"):
+		world.seam_crossed.connect(_on_seam_crossed)
+
+
+## Over a seam the birds and squirrels in view stay where they are (moved
+## with the world) instead of vanishing with the area left behind; those
+## off over the old map go off screen in their own time.
+func _on_seam_crossed(shift: Vector2) -> void:
+	shift_places(_birds, shift)
+	shift_places(_flies, shift)
+	shift_places(_squirrels, shift)
+	_last_region = _world().region
+
+
+## Moves every place (Vector2) in each of [param items] by [param by], but
+## not their speeds ("vel").
+static func shift_places(items: Array, by: Vector2) -> void:
+	for item: Dictionary in items:
+		for key: String in item:
+			if key != "vel" and item[key] is Vector2:
+				item[key] += by
 
 
 ## What a camera pointed this way sees (Photos): every bird, squirrel and

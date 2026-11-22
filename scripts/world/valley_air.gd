@@ -21,6 +21,8 @@ var _drift := Vector2.ZERO
 var _view := Rect2()
 var _mat: ShaderMaterial
 var _time := 0.0
+## How far World has moved the world at seams (see the shader's anchor).
+var _anchor := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -30,6 +32,15 @@ func _ready() -> void:
 	_mat.shader = SHADER
 	material = _mat
 	_drift = Vector2(randf() * 4000.0, randf() * 4000.0)
+	var world := get_parent()
+	if world and world.has_signal("seam_crossed"):
+		world.seam_crossed.connect(shift)
+
+
+## Over a seam the world moved by [param by]: the mist moves with it.
+func shift(by: Vector2) -> void:
+	_anchor += by
+	_mat.set_shader_parameter("anchor", _anchor)
 
 
 func _process(delta: float) -> void:

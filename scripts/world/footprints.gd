@@ -39,6 +39,8 @@ var _walkers := {}
 var _redraw_wait := 0.0
 var _region: Node
 var _on := false
+## Set over a seam, so the region_changed that follows keeps the tracks.
+var _crossed := false
 
 
 ## The painted ground's layer: the region sits first among World's children,
@@ -59,7 +61,30 @@ func _ready() -> void:
 	visible = false
 	var world := get_parent()
 	if world and world.has_signal("region_changed"):
-		world.region_changed.connect(func(_r: Node) -> void: clear())
+		world.region_changed.connect(_on_region_changed.unbind(1))
+	if world and world.has_signal("seam_crossed"):
+		world.seam_crossed.connect(_on_seam_crossed)
+
+
+## A new place starts with fresh snow, through a door or at the end of a
+## trip; over a seam the tracks in view stay (see _on_seam_crossed).
+func _on_region_changed() -> void:
+	if _crossed:
+		_crossed = false
+		return
+	clear()
+
+
+## Walking over a seam the world moved by [param shift]: the tracks move
+## with it, and the trail behind you runs on over the edge.
+func _on_seam_crossed(shift: Vector2) -> void:
+	_crossed = true
+	for i in _pos.size():
+		_pos[i] += shift
+	for id: int in _walkers:
+		var last: Array = _walkers[id]
+		last[0] += shift
+	queue_redraw()
 
 
 ## How many prints are in the snow now (for tests).
