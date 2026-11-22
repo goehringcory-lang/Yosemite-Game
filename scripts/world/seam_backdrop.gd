@@ -24,6 +24,8 @@ const Z := -40
 const FRINGE_Z := 8
 ## On the maps' painted ground and cliffs, under everything standing on them.
 const SHADE_Z := -6
+## Just over the maps' cliff paintings (theirs is -8).
+const BAND_Z := -7
 const FLOOR := Color(0.13, 0.17, 0.1)
 ## The floor's tones in deep shade: needle duff, darker hollows, lighter
 ## patches and the odd dry fleck; and the same under snow.
@@ -106,7 +108,26 @@ var _look := ""
 var _behind := Node2D.new()
 var _over := Node2D.new()
 var _shadow := Node2D.new()
+## Over a map's cliff painting where it ends in sky (BAND_Z): the forest
+## floor laid over that sky, and what stands on it.
+var _band := Node2D.new()
 var _floor: Texture2D
+## What each map's cliff painting has of sky along its top (see
+## [method skies_of]): Rect2s, in the maps' coordinates.
+var _skies: Array = []
+## The stretches of that sky the woods face: [rect] each. The floor goes over
+## them and trees stand on them, so the woods run down to the cliff tops.
+var _bands: Array[Rect2] = []
+## What stands on them, back to front: [texture, top-left, tint] each.
+var _on_bands: Array = []
+var _band_chunks: Array[Node2D] = []
+
+## Painting -> how deep its sky runs down from its top, column by column
+## ([from x, to x, rows] each), written by tools/seams/wall_skies.py (reading
+## the paintings here would fetch them back from the graphics card, which
+## stalls a frame).
+const SKIES_PATH := "res://data/park/wall_skies.json"
+static var _wall_skies = null
 
 static var _floors := {}
 
@@ -131,13 +152,19 @@ func _ready() -> void:
 	_shadow.z_as_relative = false
 	_shadow.draw.connect(_draw_shade)
 	add_child(_shadow)
+	_band.name = "SkyBand"
+	_band.z_index = BAND_Z
+	_band.z_as_relative = false
+	_band.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	_band.draw.connect(_draw_bands)
+	add_child(_band)
 	set_process(_rect.has_area())
 
 
 func _notification(what: int) -> void:
 	# one that never entered the tree still owns its layers
 	if what == NOTIFICATION_PREDELETE:
-		for layer: Node2D in [_behind, _over, _shadow]:
+		for layer: Node2D in [_behind, _over, _shadow, _band]:
 			if is_instance_valid(layer) and layer.get_parent() == null:
 				layer.free()
 
@@ -149,12 +176,16 @@ func _notification(what: int) -> void:
 ## No sky is drawn above a lower map's cliffs, even where their painting ends
 ## in sky: the camera only sees above a map beside a higher one, so that sky
 ## would lie beside the other map's ground and read as a flat blue lake (as
-## it did west of Camp 4, above Leidig Meadow). The woods fill it instead.
-func cover(rect: Rect2, maps: Array[Rect2] = []) -> void:
-	if rect == _rect and maps == _maps:
+## it did west of Camp 4, above Leidig Meadow). The woods fill it instead,
+## and run on down over the painted sky ([param skies], one list of Rect2s
+## per map, from [method skies_of]) to the cliff tops, or that band of blue
+## between the woods and the cliffs reads as a river.
+func cover(rect: Rect2, maps: Array[Rect2] = [], skies: Array = []) -> void:
+	if rect == _rect and maps == _maps and skies == _skies:
 		return
 	_rect = rect
 	_maps = maps
+	_skies = skies
 	set_process(rect.has_area())
 	_lay_out()
 
@@ -170,6 +201,34 @@ func _look_key() -> String:
 	return "%d:%s" % [clampi(GameClock.season, 0, 3), Seasons.snow_cover() > SNOW_FLOOR]
 
 
+## The sky painted along the top of [param region]'s cliff wall painting (a
+## Sprite2D named "...Wall" drawn from its top-left corner), with the
+## region's map at [param bounds]: Rect2s in the same coordinates as bounds,
+## from the map's top edge down as far as the sky goes. Empty if its top
+## isn't sky.
+static func skies_of(region: Region, bounds: Rect2) -> Array[Rect2]:
+	if _wall_skies == null:
+		_wall_skies = {}
+		if FileAccess.file_exists(SKIES_PATH):
+			var parsed = JSON.parse_string(FileAccess.get_file_as_string(SKIES_PATH))
+			if parsed is Dictionary:
+				_wall_skies = parsed
+	var found: Array[Rect2] = []
+	var shift := bounds.position - region.get_bounds().position
+	for child in region.get_children():
+		var wall := child as Sprite2D
+		if wall == null or wall.texture == null or wall.centered or not String(wall.name).ends_with("Wall") or wall.position.y > 0.5:
+			continue
+		for span: Array in _wall_skies.get(wall.texture.resource_path, []):
+			var x0: float = maxf(wall.position.x + float(span[0]) * wall.scale.x + shift.x, bounds.position.x)
+			var x1: float = minf(wall.position.x + float(span[1]) * wall.scale.x + shift.x, bounds.end.x)
+			var depth: float = (float(span[2]) * wall.scale.y + wall.position.y + shift.y) - bounds.position.y
+			if x1 > x0 and depth > 0.0:
+				found.append(Rect2(x0, bounds.position.y, x1 - x0, depth))
+		break
+	return found
+
+
 ## Works out what stands where: the trees and understory on their grid, each
 ## under the maps or over them, and the brush along the maps' edges.
 func _lay_out() -> void:
@@ -178,6 +237,10 @@ func _lay_out() -> void:
 	_chunk(self, [], _under_chunks)
 	_chunk(_over, [], _fringe_chunks)
 	_shade_rects.clear()
+	_bands.clear()
+	_on_bands.clear()
+	_chunk(_band, [], _band_chunks)
+	_band.queue_redraw()
 	_look = _look_key()
 	queue_redraw()
 	_behind.queue_redraw()
@@ -191,6 +254,17 @@ func _lay_out() -> void:
 	# What the camera can see (it stops at the edges of rect), on the art's
 	# two-pixel grain like everything standing on the maps.
 	_area = Rect2((_rect.position / 2.0).floor() * 2.0, (_rect.size / 2.0).ceil() * 2.0 + Vector2(2, 2))
+	# the painted sky along the map tops that face the woods
+	for i in mini(_maps.size(), _skies.size()):
+		for stretch: Vector2 in _facing_woods(_maps[i], Vector2i.UP):
+			# on into where the next map overlaps this one, since their
+			# grounds dither into each other there
+			stretch = Vector2(maxf(stretch.x - Seam.OVERLAP, _maps[i].position.x), minf(stretch.y + Seam.OVERLAP, _maps[i].end.x))
+			for sky: Rect2 in _skies[i]:
+				var from := maxf(sky.position.x, stretch.x)
+				var to := minf(sky.end.x, stretch.y)
+				if to > from:
+					_bands.append(Rect2(from, sky.position.y, to - from, sky.size.y))
 	var trees: Array[Texture2D] = []
 	for tree_name in TREES:
 		trees.append(_picture(tree_name, season))
@@ -200,6 +274,7 @@ func _lay_out() -> void:
 	# [foot y, texture, top-left, tint] each
 	var under := []
 	var over := []
+	var on_bands := []
 	# The grid: a column past the view either side, and down to where the
 	# tallest tree standing below the view still reaches into it. Most of it
 	# lies under a map: only the cells off them are looked at.
@@ -223,7 +298,7 @@ func _lay_out() -> void:
 						# too short to reach up into the view from there
 						continue
 					var item := [foot.y, tree, at, _shade(_gap(foot))]
-					var layer := _standing(foot, Rect2(at, size))
+					var layer := 3 if _on_band(foot) else _standing(foot, Rect2(at, size))
 					# one standing past the view is never drawn over a map:
 					# the camera can't look past that edge, and with no seam
 					# open nothing stands there
@@ -232,19 +307,22 @@ func _lay_out() -> void:
 					match layer:
 						1: under.append(item)
 						2: over.append(item)
+						3: on_bands.append(item)
 				var pick := _hash(cell + Vector2i(13, 57))
 				if pick < UNDERSTORY:
 					var kind := int(pick / UNDERSTORY * BRUSH.size()) % BRUSH.size()
 					var root := _snap((Vector2(cell) + Vector2(fmod(pick * 31.0, 1.0), fmod(pick * 17.0, 1.0))) * SPACING)
 					var plant: Texture2D = brush[kind]
 					if root.y - plant.get_height() < _rect.end.y and _in_woods(root):
-						under.append([root.y, plant, root - Vector2(plant.get_width() * 0.5, plant.get_height() - float(BRUSH[kind][2])), _shade(_gap(root))])
+						(on_bands if _on_band(root) else under).append([root.y, plant, root - Vector2(plant.get_width() * 0.5, plant.get_height() - float(BRUSH[kind][2])), _shade(_gap(root))])
 	for i in _maps.size():
 		_line_edges(_maps[i], brush, over)
 	_under = _back_to_front(under)
 	_fringe = _back_to_front(over)
 	_chunk(self, _under, _under_chunks)
 	_chunk(_over, _fringe, _fringe_chunks)
+	_on_bands = _back_to_front(on_bands)
+	_chunk(_band, _on_bands, _band_chunks)
 
 
 ## Hands [param items] to child canvas items of CHUNK each, in order, under
@@ -281,8 +359,14 @@ func _open_cells(from: int, row: int, count: int) -> Array[Vector2i]:
 	for map in _maps:
 		if top < map.position.y or top + SPACING > map.end.y:
 			continue
-		# the columns whose whole cell lies on this map
-		runs = _without(runs, Vector2i(ceili(map.position.x / SPACING), floori(map.end.x / SPACING)))
+		# the columns whose whole cell lies on this map, less those over the
+		# painted sky along its top, where the woods go on
+		var covered: Array[Vector2i] = [Vector2i(ceili(map.position.x / SPACING), floori(map.end.x / SPACING))]
+		for band in _bands:
+			if band.position.y == map.position.y and top < band.end.y:
+				covered = _without(covered, Vector2i(floori(band.position.x / SPACING), ceili(band.end.x / SPACING)))
+		for gone in covered:
+			runs = _without(runs, gone)
 	return runs
 
 
@@ -465,8 +549,11 @@ func _strip(map: Rect2, side: Vector2i, along: float, length: float, near: float
 	return Rect2(map.end.x - near - depth, along, depth, length)
 
 
-## True if a tree may stand at [param foot]: off every map.
+## True if a tree may stand at [param foot]: off every map, or on the
+## painted sky along one's top.
 func _in_woods(foot: Vector2) -> bool:
+	if _on_band(foot):
+		return true
 	for map in _maps:
 		if map.has_point(foot):
 			return false
@@ -554,6 +641,20 @@ static func _floor_texture(snowy: bool) -> Texture2D:
 			image.fill_rect(Rect2i(x * 2, y * 2, 2, 2), tone)
 	_floors[snowy] = ImageTexture.create_from_image(image)
 	return _floors[snowy]
+
+
+## True if [param foot] is on the painted sky along a map's top (and the
+## woods stand on it).
+func _on_band(foot: Vector2) -> bool:
+	for band in _bands:
+		if band.has_point(foot):
+			return true
+	return false
+
+
+func _draw_bands() -> void:
+	for band in _bands:
+		_band.draw_texture_rect(_floor, band, true)
 
 
 func _draw_floor() -> void:

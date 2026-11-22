@@ -200,6 +200,14 @@ func _check_backdrop() -> void:
 	check(woods._under.any(func(item: Array) -> bool:
 		var at: Vector2 = item[1]
 		return at.x < -400.0 and at.y + (item[0] as Texture2D).get_height() < b.position.y), "woods fill the corner above the lower map, not sky")
+	# and where B's cliff painting ends in sky, the woods run on down over it
+	# to the cliff tops, not leaving a strip of blue that reads as a river
+	var sky: Array[Rect2] = [Rect2(-1984, b.position.y, 1200, 80), Rect2(-784, b.position.y, 848, 40)]
+	woods.cover(merged, maps, [[], sky])
+	check(woods._bands.size() == 2 and is_equal_approx(woods._bands[1].end.x, b.end.x), "the woods cover the painted sky along B's top, on into where A overlaps it")
+	check(woods._in_woods(Vector2(-900, b.position.y + 60)) and not woods._in_woods(Vector2(-500, b.position.y + 60)), "trees stand on that sky as far down as it goes")
+	check(not woods._on_bands.is_empty(), "and some do")
+	woods.cover(merged, maps)
 	# the shade and the brush line the edges that face the woods (A's west
 	# edge above B, B's top edge west of A), not the stretch the two maps
 	# share nor the edges the camera can't look past
