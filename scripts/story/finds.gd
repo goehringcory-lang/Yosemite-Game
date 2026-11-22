@@ -131,12 +131,18 @@ static func icon_of(find: Dictionary) -> Texture2D:
 	return null
 
 
-## Up to RUMORS hints about finds not yet found, in areas you've walked into.
+## How many hidden-find rumors the Logbook passes on at once.
+func rumor_limit() -> int:
+	return RUMORS + (2 if Perks.has("trail_sense") else 0)
+
+
+## Up to rumor_limit() hints about finds not yet found, in areas you've walked into.
 ## The same few stay until one is found, so they don't shuffle each visit.
 func rumors() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
+	var limit := rumor_limit()
 	for find in _finds:
-		if result.size() >= RUMORS:
+		if result.size() >= limit:
 			break
 		if found.has(find.id) or str(find.get("rumor", "")) == "":
 			continue

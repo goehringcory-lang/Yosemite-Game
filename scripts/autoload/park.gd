@@ -134,7 +134,7 @@ func legs_from(hub_id: String) -> Array[Dictionary]:
 		if not forward:
 			path.reverse()
 		var base_minutes := int(route.minutes_ab if forward else route.minutes_ba)
-		var travel_minutes := maxi(5, roundi(base_minutes * (1.0 - Perks.bonus("high_country_timing"))))
+		var travel_minutes := maxi(5, roundi(base_minutes * (1.0 - Perks.bonus("high_country_timing") - Perks.bonus("trail_sense"))))
 		legs.append({
 			"id": route.id,
 			"to": destination,

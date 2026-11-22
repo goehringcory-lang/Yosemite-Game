@@ -657,6 +657,9 @@ func develop(view: Dictionary, image: Image = null) -> Dictionary:
 	for entry in fresh:
 		list_ticked.emit(entry)
 	changed.emit()
+	if Perks.has("gallery_eye") and int(photo.stars) >= 3:
+		Market.set_tab("village_store", Market.tab("village_store") + 10)
+		result["gallery_credit"] = 10
 	if not fresh.is_empty():
 		QuestLog.changed.emit() # a "photographed" step may be done now
 	Achievements.check()

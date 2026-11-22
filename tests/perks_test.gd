@@ -47,7 +47,7 @@ func _ready() -> void:
 
 
 func test_definitions() -> void:
-	check(Perks.PERKS.size() >= 6 and Perks.PERKS.size() <= 16, "6 to 16 perks (%d)" % Perks.PERKS.size())
+	check(Perks.PERKS.size() >= 6 and Perks.PERKS.size() <= 24, "6 to 24 perks (%d)" % Perks.PERKS.size())
 	var ids := {}
 	for perk: Dictionary in Perks.PERKS:
 		ids[perk.id] = true

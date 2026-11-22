@@ -7,6 +7,7 @@ class_name NewGame
 ## What World resets for a new game. (The clock is left alone: a game that
 ## just started has it at the first morning already, and tests set it first.)
 static func reset() -> void:
+	Perks.resetting = true
 	Inventory.start_new_game()
 	Park.start_new_game()
 	Gear.start_new_game()
@@ -31,6 +32,7 @@ static func reset() -> void:
 	Market.start_new_game()
 	GearSale.start_new_game()
 	Crow.paper_day = ""
+	Perks.resetting = false
 
 
 ## Everything, the clock and the larder too: for the pause menu's Quit to
