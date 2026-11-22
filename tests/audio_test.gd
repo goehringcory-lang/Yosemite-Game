@@ -248,10 +248,10 @@ func test_emitters() -> void:
 	check(emitter.bus == Sound.BUS_AMBIENCE and emitter.stream != null and emitter.playing, "a waterfall plays its loop on the Ambience bus")
 	GameClock.season = GameClock.Season.SPRING
 	emitter._refresh_level()
-	var spring := emitter.volume_linear
+	var spring := emitter.target_volume()
 	GameClock.season = GameClock.Season.FALL
 	emitter._refresh_level()
-	check(emitter.volume_linear < spring * 0.5, "falls are loud in spring and quiet in fall (%.2f, %.2f)" % [spring, emitter.volume_linear])
+	check(emitter.target_volume() < spring * 0.5, "falls are loud in spring and quiet in fall (%.2f, %.2f)" % [spring, emitter.target_volume()])
 	GameClock.season = GameClock.Season.SUMMER
 	world._enter_region("tunnel_view", "arrival")
 	await get_tree().process_frame

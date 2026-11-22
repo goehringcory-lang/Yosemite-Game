@@ -173,7 +173,7 @@ func test_falls() -> void:
 	var roar: SoundEmitter = spray.find_child("Sound_waterfall", false, false) if spray else null
 	if roar:
 		roar._refresh_level()
-	check(roar != null and roar.volume_linear == 0.0, "and no roar")
+	check(roar != null and roar.target_volume() == 0.0, "and no roar")
 	world._enter_region("bridalveil_fall", "arrival")
 	await get_tree().process_frame
 	var bridalveil := _sprite("BridalveilFall")

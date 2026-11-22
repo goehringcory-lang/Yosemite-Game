@@ -85,6 +85,16 @@ static func attach_rivers(region: Region) -> void:
 		region.add_child(emitter)
 
 
+## Seconds to fade in when it starts (its place laid out, or you come back
+## through a door), so a fire or a fall never starts at full roar.
+const FADE_IN := 0.6
+
+## How far it has faded in, 0 to 1, and its level from the season (set
+## every couple of seconds, eased toward each frame).
+var _fade := 0.0
+var _target := 0.0
+
+
 func _ready() -> void:
 	bus = Sound.BUS_AMBIENCE
 	stream = Sound.loop_stream(sound)
@@ -95,8 +105,11 @@ func _ready() -> void:
 
 func _notification(what: int) -> void:
 	# A region the player left keeps its nodes but leaves the tree, which
-	# stops the sound; start it again on the way back in.
+	# stops the sound (Sound.let_go fades out a copy); start it again, fading
+	# in, on the way back in.
 	if what == NOTIFICATION_ENTER_TREE and stream:
+		_fade = 0.0
+		volume_linear = 0.0
 		_resume.call_deferred()
 
 
@@ -105,13 +118,23 @@ func _process(delta: float) -> void:
 	if _check <= 0.0:
 		_check = 2.0
 		_refresh_level()
+	_fade = minf(_fade + delta / FADE_IN, 1.0)
+	var want := _target * _fade
+	# the season's level eases too, instead of stepping every two seconds
+	volume_linear = want if _fade < 1.0 else move_toward(volume_linear, want, delta / FADE_IN)
+
+
+## Its level now from the season and the fall's flow (0 to [member level]),
+## before fading in.
+func target_volume() -> float:
+	return _target
 
 
 func _refresh_level() -> void:
 	var season := 1.0
 	if sound == "waterfall":
 		season = Seasons.waterfall_flow(flow_kind) if flow_kind != "" else Sound.waterfall_level()
-	volume_linear = level * season
+	_target = level * season
 	_resume()
 
 
