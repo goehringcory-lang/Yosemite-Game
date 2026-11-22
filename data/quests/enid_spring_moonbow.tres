@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "enid_spring_moonbow"
+title = "Moonbow and High Water"
+giver = "enid_michael"
+requires = PackedStringArray("enid_leave_some", "enid_dawn_chorus")
+offered_in = 1
+out_of_season = PackedStringArray("The Wildflower Walk and the moonbow belong to spring, when the falls are roaring and the meadow is wet. Come and see me when the snow melts.")
+intro = PackedStringArray("Spring is the valley's whole symphony played at once. The Wildflower Walk is coming round, the Merced is running bank-full, and under the full moon Lower Yosemite Fall makes a bow of silver light.", "I'm setting a table for the walkers, and I'd love your hands. Bring me three bunches of fresh miner's lettuce from the wet ground first.", "Then check with Ranger Hodges on the spring flood and the moon's phase, and go see that moonbow for yourself.")
+steps = [{"type": "have", "item": "miners_lettuce", "count": 3, "consume": true, "objective": "Gather 3 miner's lettuce for Enid Michael's spring Wildflower Walk table", "reminder": "Three bunches of miner's lettuce from the Valley floor's damp shade. Take one leaf from a patch and leave the rest.", "done": ["Crisp as snowmelt. That will do nicely for the Wildflower Walk table.", "Now go and ask Ranger Hodges at the station how high the river is running and which nights the moon is full."]}, {"type": "talk", "target": "clare_hodges", "objective": "Check the spring snowmelt and full-moon nights with Ranger Hodges", "reminder": "Ranger Hodges keeps the gauge at the station. Ask her when the moon is full over the falls.", "done": ["The Merced is up over the low meadows, and Lower Yosemite Fall is throwing spray halfway across the bridge.", "The moon is full on nights thirteen through fifteen of spring. Stand at the foot of Lower Yosemite Fall between nine at night and two in the morning, and watch the mist catch the light.", "Tell Enid I'll see her at the Wildflower Walk if the bears behave themselves."]}, {"type": "unlocked", "ability": "saw_moonbow", "objective": "Watch the spring moonbow at Lower Yosemite Fall on a full-moon night (Spring 13 to 15, 9 PM to 2 AM), then tell Enid Michael", "reminder": "Go down to Lower Yosemite Fall on a spring full-moon night, days thirteen to fifteen, after nine. Let your eyes settle in the dark.", "done": ["You saw it! A pale silver arch right in the spray, and the whole cliff booming behind it.", "Every spring I tell visitors it's real, and every spring half of them think I'm teasing until they stand in the mist."]}]
+outro = PackedStringArray("Take my recipe for wildflower honey cake, and a couple warm from the skillet. I've also had a pressed-flower field table carried down to your camp under the oaks—food tucked in your chest will keep longer with a cool table to sort it on.", "Walk slow this spring. Once you've watched the mist by moonlight, the little things in the grass glint a good deal brighter.")
+reward_items = {"wildflower_honey_cake": 2}
+reward_recipes = PackedStringArray("wildflower_honey_cake")

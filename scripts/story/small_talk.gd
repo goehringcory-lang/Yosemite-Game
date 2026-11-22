@@ -75,6 +75,11 @@ const LINES := {
 			"climb": "Heard you were up %s. I get dizzy on the apple ladder, myself.",
 			"sighting": "You saw %s? Long as it stays out of my orchard, it's welcome in the valley.",
 		},
+		"after": {
+			"lamon_fall_meadow": [
+				"That oak workbench looks right at home under the apple trees. Keep your pack tight before snow flies.",
+			],
+		},
 		"loved": "Apples! Now you're speaking my language. Thank you kindly.",
 	},
 	"bridget_degnan": {
@@ -172,6 +177,11 @@ const LINES := {
 			"climb": "One of my guests came back from the meadow saying you'd climbed %s. I told her I know you.",
 			"rescue": "I hear you found %s. That family will be telling the story for years. Well done.",
 		},
+		"after": {
+			"curry_summer_firefall": [
+				"The string lights look lovely over at the homestead. Every camp deserves a warm glow after the Firefall fades.",
+			],
+		},
 		"loved": "Oh, my! That's just the thing. You're a dear.",
 	},
 	"george_anderson": {
@@ -231,6 +241,11 @@ const LINES := {
 			"climb": "You climbed %s? If I'd known, I'd have had the long lens on you.",
 			"sighting": "You saw %s! I never have the right lens when it matters. Did you get a good look?",
 		},
+		"after": {
+			"ansel_winter_horsetail": [
+				"Horsetail Fall in late winter is a gift you can't schedule. Keep that copper kettle simmering when the snow flies.",
+			],
+		},
 		"loved": "Oh, splendid! You know my weaknesses. Thank you.",
 	},
 	"james_mccauley": {
@@ -267,6 +282,11 @@ const LINES := {
 		"news": {
 			"climb": "You climbed %s? Did you see what grows in the cracks up there? Next time, look.",
 			"sighting": "You saw %s! Write down the time and the place, please. One good record is worth ten good stories.",
+		},
+		"after": {
+			"enid_spring_moonbow": [
+				"How is the field table holding up? A cool cedar board keeps spring greens crisp twice as long.",
+			],
 		},
 		"loved": "Oh, you've been foraging carefully, I can tell. Thank you!",
 	},

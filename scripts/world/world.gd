@@ -682,6 +682,12 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	var cold_note := Warmth.morning_note()
 	if cold_note != "":
 		message += "\n" + cold_note
+	if Perks.has("high_country_timing") and GameClock.season == GameClock.Season.SUMMER:
+		var storm := HighCountry.storm_hour()
+		if storm > 0.0:
+			var sh := int(round(storm))
+			var h12 := sh % 12
+			message += "\nHigh-country forecast: afternoon storm expected over Tuolumne around %d %s." % [12 if h12 == 0 else h12, "AM" if sh < 12 else "PM"]
 	if Larder.last_spoiled != "":
 		message += "\n" + Larder.last_spoiled
 	if Camp.last_spoiled != "":
@@ -795,6 +801,8 @@ func _face_away_from_way_back(left: String) -> void:
 func _arrive() -> void:
 	$DayNight.visible = not region.indoors
 	Warmth.outdoors = not region.indoors
+	if region.region_id == "mirror_lake" and GameClock.season == GameClock.Season.FALL:
+		QuestLog.mark_event("saw_dry_mirror_lake", "Mirror Lake has dried back to a sandy meadow for the fall.")
 	if forage:
 		forage.refresh()
 	var plants := PlantSpawner.attach(region)

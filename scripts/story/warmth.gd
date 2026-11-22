@@ -47,7 +47,9 @@ static func is_cold() -> bool:
 
 ## What the cold does to your walking speed (1 when it doesn't).
 static func speed_factor() -> float:
-	return COLD_SPEED if is_cold() else 1.0
+	if not is_cold():
+		return 1.0
+	return lerpf(COLD_SPEED, 1.0, Perks.bonus("winter_hearth"))
 
 
 ## Whether Marty would remind you: you have your first kit from him, and not

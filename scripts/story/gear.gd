@@ -175,7 +175,7 @@ func carried_all() -> Dictionary:
 
 
 func bag_room() -> int:
-	return BAG_ROOM + (HAUL_BAG_ROOM if carried("haul_bag") > 0 else 0)
+	return BAG_ROOM + (HAUL_BAG_ROOM if carried("haul_bag") > 0 else 0) + int(Perks.bonus("clean_pack"))
 
 
 func bag_used() -> int:

@@ -44,6 +44,8 @@ func photo_subjects() -> Array:
 func _process(delta: float) -> void:
 	var active := GameClock.is_moonbow_time()
 	level = move_toward(level, 1.0 if active else 0.0, delta / FADE_TIME)
+	if active and level >= 0.3:
+		QuestLog.mark_event("saw_moonbow", "A pale silver moonbow arches through the spray of Lower Yosemite Fall.")
 	visible = active or level > 0.0
 	if not visible:
 		return

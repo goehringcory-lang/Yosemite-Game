@@ -14,6 +14,7 @@ const FOODS := [
 	"acorn_flour", "leached_acorn_meal", "acorn_mush", "acorn_cake",
 	"elderberry_sauce", "manzanita_cider", "roasted_morels", "toasted_toyon",
 	"yerba_buena_tea", "spring_greens", "bread_pudding", "dry_crusts",
+	"wildflower_honey_cake", "curry_cobbler", "autumn_hand_pie", "bracebridge_wassail",
 ]
 
 var art := Art.new()
@@ -225,3 +226,53 @@ func _dry_crusts(im: Image, ox: int) -> void:
 		art.ellipse(im, ox + p[0] + 0.5, p[1] + 0.5, p[2], p[3], c("8a5a2a"))
 		art.ellipse(im, ox + p[0] + 0.5, p[1] + 1, p[2] - 1.2, p[3] - 1.2, c("d8b880"))
 		art.px(im, ox + p[0] - 1, p[1] - 1, c("b07a3a"))
+
+
+func _wildflower_honey_cake(im: Image, ox: int) -> void:
+	# a round golden skillet cake glazed with honey, strawberry and clover blossom on top
+	art.ellipse(im, ox + 8, 11, 6.2, 3.0, c("9a6220"))
+	art.ellipse(im, ox + 8, 8.5, 6.2, 3.2, c("d89a34"))
+	art.ellipse(im, ox + 7.5, 7.5, 5.0, 2.2, c("f0c658"))
+	# honey drips down the side
+	for x in [4, 7, 11]:
+		art.rect(im, ox + x, 9, 1, 3, c("e8b23a"))
+	# strawberry and white clover blossom garnish
+	art.ellipse(im, ox + 6.5, 6.5, 1.5, 1.3, c("c8362a"))
+	art.px(im, ox + 6, 6, c("f07a6a"))
+	art.px(im, ox + 10, 6, c("f4f0e4"))
+	art.px(im, ox + 11, 7, c("6aa84a"))
+
+
+func _curry_cobbler(im: Image, ox: int) -> void:
+	# a dark cast-iron tin bubbling with blackberry-elderberry filling and golden biscuits
+	art.rect(im, ox + 1, 7, 14, 7, c("4a484c"))
+	art.rect(im, ox + 1, 12, 14, 2, c("2e2c30"))
+	art.rect(im, ox + 2, 7, 12, 4, c("48204c"))
+	art.rect(im, ox + 3, 7, 4, 2, c("6a346e"))
+	# browned biscuit rounds across the top
+	for p in [[4, 7], [8, 6], [11, 7]]:
+		art.ellipse(im, ox + p[0] + 0.5, p[1] + 0.5, 2.1, 1.4, c("c88a3c"))
+		art.px(im, ox + p[0], p[1], c("ecd088"))
+	_steam(im, ox, [6, 10])
+
+
+func _autumn_hand_pie(im: Image, ox: int) -> void:
+	# a golden crimped half-moon pasty, sturdy for a big-wall pack
+	art.ellipse(im, ox + 8, 10.5, 6.6, 3.6, c("8a5422"))
+	art.ellipse(im, ox + 8, 9.2, 6.2, 3.4, c("c88438"))
+	art.ellipse(im, ox + 7.2, 8.2, 4.4, 2.0, c("e4ad5c"))
+	# crimped edge notches and steam vents
+	for x in range(3, 13, 2):
+		art.px(im, ox + x, 12, c("a86a2a"))
+	art.px(im, ox + 6, 8, c("6a3c18"))
+	art.px(im, ox + 9, 8, c("6a3c18"))
+
+
+func _bracebridge_wassail(im: Image, ox: int) -> void:
+	# a gleaming copper mug filled with spiced ruby wassail and a rose-hip garnish
+	_cup(im, ox, "c8743c", "8a4420", "8c2420")
+	art.px(im, ox + 6, 5, c("d85a3a"))
+	art.px(im, ox + 8, 5, c("e8b048"))
+	art.px(im, ox + 5, 9, c("ecc08a"))
+	_steam(im, ox, [5, 9])
+

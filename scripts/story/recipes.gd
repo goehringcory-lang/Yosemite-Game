@@ -22,6 +22,10 @@ const RECIPES: Array[RecipeData] = [
 	preload("res://data/recipes/spring_greens.tres"),
 	preload("res://data/recipes/bread_pudding.tres"),
 	preload("res://data/recipes/dry_crusts.tres"),
+	preload("res://data/recipes/wildflower_honey_cake.tres"),
+	preload("res://data/recipes/curry_cobbler.tres"),
+	preload("res://data/recipes/autumn_hand_pie.tres"),
+	preload("res://data/recipes/bracebridge_wassail.tres"),
 ]
 
 const STARTING_RECIPES := ["yerba_buena_tea", "roasted_morels"]

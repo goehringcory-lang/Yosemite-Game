@@ -58,6 +58,8 @@ func _process(delta: float) -> void:
 		get_tree().call_group("hud", "show_message", MESSAGE)
 	_was_lit = lit
 	level = move_toward(level, 1.0 if lit else 0.0, delta / (FADE_IN if lit else FADE_OUT))
+	if lit and level >= 0.3:
+		QuestLog.mark_event("saw_horsetail")
 	visible = Seasons.horsetail_running() or level > 0.0
 	if not visible:
 		return

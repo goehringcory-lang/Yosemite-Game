@@ -20,6 +20,10 @@ const WORLD_ABILITIES := {
 	"diving_board_light": "the Diving Board in the afternoon (Backcountry)",
 	"muir_cloud_sea": "on top of Half Dome before ten after a night at Little Yosemite (Backcountry)",
 	"first_photograph": "the first picture taken with Ansel's camera (Photos)",
+	"saw_moonbow": "watching the spring moonbow at Lower Yosemite Fall (Moonbow)",
+	"saw_firefall": "watching the summer Firefall from Camp Curry (Firefall)",
+	"saw_dry_mirror_lake": "visiting Mirror Lake dried to a meadow in fall (World)",
+	"saw_horsetail": "watching Horsetail Fall glow in late winter (HorsetailFall)",
 }
 
 var failures := 0

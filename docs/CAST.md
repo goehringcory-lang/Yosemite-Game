@@ -221,6 +221,10 @@ Fish board ....... Greg, Tight Lines ..................... traced with your bigg
 Framed sheets .... Enid Michael, The Full Press .......... instead of elderberry sauce
 Summit cairn ..... (no quest) ............................ a stone for every summit in the logbook
 The sign ......... after the cave ........................ THE GUARDIAN'S CAMP
+Field table ...... Enid Michael, Moonbow and High Water .. food in the camp chest ages half as fast
+String lights .... Jennie Curry, Let the Fire Fall ....... lit at night; +3 stamina at every climbing rest
+Workbench ........ Lamon, After the Flood, Before the Snow +15% barter value with climbers and outfitters
+Hearth kettle .... Ansel Adams, Fire on the Granite ...... pour a free mug of spiced wassail each morning
 ```
 
 Every main-line quest from Firefall Slab on also leaves a keepsake on the shelf (`Camp.KEEPSAKES`).
@@ -304,6 +308,19 @@ The seasons, the hours, and the hubs past the Valley:
   Chef Marchand: The Chef's Larder  (spring and summer; after The Guardian's Register) 4 wild strawberries,
                                     2 yerba buena, then meet him at the old oak on the Tea Lawn
                                     → he shows you the carved face in its bark, 2 bread pudding
+Seasonal festivities and natural events (`tests/seasonal_events_test.tscn`):
+  Enid Michael: Moonbow and High Water .. (spring only; after Dawn Chorus) 3 miner's lettuce, check spring
+                                          runoff with Hodges, witness the full-moon moonbow at Lower Yosemite Fall
+                                          → Wildflower Honey Cake recipe + 2 cakes, Field Table, Botanist's Glint perk
+  Jennie Curry: Let the Fire Fall ....... (summer only; after Fall of Fire) 3 blackberries, check the rim
+                                          bonfire with McCauley, watch the 9 PM Firefall from Camp Curry
+                                          → Camp Curry Berry Cobbler recipe + 2 cobblers, String Lights, High-Country Timing perk
+  James Lamon: After the Flood, Before the Snow .. (fall only; after Laying By) 3 hazelnuts, check in with Wren
+                                          for the Facelift, visit dry Mirror Lake in fall
+                                          → Chanterelle Hand Pie recipe + 2 pies, Trail-Crew Workbench, Clean Pack perk
+  Ansel Adams: Fire on the Granite, Feast in the Hall .. (winter only; after Monolith) 3 rose hips, deliver to
+                                          Chef Marchand for Bracebridge Dinner, watch Horsetail Fall glow in late winter
+                                          → Bracebridge Spiced Wassail recipe + 2 mugs, Hearth Kettle, Winter Hearth perk
 Other:
   Lucy Telles: The Big Basket ✦ ... her name in the Register → 2 acorn cakes
   Carrie Bethel: Over the Crest ✦ . 4 acorn flour → 10 pine nuts

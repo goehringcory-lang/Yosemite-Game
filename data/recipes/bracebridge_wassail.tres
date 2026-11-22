@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/recipe_data.gd" id="1_recipe"]
+
+[resource]
+script = ExtResource("1_recipe")
+id = "bracebridge_wassail"
+display_name = "Bracebridge Spiced Wassail"
+station = "campfire"
+inputs = {"wood_rose_hips": 3, "toyon_berries": 2}
+output_id = "bracebridge_wassail"
+output_count = 2
+minutes = 35
+description = "Rose hips and toyon berries steeped over coals into two steaming mugs that keep well through winter."

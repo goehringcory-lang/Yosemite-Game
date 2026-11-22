@@ -310,15 +310,16 @@ func light_now(indoors := false) -> String:
 		return "indoors"
 	var hour := fposmod(Sun.hour_now(), 24.0)
 	var sun := Sun.times()
+	var golden := GOLDEN_HOURS + Perks.bonus("winter_hearth")
 	if Sun.night() > 0.75:
 		return "moonlight" if GameClock.is_full_moon() else "night"
 	if hour < 12.0:
-		if hour < sun.x + GOLDEN_HOURS:
+		if hour < sun.x + golden:
 			return "first_light"
 		return "morning" if hour < 10.5 else "midday"
 	if hour < 14.5:
 		return "midday"
-	if hour < sun.y - GOLDEN_HOURS:
+	if hour < sun.y - golden:
 		return "afternoon"
 	if hour < sun.y - 0.25:
 		return "last_light"
