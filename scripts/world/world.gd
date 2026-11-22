@@ -24,9 +24,15 @@ const SEAM_FAR := 960.0
 ## edge, so walking along an edge where two regions meet it doesn't flick
 ## between them.
 const SEAM_SWAP := 160.0
+## Walking into a seam whose region past it is still loading, the player
+## waits at the edge this long (ms) for it before it's set up all at once.
+const SEAM_WAIT_MS := 1500
 
 ## The region the player is in.
 var region: Region
+## Where the player last arrived, by a door, a fade, a trip or over a seam
+## (see use_exit).
+var _arrived_at := Vector2.INF
 ## The forage spawner in the current region, if it has one. Hubs give theirs
 ## a unique name (Forage_<hub id>), so look for it by type.
 var forage: ForageSpawner:
@@ -262,6 +268,15 @@ func remember_door(door: BuildingDoor) -> void:
 func use_exit(exit: RegionExit) -> void:
 	if _busy or not player.can_act:
 		return
+	# Still standing where they arrived, and not really in it: physics still
+	# sees them where they stood in the last place, at the same spot as this
+	# exit (the rooms' doors all sit at the bottom middle, and Four Mile's
+	# road east is where Bridalveil's road east was). Going now would carry
+	# them straight on through, place after place.
+	if region.is_ancestor_of(exit) and player.global_position.distance_to(_arrived_at) < 2.0 \
+			and exit.overlaps_body(player) and not exit.touches(player):
+		exit.watch(player)
+		return
 	# The next region is laid out past this edge, or this is its own exit
 	# back: walk on across (see _physics_process). Called for an exit the
 	# player isn't standing at (from a script), it takes them there anyway.
@@ -269,6 +284,50 @@ func use_exit(exit: RegionExit) -> void:
 			and (region.to_local(exit.global_position) - seam.point).length() < Seam.CORRIDOR \
 			and player.global_position.distance_to(exit.global_position) < Seam.CORRIDOR)):
 		return
+	# An edge that is a seam, reached before the region past it was laid out
+	# (it was still loading, or the player came straight off a fade beside
+	# it): lay it out now and let them walk on over, rather than cutting to
+	# the far side. A moment's set-up, not a jump to somewhere else.
+	if region.is_ancestor_of(exit) and exit in _seam_exits(region) and _at_exit(exit):
+		# not mid-physics (exits fire there), where the maps can't change
+		_seam_or_exit.call_deferred(exit)
+		return
+	_take_exit(exit)
+
+
+## Lays out the seam through [param exit], or, where the maps don't meet
+## edge to edge, takes it. A region past it that isn't set up yet is loaded
+## first and set up a step a frame (see _update_seam) while the player waits
+## at the edge, so the game doesn't stall a frame on it; only if that takes
+## too long is it set up all at once.
+func _seam_or_exit(exit: RegionExit) -> void:
+	var id := exit.target_region
+	if not _regions.has(id):
+		var path := region_scene_path(id)
+		if not _region_ready(id) and _preloading != path:
+			_preload_queue.erase(path)
+			_preload_queue.push_front(path)
+		var waited := 0
+		while not _regions.has(id) and waited < SEAM_WAIT_MS and _at_exit(exit):
+			var start := Time.get_ticks_msec()
+			await get_tree().process_frame
+			waited += Time.get_ticks_msec() - start
+	if _busy or not is_instance_valid(exit) or not region.is_ancestor_of(exit) or not _at_exit(exit):
+		return
+	var found := _seam_for(exit)
+	if found:
+		if not _same_seam(found, seam):
+			_lay_seam(found)
+	else:
+		_take_exit(exit)
+
+
+## Is the player standing at [param exit] (not using it from a script)?
+func _at_exit(exit: RegionExit) -> bool:
+	return player.global_position.distance_to(exit.global_position) < Seam.CORRIDOR
+
+
+func _take_exit(exit: RegionExit) -> void:
 	if not exit.is_open_now():
 		hud.show_message(exit.closed_message())
 		return
@@ -581,6 +640,7 @@ func _show_bear_tracks() -> void:
 ## if that spot exists, and otherwise keeps their position.
 func _enter_region(id: String, spawn_name := "") -> void:
 	_drop_seam()
+	var at := player.global_position
 	if player.get_parent():
 		player.get_parent().remove_child(player)
 	if region:
@@ -588,12 +648,18 @@ func _enter_region(id: String, spawn_name := "") -> void:
 	region = _get_region(id)
 	add_child(region)
 	move_child(region, 0)
-	region.entities.add_child(player)
 	var spawn: Marker2D = region.get_spawn(spawn_name) if spawn_name != "" else null
 	if spawn:
-		player.global_position = spawn.global_position
+		at = spawn.global_position
 	elif spawn_name != "":
 		push_warning("Region %s has no spawn point named %s" % [id, spawn_name])
+	# On the spot before joining the region: added where they stood in the
+	# last one, an exit here at that spot (the rooms' doors all sit at the
+	# bottom middle) would see them and fire as soon as they arrive.
+	player.position = region.entities.to_local(at)
+	region.entities.add_child(player)
+	player.global_position = at
+	_arrived_at = at
 	# Beside a seam, lay the next region out now, while the screen is dark,
 	# so the camera starts out looking over the edge.
 	_update_seam(true)
@@ -708,10 +774,16 @@ func _update_seam(now := false) -> void:
 			best_gap = gap
 	if _same_seam(best, seam):
 		return
+	_lay_seam(best)
+
+
+## Lays [param next] out beside this region (or none, if null), in place of
+## the seam laid out now.
+func _lay_seam(next: Seam) -> void:
 	_drop_seam()
-	if best == null:
+	if next == null:
 		return
-	seam = best
+	seam = next
 	seam.neighbor.position = seam.offset
 	add_child(seam.neighbor)
 	seam.open(region)
@@ -805,6 +877,7 @@ func _cross_seam() -> void:
 	player.get_parent().remove_child(player)
 	region.entities.add_child(player)
 	player.global_position = at
+	_arrived_at = at
 	(player.get_node("SmoothMotion") as SmoothMotion).shift(shift)
 	_fit_camera()
 	framing.crossed(region, shift)
@@ -913,6 +986,7 @@ func _unstick_player() -> void:
 			var spot := origin + Vector2.from_angle(dir * TAU / 8.0) * radius
 			if not player.test_move(Transform2D(0.0, spot), Vector2.ZERO):
 				player.global_position = spot
+				_arrived_at = spot
 				_camera().reset_smoothing()
 				return
 
