@@ -1277,7 +1277,7 @@ func _fit_camera() -> void:
 	camera.limit_bottom = ceili(bounds.end.y)
 	if seam:
 		var maps: Array[Rect2] = [region.get_bounds(), seam.neighbor_bounds()]
-		backdrop.cover(bounds, maps, [SeamBackdrop.skies_of(region, maps[0]), SeamBackdrop.skies_of(seam.neighbor, maps[1])])
+		backdrop.cover(bounds, maps)
 	else:
 		backdrop.cover(Rect2())
 

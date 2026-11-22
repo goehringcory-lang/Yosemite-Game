@@ -195,6 +195,11 @@ func _check_backdrop() -> void:
 	beside.x = a.end.x + 30
 	check(woods._standing(beside, Rect2(beside + crown.position, crown.size)) == 2, "a crown beside a map hangs over its edge")
 	check(not woods._in_woods(Vector2(100, 100)) and woods._in_woods(Vector2(-900, 100)), "trees stand off the maps, in the corner between them")
+	# beside A's ground and above B the corner is all woods, never a flat
+	# slab of sky (that read as a lake west of Camp 4, above Leidig Meadow)
+	check(woods._under.any(func(item: Array) -> bool:
+		var at: Vector2 = item[1]
+		return at.x < -400.0 and at.y + (item[0] as Texture2D).get_height() < b.position.y), "woods fill the corner above the lower map, not sky")
 	# the shade and the brush line the edges that face the woods (A's west
 	# edge above B, B's top edge west of A), not the stretch the two maps
 	# share nor the edges the camera can't look past
