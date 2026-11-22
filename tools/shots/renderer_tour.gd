@@ -86,6 +86,15 @@ func _ready() -> void:
 					world.player.global_position = first.global_position
 					world._camera().reset_smoothing()
 			world.hud.visible = false
+			# Wait for the background loading and the next area's set-up at
+			# a seam to finish, so what's laid out across an edge doesn't
+			# depend on how fast this renderer happens to draw.
+			for i in 600:
+				if world._preload_queue.is_empty() and world._preloading == "" and world._setting_up.is_empty():
+					break
+				await get_tree().process_frame
+			for i in 4:
+				await get_tree().process_frame
 			var place := region_id if spawns.is_empty() else "%s_%s" % [region_id, spawn]
 			for hour in hours:
 				GameClock.minutes = roundi(float(hour) * 60.0)
