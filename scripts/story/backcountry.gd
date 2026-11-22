@@ -22,7 +22,7 @@ extends RefCounted
 const PERMIT := "wilderness_permit"
 const CANISTER := "bear_canister"
 ## Regions past the trailhead. A night out here is a night in the wilderness.
-const REGIONS := ["little_yosemite_valley", "half_dome"]
+const REGIONS := ["little_yosemite_valley", "half_dome", "tenaya_lake"]
 ## Firsts, kept in QuestLog.unlocks: a night out with your food in the
 ## canister, standing on top of Half Dome (by either way up), going up the
 ## cables, and the afternoon light from the Diving Board.
@@ -35,8 +35,11 @@ const CLOUD_SEA := "muir_cloud_sea"
 const MUIR_QUEST := "muir_south_dome"
 ## How many things to eat the canister holds (a real one holds a few days'
 ## food for one person). It's packed with the best food first; the rest of
-## what you carry spends the night in your pack.
+## what you carry spends the night in your pack. Answering SAR_PACK_RESCUES
+## calls earns a larger Search-and-Rescue Pack (SAR_CANISTER_HOLDS).
 const CANISTER_HOLDS := 12
+const SAR_PACK_RESCUES := 3
+const SAR_CANISTER_HOLDS := 20
 ## Half the food left in a pack goes to a bear (rounded up), and a bear comes
 ## round a full canister on about half the nights.
 const BEAR_SHARE := 0.5
@@ -64,6 +67,11 @@ static func has_canister() -> bool:
 	return Gear.carried(CANISTER) > 0
 
 
+## How many edible items fit in the bear canister overnight.
+static func canister_capacity() -> int:
+	return SAR_CANISTER_HOLDS if Rescues.count() >= SAR_PACK_RESCUES else CANISTER_HOLDS
+
+
 ## Marks a first (one of the constants above) as done. True the first time.
 static func mark(ability: String) -> bool:
 	if QuestLog.is_unlocked(ability):
@@ -86,9 +94,10 @@ static func night_out(rng: RandomNumberGenerator = null) -> String:
 		for i in Inventory.count(id):
 			units.append(id)
 	var packed := has_canister()
+	var cap := canister_capacity()
 	if packed:
 		mark(NIGHT_OUT)
-		units = units.slice(CANISTER_HOLDS)
+		units = units.slice(cap)
 	if units.is_empty():
 		if not packed:
 			return "There was nothing to eat in your pack, so there was nothing for a bear either."
@@ -108,7 +117,7 @@ static func night_out(rng: RandomNumberGenerator = null) -> String:
 		names.append(ItemDB.count_name(taken[id], item.display_name if item else id))
 	FieldLog.spot("black_bear", true, "tracks")
 	if packed:
-		return "The canister was full, so some food spent the night in your pack, and a bear found it: it ate %s. The canister holds %d things to eat." % [", ".join(names), CANISTER_HOLDS]
+		return "The canister was full, so some food spent the night in your pack, and a bear found it: it ate %s. The canister holds %d things to eat." % [", ".join(names), cap]
 	return "A bear got into your pack in the night and ate %s. Out here, food goes in a bear canister." % ", ".join(names)
 
 

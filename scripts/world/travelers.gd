@@ -177,6 +177,67 @@ const PLANS := {
 				"lines": ["Tea on the lawn, with the cliffs for company. I may never go home.", "A deer walked right across the lawn at lunch. Nobody even put down their cup."]},
 		],
 	},
+	"traveler_thru_hiker": {
+		"seasons": [GameClock.Season.SUMMER, GameClock.Season.FALL],
+		"dry": true,
+		"rest": 0,
+		"rest_lines": [
+			"Zero day in Tuolumne. Watching the rain roll off Lembert Dome from under the porch.",
+			"When thunder hits the high country, smart hikers stay low and eat peanut butter.",
+		],
+		"home_at": "20:30",
+		"stops": [
+			{"at": "7:00", "region": "tuolumne_meadows", "spot": "arrival", "offset": [-48, 36],
+				"lines": ["Just picked up my resupply box. Eight days of oats and dried fruit on my back."]},
+			{"at": "7:20", "region": "tuolumne_meadows", "spot": "soda_springs", "offset": [-40, 24],
+				"going": [
+					"Heading across the meadow to Soda Springs. Cold fizzy water right out of the granite.",
+					"Came up from Little Yosemite Valley over the Sunrise Trail yesterday. Legs still know it.",
+				],
+				"lines": [
+					"John Muir and Robert Underwood Johnson camped right near these springs when they planned the park.",
+					"You can see Cathedral Peak all the way from here on a clear morning.",
+				]},
+			{"at": "12:00", "region": "tuolumne_meadows", "spot": "tuolumne_lodge", "offset": [-48, 28],
+				"going": ["Walking east along the Tuolumne toward the lodge. Hoping for a warm meal."],
+				"lines": ["Nothing beats sitting by the Dana Fork with your boots off.", "Tomorrow it's up Lyell Canyon toward Donahue Pass."]},
+			{"at": "16:30", "region": "tuolumne_meadows", "spot": "cathedral_lakes_trailhead", "offset": [48, 24],
+				"going": ["Back across the meadow before the evening chill drops in."],
+				"lines": ["At eight thousand feet the air turns cold the minute the sun dips.", "Good trail out here. Quiet as anywhere in California."]},
+		],
+	},
+	"traveler_wawona_walker": {
+		"seasons": WARM_SEASONS,
+		"dry": true,
+		"rest": 0,
+		"rest_lines": [
+			"Rain on the Wawona veranda is its own kind of weather. Best watched with a book.",
+			"The pines smell twice as sharp after a shower down here.",
+		],
+		"home_at": "20:00",
+		"stops": [
+			{"at": "7:30", "region": "wawona", "spot": "wawona_hotel", "offset": [48, 48],
+				"lines": ["Coffee on the porch, then out across the covered bridge before the stages stir up the dust."]},
+			{"at": "7:45", "region": "wawona", "spot": "history_center", "offset": [-36, 40],
+				"going": [
+					"Over the South Fork bridge to the History Center. Galen Clark built the first bridge here himself.",
+					"Morning light on the covered bridge is worth the early start.",
+				],
+				"lines": [
+					"Every cabin in this yard was moved here piece by piece to save Yosemite's pioneer history.",
+					"Thomas Hill's old studio still stands right by the hotel lawn.",
+				]},
+			{"at": "11:30", "region": "wawona", "spot": "mariposa_grove", "offset": [-48, 24],
+				"going": ["South up the path into Mariposa Grove. The sequoias keep it cool even in July."],
+				"lines": [
+					"Galen Clark guarded these giant trees back in 1857, years before the park existed.",
+					"Stand quiet under the Grizzly Giant and you forget what century it is.",
+				]},
+			{"at": "16:00", "region": "wawona", "spot": "wawona_hotel", "offset": [48, 48],
+				"going": ["Heading back down to Wawona Hotel before supper."],
+				"lines": ["Good walk today. The South Fork's running clear.", "Tomorrow I'll take the sketchpad back up to the grove."]},
+		],
+	},
 }
 
 ## The walks: {"links": {region: {next region: [exit name, spawn name
