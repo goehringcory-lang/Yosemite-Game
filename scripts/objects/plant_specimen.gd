@@ -47,7 +47,8 @@ func _refresh_glint() -> void:
 
 
 func _process(delta: float) -> void:
-	_time = fmod(_time + delta, GLINT_EVERY)
+	var every := GLINT_EVERY * 0.55 if Perks.has("botanists_glint") else GLINT_EVERY
+	_time = fmod(_time + delta, every)
 	# A quick twinkle at the start of each beat, in four steps.
 	var glint := snappedf(clampf(1.0 - _time / 0.5, 0.0, 1.0), 0.25)
 	if glint != _glint:
@@ -62,7 +63,7 @@ func _draw() -> void:
 	var at := Vector2(8, -26)
 	var rare := Herbarium.rarity(Herbarium.get_plant(plant_id)) >= Herbarium.RARE
 	var color := Color(RARE_GLINT if rare else GLINT, _glint)
-	var arm := 2 + 2 * int(_glint * 2.0)
+	var arm := 2 + 2 * int(_glint * 2.0) + (2 if Perks.has("botanists_glint") else 0)
 	draw_rect(Rect2(at.x - arm, at.y, arm * 2 + 2, 2), color)
 	draw_rect(Rect2(at.x, at.y - arm, 2, arm * 2 + 2), color)
 

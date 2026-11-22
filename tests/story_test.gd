@@ -341,7 +341,7 @@ func test_last_page_waiting() -> void:
 	QuestLog.talk_to("galen_clark")
 	check(QuestLog.active.has("clark_last_page"), "and with everyone heard, he offers the last page")
 	QuestLog.completed.append_array(["clark_last_page", "lost_guardian"])
-	QuestLog.completed.append_array(["enid_press", "hodges_herbarium", "enid_leave_some", "enid_rim", "enid_dawn_chorus", "enid_full_press"])
+	QuestLog.completed.append_array(["enid_press", "hodges_herbarium", "enid_leave_some", "enid_rim", "enid_dawn_chorus", "enid_full_press", "enid_spring_moonbow"])
 	var enid := QuestLog.talk_to("enid_michael")
 	check(enid.size() == 2 and "Guardian" in enid[1].text, "after the finale, Enid Michael calls you Guardian")
 	new_game()

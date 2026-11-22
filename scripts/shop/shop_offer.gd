@@ -23,3 +23,5 @@ extends Resource
 @export var max_owned := 0
 ## Only once a day (the King Cobra swaps: "one's plenty before a climb").
 @export var once_a_day := false
+## Quest id that must be completed before this offer appears ("" = always).
+@export var requires_quest := ""

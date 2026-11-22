@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/thomas_hill.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "thomas_hill"
+display_name = "Thomas Hill"
+years = "1829–1908"
+affiliation = "Wawona Studio; California School of Landscape Painting"
+bio = "English-born landscape painter who first sketched Yosemite Valley in 1865 and spent four decades painting its cliffs, storms, and waterfalls. In 1886 he built a studio beside the Wawona Hotel, where he painted and taught until his death."
+legacy = "Painted thousands of Yosemite canvases from his studio at Wawona, helping turn the valley's light and weather into an American icon."
+legacy_year = 1886
+idle_lines = PackedStringArray("Turpentine, linseed oil, and Sierra dust: the finest perfume on earth.", "Visitors always ask how long a painting took. Forty years and an afternoon, I tell them.", "Step back from the easel! Nobody ever saw a cliff from six inches away.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.353, 0.220, 0.157, 1)
+home = "Thomas Hill's Studio, Wawona"
+needs_tribal_review = false
+sources = "Documented: Marjorie Dakin Arkelian, Thomas Hill: The Grand View (Oakland Museum, 1980); Yosemite National Park Historic Resource Study (Hill's Studio, Wawona)."

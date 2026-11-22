@@ -307,12 +307,18 @@ func pick(hub_id: String, season: int, fly := {}, water := FishingWater.RUN) -> 
 	return hooked(chosen, water, _rng.randf())
 
 
+## Minutes a cast takes: 10 with Master Fly Box, otherwise CAST_MINUTES.
+static func cast_minutes() -> int:
+	return 10 if Perks.has("master_fly_box") else CAST_MINUTES
+
+
 ## [param fish] as it comes out of [param water]: a "length" in inches,
 ## drawn by [param roll] (0 to 1) across its range, bigger in a hole; a
 ## "trophy" flag; and its fight, harder in the rapids and for a big fish.
 static func hooked(fish: Dictionary, water: String, roll: float) -> Dictionary:
 	var out := fish.duplicate()
-	var share := pow(clampf(roll, 0.0, 1.0), float(SIZE_POWER.get(water, 1.6)))
+	var power := maxf(0.35, float(SIZE_POWER.get(water, 1.6)) - Perks.bonus("master_fly_box"))
+	var share := pow(clampf(roll, 0.0, 1.0), power)
 	var inches: Array = fish.inches
 	out["length"] = int(round(lerpf(inches[0], inches[1], share)))
 	out["trophy"] = share >= TROPHY
@@ -353,7 +359,7 @@ func interact(player: Player) -> void:
 		Sparkle.burst(player.get_parent(), to_global(_fly_at), Sparkle.SPLASH)
 	queue_redraw()
 	game.queue_free()
-	GameClock.advance_minutes(CAST_MINUTES)
+	GameClock.advance_minutes(cast_minutes())
 	if caught:
 		land(fish)
 	else:

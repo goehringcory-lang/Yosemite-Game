@@ -53,6 +53,10 @@ const FOODS := {
 	"spring_greens": {"energy": 36, "shelf_life": 1},
 	"bread_pudding": {"energy": 30, "shelf_life": 6},
 	"dry_crusts": {"energy": 9, "shelf_life": 30},
+	"wildflower_honey_cake": {"energy": 40, "shelf_life": 8},
+	"curry_cobbler": {"energy": 42, "shelf_life": 7},
+	"autumn_hand_pie": {"energy": 48, "shelf_life": 14},
+	"bracebridge_wassail": {"energy": 34, "shelf_life": 12},
 	# Gifts and trades from quests
 	"lamon_apple": {"energy": 12, "shelf_life": 12},
 	"degnan_loaf": {"energy": 25, "shelf_life": 4},

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/arthur_bellamy.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "arthur_bellamy"
+display_name = "Arthur Bellamy"
+years = "1930s"
+affiliation = "El Portal Station & Post Office"
+bio = "Keeps the freight ledger and mail bags at El Portal, where the Yosemite Valley Railroad ends in the Merced River canyon and stages haul supplies up into the park. An invented character, not a historical figure."
+idle_lines = PackedStringArray("Every crate of flour, every mailbag, every climber's trunk passes through El Portal first.", "Down here at two thousand feet, spring shows up a month before the Valley hears about it.", "Yosemite Valley Railroad, Merced to El Portal: seventy-eight miles of canyon curves and not a dull one.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.173, 0.235, 0.345, 1)
+home = "El Portal Post Office"
+staff = true
+sources = "Invented for the game. El Portal served as the terminus of the Yosemite Valley Railroad from 1907 to 1945 and remains the western gateway and staff community for the park."

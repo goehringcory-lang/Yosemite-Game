@@ -42,12 +42,30 @@ var _asleep := false
 var _shiver_left := Warmth.SHIVER_EVERY * 0.5
 
 
+var _headlamp_light: PointLight2D
+
+
 func _ready() -> void:
 	add_to_group("persist")
 	apply_look()
 	add_child(Footfall.new())
 	add_child(fishing)
 	add_child(SmoothMotion.new())
+	_headlamp_light = PointLight2D.new()
+	_headlamp_light.name = "HeadlampLight"
+	_headlamp_light.set_script(load("res://scripts/world/night_light.gd"))
+	_headlamp_light.position = Vector2(0, -18)
+	_headlamp_light.set("radius", 140.0)
+	_headlamp_light.set("strength", 0.85)
+	_headlamp_light.set("flicker", 0.02)
+	add_child(_headlamp_light)
+	Gear.changed.connect(_refresh_headlamp)
+	_refresh_headlamp()
+
+
+func _refresh_headlamp() -> void:
+	if _headlamp_light:
+		_headlamp_light.visible = Gear.count("headlamp") > 0
 
 
 ## The interactable in front of the player, or null. One with a higher
@@ -95,7 +113,8 @@ func _physics_process(_delta: float) -> void:
 	if can_act:
 		input = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var running := input != Vector2.ZERO and Input.is_action_pressed("run")
-	velocity = input * SPEED * (1.0 + Perks.bonus("muirs_stride")) * (RUN_BOOST if running else 1.0) * Rescues.speed_factor() * Warmth.speed_factor()
+	var speed_mult := 1.0 + Perks.bonus("muirs_stride") + Perks.bonus("park_walker")
+	velocity = input * SPEED * speed_mult * (RUN_BOOST if running else 1.0) * Rescues.speed_factor() * Warmth.speed_factor()
 	_shiver(_delta)
 	move_and_slide()
 	if input != Vector2.ZERO and _action_left != 0.0:

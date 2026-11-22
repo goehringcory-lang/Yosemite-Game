@@ -91,6 +91,11 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/enid_rim.tres"),
 	preload("res://data/quests/muir_cassiope.tres"),
 	preload("res://data/quests/enid_full_press.tres"),
+	# Seasonal festivity and natural-event quests, one per season.
+	preload("res://data/quests/enid_spring_moonbow.tres"),
+	preload("res://data/quests/curry_summer_firefall.tres"),
+	preload("res://data/quests/lamon_fall_meadow.tres"),
+	preload("res://data/quests/ansel_winter_horsetail.tres"),
 	# Search and rescue from Camp 4 (Rescues). After the press book, so
 	# Hodges offers her press quests before this one.
 	preload("res://data/quests/hodges_rescue_team.tres"),
@@ -104,6 +109,13 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/clark_grove_fire.tres"),
 	preload("res://data/quests/hodges_bear_boxes.tres"),
 	preload("res://data/quests/clark_guardian_year.tres"),
+	# The Outer Keepers: seasonal and natural-event stories in Wawona, Glacier Point, and El Portal.
+	preload("res://data/quests/hill_painters_light.tres"),
+	preload("res://data/quests/hill_last_canvas.tres"),
+	preload("res://data/quests/matthes_reading_ice.tres"),
+	preload("res://data/quests/matthes_glacial_erratic.tres"),
+	preload("res://data/quests/bellamy_first_bloom.tres"),
+	preload("res://data/quests/bellamy_winter_train.tres"),
 ]
 
 const CHARACTERS: Array[CharacterData] = [
@@ -129,6 +141,8 @@ const CHARACTERS: Array[CharacterData] = [
 	preload("res://data/characters/beverly_johnson.tres"),
 	preload("res://data/characters/john_muir.tres"),
 	preload("res://data/characters/carrie_bethel.tres"),
+	preload("res://data/characters/thomas_hill.tres"),
+	preload("res://data/characters/francois_matthes.tres"),
 ]
 
 ## Invented staff (CharacterData.staff): the Mountain Shop's two, the
@@ -146,6 +160,7 @@ const STAFF: Array[CharacterData] = [
 	preload("res://data/characters/staff/jo_tolliver.tres"),
 	preload("res://data/characters/staff/mateo_reyes.tres"),
 	preload("res://data/characters/staff/michael_kochakji.tres"),
+	preload("res://data/characters/staff/arthur_bellamy.tres"),
 ]
 
 ## People met once, on one quest (a "talk" step's target), like the lost Pacific
@@ -249,6 +264,19 @@ func is_completed(quest_id: String) -> bool:
 
 func is_unlocked(ability: String) -> bool:
 	return ability in unlocks
+
+
+## Records that the player witnessed a natural event or milestone [param ability]
+## in the world. Returns true the first time, and shows [param note] on the HUD
+## if provided.
+func mark_event(ability: String, note := "") -> bool:
+	if is_unlocked(ability):
+		return false
+	unlocks.append(ability)
+	if note != "" and is_inside_tree():
+		get_tree().call_group("hud", "show_message", note)
+	changed.emit()
+	return true
 
 
 func has_climbed(route_id: String) -> bool:
@@ -845,6 +873,9 @@ func _give_rewards(quest: QuestData) -> String:
 	var camp := Camp.reward_line(quest.id)
 	if camp != "":
 		text += " " + camp
+	var perk := Perks.quest_perk_line(quest.id)
+	if perk != "":
+		text += " " + perk
 	return text
 
 

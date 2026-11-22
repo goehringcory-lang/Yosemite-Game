@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "bellamy_winter_train"
+title = "The Winter Train"
+giver = "arthur_bellamy"
+requires = PackedStringArray("bellamy_first_bloom")
+offered_in = 8
+out_of_season = PackedStringArray("Stop back down in winter, when snow seals the high roads and the Yosemite Valley Railroad is the park's lifeline.")
+intro = PackedStringArray("Snow's buried Tioga Pass and Glacier Point, and half the park thinks we're cut off. Not while the Yosemite Valley Railroad runs up this canyon!", "The evening winter train is due in with mailbags and climbing crates. Bring me three wood rose hips for the crew's kettle, then help me sort the manifest after five.")
+steps = [{"type": "have", "item": "wood_rose_hips", "count": 3, "consume": true, "objective": "Bring 3 wood rose hips to Arthur Bellamy at El Portal Post Office", "reminder": "Three wood rose hips for winter tea—they hang right on the canyon bushes all winter.", "done": ["Tart and bright, just what the brakeman ordered. Come back after five this evening when the lantern's lit and the freight bags come off the car."]}, {"type": "time", "from": 17, "to": 22, "objective": "Help Arthur Bellamy sort the winter train manifest between 5 and 10 PM", "reminder": "Drop by between five and ten in the evening to sort the winter mail and freight.", "done": ["Mailbags tallied, flour stacked dry, and a box of surplus climbing cams left right on our manifest.", "From 1907 on, this little line kept Yosemite fed through every blizzard."]}]
+outro = PackedStringArray("I've opened the full Winter Express manifest for you—discounted cams, warm bread pudding, and acorn cakes whenever you trade down here in El Portal.", "And take a full winter ration bundle for the road back up the Merced.")
+reward_items = {"bread_pudding": 2, "beef_jerky": 2, "chocolate_bar": 2}

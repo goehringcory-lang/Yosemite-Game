@@ -50,6 +50,9 @@ const PIECES: Array[Dictionary] = [
 	{"id": "print", "name": "Half Dome print", "quest": "ansel_monolith", "from": "ansel_adams", "pos": Vector2(500, 266),
 		"got": "a print of Half Dome from Ansel Adams, for your camp",
 		"text": "Monolith, the Face of Half Dome, from 1927, on a little easel by your shelf. In the margin, in pencil: \"For the camp under the oaks.\""},
+	{"id": "hill_study", "name": "Thomas Hill oil study", "quest": "hill_last_canvas", "from": "thomas_hill", "pos": Vector2(536, 266),
+		"got": "a framed oil study of Bridalveil and El Capitan from Thomas Hill (+25% friendship from gifts)",
+		"text": "A warm miniature oil study painted by Thomas Hill at Wawona: clearing storm clouds and gold light down Bridalveil's spray. Gifts you share across the park earn 25% more friendship."},
 	{"id": "hammock", "name": "Webbing hammock", "quest": "wren_apron", "from": "wren_alvarez", "pos": Vector2(560, 334),
 		"got": "a hammock woven out of old climbing webbing",
 		"text": "Retired tubular webbing, woven into a hammock on an A-frame of lodgepole. Too worn to trust on a wall; perfect for an afternoon."},
@@ -86,6 +89,18 @@ const PIECES: Array[Dictionary] = [
 	{"id": "guardian_sign", "name": "The Guardian's camp", "quest": "lost_guardian", "from": "galen_clark", "pos": Vector2(204, 300),
 		"got": "a sign at your camp",
 		"text": "A board carved by many hands, and not very well: THE GUARDIAN'S CAMP. Somebody has added a smaller line underneath: \"Knock. They're usually out.\""},
+	{"id": "field_table", "name": "Pressed-flower field table", "quest": "enid_spring_moonbow", "from": "enid_michael", "pos": Vector2(540, 266),
+		"got": "a pressed-flower field table for your camp (food in your chest ages half as fast)",
+		"text": "A shaded cedar sorting table with a spare plant press and spring specimens laid out to dry. Keeping your camp stores cool and sorted cuts spoilage in your camp chest in half."},
+	{"id": "string_lights", "name": "Camp Curry string lights", "quest": "curry_summer_firefall", "from": "jennie_curry", "pos": Vector2(440, 344),
+		"got": "a strand of Camp Curry string lights for your camp (+3 stamina at every climbing rest)",
+		"text": "Warm glass bulbs strung between two lodgepole posts, just like the dining lawn at Camp Curry. A bright, restful camp leaves you fresher on the rock: every belay ledge and rest stance restores 3 extra stamina."},
+	{"id": "workbench", "name": "Trail-crew workbench", "quest": "lamon_fall_meadow", "from": "james_lamon", "pos": Vector2(180, 366),
+		"got": "a trail-crew workbench for your camp (+15% barter value with climbers and outfitters)",
+		"text": "Seasoned Lamon oak planks bolted into a heavy camp bench, with a vise and neatly coiled cord from Wren. Climbers and outfitters pay 15% more for whatever you bring to trade."},
+	{"id": "hearth_kettle", "name": "Ahwahnee hearth kettle", "quest": "ansel_winter_horsetail", "from": "ansel_adams", "pos": Vector2(474, 404),
+		"got": "a copper hearth kettle for your campfire (pour a free mug of spiced wassail each morning)",
+		"text": "A hammered copper kettle from the Ahwahnee kitchen, kept simmering on the coals of your fire. Step up once a day to pour a hot mug of Bracebridge Spiced Wassail for the trail."},
 ]
 
 ## What every main-line quest leaves on the keepsake shelf: name, a few
@@ -110,6 +125,8 @@ const KEEPSAKES: Array[Dictionary] = [
 ## bear box is in.
 const CHEST_SPACES := 10
 const BEAR_BOX_SPACES := 6
+## Extra stamina restored on belay ledges and rest stances once Camp Curry string lights are hung.
+const STRING_LIGHTS_REST := 3
 
 ## The camp chest: item id -> count.
 var chest: Dictionary = {}
@@ -118,6 +135,10 @@ var chest: Dictionary = {}
 var chest_batches: Dictionary = {}
 ## What spoiled in the chest last night ("" if nothing), for the morning.
 var last_spoiled := ""
+## Day (Friendship.today()) the Ahwahnee hearth kettle was last poured.
+var kettle_day := -1
+## Toggles each night while field_table is present so chest food ages every other night.
+var _field_table_skip := false
 
 
 func _ready() -> void:
@@ -130,6 +151,8 @@ func start_new_game() -> void:
 	chest = {}
 	chest_batches = {}
 	last_spoiled = ""
+	kettle_day = -1
+	_field_table_skip = false
 	changed.emit()
 
 
@@ -228,10 +251,28 @@ func describe(id: String) -> String:
 				text += " Hanging here: %s." % ", ".join(rack)
 		"chest":
 			text += " %d of %d spaces used." % [chest.size(), chest_spaces()]
+		"hearth_kettle":
+			text += " Fresh pot simmering." if can_pour_kettle() else " You already poured today's mug; more will simmer tomorrow."
 	var who := giver_name(piece)
 	if who != "":
 		text += "\nFrom %s." % who
 	return text
+
+
+## True while the Ahwahnee hearth kettle has a fresh mug ready to pour today.
+func can_pour_kettle() -> bool:
+	return has("hearth_kettle") and kettle_day != Friendship.today()
+
+
+## Pours one free mug of Bracebridge Spiced Wassail from the hearth kettle,
+## once per day. Returns true if poured.
+func pour_kettle() -> bool:
+	if not can_pour_kettle():
+		return false
+	kettle_day = Friendship.today()
+	Inventory.add("bracebridge_wassail", 1)
+	changed.emit()
+	return true
 
 
 ## Your biggest fish so far: {"name", "inches"}, or {} before the first.
@@ -307,8 +348,13 @@ func take_out(id: String, amount: int) -> int:
 
 
 ## Ages the food in the chest a day, like Larder does for your pack.
+## With Enid's pressed-flower field table, food in the chest ages every other night.
 func _age_food() -> void:
 	last_spoiled = ""
+	if has("field_table"):
+		_field_table_skip = not _field_table_skip
+		if _field_table_skip:
+			return
 	var spoiled := {}
 	for id: String in chest_batches.keys():
 		var list: Array = chest_batches[id]
@@ -346,12 +392,14 @@ func dress(region: Node) -> void:
 
 
 func save_data() -> Dictionary:
-	return {"chest": chest, "batches": chest_batches}
+	return {"chest": chest, "batches": chest_batches, "kettle_day": kettle_day, "field_table_skip": _field_table_skip}
 
 
 func load_data(data: Dictionary) -> void:
 	chest = {}
 	chest_batches = {}
+	kettle_day = int(data.get("kettle_day", -1))
+	_field_table_skip = bool(data.get("field_table_skip", false))
 	var saved: Dictionary = data.get("chest", {})
 	for id in saved:
 		if ItemDB.get_item(str(id)) and int(saved[id]) > 0:

@@ -39,14 +39,14 @@ const FESTIVALS := [
 			"See the miner's lettuce, the leaf wrapped right round the stem? The forty-niners ate it against scurvy. Taste one.",
 			"And that's a shooting star, nodding over the wet ground. Every flower here had a name before mine, remember.",
 		],
-		"reward": {"spring_greens": 1}, "points": 60},
+		"reward": {"spring_greens": 2, "yerba_buena_tea": 2, "pine_nuts": 1}, "points": 100},
 	{"id": "fourth_of_july", "name": "The Fourth at Camp Curry", "season": 1, "day": 4, "hours": [17, 22],
 		"host": "jennie_curry",
 		"lines": [
 			"Happy Fourth! Supper's on the long tables tonight, and everyone eats.",
 			"Stay till nine. When David calls up to Glacier Point, the whole camp goes quiet for the Firefall.",
 		],
-		"reward": {"bread_pudding": 2}, "points": 60},
+		"reward": {"bread_pudding": 2, "degnan_loaf": 1, "chocolate_bar": 2}, "points": 100},
 	{"id": "facelift", "name": "The Yosemite Facelift", "season": 2, "day": 20, "hours": [8, 18],
 		"host": "wren_alvarez",
 		"lines": [
@@ -56,7 +56,7 @@ const FESTIVALS := [
 		"done_lines": [
 			"Five! The Valley looks better already. Thanks for pitching in.",
 		],
-		"reward": {"chocolate_bar": 2, "trail_mix": 1}, "points": 80},
+		"reward": {"chocolate_bar": 2, "trail_mix": 2, "king_cobra": 1, "rusty_piton": 1}, "points": 120},
 	{"id": "bracebridge", "name": "The Bracebridge Dinner", "season": 3, "day": 24, "hours": [17, 22],
 		"host": "ahwahnee_chef",
 		"lines": [
@@ -64,7 +64,7 @@ const FESTIVALS := [
 			"The squire, the parson, carols, and seven courses with a fanfare for each. Mr. Adams staged it for years, you know.",
 			"Here, a plate from the kitchen for the road. Joyeux Noël.",
 		],
-		"reward": {"cheddar_wedge": 1, "bread_pudding": 1, "chocolate_bar": 1}, "points": 60},
+		"reward": {"cheddar_wedge": 2, "bread_pudding": 2, "chocolate_bar": 2, "lamon_apple": 2}, "points": 100},
 ]
 
 ## Festival id -> the year you last went (talked with its host on the day).

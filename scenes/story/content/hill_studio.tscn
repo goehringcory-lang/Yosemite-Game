@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_npc"]
+[ext_resource type="Resource" path="res://data/characters/thomas_hill.tres" id="2_hill"]
+
+[node name="HillStudioStory" type="Node2D"]
+
+[node name="ThomasHill" parent="." instance=ExtResource("1_npc")]
+character = ExtResource("2_hill")
+spot = "door"
+offset = Vector2(-96, -108)
+wander_radius = 24

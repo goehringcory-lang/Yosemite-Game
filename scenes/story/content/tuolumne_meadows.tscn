@@ -9,6 +9,14 @@
 [ext_resource type="Resource" path="res://data/characters/visitors/visitor_backpacker.tres" id="7_r"]
 [ext_resource type="Resource" path="res://data/characters/hikers/switchback.tres" id="8_r"]
 [ext_resource type="PackedScene" path="res://scenes/world/tuolumne_skyline.tscn" id="skyline_r"]
+[ext_resource type="Script" path="res://scripts/objects/bulletin_board.gd" id="board_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_board.png" id="board_tex"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_board_col"]
+size = Vector2(72, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_board_hit"]
+size = Vector2(84, 32)
 
 [node name="TuolumneMeadowsStory" type="Node2D"]
 
@@ -45,3 +53,27 @@ wander_radius = 24
 only_on_step = "kochakji_general_delivery:0"
 
 [node name="TuolumneSkyline" parent="." instance=ExtResource("skyline_r")]
+
+[node name="TuolumneBoard" type="StaticBody2D" parent="."]
+position = Vector2(1360, 1552)
+collision_mask = 0
+script = ExtResource("board_script")
+title = "Tuolumne Meadows Trailhead Board"
+text = "Pinned under clear thumbtacks: high-country snow reports for Donahue Pass, rides down Tioga Road, lost trekking poles, and notes from Pacific Crest and John Muir Trail hikers."
+
+[node name="Sprite" type="Sprite2D" parent="TuolumneBoard"]
+texture = ExtResource("board_tex")
+offset = Vector2(0, -50)
+
+[node name="Collision" type="CollisionShape2D" parent="TuolumneBoard"]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_board_col")
+
+[node name="Hitbox" type="Area2D" parent="TuolumneBoard"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="TuolumneBoard/Hitbox"]
+position = Vector2(0, -16)
+shape = SubResource("RectangleShape2D_board_hit")

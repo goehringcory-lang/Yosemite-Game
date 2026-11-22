@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "curry_summer_firefall"
+title = "Let the Fire Fall"
+giver = "jennie_curry"
+requires = PackedStringArray("curry_starter", "mccauley_firefall")
+offered_in = 2
+out_of_season = PackedStringArray("The Firefall and the Fourth of July supper are summer's work, when the rim is dry and the camp is full. Come and see me in summer.")
+intro = PackedStringArray("Summer's here, the tent cabins are full, and the Fourth of July supper is on every camper's mind. Nothing brings this whole valley together like the nine o'clock call up to Glacier Point.", "First, my kitchen is short on berries for the long-table cobbler. Bring me three handfuls of wild California blackberries.", "Then run word up to James McCauley on the rim so his red-fir bark is banked before the afternoon clouds roll in, and be back on the lawn at nine to watch it fall.")
+steps = [{"type": "have", "item": "california_blackberry", "count": 3, "consume": true, "objective": "Bring 3 California blackberries to Jennie Curry for Camp Curry's summer cobbler", "reminder": "Three handfuls of wild blackberries from the Valley's sunny edges. Mind the thorns.", "done": ["Dark and sweet. The kitchen will have cobbler enough for every table on the lawn.", "Now head up to Glacier Point and tell James McCauley we're ready for the call tonight."]}, {"type": "talk", "target": "james_mccauley", "objective": "Check the Firefall bonfire with James McCauley on Glacier Point", "reminder": "James McCauley is up on Glacier Point, watching the rim and the afternoon clouds.", "done": ["Jennie sent you? Good. The red-fir bark is piled high and dry.", "Up here you learn to watch the summer thunderheads build over the domes after lunch. Get your work done before they break, and by nine the sky clears clean as glass.", "Be down at Camp Curry at nine o'clock sharp. When David calls up to the rim, I'll push the coals over."]}, {"type": "unlocked", "ability": "saw_firefall", "objective": "Watch the Firefall from Curry Village at 9 PM on a summer evening, then tell Jennie Curry", "reminder": "Stand out at Curry Village at nine o'clock on a summer night and look up at the rim.", "done": ["\"Let the fire fall!\" Three thousand feet of glowing embers, and even the noisy ones go quiet for fifteen minutes.", "That's summer in Yosemite, right there."]}]
+outro = PackedStringArray("You've earned our kitchen's berry cobbler recipe and two fresh portions for your pack. And I sent a crew over to your camp under the oaks to string Camp Curry lights between the posts—a well-lit camp makes for deeper sleep before a climb.", "After running up to the rim and back ahead of the storms, you've picked up real high-country timing, too.")
+reward_items = {"curry_cobbler": 2}
+reward_recipes = PackedStringArray("curry_cobbler")

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+id = "ansel_winter_horsetail"
+title = "Fire on the Granite, Feast in the Hall"
+giver = "ansel_adams"
+requires = PackedStringArray("ansel_brownie", "ansel_monolith")
+offered_in = 8
+out_of_season = PackedStringArray("Bracebridge Dinner and the sunset fire on Horsetail Fall belong to winter, when the sun sits low on the south rim. Come back when snow is on the meadows.")
+intro = PackedStringArray("Winter is my favorite season in Yosemite. Snow quiets the roads, storms tear open over El Capitan, and at the Ahwahnee we turn the dining room into Bracebridge Hall for one grand night.", "Chef Marchand needs winter rose hips for the spiced wassail kettle—three handfuls from the frosty bushes will do.", "Deliver them to him at the Ahwahnee, and then on a clear evening late in winter, go stand in El Capitan Meadow at half past five and watch Horsetail Fall catch fire.")
+steps = [{"type": "have", "item": "wood_rose_hips", "count": 3, "consume": true, "objective": "Gather 3 wood rose hips for Ansel Adams and the Bracebridge Dinner", "reminder": "Look for bright red rose hips along the winter thickets—they stay sweet after a frost.", "done": ["Bright red as holly berries. Take these straight to Chef Marchand in the Ahwahnee Dining Room."]}, {"type": "talk", "target": "ahwahnee_chef", "objective": "Deliver the winter rose hips to Chef Lucien Marchand in the Ahwahnee Dining Room", "reminder": "Chef Marchand is in the Ahwahnee Dining Room, preparing the Bracebridge feast.", "done": ["Ah, winter rose hips! Just in time for the Bracebridge wassail bowl. Mr. Adams insists the fanfare is nothing without the aroma of hot spice filling the hall.", "Before you go back to him, do not miss El Capitan's east shoulder on a clear late-winter evening—days seventeen through twenty-eight, around five-twenty in the afternoon. The low sun turns Horsetail Fall to liquid fire."]}, {"type": "unlocked", "ability": "saw_horsetail", "objective": "Watch Horsetail Fall glow orange from El Capitan Meadow on a clear late-winter evening (Winter 17 to 28, 5:20 to 5:50 PM), then tell Ansel Adams", "reminder": "Stand in El Capitan Meadow on a clear late-winter evening, days seventeen to twenty-eight, around 5:20 PM, and look up at El Capitan's east shoulder.", "done": ["Ten minutes of molten orange against blue granite, and then it's gone until next February.", "No bonfire on the rim needed—just snowmelt, a clear horizon, and the patience to stand in the cold."]}]
+outro = PackedStringArray("Chef Marchand sent his spiced wassail recipe along with two steaming mugs, and a copper hearth kettle to hang beside your campfire—help yourself to a hot mug there any morning.", "And once you've waited out a winter sunset in the snow, the cold slows you less and you'll catch first and last light a good deal longer through the viewfinder.")
+reward_items = {"bracebridge_wassail": 2}
+reward_recipes = PackedStringArray("bracebridge_wassail")

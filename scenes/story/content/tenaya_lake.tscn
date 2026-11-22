@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="1_door"]
+[ext_resource type="PackedScene" path="res://scenes/objects/backcountry_camp.tscn" id="2_camp"]
+[ext_resource type="Script" path="res://scripts/fishing/fishing_water.gd" id="3_fw"]
+
+[node name="TenayaLakeStory" type="Node2D"]
+
+[node name="SunriseTrailDown" parent="." instance=ExtResource("1_door")]
+position = Vector2(1040, 1072)
+label = "Sunrise Trail, down to Little Yosemite Valley"
+target_region = "little_yosemite_valley"
+target_spawn = "half_dome_trail"
+minutes = 180
+closure = "tioga_road"
+
+[node name="TenayaCamp" parent="." instance=ExtResource("2_camp")]
+position = Vector2(1184, 1024)
+wake_spot = "sunrise_trailhead"
+place_name = "Tenaya Lake"
+
+[node name="TenayaLakeBasin" type="Node2D" parent="."]
+position = Vector2(1228, 474)
+script = ExtResource("3_fw")
+kind = "hole"
+size = Vector2(300, 140)
+title = "Tenaya Lake Basin"

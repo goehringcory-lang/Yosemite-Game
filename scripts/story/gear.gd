@@ -48,6 +48,8 @@ const GEAR: Array[GearData] = [
 	# The camera Ansel Adams lends you, and his other lenses (Photos).
 	preload("res://data/gear/camera.tres"),
 	preload("res://data/gear/camera_lenses.tres"),
+	# Utility trail headlamp earned by helping around the park (Perks).
+	preload("res://data/gear/headlamp.tres"),
 ]
 
 ## You arrive with approach shoes. The Mountain Shop fits you with your
@@ -175,7 +177,7 @@ func carried_all() -> Dictionary:
 
 
 func bag_room() -> int:
-	return BAG_ROOM + (HAUL_BAG_ROOM if carried("haul_bag") > 0 else 0)
+	return BAG_ROOM + (HAUL_BAG_ROOM if carried("haul_bag") > 0 else 0) + int(Perks.bonus("clean_pack"))
 
 
 func bag_used() -> int:

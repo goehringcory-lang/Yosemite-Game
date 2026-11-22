@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "matthes_reading_ice"
+title = "Reading the Ice"
+giver = "francois_matthes"
+requires = PackedStringArray("clark_register")
+intro = PackedStringArray("Step up to the relief model! I am François Matthes of the Geological Survey. For years men argued whether Yosemite was split by a cataclysm or carved by ice.", "Both rivers and three great ice ages shaped these walls—and John Muir saw the ice before any of us had a contour map.", "Take my survey notes to Mr. Muir, and pack a proper field lunch worth at least 25 energy so we can walk the rim benches together.")
+steps = [{"type": "talk", "target": "john_muir", "objective": "Take François Matthes's survey notes to John Muir", "reminder": "Find John Muir and share my glacial trimline measurements with him.", "done": ["Matthes measured the benches all the way up to Glacier Point? Ha! Tell the good Dutchman that his contour lines sing the same song my boots did.", "Three ice ages! And Josiah Whitney swore the valley floor simply fell out from under us. I should like to frame his map."]}, {"type": "have_food", "energy": 25, "objective": "Bring trail food worth 25 energy to François Matthes at the Geology Hut", "reminder": "Pack trail food worth at least 25 energy. Geological surveys run on cheese and steady legs.", "done": ["Splendid. Look down across Tenaya Canyon: you can trace the exact height where the glacier polished the domes and left the upper spires sharp."]}]
+outro = PackedStringArray("I have added a note beside Mr. Muir's page in the Guardian's Register—credit where credit is due, both to the ice and to the Merced River.", "Take some cheddar and jerky from my field pack. Come back in summer or fall when the granite walls are dry and we'll study the rock joints up close.")
+reward_items = {"cheddar_wedge": 2, "beef_jerky": 2}

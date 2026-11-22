@@ -67,6 +67,8 @@ func _process(delta: float) -> void:
 		_delay = maxf(_delay - delta, 0.0)
 		target = 1.0 if _delay <= 0.0 else 0.0
 	level = move_toward(level, target, delta / (FADE_IN if target > level else FADE_OUT))
+	if active and level >= 0.3:
+		QuestLog.mark_event("saw_firefall")
 	if active or level > 0.0 or not _embers.is_empty():
 		_time += delta
 		_step_embers(delta)

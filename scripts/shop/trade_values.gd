@@ -164,9 +164,13 @@ static func worth_to(data: ShopData, id: String, days_left := 0, extra_glut := 0
 		return 0.0
 	var tastes := data.tastes if data else ""
 	value *= taste(tastes, id) * season_factor(id)
+	if Camp.has("workbench") and tastes in ["climber", "outfitter"]:
+		value *= 1.15
 	if days_left == 1 and FoodDB.shelf_life(id) > 1:
 		value *= LAST_DAY_FACTOR
 	value *= Market.appetite(Market.key_of(data), sort_of(id), extra_glut)
+	if tastes == "store":
+		value *= 1.0 + Perks.bonus("gallery_eye")
 	if tastes == "store" and data:
 		var shelf := _shelf_price(data, id)
 		if shelf > 0:

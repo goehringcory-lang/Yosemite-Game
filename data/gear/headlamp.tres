@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/lost_headlamp.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "headlamp"
+display_name = "Trail Headlamp"
+description = "A brass-and-webbing camp headlamp earned from people you've helped around the park. Lights dark trails ahead of you after sunset and lets you set out on trips an hour later in the evening."
+icon = ExtResource("2_icon")
+tier = 1
+trade_value = 0
+keepsake = true

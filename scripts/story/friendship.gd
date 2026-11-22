@@ -55,6 +55,9 @@ const LOVES := {
 	"jo_tolliver": ["chocolate_bar", "pilot_bread"],
 	"mateo_reyes": ["beef_jerky", "trail_mix"],
 	"michael_kochakji": ["chocolate_bar", "dried_apples"],
+	"thomas_hill": ["bread_pudding", "wild_strawberry"],
+	"francois_matthes": ["cheddar_wedge", "beef_jerky"],
+	"arthur_bellamy": ["pilot_bread", "dried_apricots"],
 }
 const LOVED_LINES := [
 	"Oh! For me? I love these. Thank you!",
@@ -202,17 +205,19 @@ func give(character_id: String, item_id: String) -> String:
 	gifted[character_id] = today()
 	var kind := taste(character_id, item_id)
 	var lines: Array = PLAIN_LINES
+	var points := PLAIN_POINTS
 	match kind:
 		"loved":
-			add(character_id, LOVED_POINTS)
+			points = LOVED_POINTS
 			# in their own words, if they have some (SmallTalk)
 			var own := SmallTalk.loved_line(character_id)
 			lines = [own] if own != "" else LOVED_LINES
 		"liked":
-			add(character_id, LIKED_POINTS)
+			points = LIKED_POINTS
 			lines = LIKED_LINES
-		_:
-			add(character_id, PLAIN_POINTS)
+	if Camp.has("hill_study"):
+		points = roundi(points * 1.25)
+	add(character_id, points)
 	return lines[absi(hash(character_id) + today()) % lines.size()]
 
 
