@@ -44,7 +44,7 @@ const FOOTPRINT := {
 	"guardian_sign": Vector2(10, 6), "lantern": Vector2(6, 6),
 	"field_table": Vector2(34, 10), "string_lights": Vector2(0, 0),
 	"workbench": Vector2(38, 10), "hearth_kettle": Vector2(12, 6),
-	"guardian_sign": Vector2(10, 6), "lantern": Vector2(6, 6), "hill_study": Vector2(14, 6),
+	"hill_study": Vector2(14, 6),
 }
 
 

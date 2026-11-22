@@ -82,7 +82,7 @@ func test_balance() -> void:
 	check(stored + 4 * 2 * 4 <= Granary.CAPACITY_PER_CHUCKAH, "one chuckah holds enough acorns for Harding's cakes and reserve")
 	for note: Dictionary in BoardRequests.NOTES:
 		var item := ItemDB.get_item(note.item)
-		var grows: bool = note.seasons.all(func(season: int) -> bool: return item.is_forageable_in(season))
+		var grows: bool = note.seasons.all(func(season: int) -> bool: return item.is_forageable_in(season) or _bites_in(note.item, season))
 		check(item != null and grows, "board note %s asks for something in season" % note.id)
 		if item.habitat == ItemData.Habitat.HIGH_COUNTRY:
 			check(note.get("hub", "") == "tuolumne_meadows", "board note %s waits until Tuolumne is open" % note.id)
@@ -281,3 +281,11 @@ func test_climb_effects() -> void:
 	state = ClimbState.new(APRON, 2, 7)
 	state._bivy("hanging")
 	check(state.stamina == ClimbState.COLD_NIGHT_STAMINA, "a plain meal on a cold night leaves you chilled")
+
+
+## True when [param fish_id] can be caught in [param season] (board notes may ask for fish).
+func _bites_in(fish_id: String, season: int) -> bool:
+	for fish: Dictionary in Fishing.FISH:
+		if fish.get("keep", "") == fish_id and season in fish.get("seasons", []):
+			return true
+	return false

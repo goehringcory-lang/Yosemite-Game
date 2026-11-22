@@ -97,7 +97,7 @@ const NOTES := [
 	{"id": "kochakji_brook_trout", "giver": "michael_kochakji", "item": "brook_trout", "count": 2, "seasons": [1, 2], "hub": "tuolumne_meadows",
 		"text": "Anyone fishing Tenaya Lake or the Tuolumne: two brook trout wanted for the store supper.",
 		"thanks": "High-country trout! Nothing tastes finer after a long day sorting resupply boxes.", "reward": {"beef_jerky": 2, "dried_apricots": 2}},
-	{"id": "clark_wawona_plums", "giver": "galen_clark", "item": "sierra_plum", "count": 4, "seasons": [1, 2], "hub": "wawona",
+	{"id": "clark_wawona_plums", "giver": "galen_clark", "item": "sierra_plum", "count": 4, "seasons": [1], "hub": "wawona",
 		"text": "Wawona board: wild plums from the South Fork thickets wanted for the cabin pantry. G.C.",
 		"thanks": "Those bring back my old station days at Wawona. Much obliged, friend.", "reward": {"degnan_loaf": 1, "cheddar_wedge": 2}},
 	{"id": "hodges_wawona_boletes", "giver": "clare_hodges", "item": "king_bolete", "count": 2, "seasons": [2], "hub": "wawona",
