@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hodges_pack_setup"
+title = "Leave No Trace"
+giver = "clare_hodges"
+requires = PackedStringArray("hodges_first_night")
+offered_in = 7
+out_of_season = PackedStringArray("Nobody's sleeping out this time of year. Come and see me in the spring about a proper pack.")
+intro = PackedStringArray("One night at Little Yosemite and you're looking at every flat spot in the park like it's a bed. I know that look. I had it.", "So let's get you set up properly. A frame pack with a tent, a bag and a pad strapped on, and you can sleep wherever the evening finds you.", "Marty at the Mountain Shop in Curry Village has one waiting. I told him you'd be by.", "But wherever you sleep, you leave it like nobody slept there. That's Leave No Trace, and there are wilderness rangers out there who check.")
+steps = [{"type": "talk", "target": "mountain_shop", "objective": "Get fitted for a backpacking pack by Marty Kessler at the Mountain Shop", "reminder": "Marty's got the pack in the back of the Mountain Shop, in Curry Village. Go and get fitted.", "done": ["Clare called ahead. Turn round. Arms out.", "External frame, the old kind: it carries the weight on your hips, not your shoulders. Tent strapped under, bag inside, foam pad rolled on top.", "Hip belt tighter. Tighter. There. While it's in your gear bag, it's on your back. Hang it on the rack at camp when you want it off.", "Go on. Clare wants a word before you take it anywhere."], "gear": {"backpacking_pack": 1}}, {"type": "unlocked", "ability": "lnt_camp", "objective": "Wear the pack and make camp anywhere after 6 PM, leaving no trace: off the trail, 100 feet from water, on rock or duff, food in the canister", "reminder": "Wear the pack, and after six in the evening find a spot and make camp. A hundred feet back from any water, and off the trail. Rock, sand or the duff under the trees, never the meadow. All your food in the canister. A fire only in a ring that's already there. Do it right and the morning's yours. Do it wrong and you'll meet one of my wilderness rangers, and they won't be as nice about it as I am.", "done": ["You slept out on your own and nobody could tell you'd been there. That's the whole thing, right there."]}, {"type": "return", "objective": "Tell Clare Hodges about your night out", "reminder": "Come and tell me how the night went.", "done": ["Plan ahead, camp on durable ground, pack it out, leave what you find, small fires in old rings, give the animals their room, and be kind to the next person through.", "That's the seven of them. You'll find they're mostly one rule."]}]
+outro = PackedStringArray("Keep the pack. Sleep out wherever you like, wherever the evening finds you, and wake up to whatever's there.", "And if a ranger named Pruitt is standing over your tent one morning, you'll know you got one wrong.")
+reward_items = {"trail_mix": 3}

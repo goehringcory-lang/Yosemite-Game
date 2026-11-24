@@ -43,6 +43,8 @@ const GEAR: Array[GearData] = [
 	preload("res://data/gear/royal_wulff.tres"),
 	# For nights out in the backcountry (Backcountry).
 	preload("res://data/gear/bear_canister.tres"),
+	# Camp anywhere: worn while it's in your bag (Backpacking, quest "hodges_pack_setup").
+	preload("res://data/gear/backpacking_pack.tres"),
 	# For winter: the Mountain Shop's down jacket (Warmth, quest "shop_puffy").
 	preload("res://data/gear/puffy_jacket.tres"),
 	# The camera Ansel Adams lends you, and his other lenses (Photos).

@@ -94,8 +94,9 @@ func _ready() -> void:
 
 
 func is_shown() -> bool:
-	# gear that went to camp needs somewhere to hang, rack or no rack yet
-	return Camp.has(piece.id) or (piece.id == "gear_rack" and Gear.any_cached())
+	# gear that went to camp needs somewhere to hang, rack or no rack yet,
+	# and so does the backpacking pack when you take it off
+	return Camp.has(piece.id) or (piece.id == "gear_rack" and (Gear.any_cached() or Gear.count(Backpacking.PACK) > 0))
 
 
 func _refresh() -> void:
@@ -397,7 +398,7 @@ static func rack_menu(packing: bool, page := 0) -> Dictionary:
 	var ids: Array[String] = []
 	for gear: GearData in Gear.GEAR:
 		var n := Gear.cached_count(gear.id) if packing else Gear.carried(gear.id)
-		if n > 0 and (packing or Gear.bulk(gear.id) > 0 or gear.id == "haul_bag"):
+		if n > 0 and (packing or Gear.bulk(gear.id) > 0 or gear.id in ["haul_bag", Backpacking.PACK]):
 			ids.append(gear.id)
 	var options := []
 	var icons := []
@@ -414,6 +415,8 @@ static func rack_menu(packing: bool, page := 0) -> Dictionary:
 		var facts := "Takes no room" if room == 0 else "Takes %d room%s" % [room, " each" if n > 1 else ""]
 		if id == "haul_bag":
 			facts = "Adds %d room" % Gear.HAUL_BAG_ROOM
+		elif id == Backpacking.PACK:
+			facts = "Worn on your back while it's in your bag"
 		var note := gear.description
 		if packing and Gear.carried(id) > 0:
 			note += " %d already in your bag." % Gear.carried(id)

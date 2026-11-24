@@ -16,6 +16,7 @@ const WORLD_ABILITIES := {
 	"first_rescue": "carrying the lost boy back to Jo (Rescues)",
 	"slackline_gold": "a gold medal on a Camp 4 slackline",
 	"night_out": "a night at the backcountry camp (Backcountry)",
+	"lnt_camp": "a night camped anywhere with the backpacking pack, leaving no trace (Backpacking)",
 	"half_dome_cables": "climbing the Half Dome cables (Backcountry)",
 	"diving_board_light": "the Diving Board in the afternoon (Backcountry)",
 	"muir_cloud_sea": "on top of Half Dome before ten after a night at Little Yosemite (Backcountry)",

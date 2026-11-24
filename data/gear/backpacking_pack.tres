@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/backpacking_pack.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "backpacking_pack"
+display_name = "Backpacking Pack"
+description = "An external-frame pack with a tent, a down bag and a foam pad strapped on, fitted at the Mountain Shop. While it's in your gear bag you wear it, and from six in the evening you can make camp wherever you stand: off the trail, back from water, on rock or duff, with your food in the canister. Hang it on the rack at camp to take it off."
+icon = ExtResource("2_icon")
+tier = 1
+trade_value = 0
+keepsake = true
