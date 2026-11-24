@@ -505,6 +505,13 @@ func _friends() -> void:
 			note.add_theme_color_override("font_color", DIM)
 			row.add_child(note)
 		_body.add_child(row)
+		var loves := Friendship.known_loves_for(character.id)
+		if not loves.is_empty():
+			var love_names := PackedStringArray()
+			for item_id in loves:
+				var item := ItemDB.get_item(item_id)
+				love_names.append(item.display_name if item else item_id)
+			_line("      Loves: %s" % ", ".join(love_names), DIM)
 
 
 ## A word after a friend's hearts: a heart scene waiting (HeartScenes), a
@@ -1167,10 +1174,15 @@ func _carried(id: String) -> Dictionary:
 	elif FoodDB.is_food(id):
 		facts.append("not ready to eat")
 	var days := Larder.days_left(id)
-	if days > 0:
-		facts.append("keeps %d day%s" % [days, "" if days == 1 else "s"])
+	if days == 1:
+		facts.append("spoils tonight")
+	elif days > 1:
+		facts.append("keeps %d days" % days)
 	elif FoodDB.is_food(id):
 		facts.append("keeps")
+	var reserved := Barter.reserved_note(id)
+	if reserved != "":
+		facts.append(reserved)
 	return {"name": item.display_name, "count": Inventory.count(id), "icon": item.icon,
 		"facts": ", ".join(facts), "description": item.description}
 

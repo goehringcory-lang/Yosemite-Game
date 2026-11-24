@@ -10,6 +10,16 @@ static func possible(character_id: String) -> bool:
 	return character_id != "" and Friendship.can_gift(character_id) and not Friendship.giftable_items(character_id).is_empty()
 
 
+## The option text for [param item_id] in [param character_id]'s gift menu,
+## tagging favorites you've already discovered.
+static func choice_label(character_id: String, item_id: String) -> String:
+	var item := ItemDB.get_item(item_id)
+	var label := "%s (%d)" % [item.display_name, Inventory.count(item_id)]
+	if Friendship.knows_love(character_id, item_id):
+		label += " · Favorite"
+	return label
+
+
 ## Runs the gift choice with [param player] for [param character_id], who is
 ## called [param speaker] and stands at [param anchor].
 static func offer(player: Player, character_id: String, speaker: String, anchor: Node2D) -> void:
@@ -27,7 +37,7 @@ static func offer(player: Player, character_id: String, speaker: String, anchor:
 			var icons := []
 			for id: String in items:
 				var item := ItemDB.get_item(id)
-				names.append("%s (%d)" % [item.display_name, Inventory.count(id)])
+				names.append(choice_label(character_id, id))
 				icons.append(item.icon)
 			names.append("Not now")
 			icons.append(null)

@@ -76,6 +76,8 @@ static var hold_taps := false
 static var vibration := true
 ## Pause the game when its window isn't the one in front (see LookAway).
 static var pause_away := true
+## Run by default without holding the run button; holding it walks instead.
+static var auto_run := false
 ## Trees and plants sway and gusts cross the grass (see Wind). Off stills
 ## them, for anyone the movement bothers.
 static var wind := true
@@ -217,6 +219,7 @@ static func load_settings() -> void:
 	hold_taps = bool(config.get_value("assist", "hold_taps", hold_taps))
 	vibration = bool(config.get_value("input", "vibration", vibration))
 	pause_away = bool(config.get_value("input", "pause_away", pause_away))
+	auto_run = bool(config.get_value("input", "auto_run", auto_run))
 	wind = bool(config.get_value("display", "wind", wind))
 	wayfinding = bool(config.get_value("display", "wayfinding", wayfinding))
 	journeys = bool(config.get_value("display", "journeys", journeys))
@@ -253,6 +256,7 @@ static func save() -> Error:
 	config.set_value("assist", "hold_taps", hold_taps)
 	config.set_value("input", "vibration", vibration)
 	config.set_value("input", "pause_away", pause_away)
+	config.set_value("input", "auto_run", auto_run)
 	config.set_value("display", "wind", wind)
 	config.set_value("display", "wayfinding", wayfinding)
 	config.set_value("display", "journeys", journeys)
@@ -341,6 +345,7 @@ static func reset_defaults() -> void:
 	hold_taps = false
 	vibration = true
 	pause_away = true
+	auto_run = false
 	wind = true
 	wayfinding = true
 	journeys = true

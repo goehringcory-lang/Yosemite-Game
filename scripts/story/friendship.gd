@@ -98,6 +98,8 @@ var news_count := 0
 var told: Dictionary = {}
 ## Character id -> the everyday line they said last, so it isn't said twice running.
 var said: Dictionary = {}
+## Character id -> Array of loved item ids you've discovered by gifting them.
+var known_loves: Dictionary = {}
 
 
 func _ready() -> void:
@@ -127,6 +129,7 @@ func start_new_game() -> void:
 	news_count = 0
 	told = {}
 	said = {}
+	known_loves = {}
 	changed.emit()
 
 
@@ -196,6 +199,19 @@ func giftable_items(character_id: String) -> PackedStringArray:
 	return loved + rest
 
 
+## True when you've already discovered that [param character_id] loves [param item_id].
+func knows_love(character_id: String, item_id: String) -> bool:
+	return item_id in known_loves.get(character_id, [])
+
+
+## The loved item ids you've discovered for [param character_id].
+func known_loves_for(character_id: String) -> Array[String]:
+	var out: Array[String] = []
+	for id in known_loves.get(character_id, []):
+		out.append(str(id))
+	return out
+
+
 ## Gives one [param item_id] to [param character_id]: takes it from the pack,
 ## adds the points and returns the person's thanks (a line of dialogue), or
 ## "" if it couldn't be given.
@@ -209,6 +225,10 @@ func give(character_id: String, item_id: String) -> String:
 	match kind:
 		"loved":
 			points = LOVED_POINTS
+			var list: Array = known_loves.get(character_id, [])
+			if not item_id in list:
+				list.append(item_id)
+				known_loves[character_id] = list
 			# in their own words, if they have some (SmallTalk)
 			var own := SmallTalk.loved_line(character_id)
 			lines = [own] if own != "" else LOVED_LINES
@@ -284,7 +304,8 @@ static func with_article(words: String) -> String:
 
 func save_data() -> Dictionary:
 	return {"points": points, "talked": talked, "gifted": gifted, "scenes": scenes,
-		"saved_for_you": saved_for_you, "news": news, "news_count": news_count, "told": told, "said": said}
+		"saved_for_you": saved_for_you, "news": news, "news_count": news_count, "told": told, "said": said,
+		"known_loves": known_loves}
 
 
 func load_data(data: Dictionary) -> void:
@@ -304,6 +325,14 @@ func load_data(data: Dictionary) -> void:
 	var lines: Dictionary = data.get("said", {})
 	for key in lines:
 		said[str(key)] = str(lines[key])
+	known_loves = {}
+	var saved_loves: Dictionary = data.get("known_loves", {})
+	for key in saved_loves:
+		if saved_loves[key] is Array:
+			var list: Array = []
+			for id in saved_loves[key]:
+				list.append(str(id))
+			known_loves[str(key)] = list
 	changed.emit()
 
 

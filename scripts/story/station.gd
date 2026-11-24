@@ -200,8 +200,21 @@ const POT_OPTION := "Cook in the pot"
 const POT_PAGE := 6
 
 
+## Puts recipes you have the ingredients for ahead of ones you're short on,
+## keeping each group in its original order.
+static func sorted_recipes(recipes: Array[RecipeData]) -> Array[RecipeData]:
+	var ready: Array[RecipeData] = []
+	var short: Array[RecipeData] = []
+	for recipe in recipes:
+		if Recipes.can_make(recipe):
+			ready.append(recipe)
+		else:
+			short.append(recipe)
+	return ready + short
+
+
 func interact(player: Player) -> void:
-	var recipes := Recipes.known_for(station)
+	var recipes := sorted_recipes(Recipes.known_for(station))
 	var has_pot := station == "campfire"
 	if recipes.is_empty() and not has_pot:
 		DialogueBox.say_to(player, [{"speaker": "", "text": "%s. You don't know anything to make here yet." % display_name}])
@@ -254,12 +267,21 @@ func _cook_in_pot(box: DialogueBox) -> void:
 				cursor = 0
 			"remove":
 				pot.pop_back()
+			"repeat":
+				pot.assign(Cooking.last_pot)
+				var next := pot_menu(pot, page)
+				var cook_idx: int = next.actions.find("cook")
+				cursor = cook_idx if cook_idx >= 0 else 0
 			"cook":
 				var fresh := not Cooking.knows_dish(Cooking.dish_for(pot))
 				var meal := Cooking.cook(pot)
 				if meal != "":
 					await box.say([{"speaker": "", "text": cooked_line(meal, fresh)}])
-				return
+				if Cooking.ingredients_in_inventory().is_empty():
+					return
+				pot.clear()
+				page = 0
+				cursor = 0
 			_:
 				pot.append(action.trim_prefix("add:"))
 
@@ -282,15 +304,22 @@ static func _pot_list(pot: Array) -> String:
 	return ", ".join(parts)
 
 
-## The pot's menu for what's in [param pot]: a page of ingredients from the
-## pack (with how many are left), then "More ingredients" when they run past
-## a page, "Cook it", "Take the last one out", and "Leave". [code]actions[/code]
-## says what each option does: "add:<id>", "more", "cook", "remove", "leave".
+## The pot's menu for what's in [param pot]: "Same as last time" when empty
+## and you still have the last pot's ingredients, a page of ingredients from
+## the pack (with how many are left), then "More ingredients" when they run
+## past a page, "Cook it", "Take the last one out", and "Leave". [code]actions[/code]
+## says what each option does: "repeat", "add:<id>", "more", "cook", "remove", "leave".
 static func pot_menu(pot: Array, page := 0) -> Dictionary:
 	var options := []
 	var icons := []
 	var details := []
 	var actions := []
+	if pot.is_empty() and page == 0 and Cooking.can_repeat_last_pot():
+		var last_result := Cooking.result_for(Cooking.last_pot)
+		options.append("Same as last time")
+		icons.append(Cooking.dish_icon(last_result.dish) if Cooking.knows_dish(last_result.dish) else null)
+		details.append(_preview_card(Cooking.last_pot, last_result))
+		actions.append("repeat")
 	var spare: Array[String] = []
 	for id in Cooking.ingredients_in_inventory():
 		if Inventory.count(id) > pot.count(id):

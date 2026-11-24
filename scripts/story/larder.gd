@@ -24,6 +24,37 @@ func days_left(id: String) -> int:
 	return list[0] if not list.is_empty() else 0
 
 
+## Items in the pack that will spoil at the end of today (days left <= 1),
+## as item id -> count.
+func spoiling_tonight() -> Dictionary:
+	var out := {}
+	for id: String in batches:
+		var list: Array = batches[id]
+		var n := 0
+		for days in list:
+			if int(days) <= 1:
+				n += 1
+		if n > 0:
+			out[id] = n
+	return out
+
+
+## "3 Wild Strawberries and 1 Miner's Lettuce", or "" when nothing spoils tonight.
+func spoiling_summary() -> String:
+	var soon := spoiling_tonight()
+	if soon.is_empty():
+		return ""
+	var ids := soon.keys()
+	ids.sort()
+	var parts := PackedStringArray()
+	for id: String in ids:
+		var item := ItemDB.get_item(id)
+		parts.append(ItemDB.count_name(int(soon[id]), item.display_name if item else id))
+	if parts.size() == 1:
+		return parts[0]
+	return ", ".join(parts.slice(0, parts.size() - 1)) + " and " + parts[-1]
+
+
 ## Brings the batches back in line with the Inventory's counts.
 func _reconcile() -> void:
 	for id: String in batches.keys():

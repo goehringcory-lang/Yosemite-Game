@@ -18,13 +18,29 @@ func interact(player: Player) -> void:
 		sleep_requested.emit()
 		return
 	var nights := Park.nights_until_open("tioga_road") if QuestLog.snowed_in() else 0
-	if nights <= 1:
+	var spoiling := Larder.spoiling_summary()
+	if nights <= 1 and spoiling == "":
 		sleep_requested.emit()
 		return
 	player.can_act = false
 	var box := DialogueBox.open(player)
+	if nights <= 1:
+		var details := [
+			{"title": "Sleep anyway", "rows": [], "facts": "Wake up tomorrow",
+				"note": "Cook or trade perishable food before turning in to keep it from spoiling."},
+			null,
+		]
+		var choice := await box.choose("Sleep? %s will spoil tonight." % spoiling, ["Sleep anyway", "Not yet"], "", [], details)
+		box.close()
+		player.can_act = true
+		if choice == 0:
+			sleep_requested.emit()
+		return
+	var sleep_note := "End the day here, as usual."
+	if spoiling != "":
+		sleep_note += " %s will spoil tonight." % spoiling
 	var details := [
-		{"title": "Sleep", "rows": [], "facts": "Wake up tomorrow", "note": "End the day here, as usual."},
+		{"title": "Sleep", "rows": [], "facts": "Wake up tomorrow", "note": sleep_note},
 		{"title": "Sleep through to the thaw", "rows": [], "facts": "%d nights, to Summer 1" % nights,
 			"note": "The Tioga Road opens and Muir is waiting in Tuolumne. Fresh food in your pack and your chest will spoil, and whatever the winter and spring bring, you'll sleep through."},
 		null,
