@@ -158,6 +158,8 @@ func _ready() -> void:
 	add_child(SunLight.new())
 	add_child(RadianceGI.new())
 	add_child(AirGlow.new())
+	add_child(HD2DPost.new())
+	add_child(AtmosphericMotes.new())
 	add_child(RoomLight.new())
 	add_child(GraphicsWatch.new())
 	add_child(framing)

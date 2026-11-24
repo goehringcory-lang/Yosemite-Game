@@ -50,15 +50,22 @@ func _process(_delta: float) -> void:
 	if _tint == null:
 		_tint = get_parent().get_node_or_null("DayNight") as CanvasModulate
 	var dark := 0.0
+	var golden_glow := 0.0
 	if active() and _tint != null and _tint.visible:
 		var lum := (_tint.color.r + _tint.color.g + _tint.color.b) / 3.0
 		dark = clampf((0.9 - lum) / 0.45, 0.0, 1.0)
+		var weather := Weather.today()
+		var clear: float = 1.0 - float(weather.clouds) * 0.75
+		golden_glow = Sun.golden() * clear * 0.42
 	elif active():
 		# a room at night: firelight and lamps glow, more gently
 		dark = RoomLight.level * 0.6
-	var glowing := dark > 0.01
+	var level := maxf(dark, golden_glow)
+	var glowing := level > 0.01
 	_env.glow_enabled = glowing
-	_env.glow_intensity = STRENGTH * dark
+	_env.glow_intensity = STRENGTH * level
+	# Higher threshold during golden hour so only sunlit highlights and water glints bloom.
+	_env.glow_hdr_threshold = lerpf(THRESHOLD, 0.96, clampf(golden_glow / maxf(level, 0.001) * (1.0 - dark), 0.0, 1.0))
 	var want: Environment = _env if glowing else null
 	if environment != want:
 		environment = want

@@ -40,13 +40,44 @@ func _ready() -> void:
 	await test_pipeline_and_layers()
 	await test_outdoor_day_and_night()
 	await test_indoors()
+	await test_hd2d_pillars()
 	await test_disable_toggle()
 
 	LitSprites.enabled = true
 	RadianceGI.enabled = true
+	HD2DPost.enabled = true
 	SaveManager.delete_save()
 	print("\n%s: %d failure(s)" % ["OK" if failures == 0 else "FAILED", failures])
 	get_tree().quit(failures)
+
+
+func test_hd2d_pillars() -> void:
+	var post := world.get_node_or_null("HD2DPost") as HD2DPost
+	var motes := world.get_node_or_null("AtmosphericMotes") as AtmosphericMotes
+	var atmos := world.get_node_or_null("Atmosphere") as CanvasLayer
+	check(post != null, "World attaches HD2DPost")
+	check(motes != null, "World attaches AtmosphericMotes")
+	if post == null or atmos == null:
+		return
+	check(post.layer > atmos.layer and post.layer < 18, "HD2DPost sits right after Atmosphere and below HUD/menus (layer %d)" % post.layer)
+	if not LitSprites.active():
+		return
+	set_date(SUMMER, 14, 19.5)
+	await world.go_to_region("mirror_lake", "arrival")
+	await _frames(4)
+	check(post.visible, "HD2DPost is active on High graphics")
+	var aerial: float = post._mat.get_shader_parameter("aerial_strength")
+	check(aerial > 0.05, "outdoor aerial perspective haze is active at golden hour (%.2f)" % aerial)
+	var glow := world.get_node("AirGlow") as AirGlow
+	check(glow.environment != null and glow.environment.glow_enabled, "AirGlow blooms golden-hour highlights")
+	var shadows := world.region.get_node_or_null("SunShadows") as SunShadows
+	check(shadows != null and bool(shadows._still_mat.get_shader_parameter("high_quality")), "SunShadows enables soft penumbra on High graphics")
+	var water: WaterSurface = null
+	for c in world.get_children():
+		if c is WaterSurface:
+			water = c as WaterSurface
+	check(water != null and bool(water._mat.get_shader_parameter("high_quality")), "WaterSurface enables caustics and shore foam on High graphics")
+	check(motes.visible, "AtmosphericMotes drift in clear golden-hour air")
 
 
 func test_pipeline_and_layers() -> void:

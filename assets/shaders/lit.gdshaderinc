@@ -55,7 +55,19 @@ vec3 lit_sun(vec3 nmap) {
 	}
 	vec3 n = normalize(nmap * vec3(2.0, -2.0, 1.0) - vec3(1.0, -1.0, 0.0));
 	float tilt = dot(n.xy, lit_sun_local);
-	return (1.0 + sun_light * tilt * SUN_GAIN * relief) / (1.0 + sun_light);
+	// Warm directional diffuse on sun-facing slopes; cool sky-blue hemisphere
+	// fill on shaded slopes so trunks, granite and stonework separate in 3D.
+	float lit_side = max(tilt, 0.0);
+	float shade_side = max(-tilt, 0.0);
+	vec3 sky_fill = vec3(0.88, 0.94, 1.12);
+	// Grazing sunlit rim / micro-specular along bevelled edges facing the sun.
+	float rim = pow(lit_side, 3.0) * clamp(1.1 - n.z * 0.7, 0.2, 1.0) * 0.42;
+	vec3 direct = sun_light * (lit_side * SUN_GAIN + rim) * relief;
+	vec3 shadow_cut = sun_light * shade_side * SUN_GAIN * relief;
+	vec3 shaded = max(vec3(1.0) + direct - shadow_cut, vec3(0.25));
+	// Shift shaded slopes gently toward cool sky fill.
+	shaded = mix(shaded, shaded * sky_fill, shade_side * relief * 0.48);
+	return shaded / (1.0 + sun_light);
 }
 
 vec4 lit_light(vec3 normal, vec3 light_dir, bool directional, vec4 light_color, float light_energy, vec4 albedo) {
@@ -67,6 +79,7 @@ vec4 lit_light(vec3 normal, vec3 light_dir, bool directional, vec4 light_color, 
 		// blend multiplies by, so it isn't applied here a second time.
 		return vec4(light_color.rgb * albedo.rgb * tilt * SUN_GAIN * relief, light_color.a);
 	}
-	float shade = max(1.0 + tilt * LAMP_GAIN * relief, 0.0);
+	float rim = pow(max(tilt, 0.0), 2.5) * 0.24 * relief;
+	float shade = max(1.0 + tilt * LAMP_GAIN * relief + rim, 0.0);
 	return vec4(light_color.rgb * albedo.rgb * light_energy * shade, light_color.a);
 }
