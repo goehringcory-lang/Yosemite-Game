@@ -29,6 +29,8 @@ var _halo: Sprite2D
 ## seconds, so a lamp on a timer comes up or goes out rather than cutting.
 var _hours_level := 1.0
 const HOURS_FADE := 1.5
+## Full light energy before RadianceGI direct-spill tightening (read by RadianceGI).
+var gi_energy := 0.0
 
 
 func _ready() -> void:
@@ -84,7 +86,16 @@ func _process(delta: float) -> void:
 		_phase += delta * 9.0
 		level *= 1.0 - flicker * (0.5 + 0.5 * sin(_phase) * sin(_phase * 0.37 + 1.0))
 	# A touch over 1 so a lamp clearly lifts the blue night, not just a speck.
-	energy = level * 1.25
+	gi_energy = level * 1.25
+	if RadianceGI.active():
+		# RadianceGI carries the wide, occluded light pool and soft shadows;
+		# keep the direct PointLight2D tighter for close normal-map bevels
+		# without bleeding unoccluded light behind boulders and walls.
+		energy = level * 0.72
+		texture_scale = radius * 0.62 / 64.0
+	else:
+		energy = gi_energy
+		texture_scale = radius / 64.0
 	visible = level > 0.01
 	if _halo:
 		# On High graphics the real glow (AirGlow) does this instead.

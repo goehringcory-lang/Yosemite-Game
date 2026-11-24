@@ -156,6 +156,7 @@ func _ready() -> void:
 	player.add_child(Lantern.new())
 	add_child(WaterSurface.new())
 	add_child(SunLight.new())
+	add_child(RadianceGI.new())
 	add_child(AirGlow.new())
 	add_child(RoomLight.new())
 	add_child(GraphicsWatch.new())
