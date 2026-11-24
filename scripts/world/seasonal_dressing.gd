@@ -139,6 +139,8 @@ func apply() -> void:
 	_season = clampi(GameClock.season, 0, 3)
 	for i in _sprites.size():
 		var sprite := _sprites[i]
+		if not is_instance_valid(sprite):
+			continue
 		var look: Array = _look_for(_names[i])
 		var tex: Texture2D = look[_season]
 		sprite.visible = tex != null
@@ -166,6 +168,8 @@ func apply() -> void:
 	# No snow shader at all on a bare day: the sprite goes back to being lit
 	# by real light (LitSprites), or to no shader.
 	for sprite in _caps:
+		if not is_instance_valid(sprite):
+			continue
 		if snow > 0.0:
 			LitSprites.detach_sprite(sprite)
 			sprite.material = _cap_material

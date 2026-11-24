@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_pavilion_cook.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "huff_rico"
+display_name = "Rico"
+years = "today"
+affiliation = "Park visitor"
+bio = "A Curry Village Pizza Deck cook living in the Huff employee tents behind the village. Hauls two beat-up speakers into the woods after ten."
+idle_lines = PackedStringArray("Two hundred pizzas on a Saturday night, then we haul the speakers into the pines. That's the Huff life.", "Welcome to Huff. Tent cabins with thinner canvas and louder neighbors than Curry Village.", "If you're still up past ten, listen for the bass off-trail. We never throw it in the same boulders twice.", "Don't leave snacks in your tent here. Bears know the difference between guest tents and employee tents: ours have better hot sauce.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.75, 0.32, 0.24, 1)
+home = "HUFF, Curry Village"
+visitor = true

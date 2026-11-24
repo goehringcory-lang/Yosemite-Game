@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_dirtbag.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "huff_devon"
+display_name = "Devon"
+years = "today"
+affiliation = "Park visitor"
+bio = "A seasonal dish-pit worker and boulderer living in Huff. Packs the cooler of cold King Cobras and keeps a few tabs tucked in foil."
+idle_lines = PackedStringArray("Work four shifts at the Pavilion, boulder three days, dance in the boulders past ten. Not a bad deal.", "Cooler's chained to the bear box till dark. After ten we haul it deep into the trees where the rangers don't walk.", "Ever meet Crow up Tenaya Creek? Good guy. Same wavelength as the Huff crew.", "We pick a different patch of heavy forest and boulders every night so nobody ever pins us down.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.45, 0.36, 0.62, 1)
+home = "HUFF, Curry Village"
+visitor = true

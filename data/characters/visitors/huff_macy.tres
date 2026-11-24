@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_housekeeper.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "huff_macy"
+display_name = "Macy"
+years = "today"
+affiliation = "Park visitor"
+bio = "A Curry Village housekeeper bunking in Huff. Knows every off-trail clearing in the Valley."
+idle_lines = PackedStringArray("Stripped forty guest beds this morning. Tonight I'm not sitting still for anything except a good beat in the trees.", "Huff looks small from the outside, but half the people keeping Curry Village running sleep in these tents.", "Past ten o'clock, Huff empties out. Check the post by the path if you want to know which woods we're heading for.", "Best part of working a season in the Valley? Walking five minutes off-trail and feeling like nobody else is on earth.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.32, 0.56, 0.52, 1)
+home = "HUFF, Curry Village"
+visitor = true

@@ -87,6 +87,8 @@ func _init() -> void:
 	# Nailing a piton on an aid move (last, so the sounds above keep their
 	# random takes). The screen plays it higher as the pin seats.
 	_save("climb_pin", _pin(130), RATE_FX, -5.0)
+	# HUFF late-night forest party speakers: a seamless 120 BPM loop.
+	_save("huff_party", _huff_party(150), RATE_BED, -7.0)
 	print("Sounds written to %s. Run godot --headless --path . --import next." % OUT)
 	quit()
 
@@ -97,7 +99,7 @@ func _init() -> void:
 ## A sound that isn't a loop gets a short fade at its end, so it never stops
 ## on a click.
 func _save(sound_name: String, buf: PackedFloat32Array, rate: int, peak_db: float) -> void:
-	if not (sound_name.begins_with("amb_") or sound_name in ["waterfall", "campfire", "river"]):
+	if not (sound_name.begins_with("amb_") or sound_name in ["waterfall", "campfire", "river", "huff_party"]):
 		var tail := mini(int(0.008 * rate), buf.size())
 		for i in tail:
 			buf[buf.size() - 1 - i] *= float(i) / tail
@@ -1029,3 +1031,77 @@ func _thunder(seed_value: int) -> PackedFloat32Array:
 		var t := float(i - from) / (n - from)
 		buf[i] *= swell[i] * minf(t * 6.0, 1.0) * pow(1.0 - t, 1.6)
 	return buf
+
+
+## HUFF late-night forest party speakers: 8 seconds (4 bars at 120 BPM) of
+## muffled four-on-the-floor kick, warm sub-bass groove, crisp off-beat hats
+## and a dreamy synth chord stab, as heard echoing through pine trees.
+func _huff_party(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	return _loop(8.0, 0.25, RATE_BED, func(buf: PackedFloat32Array, rate: int) -> void:
+		var beat := 0.5 # 120 BPM
+		var total_beats := int(ceilf(float(buf.size()) / rate / beat)) + 1
+		# Warm bass progression (Hz) per bar: A1, F1, G1, E1
+		var bass_notes := [55.0, 43.65, 49.0, 41.2]
+		# Dreamy minor/7th synth chord stabs per bar (Hz)
+		var chords := [
+			[220.0, 261.63, 329.63, 392.0],
+			[174.61, 220.0, 261.63, 329.63],
+			[196.0, 246.94, 293.66, 392.0],
+			[164.81, 196.0, 246.94, 329.63],
+		]
+		for b in total_beats:
+			var t0 := b * beat
+			var bar := (b / 4) % 4
+			# Kick drum on every beat: punchy pitch drop from 135 Hz to 46 Hz.
+			var k_start := int(t0 * rate)
+			var k_len := int(0.22 * rate)
+			var k_phase := 0.0
+			for i in k_len:
+				if k_start + i >= buf.size():
+					break
+				var dt := float(i) / rate
+				var f := 46.0 + 92.0 * exp(-dt * 28.0)
+				k_phase += TAU * f / rate
+				var env := minf(dt * 250.0, 1.0) * exp(-dt * 11.0)
+				buf[k_start + i] += sin(k_phase) * env * 0.95
+			# Warm pumping bass on the off-beat (sidechained feel).
+			var bf: float = bass_notes[bar]
+			var b_start := int((t0 + beat * 0.48) * rate)
+			var b_len := int(0.24 * rate)
+			var b_phase := 0.0
+			for i in b_len:
+				if b_start + i >= buf.size():
+					break
+				var dt := float(i) / rate
+				b_phase += TAU * bf / rate
+				var env := minf(dt * 40.0, 1.0) * exp(-dt * 7.5)
+				buf[b_start + i] += (sin(b_phase) + 0.35 * sin(b_phase * 2.0)) * env * 0.5
+			# Soft clap/snare on beats 2 and 4.
+			if b % 2 == 1:
+				_add_click(buf, rate, t0, 0.09, 0.28, 2200.0)
+			# Crisp off-beat hi-hat tick.
+			_add_click(buf, rate, t0 + beat * 0.5, 0.035, 0.14, 5200.0)
+			# Dreamy warm synth chord stab on beats 1 and 3.5 of each bar.
+			if b % 4 == 0 or b % 4 == 2:
+				var c_at := t0 + (0.0 if b % 4 == 0 else beat * 0.5)
+				var c_start := int(c_at * rate)
+				var c_len := int(0.45 * rate)
+				var chord: Array = chords[bar]
+				for i in c_len:
+					if c_start + i >= buf.size():
+						break
+					var dt := float(i) / rate
+					var env := minf(dt * 35.0, 1.0) * exp(-dt * 4.2)
+					var s := 0.0
+					for freq in chord:
+						s += sin(TAU * float(freq) * dt)
+					buf[c_start + i] += (s / chord.size()) * env * 0.28
+		# Soft forest-air low-pass so it sounds like speakers through pine trees.
+		var a := _one_pole(1800.0, rate)
+		var low := 0.0
+		for i in buf.size():
+			low += a * (buf[i] - low)
+			buf[i] = low * 1.15
+	)
+
