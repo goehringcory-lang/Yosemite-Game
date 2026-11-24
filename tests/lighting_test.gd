@@ -346,7 +346,9 @@ func test_indoors() -> void:
 	await _frames(3)
 	check(not sun.enabled, "no window light at night")
 	check(room.visible and RoomLight.level > 0.9, "the room dims at night (%.2f)" % RoomLight.level)
-	check(stove != null and stove.energy > 0.5, "the stove lights the room at night")
+	# With RadianceGI on, the stove's light is split: gi_energy carries the
+	# full glow and the direct PointLight2D is trimmed, so check the full glow.
+	check(stove != null and stove.gi_energy > 0.5, "the stove lights the room at night (%.2f)" % (stove.gi_energy if stove else 0.0))
 	check(lantern.energy < 0.05, "the lantern still stays out indoors at night")
 	check((world.get_node("AirGlow") as AirGlow).environment.glow_enabled, "the firelight glows indoors at night")
 	await world.go_to_region("curry_village", "store_door")
