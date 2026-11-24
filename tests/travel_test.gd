@@ -134,6 +134,11 @@ func _ready() -> void:
 	await world.travel(to_tuolumne)
 	check(world.region.region_id == "el_capitan_meadow", "no 90-minute drive at 11:40 PM")
 	GameClock.minutes = 9 * 60
+	# These checks time each drive to the minute. At time_scale 20 the clock
+	# ticks every 0.35 real seconds, so a slow arrival (a region's first build,
+	# the lighting scan) could add a stray tick. Only the drives move the clock.
+	var tick := GameClock.seconds_per_tick
+	GameClock.seconds_per_tick = 1.0e9
 
 	# Northside Drive west comes to a fork in the road. Turn right and Big Oak
 	# Flat Road climbs to Crane Flat, where the Tioga Road drives on to
@@ -184,6 +189,7 @@ func _ready() -> void:
 	await _settle(world)
 	check(world.region.region_id == "el_portal" and not world.park_map.visible and GameClock.minutes == clock + 15,
 		"straight on at the junction drives to El Portal (%d min)" % (GameClock.minutes - clock))
+	GameClock.seconds_per_tick = tick
 
 	# Road exits out of a hub open the travel map with the right destination picked.
 	var exit: RegionExit = world.region.get_node("Exits/ElPortalRoad")

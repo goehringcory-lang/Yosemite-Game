@@ -60,6 +60,12 @@ var _occluders: Array[CanvasItem] = []
 var _lights: Array[PointLight2D] = []
 var _glows: Array[Sprite2D] = []
 var _room_windows: RoomWindows
+## What each scanned sprite is (instance id -> KIND_*), kept for the region so
+## a rescan only re-walks the tree instead of re-testing ~1000 sprites.
+var _kinds := {}
+const KIND_NONE := 0
+const KIND_GLOW := 1
+const KIND_OCCLUDER := 2
 
 var _viewports: Array[SubViewport] = []
 var _scene_vp: SubViewport
@@ -89,6 +95,7 @@ func _ready() -> void:
 
 func _on_region_changed(region: Region) -> void:
 	_region = region
+	_kinds.clear()
 	_scan_in = 0.0
 	_scan()
 
@@ -311,20 +318,29 @@ func _scan() -> void:
 
 
 func _collect_entities(node: Node, player: Node) -> void:
+	# Worked out once per parent, not per sprite: a region's Entities node has
+	# ~1000 children, and asking it for its lights for each one made a scan
+	# take 40-80 ms (a hitch every RESCAN seconds and on every arrival).
+	var skip_parent := _parent_skips(node)
 	for child in node.get_children():
 		if child == player:
 			continue
 		if child is PointLight2D:
 			_lights.append(child as PointLight2D)
 			continue
-		if child is Sprite2D:
-			var sprite := child as Sprite2D
-			if _is_night_glow(sprite):
-				_glows.append(sprite)
-			elif _is_occluder(sprite):
-				_occluders.append(sprite)
-		elif child is AnimatedSprite2D:
-			if _is_occluder(child as CanvasItem):
+		if child is Sprite2D or child is AnimatedSprite2D:
+			var id := child.get_instance_id()
+			var kind: int = _kinds.get(id, -1)
+			if kind < 0:
+				kind = KIND_NONE
+				if child is Sprite2D and _is_night_glow(child as Sprite2D):
+					kind = KIND_GLOW
+				elif not skip_parent and _is_occluder(child as CanvasItem):
+					kind = KIND_OCCLUDER
+				_kinds[id] = kind
+			if kind == KIND_GLOW:
+				_glows.append(child as Sprite2D)
+			elif kind == KIND_OCCLUDER:
 				_occluders.append(child as CanvasItem)
 		if child.get_child_count() > 0:
 			_collect_entities(child, player)
@@ -337,6 +353,21 @@ static func _is_night_glow(sprite: Sprite2D) -> bool:
 	return false
 
 
+## True when sprites under [param parent] are a light's own fixture (the
+## parent is named like one or holds a PointLight2D), so they never occlude.
+static func _parent_skips(parent: Node) -> bool:
+	var p_lower := String(parent.name).to_lower()
+	for hint: String in NON_OCCLUDER_HINTS:
+		if hint in p_lower:
+			return true
+	for child in parent.get_children():
+		if child is PointLight2D:
+			return true
+	return false
+
+
+## Whether [param item] casts GI shadow. Its parent is checked separately by
+## _parent_skips (once per parent).
 static func _is_occluder(item: CanvasItem) -> bool:
 	if item.material is CanvasItemMaterial and (item.material as CanvasItemMaterial).blend_mode == CanvasItemMaterial.BLEND_MODE_ADD:
 		return false
@@ -344,14 +375,6 @@ static func _is_occluder(item: CanvasItem) -> bool:
 	var lower_name := item.name.to_lower()
 	for hint: String in NON_OCCLUDER_HINTS:
 		if hint in lower_name:
-			return false
-	var parent := item.get_parent()
-	if parent:
-		var p_lower := parent.name.to_lower()
-		for hint: String in NON_OCCLUDER_HINTS:
-			if hint in p_lower:
-				return false
-		if not parent.find_children("*", "PointLight2D", false, false).is_empty():
 			return false
 	if item is Sprite2D:
 		var tex := (item as Sprite2D).texture
