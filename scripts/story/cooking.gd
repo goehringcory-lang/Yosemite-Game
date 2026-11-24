@@ -136,6 +136,8 @@ const BITTER_ENERGY := 3
 
 ## Dish id -> {"best": highest energy cooked, "made": times cooked}.
 var discovered: Dictionary = {}
+## Ingredients used in the most recent pot cooked this session, for quick refill.
+var last_pot: Array[String] = []
 
 var _items: Dictionary = {}
 
@@ -146,6 +148,7 @@ func _ready() -> void:
 
 func start_new_game() -> void:
 	discovered = {}
+	last_pot = []
 
 
 func can_cook_with(id: String) -> bool:
@@ -266,9 +269,28 @@ func cook(pot: Array) -> String:
 	entry.best = maxi(int(entry.best), int(result.energy))
 	entry.made = int(entry.made) + 1
 	discovered[result.dish] = entry
+	last_pot.clear()
+	for id: String in pot:
+		last_pot.append(id)
 	GameClock.advance_minutes(minutes_for(pot))
 	cooked.emit(meal)
 	return meal
+
+
+## True when [member last_pot] is set and you still have enough of every
+## ingredient in it to cook the same dish again.
+func can_repeat_last_pot() -> bool:
+	if last_pot.is_empty():
+		return false
+	var needed := {}
+	for id: String in last_pot:
+		if not can_cook_with(id):
+			return false
+		needed[id] = int(needed.get(id, 0)) + 1
+	for id: String in needed:
+		if Inventory.count(id) < int(needed[id]):
+			return false
+	return true
 
 
 func knows_dish(dish: String) -> bool:
@@ -358,6 +380,7 @@ func save_data() -> Dictionary:
 
 func load_data(data: Dictionary) -> void:
 	discovered = {}
+	last_pot = []
 	var saved: Dictionary = data.get("discovered", {})
 	for dish in saved:
 		if DISHES.has(str(dish)):

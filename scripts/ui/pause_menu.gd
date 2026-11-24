@@ -28,8 +28,8 @@ const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again 
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
 const TITLE_CONFIRM := "To the title? Progress since your last save is lost. Press again."
 const TITLE_SAVED := "To the title? Your game is saved. Press again."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, TIMING, HOLD_TAPS, VIBRATION, PAUSE_AWAY, FONT, GRAPHICS, WIND, WAYFINDING, JOURNEYS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Activity timing", "Hold to tap", "Vibration", "Pause when away", "Font", "Graphics", "Wind", "Signposts", "Trip map", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, TIMING, HOLD_TAPS, VIBRATION, PAUSE_AWAY, AUTO_RUN, FONT, GRAPHICS, WIND, WAYFINDING, JOURNEYS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Activity timing", "Hold to tap", "Vibration", "Pause when away", "Auto-run", "Font", "Graphics", "Wind", "Signposts", "Trip map", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill covers the whole screen. Pixel perfect keeps every pixel the same size, with a border where the screen isn't a whole multiple of 960 x 540.",
@@ -40,6 +40,7 @@ const SETTING_HELP := [
 	"On a climbing crux that wants quick taps, hold the key instead.",
 	"A controller rumbles on a fall, a crux, a fish on the line, and a quest done.",
 	"The game pauses when you switch to another window.",
+	"Run without holding the run key; hold it to walk instead.",
 	"Smooth letters are easiest to read; pixel letters match the art.",
 	"Low uses a simpler renderer for older computers. A change takes effect when you next start the game.",
 	"Trees and plants sway and gusts cross the grass. Off keeps them still.",
@@ -896,6 +897,8 @@ func change_setting(which: int, step: int) -> void:
 				Rumble.stop()
 		Setting.PAUSE_AWAY:
 			Settings.pause_away = not Settings.pause_away
+		Setting.AUTO_RUN:
+			Settings.auto_run = not Settings.auto_run
 		Setting.WIND:
 			Settings.wind = not Settings.wind
 		Setting.WAYFINDING:
@@ -1078,6 +1081,8 @@ func _setting_value(which: int) -> String:
 			value = "On" if Settings.vibration else "Off"
 		Setting.PAUSE_AWAY:
 			value = "On" if Settings.pause_away else "Off"
+		Setting.AUTO_RUN:
+			value = "On" if Settings.auto_run else "Off"
 		Setting.WIND:
 			value = "On" if Settings.wind else "Off"
 		Setting.WAYFINDING:

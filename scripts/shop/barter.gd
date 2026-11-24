@@ -160,6 +160,31 @@ static func reserved() -> Dictionary:
 	return out
 
 
+## A short Backpack note explaining why [param id] is kept back from traders
+## ("3 needed for a quest", "needed for a board note"), or "".
+static func reserved_note(id: String) -> String:
+	var quest_need := 0
+	for quest_id: String in QuestLog.active:
+		var quest := QuestLog.get_quest(quest_id)
+		if quest == null:
+			continue
+		var step := QuestLog.current_step(quest)
+		if step.get("type", "") == "have" and str(step.get("item", "")) == id:
+			quest_need += int(step.get("count", 1))
+	var board_need := 0
+	for entry: Dictionary in BoardRequests.open_notes():
+		var note: Dictionary = entry.note
+		if str(note.get("item", "")) == id:
+			board_need += int(note.get("count", 1))
+	if quest_need > 0 and board_need > 0:
+		return "%d needed for quests & notes" % (quest_need + board_need)
+	if quest_need > 0:
+		return "needed for a quest" if quest_need == 1 else "%d needed for a quest" % quest_need
+	if board_need > 0:
+		return "needed for a board note" if board_need == 1 else "%d needed for a board note" % board_need
+	return ""
+
+
 ## What you could trade: tradeable items, less what's reserved, as id -> count.
 static func goods() -> Dictionary:
 	var out := {}

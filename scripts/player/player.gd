@@ -112,7 +112,7 @@ func _physics_process(_delta: float) -> void:
 	var input := Vector2.ZERO
 	if can_act:
 		input = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	var running := input != Vector2.ZERO and Input.is_action_pressed("run")
+	var running := input != Vector2.ZERO and (Input.is_action_pressed("run") != Settings.auto_run)
 	var speed_mult := 1.0 + Perks.bonus("muirs_stride") + Perks.bonus("park_walker")
 	velocity = input * SPEED * speed_mult * (RUN_BOOST if running else 1.0) * Rescues.speed_factor() * Warmth.speed_factor()
 	_shiver(_delta)
