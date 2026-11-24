@@ -104,6 +104,11 @@ var _door_back := {}
 ## The clock hit the pass-out hour while World or a dialogue was busy; the
 ## player passes out as soon as both are done.
 var _curfew_pending := false
+## The camp you're about to sleep in, made with the backpacking pack
+## (camp_out): {"at": Vector2, "problems": Array}, or empty.
+var _camp_out := {}
+## Where the wilderness ranger stands when you wake up beside them.
+const RANGER_BESIDE := Vector2(34, 2)
 ## Trips that take clock time play on the park map (see Journey) instead of
 ## fading to black. Shot tools turn it off; headless runs never show it.
 var journeys := true
@@ -626,6 +631,11 @@ func travel(leg: Dictionary) -> void:
 func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	if _busy:
 		return
+	# a camp made anywhere with the backpacking pack (camp_out)
+	var camp := _camp_out
+	_camp_out = {}
+	if passed_out:
+		camp = {}
 	_busy = true
 	_curfew_pending = false
 	_set_paused(true)
@@ -639,7 +649,14 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	var message_extra := ""
 	var wake_spawn := Park.HOME_SPAWN
 	var night_out := ""
-	if camp_spawn != "" and not passed_out:
+	if not camp.is_empty():
+		wake_spawn = ""
+		# a clean camp keeps its food in the canister; a bad one meets the
+		# ranger in the morning, who takes it all anyway
+		if camp.problems.is_empty():
+			Backpacking.mark(Backpacking.CLEAN_CAMP)
+			night_out = "You packed up and left no trace. " + Backcountry.night_out()
+	elif camp_spawn != "" and not passed_out:
 		wake_spawn = camp_spawn
 		night_out = Backcountry.night_out()
 	elif region.region_id != Park.HOME_REGION:
@@ -660,7 +677,13 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	var plants := PlantSpawner.attach(region)
 	if plants:
 		await plants.refresh()
-	player.global_position = region.get_spawn(wake_spawn).global_position
+	player.global_position = camp.at if not camp.is_empty() else region.get_spawn(wake_spawn).global_position
+	var ranger: Sprite2D = null
+	if not camp.is_empty() and not camp.problems.is_empty():
+		# standing over your tent when you wake
+		ranger = Backpacking.ranger_figure()
+		region.entities.add_child(ranger)
+		ranger.global_position = player.global_position + RANGER_BESIDE
 	player.lie_down(false)
 	player.facing = Vector2i.DOWN
 	player.interaction_area.position = Vector2(player.facing) * 24.0
@@ -671,6 +694,18 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	var saved := SaveManager.save_game()
 
 	await _reveal()
+	if ranger:
+		var morning := Backpacking.ranger_morning(camp.problems)
+		player.facing = Vector2i.RIGHT
+		await DialogueBox.say_to(player, morning.lines)
+		night_out = morning.summary
+		saved = SaveManager.save_game()
+		if is_instance_valid(ranger):
+			ranger.frame = CharacterSheet.frame(ranger.texture, Vector2i.RIGHT, CharacterSheet.Col.STEP_A)
+			var leave := ranger.create_tween()
+			leave.tween_property(ranger, "global_position", ranger.global_position + Vector2(140, 0), 1.6)
+			leave.parallel().tween_property(ranger, "modulate:a", 0.0, 1.6)
+			leave.tween_callback(ranger.queue_free)
 	player.pose("arms_up", 1.0) # a morning stretch
 	var save_status := "Your game was saved." if saved else "Couldn't save. Check that the game can write to its save folder."
 	var message := "Good morning! " + save_status
@@ -702,6 +737,17 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 		_show_bear_tracks() # once per pass-out, so it never repeats on later mornings
 	_set_paused(false)
 	_busy = false
+
+
+## Sleeps the night where you stand, camped with the backpacking pack
+## (CampSpot): you wake up at [param at] in this region. [param problems]
+## are the Leave No Trace rules broken there (Backpacking.problems); with
+## any, a wilderness ranger is waiting in the morning.
+func camp_out(at: Vector2, problems: Array) -> void:
+	if _busy:
+		return
+	_camp_out = {"at": at, "problems": problems}
+	await sleep()
 
 
 ## The day's page (DaySummary), over the black, until the player goes on.

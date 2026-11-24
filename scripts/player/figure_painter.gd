@@ -883,6 +883,8 @@ func _back_items(look: Dictionary, facing: int, behind: bool) -> void:
 	var c = look.get("pack_color", "7a5a3a")
 	var side := is_side(facing)
 	match pack:
+		"backpacking":
+			_backpacking_pack(c, facing, behind)
 		"pack", "frame_pack", "haul_bag":
 			var tall := 7 if pack == "pack" else 9
 			var top_y := 11 if pack == "pack" else 9
@@ -905,6 +907,42 @@ func _back_items(look: Dictionary, facing: int, behind: bool) -> void:
 				pass
 	if facing == Facing.DOWN and not behind:
 		return
+
+
+## A big backpacking pack (Backpacking): a tall bag on an external frame,
+## a sleeping pad rolled across the top, and a tent bag strapped under it.
+## From the front the pad's ends and the frame's tips stand out past your
+## shoulders, so you can tell it's on whichever way you face.
+const PAD := "c8a860"
+const PAD_DARK := "8a7440"
+const FRAME := "a8a8a8"
+const TENT_BAG := "3a6a5a"
+
+
+func _backpacking_pack(c, facing: int, behind: bool) -> void:
+	var side := is_side(facing)
+	if facing == Facing.UP and not behind:
+		rect(4, 10, 8, 8, c)
+		rect(4, 10, 2, 8, lighter(c, 0.12))
+		rect(4, 12, 8, 1, darker(c, 0.3))
+		rect(6, 14, 4, 2, darker(c, 0.15)) # the front pocket
+		rect(4, 8, 1, 11, FRAME)
+		rect(11, 8, 1, 11, FRAME)
+		rect(3, 8, 10, 2, PAD) # the pad, rolled
+		rect(3, 9, 10, 1, PAD_DARK)
+		rect(5, 18, 6, 1, TENT_BAG)
+	elif side and behind:
+		rect(10, 10, 3, 8, c)
+		rect(10, 10, 1, 8, tone(c, -0.3))
+		rect(13, 8, 1, 11, FRAME)
+		rect(10, 8, 4, 2, PAD)
+		rect(10, 9, 4, 1, PAD_DARK)
+	elif facing == Facing.DOWN and behind:
+		# the pad's ends and the frame's tips, out past your shoulders
+		rect(2, 9, 12, 2, PAD)
+		rect(2, 10, 12, 1, PAD_DARK)
+		rect(3, 7, 1, 3, FRAME)
+		rect(12, 7, 1, 3, FRAME)
 
 
 ## Things carried in the hand or worn over the clothes.

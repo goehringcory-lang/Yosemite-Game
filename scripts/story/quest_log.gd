@@ -76,6 +76,8 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/greg_first_rod.tres"),
 	# The first night out, and Half Dome from the back (Backcountry).
 	preload("res://data/quests/hodges_first_night.tres"),
+	# The backpacking pack: camp anywhere, and Leave No Trace (Backpacking).
+	preload("res://data/quests/hodges_pack_setup.tres"),
 	preload("res://data/quests/anderson_cables.tres"),
 	preload("res://data/quests/ansel_diving_board.tres"),
 	preload("res://data/quests/muir_south_dome.tres"),

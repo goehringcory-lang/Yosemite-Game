@@ -231,20 +231,33 @@ static func belayer_look(base: Dictionary) -> Dictionary:
 
 
 static func _paint() -> void:
-	if _painted_for == version:
+	# wearing the big backpacking pack (Backpacking) is a different sheet
+	var worn := Backpacking.worn()
+	var key := version * 2 + int(worn)
+	if _painted_for == key:
 		return
-	_painted_for = version
-	_face_cache.clear()
-	if is_default():
+	var faces_stale := _painted_for < 0 or _painted_for / 2 != version
+	_painted_for = key
+	if faces_stale:
+		_face_cache.clear()
+	if is_default() and not worn:
 		_sheet = load(DEFAULT_SHEET)
 		_faces = load(DEFAULT_FACES)
 		return
 	var mine := look()
+	if worn:
+		mine["pack"] = "backpacking"
 	_sheet = ImageTexture.create_from_image(Palette32.character_sheet(FigurePainter.new().draw_sheet(mine)))
-	_faces = ImageTexture.create_from_image(Palette32.snap(PortraitPainter.new().strip(mine, "player")))
+	if not faces_stale:
+		return
+	if is_default():
+		_faces = load(DEFAULT_FACES)
+	else:
+		_faces = ImageTexture.create_from_image(Palette32.snap(PortraitPainter.new().strip(mine, "player")))
 
 
-## Your walking sheet (32x48 frames; see CharacterSheet).
+## Your walking sheet (32x48 frames; see CharacterSheet), with the
+## backpacking pack on your back while you carry it.
 static func sheet() -> Texture2D:
 	_paint()
 	return _sheet

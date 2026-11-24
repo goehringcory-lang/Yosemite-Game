@@ -26,6 +26,10 @@ const PICK_TIME := 0.45
 @onready var interaction_area: Area2D = $InteractionArea
 ## Casting from the bank, the thing to use when you face water with a rod.
 var fishing := Fishing.new()
+## Open ground in the evening with the backpacking pack on (Backpacking).
+var camp_spot := CampSpot.new()
+## Whether the walking sheet shows the backpacking pack.
+var _pack_shown := false
 ## A pose held over whatever you'd otherwise be doing (see [method pose]),
 ## and the seconds left on it (negative: until [method clear_pose]).
 var action := ""
@@ -50,6 +54,8 @@ func _ready() -> void:
 	apply_look()
 	add_child(Footfall.new())
 	add_child(fishing)
+	camp_spot.name = "CampSpot"
+	add_child(camp_spot)
 	add_child(SmoothMotion.new())
 	_headlamp_light = PointLight2D.new()
 	_headlamp_light.name = "HeadlampLight"
@@ -61,6 +67,15 @@ func _ready() -> void:
 	add_child(_headlamp_light)
 	Gear.changed.connect(_refresh_headlamp)
 	_refresh_headlamp()
+	Gear.changed.connect(_refresh_pack)
+
+
+## Puts the backpacking pack on your sheet, or takes it off, when it goes
+## into the gear bag or onto the rack.
+func _refresh_pack() -> void:
+	if Backpacking.worn() != _pack_shown:
+		_pack_shown = Backpacking.worn()
+		apply_look()
 
 
 func _refresh_headlamp() -> void:
@@ -72,7 +87,8 @@ func _refresh_headlamp() -> void:
 ## interact_priority wins (a building's door over the building's sign); among
 ## equals (a person by a sign), the one nearest the middle of the reach wins,
 ## so the prompt names what you're facing rather than whichever came first.
-## With nothing there, facing water with a fly rod, it's the water (Fishing).
+## With nothing there, facing water with a fly rod, it's the water (Fishing);
+## in the evening with the backpacking pack on, it's a place to camp (CampSpot).
 func get_target() -> Node:
 	var best: Node = null
 	var best_priority := -1
@@ -90,6 +106,8 @@ func get_target() -> Node:
 			best_distance = distance
 	if best == null and Fishing.can_fish(self):
 		return fishing
+	if best == null and Backpacking.can_offer(self):
+		return camp_spot
 	return best
 
 
@@ -260,6 +278,7 @@ func _interact() -> void:
 ## Puts on the look you chose (PlayerLook): on arriving, and again whenever
 ## it changes.
 func apply_look() -> void:
+	_pack_shown = Backpacking.worn()
 	var frame := sprite.frame
 	sprite.texture = PlayerLook.sheet()
 	sprite.hframes = CharacterSheet.columns(sprite.texture)
