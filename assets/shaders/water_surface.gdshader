@@ -49,11 +49,22 @@ uniform float season_desaturate : hint_range(0.0, 1.0) = 0.0;
 uniform float snow : hint_range(0.0, 1.0) = 0.0;
 // The ground draws a running river over its painted water (its "flow").
 uniform bool river_runs = false;
+// On High graphics: adds shallow underwater caustics, lapping shoreline foam,
+// and richer golden-hour sun-path glints.
+uniform bool high_quality = false;
 
 varying vec2 world_pos;
 
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+// Crisp dual-wave underwater caustic web in art-pixel space.
+float caustic_web(vec2 p, float t) {
+	float a = sin(p.x * 0.24 + p.y * 0.18 + t * 1.35) + sin(p.x * 0.17 - p.y * 0.27 - t * 1.05);
+	float b = sin(p.x * 0.31 - p.y * 0.14 + t * 0.92 + 1.7) + sin(p.x * 0.13 + p.y * 0.33 - t * 1.48);
+	float ridge = 1.0 - abs(a * 0.25 + b * 0.25);
+	return pow(clamp(ridge, 0.0, 1.0), 4.0);
 }
 
 // Painted water: cyan-blue, or the Merced's teal (as in seasonal_ground).
@@ -167,6 +178,24 @@ void fragment() {
 		float patch = sin(ap.x * 0.033 + ap.y * 0.059 - t * 0.33 + bend);
 		float sheen = crest * smoothstep(0.12, 0.96, patch);
 		c += sun * (sheen * 0.10 + smoothstep(0.8, 0.99, sheen) * (0.15 + glow * 0.19)) * clear * daylight;
+		if (high_quality) {
+			// Sunlit underwater caustics dancing in the shallows near banks.
+			float shallow = found ? (1.0 - smoothstep(2.0, 18.0, d)) : 0.18;
+			float caust = caustic_web(ap + vec2(bend * 1.5, wave * 0.8), t);
+			vec3 caust_col = mix(vec3(0.75, 0.95, 0.98), sun, 0.45 + glow * 0.4);
+			c += caust_col * caust * shallow * clear * daylight * 0.24;
+			// Lapping shoreline foam line modulated by the arriving wave crest.
+			if (found && d < 3.0) {
+				float lap = 1.0 - smoothstep(0.8, 3.0, d + wave * 0.55);
+				float foam_break = smoothstep(0.15, 0.85, sin(ap.x * 0.28 + t * 0.9) * 0.5 + 0.5);
+				vec3 foam_col = mix(vec3(0.86, 0.95, 0.96), sun * 1.05, glow * 0.45);
+				c = mix(c, foam_col, lap * (0.22 + 0.24 * foam_break) * mix(0.4, 1.0, daylight));
+			}
+			// Extra golden-hour Fresnel shimmer streaks across open water.
+			float open_k = found ? smoothstep(2.0, 12.0, d) : 1.0;
+			float streak = smoothstep(0.82, 0.99, sin(ap.y * 0.92 + bend * 2.2 - t * 2.1)) * smoothstep(0.3, 0.95, patch);
+			c += sun * streak * open_k * clear * daylight * (0.14 + glow * 0.28);
+		}
 		// stars on still water after dark, each twinkling on its own beat
 		if (stars > 0.0) {
 			vec2 cell = floor(ap / 3.0);

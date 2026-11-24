@@ -112,6 +112,7 @@ func _process(_delta: float) -> void:
 	_mat.set_shader_parameter("glow", float(pal.glow))
 	var night := clampf(1.0 - absf(fposmod(hour + 12.0, 24.0) - 12.0) / 7.0, 0.0, 1.0)
 	_mat.set_shader_parameter("stars", clampf(night * 1.6 - 0.3, 0.0, 1.0) * (1.0 - overcast))
+	_mat.set_shader_parameter("high_quality", LitSprites.active())
 	var view := Rect2(origin.floor() - Vector2(4, 4), size.ceil() + Vector2(8, 8))
 	if view != _view:
 		_view = view

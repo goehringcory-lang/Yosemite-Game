@@ -64,6 +64,7 @@ var _still_painter: Node2D
 ## ground, and the group the movers' shadows are drawn in.
 var _bake: SubViewport
 var _still_sprite: Sprite2D
+var _still_mat: ShaderMaterial
 var _movers_group: CanvasGroup
 var _mover_mat: ShaderMaterial
 ## Window pixels per world pixel the bake was made at.
@@ -106,10 +107,10 @@ func _ready() -> void:
 	_still_sprite.centered = false
 	_still_sprite.texture = _bake.get_texture()
 	_still_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	var still_mat := ShaderMaterial.new()
-	still_mat.shader = STILL_SHADER
-	still_mat.set_shader_parameter("shade", SHADE)
-	_still_sprite.material = still_mat
+	_still_mat = ShaderMaterial.new()
+	_still_mat.shader = STILL_SHADER
+	_still_mat.set_shader_parameter("shade", SHADE)
+	_still_sprite.material = _still_mat
 	add_child(_still_sprite)
 	_movers_group = CanvasGroup.new()
 	_movers_group.fit_margin = 0.0
@@ -134,6 +135,18 @@ func _process(delta: float) -> void:
 		return
 	if not was_visible:
 		_dirty = true
+	var hq := LitSprites.active()
+	_still_mat.set_shader_parameter("high_quality", hq)
+	if hq:
+		# Soften penumbra as the sun drops low; cool-cobalt shade at golden hour.
+		var low := 1.0 - clampf((Sun.height() - 6.0) / 36.0, 0.0, 1.0)
+		_still_mat.set_shader_parameter("penumbra", lerpf(1.35, 3.2, low) * maxf(_bake_scale * 0.5, 0.75))
+		var golden_shade := Color(0.11, 0.12, 0.28)
+		var night_shade := Color(0.06, 0.09, 0.18)
+		var tint := SHADE.lerp(golden_shade, Sun.golden() * 0.7).lerp(night_shade, Sun.night())
+		_still_mat.set_shader_parameter("shade", tint)
+	else:
+		_still_mat.set_shader_parameter("shade", SHADE)
 	_still_sprite.self_modulate = Color(1, 1, 1, strength)
 	_movers_group.self_modulate = Color(1, 1, 1, strength)
 	_scan_in -= delta
@@ -179,8 +192,11 @@ func _rebake() -> void:
 	# bake pixels from the canvas's (world) coordinates
 	_bake.canvas_transform = Transform2D(0.0, Vector2(k, k), 0.0, -_painted_view.position * k)
 	_still_sprite.global_transform = Transform2D(0.0, Vector2(1.0 / k, 1.0 / k), 0.0, _painted_view.position)
+	var world_size := Vector2(_bake.size) / k
+	_still_mat.set_shader_parameter("bake_origin", _painted_view.position)
+	_still_mat.set_shader_parameter("bake_size", world_size)
 	_mover_mat.set_shader_parameter("still_origin", _painted_view.position)
-	_mover_mat.set_shader_parameter("still_size", Vector2(_bake.size) / k)
+	_mover_mat.set_shader_parameter("still_size", world_size)
 	_still_painter.queue_redraw()
 	_bake.render_target_update_mode = SubViewport.UPDATE_ONCE
 

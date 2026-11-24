@@ -63,6 +63,7 @@ func _process(delta: float) -> void:
 	_mat.set_shader_parameter("time", _time)
 	_mat.set_shader_parameter("mist", mist)
 	_mat.set_shader_parameter("rays", rays)
+	_mat.set_shader_parameter("high_quality", LitSprites.active())
 	_mat.set_shader_parameter("ray_dir", Vector2(away.x, away.y * 0.62 + 0.25))
 	# Mist catches the colour of the low sun. Up in the high country the dawn
 	# is colder: the mist is whiter and bluer and the sun warms it less.
