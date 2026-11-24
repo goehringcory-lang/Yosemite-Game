@@ -642,6 +642,9 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 	if camp_spawn != "" and not passed_out:
 		wake_spawn = camp_spawn
 		night_out = Backcountry.night_out()
+	elif region.region_id == Cabin.ROOM_REGION and Camp.has("rope_bed"):
+		# home in your own bed: wake up beside it
+		wake_spawn = CabinRoom.BED_SPOT
 	elif region.region_id != Park.HOME_REGION:
 		fell_asleep_at = _location_name()
 		if passed_out and Backcountry.is_backcountry(region.region_id):

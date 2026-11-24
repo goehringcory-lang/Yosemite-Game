@@ -366,6 +366,7 @@ func _journal_page() -> void:
 	_missing_guardian()
 	_register()
 	_camp()
+	_cabin()
 	_keepers()
 	_friends()
 	_heard_today()
@@ -453,6 +454,22 @@ func _camp() -> void:
 				var item := ItemDB.get_item(id)
 				stored.append(ItemDB.count_name(Camp.chest_count(id), item.display_name if item else id))
 			_line("In the camp chest (%d of %d spaces): %s." % [Camp.chest.size(), Camp.chest_spaces(), ", ".join(stored)])
+
+
+## Your cabin (Camp.CABIN): what keepers have done to Lamon's old cabin so
+## far, and a blank for each thing still to come and who'll bring it.
+func _cabin() -> void:
+	var have := Camp.cabin_parts()
+	_heading("Your cabin: %d of %d additions" % [have.size(), Camp.CABIN.size()])
+	if have.is_empty():
+		_line("James Lamon's old log cabin: an empty room, a leaky roof and boarded windows.", DIM)
+	for part: Dictionary in Camp.CABIN:
+		var who := Camp.giver_name(part)
+		if Camp.has(part.id):
+			_check_line(true, "%s · from %s" % [part.name, who])
+		else:
+			var quest := QuestLog.get_quest(part.quest)
+			_check_line(false, "? ? ?   Something from %s, after \"%s\"." % [who, quest.title if quest else part.quest], DIM)
 
 
 ## The keepers you've met: everyone in the Register you've talked with, in

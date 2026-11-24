@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/building_door.gd" id="1_hnr30"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_74qml"]
+size = Vector2(40, 44)
+
+[node name="LamonHomesteadDoors" type="Node2D" unique_id=563907286]
+
+[node name="DoorToGuardianCabin" type="StaticBody2D" parent="." unique_id=1965341050]
+position = Vector2(752, 292)
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_hnr30")
+label = "Your cabin"
+target_region = "guardian_cabin"
+target_spawn = "door"
+
+[node name="Hitbox" type="Area2D" parent="DoorToGuardianCabin" unique_id=1429203592]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="DoorToGuardianCabin/Hitbox" unique_id=349577596]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_74qml")
+
+[node name="guardian_cabin_door" type="Marker2D" parent="." unique_id=739793256]
+position = Vector2(752, 330)
