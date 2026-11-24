@@ -16,7 +16,7 @@ const OUTSIDE_AT := {"porch_chair": Vector2(56, 8), "mailbox": Vector2(-122, 30)
 const FOOTPRINT := {
 	"rope_bed": Vector2(68, 34), "table": Vector2(64, 22), "bookshelf": Vector2(48, 10), "hearth": Vector2(60, 10),
 	"kitchen": Vector2(50, 10), "loft": Vector2(18, 8), "writing_desk": Vector2(40, 14), "register_stand": Vector2(16, 8),
-	"mailbox": Vector2(6, 6),
+	"mailbox": Vector2(6, 6), "porch_chair": Vector2(16, 6),
 }
 ## Pieces hung on the wall: you look at them from the floor below.
 const ON_WALL := ["valley_map", "prints"]
@@ -66,18 +66,18 @@ func _ready() -> void:
 		_body.add_child(solid)
 		add_child(_body)
 	# the bed's own reach is for sleeping (CabinRoom lays a Tent over it)
-	_hitbox = Area2D.new()
-	_hitbox.name = "Hitbox"
-	_hitbox.collision_layer = 4
-	_hitbox.collision_mask = 0
-	_hitbox.monitoring = false
-	var shape := CollisionShape2D.new()
-	var reach := RectangleShape2D.new()
-	reach.size = Vector2(maxf(foot.x + 12.0, 32.0), 36)
-	shape.shape = reach
-	shape.position = Vector2(0, 10) if piece.id in ON_WALL else Vector2(0, -14)
-	_hitbox.add_child(shape)
 	if piece.id != "rope_bed":
+		_hitbox = Area2D.new()
+		_hitbox.name = "Hitbox"
+		_hitbox.collision_layer = 4
+		_hitbox.collision_mask = 0
+		_hitbox.monitoring = false
+		var shape := CollisionShape2D.new()
+		var reach := RectangleShape2D.new()
+		reach.size = Vector2(maxf(foot.x + 12.0, 32.0), 36)
+		shape.shape = reach
+		shape.position = Vector2(0, 10) if piece.id in ON_WALL else Vector2(0, -14)
+		_hitbox.add_child(shape)
 		add_child(_hitbox)
 	if piece.id == "hearth" or piece.id == "kitchen":
 		_light = PointLight2D.new()
@@ -100,7 +100,7 @@ func is_shown() -> bool:
 func _refresh() -> void:
 	var shown := is_shown()
 	visible = shown
-	if _hitbox.is_inside_tree():
+	if _hitbox:
 		_hitbox.set_deferred("monitorable", shown)
 	if _body:
 		for child in _body.get_children():
@@ -111,7 +111,8 @@ func _refresh() -> void:
 func _process(delta: float) -> void:
 	if _light == null or not visible:
 		return
-	_light.visible = Cabin.fire_lit()
+	# NightLight owns its visibility: turn it down instead
+	_light.set("strength", 0.9 if Cabin.fire_lit() else 0.0)
 	_tick += delta
 	if _tick >= 0.18:
 		_tick = 0.0

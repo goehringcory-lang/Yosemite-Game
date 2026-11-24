@@ -43,6 +43,7 @@ const WARM_HI := Color("fde9a8")
 
 var _body: StaticBody2D
 var _kitchen_shape: CollisionShape2D
+var _chimney_shape: CollisionShape2D
 var _light: PointLight2D
 var _smoke_t := 0.0
 
@@ -66,6 +67,7 @@ static func build(region: Node) -> void:
 	cabin.name = "Cabin"
 	cabin.position = POS
 	region.entities.add_child(cabin)
+	region.entities.add_child(CabinPorch.make())
 	for id: String in ["porch_chair", "mailbox"]:
 		region.entities.add_child(CabinPiece.make(Camp.get_piece(id), POS + CabinPiece.OUTSIDE_AT[id]))
 
@@ -76,7 +78,7 @@ func _ready() -> void:
 	_body.collision_mask = 0
 	# the log walls, and the chimney at the west end
 	_add_shape(Rect2(-84, -46, 168, 46))
-	_add_shape(Rect2(-106, -30, 24, 30))
+	_chimney_shape = _add_shape(Rect2(-106, -30, 24, 30))
 	_kitchen_shape = _add_shape(Rect2(84, -40, 58, 40))
 	add_child(_body)
 	_light = PointLight2D.new()
@@ -106,7 +108,9 @@ func _add_shape(rect: Rect2) -> CollisionShape2D:
 
 func _refresh() -> void:
 	_kitchen_shape.set_deferred("disabled", not Camp.has("kitchen"))
-	_light.visible = Camp.has("glass_windows")
+	_chimney_shape.set_deferred("disabled", not Camp.has("hearth"))
+	# NightLight owns its visibility: dark behind boards, lit behind glass
+	_light.set("strength", 0.8 if Camp.has("glass_windows") else 0.0)
 	queue_redraw()
 
 
@@ -373,16 +377,6 @@ func _draw_porch() -> void:
 		var s := Rect2(-16 + i * 2, 16 + i * 4, 32 - i * 4, 4)
 		draw_rect(s.grow(1), INK)
 		draw_rect(s, PLANK_HI if i == 0 else PLANK)
-	# posts holding up the eave, and a rail between
-	for x in [-88.0, -20.0, 20.0, 88.0]:
-		draw_rect(Rect2(x - 2.5, -60, 5, 72).grow(1), INK)
-		draw_rect(Rect2(x - 2.5, -60, 5, 72), LOG)
-		draw_rect(Rect2(x - 2.5, -60, 1, 72), LOG_HI)
-	for span: Vector2 in [Vector2(-86, -22), Vector2(22, 86)]:
-		draw_rect(Rect2(span.x, -6, span.y - span.x, 3).grow(1), INK)
-		draw_rect(Rect2(span.x, -6, span.y - span.x, 3), LOG_HI)
-		for x in range(int(span.x) + 6, int(span.y), 8):
-			draw_rect(Rect2(x, -3, 2, 12), LOG)
 
 
 func _draw_smoke() -> void:

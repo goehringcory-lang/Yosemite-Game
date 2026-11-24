@@ -62,7 +62,7 @@ static func furnish(region: Node) -> void:
 static func _make_bed() -> StaticBody2D:
 	var bed := StaticBody2D.new()
 	bed.name = "Bed"
-	bed.set_script(load("res://scripts/objects/tent.gd"))
+	bed.set_script(load("res://scripts/story/cabin_bed.gd"))
 	bed.collision_layer = 0
 	bed.collision_mask = 0
 	bed.position = Camp.get_piece("rope_bed").pos
