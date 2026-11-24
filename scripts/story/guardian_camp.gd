@@ -18,6 +18,11 @@ extends Node
 ##   It has room for CHEST_SPACES kinds of thing, more with the bear box.
 ##   Food keeps spoiling in there at the same rate as in your pack.
 ## - After the cave, a sign: the Guardian's camp.
+## - The cabin (CABIN). James Lamon's old log cabin stands on the spot, empty
+##   and leaky when you arrive. Keepers fix it up and furnish it as you
+##   finish their quests: a patched roof and a rope bed, a porch, a stone
+##   hearth and chimney, glass windows, a lean-to kitchen, a loft. Cabin
+##   draws it outside, CabinRoom inside (the guardian_cabin region).
 ##
 ## What you have is worked out from the quests you've finished (and the
 ## summits and fish you've logged), so an old save gets its camp the moment
@@ -121,6 +126,66 @@ const KEEPSAKES: Array[Dictionary] = [
 	{"quest": "lost_guardian", "name": "The tin box", "look": "tin", "text": "The tin box from the cave under the Royal Arches. It's empty now. Everything that was in it was you."},
 ]
 
+## The cabin's additions: id, name, the quest that brings it, who gives it
+## (a character id), where it shows ("outside" on the cabin, "inside" in
+## the room, or "both"), the reward line ("got") and what you read when you
+## look at it ("text"). Inside things stand at "pos" in the room. Like
+## PIECES, what you have is worked out from the quests you've finished, so
+## nothing extra is saved and an old save gets its cabin when it loads.
+const CABIN: Array[Dictionary] = [
+	{"id": "roof_patch", "name": "Patched roof", "quest": "lamon_orchard", "from": "james_lamon", "where": "outside",
+		"got": "a patched roof on Lamon's old cabin",
+		"text": "Lamon's old roof, the holes stopped with a wagon sheet and battens. It won't win prizes. It keeps the rain off the bed."},
+	{"id": "rope_bed", "name": "Rope bed", "quest": "lamon_orchard", "from": "james_lamon", "where": "inside", "pos": Vector2(72, 250),
+		"got": "his old rope bed, so you can sleep inside",
+		"text": "A pine frame strung with rope, a tick stuffed with meadow hay, and a wool blanket. Lamon slept on it his first winter in the valley, in 1859."},
+	{"id": "table", "name": "Plank table", "quest": "degnan_bread", "from": "bridget_degnan", "where": "inside", "pos": Vector2(296, 250),
+		"got": "a plank table and a bread box from the Degnans' kitchen",
+		"text": "A scrubbed plank table with a bench, and a tin bread box that is never quite empty. Bridget Degnan says a house without a table is only a shelter."},
+	{"id": "window_box", "name": "Window box", "quest": "enid_press", "from": "enid_michael", "where": "outside",
+		"got": "a window box of wildflowers for your cabin",
+		"text": "A cedar box under the front window, planted with shooting stars, monkeyflower and a little lupine. Enid Michael says to let them go to seed."},
+	{"id": "valley_map", "name": "Valley map", "quest": "matthes_reading_ice", "from": "francois_matthes", "where": "inside", "pos": Vector2(186, 100),
+		"got": "a survey map of the valley for your cabin wall",
+		"text": "Matthes's own survey sheet of Yosemite Valley, every contour inked by hand, with the old glaciers' reach pencilled in blue."},
+	{"id": "bookshelf", "name": "Bookshelf", "quest": "shop_guidebook", "from": "mountain_shop", "where": "inside", "pos": Vector2(64, 108),
+		"got": "a bookshelf for your cabin, with a few field guides on it",
+		"text": "Three planks on brackets, holding field guides, a tide of maps, and your climbing guidebook, its corners already soft."},
+	{"id": "porch_chair", "name": "Porch chair", "quest": "clark_big_trees", "from": "galen_clark", "where": "outside",
+		"got": "a cedar porch chair, for sitting out the evenings",
+		"text": "A chair of incense cedar with a seat of woven rawhide. Galen Clark says he did his best thinking sitting still."},
+	{"id": "porch", "name": "Front porch", "quest": "anderson_half_dome", "from": "george_anderson", "where": "outside",
+		"got": "a front porch on your cabin, with a forged iron latch on the door",
+		"text": "A plank porch across the front of the cabin, its posts drilled and pinned the way George Anderson drilled his way up Half Dome. The door latch is his iron too."},
+	{"id": "hearth", "name": "Stone hearth", "quest": "mccauley_firefall", "from": "james_mccauley", "where": "both", "pos": Vector2(256, 104),
+		"got": "a stone hearth and chimney for your cabin",
+		"text": "A granite hearth and a chimney of river stones, laid up by James McCauley, who knew a thing or two about fire. It draws well. It keeps the cabin warm all night."},
+	{"id": "glass_windows", "name": "Glass windows", "quest": "hodges_first_night", "from": "clare_hodges", "where": "both",
+		"got": "real glass windows for your cabin, in place of the shutters",
+		"text": "Two six-pane windows, packed in from the ranger station in a crate of straw. Ranger Hodges says a lit window is the best trail sign there is."},
+	{"id": "shake_roof", "name": "Shake roof", "quest": "lamon_winter", "from": "james_lamon", "where": "outside",
+		"got": "a new roof of split sugar-pine shakes, and the logs chinked tight for winter",
+		"text": "Sugar pine shakes, split by hand and laid in even rows, and every gap in the walls chinked with clay and moss. The wagon sheet is retired."},
+	{"id": "kitchen", "name": "Lean-to kitchen", "quest": "degnan_snowbound", "from": "bridget_degnan", "where": "both", "pos": Vector2(592, 112),
+		"got": "a lean-to kitchen on your cabin, with the Degnans' old cookstove",
+		"text": "A lean-to on the east wall with a cast-iron cookstove, a dry sink and a shelf of crocks. Bridget Degnan says the snowbound winter taught her where a kitchen should be: indoors."},
+	{"id": "loft", "name": "Sleeping loft", "quest": "harding_summit", "from": "warren_harding", "where": "both", "pos": Vector2(452, 124),
+		"got": "a sleeping loft and ladder, and a window up under the roof",
+		"text": "A loft over the back of the cabin, up a ladder Warren Harding built with what he swears were leftover bolts. Up there you can see the stars through the roof window."},
+	{"id": "writing_desk", "name": "Writing desk", "quest": "muir_cathedral", "from": "john_muir", "where": "inside", "pos": Vector2(436, 250),
+		"got": "a writing desk by the window, from John Muir",
+		"text": "A slant-top desk with an inkwell and a stack of notebooks. Muir says to write things down while they're still alive in you."},
+	{"id": "mailbox", "name": "Mailbox", "quest": "kochakji_general_delivery", "from": "michael_kochakji", "where": "outside",
+		"got": "a mailbox for your cabin, on a post by the path",
+		"text": "A tin mailbox on a cedar post, with a red flag. Michael Kochakji painted GENERAL DELIVERY on it, then crossed it out and painted your name."},
+	{"id": "prints", "name": "Framed prints", "quest": "ansel_portfolio", "from": "ansel_adams", "where": "inside", "pos": Vector2(322, 100),
+		"got": "two framed prints from Ansel Adams's portfolio, for your cabin wall",
+		"text": "Two silver prints in plain frames: Half Dome in winter, and an oak at dawn by your own camp. On the back of one, in pencil: \"For the cabin.\""},
+	{"id": "register_stand", "name": "Register stand", "quest": "clark_guardian_year", "from": "galen_clark", "where": "both", "pos": Vector2(170, 324),
+		"got": "a stand for the Register by your door, and a nameplate over it",
+		"text": "An oak stand by the door with the Register open on it, and over the door outside a carved board: THE GUARDIAN. Galen Clark says the job comes with a desk now."},
+]
+
 ## How many kinds of thing the camp chest holds, and how many more once the
 ## bear box is in.
 const CHEST_SPACES := 10
@@ -160,7 +225,20 @@ func get_piece(id: String) -> Dictionary:
 	for piece: Dictionary in PIECES:
 		if piece.id == id:
 			return piece
+	for part: Dictionary in CABIN:
+		if part.id == id:
+			return part
 	return {}
+
+
+## The cabin's additions you have, in CABIN order. [param where] keeps only
+## those that show "inside" or "outside" ("both" counts for either).
+func cabin_parts(where := "") -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for part: Dictionary in CABIN:
+		if (where == "" or part.where == where or part.where == "both") and QuestLog.is_completed(part.quest):
+			out.append(part)
+	return out
 
 
 ## Whether the camp has [param id] yet.
@@ -201,9 +279,16 @@ func reward_line(quest_id: String) -> String:
 	for keepsake: Dictionary in KEEPSAKES:
 		if keepsake.quest == quest_id:
 			parts.append("%s for your keepsake shelf" % keepsake.name.to_lower())
-	if parts.is_empty():
-		return ""
-	return "For your camp: %s." % "; ".join(parts)
+	var cabin := PackedStringArray()
+	for part: Dictionary in CABIN:
+		if part.quest == quest_id:
+			cabin.append(part.got)
+	var out := PackedStringArray()
+	if not parts.is_empty():
+		out.append("For your camp: %s." % "; ".join(parts))
+	if not cabin.is_empty():
+		out.append("For your cabin: %s." % "; ".join(cabin))
+	return " ".join(out)
 
 
 ## Who gave [param piece], as a display name ("" for things nobody gave).
@@ -383,8 +468,12 @@ func _age_food() -> void:
 ## Puts the camp things at the homestead (StoryContent.attach calls this for
 ## every region). Each one shows itself once you have it.
 func dress(region: Node) -> void:
+	if region.get("region_id") == Cabin.ROOM_REGION and not region.entities.has_node("CabinRoom"):
+		CabinRoom.furnish(region)
+		return
 	if region.get("region_id") != REGION or region.entities.has_node(CampPiece.node_name("chest")):
 		return
+	Cabin.build(region)
 	for piece: Dictionary in PIECES:
 		region.entities.add_child(CampPiece.make(piece))
 	# the supper after the finale, laid on here while it's waiting
