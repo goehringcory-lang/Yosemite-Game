@@ -66,14 +66,21 @@ func _process(_delta: float) -> void:
 	_mat.set_shader_parameter("haze", air * (1.0 - night))
 
 
+static var _haze_key := -1
+static var _haze_roll := 0.7
+
+
 ## How hazy the valley air is now (0..1): a little each day by season, more
 ## in the afternoon, less after rain has washed the air clean.
 static func haze() -> float:
 	var weather := Weather.today()
 	var season := clampi(GameClock.season, 0, 3)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = hash("haze:%d:%d:%d" % [GameClock.year, season, GameClock.day])
-	var day_roll := rng.randf_range(0.4, 1.0)
+	var key := (GameClock.year * 4 + season) * 64 + GameClock.day
+	if key != _haze_key:
+		_haze_key = key
+		var rng := RandomNumberGenerator.new()
+		rng.seed = hash("haze:%d:%d:%d" % [GameClock.year, season, GameClock.day])
+		_haze_roll = rng.randf_range(0.4, 1.0)
 	var afternoon := 0.5 + 0.5 * smoothstep(0.2, 0.75, Sun.arc())
 	var washed: float = 1.0 - maxf(weather.rain, weather.snow)
-	return SEASON_HAZE[season] * day_roll * afternoon * washed
+	return SEASON_HAZE[season] * _haze_roll * afternoon * washed

@@ -35,15 +35,22 @@ var _fade := PackedFloat32Array()
 ## Kinds (KINDS indices) on their way out, fading to nothing.
 var _leaving := {}
 ## The day part of the last key: a new day starts the air afresh.
-var _day_key := ""
+var _day_key := -1
 const FADE := 2.5
 var _time := 0.0
-var _key := ""
+var _key := -1
 var _view := Rect2()
 var _tint: CanvasModulate
 var _fireflies: Node2D
+var _has_fireflies := false
+var _had_fireflies := false
 
-static var _today_key := ""
+static var _today_date := -1
+static var _today_key := "":
+	set(v):
+		_today_key = v
+		if v == "":
+			_today_date = -1
 static var _today := {}
 
 
@@ -51,10 +58,10 @@ static var _today := {}
 ## rain are how hard it's coming down; clouds is how much of the sky is
 ## covered (overcast when it rains or snows).
 static func today() -> Dictionary:
-	var key := "weather:%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day]
-	if key == _today_key:
+	var date := (GameClock.year * 4 + GameClock.season) * 64 + GameClock.day
+	if date == _today_date:
 		return _today
-	_today_key = key
+	_today_date = date
 	_today = on_day(GameClock.year, GameClock.season, GameClock.day)
 	return _today
 
@@ -119,68 +126,85 @@ func _process(delta: float) -> void:
 	if not outdoors:
 		return
 	_view = _camera_view()
-	var key := "%d:%d:%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day, int(_darkness() > 0.35), int(_motes_on())]
+	var dark_flag := 1 if _darkness() > 0.35 else 0
+	var motes_flag := 1 if _motes_on() else 0
+	var key := (((GameClock.year * 4 + GameClock.season) * 64 + GameClock.day) * 2 + dark_flag) * 2 + motes_flag
 	if key != _key:
 		_key = key
-		_populate()
+		_populate(dark_flag, motes_flag)
 	_time += delta
 	_fade_kinds(delta)
 	var wind := 8.0 + 10.0 * sin(_time * 0.13) + 4.0 * sin(_time * 0.41 + 1.0)
 	var area := _view.grow(MARGIN)
+	var ax := area.position.x
+	var ay := area.position.y
+	var aw := area.size.x
+	var ah := area.size.y
 	for i in _pos.size():
 		var p := _pos[i]
 		var d := _depth[i]
 		var ph := _phase[i]
-		var v := Vector2.ZERO
+		var vx := 0.0
+		var vy := 0.0
 		match _kind[i]:
 			0: # snow: slow, swaying
-				v = Vector2(wind * 0.6 + sin(_time * 1.3 + ph) * 10.0, 18.0 + 18.0 * d)
+				vx = wind * 0.6 + sin(_time * 1.3 + ph) * 10.0
+				vy = 18.0 + 18.0 * d
 			1: # rain: fast slanted streaks
-				v = Vector2(wind * 3.0 + 36.0, 300.0 + 120.0 * d)
+				vx = wind * 3.0 + 36.0
+				vy = 300.0 + 120.0 * d
 			2: # petals: flutter on the breeze
-				v = Vector2(wind * 1.4 + sin(_time * 2.1 + ph) * 18.0, 12.0 + 10.0 * d + cos(_time * 2.1 + ph) * 6.0)
+				vx = wind * 1.4 + sin(_time * 2.1 + ph) * 18.0
+				vy = 12.0 + 10.0 * d + cos(_time * 2.1 + ph) * 6.0
 			3: # leaves: swing side to side as they fall
-				v = Vector2(wind * 1.2 + sin(_time * 1.6 + ph) * 28.0, 16.0 + 16.0 * d)
+				vx = wind * 1.2 + sin(_time * 1.6 + ph) * 28.0
+				vy = 16.0 + 16.0 * d
 			4: # fluff: hangs in the air
-				v = Vector2(wind * 0.8 + sin(_time * 0.7 + ph) * 6.0, sin(_time * 0.9 + ph * 2.0) * 6.0 - 1.2)
+				vx = wind * 0.8 + sin(_time * 0.7 + ph) * 6.0
+				vy = sin(_time * 0.9 + ph * 2.0) * 6.0 - 1.2
 			5: # fireflies: slow wandering loops
-				v = Vector2(cos(_time * 0.6 + ph) * 12.0, sin(_time * 0.8 + ph * 1.7) * 8.0)
+				vx = cos(_time * 0.6 + ph) * 12.0
+				vy = sin(_time * 0.8 + ph * 1.7) * 8.0
 			6: # light motes: barely moving, drifting up through the sun
-				v = Vector2(wind * 0.3 + cos(_time * 0.4 + ph) * 8.0, sin(_time * 0.5 + ph * 1.3) * 6.0 - 2.4)
-		p += v * delta
+				vx = wind * 0.3 + cos(_time * 0.4 + ph) * 8.0
+				vy = sin(_time * 0.5 + ph * 1.3) * 6.0 - 2.4
 		# Wrap round the view, in world space.
-		p = area.position + Vector2(fposmod(p.x - area.position.x, area.size.x), fposmod(p.y - area.position.y, area.size.y))
-		_pos[i] = p
+		_pos[i] = Vector2(ax + fposmod(p.x + vx * delta - ax, aw), ay + fposmod(p.y + vy * delta - ay, ah))
 	queue_redraw()
-	_fireflies.queue_redraw()
+	if _has_fireflies:
+		_had_fireflies = true
+		_fireflies.queue_redraw()
+	elif _had_fireflies:
+		_had_fireflies = false
+		_fireflies.queue_redraw()
 
 
 ## Rebuilds the flakes for the day (and for dusk, when the fireflies come out).
-func _populate() -> void:
+func _populate(dark_flag: int, motes_flag: int) -> void:
 	var w := today()
 	var counts := {}
 	match GameClock.season:
 		GameClock.Season.SPRING:
 			counts["petal"] = 1.0
-			if _motes_on():
+			if motes_flag == 1:
 				counts["mote"] = 0.65
 		GameClock.Season.SUMMER:
-			if _darkness() > 0.35:
+			if dark_flag == 1:
 				counts["firefly"] = 1.0
 			else:
 				counts["fluff"] = 1.0
-				if _motes_on():
+				if motes_flag == 1:
 					counts["mote"] = 1.0
 		GameClock.Season.FALL:
 			counts["leaf"] = 1.0
-			if _motes_on():
+			if motes_flag == 1:
 				counts["mote"] = 0.75
 	if w.snow > 0.0:
 		counts["snow"] = w.snow
 	if w.rain > 0.0:
 		counts["rain"] = w.rain
 		counts.erase("petal")
-	var day_key := "%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day]
+	var day_key := (GameClock.year * 4 + GameClock.season) * 64 + GameClock.day
 	# Later in the same day (the light changed): keep what still belongs in
 	# the air, fade out what doesn't and fade in what's new.
 	var same_day := day_key == _day_key and not _pos.is_empty()
@@ -203,12 +227,13 @@ func _populate() -> void:
 		_fade.clear()
 		_leaving.clear()
 	var rng := RandomNumberGenerator.new()
-	rng.seed = hash(_key)
+	rng.seed = hash("%d:%d:%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day, dark_flag, motes_flag])
 	var area := _view.grow(MARGIN)
 	for kind_name: String in counts:
 		# wanted again: none of its flakes should fade out (even if it had
 		# all gone already)
-		_leaving.erase(KINDS.find(kind_name))
+		var kind_idx := KINDS.find(kind_name)
+		_leaving.erase(kind_idx)
 		if have.has(kind_name):
 			continue
 		# Low graphics: half as many, for slower computers
@@ -216,17 +241,27 @@ func _populate() -> void:
 		var n := mini(int(COUNTS[kind_name] * float(counts[kind_name]) * share), MAX_FLAKES - _pos.size())
 		for i in n:
 			_pos.append(area.position + Vector2(rng.randf() * area.size.x, rng.randf() * area.size.y))
-			_kind.append(KINDS.find(kind_name))
+			_kind.append(kind_idx)
 			_depth.append(rng.randf())
 			_phase.append(rng.randf() * TAU)
 			_color.append(_color_for(kind_name, rng))
 			_fade.append(0.0 if same_day else 1.0)
+	_recheck_fireflies()
+
+
+func _recheck_fireflies() -> void:
+	_has_fireflies = false
+	for i in _kind.size():
+		if _kind[i] == 5:
+			_has_fireflies = true
+			return
 
 
 ## Fades each flake towards in (or out, for a kind that's leaving), and lets
 ## go of those that have faded out.
 func _fade_kinds(delta: float) -> void:
 	var step := delta / FADE
+	var removed := false
 	var i := _pos.size() - 1
 	while i >= 0:
 		if _leaving.has(_kind[i]):
@@ -238,9 +273,12 @@ func _fade_kinds(delta: float) -> void:
 				_phase.remove_at(i)
 				_color.remove_at(i)
 				_fade.remove_at(i)
+				removed = true
 		elif _fade[i] < 1.0:
 			_fade[i] = minf(_fade[i] + step, 1.0)
 		i -= 1
+	if removed:
+		_recheck_fireflies()
 
 
 func _color_for(kind_name: String, rng: RandomNumberGenerator) -> Color:

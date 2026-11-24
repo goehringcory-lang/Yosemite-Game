@@ -173,9 +173,6 @@ void fragment() {
 	vec3 rgb = c.rgb;
 	float mx = max(c.r, max(c.g, c.b));
 	float sat = (mx - min(c.r, min(c.g, c.b))) / max(mx, 0.001);
-	float hue = hue_of(c.rgb);
-	// vivid, and neither green nor the browns of paths and bark: a wildflower dot
-	float flower = step(0.4, sat) * step(0.035, abs(hue - 0.09)) * step(0.5, 1.0 - grass) * (1.0 - water);
 	// grass takes the tint at full strength, paths and rock at a third
 	float k = tint_amount * (0.3 + 0.7 * grass) * (1.0 - water);
 	rgb = mix(rgb, tint * (0.35 + lum * 1.05), k);
@@ -191,13 +188,19 @@ void fragment() {
 		rgb = mix(rgb, rgb * vec3(1.22, 1.18, 1.0) + vec3(0.02, 0.03, 0.0), turned * gust_grass);
 		rgb *= 1.0 + 0.06 * gust * gust_grass;
 	}
-	// frost: small clumps of whitened pixels, mostly on grass, hardly on paving
-	// the art is drawn at 2x, so work in 2x2 blocks of texture pixels
-	vec2 px = floor(floor(UV / TEXTURE_PIXEL_SIZE) * 0.5);
-	float n = hash(floor(px / 3.0)) * 0.65 + hash(px) * 0.35;
-	float cover = frost * (0.08 + 0.92 * grass) * (1.0 - water);
-	float f = step(1.0 - cover, n);
-	rgb = mix(rgb, frost_color * (0.85 + lum * 0.25), f * 0.6);
+	vec2 px = vec2(0.0);
+	bool has_px = frost > 0.0 || snow > 0.0 || flower_fill.a > 0.0;
+	if (has_px) {
+		// the art is drawn at 2x, so work in 2x2 blocks of texture pixels
+		px = floor(floor(UV / TEXTURE_PIXEL_SIZE) * 0.5);
+	}
+	if (frost > 0.0) {
+		// frost: small clumps of whitened pixels, mostly on grass, hardly on paving
+		float n = hash(floor(px / 3.0)) * 0.65 + hash(px) * 0.35;
+		float cover = frost * (0.08 + 0.92 * grass) * (1.0 - water);
+		float f = step(1.0 - cover, n);
+		rgb = mix(rgb, frost_color * (0.85 + lum * 0.25), f * 0.6);
+	}
 	if (snow > 0.0) {
 		// drifts lie deepest on grass; asphalt (dark and grey) is ploughed, and
 		// so are the lines painted on it (asphalt an art pixel either side)
@@ -282,8 +285,13 @@ void fragment() {
 		float bed = smoothstep(0.27, 0.62, lum);
 		rgb += sun_light * vec3(0.19, 0.21, 0.16) * caustic * bed * water_shimmer;
 	}
-	if (flower > 0.5 && flower_fill.a > 0.0) {
-		rgb = flower_fill.rgb * (0.9 + 0.2 * hash(px));
+	if (flower_fill.a > 0.0) {
+		float hue = hue_of(c.rgb);
+		// vivid, and neither green nor the browns of paths and bark: a wildflower dot
+		float flower = step(0.4, sat) * step(0.035, abs(hue - 0.09)) * step(0.5, 1.0 - grass) * (1.0 - water);
+		if (flower > 0.5) {
+			rgb = flower_fill.rgb * (0.9 + 0.2 * hash(px));
+		}
 	}
 	lit_sun_gain = lit_sun(NORMAL_MAP);
 	COLOR = vec4(rgb * lit_sun_gain, c.a);

@@ -40,6 +40,7 @@ var _timer := CHECK_EVERY * 0.5
 var _cooldown := 0.0
 var _rng := RandomNumberGenerator.new()
 var _last_region: Node
+var _had_any := false
 
 
 func _ready() -> void:
@@ -126,27 +127,44 @@ func _process(delta: float) -> void:
 		_prey.clear()
 		_puffs.clear()
 		_timer = CHECK_EVERY * 0.5
-	_cooldown = maxf(_cooldown - delta, 0.0)
+	if _cooldown > 0.0:
+		_cooldown = maxf(_cooldown - delta, 0.0)
 	if _falcons.is_empty() and _cooldown <= 0.0 and active():
 		_timer -= delta
 		if _timer <= 0.0:
 			_timer = CHECK_EVERY
 			if _rng.randf() < chance():
 				send_one()
+	if _falcons.is_empty() and _prey.is_empty() and _puffs.is_empty():
+		if _had_any:
+			_had_any = false
+			queue_redraw()
+		return
 	var view := _view()
+	var before := _falcons.size()
 	for falcon in _falcons:
 		_update(falcon, delta, view)
 	for bird in _prey:
 		bird.pos += bird.vel * delta
 		bird.flap += delta
-	for puff in _puffs:
+	for i in range(_puffs.size() - 1, -1, -1):
+		var puff: Dictionary = _puffs[i]
 		puff.time += delta
-	_puffs = _puffs.filter(func(p: Dictionary) -> bool: return p.time < 1.4)
-	_prey = _prey.filter(func(b: Dictionary) -> bool: return view.grow(80.0).has_point(b.pos) and not b.get("caught", false))
-	var before := _falcons.size()
-	_falcons = _falcons.filter(func(f: Dictionary) -> bool: return f.state != "leave" or view.grow(120.0).has_point(f.pos - Vector2(0, f.height)))
+		if puff.time >= 1.4:
+			_puffs.remove_at(i)
+	var prey_view := view.grow(80.0)
+	for i in range(_prey.size() - 1, -1, -1):
+		var bird: Dictionary = _prey[i]
+		if not prey_view.has_point(bird.pos) or bird.get("caught", false):
+			_prey.remove_at(i)
+	var falcon_view := view.grow(120.0)
+	for i in range(_falcons.size() - 1, -1, -1):
+		var f: Dictionary = _falcons[i]
+		if f.state == "leave" and not falcon_view.has_point(f.pos - Vector2(0, f.height)):
+			_falcons.remove_at(i)
 	if before > 0 and _falcons.is_empty():
 		_cooldown = COOLDOWN
+	_had_any = not (_falcons.is_empty() and _prey.is_empty() and _puffs.is_empty())
 	queue_redraw()
 
 

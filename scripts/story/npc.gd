@@ -96,6 +96,11 @@ var _pose_left := 0.0
 var _speaking := 0.0
 var _dozing := false
 var _clock := 0.0
+var _name_hash := 0
+var _home_at := HOME_FROM
+var _rain_stay := false
+var _region_dirty := true
+var _world: Node
 
 ## Visitors head home between these hours (each at their own time) and come
 ## back out in the morning; on a rainy day about half of them stay in.
@@ -131,21 +136,29 @@ const TALK_MAX := 2.6
 const TALK_FPS := 7.0
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PARENTED or what == NOTIFICATION_ENTER_TREE:
+		_region_dirty = true
+
+
 func _ready() -> void:
 	add_to_group(Footprints.GROUP)
+	_name_hash = hash(name)
+	_home_at = HOME_FROM + float(absi(_name_hash) % 100) / 100.0 * HOME_SPREAD
+	_rain_stay = absi(hash(name + "rain")) % 2 == 0
+	var home_region := _find_region()
+	_region_of = home_region
+	_region_dirty = false
 	if spot != "":
-		var region := _find_region()
-		var marker: Marker2D = region.get_spawn(spot) if region else null
+		var marker: Marker2D = home_region.get_spawn(spot) if home_region else null
 		if marker:
 			global_position = marker.global_position + offset
 		else:
 			push_warning("%s: no spot named '%s'" % [name, spot])
 	_home = global_position
 	_target = _home
-	var home_region := _find_region()
-	_region_of = home_region
 	_region_at = home_region.global_position if home_region else Vector2.ZERO
-	_rng.seed = hash(name)
+	_rng.seed = _name_hash
 	_wait = _rng.randf_range(0.5, 3.0)
 	_stops = parse_timetable(timetable)
 	if not _stops.is_empty():
@@ -212,8 +225,10 @@ func on_line(speaker: String, text: String, mood: String) -> void:
 ## then, wave to a friend walking up (once a day), and doze late at night.
 func _idle_life(delta: float) -> void:
 	_clock += delta
-	_speaking = maxf(_speaking - delta, 0.0)
-	_pose_left = maxf(_pose_left - delta, 0.0)
+	if _speaking > 0.0:
+		_speaking = maxf(_speaking - delta, 0.0)
+	if _pose_left > 0.0:
+		_pose_left = maxf(_pose_left - delta, 0.0)
 	if _sprite == null or not visible:
 		return
 	var standing := velocity == Vector2.ZERO and _route.is_empty()
@@ -222,7 +237,8 @@ func _idle_life(delta: float) -> void:
 	_show_frame()
 	if _talking:
 		return
-	_dozing = standing and character != null and not character.visitor and not stands_still and is_dozing_hour()
+	var dozing_now := character != null and not character.visitor and not stands_still and is_dozing_hour()
+	_dozing = standing and dozing_now
 	if not standing:
 		_glance_back = Vector2i.ZERO
 		return
@@ -241,7 +257,7 @@ func _idle_life(delta: float) -> void:
 			facing = turns[_rng.randi() % turns.size()]
 			_glance = GLANCE_HOLD
 		_update_frame(false)
-	if character and not character.visitor and not stands_still and is_dozing_hour():
+	if dozing_now:
 		_doze -= delta
 		if _doze <= 0.0:
 			_doze = DOZE
@@ -262,9 +278,10 @@ func _greet_friend() -> bool:
 	var today := Friendship.today()
 	if _greeted_day == today or Friendship.hearts(character.id) < GREET_HEARTS:
 		return false
-	var world := get_tree().get_first_node_in_group("world")
-	var player: Node2D = world.player if world and "player" in world else null
-	if player == null or player.global_position.distance_to(global_position) > GREET_REACH:
+	if not is_instance_valid(_world):
+		_world = get_tree().get_first_node_in_group("world")
+	var player: Node2D = _world.player if _world and "player" in _world else null
+	if player == null or player.global_position.distance_squared_to(global_position) > GREET_REACH * GREET_REACH:
 		return false
 	_greeted_day = today
 	_face(player.global_position - global_position)
@@ -427,10 +444,9 @@ func is_out() -> bool:
 	if character == null or not character.visitor:
 		return true
 	var hour := GameClock.minutes / 60.0
-	var home_at := HOME_FROM + float(absi(hash(name)) % 100) / 100.0 * HOME_SPREAD
-	if hour >= home_at or hour < OUT_FROM:
+	if hour >= _home_at or hour < OUT_FROM:
 		return false
-	return not (Weather.today().rain > 0.4 and absi(hash(name + "rain")) % 2 == 0)
+	return not (_rain_stay and Weather.today().rain > 0.4)
 
 
 ## Fades them away (home for the night) or back.
@@ -459,17 +475,21 @@ func _find_region() -> Region:
 ## moved it since they were set. Left where they were, a wanderer in the
 ## region laid beside yours set off a whole map's width toward the seam.
 func _follow_region() -> void:
-	var region := _find_region()
+	if _region_dirty or not is_instance_valid(_region_of):
+		_region_dirty = false
+		var found := _find_region()
+		if found != _region_of:
+			_region_of = found
+			_region_at = found.global_position if found else Vector2.ZERO
+			return
+	var region := _region_of
 	if region == null:
 		return
-	if region != _region_of:
-		_region_of = region
-		_region_at = region.global_position
+	var pos := region.global_position
+	if pos == _region_at:
 		return
-	if region.global_position == _region_at:
-		return
-	var shift := region.global_position - _region_at
-	_region_at = region.global_position
+	var shift := pos - _region_at
+	_region_at = pos
 	_home += shift
 	_target += shift
 	for i in _route.size():
@@ -517,7 +537,7 @@ func _physics_process(delta: float) -> void:
 	var radius := roam_radius()
 	if radius <= 0.0:
 		# standing at their spot: walk back to it first if they're out
-		if global_position.distance_to(_home) <= 4.0 or _stuck_time > 1.0:
+		if global_position.distance_squared_to(_home) <= 16.0 or _stuck_time > 1.0:
 			if velocity != Vector2.ZERO:
 				velocity = Vector2.ZERO
 				_update_frame(false)
@@ -531,7 +551,7 @@ func _physics_process(delta: float) -> void:
 			_stuck_time = 0.0
 		return
 	var to_target := _target - global_position
-	if to_target.length() < 4.0 or _stuck_time > 1.0:
+	if to_target.length_squared() < 16.0 or _stuck_time > 1.0:
 		velocity = Vector2.ZERO
 		_wait = _rng.randf_range(1.5, 5.0)
 		_update_frame(false)
@@ -539,7 +559,7 @@ func _physics_process(delta: float) -> void:
 	velocity = to_target.normalized() * walk_speed
 	var before := global_position
 	move_and_slide()
-	if global_position.distance_to(before) < walk_speed * delta * 0.25:
+	if global_position.distance_squared_to(before) < (walk_speed * delta * 0.25) * (walk_speed * delta * 0.25):
 		_stuck_time += delta
 	_face(to_target)
 	_walk_time += delta
@@ -550,17 +570,19 @@ func _physics_process(delta: float) -> void:
 ## person) holds them up a moment, then they find a way round.
 func _follow_route(delta: float) -> void:
 	var to_point := _route[0] - global_position
-	if to_point.length() < 4.0:
+	if to_point.length_squared() < 16.0:
 		_route.remove_at(0)
 		_stuck_time = 0.0
 		if _route.is_empty():
 			_arrive()
 		return
 	# the last bit of a step lands on the point rather than past it
-	velocity = to_point.normalized() * minf(travel_speed, to_point.length() / delta)
+	var dist := to_point.length()
+	velocity = (to_point / dist) * minf(travel_speed, dist / delta)
 	var before := global_position
 	move_and_slide()
-	if global_position.distance_to(before) < velocity.length() * delta * 0.25:
+	var min_step := velocity.length() * delta * 0.25
+	if global_position.distance_squared_to(before) < min_step * min_step:
 		_stuck_time += delta
 		if _stuck_time > 1.5:
 			_stuck_time = 0.0
@@ -599,9 +621,11 @@ func _show_frame() -> void:
 		col = _pose_col
 	elif _speaking > 0.0:
 		col = CharacterSheet.Col.TALK if int(_speaking * TALK_FPS) % 2 == 0 else CharacterSheet.Col.STAND
-	elif _dozing or CharacterSheet.blinking(_clock, hash(name)):
+	elif _dozing or CharacterSheet.blinking(_clock, _name_hash):
 		col = CharacterSheet.Col.BLINK
-	_sprite.frame = CharacterSheet.frame(_sprite.texture, facing, col)
+	var next_frame := CharacterSheet.frame(_sprite.texture, facing, col)
+	if _sprite.frame != next_frame:
+		_sprite.frame = next_frame
 
 
 func interact(player: Player) -> void:

@@ -47,11 +47,15 @@ void fragment() {
 		a += texture(TEXTURE, UV + vec2(step_uv.x, -step_uv.y) * 0.72).a * 0.07;
 		a += texture(TEXTURE, UV + vec2(-step_uv.x, -step_uv.y) * 0.72).a * 0.07;
 
-		// Subtle wind-dappled canopy light variation inside deep shadows.
-		vec2 wp = bake_origin + UV * bake_size;
-		float dapple = vnoise(wp * 0.055 + vec2(TIME * (0.25 + wind_strength * 0.25), TIME * 0.12));
-		float dapple_mod = mix(0.90, 1.06, dapple);
-		float out_a = clamp(a * dapple_mod, 0.0, 1.0) * COLOR.a;
-		COLOR = vec4(shade, out_a);
+		if (a <= 0.001) {
+			COLOR = vec4(shade, 0.0);
+		} else {
+			// Subtle wind-dappled canopy light variation inside deep shadows.
+			vec2 wp = bake_origin + UV * bake_size;
+			float dapple = vnoise(wp * 0.055 + vec2(TIME * (0.25 + wind_strength * 0.25), TIME * 0.12));
+			float dapple_mod = mix(0.90, 1.06, dapple);
+			float out_a = clamp(a * dapple_mod, 0.0, 1.0) * COLOR.a;
+			COLOR = vec4(shade, out_a);
+		}
 	}
 }

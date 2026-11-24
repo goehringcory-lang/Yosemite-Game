@@ -73,14 +73,14 @@ static func wall_texture(im: Image, rock_key: String, wet: float, seed_value: in
 
 ## [param im] at twice the size by Scale2x, with the wall's grain when
 ## [param detail] has some ({"grain": [...], "seed": int, "glints": int}).
-static func scale2x(im: Image, detail := {}) -> Image:
+static func scale2x(im: Image, detail := {}, allow_parallel := true) -> Image:
 	var src := _rgba(im)
 	var w := src.get_width()
 	var h := src.get_height()
 	var data := src.get_data().to_int32_array()
 	if detail.get("grain", []).is_empty():
-		return _scale_plain(src, data, w, h)
-	var out := _bands(h, w * h >= PARALLEL_PIXELS, func(y0: int, y1: int) -> PackedInt32Array:
+		return _scale_plain(src, data, w, h, allow_parallel)
+	var out := _bands(h, allow_parallel and w * h >= PARALLEL_PIXELS, func(y0: int, y1: int) -> PackedInt32Array:
 		return _scale_rows(data, w, h, y0, y1, detail))
 	return Image.create_from_data(w * 2, h * 2, false, Image.FORMAT_RGBA8, out.to_byte_array())
 
@@ -91,13 +91,14 @@ static func scale2x(im: Image, detail := {}) -> Image:
 ## and below match, or left and right, stays a plain 2x2 block, so a row
 ## whose rows above and below are the same (most of a sky, a cloud or a far
 ## ridge) is done already.
-static func _scale_plain(src: Image, data: PackedInt32Array, w: int, h: int) -> Image:
+static func _scale_plain(src: Image, data: PackedInt32Array, w: int, h: int, allow_parallel := true) -> Image:
 	var doubled := src.duplicate() as Image
 	doubled.resize(w * 2, h * 2, Image.INTERPOLATE_NEAREST)
 	var base := doubled.get_data().to_int32_array()
 	var w2 := w * 2
-	var out := _bands(h, w * h >= PARALLEL_PIXELS, func(y0: int, y1: int) -> PackedInt32Array:
+	var out := _bands(h, allow_parallel and w * h >= PARALLEL_PIXELS, func(y0: int, y1: int) -> PackedInt32Array:
 		var rows := base.slice(y0 * 2 * w2, y1 * 2 * w2)
+		var wm1 := w - 1
 		for y in range(y0, y1):
 			var row := y * w
 			var up := row - w if y > 0 else row
@@ -111,19 +112,22 @@ static func _scale_plain(src: Image, data: PackedInt32Array, w: int, h: int) -> 
 				var d := data[dn + x]
 				if a == d:
 					continue
-				var p := data[row + x]
-				var c := data[row + x - 1] if x > 0 else p
-				var b := data[row + x + 1] if x < w - 1 else p
+				var rx := row + x
+				var p := data[rx]
+				var c := data[rx - 1] if x > 0 else p
+				var b := data[rx + 1] if x < wm1 else p
 				if c == b:
 					continue
+				var ox0 := o0 + (x << 1)
+				var ox1 := o1 + (x << 1)
 				if c == a:
-					rows[o0 + 2 * x] = a
+					rows[ox0] = a
 				if a == b:
-					rows[o0 + 2 * x + 1] = b
+					rows[ox0 + 1] = b
 				if d == c:
-					rows[o1 + 2 * x] = c
+					rows[ox1] = c
 				if b == d:
-					rows[o1 + 2 * x + 1] = d
+					rows[ox1 + 1] = d
 		return rows)
 	return Image.create_from_data(w2, h * 2, false, Image.FORMAT_RGBA8, out.to_byte_array())
 
@@ -170,68 +174,89 @@ static func _scale_rows(data: PackedInt32Array, w: int, h: int, y0: int, y1: int
 		light_t = dark_t + int(grain[1])
 		crystal_t = int(grain[2])
 		glint_t = int(grain[3]) + int(detail.get("glints", 0))
-	var seed_value: int = detail.get("seed", 0)
+	var seed_mix: int = int(detail.get("seed", 0)) * 83492791
 	# Each color's darker and lighter neighbors, worked out once.
 	var darker := {}
 	var lighter := {}
 	var glint := {}
+	var wm1 := w - 1
 	for y in range(y0, y1):
 		var row := y * w
 		var up := row - w if y > 0 else row
 		var dn := row + w if y < h - 1 else row
-		var o0 := (y - y0) * 2 * w2
-		var o1 := o0 + w2
+		var ox0 := (y - y0) * 2 * w2
+		var ox1 := ox0 + w2
+		var y_mix := (y * 19349663) ^ seed_mix
+		var prev_p := data[row]
 		for x in w:
-			var p := data[row + x]
+			var rx := row + x
+			var p := data[rx]
 			var a := data[up + x]
 			var d := data[dn + x]
-			var c := data[row + x - 1] if x > 0 else p
-			var b := data[row + x + 1] if x < w - 1 else p
+			var c := prev_p
+			prev_p = p
+			var b := data[rx + 1] if x < wm1 else p
 			var e0 := p
 			var e1 := p
 			var e2 := p
 			var e3 := p
-			if c == a and c != d and a != b:
-				e0 = a
-			if a == b and a != c and b != d:
-				e1 = b
-			if d == c and d != b and c != a:
-				e2 = c
-			if b == d and b != a and d != c:
-				e3 = d
-			if grained and p == a and p == b and p == c and p == d and (p & 0xff000000) != 0:
-				# A flat pixel of stone: one hash, a byte for each screen pixel.
-				var hv := (x * 73856093) ^ (y * 19349663) ^ (seed_value * 83492791)
-				hv = ((hv ^ (hv >> 15)) * 2246822519) & 0xffffffffffff
-				hv = hv ^ (hv >> 13)
-				if not darker.has(p):
-					var col := _color(p)
-					darker[p] = _int(col.darkened(FLECK_DARK))
-					lighter[p] = _int(col.lightened(SPECK_LIGHT))
-					glint[p] = _int(col.lightened(GLINT_LIGHT))
-				var dk: int = darker[p]
-				var lt: int = lighter[p]
-				if crystal_t > 0 and ((hv >> 32) & 255) < crystal_t:
-					# A crystal weathering out: lit on top, its shadow below right.
-					e0 = lt
-					e1 = lt
-					e2 = lt
-					e3 = dk
-				else:
-					var n0 := hv & 255
-					var n1 := (hv >> 8) & 255
-					var n2 := (hv >> 16) & 255
-					var n3 := (hv >> 24) & 255
-					e0 = dk if n0 < dark_t else (lt if n0 < light_t else e0)
-					e1 = dk if n1 < dark_t else (lt if n1 < light_t else e1)
-					e2 = dk if n2 < dark_t else (lt if n2 < light_t else e2)
-					e3 = dk if n3 < dark_t else (lt if n3 < light_t else e3)
-					if glint_t > 0 and ((hv >> 40) & 255) < glint_t:
-						e1 = glint[p]
-			out[o0 + 2 * x] = e0
-			out[o0 + 2 * x + 1] = e1
-			out[o1 + 2 * x] = e2
-			out[o1 + 2 * x + 1] = e3
+			if p == a and p == d and p == c and p == b:
+				if grained and (p & 0xff000000) != 0:
+					# A flat pixel of stone: one hash, a byte for each screen pixel.
+					var hv := (x * 73856093) ^ y_mix
+					hv = ((hv ^ (hv >> 15)) * 2246822519) & 0xffffffffffff
+					hv = hv ^ (hv >> 13)
+					if not darker.has(p):
+						var col := _color(p)
+						darker[p] = _int(col.darkened(FLECK_DARK))
+						lighter[p] = _int(col.lightened(SPECK_LIGHT))
+						glint[p] = _int(col.lightened(GLINT_LIGHT))
+					var dk: int = darker[p]
+					var lt: int = lighter[p]
+					if crystal_t > 0 and ((hv >> 32) & 255) < crystal_t:
+						# A crystal weathering out: lit on top, its shadow below right.
+						e0 = lt
+						e1 = lt
+						e2 = lt
+						e3 = dk
+					else:
+						var n0 := hv & 255
+						var n1 := (hv >> 8) & 255
+						var n2 := (hv >> 16) & 255
+						var n3 := (hv >> 24) & 255
+						if n0 < dark_t:
+							e0 = dk
+						elif n0 < light_t:
+							e0 = lt
+						if n1 < dark_t:
+							e1 = dk
+						elif n1 < light_t:
+							e1 = lt
+						if n2 < dark_t:
+							e2 = dk
+						elif n2 < light_t:
+							e2 = lt
+						if n3 < dark_t:
+							e3 = dk
+						elif n3 < light_t:
+							e3 = lt
+						if glint_t > 0 and ((hv >> 40) & 255) < glint_t:
+							e1 = glint[p]
+			elif a != d and c != b:
+				if c == a:
+					e0 = a
+				if a == b:
+					e1 = b
+				if d == c:
+					e2 = c
+				if b == d:
+					e3 = d
+			out[ox0] = e0
+			out[ox0 + 1] = e1
+			out[ox1] = e2
+			out[ox1 + 1] = e3
+			ox0 += 2
+			ox1 += 2
 	return out
 
 

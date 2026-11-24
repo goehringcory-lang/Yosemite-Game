@@ -86,6 +86,12 @@ func _draw() -> void:
 	draw_rect(_view, Color.WHITE)
 
 
+static var _mist_key := -1
+static var _mist_thick_base := 0.0
+static var _mist_roll := 1.0
+static var _mist_yday_rain := 0.0
+
+
 ## How thick the morning mist is right now, before the place is counted (0..1).
 ## [param high]: in the high country, where cold air pools on the meadows on
 ## summer nights too (HighCountry.MIST_CHANCE).
@@ -94,14 +100,20 @@ static func mist_now(high := false) -> float:
 	var weather := Weather.today()
 	if weather.snow > 0.0:
 		return 0.0
-	var rng := RandomNumberGenerator.new()
-	rng.seed = hash("mist:%d:%d:%d" % [GameClock.year, season, GameClock.day])
-	var thick: float = MIST_THICKNESS[season] * rng.randf_range(0.6, 1.0)
+	var key := (GameClock.year * 4 + season) * 64 + GameClock.day
+	if key != _mist_key:
+		_mist_key = key
+		var rng := RandomNumberGenerator.new()
+		rng.seed = hash("mist:%d:%d:%d" % [GameClock.year, season, GameClock.day])
+		_mist_thick_base = MIST_THICKNESS[season] * rng.randf_range(0.6, 1.0)
+		_mist_roll = rng.randf()
+		var yesterday: Dictionary = Weather.on_day(GameClock.year, season, GameClock.day - 1) if GameClock.day > 1 else {}
+		_mist_yday_rain = yesterday.get("rain", 0.0)
+	var thick := _mist_thick_base
 	var chance: float = HighCountry.MIST_CHANCE[season] if high else MIST_CHANCE[season]
-	var misty: bool = rng.randf() < chance
+	var misty: bool = _mist_roll < chance
 	# The ground is wet after rain, and the mist comes up thick the next morning.
-	var yesterday: Dictionary = Weather.on_day(GameClock.year, season, GameClock.day - 1) if GameClock.day > 1 else {}
-	if yesterday.get("rain", 0.0) > 0.0:
+	if _mist_yday_rain > 0.0:
 		misty = true
 		thick = maxf(thick, 0.95)
 	if weather.rain > 0.0:

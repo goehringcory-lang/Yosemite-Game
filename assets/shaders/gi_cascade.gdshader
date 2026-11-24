@@ -33,17 +33,8 @@ const float PI_VAL = 3.14159265359;
 const float TAU_VAL = 6.28318530718;
 const int MAX_STEPS = 18;
 
-// Sample one specific ray index [r_idx] from an integer probe [probe] in the
-// upper cascade (spacing = [u_spacing], grid = [u_grid]).
-vec4 fetch_upper_ray(vec2 probe, float r_idx, float u_spacing, vec2 u_grid) {
-	vec2 clamped = clamp(probe, vec2(0.0), u_grid - vec2(1.0));
-	float lx = mod(r_idx, u_spacing);
-	float ly = floor(r_idx / u_spacing);
-	vec2 px = clamped * u_spacing + vec2(lx, ly) + vec2(0.5);
-	return texture(upper_tex, px / resolution);
-}
-
 void fragment() {
+	vec2 inv_res = 1.0 / resolution;
 	float c = float(cascade_index);
 	float spacing = exp2(c + 1.0);
 	float num_rays = spacing * spacing;
@@ -65,7 +56,7 @@ void fragment() {
 
 	// If the probe itself sits inside an emitter, collect its glow immediately
 	// on cascade 0 so lights don't leave dark cores.
-	vec4 origin_scene = texture(scene_tex, probe_pos / resolution);
+	vec4 origin_scene = (cascade_index == 0) ? texture(scene_tex, probe_pos * inv_res) : vec4(0.0);
 	if (cascade_index == 0 && origin_scene.a > 0.5 && dot(origin_scene.rgb, vec3(1.0)) > 0.01) {
 		rad = origin_scene.rgb;
 		vis = 0.0;
@@ -80,8 +71,7 @@ void fragment() {
 			if (t >= t_end) {
 				break;
 			}
-			vec2 pos = probe_pos + dir * t;
-			vec2 suv = pos / resolution;
+			vec2 suv = (probe_pos + dir * t) * inv_res;
 			if (suv.x < 0.0 || suv.y < 0.0 || suv.x > 1.0 || suv.y > 1.0) {
 				break;
 			}
@@ -108,19 +98,28 @@ void fragment() {
 			vis = sky_ao_weight;
 		} else {
 			float u_spacing = spacing * 2.0;
-			vec2 u_grid = resolution / u_spacing;
-			vec2 u_coord = (probe_pos / u_spacing) - vec2(0.5);
+			float inv_u_spacing = 1.0 / u_spacing;
+			vec2 u_max = resolution * inv_u_spacing - vec2(1.0);
+			vec2 u_coord = (probe_pos * inv_u_spacing) - vec2(0.5);
 			vec2 p00 = floor(u_coord);
 			vec2 f = clamp(u_coord - p00, vec2(0.0), vec2(1.0));
+			vec2 u_step = u_spacing * inv_res;
+			vec2 base00 = clamp(p00, vec2(0.0), u_max) * u_step;
+			vec2 base10 = clamp(p00 + vec2(1.0, 0.0), vec2(0.0), u_max) * u_step;
+			vec2 base01 = clamp(p00 + vec2(0.0, 1.0), vec2(0.0), u_max) * u_step;
+			vec2 base11 = clamp(p00 + vec2(1.0, 1.0), vec2(0.0), u_max) * u_step;
 
 			vec4 merged = vec4(0.0);
 			float base_r = ray_idx * 4.0;
 			for (int k = 0; k < 4; k++) {
 				float r_k = base_r + float(k);
-				vec4 s00 = fetch_upper_ray(p00, r_k, u_spacing, u_grid);
-				vec4 s10 = fetch_upper_ray(p00 + vec2(1.0, 0.0), r_k, u_spacing, u_grid);
-				vec4 s01 = fetch_upper_ray(p00 + vec2(0.0, 1.0), r_k, u_spacing, u_grid);
-				vec4 s11 = fetch_upper_ray(p00 + vec2(1.0, 1.0), r_k, u_spacing, u_grid);
+				float ly = floor(r_k * inv_u_spacing);
+				float lx = r_k - ly * u_spacing;
+				vec2 ray_uv = (vec2(lx, ly) + vec2(0.5)) * inv_res;
+				vec4 s00 = texture(upper_tex, base00 + ray_uv);
+				vec4 s10 = texture(upper_tex, base10 + ray_uv);
+				vec4 s01 = texture(upper_tex, base01 + ray_uv);
+				vec4 s11 = texture(upper_tex, base11 + ray_uv);
 				vec4 top = mix(s00, s10, f.x);
 				vec4 bot = mix(s01, s11, f.x);
 				merged += mix(top, bot, f.y);
