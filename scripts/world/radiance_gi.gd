@@ -34,6 +34,7 @@ const CASCADE_COUNT := 4
 const JFA_STEPS := [128, 64, 32, 16, 8, 4, 2, 1]
 const RESCAN := 1.5
 const MIN_OCCLUDER_HEIGHT := 20.0
+const GRID_CELL := 256.0
 
 const SEED_SHADER := preload("res://assets/shaders/gi_jfa_seed.gdshader")
 const STEP_SHADER := preload("res://assets/shaders/gi_jfa_step.gdshader")
@@ -51,12 +52,18 @@ static var enabled := true
 
 var _built := false
 var _region: Region
+var _player: Node
 var _tint: CanvasModulate
 var _room_light: CanvasModulate
 var _scan_in := 0.0
 var _view := Rect2(Vector2.ZERO, Vector2(960, 540))
 
 var _occluders: Array[CanvasItem] = []
+var _dynamic_occluders: Array[CanvasItem] = []
+## Coarse 256px spatial grid of static occluders in region-local space:
+## Vector2i -> Array of [CanvasItem, Rect2 (local footprint)].
+var _static_grid := {}
+var _static_occ_ids := PackedInt64Array()
 var _lights: Array[PointLight2D] = []
 var _glows: Array[Sprite2D] = []
 var _room_windows: RoomWindows
@@ -65,7 +72,8 @@ var _room_windows: RoomWindows
 var _kinds := {}
 const KIND_NONE := 0
 const KIND_GLOW := 1
-const KIND_OCCLUDER := 2
+const KIND_STATIC_OCCLUDER := 2
+const KIND_DYNAMIC_OCCLUDER := 3
 
 var _viewports: Array[SubViewport] = []
 var _scene_vp: SubViewport
@@ -73,6 +81,19 @@ var _scene_painter: Node2D
 var _cascade_mats: Array[ShaderMaterial] = []
 var _composite_rect: ColorRect
 var _composite_mat: ShaderMaterial
+
+## Cached last-sent composite uniforms so unchanged values aren't pushed every frame.
+var _last_tint := Vector3(-1, -1, -1)
+var _last_gi_str := -1.0
+var _last_ao_str := -1.0
+var _last_ao_col := Vector3(-1, -1, -1)
+var _last_bounce_col := Vector3(-1, -1, -1)
+var _last_bounce_str := -1.0
+var _last_sky_ao := -1.0
+var _watched_region: Region
+var _watched_entities: Node
+var _tree_dirty := true
+var _force_scan_in := 12.0
 
 
 ## True when 2D Radiance Cascades GI is active (High graphics / Forward+).
@@ -89,14 +110,47 @@ func _ready() -> void:
 			world.region_changed.connect(_on_region_changed)
 		_tint = world.get_node_or_null("DayNight") as CanvasModulate
 		_room_light = world.get_node_or_null("RoomLight") as CanvasModulate
+		_player = world.get_node_or_null("Player")
 	if active():
 		_build_pipeline()
 
 
+func _watch_region(region: Region) -> void:
+	if _watched_region == region:
+		return
+	if is_instance_valid(_watched_region):
+		if _watched_region.child_entered_tree.is_connected(_on_tree_changed):
+			_watched_region.child_entered_tree.disconnect(_on_tree_changed)
+		if _watched_region.child_exiting_tree.is_connected(_on_tree_changed):
+			_watched_region.child_exiting_tree.disconnect(_on_tree_changed)
+	if is_instance_valid(_watched_entities):
+		if _watched_entities.child_entered_tree.is_connected(_on_tree_changed):
+			_watched_entities.child_entered_tree.disconnect(_on_tree_changed)
+		if _watched_entities.child_exiting_tree.is_connected(_on_tree_changed):
+			_watched_entities.child_exiting_tree.disconnect(_on_tree_changed)
+	_watched_region = region
+	_watched_entities = region.entities if region != null else null
+	if _watched_region != null:
+		_watched_region.child_entered_tree.connect(_on_tree_changed)
+		_watched_region.child_exiting_tree.connect(_on_tree_changed)
+	if _watched_entities != null:
+		_watched_entities.child_entered_tree.connect(_on_tree_changed)
+		_watched_entities.child_exiting_tree.connect(_on_tree_changed)
+
+
+func _on_tree_changed(_node: Node) -> void:
+	_tree_dirty = true
+
+
 func _on_region_changed(region: Region) -> void:
 	_region = region
+	_watch_region(region)
 	_kinds.clear()
-	_scan_in = 0.0
+	_static_grid.clear()
+	_static_occ_ids.clear()
+	_tree_dirty = false
+	_force_scan_in = 12.0
+	_scan_in = RESCAN
 	_scan()
 
 
@@ -216,6 +270,9 @@ func _process(delta: float) -> void:
 		var world := get_parent()
 		if world and "region" in world:
 			_region = world.region
+			_watch_region(_region)
+			_tree_dirty = true
+			_scan_in = 0.0
 	if _region == null:
 		_set_running(false)
 		return
@@ -223,9 +280,13 @@ func _process(delta: float) -> void:
 	_set_running(true)
 
 	_scan_in -= delta
+	_force_scan_in -= delta
 	if _scan_in <= 0.0:
 		_scan_in = RESCAN
-		_scan()
+		if _tree_dirty or _force_scan_in <= 0.0:
+			_tree_dirty = false
+			_force_scan_in = 12.0
+			_scan()
 
 	# Align the 256x144 scene buffer to the current camera view.
 	_view = _view_rect()
@@ -274,18 +335,34 @@ func _update_uniforms() -> void:
 
 	# Top cascade sky visibility weight (1.0 outdoors for AO, 0.0 indoors so
 	# rooms don't get outdoor sky AO).
-	if _cascade_mats.size() == CASCADE_COUNT and _cascade_mats[CASCADE_COUNT - 1] != null:
+	var sky_ao := 0.0 if indoors else 1.0
+	if sky_ao != _last_sky_ao and _cascade_mats.size() == CASCADE_COUNT and _cascade_mats[CASCADE_COUNT - 1] != null:
+		_last_sky_ao = sky_ao
 		var top_mat := _cascade_mats[CASCADE_COUNT - 1]
 		top_mat.set_shader_parameter("sky_radiance", Vector3.ZERO)
-		top_mat.set_shader_parameter("sky_ao_weight", 0.0 if indoors else 1.0)
+		top_mat.set_shader_parameter("sky_ao_weight", sky_ao)
 
-	_composite_mat.set_shader_parameter("tint", Vector3(world_tint.r, world_tint.g, world_tint.b))
-	_composite_mat.set_shader_parameter("gi_strength", gi_str)
-	_composite_mat.set_shader_parameter("ao_strength", ao_str)
-	_composite_mat.set_shader_parameter("ao_color", Vector3(ao_col.r, ao_col.g, ao_col.b))
-	_composite_mat.set_shader_parameter("bounce_tint", Vector3(bounce_col.r, bounce_col.g, bounce_col.b))
-	_composite_mat.set_shader_parameter("bounce_strength", bounce_str)
-	_composite_mat.set_shader_parameter("strength", 1.0)
+	var tint_v := Vector3(world_tint.r, world_tint.g, world_tint.b)
+	if tint_v != _last_tint:
+		_last_tint = tint_v
+		_composite_mat.set_shader_parameter("tint", tint_v)
+	if gi_str != _last_gi_str:
+		_last_gi_str = gi_str
+		_composite_mat.set_shader_parameter("gi_strength", gi_str)
+	if ao_str != _last_ao_str:
+		_last_ao_str = ao_str
+		_composite_mat.set_shader_parameter("ao_strength", ao_str)
+	var ao_v := Vector3(ao_col.r, ao_col.g, ao_col.b)
+	if ao_v != _last_ao_col:
+		_last_ao_col = ao_v
+		_composite_mat.set_shader_parameter("ao_color", ao_v)
+	var bounce_v := Vector3(bounce_col.r, bounce_col.g, bounce_col.b)
+	if bounce_v != _last_bounce_col:
+		_last_bounce_col = bounce_v
+		_composite_mat.set_shader_parameter("bounce_tint", bounce_v)
+	if bounce_str != _last_bounce_str:
+		_last_bounce_str = bounce_str
+		_composite_mat.set_shader_parameter("bounce_strength", bounce_str)
 
 
 func _view_rect() -> Rect2:
@@ -300,29 +377,67 @@ func _view_rect() -> Rect2:
 
 func _scan() -> void:
 	_occluders.clear()
+	_dynamic_occluders.clear()
 	_lights.clear()
 	_glows.clear()
 	_room_windows = null
 	if _region == null or not is_instance_valid(_region):
+		_static_grid.clear()
+		_static_occ_ids.clear()
 		return
 	var world := get_parent()
-	var player: Node = world.get_node_or_null("Player") if world else null
+	if _player == null or not is_instance_valid(_player):
+		_player = world.get_node_or_null("Player") if world else null
+	var static_occs: Array[CanvasItem] = []
+	var static_ids := PackedInt64Array()
 	if _region.entities:
-		_collect_entities(_region.entities, player)
-	if player:
-		for child in player.find_children("*", "PointLight2D", true, false):
+		_collect_entities(_region.entities, _player, static_occs, static_ids)
+	if static_ids != _static_occ_ids:
+		_static_occ_ids = static_ids
+		_rebuild_static_grid(static_occs)
+	if _player:
+		for i in _player.get_child_count():
+			var child := _player.get_child(i)
 			if child is PointLight2D:
 				_lights.append(child as PointLight2D)
+			elif child.get_child_count() > 0:
+				for sub in child.find_children("*", "PointLight2D", true, false):
+					_lights.append(sub as PointLight2D)
 	if _region.indoors:
 		_room_windows = _region.get_node_or_null("RoomWindows") as RoomWindows
 
 
-func _collect_entities(node: Node, player: Node) -> void:
-	# Worked out once per parent, not per sprite: a region's Entities node has
-	# ~1000 children, and asking it for its lights for each one made a scan
-	# take 40-80 ms (a hitch every RESCAN seconds and on every arrival).
-	var skip_parent := _parent_skips(node)
-	for child in node.get_children():
+func _rebuild_static_grid(static_occs: Array[CanvasItem]) -> void:
+	_static_grid.clear()
+	var to_region := _region.get_global_transform().affine_inverse()
+	for item in static_occs:
+		var rect := _rect_of(item)
+		var local_rect := (to_region * item.get_global_transform()) * rect
+		var fp := _footprint_of(local_rect)
+		var entry := [item, fp]
+		var cx0 := floori(fp.position.x / GRID_CELL)
+		var cx1 := floori(fp.end.x / GRID_CELL)
+		var cy0 := floori(fp.position.y / GRID_CELL)
+		var cy1 := floori(fp.end.y / GRID_CELL)
+		for cy in range(cy0, cy1 + 1):
+			for cx in range(cx0, cx1 + 1):
+				var key := Vector2i(cx, cy)
+				var bucket: Variant = _static_grid.get(key)
+				if bucket == null:
+					_static_grid[key] = [entry]
+				else:
+					(bucket as Array).append(entry)
+
+
+func _collect_entities(node: Node, player: Node, static_occs: Array[CanvasItem], static_ids: PackedInt64Array) -> void:
+	# _parent_skips is computed lazily only when an uncached sprite is seen: on
+	# rescans every existing sprite is already in _kinds, so 0 string/child
+	# checks run on the ~1,500 parent props.
+	var skip_checked := false
+	var skip_parent := false
+	var count := node.get_child_count()
+	for i in count:
+		var child := node.get_child(i)
 		if child == player:
 			continue
 		if child is PointLight2D:
@@ -335,15 +450,35 @@ func _collect_entities(node: Node, player: Node) -> void:
 				kind = KIND_NONE
 				if child is Sprite2D and _is_night_glow(child as Sprite2D):
 					kind = KIND_GLOW
-				elif not skip_parent and _is_occluder(child as CanvasItem):
-					kind = KIND_OCCLUDER
+				else:
+					if not skip_checked:
+						skip_checked = true
+						skip_parent = _parent_skips(node)
+					if not skip_parent and _is_occluder(child as CanvasItem):
+						kind = KIND_DYNAMIC_OCCLUDER if _is_dynamic(child as CanvasItem) else KIND_STATIC_OCCLUDER
 				_kinds[id] = kind
 			if kind == KIND_GLOW:
 				_glows.append(child as Sprite2D)
-			elif kind == KIND_OCCLUDER:
+			elif kind == KIND_STATIC_OCCLUDER:
 				_occluders.append(child as CanvasItem)
+				static_occs.append(child as CanvasItem)
+				static_ids.append(id)
+			elif kind == KIND_DYNAMIC_OCCLUDER:
+				_occluders.append(child as CanvasItem)
+				_dynamic_occluders.append(child as CanvasItem)
 		if child.get_child_count() > 0:
-			_collect_entities(child, player)
+			_collect_entities(child, player, static_occs, static_ids)
+
+
+func _is_dynamic(item: CanvasItem) -> bool:
+	if item is AnimatedSprite2D or item.has_meta("shadow_moves"):
+		return true
+	var node: Node = item.get_parent()
+	while node != null and node != _region.entities:
+		if node is CharacterBody2D or node is RigidBody2D or node is AnimatableBody2D:
+			return true
+		node = node.get_parent()
+	return false
 
 
 static func _is_night_glow(sprite: Sprite2D) -> bool:
@@ -360,8 +495,8 @@ static func _parent_skips(parent: Node) -> bool:
 	for hint: String in NON_OCCLUDER_HINTS:
 		if hint in p_lower:
 			return true
-	for child in parent.get_children():
-		if child is PointLight2D:
+	for i in parent.get_child_count():
+		if parent.get_child(i) is PointLight2D:
 			return true
 	return false
 
@@ -403,39 +538,66 @@ static func _rect_of(item: CanvasItem) -> Rect2:
 	return Rect2()
 
 
+static func _footprint_of(world_rect: Rect2) -> Rect2:
+	var w := world_rect.size.x
+	var h := world_rect.size.y
+	var foot_y := world_rect.end.y
+	var cx := world_rect.position.x + w * 0.5
+	var fp_w: float
+	var fp_h: float
+	if w < h * 0.72:
+		# Tall narrow sprite (pine/oak trunk, post): occlude trunk base so
+		# light passes naturally over the canopy while trunks cast crisp shadows.
+		fp_w = clampf(w * 0.36, 6.0, 28.0)
+		fp_h = clampf(h * 0.22, 6.0, 24.0)
+	else:
+		# Wide grounded sprite (cabin, tent, boulder, bench, sofa): occlude
+		# core body inset slightly from the front edge so the front face stays lit.
+		fp_w = w * 0.78
+		fp_h = clampf(h * 0.44, 10.0, 60.0)
+	return Rect2(cx - fp_w * 0.5, foot_y - fp_h - 3.0, fp_w, fp_h)
+
+
 func _draw_scene() -> void:
 	var cull := _view.grow(160.0)
 	var occ_color := Color(0.0, 0.0, 0.0, 1.0)
 
-	# 1. Grounded occluder footprints (black, alpha = 1).
-	for item in _occluders:
+	# 1a. Static grounded occluder footprints from the coarse spatial grid.
+	if not _static_grid.is_empty() and _region != null and is_instance_valid(_region):
+		var reg_origin := _region.global_position
+		var local_cull := Rect2(cull.position - reg_origin, cull.size)
+		var cx0 := floori(local_cull.position.x / GRID_CELL)
+		var cx1 := floori(local_cull.end.x / GRID_CELL)
+		var cy0 := floori(local_cull.position.y / GRID_CELL)
+		var cy1 := floori(local_cull.end.y / GRID_CELL)
+		for cy in range(cy0, cy1 + 1):
+			for cx in range(cx0, cx1 + 1):
+				var bucket: Variant = _static_grid.get(Vector2i(cx, cy))
+				if bucket == null:
+					continue
+				for entry: Array in bucket:
+					var raw: Variant = entry[0]
+					if not is_instance_valid(raw):
+						continue
+					var item := raw as CanvasItem
+					if not item.is_visible_in_tree():
+						continue
+					var fp: Rect2 = entry[1]
+					if local_cull.intersects(fp):
+						_scene_painter.draw_rect(Rect2(fp.position + reg_origin, fp.size), occ_color)
+
+	# 1b. Dynamic occluders (people, animated props).
+	for item in _dynamic_occluders:
 		if not is_instance_valid(item) or not item.is_visible_in_tree():
 			continue
 		var rect := _rect_of(item)
-		var xform := item.get_global_transform()
-		var world_rect := xform * rect
+		var world_rect := item.get_global_transform() * rect
 		if not cull.intersects(world_rect):
 			continue
-		var w := world_rect.size.x
-		var h := world_rect.size.y
-		var foot_y := world_rect.end.y
-		var cx := world_rect.get_center().x
-		var fp_w: float
-		var fp_h: float
-		if w < h * 0.72:
-			# Tall narrow sprite (pine/oak trunk, post): occlude trunk base so
-			# light passes naturally over the canopy while trunks cast crisp shadows.
-			fp_w = clampf(w * 0.36, 6.0, 28.0)
-			fp_h = clampf(h * 0.22, 6.0, 24.0)
-		else:
-			# Wide grounded sprite (cabin, tent, boulder, bench, sofa): occlude
-			# core body inset slightly from the front edge so the front face stays lit.
-			fp_w = w * 0.78
-			fp_h = clampf(h * 0.44, 10.0, 60.0)
-		var fp := Rect2(cx - fp_w * 0.5, foot_y - fp_h - 3.0, fp_w, fp_h)
-		_scene_painter.draw_rect(fp, occ_color)
+		_scene_painter.draw_rect(_footprint_of(world_rect), occ_color)
 
 	# 2. NightGlow emitters (lit windows, glowing tents, Curry Village string lights).
+	var drew_glow := false
 	for glow in _glows:
 		if not is_instance_valid(glow) or not glow.is_visible_in_tree():
 			continue
@@ -452,7 +614,9 @@ func _draw_scene() -> void:
 		var col := Color(1.0 * gain, 0.74 * gain, 0.38 * gain, 1.0)
 		_scene_painter.draw_set_transform_matrix(xform)
 		_scene_painter.draw_texture_rect(glow.texture, rect, false, col)
-	_scene_painter.draw_set_transform_matrix(Transform2D.IDENTITY)
+		drew_glow = true
+	if drew_glow:
+		_scene_painter.draw_set_transform_matrix(Transform2D.IDENTITY)
 
 	# 3. Indoor daylight windows (RoomWindows): soft sky/golden sunlight pouring
 	# from back-wall panes around furniture.
@@ -477,8 +641,7 @@ func _draw_scene() -> void:
 					_scene_painter.draw_rect(sill, hdr)
 
 	# 4. NightLight emitters (campfires, streetlamps, lanterns, hearths, headlamp).
-	var world := get_parent()
-	var player: Node = world.get_node_or_null("Player") if world else null
+	var player := _player if is_instance_valid(_player) else null
 	for light in _lights:
 		if not is_instance_valid(light) or not light.is_visible_in_tree():
 			continue

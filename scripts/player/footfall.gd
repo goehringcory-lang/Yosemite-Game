@@ -47,9 +47,21 @@ var _puffed := false
 var quiet := false
 ## Faster than this (pixels a second), the feet kick up a spray.
 const RUN_SPEED := 220.0
+const RUN_SPEED_SQ := RUN_SPEED * RUN_SPEED
 var _running := false
 ## The body's speed when last looked at, to see it pull up from a run.
 var _pace := 0.0
+var _parent_body: Node2D
+var _mover: CharacterBody2D
+var _cached_region: Region
+var _region_dirty := true
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PARENTED or what == NOTIFICATION_ENTER_TREE:
+		_parent_body = get_parent() as Node2D
+		_mover = _parent_body as CharacterBody2D
+		_region_dirty = true
 
 
 func _ready() -> void:
@@ -71,31 +83,37 @@ func _ready() -> void:
 	_print_layer.z_as_relative = false
 	_print_layer.draw.connect(_draw_prints)
 	add_child(_print_layer)
-	_last = _body().global_position if _body() else Vector2.ZERO
+	_parent_body = get_parent() as Node2D
+	_mover = _parent_body as CharacterBody2D
+	_last = _parent_body.global_position if _parent_body else Vector2.ZERO
 
 
 func _body() -> Node2D:
-	return get_parent() as Node2D
+	return _parent_body
 
 
 func _process(delta: float) -> void:
-	var body := _body()
+	var body := _parent_body
 	if body == null:
 		return
 	var feet := body.global_position
-	var moved := feet.distance_to(_last)
-	_last = feet
+	var moved := 0.0
+	if feet != _last:
+		moved = feet.distance_to(_last)
+		_last = feet
 	# Read from the body's own speed where it has one: that holds between
 	# physics ticks (the feet only move on the tick, so the distance covered
 	# in one drawn frame reads as a run on a fast screen).
-	var mover := body as CharacterBody2D
-	_running = mover.get_real_velocity().length() > RUN_SPEED if mover else delta > 0.0 and moved / delta > RUN_SPEED
-	# Stopping dead from a run.
+	var mover := _mover
 	if mover:
-		var speed := mover.get_real_velocity().length()
-		if _pace > RUN_SPEED and speed < 1.0:
+		var speed_sq := mover.get_real_velocity().length_squared()
+		_running = speed_sq > RUN_SPEED_SQ
+		# Stopping dead from a run.
+		if _pace > RUN_SPEED and speed_sq < 1.0:
 			_skid(feet)
-		_pace = speed
+		_pace = sqrt(speed_sq) if _running else 0.0
+	else:
+		_running = delta > 0.0 and moved / delta > RUN_SPEED
 	# A jump (a door, a spawn) is not a step.
 	if moved > 0.0 and moved < 16.0:
 		_walked += moved
@@ -120,7 +138,9 @@ func _process(delta: float) -> void:
 			i += 1
 	_age_prints(delta)
 	var puffing := not _puffs.is_empty()
-	visible = puffing or not _prints.is_empty()
+	var want_visible := puffing or not _prints.is_empty()
+	if visible != want_visible:
+		visible = want_visible
 	if puffing or _puffed:
 		queue_redraw()
 		_breath.queue_redraw()
@@ -145,8 +165,8 @@ func _step(at: Vector2) -> void:
 	if color.a <= 0.0:
 		return # frozen ground: no dust
 	var behind := Vector2.ZERO
-	if _running and _body() and "facing" in _body():
-		behind = -Vector2(_body().get("facing"))
+	if _running and _parent_body and "facing" in _parent_body:
+		behind = -Vector2(_parent_body.get("facing"))
 	_add([at, 0.0, 2 if _running else 0, color, behind])
 
 
@@ -216,10 +236,13 @@ func _indoors() -> bool:
 
 
 func _region() -> Region:
-	var node := get_parent()
-	while node and not node is Region:
-		node = node.get_parent()
-	return node as Region
+	if _region_dirty or not is_instance_valid(_cached_region):
+		_region_dirty = false
+		var node := get_parent()
+		while node and not node is Region:
+			node = node.get_parent()
+		_cached_region = node as Region
+	return _cached_region
 
 
 ## Prints last the day; falling snow fills them in.

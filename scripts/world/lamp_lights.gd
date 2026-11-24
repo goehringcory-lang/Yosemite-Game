@@ -34,12 +34,18 @@ const LIGHTS := {
 static func attach(region: Region) -> void:
 	if region.entities == null:
 		return
-	for sprite in region.entities.find_children("*", "Sprite2D", true, false):
+	var sprites: Array[Sprite2D] = []
+	var has_light := {}
+	_scan_entities(region.entities, region.entities, sprites, has_light)
+	for sprite in sprites:
 		var spec: Dictionary = LIGHTS.get(_art_of(sprite), {})
 		if spec.is_empty():
 			continue
 		var holder := sprite.get_parent() as Node2D
-		if holder == null or not holder.find_children("*", "PointLight2D", true, false).is_empty():
+		if holder == null:
+			continue
+		var holder_id := holder.get_instance_id()
+		if has_light.has(holder_id):
 			continue
 		var rect: Rect2 = sprite.get_rect()
 		var head: int = spec.head
@@ -52,6 +58,28 @@ static func attach(region: Region) -> void:
 		light.position = sprite.position + Vector2(rect.get_center().x, y)
 		holder.add_child(light)
 		light.color = spec.color
+		var cur: Node = holder
+		while cur != null:
+			has_light[cur.get_instance_id()] = true
+			if cur == region.entities:
+				break
+			cur = cur.get_parent()
+
+
+static func _scan_entities(node: Node, stop: Node, sprites: Array[Sprite2D], has_light: Dictionary) -> void:
+	for i in node.get_child_count():
+		var child := node.get_child(i)
+		if child is Sprite2D:
+			sprites.append(child as Sprite2D)
+		elif child is PointLight2D:
+			var cur: Node = node
+			while cur != null:
+				has_light[cur.get_instance_id()] = true
+				if cur == stop:
+					break
+				cur = cur.get_parent()
+		if child.get_child_count() > 0:
+			_scan_entities(child, stop, sprites, has_light)
 
 
 static func _art_of(sprite: Sprite2D) -> String:

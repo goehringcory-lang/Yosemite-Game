@@ -32,7 +32,8 @@ var _puffs: Array = []
 var _who := {}
 var _rng := RandomNumberGenerator.new()
 var _on := false
-var _fires: Array[Vector2] = []
+var _fires_local: Array[Vector2] = []
+var _fires_loaded := false
 var _region: Node
 
 
@@ -62,13 +63,17 @@ func _process(delta: float) -> void:
 			queue_redraw()
 	if region != _region:
 		_region = region
-		_fires = _campfires(region)
+		_fires_loaded = false
+		_fires_local = []
 		_who.clear()
 	if _who.size() > 64:
 		for id: int in _who.keys():
 			if not is_instance_id_valid(id):
 				_who.erase(id)
 	if on:
+		if not _fires_loaded:
+			_fires_loaded = true
+			_fires_local = _campfires_local(region)
 		var centre := _view_centre()
 		if world.player and world.player.is_visible_in_tree():
 			_tick(world.player, delta, centre)
@@ -157,23 +162,32 @@ func _draw() -> void:
 
 
 func _near_fire(at: Vector2) -> bool:
-	for f in _fires:
-		if f.distance_squared_to(at) < FIRE_WARM * FIRE_WARM:
+	if _fires_local.is_empty():
+		return false
+	var local_at := (_region as Node2D).to_local(at) if _region is Node2D else at
+	for f in _fires_local:
+		if f.distance_squared_to(local_at) < FIRE_WARM * FIRE_WARM:
 			return true
 	return false
 
 
-## Where the campfires are in [param region] (sprites whose art is a campfire,
-## a fire pit or a lit fire ring; not woodpiles or cold rings).
-static func _campfires(region: Node) -> Array[Vector2]:
-	var out: Array[Vector2] = []
+## Where the campfires are in [param region], cached in region-local pixels
+## (sprites whose art is a campfire, a fire pit or a lit fire ring; not
+## woodpiles or cold rings).
+static func _campfires_local(region: Node) -> Array[Vector2]:
 	if region == null:
-		return out
+		return []
+	if region.has_meta("breath_fires_local"):
+		return region.get_meta("breath_fires_local")
+	var out: Array[Vector2] = []
+	var as_2d := region as Node2D
 	for node in region.find_children("*", "Sprite2D", true, false):
-		var tex := (node as Sprite2D).texture
+		var sprite := node as Sprite2D
+		var tex := sprite.texture
 		var file := tex.resource_path.get_file() if tex else ""
 		if file.contains("campfire") or file.contains("fire_pit") or (file.contains("fire_ring") and not file.contains("cold")):
-			out.append((node as Sprite2D).global_position)
+			out.append(as_2d.to_local(sprite.global_position) if as_2d else sprite.global_position)
+	region.set_meta("breath_fires_local", out)
 	return out
 
 

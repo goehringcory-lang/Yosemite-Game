@@ -21,6 +21,7 @@ extends PointLight2D
 
 static var _glow: GradientTexture2D
 static var _halo_tex: GradientTexture2D
+static var _add_mat: CanvasItemMaterial
 
 var _tint: CanvasModulate
 var _phase := 0.0
@@ -76,32 +77,51 @@ func _process(delta: float) -> void:
 			return
 	var dark := 0.0
 	if _tint.visible:
-		var lum := (_tint.color.r + _tint.color.g + _tint.color.b) / 3.0
-		dark = clampf((0.9 - lum) / 0.45, 0.0, 1.0)
+		var c := _tint.color
+		var lum := (c.r + c.g + c.b) / 3.0
+		if lum < 0.9:
+			dark = clampf((0.9 - lum) / 0.45, 0.0, 1.0)
 	elif not outdoor_only:
 		dark = RoomLight.level
-	_hours_level = move_toward(_hours_level, 1.0 if _in_hours() else 0.0, delta / HOURS_FADE)
+	if lit_hours.x >= 0:
+		_hours_level = move_toward(_hours_level, 1.0 if _in_hours() else 0.0, delta / HOURS_FADE)
+	if dark <= 0.0:
+		if not visible and gi_energy == 0.0:
+			return
+		gi_energy = 0.0
+		energy = 0.0
+		visible = false
+		return
 	var level := strength * dark * _hours_level
 	if flicker > 0.0 and level > 0.0:
 		_phase += delta * 9.0
 		level *= 1.0 - flicker * (0.5 + 0.5 * sin(_phase) * sin(_phase * 0.37 + 1.0))
 	# A touch over 1 so a lamp clearly lifts the blue night, not just a speck.
 	gi_energy = level * 1.25
+	var want_visible := level > 0.01
 	if RadianceGI.active():
 		# RadianceGI carries the wide, occluded light pool and soft shadows;
 		# keep the direct PointLight2D tighter for close normal-map bevels
 		# without bleeding unoccluded light behind boulders and walls.
 		energy = level * 0.72
-		texture_scale = radius * 0.62 / 64.0
+		var want_scale := radius * 0.62 / 64.0
+		if texture_scale != want_scale:
+			texture_scale = want_scale
 	else:
 		energy = gi_energy
-		texture_scale = radius / 64.0
-	visible = level > 0.01
-	if _halo:
+		var want_scale := radius / 64.0
+		if texture_scale != want_scale:
+			texture_scale = want_scale
+	if visible != want_visible:
+		visible = want_visible
+	if _halo and want_visible:
 		# On High graphics the real glow (AirGlow) does this instead.
-		_halo.visible = not AirGlow.active()
-		# Drawn bright, since the night tint dims it with everything else.
-		_halo.modulate = Color(color.r, color.g, color.b, 1.0) * Color(2.2, 2.2, 2.2, minf(level * halo * 0.5, 1.0))
+		var want_halo := not AirGlow.active()
+		if _halo.visible != want_halo:
+			_halo.visible = want_halo
+		if want_halo:
+			# Drawn bright, since the night tint dims it with everything else.
+			_halo.modulate = Color(color.r * 2.2, color.g * 2.2, color.b * 2.2, minf(level * halo * 0.5, 1.0))
 
 
 func _in_hours() -> bool:
@@ -121,13 +141,14 @@ func _add_halo() -> void:
 		_halo_tex.fill_to = Vector2(1.0, 0.5)
 		_halo_tex.width = 64
 		_halo_tex.height = 64
+	if _add_mat == null:
+		_add_mat = CanvasItemMaterial.new()
+		_add_mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	_halo = Sprite2D.new()
 	_halo.name = "Halo"
 	_halo.texture = _halo_tex
 	_halo.scale = Vector2.ONE * clampf(radius * 0.4, 10.0, 34.0) / 32.0
 	_halo.z_index = 18
 	_halo.z_as_relative = false
-	var add := CanvasItemMaterial.new()
-	add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-	_halo.material = add
+	_halo.material = _add_mat
 	add_child(_halo)

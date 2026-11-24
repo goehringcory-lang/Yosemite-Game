@@ -82,6 +82,7 @@ var _squirrels: Array[Dictionary] = []
 var _spawn_timer := 1.0
 var _rng := RandomNumberGenerator.new()
 var _last_region: Node
+var _had_any := false
 
 
 func _ready() -> void:
@@ -245,6 +246,11 @@ func _process(delta: float) -> void:
 		if _spawn_timer <= 0.0:
 			_spawn_timer = SPAWN_EVERY
 			_try_spawn()
+	if _birds.is_empty() and _flies.is_empty() and _squirrels.is_empty():
+		if _had_any:
+			_had_any = false
+			queue_redraw()
+		return
 	var view := _view().grow(80.0)
 	var player := _player_position()
 	if not active:
@@ -260,11 +266,21 @@ func _process(delta: float) -> void:
 		_update_squirrel(squirrel, delta, player, active)
 	if active and not _running():
 		_spot(player)
-	_birds = _birds.filter(func(b: Dictionary) -> bool: return view.has_point(b.pos) or b.state != "fly")
-	_flies = _flies.filter(func(f: Dictionary) -> bool: return view.grow(80.0).has_point(f.pos))
-	# birds left behind off screen go quietly
-	_birds = _birds.filter(func(b: Dictionary) -> bool: return view.grow(160.0).has_point(b.pos))
-	_squirrels = _squirrels.filter(func(q: Dictionary) -> bool: return view.has_point(q.pos) or (q.state != "flee" and view.grow(160.0).has_point(q.pos)))
+	var view160 := view.grow(160.0)
+	var view80 := view.grow(80.0)
+	for i in range(_birds.size() - 1, -1, -1):
+		var b: Dictionary = _birds[i]
+		# birds left behind off screen go quietly
+		if not view160.has_point(b.pos) or (b.state == "fly" and not view.has_point(b.pos)):
+			_birds.remove_at(i)
+	for i in range(_flies.size() - 1, -1, -1):
+		if not view80.has_point(_flies[i].pos):
+			_flies.remove_at(i)
+	for i in range(_squirrels.size() - 1, -1, -1):
+		var q: Dictionary = _squirrels[i]
+		if not view.has_point(q.pos) and (q.state == "flee" or not view160.has_point(q.pos)):
+			_squirrels.remove_at(i)
+	_had_any = not (_birds.is_empty() and _flies.is_empty() and _squirrels.is_empty())
 	queue_redraw()
 
 

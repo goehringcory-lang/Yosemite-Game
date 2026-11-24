@@ -57,6 +57,11 @@ const FONT_SIZE := 8
 var _signs: Dictionary = {}
 var _wait := 0.0
 var _alpha := 0.0
+var _hud: Node
+var _world: Node
+static var _places_source: Array = []
+static var _listed_keys: Dictionary = {}
+static var _region_names: Dictionary = {}
 
 
 func _ready() -> void:
@@ -65,25 +70,43 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	var hud := get_tree().get_first_node_in_group("hud")
-	var world := get_tree().get_first_node_in_group("world")
+	if not is_instance_valid(_hud):
+		_hud = get_tree().get_first_node_in_group("hud")
+	if not is_instance_valid(_world):
+		_world = get_tree().get_first_node_in_group("world")
+	var hud := _hud
+	var world := _world
 	var shown: bool = Settings.wayfinding and world != null and hud != null and not hud.is_covered() \
 			and _outdoors(world) and not _hud_talking(hud)
+	var prev_alpha := _alpha
 	_alpha = move_toward(_alpha, 1.0 if shown else 0.0, delta * 3.0)
 	if _alpha <= 0.0:
 		if not _signs.is_empty():
 			_signs.clear()
 			queue_redraw()
+		elif prev_alpha > 0.0:
+			queue_redraw()
 		return
+	var dirty := _alpha != prev_alpha
 	_wait -= delta
 	if _wait <= 0.0 and shown:
 		_wait = REFRESH
-		_place_signs(world)
+		if _place_signs(world):
+			dirty = true
 	# glide toward where each sign belongs
 	var eased := clampf(delta * 8.0, 0.0, 1.0)
 	for sign: Dictionary in _signs.values():
-		sign.at = (sign.at as Vector2).lerp(sign.goal, eased)
-	queue_redraw()
+		var at: Vector2 = sign.at
+		var goal: Vector2 = sign.goal
+		var dist_sq := at.distance_squared_to(goal)
+		if dist_sq > 0.0025:
+			sign.at = at.lerp(goal, eased)
+			dirty = true
+		elif dist_sq > 0.0:
+			sign.at = goal
+			dirty = true
+	if dirty:
+		queue_redraw()
 
 
 ## The place name, a card or a message is up: the signs step back so the
@@ -100,27 +123,37 @@ static func _outdoors(world: Node) -> bool:
 
 
 ## Where the signs go this time: a direction from the middle of the screen
-## for each thing to point at.
-func _place_signs(world: Node) -> void:
+## for each thing to point at. Returns true if the set or any goal/dir changed.
+func _place_signs(world: Node) -> bool:
 	var region: Region = world.region
 	var player: Player = world.player
 	var camera := player.get_node_or_null("Camera") as Camera2D
 	if camera == null:
-		return
+		return false
 	var view_size := get_viewport_rect().size / camera.zoom
 	var view := Rect2(camera.get_screen_center_position() - view_size / 2.0, view_size)
 	var at := region.to_local(player.global_position)
 	var wanted: Array[Dictionary] = []
 	wanted.append_array(_landmarks(region, at))
 	wanted.append_array(_unknowns(world, region, at, view))
+	var changed := wanted.size() != _signs.size()
 	var keep: Dictionary = {}
 	for want in wanted:
 		var goal := _edge_spot(want.dir)
-		var sign: Dictionary = _signs.get(want.key, {"at": goal})
+		var existing = _signs.get(want.key)
+		var sign: Dictionary
+		if existing == null:
+			changed = true
+			sign = {"at": goal}
+		else:
+			sign = existing
+			if (sign.goal as Vector2).distance_squared_to(goal) > 0.0025 or (sign.dir as Vector2).distance_squared_to(want.dir) > 0.0001:
+				changed = true
 		sign.merge(want, true)
 		sign.goal = goal
 		keep[want.key] = sign
 	_signs = keep
+	return changed
 
 
 ## The landmarks a long walk off, nearest first, as directions on screen.
@@ -182,20 +215,29 @@ func _unknowns(world: Node, region: Region, at: Vector2, view: Rect2) -> Array[D
 	return found.slice(0, MOST_UNKNOWN)
 
 
+static func _ensure_places_index() -> void:
+	var places := Discoveries.places()
+	if _places_source.size() == places.size() and not _listed_keys.is_empty():
+		return
+	_places_source = places
+	_listed_keys.clear()
+	_region_names.clear()
+	for entry: Dictionary in places:
+		_listed_keys[entry.key] = true
+		if not _region_names.has(entry.region):
+			_region_names[entry.region] = entry.name
+
+
 static func _listed(key: String) -> bool:
-	for entry: Dictionary in Discoveries.places():
-		if entry.key == key:
-			return true
-	return false
+	_ensure_places_index()
+	return _listed_keys.has(key)
 
 
 ## A region's own entry on the list of places is the first one listed for
 ## it (list_places writes the area before the spots inside it).
 static func _region_name(id: String) -> String:
-	for entry: Dictionary in Discoveries.places():
-		if entry.region == id:
-			return entry.name
-	return ""
+	_ensure_places_index()
+	return _region_names.get(id, "")
 
 
 ## About where [param at] (pixels in [param region]) is on the Earth: the
@@ -234,6 +276,7 @@ func _draw() -> void:
 	if _signs.is_empty():
 		return
 	var font := get_theme_default_font()
+	var clear := _keep_clear()
 	var placed: Array[Rect2] = []
 	for sign: Dictionary in _signs.values():
 		var text: String = sign.text
@@ -245,9 +288,12 @@ func _draw() -> void:
 		var box := Rect2(at - box_size / 2.0 - dir * Vector2(box_size.x / 2.0 + 4.0, box_size.y / 2.0 + 4.0), box_size)
 		box.position = box.position.clamp(Vector2(2, 2), UiScale.SCREEN - box_size - Vector2(2, 2))
 		# don't sit on the clock or the status bar, or stack two cards
-		for other in _keep_clear() + placed:
+		for other in clear:
 			if other.intersects(box):
 				# move off it toward the middle of the screen
+				box.position.y = other.end.y + 1.0 if box.get_center().y < UiScale.SCREEN.y / 2.0 else other.position.y - box.size.y - 1.0
+		for other in placed:
+			if other.intersects(box):
 				box.position.y = other.end.y + 1.0 if box.get_center().y < UiScale.SCREEN.y / 2.0 else other.position.y - box.size.y - 1.0
 		placed.append(box)
 		box.position = box.position.round()
@@ -275,7 +321,7 @@ func _draw() -> void:
 ## The HUD's own panels that are showing, in UI pixels.
 func _keep_clear() -> Array[Rect2]:
 	var clear: Array[Rect2] = []
-	var hud := get_tree().get_first_node_in_group("hud")
+	var hud := _hud if is_instance_valid(_hud) else get_tree().get_first_node_in_group("hud")
 	if hud == null:
 		return clear
 	for panel: Control in [hud.clock_panel, hud.status_bar]:

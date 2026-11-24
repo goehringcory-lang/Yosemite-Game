@@ -58,19 +58,85 @@ func _build(region: Region) -> void:
 	_astar.update()
 	var space := region.get_world_2d().direct_space_state
 	var query := PhysicsShapeQueryParameters2D.new()
-	var box := RectangleShape2D.new()
-	box.size = _foot
-	query.shape = box
 	query.collision_mask = 1
 	query.collide_with_areas = false
+	query.exclude = _actor_rids(region)
+	var base := _astar.offset + Vector2(0, -6)
+	var leaf_box := RectangleShape2D.new()
+	leaf_box.size = _foot
+	# Fast 4x4 -> 1x1 pruning when to_world is pure translation (all regions).
+	if to_world.x == Vector2.RIGHT and to_world.y == Vector2.DOWN:
+		var world_base := base + to_world.origin
+		var box4 := RectangleShape2D.new()
+		box4.size = _foot + Vector2(3 * _cell_size + 0.5, 3 * _cell_size + 0.5)
+		var edge_box := RectangleShape2D.new()
+		for y0 in range(0, cells.y, 4):
+			var h := mini(4, cells.y - y0)
+			for x0 in range(0, cells.x, 4):
+				var w := mini(4, cells.x - x0)
+				if w == 4 and h == 4:
+					query.shape = box4
+				else:
+					edge_box.size = _foot + Vector2((w - 1) * _cell_size + 0.5, (h - 1) * _cell_size + 0.5)
+					query.shape = edge_box
+				query.transform = Transform2D(
+					0.0,
+					world_base + Vector2((x0 + (w - 1) * 0.5) * _cell_size, (y0 + (h - 1) * 0.5) * _cell_size)
+				)
+				if space.intersect_shape(query, 1).is_empty():
+					continue
+				query.shape = leaf_box
+				for y in range(y0, y0 + h):
+					var wy := world_base.y + y * _cell_size
+					for x in range(x0, x0 + w):
+						query.transform = Transform2D(0.0, Vector2(world_base.x + x * _cell_size, wy))
+						if _cell_blocked(space, query):
+							_astar.set_point_solid(Vector2i(x, y))
+		return
+	query.shape = leaf_box
 	for y in cells.y:
 		for x in cells.x:
-			query.transform = Transform2D(0.0, to_world * (_astar.offset + Vector2(x, y) * _cell_size + Vector2(0, -6)))
-			for hit: Dictionary in space.intersect_shape(query, 8):
-				var body: Object = hit.collider
-				if not (body is NPC or body is Player):
-					_astar.set_point_solid(Vector2i(x, y))
-					break
+			query.transform = Transform2D(0.0, to_world * (base + Vector2(x, y) * _cell_size))
+			if _cell_blocked(space, query):
+				_astar.set_point_solid(Vector2i(x, y))
+
+
+static func _cell_blocked(space: PhysicsDirectSpaceState2D, query: PhysicsShapeQueryParameters2D) -> bool:
+	var hits := space.intersect_shape(query, 1)
+	if hits.is_empty():
+		return false
+	var body: Object = hits[0].collider
+	if not (body is NPC or body is Player):
+		return true
+	# Rare fallback if an unexcluded NPC/Player wasn't in the exclude list.
+	for hit: Dictionary in space.intersect_shape(query, 8):
+		var other: Object = hit.collider
+		if not (other is NPC or other is Player):
+			return true
+	return false
+
+
+static func _actor_rids(region: Region) -> Array[RID]:
+	var rids: Array[RID] = []
+	var seen := {}
+	if region.is_inside_tree():
+		var tree := region.get_tree()
+		for group in ["talkers", "persist", Footprints.GROUP]:
+			for node in tree.get_nodes_in_group(group):
+				if node is NPC or node is Player:
+					var rid: RID = (node as CollisionObject2D).get_rid()
+					if not seen.has(rid):
+						seen[rid] = true
+						rids.append(rid)
+	if region.entities:
+		for i in region.entities.get_child_count():
+			var child := region.entities.get_child(i)
+			if child is NPC or child is Player:
+				var rid: RID = (child as CollisionObject2D).get_rid()
+				if not seen.has(rid):
+					seen[rid] = true
+					rids.append(rid)
+	return rids
 
 
 func _cell(pos: Vector2) -> Vector2i:

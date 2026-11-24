@@ -26,6 +26,8 @@ const WILD_DRESSING_DIR := "res://scenes/regions/dressing/wild/"
 ## leaves (see Place). place_at() runs several times a second.
 var _places: Array[Place] = []
 var _places_valid := false
+var _bounds := Rect2()
+var _bounds_valid := false
 
 @onready var map: RegionMap = get_node_or_null("Map")
 @onready var entities: Node2D = $Entities
@@ -96,7 +98,13 @@ func to_lonlat(pos: Vector2) -> Vector2:
 
 ## The playable area in pixels, from the ground layer.
 func get_bounds() -> Rect2:
+	if _bounds_valid:
+		return _bounds
 	var ground := get_ground()
 	var used := ground.get_used_rect()
 	var tile := Vector2(ground.tile_set.tile_size)
-	return Rect2(Vector2(used.position) * tile, Vector2(used.size) * tile)
+	var rect := Rect2(Vector2(used.position) * tile, Vector2(used.size) * tile)
+	if used.size != Vector2i.ZERO:
+		_bounds = rect
+		_bounds_valid = true
+	return rect

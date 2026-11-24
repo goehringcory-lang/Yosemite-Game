@@ -813,23 +813,37 @@ func _hour() -> float:
 func _paint_scenery() -> void:
 	_pal = ClimbSky.palette(_hour())
 	var seed_value := hash(route.id)
-	# The far landscape paints on a worker thread while this one paints the
-	# sky and the wall; both are plain Image work with their own seeds.
+	# The far landscape and clouds (including their Scale2x passes) paint on a
+	# worker thread while this one paints the sky and the wall; both are plain
+	# Image work with their own seeds.
 	var land := {}
+	var scaled_layers: Array = []
+	var scaled_clouds: Array = []
 	var pal := _pal.duplicate(true)
 	var land_profile := profile.duplicate(true)
 	var land_task := WorkerThreadPool.add_task(func() -> void:
-		land.merge(ClimbLandscape.build(land_profile, pal, seed_value)))
+		var built := ClimbLandscape.build(land_profile, pal, seed_value)
+		land.merge(built)
+		for layer: Dictionary in built.layers:
+			var im: Image = layer.image
+			scaled_layers.append({"image": ClimbHiRes.scale2x(im, {}, false), "size": im.get_size(), "sink": layer.sink, "pad": layer.pad})
+		for i in 4:
+			var cim := ClimbSky.cloud(pal, seed_value + i)
+			scaled_clouds.append({"image": ClimbHiRes.scale2x(cim, {}, false), "size": cim.get_size()}))
 	_sky_tex = ImageTexture.create_from_image(ClimbSky.sky(_pal))
 	_paint_wall(seed_value)
 	WorkerThreadPool.wait_for_task_completion(land_task)
 	_layers.clear()
-	for layer: Dictionary in land.layers:
-		_layers.append({"tex": ClimbHiRes.texture(layer.image), "sink": layer.sink, "pad": layer.pad})
+	for entry: Dictionary in scaled_layers:
+		var tex := ImageTexture.create_from_image(entry.image)
+		tex.set_size_override(entry.size)
+		_layers.append({"tex": tex, "sink": entry.sink, "pad": entry.pad})
 	_falls = land.falls
 	_clouds.clear()
-	for i in 4:
-		_clouds.append(ClimbHiRes.texture(ClimbSky.cloud(_pal, seed_value + i)))
+	for entry: Dictionary in scaled_clouds:
+		var tex := ImageTexture.create_from_image(entry.image)
+		tex.set_size_override(entry.size)
+		_clouds.append(tex)
 
 
 ## Paints this pitch's wall (or roof) for the current light.

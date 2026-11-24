@@ -84,6 +84,21 @@ var _lean := Vector2.ZERO
 ## ones (buildings, wide rocks) keep their width east-west.
 var _across := Vector2.RIGHT
 var _view := Rect2()
+## Cached upright test per Sprite2D instance id (invalidated if texture changes).
+var _upright_tex := {}
+var _upright_ok := {}
+## Cached _moves() result per caster instance id.
+var _moves_cache := {}
+## Last pushed shader/modulate state to avoid redundant uniform uploads.
+var _last_hq := -1
+var _last_penumbra := -1.0
+var _last_shade := Color(-1, -1, -1, -1)
+var _last_strength := -1.0
+var _had_movers := true
+## Set when region.entities adds/removes a child so _scan() only walks the tree
+## when something changed (plus a slow fallback for deep subtree edits).
+var _entities_dirty := true
+var _force_scan_in := 12.0
 
 
 const STILL_SHADER := preload("res://assets/shaders/shadow_still.gdshader")
@@ -92,6 +107,9 @@ const MOVER_SHADER := preload("res://assets/shaders/shadow_mover.gdshader")
 
 func _ready() -> void:
 	name = "SunShadows"
+	if region and region.entities:
+		region.entities.child_entered_tree.connect(_on_entities_changed)
+		region.entities.child_exiting_tree.connect(_on_entities_changed)
 	_bake = SubViewport.new()
 	_bake.transparent_bg = true
 	_bake.disable_3d = true
@@ -110,6 +128,7 @@ func _ready() -> void:
 	_still_mat = ShaderMaterial.new()
 	_still_mat.shader = STILL_SHADER
 	_still_mat.set_shader_parameter("shade", SHADE)
+	_last_shade = SHADE
 	_still_sprite.material = _still_mat
 	add_child(_still_sprite)
 	_movers_group = CanvasGroup.new()
@@ -125,6 +144,11 @@ func _ready() -> void:
 	_movers_group.add_child(_painter)
 
 
+func _on_entities_changed(_node: Node) -> void:
+	_entities_dirty = true
+	_scan_in = 0.0
+
+
 func _process(delta: float) -> void:
 	if region == null:
 		return
@@ -136,25 +160,43 @@ func _process(delta: float) -> void:
 	if not was_visible:
 		_dirty = true
 	var hq := LitSprites.active()
-	_still_mat.set_shader_parameter("high_quality", hq)
+	var hq_int := 1 if hq else 0
+	if hq_int != _last_hq:
+		_last_hq = hq_int
+		_still_mat.set_shader_parameter("high_quality", hq)
 	if hq:
 		# Soften penumbra as the sun drops low; cool-cobalt shade at golden hour.
 		var low := 1.0 - clampf((Sun.height() - 6.0) / 36.0, 0.0, 1.0)
-		_still_mat.set_shader_parameter("penumbra", lerpf(1.35, 3.2, low) * maxf(_bake_scale * 0.5, 0.75))
+		var penumbra := lerpf(1.35, 3.2, low) * maxf(_bake_scale * 0.5, 0.75)
+		if absf(penumbra - _last_penumbra) > 0.005:
+			_last_penumbra = penumbra
+			_still_mat.set_shader_parameter("penumbra", penumbra)
 		var golden_shade := Color(0.11, 0.12, 0.28)
 		var night_shade := Color(0.06, 0.09, 0.18)
 		var tint := SHADE.lerp(golden_shade, Sun.golden() * 0.7).lerp(night_shade, Sun.night())
-		_still_mat.set_shader_parameter("shade", tint)
-	else:
+		if tint != _last_shade:
+			_last_shade = tint
+			_still_mat.set_shader_parameter("shade", tint)
+	elif _last_shade != SHADE:
+		_last_shade = SHADE
 		_still_mat.set_shader_parameter("shade", SHADE)
-	_still_sprite.self_modulate = Color(1, 1, 1, strength)
-	_movers_group.self_modulate = Color(1, 1, 1, strength)
+	if absf(strength - _last_strength) > 0.0005:
+		_last_strength = strength
+		var mod := Color(1, 1, 1, strength)
+		_still_sprite.self_modulate = mod
+		_movers_group.self_modulate = mod
 	_scan_in -= delta
+	_force_scan_in -= delta
 	if _scan_in <= 0.0:
 		_scan_in = RESCAN
-		_scan()
-	_view = _view_rect()
-	var scale_now := _window_scale()
+		if _entities_dirty or _force_scan_in <= 0.0:
+			_entities_dirty = false
+			_force_scan_in = 12.0
+			_scan()
+	var vp := get_viewport()
+	var camera := vp.get_camera_2d()
+	_view = _view_rect_for(vp, camera)
+	var scale_now := _window_scale_for(vp, camera)
 	if (_lean - _painted_lean).length() > LEAN_STEP or not _painted_view.encloses(_view) \
 			or global_position != _painted_at or scale_now != _bake_scale:
 		_dirty = true
@@ -167,15 +209,24 @@ func _process(delta: float) -> void:
 		_painted_at = global_position
 		_bake_scale = scale_now
 		_rebake()
-	_painter.queue_redraw()
+	if not _movers.is_empty():
+		_had_movers = true
+		_painter.queue_redraw()
+	elif _had_movers:
+		_had_movers = false
+		_painter.queue_redraw()
 
 
 ## Window pixels per world pixel: 2 for a 1920x1080 window over the 960x540
 ## view (the canvas is drawn at the window's size), 1 on Low (drawn at
 ## 960x540 and scaled up), more when the camera zooms in.
 func _window_scale() -> float:
-	var k := get_viewport().get_final_transform().get_scale().x
-	var camera := get_viewport().get_camera_2d()
+	var vp := get_viewport()
+	return _window_scale_for(vp, vp.get_camera_2d())
+
+
+func _window_scale_for(vp: Viewport, camera: Camera2D) -> float:
+	var k := vp.get_final_transform().get_scale().x
 	if camera:
 		k *= camera.zoom.x
 	return clampf(k, 0.25, 8.0)
@@ -208,12 +259,14 @@ func _strength() -> float:
 	var clear := 1.0 - smoothstep(0.55, 0.95, weather.clouds)
 	var sun := Sun.daylight()
 	if sun > 0.0:
-		_lean = _lean_toward(Sun.direction(), Sun.height())
+		var height := Sun.height()
+		_lean = _lean_toward(Sun.direction(), height)
 		# Low sun gives long, paler shadows.
-		return STRENGTH * sun * clear * lerpf(0.75, 1.0, smoothstep(4.0, 20.0, Sun.height()))
+		return STRENGTH * sun * clear * lerpf(0.75, 1.0, smoothstep(4.0, 20.0, height))
 	var moon := Sun.night() * Sun.moon() * clear
 	if moon > 0.3:
-		_lean = _lean_toward(Sun.moon_direction(), 40.0 * Sun.moon_direction().y + 8.0)
+		var mdir := Sun.moon_direction()
+		_lean = _lean_toward(mdir, 40.0 * mdir.y + 8.0)
 		return STRENGTH * 0.5 * smoothstep(0.3, 0.9, moon)
 	return 0.0
 
@@ -232,39 +285,59 @@ func _lean_toward(toward: Vector2, degrees: float) -> Vector2:
 
 
 func _scan() -> void:
-	_casters = []
+	_casters.clear()
 	if region.entities:
 		_collect(region.entities)
-	var to_region := region.get_global_transform().affine_inverse()
+	var reg_xform := region.get_global_transform()
+	var reg_identity := reg_xform == Transform2D.IDENTITY
+	var to_region := Transform2D.IDENTITY if reg_identity else reg_xform.affine_inverse()
 	var placed := {}
 	_movers.clear()
 	_still.clear()
 	for caster in _casters:
 		var id := caster.get_instance_id()
-		var at := to_region * caster.get_global_transform()
+		var at := caster.get_global_transform() if reg_identity else to_region * caster.get_global_transform()
 		placed[id] = at
-		if _moves(caster) or caster.has_meta("shadow_moves") or (_placed.has(id) and _placed[id] != at):
+		var is_mover: bool
+		if _moves_cache.has(id):
+			is_mover = _moves_cache[id]
+		else:
+			is_mover = _moves(caster)
+			_moves_cache[id] = is_mover
+		if is_mover or caster.has_meta("shadow_moves") or (_placed.has(id) and _placed[id] != at):
 			_movers.append(caster)
 			continue
 		_still.append(caster)
 		if not _placed.has(id):
 			# a still caster for the first time: paint again when it changes
-			for signal_name in ["visibility_changed", "tree_exiting"]:
-				if not caster.is_connected(signal_name, _changed):
-					caster.connect(signal_name, _changed)
-			for signal_name in ["texture_changed", "frame_changed"]:
-				if caster.has_signal(signal_name) and not caster.is_connected(signal_name, _animated.bind(caster)):
-					caster.connect(signal_name, _animated.bind(caster), CONNECT_ONE_SHOT)
+			if not caster.is_connected("visibility_changed", _changed):
+				caster.connect("visibility_changed", _changed)
+			if not caster.is_connected("tree_exiting", _changed):
+				caster.connect("tree_exiting", _changed)
+			if caster.has_signal("texture_changed"):
+				var cb := _animated.bind(caster)
+				if not caster.is_connected("texture_changed", cb):
+					caster.connect("texture_changed", cb, CONNECT_ONE_SHOT)
+			if caster.has_signal("frame_changed"):
+				var cb := _animated.bind(caster)
+				if not caster.is_connected("frame_changed", cb):
+					caster.connect("frame_changed", cb, CONNECT_ONE_SHOT)
 	# Paint the still ones again only when they've changed: one came or
 	# went, or one moved (and so is a mover now). A change nothing
 	# announced (a flip) shows the next time they're painted.
+	var still_count := _still.size()
 	var ids := PackedInt64Array()
-	for caster in _still:
-		ids.append(caster.get_instance_id())
+	ids.resize(still_count)
+	for i in still_count:
+		ids[i] = _still[i].get_instance_id()
 	if ids != _still_ids:
 		_still_ids = ids
 		_dirty = true
 	_placed = placed
+	if _upright_tex.size() > _casters.size() * 3 + 512:
+		_upright_tex.clear()
+		_upright_ok.clear()
+		_moves_cache.clear()
 
 
 func _changed() -> void:
@@ -296,8 +369,24 @@ func _moves(caster: CanvasItem) -> bool:
 
 
 func _collect(node: Node) -> void:
-	for child in node.get_children():
-		if child is Sprite2D or child is AnimatedSprite2D:
+	for i in node.get_child_count():
+		var child := node.get_child(i)
+		if child is Sprite2D:
+			var sprite := child as Sprite2D
+			var tex := sprite.texture
+			if tex == null:
+				continue
+			var id := sprite.get_instance_id()
+			if _upright_tex.get(id) == tex:
+				if _upright_ok[id]:
+					_casters.append(sprite)
+			else:
+				var ok := _is_upright(sprite)
+				_upright_tex[id] = tex
+				_upright_ok[id] = ok
+				if ok:
+					_casters.append(sprite)
+		elif child is AnimatedSprite2D:
 			if _is_upright(child):
 				_casters.append(child)
 		elif child is CanvasItem and child.get_child_count() > 0:
@@ -334,8 +423,12 @@ static func _frame_texture(anim: AnimatedSprite2D) -> Texture2D:
 
 
 func _view_rect() -> Rect2:
-	var size := get_viewport_rect().size
-	var camera := get_viewport().get_camera_2d()
+	var vp := get_viewport()
+	return _view_rect_for(vp, vp.get_camera_2d())
+
+
+func _view_rect_for(vp: Viewport, camera: Camera2D) -> Rect2:
+	var size := vp.get_visible_rect().size
 	var center := size / 2.0
 	if camera:
 		size /= camera.zoom
@@ -345,6 +438,8 @@ func _view_rect() -> Rect2:
 
 ## The moving casters' shadows, every frame.
 func _paint() -> void:
+	if _movers.is_empty():
+		return
 	_paint_casters(_painter.get_global_transform().affine_inverse(), _painter, _movers, _view, SHADE)
 
 
@@ -355,6 +450,12 @@ func _paint_still() -> void:
 
 
 func _paint_casters(to_local: Transform2D, painter: Node2D, casters: Array[CanvasItem], view: Rect2, color: Color) -> void:
+	var vx0 := view.position.x
+	var vy0 := view.position.y
+	var vx1 := view.end.x
+	var vy1 := view.end.y
+	var lean_reach := absf(_lean.x) + absf(_lean.y)
+	var identity_local := to_local == Transform2D.IDENTITY
 	for caster in casters:
 		if not is_instance_valid(caster) or not caster.is_visible_in_tree():
 			continue
@@ -381,8 +482,8 @@ func _paint_casters(to_local: Transform2D, painter: Node2D, casters: Array[Canva
 		var xform := caster.get_global_transform()
 		# Skip shadows that can't reach the view.
 		var foot := xform.origin
-		var reach := rect.size.y * (absf(_lean.x) + absf(_lean.y)) + rect.size.x
-		if not view.grow(reach).has_point(foot):
+		var reach := rect.size.y * lean_reach + rect.size.x
+		if foot.x < vx0 - reach or foot.x > vx1 + reach or foot.y < vy0 - reach or foot.y > vy1 + reach:
 			continue
 		# Lay the sprite on the ground: a point h pixels above the feet lands
 		# h * _lean from them; its width runs square to the shadow if it's
@@ -393,7 +494,7 @@ func _paint_casters(to_local: Transform2D, painter: Node2D, casters: Array[Canva
 		var lay := Transform2D(across, -_lean, Vector2(mid, feet) - across * mid + _lean * feet)
 		if flip:
 			lay = lay * Transform2D(Vector2(-1, 0), Vector2(0, 1), Vector2(2.0 * mid, 0))
-		painter.draw_set_transform_matrix(to_local * xform * lay)
+		painter.draw_set_transform_matrix(xform * lay if identity_local else to_local * xform * lay)
 		if caster is Sprite2D:
 			painter.draw_texture_rect_region(tex, rect, src, color)
 		else:

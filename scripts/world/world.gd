@@ -776,6 +776,17 @@ func _settle_view() -> void:
 	LandmarkFraming.set_offset_on_pixel(camera, camera.offset)
 
 
+## All RegionDoor and RegionExit nodes in [param r], cached on the region.
+static func _region_ways(r: Region) -> Array:
+	if not r.has_meta("region_ways"):
+		var ways: Array = []
+		for node in r.find_children("*", "", true, false):
+			if node is RegionDoor or node is RegionExit:
+				ways.append(node)
+		r.set_meta("region_ways", ways)
+	return r.get_meta("region_ways")
+
+
 ## Through a door or along a way, the player arrives facing on into the new
 ## place, away from the way back to [param left] beside them, instead of
 ## however they faced when they left (often into the wall by the door).
@@ -785,12 +796,13 @@ func _face_away_from_way_back(left: String) -> void:
 	var at := player.global_position
 	var nearest := FACE_AWAY_NEAR
 	var away := Vector2.ZERO
-	for node in region.find_children("*", "", true, false):
-		if not (node is RegionDoor or node is RegionExit) or node.target_region != left:
+	for node in _region_ways(region):
+		if not is_instance_valid(node) or node.target_region != left:
 			continue
 		var gap := at - (node as Node2D).global_position
-		if gap.length() < nearest and gap.length() > 1.0:
-			nearest = gap.length()
+		var dist := gap.length()
+		if dist < nearest and dist > 1.0:
+			nearest = dist
 			away = gap
 	if away == Vector2.ZERO:
 		return
@@ -853,16 +865,19 @@ func _set_up_step(id: String, all_at_once := true) -> void:
 			LampLights.attach(made)
 			remove_child(made)
 		2:
-			# the lit material, sprite by sprite (most of the sprites in a
-			# big region), a slice a call while walking
+			# the lit material and wind sway, sprite by sprite (most of the
+			# sprites in a big region), a slice a call while walking
 			if not made.has_meta("lit_sprites"):
 				made.set_meta("lit_sprites", LitSprites.sprites_in(made))
 			var sprites: Array = made.get_meta("lit_sprites")
 			var from: int = made.get_meta("lit_next", 0)
 			var until := Time.get_ticks_usec() + LIT_BUDGET_USEC
 			while from < sprites.size() and (all_at_once or Time.get_ticks_usec() < until):
-				if is_instance_valid(sprites[from]):
-					LitSprites.attach_sprite(sprites[from])
+				var raw: Variant = sprites[from]
+				if is_instance_valid(raw):
+					var sprite := raw as Sprite2D
+					LitSprites.attach_sprite(sprite)
+					Wind.attach_sprite(sprite)
 				from += 1
 			if from < sprites.size():
 				made.set_meta("lit_next", from)
@@ -871,7 +886,6 @@ func _set_up_step(id: String, all_at_once := true) -> void:
 			made.remove_meta("lit_next")
 		_:
 			LitSprites.attach_ground(made)
-			Wind.attach(made)
 			made.remove_meta("set_up_step")
 			_setting_up.erase(id)
 			_regions[id] = made
@@ -1192,8 +1206,8 @@ func _load_region_scene(id: String) -> PackedScene:
 func _preload_neighbors() -> void:
 	if not region.has_meta("exit_targets"):
 		var targets: Array[String] = []
-		for node in region.find_children("*", "", true, false):
-			if node is RegionExit or node is RegionDoor:
+		for node in _region_ways(region):
+			if is_instance_valid(node):
 				targets.append(node.target_region)
 		region.set_meta("exit_targets", targets)
 	var ids: Array[String] = []

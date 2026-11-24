@@ -31,11 +31,17 @@ var kind := "yosemite"
 var level := 0.0
 
 var _time := 0.0
+var _redraw_wait := 0.0
+var _drawn_level := -1.0
+var _was_in_view := false
 var _drops: CPUParticles2D
 var _bow: Node2D
 ## The bow laid out in cells (see _lay_out_bow), and the radius it was for.
-var _cells: Array = []
-var _haze: Array[Vector2] = []
+var _cell_pos := PackedVector2Array()
+var _cell_col := PackedColorArray()
+var _cell_alpha := PackedFloat32Array()
+var _cell_phase := PackedFloat32Array()
+var _haze := PackedVector2Array()
 var _cells_for := -1.0
 
 
@@ -96,45 +102,81 @@ func rainbow_time() -> bool:
 	return weather.rain <= 0.0 and weather.snow <= 0.0 and weather.clouds < 0.6
 
 
+func _bow_in_view() -> bool:
+	var vp := get_viewport()
+	if vp == null:
+		return true
+	var size := vp.get_visible_rect().size
+	var cam := vp.get_camera_2d()
+	var center := size * 0.5
+	if cam != null:
+		size /= cam.zoom
+		center = cam.get_screen_center_position()
+	var pos := _bow.global_position
+	var pad := radius + 32.0
+	var half := size * 0.5
+	return absf(pos.x - center.x) <= half.x + pad and absf(pos.y - center.y) <= half.y + pad
+
+
 func _process(delta: float) -> void:
 	var on := rainbow_time()
 	level = move_toward(level, 1.0 if on else 0.0, delta / FADE_TIME)
+	var was_visible := _bow.visible
 	_bow.visible = level > 0.0
-	if _bow.visible:
-		_time += delta
+	if not _bow.visible:
+		_was_in_view = false
+		return
+	_time += delta
+	var in_view := _bow_in_view()
+	if not in_view:
+		_was_in_view = false
+		return
+	_redraw_wait -= delta
+	if not was_visible or not _was_in_view or _redraw_wait <= 0.0 or absf(level - _drawn_level) > 0.01:
+		_was_in_view = true
+		_redraw_wait = 0.05
+		_drawn_level = level
 		_bow.queue_redraw()
 
 
-## Lays the bow out once for [member radius]: its cells as [x, y, band
-## colour, alpha before the gusts and the strength], and the haze's cells.
+## Lays the bow out once for [member radius]: its cells as packed position,
+## colour, base alpha and gust phase, and the haze's cells.
 ## The whole square round the bow (over 5,000 cells, for some hundreds
 ## drawn) was scanned every frame it was up; only the gusts and the
 ## strength change.
 func _lay_out_bow() -> void:
 	_cells_for = radius
-	_cells = []
-	_haze = []
+	_cell_pos.clear()
+	_cell_col.clear()
+	_cell_alpha.clear()
+	_cell_phase.clear()
+	_haze.clear()
 	var r := radius * 0.5
 	var reach := int(r) + 4
+	var band_count := BANDS.size()
 	for px in range(-reach, reach + 1):
 		for py in range(-reach, 2):
-			var dist := Vector2(px, py).length()
+			var dist := sqrt(float(px * px + py * py))
 			var band := int(floor(r - dist + 3.0))
-			if band < 0 or band >= BANDS.size():
+			if band < 0 or band >= band_count:
 				continue
 			var alpha := 0.42
 			# the outermost and innermost bands are dithered, so the edge stays crisp
-			if (band == 0 or band == BANDS.size() - 1) and (px + py) % 2 == 0:
+			if (band == 0 or band == band_count - 1) and (px + py) % 2 == 0:
 				continue
 			# brightest low down, where the spray is thickest; the crown thins out
 			var up := -float(py) / r
 			alpha *= clampf(1.15 - up * 0.9, 0.15, 1.0) * clampf((up + 0.05) * 4.0, 0.0, 1.0)
 			if alpha > 0.0:
-				_cells.append([px, py, BANDS[band], alpha])
+				_cell_pos.append(Vector2(px * 2, py * 2))
+				_cell_col.append(BANDS[band])
+				_cell_alpha.append(alpha)
+				_cell_phase.append(px * 0.21 - py * 0.1)
 	# a faint bright haze inside the bow, as in a real one
+	var r_inner_sq := (r - 4.0) * (r - 4.0)
 	for py in range(-int(r * 0.6), 1, 2):
 		for px in range(-int(r * 0.8), int(r * 0.8) + 1, 2):
-			if Vector2(px, py).length() < r - 4 and (px + py) % 4 == 0:
+			if float(px * px + py * py) < r_inner_sq and (px + py) % 4 == 0:
 				_haze.append(Vector2(px * 2, py * 2))
 
 
@@ -144,15 +186,14 @@ func _draw_bow() -> void:
 	if _cells_for != radius:
 		_lay_out_bow()
 	var strength := level * lerpf(0.55, 1.0, flow)
-	for cell: Array in _cells:
-		var px: int = cell[0]
-		var py: int = cell[1]
-		var col: Color = cell[2]
-		var alpha: float = cell[3]
-		alpha *= 0.75 + 0.25 * sin(_time * 1.3 + px * 0.21 - py * 0.1)
-		alpha *= strength
+	var t := _time * 1.3
+	var cell_size := Vector2(2, 2)
+	for i in _cell_pos.size():
+		var alpha := _cell_alpha[i] * (0.75 + 0.25 * sin(t + _cell_phase[i])) * strength
 		if alpha > 0.02:
-			_bow.draw_rect(Rect2(px * 2, py * 2, 2, 2), Color(col, alpha))
+			var col := _cell_col[i]
+			col.a = alpha
+			_bow.draw_rect(Rect2(_cell_pos[i], cell_size), col)
 	var haze := Color(1, 1, 0.95, 0.035 * strength)
-	for at: Vector2 in _haze:
-		_bow.draw_rect(Rect2(at, Vector2(2, 2)), haze)
+	for i in _haze.size():
+		_bow.draw_rect(Rect2(_haze[i], cell_size), haze)

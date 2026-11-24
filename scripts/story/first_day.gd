@@ -65,6 +65,12 @@ var _found: Dictionary = {}
 var _card: PanelContainer
 var _line: ButtonHints
 var _arrow: Control
+var _hud: HUD
+var _journal: Node
+var _map: Node
+var _last_text := ""
+var _last_done_color := -1
+var _last_below := -1.0
 
 
 func _ready() -> void:
@@ -91,7 +97,12 @@ func start_new_game() -> void:
 
 ## True once every lesson is done.
 func is_over() -> bool:
-	return LESSONS.all(func(id: String) -> bool: return id in done)
+	if done.size() < LESSONS.size():
+		return false
+	for id: String in LESSONS:
+		if not done.has(id):
+			return false
+	return true
 
 
 ## The lesson on the card now ("" when none is).
@@ -117,8 +128,14 @@ func _on_day_started() -> void:
 	mark("sleep")
 
 
+func _get_hud() -> HUD:
+	if not is_instance_valid(_hud):
+		_hud = get_tree().get_first_node_in_group("hud") as HUD
+	return _hud
+
+
 func _build() -> void:
-	var hud := get_tree().get_first_node_in_group("hud") as HUD
+	var hud := _get_hud()
 	if hud == null:
 		return
 	_arrow = Control.new()
@@ -154,7 +171,7 @@ func _process(delta: float) -> void:
 	_time += delta
 	var world := get_parent()
 	var player: Player = world.player if world and "player" in world else null
-	if player == null or is_over() and _finishing == "":
+	if player == null or (is_over() and _finishing == ""):
 		_hide()
 		return
 	_watch(player, delta)
@@ -202,14 +219,16 @@ func _watch(_player: Player, _delta: float) -> void:
 		mark("talk")
 	if Perks.stat("forage") >= GATHER_COUNT:
 		mark("gather")
-	var journal := get_tree().get_first_node_in_group("journal")
-	if journal and journal.is_open():
-		if journal.tab() == Journal.Tab.BACKPACK:
+	if not is_instance_valid(_journal):
+		_journal = get_tree().get_first_node_in_group("journal")
+	if _journal and _journal.is_open():
+		if _journal.tab() == Journal.Tab.BACKPACK:
 			mark("backpack")
-		elif journal.tab() == Journal.Tab.QUESTS:
+		elif _journal.tab() == Journal.Tab.QUESTS:
 			mark("quests")
-	var map := get_tree().get_first_node_in_group("park_map")
-	if map and map.is_open():
+	if not is_instance_valid(_map):
+		_map = get_tree().get_first_node_in_group("park_map")
+	if _map and _map.is_open():
 		mark("map")
 	var region_id := _region_id()
 	if region_id == "curry_village" or _started("shop_guidebook"):
@@ -223,7 +242,7 @@ func _watch(_player: Player, _delta: float) -> void:
 ## The first lesson not done whose moment has come, or "".
 func _next() -> String:
 	for id: String in LESSONS:
-		if id not in done and _ready_for(id):
+		if not done.has(id) and _ready_for(id):
 			return id
 	return ""
 
@@ -253,27 +272,25 @@ func _ready_for(id: String) -> bool:
 
 ## The card's line for [param id], with the buttons for the device in use.
 func text_for(id: String) -> String:
-	var hud := get_tree().get_first_node_in_group("hud") as HUD
-	var pad := func(keyboard: String, gamepad: String) -> String:
-		return hud.prompt(keyboard, gamepad) if hud else keyboard
-	var use: String = pad.call("E", "A")
+	var hud := _get_hud()
+	var use: String = hud.prompt("E", "A") if hud else "E"
 	match id:
 		"walk":
-			return "[%s] Walk around camp" % pad.call("WASD", "Stick")
+			return "[%s] Walk around camp" % (hud.prompt("WASD", "Stick") if hud else "WASD")
 		"talk":
 			return "[%s] Talk to Galen Clark" % use
 		"gather":
 			return "[%s] Gather something to eat  %d/%d" % [use, mini(Perks.stat("forage"), GATHER_COUNT), GATHER_COUNT]
 		"backpack":
-			return "[B] Look in your backpack" if pad.call("k", "g") == "k" else "[Y] then [RB] Backpack"
+			return "[B] Look in your backpack" if (hud.prompt("k", "g") if hud else "k") == "k" else "[Y] then [RB] Backpack"
 		"quests":
-			return "[Q] See what to do next" if pad.call("k", "g") == "k" else "[Y] then [RB] Quests"
+			return "[Q] See what to do next" if (hud.prompt("k", "g") if hud else "k") == "k" else "[Y] then [RB] Quests"
 		"run":
-			return "Hold [%s] to run" % pad.call("Shift", "B")
+			return "Hold [%s] to run" % (hud.prompt("Shift", "B") if hud else "Shift")
 		"head_out":
 			return "Out the south gate to Curry Village"
 		"map":
-			return "[%s] Look at the map" % pad.call("M", "Back")
+			return "[%s] Look at the map" % (hud.prompt("M", "Back") if hud else "M")
 		"cook":
 			return "[%s] Cook supper at the campfire" % use
 		"sleep":
@@ -341,7 +358,7 @@ func _candidates(region: Region, id: String) -> Array:
 ## True when the card should be up: tips on, nothing covering the screen.
 func _shown() -> bool:
 	var world := get_parent()
-	var hud := get_tree().get_first_node_in_group("hud") as HUD
+	var hud := _get_hud()
 	if not Settings.tips or hud == null or hud.is_covered() or get_tree().paused:
 		return false
 	if world and world.get("_busy"):
@@ -355,25 +372,36 @@ func _show(_player: Player) -> void:
 	var id := current()
 	var up := id != "" and _shown()
 	if up:
-		_line.text = text_for(id)
-		_line.add_theme_color_override("font_color", DONE_COLOR if id == _finishing else Color.WHITE)
-		_card.size = Vector2.ZERO
-		var hud := get_tree().get_first_node_in_group("hud") as HUD
+		var next_text := text_for(id)
+		var is_done_color := 1 if id == _finishing else 0
+		var hud := _get_hud()
 		var below := hud.clock_panel.get_rect().end.y + 3.0 if hud else 40.0
-		var width := _card.get_combined_minimum_size().x
-		_card.position = Vector2(UiScale.SCREEN.x - 4.0 - width, below).round()
+		if next_text != _last_text or is_done_color != _last_done_color or below != _last_below:
+			_last_text = next_text
+			_last_done_color = is_done_color
+			_last_below = below
+			_line.text = next_text
+			_line.add_theme_color_override("font_color", DONE_COLOR if is_done_color == 1 else Color.WHITE)
+			_card.size = Vector2.ZERO
+			var width := _card.get_combined_minimum_size().x
+			_card.position = Vector2(UiScale.SCREEN.x - 4.0 - width, below).round()
 	var goal := 1.0 if up else 0.0
 	if id == _finishing and _finish_left < 0.25:
 		goal = 0.0 # fades out as the next comes
-	_card.modulate.a = move_toward(_card.modulate.a, goal, get_process_delta_time() * 6.0)
+	var a := _card.modulate.a
+	if a != goal:
+		_card.modulate.a = move_toward(a, goal, get_process_delta_time() * 6.0)
 	_arrow.visible = up and id != _finishing and is_instance_valid(_target)
-	_arrow.queue_redraw()
+	if _arrow.visible:
+		_arrow.queue_redraw()
 
 
 func _hide() -> void:
 	if _card:
-		_card.modulate.a = 0.0
-		_arrow.visible = false
+		if _card.modulate.a != 0.0:
+			_card.modulate.a = 0.0
+		if _arrow.visible:
+			_arrow.visible = false
 
 
 ## The gold arrow: over the thing when it's on screen (unless a person's
@@ -431,7 +459,10 @@ func _started(quest_id: String) -> bool:
 
 
 func _all_done(ids: Array) -> bool:
-	return ids.all(func(id: String) -> bool: return id in done)
+	for id: String in ids:
+		if not done.has(id):
+			return false
+	return true
 
 
 func _region_id() -> String:

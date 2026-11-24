@@ -232,6 +232,8 @@ func peek_node(node_name: String) -> Dictionary:
 ## Loads saved data into persist nodes under [param root] that weren't in
 ## the tree at load time (for example a region entered for the first time).
 func restore(root: Node) -> void:
+	if _pending.is_empty():
+		return
 	for node in root.find_children("*", "", true, false):
 		if node.is_in_group("persist") and _pending.has(node.name):
 			node.load_data(_pending[node.name])

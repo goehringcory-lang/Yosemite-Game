@@ -41,8 +41,15 @@ const FALLS := {
 ## and the first weeks of spring.
 const HORSETAIL_SPRING_DAYS := 14
 
-static var _snow_key := ""
+static var _snow_date := -1
+static var _snow_key := "":
+	set(v):
+		_snow_key = v
+		if v == "":
+			_snow_date = -1
 static var _snow := 0.0
+static var _yday_rain_key := -1
+static var _yday_rain := 0.0
 
 
 ## How much snow lies on the ground, 0 (bare) to 1 (the floor is white).
@@ -52,8 +59,8 @@ static func snow_cover(year := -1, season := -1, day := -1) -> float:
 		year = GameClock.year
 		season = GameClock.season
 		day = GameClock.day
-	var key := "%d:%d:%d" % [year, season, day]
-	if key == _snow_key:
+	var date := (year * 4 + season) * 64 + day
+	if date == _snow_date:
 		return _snow
 	var cover := 0.0
 	match season:
@@ -62,7 +69,7 @@ static func snow_cover(year := -1, season := -1, day := -1) -> float:
 		GameClock.Season.SPRING when year > 1:
 			# Last winter's snow, melting.
 			cover = maxf(_winter_snow(year - 1, GameClock.DAYS_PER_SEASON) - SPRING_MELT * day, 0.0)
-	_snow_key = key
+	_snow_date = date
 	_snow = cover
 	return cover
 
@@ -126,13 +133,19 @@ static func wetness(hour := -1.0) -> float:
 		return 0.0
 	if weather.rain > 0.0:
 		return clampf(0.55 + weather.rain * 0.6, 0.0, 1.0)
-	var yesterday := Weather.on_day(GameClock.year, GameClock.season, GameClock.day - 1)
-	if GameClock.day <= 1:
-		# the last day of the season before
-		var before := posmod(GameClock.season - 1, 4)
-		var year := GameClock.year - (1 if GameClock.season == 0 else 0)
-		yesterday = Weather.on_day(year, before, GameClock.DAYS_PER_SEASON) if year >= 1 else {"rain": 0.0}
-	if yesterday.rain <= 0.0:
+	var key := (GameClock.year * 4 + GameClock.season) * 64 + GameClock.day
+	var yday_rain := _yday_rain
+	if key != _yday_rain_key:
+		_yday_rain_key = key
+		if GameClock.day <= 1:
+			# the last day of the season before
+			var before := posmod(GameClock.season - 1, 4)
+			var year := GameClock.year - (1 if GameClock.season == 0 else 0)
+			yday_rain = Weather.on_day(year, before, GameClock.DAYS_PER_SEASON).rain if year >= 1 else 0.0
+		else:
+			yday_rain = Weather.on_day(GameClock.year, GameClock.season, GameClock.day - 1).rain
+		_yday_rain = yday_rain
+	if yday_rain <= 0.0:
 		return 0.0
 	if hour < 0.0:
 		hour = Sun.hour_now()

@@ -124,39 +124,56 @@ static func paint(state: ClimbState, rock_key: String, pal: Dictionary, seed_val
 	return result
 
 
+const BANDS := 8
+
+
 ## Last pass over the finished wall: a gentle contrast curve with warm lights
 ## and cool shadows, the face turning away into shade toward the corner on the
 ## right, and a soft fall-off at the left screen edge.
 static func _finish(im: Image, edge: PackedInt32Array) -> void:
 	var w := im.get_width()
 	var h := im.get_height()
-	var data := im.get_data()
-	# Most of the face gets the plain 0.93 shade, and the wall is painted in a
-	# few hundred colors, so each color's result is worked out once.
-	var plain := {}
-	for y in h:
-		var e := edge[y]
-		var row := y * w * 4
-		for x in range(0, mini(e + 1, w)):
-			var o := row + x * 4
-			var px := data.decode_u32(o)
-			if px >> 24 < 128:
-				continue
-			var shade := 0.93
-			var turn := float(x - (e - 22)) / 18.0
-			if turn <= 0.0 and x >= 16:
-				var rgb: int = plain.get(px & 0xffffff, -1)
-				if rgb < 0:
-					rgb = _finish_rgb(px, shade)
-					plain[px & 0xffffff] = rgb
-				data.encode_u32(o, rgb | (px & 0xff000000))
-				continue
-			if turn > 0.0:
-				shade -= minf(turn, 1.0) * 0.14
-			if x < 16:
-				shade -= (16.0 - x) / 16.0 * 0.1
-			data.encode_u32(o, _finish_rgb(px, shade) | (px & 0xff000000))
-	im.set_data(w, h, false, Image.FORMAT_RGBA8, data)
+	var pixels := im.get_data().to_int32_array()
+	var band_rows := ceili(h / float(BANDS))
+	var parts := []
+	parts.resize(BANDS)
+	var task := WorkerThreadPool.add_group_task(func(b: int) -> void:
+		var y0 := mini(b * band_rows, h)
+		var y1 := mini((b + 1) * band_rows, h)
+		var rows := pixels.slice(y0 * w, y1 * w)
+		# Most of the face gets the plain 0.93 shade, and the wall is painted
+		# in a few hundred colors, so each color's result is worked out once.
+		var plain := {}
+		for y in range(y0, y1):
+			var e := edge[y]
+			var lim := mini(e + 1, w)
+			var row := (y - y0) * w
+			var turn_start := e - 22
+			for x in lim:
+				var idx := row + x
+				var px := rows[idx]
+				if ((px >> 24) & 0xff) < 128:
+					continue
+				if x >= 16 and x <= turn_start:
+					var key := px & 0xffffff
+					var rgb: int = plain.get(key, -1)
+					if rgb < 0:
+						rgb = _finish_rgb(px, 0.93)
+						plain[key] = rgb
+					rows[idx] = rgb | (px & 0xff000000)
+					continue
+				var shade := 0.93
+				if x > turn_start:
+					shade -= minf(float(x - turn_start) / 18.0, 1.0) * 0.14
+				if x < 16:
+					shade -= (16.0 - x) / 16.0 * 0.1
+				rows[idx] = _finish_rgb(px, shade) | (px & 0xff000000)
+		parts[b] = rows, BANDS)
+	WorkerThreadPool.wait_for_group_task_completion(task)
+	var out := PackedInt32Array()
+	for part: PackedInt32Array in parts:
+		out.append_array(part)
+	im.set_data(w, h, false, Image.FORMAT_RGBA8, out.to_byte_array())
 
 
 ## _finish()'s curve for one pixel (RGBA8 packed little-endian, as
@@ -186,13 +203,11 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 	var smooth := style == "slab" or style == "dike" or rock_key == "polished" or rock_key == "dome"
 	var relief := _relief(w, h, rng.randi(), smooth)
 	var lut := _packed_tones(c)
-	var out := PackedByteArray()
-	out.resize(w * h * 4)
 	var k_light := 1.45 if not smooth else 1.0
 	# The terms of the shading that depend on one input each, worked out once
 	# (the same arithmetic as per pixel, so the picture doesn't change).
-	var light_x := _scaled_diffs(0.8)
-	var light_y := _scaled_diffs(0.55)
+	var light_x := _scaled_diffs(0.8 / 255.0 * 4.0 * k_light)
+	var light_y := _scaled_diffs(0.55 / 255.0 * 4.0 * k_light)
 	# The broad light: the upper left of the face is lit and the lower right
 	# falls off, so every plate reads as lit from the same side.
 	var sun_x := PackedFloat64Array()
@@ -202,29 +217,46 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 	var sun_y := PackedFloat64Array()
 	sun_y.resize(h)
 	for y in h:
-		sun_y[y] = (0.5 - float(y) / h) * 0.16
+		sun_y[y] = 2.0 + (0.5 - float(y) / h) * 0.16
 	var height := PackedFloat64Array()
 	height.resize(256)
 	for v in 256:
 		height[v] = (v / 255.0 - 0.5) * 1.2
 	var bayer := _bayer_terms(0.03)
-	for y in h:
-		var row := y * w
-		var brow := (y & 3) << 2
-		var up := y > 2
-		var down := y < h - 3
-		for x in w:
-			var i := row + x
-			var here := relief[i]
-			var xl := relief[i - 3] if x > 2 else here
-			var xr := relief[i + 3] if x < w - 3 else here
-			var yu := relief[i - 3 * w] if up else here
-			var yd := relief[i + 3 * w] if down else here
-			# Light from the upper left: surfaces facing left and up are lit.
-			var s_light := (light_x[xl - xr + 255] + light_y[yu - yd + 255]) / 255.0 * 4.0
-			var t := 2.0 + s_light * k_light + sun_x[x] + sun_y[y] + height[here]
-			out.encode_u32(i * 4, lut[clampi(roundi((t + bayer[brow | (x & 3)]) * 3.0) * 4 / 3, 0, 19)])
-	im.set_data(w, h, false, Image.FORMAT_RGBA8, out)
+	var band_rows := ceili(h / float(BANDS))
+	var parts := []
+	parts.resize(BANDS)
+	var stride3 := 3 * w
+	var wm3 := w - 3
+	var hm3 := h - 3
+	var task := WorkerThreadPool.add_group_task(func(b: int) -> void:
+		var y0 := mini(b * band_rows, h)
+		var y1 := mini((b + 1) * band_rows, h)
+		var rows := PackedInt32Array()
+		rows.resize(maxi(y1 - y0, 0) * w)
+		for y in range(y0, y1):
+			var row := y * w
+			var out_row := (y - y0) * w
+			var brow := (y & 3) << 2
+			var up := y > 2
+			var down := y < hm3
+			var sy := sun_y[y]
+			for x in w:
+				var i := row + x
+				var here := relief[i]
+				var xl := relief[i - 3] if x > 2 else here
+				var xr := relief[i + 3] if x < wm3 else here
+				var yu := relief[i - stride3] if up else here
+				var yd := relief[i + stride3] if down else here
+				# Light from the upper left: surfaces facing left and up are lit.
+				var t := sy + light_x[xl - xr + 255] + light_y[yu - yd + 255] + sun_x[x] + height[here]
+				rows[out_row + x] = lut[clampi(roundi((t + bayer[brow | (x & 3)]) * 3.0) * 4 / 3, 0, 19)]
+		parts[b] = rows, BANDS)
+	WorkerThreadPool.wait_for_group_task_completion(task)
+	var out := PackedInt32Array()
+	for part: PackedInt32Array in parts:
+		out.append_array(part)
+	im.set_data(w, h, false, Image.FORMAT_RGBA8, out.to_byte_array())
 	_joints(im, c, rng, smooth)
 	_stains(im, c, rng, deco)
 	_lichen(im, c, rng, deco, h)
@@ -243,7 +275,7 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 
 
 ## The 20 quarter-steps of the rock ramp as opaque RGBA8 pixels, packed for
-## PackedByteArray.encode_u32.
+## PackedByteArray.encode_u32 / PackedInt32Array.
 static func _packed_tones(c: Dictionary) -> PackedInt64Array:
 	var lut := PackedInt64Array()
 	for i in 20:
@@ -276,15 +308,6 @@ static func _bayer_terms(k: float) -> PackedFloat64Array:
 
 ## A height map, 0..255 per pixel: fluted noise plus plates cut by joints.
 static func _relief(w: int, h: int, seed_value: int, smooth: bool) -> PackedByteArray:
-	var fbm := FastNoiseLite.new()
-	fbm.seed = seed_value
-	fbm.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
-	fbm.frequency = 0.015 if not smooth else 0.011
-	fbm.fractal_octaves = 2
-	fbm.fractal_gain = 0.4
-	var squash := 3 if not smooth else 2
-	var a := fbm.get_image(w, maxi(h / squash, 8), false, false, true)
-	a.resize(w, h, Image.INTERPOLATE_BILINEAR)
 	var cells := FastNoiseLite.new()
 	cells.seed = seed_value + 7
 	cells.noise_type = FastNoiseLite.TYPE_CELLULAR
@@ -294,11 +317,23 @@ static func _relief(w: int, h: int, seed_value: int, smooth: bool) -> PackedByte
 	cells.domain_warp_enabled = true
 	cells.domain_warp_amplitude = 18.0
 	cells.domain_warp_frequency = 0.02
-	var b := cells.get_image(w, h, false, false, true)
+	var b_holder: Array = [null]
+	var cells_task := WorkerThreadPool.add_task(func() -> void:
+		b_holder[0] = cells.get_image(w, h, false, false, true))
+	var fbm := FastNoiseLite.new()
+	fbm.seed = seed_value
+	fbm.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	fbm.frequency = 0.015 if not smooth else 0.011
+	fbm.fractal_octaves = 2
+	fbm.fractal_gain = 0.4
+	var squash := 3 if not smooth else 2
+	var a := fbm.get_image(w, maxi(h / squash, 8), false, false, true)
+	a.resize(w, h, Image.INTERPOLATE_BILINEAR)
+	WorkerThreadPool.wait_for_task_completion(cells_task)
+	var b: Image = b_holder[0]
 	var da := a.get_data()
 	var db := b.get_data()
-	var out := PackedByteArray()
-	out.resize(w * h)
+	var total := w * h
 	var wa := 0.5 if not smooth else 0.42
 	# Each source is a byte, so weigh the 256 values once.
 	var weigh_a := PackedFloat64Array()
@@ -308,8 +343,21 @@ static func _relief(w: int, h: int, seed_value: int, smooth: bool) -> PackedByte
 	for v in 256:
 		weigh_a[v] = v * wa
 		weigh_b[v] = v * (1.0 - wa) * 0.9
-	for i in w * h:
-		out[i] = int(weigh_a[da[i]] + weigh_b[db[i]])
+	var chunk := ceili(total / float(BANDS))
+	var parts := []
+	parts.resize(BANDS)
+	var blend_task := WorkerThreadPool.add_group_task(func(band: int) -> void:
+		var i0 := mini(band * chunk, total)
+		var i1 := mini((band + 1) * chunk, total)
+		var slice := PackedByteArray()
+		slice.resize(maxi(i1 - i0, 0))
+		for i in range(i0, i1):
+			slice[i - i0] = int(weigh_a[da[i]] + weigh_b[db[i]])
+		parts[band] = slice, BANDS)
+	WorkerThreadPool.wait_for_group_task_completion(blend_task)
+	var out := PackedByteArray()
+	for part: PackedByteArray in parts:
+		out.append_array(part)
 	return out
 
 
@@ -733,42 +781,80 @@ static func paint_roof(state: ClimbState, rock_key: String, pal: Dictionary, see
 	var wall_x := int(L.roof_px(top, 0, 2).x) - 26
 	var lip_x := int(L.roof_px(top, top - 1, 2).x) + 14
 	var shelf_top := int(L.ROOF_Y - L.ROOF_TOP_LIFT) - 2
-	var lut: Array[Color] = []
-	for i in 20:
-		lut.append(tone(c, i * 0.25))
+	var lut := _packed_tones(c)
+	var bayer := _bayer_terms(0.16)
+	var light_x := _scaled_diffs(0.6 / 255.0 * 4.0 * 1.2)
+	var light_y := _scaled_diffs(0.7 / 255.0 * 4.0 * 1.2)
+	var height := PackedFloat64Array()
+	height.resize(256)
+	for v in 256:
+		height[v] = 1.9 + (v / 255.0 - 0.5) * 1.0
+	var under_x := PackedInt32Array()
+	under_x.resize(w)
+	for x in w:
+		under_x[x] = int(L.ROOF_Y + 14 + sin(x * 0.07) * 2.0 + P.noise(x / 3, 0, 2) * 3.0)
+	var band_rows := ceili(h / float(BANDS))
+	var px_parts := []
+	var mask_parts := []
+	px_parts.resize(BANDS)
+	mask_parts.resize(BANDS)
+	var stride3 := 3 * w
+	var wm3 := w - 3
+	var hm3 := h - 3
+	var lip_end := mini(lip_x + 120, w)
+	var task := WorkerThreadPool.add_group_task(func(b: int) -> void:
+		var y0 := mini(b * band_rows, h)
+		var y1 := mini((b + 1) * band_rows, h)
+		var count := maxi(y1 - y0, 0) * w
+		var rows := PackedInt32Array()
+		rows.resize(count)
+		var mrows := PackedByteArray()
+		mrows.resize(count)
+		for y in range(y0, y1):
+			var row := y * w
+			var out_row := (y - y0) * w
+			var brow := (y & 3) << 2
+			var up := y > 2
+			var down := y < hm3
+			for x in lip_end:
+				var under := under_x[x]
+				var inside := false
+				var depth_under := 0
+				if x < wall_x:
+					inside = true
+				elif x < lip_x:
+					inside = y < under
+					depth_under = under - y
+				else:
+					# Beyond the lip: a shelf, thinner, stepped up.
+					inside = y >= shelf_top and y < under - 22 + (x - lip_x) / 4
+				if not inside:
+					continue
+				var i := row + x
+				var oi := out_row + x
+				mrows[oi] = 1
+				var here := relief[i]
+				var xl := relief[i - 3] if x > 2 else here
+				var xr := relief[i + 3] if x < wm3 else here
+				var yu := relief[i - stride3] if up else here
+				var yd := relief[i + stride3] if down else here
+				var t := height[here] + light_x[xl - xr + 255] + light_y[yu - yd + 255]
+				# The underside of a roof sits in shade.
+				if x >= wall_x and x < lip_x and depth_under < 22:
+					t -= (22 - depth_under) * 0.045
+				rows[oi] = lut[clampi(roundi((t + bayer[brow | (x & 3)]) * 3.0) * 4 / 3, 0, 19)]
+		px_parts[b] = rows
+		mask_parts[b] = mrows, BANDS)
+	WorkerThreadPool.wait_for_group_task_completion(task)
+	var out := PackedInt32Array()
 	var mask := PackedByteArray()
-	mask.resize(w * h)
-	for y in h:
-		for x in w:
-			var under := int(L.ROOF_Y + 14 + sin(x * 0.07) * 2.0 + P.noise(x / 3, 0, 2) * 3.0)
-			var inside := false
-			var depth_under := 0
-			if x < wall_x:
-				inside = true
-			elif x < lip_x:
-				inside = y < under
-				depth_under = under - y
-			elif x < lip_x + 120:
-				# Beyond the lip: a shelf, thinner, stepped up.
-				inside = y >= shelf_top and y < under - 22 + (x - lip_x) / 4
-			if not inside:
-				continue
-			var i := y * w + x
-			mask[i] = 1
-			var xl := relief[i - 3] if x > 2 else relief[i]
-			var xr := relief[i + 3] if x < w - 3 else relief[i]
-			var yu := relief[i - 3 * w] if y > 2 else relief[i]
-			var yd := relief[i + 3 * w] if y < h - 3 else relief[i]
-			var s_light := ((xl - xr) * 0.6 + (yu - yd) * 0.7) / 255.0 * 4.0
-			var t := 1.9 + s_light * 1.2 + (relief[i] / 255.0 - 0.5) * 1.0
-			# The underside of a roof sits in shade.
-			if x >= wall_x and x < lip_x and depth_under < 22:
-				t -= (22 - depth_under) * 0.045
-			var bay: float = P.BAYER[y & 3][x & 3] / 16.0 - 0.5
-			im.set_pixel(x, y, lut[clampi(roundi((t + bay * 0.16) * 3.0) * 4 / 3, 0, 19)])
+	for b in BANDS:
+		out.append_array(px_parts[b])
+		mask.append_array(mask_parts[b])
+	im.set_data(w, h, false, Image.FORMAT_RGBA8, out.to_byte_array())
 	# The edge of the rock: a dark outline, and a lit rim on the lip and shelf.
 	for x in range(wall_x, w):
-		var under := int(L.ROOF_Y + 14 + sin(x * 0.07) * 2.0 + P.noise(x / 3, 0, 2) * 3.0)
+		var under := under_x[x]
 		if x < lip_x:
 			P.rect(im, x, under, 1, 1, c.seam)
 			P.px(im, x, under - 1, c.deep)
@@ -784,11 +870,11 @@ static func paint_roof(state: ClimbState, rock_key: String, pal: Dictionary, see
 	_stains(im, c, rng, ["streaks"])
 	_lichen(im, c, rng, ["lichen"], h)
 	# Stains and lichen only belong on rock.
-	var data := im.get_data()
+	var pixels := im.get_data().to_int32_array()
 	for i in w * h:
 		if mask[i] == 0:
-			data.encode_u32(i * 4, 0)
-	im.set_data(w, h, false, Image.FORMAT_RGBA8, data)
+			pixels[i] = 0
+	im.set_data(w, h, false, Image.FORMAT_RGBA8, pixels.to_byte_array())
 	var ledge_y := int(L.ROOF_Y) + 62
 	_ledge(im, c, rng, ledge_y, wall_x + 74, false, "crack")
 	# The crack along the ceiling: a dark slit with a lit lip below.

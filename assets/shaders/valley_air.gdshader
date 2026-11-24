@@ -53,33 +53,39 @@ void fragment() {
 
 	// Mist: long, low banks stretched east-west, thinning at their edges, with
 	// slower wisps rolling through them.
-	vec2 mp = (px + drift) / vec2(420.0, 190.0);
-	float bank = fbm(mp);
-	float wisp = fbm((px + drift * 1.7) / vec2(150.0, 70.0) + 11.0);
-	float m = smoothstep(0.55 - mist * 0.35, 0.85 - mist * 0.2, bank * 0.75 + wisp * 0.35);
-	if (!high_quality) {
-		m = floor(m * 4.0 + 0.5) / 4.0;
+	float mist_a = 0.0;
+	if (mist > 0.001) {
+		vec2 mp = (px + drift) / vec2(420.0, 190.0);
+		float bank = fbm(mp);
+		float wisp = fbm((px + drift * 1.7) / vec2(150.0, 70.0) + 11.0);
+		float m = smoothstep(0.55 - mist * 0.35, 0.85 - mist * 0.2, bank * 0.75 + wisp * 0.35);
+		if (!high_quality) {
+			m = floor(m * 4.0 + 0.5) / 4.0;
+		}
+		mist_a = m * min(mist * 1.1, 0.6);
 	}
-	float mist_a = m * min(mist * 1.1, 0.6);
 
 	// Light shafts: bands along the light's direction, slowly breathing, that
 	// fade in and out along their length.
-	vec2 dir = normalize(ray_dir);
-	vec2 across = vec2(-dir.y, dir.x);
-	float a = dot(px, across);
-	float along = dot(px, dir);
-	float band = vnoise(vec2(a / 38.0, time * 0.05)) * 0.65 + vnoise(vec2(a / 14.0 + 3.1, time * 0.08)) * 0.35;
-	float shaft = smoothstep(0.58, 0.85, band);
-	shaft *= smoothstep(0.25, 0.7, vnoise(vec2(a / 90.0, along / 260.0 + time * 0.02)));
-	if (!high_quality) {
-		shaft = floor(shaft * 3.0 + 0.5) / 3.0;
-	} else {
-		// Secondary broad atmospheric beam for rich volumetric depth.
-		float broad = smoothstep(0.45, 0.85, vnoise(vec2(a / 96.0 + 7.2, time * 0.03)));
-		shaft = clamp(shaft + broad * 0.35, 0.0, 1.25);
+	float ray_a = 0.0;
+	if (rays > 0.001) {
+		vec2 dir = normalize(ray_dir);
+		vec2 across = vec2(-dir.y, dir.x);
+		float a = dot(px, across);
+		float along = dot(px, dir);
+		float band = vnoise(vec2(a / 38.0, time * 0.05)) * 0.65 + vnoise(vec2(a / 14.0 + 3.1, time * 0.08)) * 0.35;
+		float shaft = smoothstep(0.58, 0.85, band);
+		shaft *= smoothstep(0.25, 0.7, vnoise(vec2(a / 90.0, along / 260.0 + time * 0.02)));
+		if (!high_quality) {
+			shaft = floor(shaft * 3.0 + 0.5) / 3.0;
+		} else {
+			// Secondary broad atmospheric beam for rich volumetric depth.
+			float broad = smoothstep(0.45, 0.85, vnoise(vec2(a / 96.0 + 7.2, time * 0.03)));
+			shaft = clamp(shaft + broad * 0.35, 0.0, 1.25);
+		}
+		// Shafts show best through mist.
+		ray_a = shaft * rays * ((high_quality ? 0.11 : 0.065) + mist_a * 0.42);
 	}
-	// Shafts show best through mist.
-	float ray_a = shaft * rays * ((high_quality ? 0.11 : 0.065) + mist_a * 0.42);
 
 	vec3 rgb = mist_color * mist_a + ray_color * ray_a;
 	COLOR = vec4(rgb, mist_a);

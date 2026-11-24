@@ -126,11 +126,19 @@ void fragment() {
 	// whole art pixels, sampled at their centres
 	vec2 ap = floor(world_pos * 0.5);
 	vec2 wp = ap * 2.0 + 1.0;
-	vec4 g = ground_at(wp);
-	vec3 here = untint(screen_at(wp));
-	// a running river (river_flow.gdshaderinc) redraws its painted water in
-	// other blues, so there any water still showing counts
-	bool open = g.a > 0.5 && waterness(g.rgb) > 0.5 && (distance(here, g.rgb) < 0.2 || (river_runs && waterness(here) > 0.5));
+	vec2 inv_ground = 1.0 / ground_size;
+	vec2 guv = (wp - ground_origin) * inv_ground;
+	bool open = false;
+	vec3 here = vec3(0.0);
+	if (guv.x >= 0.0 && guv.y >= 0.0 && guv.x <= 1.0 && guv.y <= 1.0) {
+		vec4 g = texture(ground_tex, guv);
+		if (g.a > 0.5 && waterness(g.rgb) > 0.5) {
+			here = untint(screen_at(wp));
+			// a running river (river_flow.gdshaderinc) redraws its painted water in
+			// other blues, so there any water still showing counts
+			open = distance(here, g.rgb) < 0.2 || (river_runs && waterness(here) > 0.5);
+		}
+	}
 	if (!open) {
 		COLOR = vec4(0.0);
 	} else {
@@ -145,9 +153,17 @@ void fragment() {
 		// how far below the bank this is: walk up the painted water
 		float d = 0.0;
 		bool found = false;
+		float step_y = 2.0 * inv_ground.y;
+		vec2 walk_uv = guv;
 		for (int i = 1; i <= 40; i++) {
 			if (float(i) > reach) break;
-			if (!is_water(wp - vec2(0.0, float(i) * 2.0))) {
+			walk_uv.y -= step_y;
+			bool still_water = false;
+			if (walk_uv.y >= 0.0 && walk_uv.y <= 1.0) {
+				vec4 wg = texture(ground_tex, walk_uv);
+				still_water = wg.a > 0.5 && waterness(wg.rgb) > 0.5;
+			}
+			if (!still_water) {
 				d = float(i);
 				found = true;
 				break;

@@ -24,18 +24,27 @@ const GRADIENT_SUNRISE := 6.2 / 24.0
 const GRADIENT_SUNSET := 19.2 / 24.0
 
 
+static var _times_key := -1
+static var _times_val := Vector2.ZERO
+
+
 ## Today's sunrise (x) and sunset (y), in clock hours.
 static func times(season := -1, day := -1) -> Vector2:
 	if season < 0:
 		season = GameClock.season
 	if day < 0:
 		day = GameClock.day
+	var key := season * 64 + day
+	if key == _times_key:
+		return _times_val
 	var half := GameClock.DAYS_PER_SEASON / 2.0
 	var f := (float(day) - half) / GameClock.DAYS_PER_SEASON
 	var other := season + (1 if f >= 0.0 else -1)
 	var a: Vector2 = SUN_TIMES[posmod(season, 4)]
 	var b: Vector2 = SUN_TIMES[posmod(other, 4)]
-	return a.lerp(b, absf(f))
+	_times_key = key
+	_times_val = a.lerp(b, absf(f))
+	return _times_val
 
 
 ## The clock time now, in hours (0 to 24).

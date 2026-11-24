@@ -12,6 +12,9 @@ extends CPUParticles2D
 @export var area := Vector2(4, 2)
 
 var _tint: CanvasModulate
+var _last_season := -1
+static var _puff_tex: Texture2D
+static var _add_mat: CanvasItemMaterial
 
 
 func _ready() -> void:
@@ -104,19 +107,26 @@ func _ready() -> void:
 	# Fires crackle and waterfalls roar, heard from nearby.
 	if effect == "sparks":
 		add_child(SoundEmitter.make("campfire", 300.0, 0.8))
+		set_process(false)
 	elif effect == "mist":
 		add_child(SoundEmitter.make("waterfall", 720.0, 1.0))
+		set_process(false)
 	if effect == "fireflies":
 		# Fireflies glow: additive, so they show against the night tint.
-		var add := CanvasItemMaterial.new()
-		add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-		material = add
+		if _add_mat == null:
+			_add_mat = CanvasItemMaterial.new()
+			_add_mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		material = _add_mat
 
 
 func _process(_delta: float) -> void:
 	if effect == "drift":
+		var season := GameClock.season
+		if season == _last_season:
+			return
+		_last_season = season
 		# Petals of apple blossom in spring, gold leaves in fall.
-		match GameClock.season:
+		match season:
 			GameClock.Season.SPRING:
 				color = Color(0.98, 0.84, 0.88)
 				emitting = true
@@ -127,22 +137,29 @@ func _process(_delta: float) -> void:
 				emitting = false
 	elif effect == "fireflies":
 		# Summer nights only: no fireflies in spring, fall or winter.
-		emitting = GameClock.season == GameClock.Season.SUMMER and _darkness() > 0.35
+		var want := GameClock.season == GameClock.Season.SUMMER and _darkness() > 0.35
+		if emitting != want:
+			emitting = want
 	elif effect == "smoke":
 		# Chimneys smoke in the cold months and at either end of the day.
 		var hour := GameClock.hour
-		emitting = GameClock.season >= GameClock.Season.FALL or hour < 9 or hour >= 17
+		var want := GameClock.season >= GameClock.Season.FALL or hour < 9 or hour >= 17
+		if emitting != want:
+			emitting = want
 
 
 ## A 7x6 puff: a solid middle and a checkered rim.
 static func _puff() -> Texture2D:
+	if _puff_tex != null:
+		return _puff_tex
 	var im := Image.create_empty(7, 6, false, Image.FORMAT_RGBA8)
 	for y in 6:
 		for x in 7:
 			var d := Vector2((x - 3.0) / 3.5, (y - 2.5) / 3.0).length()
 			if d < 0.62 or (d < 1.0 and (x + y) % 2 == 0):
 				im.set_pixel(x, y, Color.WHITE)
-	return ImageTexture.create_from_image(im)
+	_puff_tex = ImageTexture.create_from_image(im)
+	return _puff_tex
 
 
 func _darkness() -> float:
