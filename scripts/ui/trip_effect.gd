@@ -10,6 +10,7 @@ extends CanvasLayer
 
 const TRIP_SECONDS := 10.0
 const HAZE_SECONDS := 25.0
+const BUZZ_SECONDS := 18.0
 
 const SHADER := """
 shader_type canvas_item;
@@ -108,3 +109,16 @@ static func haze(from: Node) -> void:
 	tween.tween_property(fx, "intensity", 0.07, 3.0)
 	tween.tween_property(fx, "intensity", 0.0, HAZE_SECONDS - 3.0).set_ease(Tween.EASE_IN)
 	tween.tween_callback(fx.queue_free)
+
+
+## A light tipsy buzz, for a cold beer at the party: a soft sway that fades
+## over BUZZ_SECONDS. Doesn't wait.
+static func buzz(from: Node) -> void:
+	var fx := TripEffect.new()
+	fx.layer = 48
+	from.get_tree().root.add_child(fx)
+	var tween := fx.create_tween()
+	tween.tween_property(fx, "intensity", 0.045, 2.0)
+	tween.tween_property(fx, "intensity", 0.0, BUZZ_SECONDS - 2.0).set_ease(Tween.EASE_IN)
+	tween.tween_callback(fx.queue_free)
+

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_lifeguard.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "huff_tessa"
+display_name = "Tessa"
+years = "today"
+affiliation = "Park visitor"
+bio = "A Curry Village pool attendant living in Huff. Strings up the colored dance lights between pine trunks when the crew heads out at night."
+idle_lines = PackedStringArray("I rigged three battery dance lights on a broomstick. Wait till you see them bouncing off the granite in the dark.", "You can always tell a Huff tent by the climbing shoes drying on the steps and the headlamp clipped to the roof pole.", "After ten we take the party off-trail. Follow the colored glow through the trees.", "Nothing beats cold river water in the afternoon and a secret forest dance floor at midnight.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.82, 0.42, 0.64, 1)
+home = "HUFF, Curry Village"
+visitor = true

@@ -117,6 +117,12 @@
 		},
 		{
 			"hub": "yosemite_valley",
+			"key": "curry_village/HUFF",
+			"name": "HUFF",
+			"region": "curry_village"
+		},
+		{
+			"hub": "yosemite_valley",
 			"key": "el_capitan_meadow/El Capitan Meadow",
 			"name": "El Capitan Meadow",
 			"region": "el_capitan_meadow"

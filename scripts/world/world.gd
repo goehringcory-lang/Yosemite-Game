@@ -143,6 +143,8 @@ func _ready() -> void:
 	add_child(RescueField.new())
 	# today's happenings around the park, in the area you're in
 	add_child(HappeningField.new())
+	# HUFF crew's secret off-trail forest party after 10 PM
+	add_child(HuffPartyField.new())
 	# people walking between the Valley's areas on days of their own
 	add_child(Travelers.new())
 	seam_crossed.connect(Sound.shift_calls)

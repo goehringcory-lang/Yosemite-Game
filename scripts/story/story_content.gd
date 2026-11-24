@@ -25,6 +25,8 @@ static func attach(region: Region) -> void:
 		return
 	region.set_meta("story_attached", true)
 	EasterEggs.dress(region)
+	# HUFF: the employee tent community behind Curry Village.
+	HuffCamp.dress(region)
 	# The Guardian's Year's work spots, and what the work leaves behind.
 	Stewardship.dress(region)
 	# Your camp at the homestead, and what the story has given it.
