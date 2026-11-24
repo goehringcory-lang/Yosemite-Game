@@ -466,7 +466,10 @@ func _draw_scene() -> void:
 		if not cull.has_point(pos):
 			continue
 		var carried := player != null and light.get_parent() == player
-		var r := clampf(light.radius * 0.095, 5.5, 16.0)
+		# Only NightLight has a radius; other lights (headlamp, camp pieces)
+		# are plain PointLight2D, so fall back to their texture size.
+		var reach: float = light.get("radius") if "radius" in light else light.texture_scale * 64.0
+		var r := clampf(reach * 0.095, 5.5, 16.0)
 		var gain := e * (0.45 if carried else 1.85)
 		var at := pos + Vector2(0.0, 10.0) if carried else pos
 		var hdr := Color(light.color.r * gain, light.color.g * gain, light.color.b * gain, 1.0)
