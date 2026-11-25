@@ -16,7 +16,7 @@ const LOCATION_SHOWN := 4.0
 const HINTS_SHOWN := 8.0
 ## The wipe's color: the deep night of the palette, not flat black.
 const WIPE_COLOR := Color(0.067, 0.059, 0.09)
-const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary", "photo_album"]
+const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary", "photo_album", "gear_tent"]
 
 var _player: Player
 ## The food energy you carry, under the time.
@@ -244,9 +244,8 @@ func show_find(find: Dictionary) -> void:
 func _on_gear_added(id: String, amount: int) -> void:
 	var gear := Gear.get_gear(id)
 	if gear:
-		# a cam shows its size: the newest one on the rack (CamSizes)
-		var icon := CamSizes.icon(Gear.count(id) - 1) if id == "cam" else gear.icon
-		toasts.notify("gear:" + id, icon, gear.display_name, amount)
+		# a "cam" arrives as its size (Gear.add), so it shows that size's icon
+		toasts.notify("gear:" + id, gear.icon, gear.display_name, amount)
 		Sound.play("item_get", 0.0, 0.0)
 
 

@@ -72,8 +72,9 @@ func test_toasts(world: Node) -> void:
 	Inventory.add("wild_strawberry")
 	check(toasts.count() == before + 1, "two strawberries share one card")
 	check(toasts.text_for("wild_strawberry").ends_with("x2"), "the card counts them: %s" % toasts.text_for("wild_strawberry"))
+	var size := Gear.next_cam()
 	Gear.add("cam")
-	check(toasts.text_for("gear:cam") == "Cam", "new gear gets a card of its own")
+	check(toasts.text_for("gear:" + size) == Gear.get_gear(size).display_name, "new gear gets a card of its own, with the cam's size (%s)" % toasts.text_for("gear:" + size))
 	for id in ["miners_lettuce", "sierra_onion", "yampah", "black_oak_acorn", "acorn_cake", "trail_mix"]:
 		Inventory.add(id)
 	check(toasts.count() <= ItemToasts.MAX_CARDS, "no more than %d cards at once" % ItemToasts.MAX_CARDS)

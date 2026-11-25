@@ -11,3 +11,4 @@ description = "Dry hands hold better on warm granite."
 icon = ExtResource("2_icon")
 tier = 0
 trade_value = 15
+kind = "body"

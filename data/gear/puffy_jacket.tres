@@ -11,3 +11,4 @@ description = "A goose-down puffy from the Mountain Shop, patched on one sleeve.
 icon = ExtResource("2_icon")
 tier = 1
 trade_value = 80
+kind = "camp"

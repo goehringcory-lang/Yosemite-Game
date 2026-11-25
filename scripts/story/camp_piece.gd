@@ -397,6 +397,8 @@ func _rack_menu(box: DialogueBox, packing: bool) -> void:
 static func rack_menu(packing: bool, page := 0) -> Dictionary:
 	var ids: Array[String] = []
 	for gear: GearData in Gear.GEAR:
+		if gear.generic:
+			continue
 		var n := Gear.cached_count(gear.id) if packing else Gear.carried(gear.id)
 		if n > 0 and (packing or Gear.bulk(gear.id) > 0 or gear.id in ["haul_bag", Backpacking.PACK]):
 			ids.append(gear.id)
@@ -410,7 +412,7 @@ static func rack_menu(packing: bool, page := 0) -> Dictionary:
 		var gear := Gear.get_gear(id)
 		var n := Gear.cached_count(id) if packing else Gear.carried(id)
 		options.append("%s (%d)" % [gear.display_name, n])
-		icons.append(CamSizes.icon(0) if id == "cam" else gear.icon)
+		icons.append(gear.icon)
 		var room := Gear.bulk(id)
 		var facts := "Takes no room" if room == 0 else "Takes %d room%s" % [room, " each" if n > 1 else ""]
 		if id == "haul_bag":

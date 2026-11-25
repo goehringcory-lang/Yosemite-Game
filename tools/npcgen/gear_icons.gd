@@ -18,6 +18,11 @@ func _init() -> void:
 	for size: Array in CAM_SIZES:
 		cam(size[1], size[2], size[3]).save_png(ProjectSettings.globalize_path(OUT + size[0]))
 		print("drew ", size[0])
+	for nuts: Array in NUT_SETS:
+		nut_set(nuts[1]).save_png(ProjectSettings.globalize_path(OUT + nuts[0]))
+		print("drew ", nuts[0])
+	rope_70().save_png(ProjectSettings.globalize_path(OUT + "rope_70.png"))
+	print("drew rope_70.png")
 	quit()
 
 
@@ -101,6 +106,18 @@ const CAM_SIZES := [
 	["cam.png", "ec6a5e", "c8382e", "8a2420"],
 	["cam_2.png", "f6d873", "dcaa2c", "98701a"],
 	["cam_3.png", "6fa8e6", "2f6cc0", "1d437f"],
+	# The rest of the run, from booty and the shops: #0.3 blue, #0.4 grey,
+	# #0.5 purple, #4 grey.
+	["cam_03.png", "7fb0ec", "3f7fd0", "24508e"],
+	["cam_04.png", "c4c4ca", "8a8a90", "5a5a62"],
+	["cam_05.png", "c08ae0", "8a4fb0", "5a2e7a"],
+	["cam_4.png", "c4c4ca", "8a8a90", "5a5a62"],
+]
+## Nut sets: file, then three heads' colors (light, base, dark) small to big.
+const NUT_SETS := [
+	["nut_small.png", [["e4e4ea", "b8b8c0", "7e7e88"], ["f0a8d8", "c8609a", "8a3868"], ["8fd0f0", "3fa0d0", "1f6890"]]],
+	["nut_mid.png", [["f6c88a", "d08a3a", "8a5420"], ["e88a7a", "c04a3a", "7e2a20"], ["d6e07a", "a8b03a", "6a7020"]]],
+	["nut_big.png", [["8ae0b0", "3fa070", "1f6a44"], ["8ab0f0", "3f6ad0", "1f3e8a"], ["e0a0e0", "a050a8", "6a2e70"]]],
 ]
 const TRIGGER_LT := "6a6a74"
 const TRIGGER := "3c3c44"
@@ -259,3 +276,42 @@ func _outline64() -> void:
 					break
 	for p in edge:
 		im.set_pixelv(p, OUTLINE)
+
+
+# --- Nuts and the long rope --------------------------------------------------
+
+## A set of three wired nuts hanging off one oval carabiner: each a tapered
+## aluminum head, anodized its own color, on a loop of steel wire.
+func nut_set(heads: Array) -> Image:
+	im = Image.create_empty(64, 64, false, Image.FORMAT_RGBA8)
+	# the carabiner across the top
+	_part(_ellipse(Vector2(32, 11), 15.0, 7.0), STEEL, STEEL_HI, STEEL_DK)
+	_hole(_ellipse(Vector2(32, 11), 11.0, 3.6))
+	for i in 3:
+		var x := 18 + i * 14
+		var w := 4.0 + i * 1.5
+		var top := 30 + i * 2
+		# the wire loop down from the carabiner to the head
+		_line(Vector2i(x - 2, 17), Vector2i(x - 2, top), STEEL_LT)
+		_line(Vector2i(x + 2, 17), Vector2i(x + 2, top), STEEL_DK)
+		var c: Array = heads[i]
+		_part(_poly([Vector2(x - w, top), Vector2(x + w, top), Vector2(x + w - 2, top + 14 + i * 2), Vector2(x - w + 2, top + 14 + i * 2)]), c[1], c[0], c[2])
+		# the wire's end through the head's crown
+		px(x - 1, top + 2, STEEL_HI)
+		px(x + 1, top + 2, STEEL_HI)
+	_outline64()
+	return im
+
+
+## The 70 m rope: the 60 m rope's coil, dyed teal.
+func rope_70() -> Image:
+	var src := Image.load_from_file(ProjectSettings.globalize_path(OUT + "rope.png"))
+	src.convert(Image.FORMAT_RGBA8)
+	for y in src.get_height():
+		for x in src.get_width():
+			var c := src.get_pixel(x, y)
+			if c.a == 0.0 or c.s < 0.25:
+				continue
+			c.h = fposmod(c.h + 0.5, 1.0)
+			src.set_pixel(x, y, c)
+	return src

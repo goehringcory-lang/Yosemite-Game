@@ -11,3 +11,4 @@ description = "A hanging cot, so you can sleep on the wall."
 icon = ExtResource("2_icon")
 tier = 3
 trade_value = 135
+kind = "wall"

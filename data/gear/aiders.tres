@@ -11,3 +11,4 @@ description = "Webbing ladders for aid climbing blank sections of big walls."
 icon = ExtResource("2_icon")
 tier = 3
 trade_value = 35
+kind = "wall"

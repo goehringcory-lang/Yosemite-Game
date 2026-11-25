@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/cam_04.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "cam_04"
+display_name = "Cam #0.4"
+description = "Spring-loaded protection for cracks. Fits fingers."
+icon = ExtResource("2_icon")
+tier = 2
+trade_value = 36
+kind = "cam"
+size = "#0.4"
+width_min = 1
+width_max = 1
+color = Color(0.5412, 0.5412, 0.5647, 1)
