@@ -470,7 +470,7 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 	var gx := x + 34
 	for id: String in route.required_gear:
 		var need := int(route.required_gear[id])
-		var have := Gear.carried(id)
+		var have := Gear.have(id, true)
 		UI.slot(ci, Vector2(gx, gy - 11), id, need, have < need)
 		gx += 22
 	if route.top_rope:

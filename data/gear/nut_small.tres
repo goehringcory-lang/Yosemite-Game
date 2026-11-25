@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/nut_small.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "nut_small"
+display_name = "Small nuts"
+description = "A set of small wired nuts on one carabiner, for thin seams where a cam won't go."
+icon = ExtResource("2_icon")
+tier = 1
+trade_value = 20
+kind = "nut"
+size = "small"
+width_min = 0
+width_max = 1
+color = Color(0.7216, 0.7216, 0.7529, 1)
