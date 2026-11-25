@@ -297,6 +297,7 @@ const RESULT_TEXT := {
 	"slip_time": "Too slow!", "slip_barn_door": "Barn door!", "slip_pumped": "Pumped off!",
 	"nail_perfect": "PERFECT PIN!", "nail_good": "Seated", "nail_over": "Over-driven", "nail_slip": "Popped!",
 	"haul_perfect": "Clean haul!", "haul_good": "Hauled", "haul_slip": "Slow haul",
+	"place_solid": "BOMBER!", "slip_tipped": "Tipped out!", "slip_rip": "It ripped!", "booty": "BOOTY!",
 }
 
 
@@ -311,7 +312,7 @@ static func crux_result(ci: CanvasItem, result: String, age: float, at := Vector
 	var miss := result.begins_with("slip") or result in ["nail_over", "nail_slip", "haul_slip"]
 	if miss:
 		col = UI.WARN
-	elif result in ["perfect", "nail_perfect", "haul_perfect"]:
+	elif result in ["perfect", "nail_perfect", "haul_perfect", "place_solid", "booty"]:
 		col = UI.GOLD
 	var alpha := clampf(1.4 - age, 0.0, 1.0)
 	# Over the climber, kept clear of the screen's edges and the plates at the top.
