@@ -8,7 +8,10 @@ extends Node
 ##   SHOT_INTRO   1 to shoot the route card instead of the climb
 ##   SHOT_SPECIAL cards to shoot instead: "crux", "pumped", "dyno", "result", "pause", "night",
 ##                or "falcon" for a peregrine stooping past the wall, or a
-##                longer check part-way through: "swing", "nail", "haul", "layback"
+##                longer check part-way through: "swing", "nail", "haul", "layback",
+##                or placing gear: "place" (picking and seating a cam), "clip"
+##                (off a crimp), "booty" (working stuck gear free), "rack"
+##                (pieces of every quality on the wall, the rack on the harness)
 ##   SHOT_DIR     folder for the PNGs (default user://)
 ##   SHOT_UNLIT   1 to leave the wall unlit (ClimbLight off), as on Low
 ##   SHOT_PAD     1 to show the gamepad's buttons in the hints
@@ -46,6 +49,8 @@ func _ready() -> void:
 		GameClock.minutes = int(hour) * 60
 		var game: ClimbMinigame = load("res://scenes/climb/climb_minigame.tscn").instantiate()
 		game.setup(route, 4)
+		if _env("SHOT_SPECIAL", "") in ["place", "clip", "booty", "rack"]:
+			game.state.set_rack(_full_rack())
 		game.state.pitch = int(_env("SHOT_PITCH", "0"))
 		game.state._start_pitch()
 		add_child(game)
@@ -125,6 +130,71 @@ func _ready() -> void:
 						c.tension = 0.56
 						c.strain = 0.25
 						c.pace = 0.0
+			"place", "booty", "rack":
+				var st := game.state
+				var kind := _env("SHOT_SPECIAL", "")
+				st.holds[st.row][st.col] = {"cost": 4, "crack": true, "width": 4, "grip": "crimp"}
+				if kind == "rack":
+					# A ladder of pieces below: bomber, good, a tipped-out one up top.
+					st.protection.clear()
+					var rack := st.rack_now()
+					var qualities := ["solid", "good", "over", "marginal"]
+					for i in mini(st.row - 1, 4):
+						var r := st.row - 1 - (mini(st.row - 1, 4) - 1 - i)
+						var piece: Dictionary = rack[(3 + i * 2) % rack.size()]
+						st.protection.append({"cell": Vector2i(clampi(st.col + (1 if i % 2 == 0 else -1), 0, ClimbState.COLUMNS - 1), r), "kind": "cam", "hw": "nut" if piece.kind == "nut" else "cam",
+							"quality": qualities[i % 4], "color": piece.color, "key": ClimbRack.key(piece), "name": piece.name})
+					st.protection_row = st.protection.back().cell.y if not st.protection.is_empty() else 0
+					game._crux_result = ""
+				elif kind == "booty":
+					st.booty = [{"id": "shot", "name": "A battered #4", "gear": "cam_4", "width": 7}]
+					st.holds[st.row][st.col]["booty"] = 0
+					st.holds[st.row][st.col]["width"] = 7
+					st.take_booty()
+					game._start_crux()
+					game._crux_grace = 0.0
+					var b: BootyCheck = game._crux.check
+					b.knocks = 1
+					b.pos = b.center - 0.05
+					b.speed = 0.0
+				else:
+					st.protection_row = mini(st.protection_row, st.row - 1)
+					st.place_cam()
+					game._start_crux()
+					game._crux_grace = 0.0
+					var c: PlaceCheck = game._crux.check
+					c.phase = "seat"
+					c.pull = 0.44
+					c.pull_speed = 0.0
+					c.time_left = c.time_total * 0.55
+					# hold the trigger for the picture
+					c.chosen = c.selected()
+				if kind != "rack":
+					game.set_process(false)
+					game._canvas.queue_redraw()
+			"clip":
+				var st := game.state
+				var bolt_row := -1
+				for r: int in st.bolts:
+					bolt_row = r
+					break
+				if bolt_row < 0:
+					# no bolt on this pitch: put one beside you
+					st.bolts[st.row] = st.col
+					st.bolt_kinds[st.row] = "bolt"
+					bolt_row = st.row
+				st.row = bolt_row
+				st.col = int(st.bolts[bolt_row])
+				st.protection_row = 0
+				st.holds[st.row][st.col] = {"cost": 4, "crack": false, "grip": "crimp"}
+				st.clip_bolt()
+				game._start_crux()
+				game._crux_grace = 0.0
+				var cc: ClipCheck = game._crux.check
+				cc.pos = ClipCheck.CENTER - 0.12
+				cc.speed = 0.0
+				game.set_process(false)
+				game._canvas.queue_redraw()
 			"storm":
 				game.state.start_minutes = 15 * 60
 				for k in 60:
@@ -179,6 +249,18 @@ func _ready() -> void:
 		game.queue_free()
 		await get_tree().process_frame
 	get_tree().quit()
+
+
+## A rack for the gear shots: three nuts, then a cam of every size, doubles
+## in the hand sizes.
+func _full_rack() -> Array:
+	var out := []
+	for n in [[0, 1, "Nut (small)"], [2, 3, "Nut (mid)"], [3, 4, "Nut (big)"]]:
+		out.append({"id": "nut", "kind": "nut", "width_min": n[0], "width_max": n[1], "color": ClimbRack.width_color(n[0]), "count": 1, "name": n[2]})
+	for w in ClimbRack.WIDTHS.size():
+		out.append({"id": "cam_%d" % w, "kind": "cam", "width_min": w, "width_max": w, "color": ClimbRack.width_color(w),
+			"count": 2 if w in [3, 4, 5] else 1, "name": "Cam " + ClimbRack.width_size(w)})
+	return out
 
 
 func _save(dir: String, route_id: String, tag: String) -> void:
