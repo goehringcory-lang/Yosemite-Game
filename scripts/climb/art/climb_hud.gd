@@ -441,6 +441,12 @@ static func route_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, b
 	var tx := r.position.x + 306
 	UI.ink(ci, Vector2(tx, band + 7), "THE LINE", UI.WARN_DARK, 10)
 	UI.ink(ci, Vector2(r.end.x - 16, band + 7), "* crux", UI.INK_SOFT, 10, 60.0, HORIZONTAL_ALIGNMENT_RIGHT)
+	# A topo's spine: the line runs up through every pitch's belay.
+	if n > 1:
+		var spine_x := tx + 3.0
+		var y_low := band + 19 - 3.0
+		var y_high := band + 19 + (n - 1) * row_h - 3.0
+		ci.draw_line(Vector2(spine_x, y_low), Vector2(spine_x, y_high), UI.WOOD_DARK, 1.0)
 	for i in n:
 		var yy := band + 19 + (n - 1 - i) * row_h
 		var diff := route.pitches[i]

@@ -26,6 +26,24 @@ A climb is a short sequence of decisions: read the wall, choose a line, decide w
 - **Crux feedback.** The result stamps over the climber and pops in. Perfect: a 0.08 s hit-stop, sparks, the chime. Good: a softer, lower chime. A miss: a scrape, a jolt, grit, and the stamp shakes.
 - **Flow.** `ClimbMinigame.flow` counts perfect cruxes in a row (a good, a miss or a fall ends it); each rings a little higher, the stamp shows "Flow xN" from 2, the belayer has a `flow` line at 3, and the result card gives `best_flow`. It is all on the screen; the rules in `ClimbState` don't change, so the bots' tuning is the same.
 
+## Reading the wall
+
+The line up every pitch shows on the wall, so you read the rock rather than a list of numbers (`scripts/climb/art/climb_topo.gd`, from the pitch's guaranteed line, `ClimbState.line`):
+
+- **The topo sketch.** As a pitch starts, a guidebook topo draws itself up the wall in chalky ink: a wobbly dashed line from you to the anchor, an X and the topo's name at each crux point, and the belay's (or the summit's) ring. It fades after a few seconds. On the first pitch of a route the view also looks up the line on its own (`SCOUT_TIMES`), and climbing on stops it.
+- **Hold Down to read the line.** Anywhere on a pitch, holding Down eases the view up to the anchor with the sketch on; let go and it comes back to you. The hint bar offers it for the first seconds of each pitch.
+- **Chalk.** The next four holds of the line carry chalk, fading with distance, as on a popular route. Valley routes are well chalked, high-country routes hardly, snow not at all, and a boulder problem is caked on every hold (`ClimbTopo.chalkiness`; a profile's `chalk` overrides it). A crux hold is left bare. The line is the guaranteed way, not the only one: every other hold still works.
+
+## Height and the top
+
+- **Exposure.** `ClimbMinigame.exposure()` runs from 0 on the ground to 1 at 1,500 ft (`EXPOSED_FT`). The wind rises with it and the valley's birds and crickets fall away below you (`Sound.bed_targets`), and high up the air moving up the face carries specks of dust and seed past you.
+- **Height marks.** At a belay, the altimeter calls out each 500 ft passed ("1,000 ft up").
+- **The rope** bounces as it catches a fall and settles (`_twang`).
+- **Topping out.** After the cheer, the wall drops away and the view opens over the whole country, with you standing on the rim, arms up, and your partner sitting on the rope beside you, under "You topped out", the route and its height (and nights on the wall). Any key brings the result card once the view has opened (`SUMMIT_SKIP`); it comes up on its own after `SUMMIT_HOLD`. A boulder problem goes straight to its result card.
+- **The route card** joins its pitch list with a topo spine, bottom to top.
+
+Shots: `SHOT_SPECIAL=read`, `chalk` and `summit` in `tools/shots/climb_shot.gd`.
+
 ## Gear and what it does
 
 | Gear | When you get it | In the climb |

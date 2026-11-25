@@ -755,6 +755,12 @@ Your climber works up the face on a rope that runs through every quickdraw, cam 
 
 ![Midnight Lightning, with Chongo spotting](docs/climb_midnight_lightning.png)
 
+**Reading the wall.** The line up each pitch is on the rock: as a pitch starts a guidebook topo draws itself up the wall in chalky ink (an X and a name at each crux, a ring at the anchor), the next holds of the line carry chalk the way a popular route does, and holding Down looks up the pitch to its anchor; the first pitch of a route looks up its line on its own. The higher you climb the more it's only the wind, the altimeter calls out each 500 ft at a belay, the rope bounces when it catches a fall, and at the top the wall drops away and the whole country opens out below you before the result card (`scripts/climb/art/climb_topo.gd`; more in [docs/CLIMBING_MINIGAME.md](docs/CLIMBING_MINIGAME.md)).
+
+![Reading the line on the Nose: holding Down looks up the pitch](docs/climb_read_line.png)
+
+![The view from the top of the Nose](docs/climb_summit.png)
+
 **Style** is rated on the result card: an *onsight* (no falls), *hard-won* (falls but free), or *aided*. The Nose can be done free, as the story asks, or with aid.
 
 Where things are:
@@ -768,7 +774,7 @@ Where things are:
 | The day's weather on the wall and the forecast | `scripts/climb/wall_weather.gd` |
 | Pictures | `scripts/climb/art/`: `climb_rock.gd` (granite, cracks, dikes, roofs, ice), `climb_landscape.gd` (the skyline), `climb_scenes.gd` and `climb_props.gd` (bases and summits), `climb_sprites.gd` (climber, belayers, hardware: jams in cracks, laybacks up flakes, a mantel onto the top), `climb_hud.gd`, `climb_ui.gd`, `climb_night.gd`, and `climb_hires.gd` (the 32px finish: Scale2x, each formation's granite grain, wet rock) |
 
-The font is Noto Sans (SIL Open Font License, `assets/fonts/`). To photograph a route: `SHOT_ROUTE=the_nose SHOT_PITCH=6 SHOT_HOURS=7,19 godot --path . res://tools/shots/climb_shot.tscn` (needs a window; `SHOT_INTRO=1` shoots the route card, `SHOT_SPECIAL=crux|result|pause|night` the others, and `swing|layback|nail|haul` the longer checks part-way through). `tools/shots/climb_walls.tscn`, `climb_landmarks.tscn` and `climb_figures.tscn` show the rock, the skyline and the people on their own. More in [docs/CLIMBING_MINIGAME.md](docs/CLIMBING_MINIGAME.md).
+The font is Noto Sans (SIL Open Font License, `assets/fonts/`). To photograph a route: `SHOT_ROUTE=the_nose SHOT_PITCH=6 SHOT_HOURS=7,19 godot --path . res://tools/shots/climb_shot.tscn` (needs a window; `SHOT_INTRO=1` shoots the route card, `SHOT_SPECIAL=crux|result|pause|night|read|chalk|summit` the others, and `swing|layback|nail|haul` the longer checks part-way through). `tools/shots/climb_walls.tscn`, `climb_landmarks.tscn` and `climb_figures.tscn` show the rock, the skyline and the people on their own. More in [docs/CLIMBING_MINIGAME.md](docs/CLIMBING_MINIGAME.md).
 
 ## Sound
 
