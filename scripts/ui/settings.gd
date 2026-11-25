@@ -15,6 +15,9 @@ enum Graphics { HIGH, LOW, AUTO }
 ## How much room the timed activities give you (see [method pace] and
 ## [method room]).
 enum Timing { STANDARD, RELAXED, GENTLE }
+## How a move is made on the climbing screen (ClimbReach): hold and let go,
+## tap to reach and tap again to grab, or straight onto the hold.
+enum ClimbMoves { REACH, TWO_TAPS, SIMPLE }
 
 const DEFAULT_PATH := "user://settings.cfg"
 const TEXT_SPEED_NAMES := ["Slow", "Normal", "Fast", "Instant"]
@@ -22,6 +25,7 @@ const TEXT_SPEED_NAMES := ["Slow", "Normal", "Fast", "Instant"]
 const TEXT_SPEED_CPS := [30.0, 60.0, 120.0, 0.0]
 const PROMPT_NAMES := ["Auto", "Keyboard", "Gamepad"]
 const TIMING_NAMES := ["Standard", "Relaxed", "Gentle"]
+const CLIMB_MOVE_NAMES := ["Reach", "Tap twice", "Simple"]
 ## At each Timing: how fast the meters' markers, the fish and the slackline
 ## move (1 is as designed), and how much wider the greens and longer the
 ## time limits are.
@@ -72,6 +76,8 @@ static var timing := Timing.STANDARD
 ## Assist: on a crux that wants quick taps (and the left-right ones), holding
 ## the key counts as tapping it.
 static var hold_taps := false
+## Assist: how moves are made on the climbing screen (see ClimbMoves).
+static var climb_moves := ClimbMoves.REACH
 ## Controller rumble (see Rumble).
 static var vibration := true
 ## Pause the game when its window isn't the one in front (see LookAway).
@@ -217,6 +223,7 @@ static func load_settings() -> void:
 	tips = bool(config.get_value("input", "tips", tips))
 	timing = clampi(int(config.get_value("assist", "timing", timing)), 0, Timing.size() - 1) as Timing
 	hold_taps = bool(config.get_value("assist", "hold_taps", hold_taps))
+	climb_moves = clampi(int(config.get_value("assist", "climb_moves", climb_moves)), 0, ClimbMoves.size() - 1) as ClimbMoves
 	vibration = bool(config.get_value("input", "vibration", vibration))
 	pause_away = bool(config.get_value("input", "pause_away", pause_away))
 	auto_run = bool(config.get_value("input", "auto_run", auto_run))
@@ -254,6 +261,7 @@ static func save() -> Error:
 	config.set_value("input", "tips", tips)
 	config.set_value("assist", "timing", int(timing))
 	config.set_value("assist", "hold_taps", hold_taps)
+	config.set_value("assist", "climb_moves", int(climb_moves))
 	config.set_value("input", "vibration", vibration)
 	config.set_value("input", "pause_away", pause_away)
 	config.set_value("input", "auto_run", auto_run)
@@ -343,6 +351,7 @@ static func reset_defaults() -> void:
 	tips = true
 	timing = Timing.STANDARD
 	hold_taps = false
+	climb_moves = ClimbMoves.REACH
 	vibration = true
 	pause_away = true
 	auto_run = false

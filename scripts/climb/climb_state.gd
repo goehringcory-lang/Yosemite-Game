@@ -36,6 +36,19 @@ extends RefCounted
 ## placing gear is cheap from a jug and strenuous from a crimp. So the line
 ## matters: string the crimps together and you'll be paying double by the
 ## crux; break them up with jugs and place your gear from good holds.
+##
+## The rack (ClimbRack): every crack hold has a width, from thin fingers to
+## offwidth, and each cam or nut on your rack fits one or two. On the screen
+## placing a piece is a skill check of its own (PlaceCheck): pick the size,
+## then seat it while your grip lasts. It goes in "solid", "good", "over"
+## (over-cammed: it holds, but takes cleaning) or "marginal" (tipped out, a
+## piece a size off seated badly, or a slung horn). A marginal piece holds a
+## short fall but rips out of a longer one, and the piece below catches you,
+## further down. Clipping a bolt off a crimp, or pumped, is a quick check too
+## (ClipCheck). With the right size from a jug or a stance the piece just
+## goes in, so long walls don't drag. Tests and bots place every piece
+## "good", as before. Some cracks hold booty, a stuck piece somebody left:
+## work it free (BootyCheck) and it's yours to keep.
 
 enum Status { CLIMBING, TOPPED_OUT, RETREATED }
 
@@ -100,6 +113,34 @@ const SHAKE_PUMP := 5
 const MINUTES_TO_SHAKE := 3
 ## Stamina it takes to place a cam or clip a draw, by the hold you're on.
 const PROTECT_COST := {"jug": 1, "edge": 2, "crimp": 5}
+## Reaching and grabbing (the screen's ClimbReach, see [method move]).
+const PRECISE_SAVING := 1
+const SLOPPY_COST := 1
+const SLOPPY_PUMP := 1
+const JAM_REST := 1
+## Pitch styles where a crack hold is a hand jam, and where edges are slopers.
+const JAM_STYLES := ["crack", "flake", "chimney", "roof"]
+const SLOPER_STYLES := ["slab", "dike"]
+## Seconds your grip gives you to place a piece (PlaceCheck) or clip from a
+## bad hold (ClipCheck), by the hold you hang on, less GRIP_PER_PUMP for each
+## point of pump; never under GRIP_MIN. A stance gives GRIP_REST.
+const GRIP_SECONDS := {"jug": 6.0, "edge": 4.5, "crimp": 3.0, "step": 6.0}
+const GRIP_REST := 8.0
+const GRIP_PER_PUMP := 0.3
+const GRIP_WET := 0.5
+const GRIP_MIN := 1.5
+## A marginal piece holds a fall from this many moves above it, and rips out
+## of anything longer.
+const MARGINAL_HOLDS := 1
+## Minutes your second spends cleaning each over-cammed piece.
+const STUCK_MINUTES := 4
+## Fumbling a clip costs this much stamina.
+const CLIP_FUMBLE := 2
+## Working booty loose takes these minutes, whether it comes or not.
+const BOOTY_MINUTES := 3
+## After this many solid placements on a pitch, the right size goes straight
+## in from an edge too (you've found your rhythm).
+const QUICK_AFTER_SOLID := 3
 ## How often each grip comes up, by pitch style: [jug, edge] (the rest are
 ## crimps). The guaranteed line is drawn from the same mix.
 const GRIPS := {
@@ -163,7 +204,7 @@ const SLOPPY_HAUL_STAMINA := 4
 const HAUL_SECOND_SNAG := 5
 ## The checks a ClimbCheck plays (see make_check), rather than the screen's
 ## own meters.
-const CHECK_KINDS := ["swing", "nail", "haul", "layback"]
+const CHECK_KINDS := ["swing", "nail", "haul", "layback", "place", "clip", "booty"]
 ## Climbing a chimney: alternate sides, or lose the rhythm.
 const CHIMNEY_BONUS := 1
 const CHIMNEY_PENALTY := 2
@@ -225,8 +266,23 @@ var placed_cams: Array[Vector2i] = []
 ## Bolts clipped this pitch (their cells).
 var clipped_bolts: Array[Vector2i] = []
 ## Every piece the rope runs through this pitch, lowest first:
-## {"cell": Vector2i, "kind": "cam" or "draw", "hw": "cam", "bolt" or "pin"}.
+## {"cell": Vector2i, "kind": "cam" or "draw", "hw": "cam", "nut", "sling",
+## "bolt" or "pin"}, and for a placed piece its "quality" ("solid", "good",
+## "over", "marginal"), "color" and "key" (ClimbRack.key).
 var protection: Array[Dictionary] = []
+## The cams and nuts you carry (ClimbRack pieces), and how many of each are
+## still on your harness this pitch: ClimbRack.key -> count.
+var rack: Array[Dictionary] = []
+var rack_left: Dictionary = {}
+## Pieces placed this climb, how many went in solid, and how many ripped.
+var placements := 0
+var solid_placements := 0
+var rips := 0
+var solid_this_pitch := 0
+## Booty left on this route that hasn't been found (WallBooty sets it):
+## {"pitch", "row", "id", "name", "text"...}. Taken ones go to booty_taken.
+var booty: Array[Dictionary] = []
+var booty_taken: Array[Dictionary] = []
 ## Row -> column of the bolt (or old piton) on that row.
 var bolts: Dictionary = {}
 ## Row -> "bolt" or "pin", for the fixed pieces in [member bolts].
@@ -260,6 +316,17 @@ var jug_moves := 0
 ## Crux moves done well, and missed.
 var perfect_cruxes := 0
 var slipped_cruxes := 0
+## How each move was grabbed on the screen (see ClimbReach): "perfect" moves
+## cost a point less, "sloppy" ones a point more and a point of pump. Bots and
+## tests grab every hold "good", so their numbers are the same as before.
+var precise_moves := 0
+var sloppy_moves := 0
+var free_moves := 0
+## The hand that made the last move: "left", "right", or "" at a belay, after
+## a match (straight up) or a fall. Reaching with the same hand twice is a bump.
+var last_hand := ""
+## Added to the crux meter's green by a flow of clean moves on the screen.
+var flow_window := 0.0
 ## What just happened, for the UI.
 var message := ""
 ## Row -> {column -> hold} for the current pitch. A hold has "cost" and
@@ -285,6 +352,15 @@ var top_row := 8
 var last_dx := 0
 
 var _rng := RandomNumberGenerator.new()
+## Crack widths roll on their own, so a seed's wall is the same as it was.
+var _width_rng := RandomNumberGenerator.new()
+## The guaranteed line of this pitch: row -> column.
+var _path: Dictionary = {}
+## The ClimbCheck the pending check is played by (make_check), for its choice.
+var _check: ClimbCheck
+var _clean_note := ""
+## The row you last failed to work booty free on (protect places gear there next).
+var _booty_tried_row := -1
 var _rested_rows := {}
 var _shaken_rows := {}
 ## 1 once [method route_has_fixed_pieces] has found some, 0 if none, -1 unasked.
@@ -314,7 +390,96 @@ func _init(p_route: RouteData, cams: int, seed := -1, kit := {}) -> void:
 		_rng.seed = seed
 	else:
 		_rng.randomize()
+	if not route.top_rope and not route.boulder:
+		rack = ClimbRack.from_count(cams)
 	_start_pitch()
+
+
+## Climbs with the rack [param pieces] (ClimbRack pieces, as ClimbRack.from_gear
+## gives them): every cam and nut, by size. The screen calls this; tests and
+## bots climb with the rack their cam count makes.
+func set_rack(pieces: Array) -> void:
+	if route.top_rope or route.boulder:
+		return
+	rack.clear()
+	var total := 0
+	for piece: Dictionary in pieces:
+		rack.append(piece.duplicate())
+		total += int(piece.get("count", 0))
+	cams_per_pitch = total
+	_refill_rack()
+
+
+## Puts every piece back on your harness (your second brings them up).
+func _refill_rack() -> void:
+	rack_left.clear()
+	var total := 0
+	for piece in rack:
+		rack_left[ClimbRack.key(piece)] = int(rack_left.get(ClimbRack.key(piece), 0)) + int(piece.count)
+		total += int(piece.count)
+	if not route.top_rope and not route.boulder and not rack.is_empty():
+		cams_left = total
+
+
+## What the cracks on this pitch take, for the belay: "Cracks: hands to
+## fists." and a warning when nothing on your rack fits the widest or the
+## thinnest of them. Empty with no rack or no cracks.
+func crack_note() -> String:
+	if rack.is_empty() or _crack_chance() <= 0.0 or is_snow():
+		return ""
+	var widths: Array = ClimbRack.pitch_widths(spec)
+	var note := "Cracks: %s." % ClimbRack.range_text(widths)
+	for w: int in [int(widths[1]), int(widths[0])]:
+		if not has_fit(w):
+			return note + " Nothing on your rack fits the %s: sling what you can." % ClimbRack.width_name(w)
+	return note
+
+
+## The width of the crack at ([param r], [param c]) (ClimbRack.WIDTHS).
+func crack_width(r: int, c: int) -> int:
+	return int(hold_at(r, c).get("width", 4))
+
+
+## The rack with what's left of each piece this pitch ("left").
+func rack_now() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for piece in rack:
+		var p := piece.duplicate()
+		p["left"] = int(rack_left.get(ClimbRack.key(piece), 0))
+		out.append(p)
+	return out
+
+
+## The piece on your harness that best fits a crack [param width] wide (of
+## two, the one you have more of), or {} if your harness is empty.
+func best_piece(width: int) -> Dictionary:
+	var best := {}
+	var best_off := 99
+	var best_left := -1
+	for piece in rack_now():
+		if int(piece.left) <= 0:
+			continue
+		var off := ClimbRack.misfit(piece, width)
+		if off < best_off or (off == best_off and int(piece.left) > best_left):
+			best = piece
+			best_off = off
+			best_left = int(piece.left)
+	return best
+
+
+## True if your rack has a piece within one size of [param width].
+func has_fit(width: int) -> bool:
+	var best := best_piece(width)
+	return not best.is_empty() and ClimbRack.misfit(best, width) <= 1
+
+
+## Seconds your grip gives you to place gear from where you hang.
+func grip_seconds() -> float:
+	var seconds: float = GRIP_REST if hold_at(row, col).get("rest", false) else float(GRIP_SECONDS.get(grip(), 4.5))
+	seconds -= GRIP_PER_PUMP * pump
+	if is_wet():
+		seconds -= GRIP_WET
+	return maxf(seconds, GRIP_MIN) * Settings.room()
 
 
 func runout() -> int:
@@ -537,8 +702,65 @@ func bolts_per_pitch() -> int:
 	return bolts.size()
 
 
+## The hand technique the hold at ([param r], [param c]) asks for: "jug",
+## "edge", "crimp", "jam" (a crack hold on a crack, flake, chimney or roof
+## pitch), "sloper" (friction holds on slab and dike pitches), or "step"
+## (ledges, snow). It sets how a reach is timed (ClimbReach), and the hand
+## poses read it. A hold's "shape" (when the art tags one) refines it.
+func technique_at(r: int, c: int) -> String:
+	var hold := hold_at(r, c)
+	var grip_name: String = hold.get("grip", "step")
+	if hold.is_empty() or int(hold.get("cost", 0)) <= 0 or grip_name == "step" or is_snow():
+		return "step"
+	var shape: String = hold.get("shape", "")
+	if shape.ends_with("_jam"):
+		return "jam"
+	if shape == "palm":
+		return "sloper"
+	if grip_name == "jug":
+		return "jug"
+	if hold.get("crack", false) and style() in JAM_STYLES:
+		return "jam"
+	if style() in SLOPER_STYLES and grip_name == "edge":
+		return "sloper"
+	return grip_name
+
+
+## The technique of the hold you're on.
+func technique() -> String:
+	return technique_at(row, col)
+
+
+## The hand a move with [param dx] reaches with: left for up-left, right for
+## up-right, and straight up matches ("match": the low hand comes up beside
+## the high one).
+static func hand_for(dx: int) -> String:
+	return "left" if dx < 0 else ("right" if dx > 0 else "match")
+
+
+## "clean" when the reaching hand isn't the one that just moved, "bump" when
+## it is (you move the same hand twice and hang off the other the whole
+## time), "match" for straight up.
+##
+## A bump the wall forces on you (nothing else in reach but that hand's
+## side) counts as a match: no penalty for the rock's shape.
+func sequence_for(dx: int) -> String:
+	var hand := hand_for(dx)
+	if hand == "match":
+		return "match"
+	if hand != last_hand:
+		return "clean"
+	for d in [-1, 0, 1]:
+		if d != dx and not hold_at(row + 1, col + d).is_empty():
+			return "bump"
+	return "match"
+
+
 ## Moves up one row. [param dx] is -1 (up-left), 0 (straight up), or 1 (up-right).
-func move(dx: int) -> bool:
+## [param grab] is how the screen's reach landed ("perfect", "good" or
+## "sloppy"; see ClimbReach): a perfect grab costs 1 less (and a perfect jam
+## eases the pump), a sloppy one 1 more and a point of pump.
+func move(dx: int, grab := "good") -> bool:
 	if status != Status.CLIMBING or not pending.is_empty():
 		return false
 	var target := hold_at(row + 1, col + dx)
@@ -552,8 +774,32 @@ func move(dx: int) -> bool:
 		message = "No hold there."
 		return false
 	var cost := move_cost(row + 1, col + dx)
+	var technique_name := technique_at(row + 1, col + dx)
+	if technique_name == "step":
+		grab = "good" # ledges and kicked steps aren't reached for
+	var extra_pump := 0
+	match grab:
+		"perfect":
+			cost = maxi(cost - PRECISE_SAVING, 1)
+			precise_moves += 1
+			if technique_name == "jam":
+				extra_pump = -JAM_REST
+		"sloppy":
+			cost += SLOPPY_COST
+			extra_pump = SLOPPY_PUMP
+			sloppy_moves += 1
+	free_moves += 1
+	var hand := hand_for(dx)
+	last_hand = "" if hand == "match" else hand
+	if extra_pump != 0:
+		pump = clampi(pump + extra_pump, 0, PUMP_MAX)
 	_step(dx, cost, MINUTES_PER_MOVE - int(Perks.bonus("light_rack")))
 	return true
+
+
+## A flow of clean moves on the screen eases the forearms a little.
+func ease_pump(amount := 1) -> void:
+	pump = maxi(pump - amount, 0)
 
 
 ## True when no hold is in reach above: straight up or a column either side.
@@ -597,6 +843,9 @@ func aid_step(dx: int) -> bool:
 ## your aiders.
 func _aid(dx: int, mins: int, pin := false) -> void:
 	cams_left -= 1
+	if not pin:
+		var target := hold_at(row + 1, col + dx)
+		_take_from_rack(best_piece(int(target.width)) if target.get("crack", false) and target.has("width") else _most_plentiful())
 	var cell := Vector2i(col + dx, row + 1)
 	protection_row = row + 1
 	placed_cams.append(cell)
@@ -773,6 +1022,7 @@ func crux_window() -> float:
 	window += CRUX_MERCY_WINDOW * _crux_mercy()
 	window -= PUMP_WINDOW * pump
 	window += float(pending.get("narrow", 0.0))
+	window += flow_window
 	if is_wet():
 		window -= WET_WINDOW
 	if is_windy():
@@ -823,6 +1073,15 @@ func make_check() -> ClimbCheck:
 			return NailCheck.new(nail_window(), NAIL_SECONDS * Settings.room(), crux_speed() * 0.7)
 		"haul":
 			return HaulCheck.new(haul_snags(), Settings.room(), Settings.pace())
+		"place":
+			_check = PlaceCheck.new(rack_now(), int(pending.get("width", 4)), grip_seconds(), Settings.pace(), Settings.room())
+			return _check
+		"clip":
+			_check = ClipCheck.new(grip_seconds(), Settings.pace(), Settings.room())
+			return _check
+		"booty":
+			_check = BootyCheck.new(grip_seconds() + 2.0, Settings.pace(), Settings.room(), row * 31 + pitch)
+			return _check
 	return null
 
 
@@ -845,6 +1104,15 @@ func resolve_crux(result: String) -> void:
 			return
 		"haul":
 			_resolve_haul(result)
+			return
+		"place":
+			_resolve_place(result)
+			return
+		"clip":
+			_resolve_clip(result)
+			return
+		"booty":
+			_resolve_booty(result)
 			return
 	var name: String = pending.name
 	var diff := int(spec.get("diff", 2))
@@ -884,24 +1152,129 @@ func resolve_crux(result: String) -> void:
 	_settle()
 
 
+## On the screen you can always sling a horn, even with your harness empty.
 func can_place_cam() -> bool:
-	return not route.boulder and status == Status.CLIMBING and pending.is_empty() and not route.top_rope and cams_left > 0 \
+	return not route.boulder and status == Status.CLIMBING and pending.is_empty() and not route.top_rope \
+		and (cams_left > 0 or (interactive and not rack.is_empty())) \
 		and hold_at(row, col).get("crack", false) and protection_row < row
 
 
+## Places a piece in the crack you're on. On the screen ([member
+## interactive]) that's a "place" check (PlaceCheck) left pending, unless the
+## right size goes straight in (see [method quick_place]); otherwise (tests,
+## bots) the best fit on your rack goes in "good".
 func place_cam() -> bool:
 	if not can_place_cam():
 		message = "You need a crack to place a cam." if cams_left > 0 else "You're out of cams for this pitch."
 		return false
-	cams_left -= 1
+	var width := crack_width(row, col)
+	var best := best_piece(width)
+	if not interactive:
+		_place(best, "good")
+		return true
+	if quick_place(best, width):
+		_place(best, "good", true)
+		return true
+	pending = {"kind": "place", "name": "Place gear", "row": row, "cell": Vector2i(col, row), "width": width,
+		"index": 1, "count": 1, "tries": 0, "pumped": false, "window": 0.0}
+	message = ""
+	events.append({"type": "place_start", "width": width})
+	return true
+
+
+## True when [param piece] is the right size for a crack [param width] wide
+## and you hang somewhere easy (a jug or a stance, or an edge once you've
+## found your rhythm), not pumped: it just goes in.
+func quick_place(piece: Dictionary, width: int) -> bool:
+	if piece.is_empty() or ClimbRack.misfit(piece, width) != 0 or pump >= PUMP_WARN:
+		return false
+	var hold := hold_at(row, col)
+	return hold.get("rest", false) or grip() == "jug" or (grip() == "edge" and solid_this_pitch >= QUICK_AFTER_SOLID)
+
+
+## Finishes a "place" check: the piece you picked goes in as well as you
+## seated it ("perfect" solid, "good", "over" over-cammed, "slip" marginal).
+func _resolve_place(result: String) -> void:
+	var check := _check as PlaceCheck
+	var piece: Dictionary = check.chosen if check != null else {}
+	var detail := check.detail if check != null else ""
+	pending = {}
+	_check = null
+	if result == "cancel":
+		# Nothing went in: you grabbed the rock again.
+		if detail == "grip":
+			_protect_effort()
+			message = "Your grip goes before you pick a piece. You grab the rock: try from a better hold."
+		else:
+			message = "You leave the crack for now."
+		events.append({"type": "place_cancel"})
+		return
+	var quality: String = {"perfect": "solid", "good": "good", "over": "over"}.get(result, "marginal")
+	if piece.is_empty() or piece.get("kind", "") == "sling":
+		piece = ClimbRack.SLING
+		quality = "marginal"
+	_place(piece, quality, false, detail)
+
+
+## The piece you have most of on your harness, or {}.
+func _most_plentiful() -> Dictionary:
+	var best := {}
+	for piece in rack_now():
+		if int(piece.left) > int(best.get("left", 0)):
+			best = piece
+	return best
+
+
+func _take_from_rack(piece: Dictionary) -> void:
+	if piece.is_empty() or piece.get("kind", "") == "sling":
+		return
+	var k := ClimbRack.key(piece)
+	if rack_left.has(k):
+		rack_left[k] = maxi(int(rack_left[k]) - 1, 0)
+
+
+## Puts [param piece] in the crack you're on, [param quality] as it went.
+func _place(piece: Dictionary, quality: String, quick := false, detail := "") -> void:
+	var kind: String = piece.get("kind", "cam")
+	if kind != "sling":
+		cams_left -= 1
+		_take_from_rack(piece)
+	var hw := "nut" if kind == "nut" else ("sling" if kind == "sling" else "cam")
 	protection_row = row
 	placed_cams.append(Vector2i(col, row))
-	protection.append({"cell": Vector2i(col, row), "kind": "cam", "hw": "cam"})
+	protection.append({"cell": Vector2i(col, row), "kind": "cam", "hw": hw, "quality": quality,
+		"color": piece.get("color", CamSizes.color(0)), "key": ClimbRack.key(piece) if not piece.is_empty() else "",
+		"name": piece.get("name", "Cam"), "width": int(piece.get("width_min", 4)), "size_index": int(piece.get("size_index", -1))})
 	_protect_effort()
 	minutes += MINUTES_PER_CAM
-	message = _protect_message("Cam placed.")
-	events.append({"type": "cam"})
-	return true
+	placements += 1
+	if quality == "solid":
+		solid_placements += 1
+		solid_this_pitch += 1
+	message = _protect_message(_placed_line(piece, quality, quick, detail))
+	events.append({"type": "cam", "quality": quality, "hw": hw, "quick": quick})
+
+
+## What the screen says about a piece that just went in.
+func _placed_line(piece: Dictionary, quality: String, quick: bool, detail: String) -> String:
+	var name := String(piece.get("name", "Cam"))
+	var crack := ClimbRack.width_name(crack_width(row, col))
+	if piece.get("kind", "") == "sling":
+		return "Nothing on your rack fits this %s crack. You sling a horn: it'll hold a short fall at best." % crack
+	match quality:
+		"solid":
+			return "Bomber. The %s sits mid-range in the %s crack." % [name, crack]
+		"over":
+			return "Over-cammed: the %s holds, but your second will fight to clean it." % name
+		"marginal":
+			if detail == "grip":
+				return "Your grip goes. You leave the %s half-set and grab the rock. Don't fall on it." % name
+			return "Tipped out: the %s is barely in. Don't fall on it, and place another soon." % name
+	if quick or detail == "":
+		return "%s placed." % name if piece.get("kind", "") == "nut" else "Cam placed."
+	if detail == "off_size":
+		return "The %s goes in, a size off. It'll do." % name
+	return "%s placed. Good enough." % name
 
 
 ## True if there's a bolt on this row within arm's reach (your column or the
@@ -911,6 +1284,8 @@ func can_clip() -> bool:
 		and bolts.has(row) and absi(int(bolts[row]) - col) <= 1 and protection_row < row
 
 
+## On the screen, clipping off a crimp or with pumped forearms is a "clip"
+## check (ClipCheck); anywhere easier the draw just goes on.
 func clip_bolt() -> bool:
 	if not can_clip():
 		if not bolts.has(row):
@@ -922,6 +1297,17 @@ func clip_bolt() -> bool:
 		else:
 			message = "You've already clipped that bolt."
 		return false
+	if interactive and not hold_at(row, col).get("rest", false) and (grip() == "crimp" or pump >= PUMP_WARN):
+		pending = {"kind": "clip", "name": "Clip", "row": row, "cell": Vector2i(int(bolts[row]), row),
+			"index": 1, "count": 1, "tries": 0, "pumped": false, "window": 0.0}
+		message = ""
+		events.append({"type": "clip_start"})
+		return true
+	_clip()
+	return true
+
+
+func _clip(how := "") -> void:
 	var bolt := Vector2i(int(bolts[row]), row)
 	var hw: String = bolt_kinds.get(row, "bolt")
 	quickdraws_left -= 1
@@ -931,8 +1317,25 @@ func clip_bolt() -> bool:
 	_protect_effort()
 	minutes += MINUTES_PER_CLIP
 	message = _protect_message("Clipped the old piton." if hw == "pin" else "Clipped. The rope runs through the quickdraw.")
+	if how == "perfect":
+		message = "Snap. A clean clip off a bad hold."
+	elif how == "good":
+		message = "Clipped, just. Breathe."
 	events.append({"type": "clip", "hw": hw})
-	return true
+
+
+## Finishes a "clip" check: clipped, or fumbled (the rope drops, and you can
+## try again or climb on).
+func _resolve_clip(result: String) -> void:
+	pending = {}
+	_check = null
+	if result == "slip":
+		stamina = maxi(stamina - CLIP_FUMBLE, 1)
+		minutes += 1
+		message = "You fumble the clip and the rope drops (-%d). Try again, or climb on." % CLIP_FUMBLE
+		events.append({"type": "fumble"})
+		return
+	_clip(result)
 
 
 ## Placing a piece: cheap from a jug, strenuous off a crimp. It never takes
@@ -955,7 +1358,78 @@ func protect() -> bool:
 	if route.boulder:
 		message = "No rope on a boulder. The pad and your spotter are your protection."
 		return false
+	# The stuck piece first; after a try, the button protects you (and the
+	# next press tries the booty again once you have a piece in).
+	if can_take_booty() and (_booty_tried_row != row or not can_place_cam()):
+		return take_booty()
 	return clip_bolt() if is_bolted() or can_clip() else place_cam()
+
+
+## The booty in the crack you're on, or {}.
+func booty_here() -> Dictionary:
+	var i := int(hold_at(row, col).get("booty", -1))
+	return booty[i] if i >= 0 and i < booty.size() else {}
+
+
+## True on the screen at a crack with a stuck piece in it.
+func can_take_booty() -> bool:
+	return interactive and status == Status.CLIMBING and pending.is_empty() and not booty_here().is_empty()
+
+
+## Starts working the stuck piece out (BootyCheck).
+func take_booty() -> bool:
+	if not can_take_booty():
+		return false
+	var found := booty_here()
+	pending = {"kind": "booty", "name": String(found.get("name", "Stuck cam")), "row": row, "cell": Vector2i(col, row),
+		"index": 1, "count": 1, "tries": 0, "pumped": false, "window": 0.0}
+	message = ""
+	events.append({"type": "booty_start"})
+	return true
+
+
+func _resolve_booty(result: String) -> void:
+	var found := booty_here()
+	pending = {}
+	_check = null
+	if result == "slip" or found.is_empty():
+		_booty_tried_row = row
+		minutes += BOOTY_MINUTES
+		message = "It won't budge yet. Place a piece, then try again, or leave it." if can_place_cam() else "It won't budge yet. Try again, or leave it."
+		events.append({"type": "booty_stuck"})
+		return
+	hold_at(row, col).erase("booty")
+	booty_taken.append(found)
+	minutes += BOOTY_MINUTES
+	_booty_tried_row = -1
+	message = "Booty! %s. Finders keepers: it's yours to keep." % String(found.get("name", "A stuck cam"))
+	events.append({"type": "booty", "booty": found})
+
+
+## Gives this pitch's stuck pieces (WallBooty) their cracks: each sits on the
+## line at its row, so you climb right past it.
+func set_booty(list: Array) -> void:
+	booty.clear()
+	for b: Dictionary in list:
+		booty.append(b)
+	_place_booty()
+
+
+func _place_booty() -> void:
+	for i in booty.size():
+		var b: Dictionary = booty[i]
+		var r := int(b.get("row", 0))
+		if int(b.get("pitch", 0)) != pitch or r <= 0 or r >= top_row or not _path.has(r):
+			continue
+		var hold: Dictionary = holds[r][_path[r]]
+		if hold.get("kind", "") in ["snow", "ice"]:
+			continue
+		hold.crack = true
+		hold["booty"] = i
+		if b.has("width"):
+			hold["width"] = int(b.width)
+		elif not hold.has("width"):
+			hold["width"] = _roll_width()
 
 
 ## True if chalking up would help: on rock, once a pitch, anywhere but a
@@ -1161,8 +1635,26 @@ func _fall() -> void:
 		message = "You slide, then self-arrest with your ice axe. Catch your breath." if has_axe else "You slide a long way before you stop."
 		return
 	var distance := runout()
+	# A marginal piece holds a short fall; from higher up it rips, and the
+	# piece below has to catch you (only one rips: the next one's sound).
+	var ripped := {}
+	if not protection.is_empty() and protection.back().get("quality", "good") == "marginal" and distance > MARGINAL_HOLDS:
+		ripped = protection.pop_back()
+		placed_cams.erase(ripped.cell)
+		if ripped.get("hw", "") != "sling":
+			# It slides down the rope to your harness.
+			cams_left += 1
+			if rack_left.has(ripped.get("key", "")):
+				rack_left[ripped.key] = int(rack_left[ripped.key]) + 1
+		protection_row = protection.back().cell.y if not protection.is_empty() else 0
+		distance = runout()
+		rips += 1
+		events.append({"type": "rip", "piece": ripped})
+	var rip_line := ""
+	if not ripped.is_empty():
+		rip_line = "Your %s rips out! " % ("slung horn" if ripped.get("hw", "") == "sling" else String(ripped.get("name", "cam")))
 	if distance >= DANGEROUS_RUNOUT:
-		retreat("You fell %d moves past your last protection. Shaken, you lower off and walk back down." % (distance * 2))
+		retreat(rip_line + "You fell %d moves past your last protection. Shaken, you lower off and walk back down." % (distance * 2))
 		return
 	# A leader falls twice as far as they were above their protection.
 	row = maxi(protection_row - distance, 0)
@@ -1173,8 +1665,8 @@ func _fall() -> void:
 	var catcher := "belay"
 	if protection_row > 0 and not protection.is_empty():
 		var last: Dictionary = protection.back()
-		catcher = "quickdraw" if last.kind == "draw" else "cam"
-	message = "You fall, and your %s catches you. Shake it out and try again." % catcher
+		catcher = "quickdraw" if last.kind == "draw" else ("sling" if last.get("hw", "") == "sling" else ("nut" if last.get("hw", "") == "nut" else "cam"))
+	message = rip_line + ("You fall, and your %s catches you. Shake it out and try again." % catcher)
 
 
 ## Tries left on a boulder problem, counting the one you're on.
@@ -1217,6 +1709,15 @@ func _fall_on_pad() -> void:
 ## "haul" check (HaulCheck) left pending, which [method resolve_crux] settles;
 ## otherwise it takes MINUTES_PER_HAUL.
 func _finish_pitch() -> void:
+	var stuck := 0
+	for piece in protection:
+		if piece.get("quality", "") == "over":
+			stuck += 1
+	_clean_note = ""
+	if stuck > 0:
+		minutes += STUCK_MINUTES * stuck
+		_clean_note = " Your second fights the over-cammed %s out (+%d min)." % ["piece" if stuck == 1 else "pieces", STUCK_MINUTES * stuck]
+		events.append({"type": "stuck", "count": stuck})
 	if needs_haul() and interactive:
 		pending = {"kind": "haul", "name": "Haul the bag", "row": row, "cell": Vector2i(col, row),
 			"index": 1, "count": 1, "tries": 0, "pumped": false, "window": 0.0}
@@ -1268,12 +1769,17 @@ func _next_pitch(haul_minutes: int) -> void:
 	if haul_minutes > 0:
 		minutes += haul_minutes
 		haul_note = " You haul the bag (+%d min)." % haul_minutes
+	haul_note += _clean_note
+	_clean_note = ""
 	if _night_after(finished_spec):
 		if not _bivy(finished_spec.get("bivy", "ledge")):
 			return
 	stamina = mini(stamina + BELAY_REST + (DEVICE_REST if has_device else 0) + int(Perks.bonus("leonards_belay")) + (Camp.STRING_LIGHTS_REST if Camp.has("string_lights") else 0), MAX_STAMINA)
 	_start_pitch()
 	message = ("Belay ledge. Pitch %d of %d." % [pitch + 1, route.pitches.size()] + haul_note) if message == "" else message + haul_note
+	var note := crack_note()
+	if note != "":
+		message += " " + note
 
 
 func _night_after(finished_spec: Dictionary) -> bool:
@@ -1371,6 +1877,9 @@ func _start_pitch() -> void:
 	col = COLUMNS / 2
 	last_dx = 0
 	cams_left = cams_per_pitch
+	_refill_rack()
+	solid_this_pitch = 0
+	_check = null
 	quickdraws_left = quickdraws_per_pitch
 	protection_row = 0
 	falls_this_pitch = 0
@@ -1383,9 +1892,12 @@ func _start_pitch() -> void:
 	_rested_rows = {}
 	_shaken_rows = {}
 	pump = 0
+	last_hand = ""
 	spec = ClimbProfiles.pitch_spec(route, pitch)
 	top_row = int(spec.rows)
+	_width_rng.seed = _rng.seed + 7919 * (pitch + 1)
 	_generate_holds()
+	_place_booty()
 	# How each hold is taken by hand and foot (see HoldShape).
 	HoldShape.tag(holds, style())
 	events.append({"type": "pitch_start", "pitch": pitch, "name": spec.name})
@@ -1407,6 +1919,7 @@ func _crack_chance() -> float:
 
 func _generate_holds() -> void:
 	holds = {}
+	_path = {}
 	bolts = {}
 	bolt_kinds = {}
 	var difficulty := int(spec.diff)
@@ -1450,6 +1963,7 @@ func _generate_holds() -> void:
 		holds[r] = rowd
 	_remove_dead_ends(difficulty, cols)
 	_apply_features(path, difficulty)
+	_path = path
 	if is_bolted():
 		# Bolts sit on the line, so the easy way up passes every one of them.
 		var gap := int(spec.get("bolt_gap", BOLT_SPACING))
@@ -1470,6 +1984,12 @@ func _generate_holds() -> void:
 			hold.erase("hard")
 	if _crack_chance() > 0.0 and not is_snow():
 		_ensure_cracks(path)
+	# Every crack gets its width (rolled apart from the holds, so a seed's
+	# wall is the same one it always was).
+	for r: int in holds:
+		for c: int in holds[r]:
+			if holds[r][c].get("crack", false) and not holds[r][c].has("width"):
+				holds[r][c]["width"] = _roll_width()
 
 
 ## A boulder problem's holds are the real ones, the same every time: the
@@ -1503,6 +2023,12 @@ func _remove_dead_ends(difficulty: int, cols: Array) -> void:
 			if not reachable:
 				var nc := clampi(c + _rng.randi_range(-1, 1), cols.min(), cols.max())
 				holds[r + 1][nc] = _make_hold(difficulty, false)
+
+
+## A width for a crack on this pitch (ClimbRack.pitch_widths).
+func _roll_width() -> int:
+	var widths: Array = ClimbRack.pitch_widths(spec)
+	return _width_rng.randi_range(int(widths[0]), int(widths[1]))
 
 
 ## A grip for a new hold on this pitch's style (see [constant GRIPS]).

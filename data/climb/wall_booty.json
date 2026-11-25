@@ -1,0 +1,29 @@
+{
+	"_note": "Booty on the wall (WallBooty): stuck pieces in cracks on the climbing screen, one time each per game. 'id' is saved, never change it. 'pitch' counts from 0; 'row' is the move on that pitch (1 to the pitch's rows - 1), on the line. 'gear' is a Gear id (a sized cam or nut); 'width' the crack it's stuck in (ClimbRack.WIDTHS). tests/gear_placement_test.tscn checks every one.",
+	"booty": [
+		{"id": "nutcracker_stopper", "route": "nutcracker", "pitch": 1, "row": 4, "gear": "nut_mid", "width": 2,
+			"name": "An old Chouinard Stopper",
+			"text": "Set hard in the finger crack and left behind, its swage worn smooth. Royal Robbins climbed this route on nuts alone in 1967, to show it could be done without hammering pitons."},
+		{"id": "apron_purple", "route": "glacier_point_apron", "pitch": 0, "row": 5, "gear": "cam_05", "width": 2,
+			"name": "A purple #0.5",
+			"text": "Walked deep into the Grack, where somebody's tug only sank it further. A few taps with the nut tool and the lobes let go."},
+		{"id": "cathedral_grey", "route": "cathedral_peak", "pitch": 2, "row": 4, "gear": "cam_04", "width": 1,
+			"name": "A grey #0.4",
+			"text": "Jammed behind a knob at the back of the chimney, a little sun-faded. Someone's bail piece from an afternoon storm."},
+		{"id": "spire_small_nut", "route": "higher_cathedral_spire", "pitch": 1, "row": 5, "gear": "nut_small", "width": 0,
+			"name": "A tiny brass nut",
+			"text": "Set in a seam beside an old pin scar and forgotten. Small enough to fit where nothing else will."},
+		{"id": "arches_blue", "route": "royal_arches", "pitch": 1, "row": 3, "gear": "cam_3", "width": 6,
+			"name": "A blue #3",
+			"text": "Over-cammed in a flare under the arch, its sling bleached pale. It comes out with a groan and a shower of grit."},
+		{"id": "steck_four", "route": "steck_salathe", "pitch": 4, "row": 5, "gear": "cam_4", "width": 7,
+			"name": "A battered #4",
+			"text": "Stuck deep in the wide crack, dented from a fall long ago. On the Steck-Salathé, a big cam is worth more than gold."},
+		{"id": "astroman_grey", "route": "astroman", "pitch": 0, "row": 6, "gear": "cam_03", "width": 0,
+			"name": "A tiny #0.3",
+			"text": "Tipped into a pin scar in the fingertip crack, the trigger bent. It still works. Finders keepers."},
+		{"id": "nose_green", "route": "the_nose", "pitch": 1, "row": 5, "gear": "cam_075", "width": 3,
+			"name": "A green #0.75",
+			"text": "Left in the Stoveleg Cracks by a speed team who couldn't stop to clean it. Its sling has a name written on it, too faded to read."}
+	]
+}

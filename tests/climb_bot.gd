@@ -22,6 +22,11 @@ var shake_at := 3
 var use_aid := true
 var use_jug := true
 var greedy := false
+## How the bot's grabs land (ClimbReach on the screen), as weights of
+## "perfect", "good" and "sloppy". Empty: every grab is "good", the old
+## economy. Its plan still prices every move as a good grab.
+var grabs := {}
+var _grab_rng := RandomNumberGenerator.new()
 var guard_limit := 900
 var moves := 0
 ## The plan for the current pitch: (r, c, pump, runout, cams) -> [cost, action].
@@ -55,8 +60,22 @@ func step(state: ClimbState) -> void:
 	elif choice.mode == "aid":
 		state.aid_step(dx)
 	else:
-		state.move(dx)
+		state.move(dx, _roll_grab())
 	moves += 1
+
+
+func _roll_grab() -> String:
+	if grabs.is_empty():
+		return "good"
+	var total := 0.0
+	for k in grabs:
+		total += float(grabs[k])
+	var roll := _grab_rng.randf() * total
+	for k in grabs:
+		roll -= float(grabs[k])
+		if roll <= 0.0:
+			return k
+	return "good"
 
 
 func _eat(state: ClimbState) -> void:
