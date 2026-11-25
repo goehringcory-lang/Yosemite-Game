@@ -20,12 +20,18 @@ static func title(kind: String, name: String) -> String:
 			return "AID: NAIL A PIN"
 		"haul":
 			return "HAUL THE BAG"
+		"place":
+			return "PLACE GEAR"
+		"clip":
+			return "CLIP THE BOLT"
+		"booty":
+			return "BOOTY: " + name.to_upper()
 	return "CRUX: " + name.to_upper()
 
 
 ## Draws the panel for [param check], the rules of a [param kind] check.
 static func draw(ci: CanvasItem, kind: String, name: String, check: ClimbCheck) -> void:
-	var r := Rect2(SCREEN.x * 0.5 - 110, 54 if kind == "swing" else 60, 220, 84 if kind == "swing" else 72)
+	var r := Rect2(SCREEN.x * 0.5 - 110, 54 if kind in ["swing", "place"] else 60, 220, 84 if kind == "swing" else (100 if kind == "place" else 72))
 	UI.panel(ci, r)
 	UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 17), title(kind, name), UI.WARN_DARK, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
 	match kind:
@@ -37,6 +43,12 @@ static func draw(ci: CanvasItem, kind: String, name: String, check: ClimbCheck) 
 			_haul(ci, r, check as HaulCheck)
 		"layback":
 			_layback(ci, r, check as LaybackCheck)
+		"place":
+			_place(ci, r, check as PlaceCheck)
+		"clip":
+			_clip(ci, r, check as ClipCheck)
+		"booty":
+			_booty(ci, r, check as BootyCheck)
 	_time_bar(ci, r, check)
 
 
@@ -188,3 +200,85 @@ static func _layback(ci: CanvasItem, r: Rect2, l: LaybackCheck) -> void:
 	if Settings.hold_taps:
 		prompt = "Hold [%s] to pull, hold [%s] to step" % [UI.button(ci, "Space", "X"), UI.button(ci, "Up", "Stick up")]
 	UI.keys(ci, Vector2(r.position.x + 110, r.position.y + 58), prompt, UI.INK_SOFT, 10, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+## Placing a piece (PlaceCheck): your rack along the top, the crack's width,
+## and the trigger bar with its green for the piece you've picked.
+static func _place(ci: CanvasItem, r: Rect2, c: PlaceCheck) -> void:
+	var crack := "%s crack (%s fits)" % [ClimbRack.width_name(c.width).capitalize(), ClimbRack.width_size(c.width)]
+	ClimbGearArt.crack_tick(ci, Vector2(r.position.x + 18, r.position.y + 27), c.width)
+	UI.ink(ci, Vector2(r.position.x + 26, r.position.y + 31), crack, UI.INK_SOFT, 10)
+	# The rack: every piece you can pick, the cursor on the one in hand.
+	var n := c.pieces.size()
+	var step := minf(18.0, 196.0 / maxf(n, 1))
+	var x0 := r.position.x + 110 - step * (n - 1) / 2.0
+	for i in n:
+		var at := Vector2(roundf(x0 + i * step), r.position.y + 46)
+		if i == c.cursor:
+			ci.draw_rect(Rect2(at + Vector2(-7, -10), Vector2(15, 20)), UI.GOLD)
+			ci.draw_rect(Rect2(at + Vector2(-6, -9), Vector2(13, 18)), UI.WOOD_DARK)
+		ClimbGearArt.icon(ci, at, c.pieces[i], not c.can_use(i))
+		var left := int(c.pieces[i].get("left", 0))
+		if c.pieces[i].get("kind", "") != "sling" and left > 1:
+			UI.outlined(ci, at + Vector2(9, 9), str(left), UI.CREAM, 8)
+	# What you're holding, and how it fits.
+	var piece := c.selected()
+	var fit := "fits"
+	var fit_color := UI.GOOD_DARK
+	match ClimbRack.misfit_side(piece, c.width):
+		1:
+			fit = "a size big: don't over-cam it"
+			fit_color = UI.WARN
+		-1:
+			fit = "a size small: it may tip out"
+			fit_color = UI.WARN
+	if piece.get("kind", "") == "sling":
+		fit = "always holds a short fall, no more"
+		fit_color = UI.WARN
+	UI.ink(ci, Vector2(r.position.x + 110, r.position.y + 68), "%s: %s" % [piece.get("name", "Cam"), fit], fit_color, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+	# The trigger bar.
+	var bar := Rect2(r.position.x + 16, r.position.y + 72, 188, 5)
+	if piece.get("kind", "") != "sling":
+		_track(ci, bar)
+		var g := c.green()
+		_green(ci, bar, clampf(g.x - g.y / 2.0, 0.0, 1.0), clampf(g.x + g.y / 2.0, 0.0, 1.0), ClimbRack.misfit(piece, c.width) == 0)
+		if not c.is_nut():
+			var over := clampf(g.x + g.y / 2.0, 0.0, 1.0)
+			ci.draw_rect(Rect2(bar.position.x + bar.size.x * over, bar.position.y, bar.size.x * (1.0 - over), bar.size.y), Color(UI.WARN, 0.45))
+		ci.draw_rect(Rect2(bar.position.x, bar.position.y + 1, bar.size.x * c.pull, bar.size.y - 2), STEEL)
+		_marker(ci, bar, c.pull)
+	var prompt := "[%s] Pick   Hold [%s], let go in the green   [%s] Back" % [UI.button(ci, "Left/Right", "Stick"), UI.button(ci, "Space", "X"), UI.button(ci, "Esc", "B")]
+	if c.phase == "seat":
+		prompt = "Let go in the green" if not c.is_nut() else "Let go to seat it"
+	elif piece.get("kind", "") == "sling":
+		prompt = "[%s] Pick   [%s] Sling it" % [UI.button(ci, "Left/Right", "Stick"), UI.button(ci, "Space", "X")]
+	UI.keys(ci, Vector2(r.position.x + 110, r.position.y + 88), prompt, UI.INK_SOFT, 10, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+## Clipping from a bad hold (ClipCheck): the bight of rope coming up to the
+## draw's gate.
+static func _clip(ci: CanvasItem, r: Rect2, c: ClipCheck) -> void:
+	var bar := Rect2(r.position.x + 16, r.position.y + 32, 188, 10)
+	_track(ci, bar)
+	_green(ci, bar, ClipCheck.CENTER - c.window / 2.0, ClipCheck.CENTER + c.window / 2.0)
+	# The rope's bight, and the draw at the gate.
+	var mx := bar.position.x + bar.size.x * c.pos
+	ci.draw_rect(Rect2(mx - 2, bar.position.y + 2, 4, bar.size.y - 4), Color("b3362b"))
+	ci.draw_rect(Rect2(mx - 1, bar.position.y + 3, 2, 1), Color("d9772a"))
+	var gate := bar.position.x + bar.size.x * ClipCheck.CENTER
+	ci.draw_rect(Rect2(gate - 1, bar.position.y - 7, 3, 6), STEEL)
+	UI.keys(ci, Vector2(r.position.x + 110, r.position.y + 58), "[%s] Clip as the rope reaches the gate" % UI.button(ci, "Space", "X"), UI.INK_SOFT, 10, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+## Working booty loose (BootyCheck): the nut tool rocking, the green where a
+## knock tells, and the knocks so far.
+static func _booty(ci: CanvasItem, r: Rect2, c: BootyCheck) -> void:
+	var bar := Rect2(r.position.x + 16, r.position.y + 28, 150, 10)
+	_track(ci, bar)
+	_green(ci, bar, c.center - c.window / 2.0, c.center + c.window / 2.0, false)
+	ci.draw_rect(Rect2(bar.position.x + bar.size.x * c.pos - 1, bar.position.y - 2, 3, bar.size.y + 4), STEEL)
+	for i in BootyCheck.NEED:
+		var pip := Rect2(r.position.x + 174 + i * 10, r.position.y + 30, 8, 6)
+		ci.draw_rect(pip.grow(1), UI.WOOD_DARK)
+		ci.draw_rect(pip, UI.GOOD if i < c.knocks else TRACK)
+	UI.keys(ci, Vector2(r.position.x + 110, r.position.y + 58), "[%s] Knock it loose in the green" % UI.button(ci, "Space", "X"), UI.INK_SOFT, 10, HORIZONTAL_ALIGNMENT_CENTER)
