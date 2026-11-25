@@ -167,6 +167,9 @@ func setup(p_route: RouteData, seed := -1) -> void:
 	_kit = Gear.carried_all()
 	state = ClimbState.new(route, Gear.carried("cam"), seed, _kit)
 	state.interactive = true
+	# Your real rack, size by size, and any booty still stuck on this route.
+	state.set_rack(ClimbRack.from_gear())
+	state.set_booty(WallBooty.waiting(route.id))
 	state.conditions = WallWeather.today(route.id)
 	_record_before = Achievements.sends.get(route.id, {}).duplicate()
 
@@ -218,6 +221,9 @@ func skip_intro() -> void:
 		_phase = Phase.CLIMB
 		_banner_age = 0.0
 		_speak("start")
+		var note := state.crack_note()
+		if note != "":
+			_toast(note)
 
 
 func _process(delta: float) -> void:
@@ -547,9 +553,40 @@ func _events() -> void:
 				if randf() < 0.5:
 					_speak("clip")
 			"cam":
-				Sound.play("climb_cam")
+				var quality: String = e.get("quality", "good")
+				Sound.play("climb_cam", -2.0 if quality == "solid" else -5.0, 0.04, 1.15 if quality == "solid" else (0.8 if quality == "marginal" else 1.0))
 				Rumble.play("clip")
-				_fx.sparks(_torso() + Vector2(8, -6), 6)
+				_fx.sparks(_torso() + Vector2(8, -6), 10 if quality == "solid" else (2 if quality == "marginal" else 6))
+				if quality == "solid":
+					_crux_result = "place_solid"
+					_crux_result_age = 0.0
+				elif quality == "marginal":
+					_crux_result = "slip_tipped"
+					_crux_result_age = 0.0
+			"rip":
+				# A piece pulls out of the rock as the rope comes tight.
+				Sound.play("climb_pin", 0.0, 0.0, 0.6)
+				Rumble.play("fall")
+				_shake = maxf(_shake, 8.0)
+				_crux_result = "slip_rip"
+				_crux_result_age = 0.0
+				var ripped: Dictionary = e.piece
+				_fx.sparks((_screen(ripped.cell.y, ripped.cell.x) + Vector2(4, -4)).round(), 12)
+				_fx.dust((_screen(ripped.cell.y, ripped.cell.x) + Vector2(4, 0)).round(), _dust_color(), 8)
+			"fumble":
+				Sound.play("climb_clip", -8.0, 0.0, 0.7)
+				Rumble.play("miss")
+				_shake = maxf(_shake, 1.5)
+			"booty":
+				# Stuck gear, worked free: it's yours for good.
+				WallBooty.take(e.booty)
+				Sound.play("climb_crux", -2.0, 0.0, 1.2)
+				Rumble.play("crux")
+				_fx.sparks(_torso() + Vector2(8, -10), 18)
+				_crux_result = "booty"
+				_crux_result_age = 0.0
+			"booty_stuck":
+				Rumble.play("miss")
 			"chalk":
 				Sound.play("climb_chalk")
 				_fx.chalk(_torso() + Vector2(0, 2), 16)
@@ -783,7 +820,7 @@ func _crux_input(event: InputEvent) -> void:
 		return
 	if _crux.has("check"):
 		var check: ClimbCheck = _crux.check
-		for pair in [["move_left", "left"], ["move_right", "right"], ["move_up", "up"], ["use_tool", "tool"], ["interact", "interact"]]:
+		for pair in [["move_left", "left"], ["move_right", "right"], ["move_up", "up"], ["use_tool", "tool"], ["interact", "interact"], ["ui_cancel", "cancel"]]:
 			if MenuInput.pressed(event, pair[0]):
 				check.press(pair[1])
 		_after_check(check)
@@ -899,6 +936,22 @@ func _after_check(check: ClimbCheck) -> void:
 				Sound.play("climb_move", -4.0, 0.08)
 				_step += 1
 				_fx.dust(_torso() + Vector2(6, 22), _dust_color(), 2)
+			"pick":
+				Sound.play("climb_clip", -14.0, 0.05, 1.4)
+			"pull":
+				Sound.play("climb_cam", -12.0, 0.03, 1.4)
+				_act_t = -0.8
+				_act_kind = "protect"
+			"clip_try":
+				_act_t = 0.0
+				_act_kind = "protect"
+			"knock":
+				Sound.play("climb_pin", -6.0 if e.good else -12.0, 0.03, 1.3 if e.good else 0.7)
+				_act_t = 0.0
+				_act_kind = "protect"
+				if e.good:
+					_fx.sparks(_torso() + Vector2(10, -16), 3)
+					_shake = maxf(_shake, 0.8)
 	if not check.is_done():
 		return
 	var kind: String = _crux.kind
@@ -1084,6 +1137,7 @@ func _draw_screen() -> void:
 		_draw_sky(height)
 	_draw_wall()
 	_draw_protection()
+	_draw_crack_cues()
 	_draw_rope()
 	_draw_belayer()
 	_draw_climber()
@@ -1327,9 +1381,32 @@ func _draw_protection() -> void:
 				# A piton nailed for an aid move (NailCheck), with a draw on it.
 				_canvas.draw_texture(ClimbSprites.hardware("pin_draw"), p + Vector2(-6, -4))
 				continue
-			# cams go in in rack order, so each shows its size's color (CamSizes)
-			_canvas.draw_texture(ClimbSprites.hardware("cam", CamSizes.size_of(cams)), p + Vector2(-6, -4))
+			if piece.has("quality"):
+				# a cam, nut or sling from your rack, in its size's color (ClimbGearArt)
+				ClimbGearArt.placed(_canvas, p + Vector2(0, -3), piece, _time)
+			else:
+				# cams go in in rack order, so each shows its size's color (CamSizes)
+				_canvas.draw_texture(ClimbSprites.hardware("cam", CamSizes.size_of(cams)), p + Vector2(-6, -4))
 			cams += 1
+
+
+## The width of every crack near you, a tick in the color of the cam that
+## fits it; the one you're on is named. Booty glints.
+func _draw_crack_cues() -> void:
+	if route.boulder or route.top_rope or state.status != ClimbState.Status.CLIMBING or _phase == Phase.INTRO:
+		return
+	for r in range(maxi(state.row - 1, 1), mini(state.row + 3, state.top_row)):
+		for c: int in state.holds.get(r, {}):
+			var hold: Dictionary = state.holds[r][c]
+			if not hold.get("crack", false):
+				continue
+			var p := (_screen(r, c) + Vector2(-9, 0)).round()
+			var here := r == state.row and c == state.col and _move_t >= 1.0
+			ClimbGearArt.crack_tick(_canvas, p, int(hold.get("width", 4)), here and state.can_place_cam() and _phase == Phase.CLIMB)
+			if hold.has("booty"):
+				var twinkle := 0.5 + 0.5 * sin(_time * 4.0 + r)
+				_canvas.draw_rect(Rect2(p + Vector2(10, -8), Vector2(2, 2)), Color(UI.CREAM, twinkle))
+				_canvas.draw_rect(Rect2(p + Vector2(9, -7), Vector2(4, 0.5 + twinkle)), Color(Color("9fd8ff"), twinkle))
 
 
 ## Where the rope leaves each piece of protection.
@@ -1567,10 +1644,13 @@ func _hint(usable: Dictionary) -> String:
 	if state.is_pumped():
 		return "[%s] Eat, then try the move again" % _button("E", "A")
 	var parts: Array[String] = []
-	if state.can_clip():
+	if state.can_take_booty():
+		parts.append("[%s] Work the stuck gear free" % _button("Space", "X"))
+	elif state.can_clip():
 		parts.append("[%s] %s" % [_button("Space", "X"), "Clip the bolt" if state.bolt_kinds.get(state.row, "bolt") == "bolt" else "Clip the old piton"])
 	elif state.can_place_cam():
-		parts.append("[%s] Place a cam" % _button("Space", "X"))
+		var width := state.crack_width(state.row, state.col)
+		parts.append("[%s] Place gear (%s)" % [_button("Space", "X"), ClimbRack.width_size(width) if state.has_fit(width) else "nothing fits"])
 	var eat: bool = usable.get("eat", false)
 	if state.is_at_belay() and (not route.boulder or eat):
 		if eat:
@@ -1764,6 +1844,9 @@ func _draw_hud(height: float) -> void:
 	if _phase == Phase.CLIMB or _phase == Phase.PAUSE:
 		var usable := _usable()
 		var toolbar_end := ClimbHud.toolbar(_canvas, state, _time, usable)
+		if not state.rack.is_empty() and not route.top_rope and not route.boulder:
+			var on_crack: bool = state.hold_at(state.row, state.col).get("crack", false)
+			ClimbGearArt.rack_strip(_canvas, state, Vector2(10, SCREEN.y - 44), state.crack_width(state.row, state.col) if on_crack else -1)
 		ClimbHud.hints(_canvas, _hint(usable), toolbar_end + 6.0)
 	if _phase == Phase.CLIMB:
 		if move_flow >= 3 and state.status == ClimbState.Status.CLIMBING:
