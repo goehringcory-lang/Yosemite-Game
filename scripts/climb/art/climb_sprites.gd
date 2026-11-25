@@ -4,8 +4,11 @@ extends RefCounted
 ## pixel scale (a person is about 40 px tall, like the farmers in the games
 ## this art takes after): warm colors, a dark brown outline, light from the
 ## upper left. Figures are posed with two-bone limbs, so any hand or foot
-## target gives a clean pose; frames are cached by pose, and doubled to the
-## screen's 32px finish by ClimbHiRes.
+## target gives a clean pose; frames are cached by pose. The climber on the
+## wall is painted at the screen's full density by ClimberHD, with a hand
+## shape for the hold each hand is on ("gr"/"gl") and a foot technique
+## ("ftr"/"ftl", see HoldShape); the chimney climber, the belayers and the
+## hardware are doubled to the screen's 32px finish by ClimbHiRes.
 ##
 ## The climber shows what you own: red climbing shoes, a chalk bag, a harness
 ## with a rack of cams (colored by size) and quickdraws, a belay device, aiders,
@@ -76,12 +79,13 @@ const LEG := 17.0
 
 # ---------------------------------------------------------------- poses
 
-## The default stance: right hand high, left hand low, left foot high.
+## The default stance: right hand high on the hold above, left hand low,
+## left foot high.
 static func stance(step: int) -> Dictionary:
 	var a := (step % 2) == 0
 	return {
-		"hr": Vector2(9, -20) if a else Vector2(9, -9),
-		"hl": Vector2(-9, -9) if a else Vector2(-9, -20),
+		"hr": Vector2(5, -21) if a else Vector2(9, -9),
+		"hl": Vector2(-9, -9) if a else Vector2(-5, -21),
 		"fr": Vector2(7, 17) if a else Vector2(7, 22),
 		"fl": Vector2(-7, 22) if a else Vector2(-7, 17),
 		"lean": 0,
@@ -96,8 +100,8 @@ static func style_pose(style: String, step: int) -> Dictionary:
 	match style:
 		"crack":
 			return {
-				"hr": Vector2(2, -21) if a else Vector2(1, -10),
-				"hl": Vector2(-1, -10) if a else Vector2(-2, -21),
+				"hr": Vector2(4, -22) if a else Vector2(2, -10),
+				"hl": Vector2(-2, -10) if a else Vector2(-4, -22),
 				"fr": Vector2(3, 16) if a else Vector2(3, 22),
 				"fl": Vector2(-3, 22) if a else Vector2(-3, 16),
 				"lean": 0,
@@ -247,12 +251,14 @@ static func climber(pose: Dictionary, kit: Dictionary, flags := {}) -> Texture2D
 	var key := "c|%s|%s|%s" % [_pose_key(pose), _kit_key(kit), str(flags)]
 	if _cache.has(key):
 		return _cache[key]
-	var im: Image
+	var tex: ImageTexture
 	if str(pose.get("mode", "wall")) == "chimney":
-		im = _paint_chimney(pose, kit, flags)
+		tex = ClimbHiRes.texture(_paint_chimney(pose, kit, flags))
 	else:
-		im = _paint_climber(pose, kit, flags)
-	var tex := ClimbHiRes.texture(im)
+		# On the wall the climber is painted at the screen's full density
+		# (ClimberHD), so hands show the hold they're on.
+		tex = ImageTexture.create_from_image(ClimberHD.paint(pose, kit, flags))
+		tex.set_size_override(SIZE)
 	_cache[key] = tex
 	_climber_keys.append(key)
 	if _climber_keys.size() > CLIMBER_CACHE:
@@ -270,6 +276,8 @@ static func _pose_key(pose: Dictionary) -> String:
 	parts.append(str(pose.get("chalk", false)))
 	parts.append(str(roundi(pose.get("tilt", 0))))
 	parts.append(str(pose.get("side", 0)))
+	for k in ["gr", "gl", "ftr", "ftl"]:
+		parts.append(str(pose.get(k, "")))
 	return "|".join(parts)
 
 
@@ -385,196 +393,6 @@ static func _seg(im: Image, a: Vector2, b: Vector2, w: int, base: Color, contour
 		P.line(im, a + Vector2(-1, -1), b + Vector2(-1, -1), base.lightened(0.18), 1)
 
 
-static func _paint_climber(pose: Dictionary, kit: Dictionary, flags: Dictionary) -> Image:
-	var im := P.make(SIZE.x, SIZE.y)
-	var o := ORIGIN
-	var lean: float = pose.get("lean", 0)
-	var torso := o + Vector2(lean, 0)
-	var shoes_red := int(kit.get("climbing_shoes", 0)) > 0
-	var shoe_col := Color("b3362b") if shoes_red else Color("92693d")
-	var shoe_dark := Color("b3362b") if shoes_red else Color("6b4829")
-	var sole := Color("2b2a30") if shoes_red else Color("47301f")
-	var snow: bool = flags.get("snow", false)
-	var crampons: bool = int(kit.get("crampons", 0)) > 0 and snow
-	var axe: bool = int(kit.get("ice_axe", 0)) > 0 and snow
-	var harness_on: bool = int(kit.get("harness", 0)) > 0 or flags.get("always_harness", false)
-	var tilt: float = pose.get("tilt", 0)
-	var tx := roundi(torso.x)
-	var ty := roundi(torso.y)
-	# Portaledge roll, strapped across the back (behind everything).
-	# Legs first (they're behind the harness).
-	var hl: Vector2 = torso + HIP_L
-	var hr: Vector2 = torso + HIP_R
-	var fl: Vector2 = o + pose.get("fl", Vector2(-5, 20)) + Vector2(lean * 0.3, 0)
-	var fr: Vector2 = o + pose.get("fr", Vector2(5, 16)) + Vector2(lean * 0.3, 0)
-	var leg_l := _limb_out(hl, fl, LEG * 0.5, LEG * 0.5, -1.0)
-	var leg_r := _limb_out(hr, fr, LEG * 0.5, LEG * 0.5, 1.0)
-	_draw_leg(im, hl, leg_l, shoe_col, shoe_dark, sole, crampons, harness_on)
-	_draw_leg(im, hr, leg_r, shoe_col, shoe_dark, sole, crampons, harness_on)
-	# Torso: shoulders a touch wider than the waist, light from the left.
-	_torso(im, tx, ty, harness_on)
-	if flags.get("portaledge", false):
-		_portaledge_roll(im, tx, ty)
-	# Chalk bag, on the small of the back.
-	if int(kit.get("chalk_bag", 0)) > 0:
-		_chalk_bag(im, tx, ty)
-	# The rack: cams (by size) on the left, quickdraws on the right.
-	_rack(im, tx, ty, int(kit.get("cam", 0)), int(kit.get("quickdraw", 0)))
-	if int(kit.get("belay_device", 0)) > 0 and harness_on:
-		# The belay device hangs from a locker at the front of the belt; a bit shows.
-		P.rect(im, tx + 1, ty + 7, 3, 3, STEEL)
-		P.px(im, tx + 1, ty + 7, STEEL_LIT)
-		P.px(im, tx + 2, ty + 8, STEEL_DARK)
-		P.px(im, tx + 3, ty + 9, STEEL_DARK)
-	if int(kit.get("rope", 0)) > 0 and flags.get("rope_coil", false):
-		for i in 3:
-			P.hline(im, tx - 6, ty - 6 + i * 2, 13, ROPE_C if i != 1 else ROPE_D)
-	if int(kit.get("aiders", 0)) > 0 and flags.get("aiders", false):
-		_aiders(im, tx, ty)
-	# Arms.
-	var sl: Vector2 = torso + SHOULDER_L
-	var sr: Vector2 = torso + SHOULDER_R
-	var tl: Vector2 = o + pose.get("hl", Vector2(-6, -9)) + Vector2(lean * 0.4, 0)
-	var tr: Vector2 = o + pose.get("hr", Vector2(6, -19)) + Vector2(lean * 0.4, 0)
-	var arm_l := _limb_out(sl, tl, ARM * 0.5, ARM * 0.5, -1.0)
-	var arm_r := _limb_out(sr, tr, ARM * 0.5, ARM * 0.5, 1.0)
-	var chalk: bool = pose.get("chalk", false)
-	_draw_arm(im, sl, arm_l, chalk and false)
-	_draw_arm(im, sr, arm_r, chalk)
-	if axe:
-		_draw_axe(im, arm_r[1])
-	# Head and hat, from behind.
-	var hx := tx + roundi(lean * 0.5)
-	var hy := ty - 14 + roundi(tilt * 0.3)
-	_head(im, hx, hy, tilt)
-	_outline(im)
-	return im
-
-
-static func _portaledge_roll(im: Image, tx: int, ty: int) -> void:
-	# A rolled portaledge strapped across the upper back, tubes poking out.
-	P.rect(im, tx - 7, ty - 8, 14, 6, Color("a84a1c"))
-	P.rect(im, tx - 7, ty - 8, 14, 4, Color("d9772a"))
-	P.hline(im, tx - 7, ty - 8, 14, Color("f7a64a"))
-	P.rect(im, tx + 4, ty - 4, 3, 3, Color("7e531c"))
-	P.rect(im, tx - 9, ty - 5, 2, 3, STEEL)
-	P.px(im, tx - 9, ty - 5, STEEL_LIT)
-	P.rect(im, tx + 7, ty - 5, 2, 3, STEEL_DARK)
-	P.vline(im, tx - 3, ty - 6, 5, Color("47301f"))
-	P.vline(im, tx + 2, ty - 6, 5, Color("47301f"))
-
-
-static func _torso(im: Image, tx: int, ty: int, harness_on: bool) -> void:
-	var s := SHIRT
-	# Body, then shoulders.
-	P.rect(im, tx - 5, ty - 7, 10, 14, s)
-	P.rect(im, tx - 6, ty - 7, 12, 5, s)
-	# Light on the left side, shade on the right and under the arms.
-	P.rect(im, tx - 6, ty - 7, 2, 5, s.lightened(0.25))
-	P.rect(im, tx - 5, ty - 2, 2, 7, s.lightened(0.18))
-	P.rect(im, tx + 3, ty - 4, 3, 2, s.darkened(0.2))
-	P.rect(im, tx + 3, ty - 2, 2, 7, s.darkened(0.22))
-	P.vline(im, tx, ty - 5, 9, s.darkened(0.12))
-	# Shoulder yoke and collar.
-	P.hline(im, tx - 5, ty - 7, 10, s.lightened(0.34))
-	P.hline(im, tx - 5, ty - 3, 10, s.darkened(0.1))
-	# Pants seat.
-	P.rect(im, tx - 5, ty + 5, 10, 4, PANTS)
-	P.rect(im, tx - 5, ty + 5, 3, 4, PANTS.lightened(0.18))
-	P.rect(im, tx + 3, ty + 6, 2, 3, PANTS.darkened(0.2))
-	P.vline(im, tx, ty + 6, 3, PANTS.darkened(0.25))
-	# Waist belt.
-	var belt := HARNESS if harness_on else Color("86694b")
-	P.rect(im, tx - 6, ty + 3, 12, 3, belt)
-	P.hline(im, tx - 6, ty + 3, 12, belt.lightened(0.35))
-	P.hline(im, tx - 6, ty + 5, 12, belt.darkened(0.3))
-	if harness_on:
-		# Buckle and the back strap down to the leg loops.
-		P.rect(im, tx - 1, ty + 3, 3, 3, STEEL)
-		P.px(im, tx - 1, ty + 3, STEEL_LIT)
-		P.px(im, tx, ty + 4, STEEL_DARK)
-		P.vline(im, tx - 3, ty + 6, 4, HARNESS.darkened(0.15))
-		P.vline(im, tx + 3, ty + 6, 4, HARNESS.darkened(0.3))
-		# Gear loops.
-		for gx in [-6, -4, 3, 5]:
-			P.px(im, tx + gx, ty + 6, Color("47464d"))
-	else:
-		P.px(im, tx, ty + 4, Color("d8a63b"))
-
-
-static func _chalk_bag(im: Image, tx: int, ty: int) -> void:
-	var blue := Color("6f5aa6")
-	P.rect(im, tx - 2, ty - 1, 5, 6, blue)
-	P.rect(im, tx - 2, ty - 1, 2, 6, Color("6f5aa6"))
-	P.rect(im, tx + 2, ty + 1, 1, 4, Color("235679"))
-	P.hline(im, tx - 2, ty + 4, 5, Color("235679"))
-	# Rolled white rim, drawstring and a dab of chalk.
-	P.rect(im, tx - 3, ty - 2, 7, 2, Color("f5eee0"))
-	P.hline(im, tx - 3, ty - 1, 7, Color("bdb8ae"))
-	P.px(im, tx - 1, ty + 1, Color("f5eee0"))
-	P.px(im, tx, ty + 2, Color("f5eee0"))
-
-
-static func _rack(im: Image, tx: int, ty: int, cams: int, draws: int) -> void:
-	# Cams hang in two staggered columns from the left gear loops: a lobed head
-	# colored by size, a cable stem, a little sling.
-	for i in mini(cams, 5):
-		var c: Color = CAM_COLORS[i % CAM_COLORS.size()]
-		var x := tx - 9 + (i % 2) * 3
-		var y := ty + 6 + (i / 2) * 3 + (i % 2)
-		P.rect(im, x, y, 3, 2, c)
-		P.px(im, x, y, c.lightened(0.55))
-		P.px(im, x + 2, y + 1, c.darkened(0.35))
-		P.px(im, x + 1, y + 2, STEEL)
-	for i in mini(draws, 4):
-		var x := tx + 7 + (i % 2) * 2
-		var y := ty + 4 + (i / 2) * 3
-		P.rect(im, x, y, 1, 3, STEEL)
-		P.px(im, x, y, STEEL_LIT)
-		P.rect(im, x + 1, y + 1, 1, 3, Color("6f5aa6") if i % 2 == 0 else Color("f7a64a"))
-		P.px(im, x, y + 3, STEEL_DARK)
-
-
-static func _aiders(im: Image, tx: int, ty: int) -> void:
-	# Two aider ladders (blue webbing, cream steps) hanging from the belt.
-	for i in 2:
-		var x := tx + 5 + i * 2
-		P.rect(im, x, ty + 5, 1, 12 + i * 3, Color("6f5aa6"))
-		P.vline(im, x, ty + 5, 12 + i * 3, Color("6f5aa6"))
-		for k in 4:
-			P.hline(im, x - 1, ty + 8 + k * 3, 3, Color("f5eee0"))
-		P.px(im, x, ty + 5, STEEL)
-
-
-static func _draw_leg(im: Image, hip: Vector2, joints: Array[Vector2], shoe: Color, shoe_dark: Color, sole: Color, crampons: bool, harness_on: bool) -> void:
-	var knee := joints[0]
-	var foot := joints[1]
-	_seg(im, hip, knee, 4, PANTS)
-	_seg(im, knee, foot + Vector2(0, -2), 3, PANTS)
-	# Leg loop around the thigh.
-	if harness_on:
-		var mid := hip.lerp(knee, 0.45)
-		P.line(im, mid + Vector2(-2, 0), mid + Vector2(2, 0), HARNESS.darkened(0.1), 1)
-		P.px(im, roundi(mid.x) - 2, roundi(mid.y), HARNESS.lightened(0.3))
-	# Rolled cuff above the shoe.
-	var cf := foot + Vector2(0, -2)
-	P.rect(im, roundi(cf.x) - 2, roundi(cf.y) - 1, 4, 2, PANTS.lightened(0.28))
-	# Shoe: toe pointing at the rock, rubber rand and sole.
-	var fx := roundi(foot.x)
-	var fy := roundi(foot.y)
-	P.rect(im, fx - 3, fy - 1, 6, 4, shoe)
-	P.rect(im, fx - 3, fy - 1, 6, 1, shoe.lightened(0.32))
-	P.px(im, fx - 3, fy, shoe.lightened(0.2))
-	P.rect(im, fx + 2, fy, 1, 3, shoe_dark)
-	P.rect(im, fx - 3, fy + 2, 6, 1, shoe_dark)
-	P.rect(im, fx - 3, fy + 3, 6, 1, sole)
-	P.px(im, fx - 1, fy + 1, Color("f5eee0"))
-	if crampons:
-		for i in 3:
-			P.px(im, fx - 3 + i * 2, fy + 4, STEEL)
-			P.px(im, fx - 3 + i * 2, fy + 5, STEEL_DARK)
-
-
 static func _draw_arm(im: Image, shoulder: Vector2, joints: Array[Vector2], chalk: bool) -> void:
 	var elbow := joints[0]
 	var hand := joints[1]
@@ -606,53 +424,6 @@ static func _draw_arm(im: Image, shoulder: Vector2, joints: Array[Vector2], chal
 		P.rect(im, hx - 2, hy - 3, 4, 2, Color("f5eee0"))
 		P.px(im, hx + 1, hy - 3, Color("e4ddcc"))
 		P.px(im, hx - 3, hy - 2, Color("f5eee0"))
-
-
-static func _draw_axe(im: Image, hand: Vector2) -> void:
-	var hx := roundi(hand.x)
-	var hy := roundi(hand.y)
-	P.vline(im, hx, hy - 6, 15, Color("92693d"))
-	P.vline(im, hx + 1, hy - 6, 15, Color("6b4829"))
-	P.rect(im, hx - 4, hy - 8, 10, 2, STEEL)
-	P.hline(im, hx - 4, hy - 8, 10, STEEL_LIT)
-	P.rect(im, hx - 5, hy - 7, 2, 3, STEEL_DARK)
-	P.rect(im, hx + 5, hy - 7, 2, 2, STEEL_DARK)
-	P.rect(im, hx, hy + 8, 2, 2, STEEL)
-	# Wrist leash.
-	P.px(im, hx - 1, hy + 1, Color("f7a64a"))
-
-
-## The head, from behind: hair, ears and a broad-brimmed hat with a band.
-static func _head(im: Image, hx: int, hy: int, tilt: float) -> void:
-	var hair := HAIR
-	# Neck.
-	P.rect(im, hx - 2, hy + 4, 4, 3, SKIN_SHADE)
-	P.px(im, hx - 2, hy + 4, SKIN)
-	# Hair, a little over the collar.
-	P.shaded_ellipse(im, hx, hy, 4.5, 4.7, hair, hair.lightened(0.22), hair.darkened(0.22))
-	P.rect(im, hx - 4, hy + 1, 8, 3, hair)
-	P.rect(im, hx - 4, hy + 1, 2, 3, hair.lightened(0.2))
-	P.rect(im, hx + 2, hy + 3, 2, 1, hair.darkened(0.2))
-	# Ears.
-	P.px(im, hx - 5, hy + 2, SKIN)
-	P.px(im, hx - 5, hy + 3, SKIN_SHADE)
-	P.px(im, hx + 4, hy + 2, SKIN_SHADE)
-	P.px(im, hx + 4, hy + 3, SKIN_SHADE.darkened(0.15))
-	if HAT_KIND == "none":
-		return
-	if HAT_KIND == "dome":
-		# a cap or beanie: the crown alone, pulled down over the hair
-		P.shaded_ellipse(im, hx, hy - 2, 4.8, 3.6, HAT, HAT.lightened(0.3), HAT.darkened(0.22))
-		P.hline(im, hx - 4, hy, 9, HAT.darkened(0.3))
-		return
-	# Hat: brim, crown, hatband, a bright highlight and a brim shadow on the hair.
-	P.ellipse(im, hx, hy - 2, 6.6, 2.3, HAT.darkened(0.2))
-	P.ellipse(im, hx - 0.5, hy - 3, 5.8, 1.8, HAT)
-	P.hline(im, hx - 5, hy - 3, 4, HAT.lightened(0.18))
-	P.shaded_ellipse(im, hx, hy - 4, 3.8, 3.2, HAT, HAT.lightened(0.3), HAT.darkened(0.22))
-	P.hline(im, hx - 4, hy - 3, 8, Color("d8a63b"))
-	P.hline(im, hx + 1, hy - 3, 3, Color("ad7a22"))
-	P.hline(im, hx - 3, hy - 2, 7, HAT.darkened(0.45))
 
 
 # ---------------------------------------------------------------- chimney

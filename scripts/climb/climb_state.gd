@@ -1898,6 +1898,8 @@ func _start_pitch() -> void:
 	_width_rng.seed = _rng.seed + 7919 * (pitch + 1)
 	_generate_holds()
 	_place_booty()
+	# How each hold is taken by hand and foot (see HoldShape).
+	HoldShape.tag(holds, style())
 	events.append({"type": "pitch_start", "pitch": pitch, "name": spec.name})
 
 

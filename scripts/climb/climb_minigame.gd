@@ -85,6 +85,8 @@ var _wall_edge := PackedInt32Array()
 var _wall_gap := Rect2i()
 var _wall_pitch := -1
 var _fx := ClimbFx.new()
+## The grip close-up beside the hand that just took a hold.
+var _grip_view := ClimbGripView.new()
 ## The row the view is centered on; eases toward the climber.
 var _view_row := 0.0
 ## The climber's drawn position in (column, row), easing between holds.
@@ -268,6 +270,7 @@ func _process(delta: float) -> void:
 		_result_age += delta
 	_weather(delta)
 	_fx.update(anim_delta)
+	_grip_view.update(anim_delta)
 	# Low stamina: the climber sweats.
 	if _phase == Phase.CLIMB and state.stamina <= 25 and state.status == ClimbState.Status.CLIMBING and fmod(_time, 0.9) < delta:
 		_fx.sweat(_torso() + Vector2(4, -16))
@@ -500,8 +503,14 @@ func _after_action(before: Vector3i) -> void:
 		_belay_frame_t = 0.3
 		if _fell:
 			_pose_mode = "fall"
+			_grip_view.clear()
 		else:
 			_pose_mode = "wall"
+			if before.y < state.row and state.row < state.top_row:
+				_grip_view.took(state.hold_at(state.row, state.col), _pose_step() % 2 == 0,
+					ClimbRock.colors(profile.get("rock", "apron"), _pal).base, state.chalk_moves > 0)
+			else:
+				_grip_view.clear()
 			Sound.play("climb_move", -2.0, 0.08)
 			if state.style() == "slab" or state.style() == "dike":
 				_fx.dust(_torso() + Vector2(0, 22), _dust_color(), 3)
@@ -523,6 +532,7 @@ func _new_pitch() -> void:
 	_view_row = 0.0
 	_move_t = 1.0
 	_banner_age = 0.0
+	_grip_view.reset()
 	_pose_mode = "wall"
 
 
@@ -1144,6 +1154,8 @@ func _draw_screen() -> void:
 	_draw_reachable()
 	ClimbHud.reach(_canvas, reaching, _reach_target(), _time, last_grab, _grab_at, _grab_age)
 	_fx.draw(_canvas)
+	if _phase == Phase.CLIMB and not _roof and _grip_view.showing():
+		_grip_view.draw(_canvas, _hand_on_hold(), Rect2(L.GRID_X - 30.0, 30.0, float(L.WALL_W) + 20.0, TRAY_TOP - 30.0))
 	_canvas.draw_set_transform(Vector2.ZERO)
 	_draw_atmosphere()
 	_draw_hud(height)
@@ -1527,6 +1539,10 @@ func _draw_climber() -> void:
 	if pose.get("mode", "") == "chimney":
 		torso.x = roundf(L.CHIMNEY_X + int(pose.side) * 6.0)
 	var pos := torso - o + Vector2(_wind_sway(), 0)
+	if not _roof and not swing and pose.get("mode", "") != "chimney" and _shown.y > 0.45:
+		# A soft shadow on the rock down and right of you (the light is upper
+		# left) seats you on the face rather than floating over it.
+		_canvas.draw_texture(tex, ((pos + Vector2(1.5, 1.5)) * 2.0).round() / 2.0, Color(0.06, 0.05, 0.1, 0.28))
 	# Half a menu pixel is one screen pixel: the climber sways that finely.
 	_canvas.draw_texture(tex, (pos * 2.0).round() / 2.0)
 	# The haul bag swings below on a big wall.
@@ -1545,11 +1561,31 @@ func _draw_climber() -> void:
 			_canvas.draw_circle(torso + Vector2(0, -14), 52.0 - i * 8.0, Color(1, 0.831, 0.541, 0.045))
 
 
+## Screen position of the hand that took the last hold (the high one).
+func _hand_on_hold() -> Vector2:
+	var pose := _pose()
+	var key := "hr" if _pose_step() % 2 == 0 else "hl"
+	var hand: Vector2 = pose.get(key, Vector2.ZERO)
+	return _torso() + hand + Vector2(float(pose.get("lean", 0)) * 1.4, -4.0)
+
+
+## The step the pose is drawn for: even with the right hand high, odd with
+## the left. It follows the hand that made the last move (Left reaches with
+## the left hand, Right with the right); a match keeps alternating.
+func _pose_step() -> int:
+	match state.last_hand:
+		"right":
+			return _step - posmod(_step, 2)
+		"left":
+			return _step - posmod(_step, 2) + 1
+	return _step
+
+
 ## The pose to draw now: a stance that eases into the next one while a move
 ## plays, with the special poses (fall, hang, cheer, chalk, protect, eat,
 ## roof, chimney) from ClimbSprites.
 func _pose() -> Dictionary:
-	var step := _step
+	var step := _pose_step()
 	var a := ClimbSprites.style_pose(state.style(), step)
 	if _roof:
 		a = ClimbSprites.roof_pose(step)
@@ -1627,7 +1663,52 @@ func _pose() -> Dictionary:
 		a["lean"] = float(a.get("lean", 0)) - roundf(2.0 * float(_crux.check.tension))
 	if state.chalk_moves > 0:
 		a["chalk"] = true
+	if mode == "wall" and a.get("mode", "") != "chimney" and not swing:
+		_grip_pose(a, step)
 	return a
+
+
+## Puts each hand's shape and each foot's technique on [param a] (see
+## HoldShape, ClimberHD): the hand that went up last is on the hold you're
+## on, the other is still on the one you came from, and a reaching hand is
+## open until it lands. On a sidepull or a gaston the other leg flags out.
+func _grip_pose(a: Dictionary, step: int) -> void:
+	var here := state.hold_at(state.row, state.col)
+	var below := state.hold_at(roundi(_from.y), roundi(_from.x))
+	if below.is_empty() or _from.y >= state.row:
+		below = here
+	var high := "gr" if step % 2 == 0 else "gl"
+	var low := "gl" if high == "gr" else "gr"
+	a[high] = "" if _move_t < 0.7 else str(here.get("shape", "jug"))
+	a[low] = str(below.get("shape", "jug"))
+	var foot := str(here.get("foot", "edge"))
+	a["ftr"] = foot
+	a["ftl"] = foot
+	if _move_t >= 1.0 and a[high] in ["sidepull", "gaston"]:
+		var side := -1.0 if high == "gr" else 1.0
+		a["fl" if side < 0 else "fr"] = Vector2(side * 15.0, 13.0)
+	# A hand reaching for the next hold (ClimbReach) lets go and rises
+	# toward it, open, as the ring closes; past the hold it overreaches.
+	if reaching and _move_t >= 1.0:
+		var grip_key := low
+		if reaching.hand == "right":
+			grip_key = "gr"
+		elif reaching.hand == "left":
+			grip_key = "gl"
+		var hand_key := "hr" if grip_key == "gr" else "hl"
+		var side_x := 1.0 if hand_key == "hr" else -1.0
+		var p := clampf(reaching.progress(), 0.0, 1.2)
+		var goal := Vector2(side_x * 5.0 + reaching.dx * 9.0, -27.0)
+		a[hand_key] = (a[hand_key] as Vector2).lerp(goal, p * 0.85)
+		a[grip_key] = ""
+		a["lean"] = float(a.get("lean", 0)) + reaching.dx * p * 1.5
+	# A sloppy grab: the feet cut loose for a moment and swing back in.
+	if last_grab == "sloppy" and _move_t < 1.0:
+		var cut := sin(_move_t * PI) * 5.0
+		a["fr"] = (a.get("fr", Vector2(5, 18)) as Vector2) + Vector2(2, cut)
+		a["fl"] = (a.get("fl", Vector2(-5, 18)) as Vector2) + Vector2(-2, cut)
+		a["ftr"] = "step"
+		a["ftl"] = "step"
 
 
 ## [param keyboard] or [param gamepad], for the device in use (MenuInput.button).
