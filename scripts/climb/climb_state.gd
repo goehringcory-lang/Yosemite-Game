@@ -1386,6 +1386,8 @@ func _start_pitch() -> void:
 	spec = ClimbProfiles.pitch_spec(route, pitch)
 	top_row = int(spec.rows)
 	_generate_holds()
+	# How each hold is taken by hand and foot (see HoldShape).
+	HoldShape.tag(holds, style())
 	events.append({"type": "pitch_start", "pitch": pitch, "name": spec.name})
 
 
