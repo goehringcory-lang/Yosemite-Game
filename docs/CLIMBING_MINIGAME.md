@@ -52,7 +52,7 @@ Shots: `SHOT_SPECIAL=read`, `chalk` and `summit` in `tools/shots/climb_shot.gd`.
 | Chalk bag | Marty's kit | Once a pitch: next 2 moves -3; wider crux windows while chalked |
 | Harness, rope | Marty's kit; Leonard | Lead climbing; top-rope practice on Swan Slab |
 | Quickdraws | Marty's kit, then Eichorn, Robbins... | Clip bolts, and fixed pitons on cam routes |
-| Cams | Leonard onward | Place in cracks; the rack refills each pitch |
+| Cams, nuts | Leonard onward; booty on the wall | Place in cracks of their width: pick the size, then seat it while your grip lasts (PlaceCheck). Solid, good and over-cammed pieces hold; a marginal one rips out of a fall from more than a move above it. The rack refills each pitch. See README, "Placing gear" |
 | Belay device | Robbins (Nutcracker) | Soft catches (+10 stamina after a fall), restful belays (+6), rappel retreat |
 | Aiders | Harding | Pull through a hard move on a wall pitch (costs the free ascent). On the screen you nail a piton first (see below): a perfect pin takes 8 minutes, a seated one 12, an over-driven one 16, and one that pops costs 3 stamina and 6 minutes and you try again. Each pin takes a piece off the rack, as a cam did |
 | Ascenders | Johnson (Astroman) | Jug fixed ropes: 3 stamina, 8 minutes, you can't fall |
