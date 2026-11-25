@@ -284,7 +284,19 @@ func test_climbing() -> void:
 	minigame.setup(route, 7)
 	get_tree().root.add_child(minigame)
 	await get_tree().process_frame
-	check(Sound.bed_targets().amb_wind >= 0.8, "the wind rises on the climbing screen")
+	var low_wind: float = Sound.bed_targets().amb_wind
+	check(low_wind >= 0.55, "the wind is up on the climbing screen (%.2f)" % low_wind)
+	# ...and rises the higher you climb, as the valley's birds fall away.
+	var low_birds: float = Sound.bed_targets().amb_day + Sound.bed_targets().amb_night
+	minigame.state.pitch = route.pitches.size() - 1
+	minigame.state._start_pitch()
+	minigame._new_pitch()
+	var high: Dictionary = Sound.bed_targets()
+	check(high.amb_wind > low_wind and high.amb_day + high.amb_night < low_birds or low_birds == 0.0,
+		"higher up the wind rises (%.2f) and the valley quiets" % high.amb_wind)
+	minigame.state.pitch = 0
+	minigame.state._start_pitch()
+	minigame._new_pitch()
 	minigame.skip_intro()
 	var played := _count_playing()
 	minigame.state.events.append({"type": "clip"})
@@ -292,7 +304,7 @@ func test_climbing() -> void:
 	check(_count_playing() > played, "clipping a bolt makes a sound")
 	minigame.queue_free()
 	await get_tree().process_frame
-	check(Sound.bed_targets().amb_wind < 0.8, "and settles when you leave it")
+	check(Sound.bed_targets().amb_wind < low_wind, "and settles when you leave it")
 
 
 func _count_playing() -> int:
