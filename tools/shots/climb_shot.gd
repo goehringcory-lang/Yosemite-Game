@@ -6,7 +6,7 @@ extends Node
 ##   SHOT_HOURS   comma-separated game hours to shoot at (default 7,12,19)
 ##   SHOT_MOVES   moves to climb before each shot (default 5)
 ##   SHOT_INTRO   1 to shoot the route card instead of the climb
-##   SHOT_SPECIAL cards to shoot instead: "crux", "pumped", "dyno", "result", "pause", "night",
+##   SHOT_SPECIAL cards to shoot instead: "grip" (the grip close-up), "crux", "pumped", "dyno", "result", "pause", "night",
 ##                "read" (Down held: the view up the pitch and its topo), "chalk",
 ##                "summit" (the top-out vista),
 ##                or "falcon" for a peregrine stooping past the wall, or a
@@ -154,6 +154,14 @@ func _ready() -> void:
 				game.state.events.append({"type": "topout"})
 				game._events()
 				game._summit_age = 3.0
+			"grip":
+				# The grip close-up beside the hand on the hold you're on.
+				game._grip_view.reset()
+				game._grip_view.took(game.state.hold_at(game.state.row, game.state.col), game._step % 2 == 0,
+					ClimbRock.colors(game.profile.get("rock", "apron"), game._pal).base)
+				game._grip_view._age = 0.3
+				game.set_process(false)
+				game._canvas.queue_redraw()
 			"place", "booty", "rack":
 				var st := game.state
 				var kind := _env("SHOT_SPECIAL", "")
