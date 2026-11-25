@@ -4,6 +4,9 @@ shader_type canvas_item;
 uniform sampler2D screen_tex : hint_screen_texture, filter_nearest;
 uniform float dither : hint_range(0.0, 0.2) = 0.03;
 uniform float pixel_size = 2.0;
+// colours that are already final (the wall's granite ramp), and how many
+uniform vec3 keep[24];
+uniform int keep_count = 0;
 
 const vec3 PAL[42] = vec3[](
 	vec3(0.1686, 0.1647, 0.1882),
@@ -93,6 +96,7 @@ const vec3 LAB[42] = vec3[](
 	vec3(6.717, 2.551, -5.361),
 	vec3(21.022, 8.136, -20.033)
 );
+const int BAYER[16] = int[](0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5);
 
 vec3 to_lab(vec3 c) {
 	c = mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c));
@@ -105,9 +109,16 @@ vec3 to_lab(vec3 c) {
 
 void fragment() {
 	vec3 c = texture(screen_tex, SCREEN_UV).rgb;
-	vec2 p = floor(FRAGCOORD.xy / pixel_size);
-	float b = (mod(p.x, 4.0) * 0.25 + mod(p.y, 4.0)) * 0.25;
-	c = clamp(c + (b - 0.47) * dither, 0.0, 1.0);
+	bool kept = false;
+	for (int k = 0; k < keep_count; k++) {
+		if (all(lessThan(abs(c - keep[k]), vec3(2.5 / 255.0)))) {
+			kept = true;
+		}
+	}
+	// a true 4x4 Bayer matrix (the old row ramp drew scanlines)
+	ivec2 p = ivec2(floor(FRAGCOORD.xy / pixel_size)) & ivec2(3);
+	float b = (float(BAYER[p.y * 4 + p.x]) + 0.5) / 16.0;
+	c = clamp(c + (b - 0.5) * dither, 0.0, 1.0);
 	vec3 l = to_lab(c);
 	float best = 1e9;
 	vec3 out_c = c;
@@ -119,5 +130,5 @@ void fragment() {
 			out_c = PAL[i];
 		}
 	}
-	COLOR = vec4(out_c, 1.0);
+	COLOR = vec4(kept ? texture(screen_tex, SCREEN_UV).rgb : out_c, 1.0);
 }

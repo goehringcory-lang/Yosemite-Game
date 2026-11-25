@@ -76,6 +76,19 @@ func update(hour: float, night: bool, head: Vector2, cloud := 0.0) -> void:
 	headlamp.range_layer_max = _layer()
 
 
+## The wall's granite ramp (ClimbRock.colors(...).ramp): the sun moves stone
+## along it rather than off it, so the palette snap still lets it through.
+static func set_ramp(material: ShaderMaterial, ramp: PackedColorArray) -> void:
+	var tones := PackedVector3Array()
+	var lumas := PackedFloat32Array()
+	for col in ramp:
+		tones.append(Vector3(col.r, col.g, col.b))
+		lumas.append(col.r * 0.299 + col.g * 0.587 + col.b * 0.114)
+	material.set_shader_parameter("ramp", tones)
+	material.set_shader_parameter("ramp_luma", lumas)
+	material.set_shader_parameter("ramp_count", tones.size())
+
+
 func _layer() -> int:
 	var node := get_parent()
 	while node and not node is CanvasLayer:
