@@ -18,7 +18,7 @@ signal changed
 
 const DATA := "res://data/park/places.json"
 ## Regions whose view takes in the whole Valley.
-const VIEWPOINTS := ["tunnel_view", "glacier_point", "half_dome"]
+const VIEWPOINTS := ["tunnel_view", "glacier_point", "half_dome", "taft_point"]
 
 ## Keys ("region_id/Place Name") of the places found so far.
 var found: Dictionary = {}

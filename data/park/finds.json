@@ -73,8 +73,8 @@
 				"near": "rock"
 			},
 			"pos": [
-				792,
-				1216
+				792.0,
+				1216.0
 			]
 		},
 		{
@@ -280,8 +280,8 @@
 				"place": "Lembert Dome"
 			},
 			"pos": [
-				3832,
-				336
+				3832.0,
+				336.0
 			]
 		},
 		{
@@ -318,8 +318,8 @@
 				"near": "rock"
 			},
 			"pos": [
-				800,
-				736
+				800.0,
+				736.0
 			]
 		},
 		{
@@ -410,6 +410,158 @@
 			"pos": [
 				1608.0,
 				696.0
+			]
+		},
+		{
+			"id": "taft_fissures_stash",
+			"region": "taft_point",
+			"title": "Rim Cairn Tin",
+			"text": "Tucked under a flat stone back from the granite rim, a dented trail tin holding dried apricots and trail mix. Somebody packed heavy for the Pohono Trail and lightened their load.",
+			"rumor": "Hikers along the Pohono Trail near Taft Point tuck spare rations under stones off the granite ledges.",
+			"reward": {
+				"dried_apricots": 2.0,
+				"trail_mix": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				792,
+				760
+			]
+		},
+		{
+			"id": "taft_crocker_piton",
+			"region": "taft_point",
+			"title": "South-Rim Piton",
+			"text": "An old forged steel piton lying in the red fir duff west of Taft Point, its eye rusted orange. Likely dropped on the walk back from a south-wall climb decades ago.",
+			"rumor": "Old iron climbing hardware still turns up in the red firs off the trail around Taft Point.",
+			"reward": {
+				"rusty_piton": 1.0
+			},
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				2160,
+				848
+			]
+		},
+		{
+			"id": "cathedral_jmt_rations",
+			"region": "cathedral_lakes",
+			"title": "Thru-Hiker's Cache",
+			"text": "In the shade of a whitebark pine off the John Muir Trail, a sealed sack of pilot bread and roasted whitebark pine nuts. Left behind by someone hurrying over Cathedral Pass ahead of a storm.",
+			"rumor": "John Muir Trail hikers sometimes drop extra rations off the path in the pines around Cathedral Lakes in summer and fall.",
+			"reward": {
+				"pilot_bread": 2.0,
+				"whitebark_pine_nuts": 2.0
+			},
+			"seasons": [
+				"summer",
+				"fall"
+			],
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				2696,
+				1288
+			]
+		},
+		{
+			"id": "cathedral_caddis_fly",
+			"region": "cathedral_lakes",
+			"title": "Elk Hair Caddis",
+			"text": "Caught on a willow twig by the alpine shoreline, a neat little Elk Hair Caddis fly, still dry on a bit of tippet. Perfect for the brook trout cruising the granite drop-off.",
+			"rumor": "Anglers lose dry flies in the brush along the shore of Cathedral Lakes once the ice melts in summer.",
+			"reward": {
+				"elk_hair_caddis": 1.0
+			},
+			"seasons": [
+				"summer",
+				"fall"
+			],
+			"spot": {
+				"near": "water"
+			},
+			"pos": [
+				2288,
+				1016
+			]
+		},
+		{
+			"id": "hetch_dam_insulator",
+			"region": "hetch_hetchy",
+			"title": "Hetch Hetchy Glass Insulator",
+			"text": "Half-buried in the granite grit below the canyon wall, a thick blue-green glass telegraph insulator from the 1920s dam construction line.",
+			"rumor": "Old blue glass insulators from the 1920s power lines still lie in the rocks off the trail at Hetch Hetchy.",
+			"reward": {
+				"glass_insulator": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				2856,
+				936
+			]
+		},
+		{
+			"id": "hetch_wapama_stash",
+			"region": "hetch_hetchy",
+			"title": "Backpacker's Dry-Bag",
+			"text": "Wedged beneath an oak root off the canyon trail, a rolled dry-bag holding beef jerky and dried apples. Whoever cached it on the way to Rancheria Falls forgot to grab it on the hike out.",
+			"rumor": "Backpackers heading out toward Rancheria Falls at Hetch Hetchy sometimes leave a food dry-bag under the oaks off the trail.",
+			"reward": {
+				"beef_jerky": 2.0,
+				"dried_apples": 2.0
+			},
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				3168,
+				1024
+			]
+		},
+		{
+			"id": "tenaya_creek_fly",
+			"region": "tenaya_creek",
+			"title": "Lost Royal Wulff",
+			"text": "Tangled in the alder roots along Tenaya Creek, a bright Royal Wulff dry fly with its white calf-tail wings still crisp.",
+			"rumor": "Somebody snagged a favorite dry fly in the brush along Tenaya Creek in spring or summer.",
+			"reward": {
+				"royal_wulff": 1.0
+			},
+			"seasons": [
+				"spring",
+				"summer"
+			],
+			"spot": {
+				"near": "water"
+			},
+			"pos": [
+				1760,
+				864
+			]
+		},
+		{
+			"id": "upper_pines_tin",
+			"region": "upper_pines",
+			"title": "Camper's Lunch Tin",
+			"text": "Behind a mossy log in the pines, a small snap-lid tin holding a bar of chocolate and a wedge of sharp cheddar, untouched by the jays.",
+			"rumor": "Campers packing out of Upper Pines sometimes leave a lunch tin back in the trees off the campground loops.",
+			"reward": {
+				"chocolate_bar": 1.0,
+				"cheddar_wedge": 1.0
+			},
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				264,
+				1272
 			]
 		}
 	]

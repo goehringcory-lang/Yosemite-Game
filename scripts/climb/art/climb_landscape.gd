@@ -71,6 +71,11 @@ const LANDMARKS := {
 	"mt_florence": {"w": 140, "h": 90, "trees": false, "snow": true, "glacier": true, "lr": 1.8, "flute": 0.6},
 	"vernal_fall": {"w": 80, "h": 50, "trees": true, "fall": true, "lr": 1.3},
 	"illilouette_fall": {"w": 90, "h": 66, "trees": true, "fall": true, "lr": 1.3},
+	# Seen from Cathedral Pass and Hetch Hetchy viewers (BinocularView).
+	"cathedral_peak": {"w": 116, "h": 132, "trees": false, "snow": true, "lr": 1.8, "flute": 0.75},
+	"kolana_rock": {"w": 144, "h": 118, "trees": true, "lr": 1.6, "flute": 0.4},
+	"wapama_falls": {"w": 130, "h": 124, "trees": true, "fall": true, "lr": 1.4, "t0": 1.0},
+	"hetch_hetchy_dome": {"w": 148, "h": 92, "trees": true, "lr": 1.5, "flute": 0.35},
 }
 
 
@@ -903,6 +908,25 @@ static func _profile(kind: String, u: float, i: int, rng: RandomNumberGenerator)
 			# A broad granite peak, its north face steep above the lake.
 			var tp := pow(maxf(1.0 - absf(u - 0.15) * (1.0 if u < 0.15 else 1.35), 0.0), 1.1) * (0.94 + 0.06 * sin(u * 15.0))
 			return maxf(tp, 0.12 * (1.0 - absf(u)))
+		"cathedral_peak":
+			# A sharp fluted spire with two flanking pinnacles (Eichorn Pinnacle on the left).
+			var spire := pow(maxf(1.0 - absf(u - 0.08) * 1.45, 0.0), 1.6)
+			var eichorn := 0.72 * pow(maxf(1.0 - absf(u + 0.42) * 3.0, 0.0), 1.4)
+			var shoulder := 0.58 * pow(maxf(1.0 - absf(u - 0.52) * 2.2, 0.0), 1.2)
+			return clampf(maxf(spire, maxf(eichorn, shoulder)) + 0.05 * _teeth(i, 9.0, 4) * (1.0 - absf(u)), 0.0, 1.0)
+		"kolana_rock":
+			# A sheer, bold granite dome rising cleanly above the reservoir.
+			var body := pow(maxf(1.0 - pow(absf(u + 0.05), 1.85), 0.0), 0.65)
+			return maxf(body * (0.95 + 0.05 * sin(u * 11.0)), 0.0)
+		"wapama_falls":
+			# Broad canyon rim cliff notched by the cascade chute.
+			var rim := smoothstep(-1.0, -0.65, u) * (1.0 - smoothstep(0.65, 1.0, u))
+			var notch := 0.12 * (1.0 - smoothstep(0.0, 0.2, absf(u)))
+			return maxf(rim * (0.94 + 0.06 * sin(u * 9.0)) - notch, 0.0)
+		"hetch_hetchy_dome":
+			# High broad granite dome above the upper canyon.
+			var dome := pow(maxf(1.0 - absf(u) * 0.95, 0.0), 0.72)
+			return maxf(dome * (0.93 + 0.07 * sin(u * 10.0)), 0.0)
 		"sierra_crest":
 			var t := 0.42 + 0.22 * sin(u * 7.0) + 0.12 * sin(u * 17.0 + 1.0) + 0.2 * _teeth(i, 17.0, 2)
 			return clampf(t, 0.05, 1.0)

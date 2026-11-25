@@ -2,9 +2,20 @@
 
 [ext_resource type="PackedScene" path="res://scenes/climb/climb_start.tscn" id="1_r"]
 [ext_resource type="Resource" path="res://data/routes/separate_reality.tres" id="2_r"]
+[ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="3_door"]
 
 [node name="TunnelViewStory" type="Node2D"]
 
 [node name="SeparateReality" parent="." instance=ExtResource("1_r")]
 position = Vector2(1872, 1200)
 route = ExtResource("2_r")
+
+[node name="PohonoTrailUp" parent="." instance=ExtResource("3_door")]
+position = Vector2(1008, 880)
+label = "Pohono Trail, up to Crocker Point and Taft Point"
+target_region = "taft_point"
+target_spawn = "west"
+minutes = 110
+closure = "four_mile_trail"
+needs_hub = "glacier_point"
+locked_text = "The Pohono Trail climbs 3,000 feet to the south rim. Climb the Glacier Point Apron above Curry Village to open the rim first."
