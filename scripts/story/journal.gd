@@ -1110,26 +1110,16 @@ func _fish() -> void:
 
 
 ## The gear in your bag, or on the rack at camp ([param at_camp]), as slots:
-## cams a slot per size, each in its color (CamSizes).
+## cams a slot per size, each with its own colored icon.
 static func gear_slots(at_camp: bool) -> Array[Dictionary]:
 	var gear: Array[Dictionary] = []
 	for item: GearData in Gear.GEAR:
+		if item.generic:
+			continue
 		var n := Gear.cached_count(item.id) if at_camp else Gear.carried(item.id)
 		var room := Gear.bulk(item.id)
 		var facts := "" if room == 0 else "Takes %d room" % room
-		if n > 0 and item.id == "cam":
-			# the cams in the bag are the smallest sizes; the rest hang at camp
-			var first := Gear.carried("cam") if at_camp else 0
-			var counts := {}
-			for k in n:
-				var i := CamSizes.size_of(first + k)
-				counts[i] = int(counts.get(i, 0)) + 1
-			var order: Array = counts.keys()
-			order.sort()
-			for i: int in order:
-				gear.append({"name": "%s %s" % [item.display_name, CamSizes.SIZES[i].size], "count": counts[i], "icon": CamSizes.icon(i),
-					"facts": CamSizes.SIZES[i].fits, "description": item.description})
-		elif n > 0:
+		if n > 0:
 			gear.append({"name": item.display_name, "count": n, "icon": item.icon, "facts": facts, "description": item.description})
 	return gear
 

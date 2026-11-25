@@ -11,13 +11,29 @@ A climb is a short sequence of decisions: read the wall, choose a line, decide w
 1. **Route card.** A postcard of the view, the pitches (a `*` for each crux point), the gear you need and have, the food you carry and what's worth bringing, night meals for routes with nights, and the day's weather on the wall (wet rock until when, wind, heat, the storm and the lightning). `E` or `Space` starts, `Esc` backs out without spending time. A day climb that would still be going at 2 AM can't be started, and the card says so.
 2. **Pitch banner.** Each pitch announces its name and a line of beta ("Chalk up before the bulge").
 3. **Read.** Every hold is a jug (drawn big), an edge, or a crimp (small). Rings mark the holds within reach with what each move costs now (shoes, chalk, pump, chimney rhythm, weather and slush included). Jugs, crimps, rests and cruxes are labelled.
-4. **Move.** Up, up-left, up-right. A move costs stamina and six game minutes. Run out and you fall.
+4. **Move.** Up, up-left, up-right. A move costs stamina and six game minutes. Run out and you fall. Each move is a reach (see "Reach and grab" below): hold the arrow, let go to grab.
 5. **Pump.** Crimps (+3), edges on pitches above grade 2 (+1) and cruxes (+1) pump your forearms; a jug takes 1 off. Each point of pump (0 to 6, the meter beside the stamina bar) adds 1 to every move and takes 0.02 off the crux meter's green. `E` on a jug (or a stance) shakes out: pump -5, 3 minutes, once a hold. A stance, a belay, a fall and a perfect crux all ease it.
 6. **Protect.** `Space` clips a bolt (or an old piton) with a quickdraw, or places a cam in a crack. It costs 1 stamina from a jug or a stance, 2 from an edge, and 5 (and a point of pump) off a crimp. The hold beside every bolt and piton is never a crimp. The rope runs through every piece; runouts of four moves or more end the climb safely. Every pitch's guaranteed line has a crack or a fixed piece at least every three moves, so there's always a safe way up.
 7. **Crux.** A hard move asks for a short skill check. Perfect gives stamina back and takes 2 off the pump. Miss it and you're spent: it costs stamina, and you eat from the pack (`E`) before you can try again. With nothing to eat (or only the meals the nights need) you fall.
 8. **Belay.** At a ledge you recover 10 stamina (16 with a belay device), can eat (`E`, not at full stamina, smaller foods first, never the real meals a night still needs), and the next pitch starts. Rope and gear are recovered by your partner.
 9. **Nights.** On a wall, a night needs a real meal (30+ energy; the smallest is eaten); the night scene plays, and you wake rested at 6:30 the next morning. Each night is a new day on the calendar (fresh food keeps spoiling), and a night falls where the route's profile says (`bivy`), not at a fixed time.
 10. **Top out or retreat.** The result card shows time, falls, style (onsight, hard-won, aided), how the cruxes went and a fact about the route. Retreating keeps your gear; the tick only comes with the top. The caller records the tick once and applies the elapsed time once.
+
+## Reach and grab
+
+Moves used to be a press of an arrow. Now each move is a small physical act, built on what the most popular climbing games share (research in PR "Make climbing a real skill game"): hold-to-grip commitment (The Climb, Jusant), a hand per side and an alternating rhythm (Jusant, New Heights), hold quality that changes how a grab feels (New Heights, The Climb), and tremble as the pump cue (Cairn).
+
+- **Reach.** Hold Left, Up or Right: Left reaches with the left hand, Right with the right, Up brings the low hand up to match. A ring closes on the hold as the hand goes (`ClimbReach`, drawn by `ClimbHud.reach`). Let go as it meets the hold.
+- **Technique.** `ClimbState.technique_at(r, c)` names the hand the hold asks for. A **jug** takes a tap. An **edge** wants a little care. A **crimp** is tight and quick. A **hand jam** (a crack hold on a crack, flake, chimney or roof pitch) has a sweet spot where the hand sets. A **sloper** (an edge on a slab or dike) only takes a late, deliberate hand. Ledges and kicked steps on snow aren't reached for. An art "shape" tag on a hold refines it (`*_jam` is a jam, `palm` a sloper).
+- **Grab.** In the sweet spot it's *precise*: the move costs 1 less (never under 1), and a precise jam is a rest (a point of pump off). In the pale band it's *good*: the old cost. Early or late it's *sloppy*: 1 more and a point of pump, and the move still happens. Hang on far past the hold and the hand slaps on by itself.
+- **Sequence.** Alternating hands is *clean*: the bands are 15 % wider. The same hand twice is a *bump*: 20 % narrower, the hand shakes, and the preview draws that hold's ring broken. Pump narrows the bands 4 % a point and shakes the ring.
+- **Flow.** Clean moves in a row (not sloppy, not a bump) count up (`ClimbMinigame.move_flow`). Every 5 eases a point of pump with a chime, and from 5 on the next crux's green is 0.02 wider (`ClimbState.flow_window`). A sloppy grab, a bump or a fall ends it.
+- **Teaching.** The first-minute hint says "Hold to reach, let go to grab". The first sloppy grab of a climb says why: too early, too late, or the same hand twice.
+- **Assists.** *Climbing moves* (Settings): Reach, Tap twice (tap to reach, tap again to grab) or Simple (an arrow moves straight onto the hold, every grab good). Activity timing widens the bands (`Settings.room`) and slows the hand (`Settings.pace`).
+- **Result card.** "Moves: 18 precise, 4 sloppy of 40, 9 clean in a row". Medals are unchanged.
+- **Economy.** Bots and tests grab "good", so their numbers are as before. `test_reach_grabs` plays every route with a fair player (a fifth precise, a fifth sloppy), who tops out about as often as the planning bot, and an all-sloppy one, who still tops the beginner routes. `CLIMB_STATS=1` prints both.
+- **For the poses.** `ClimbMinigame.reach_hand()`, `reach_progress()` and `last_grab` say which hand is out, how far, and how the last grab landed.
+- Shot: `SHOT_SPECIAL=reach SHOT_TECHNIQUE=crimp SHOT_REACH=0.9` in tools/shots/climb_shot.gd.
 
 ## Medals, records and flow
 
@@ -34,7 +50,7 @@ A climb is a short sequence of decisions: read the wall, choose a line, decide w
 | Chalk bag | Marty's kit | Once a pitch: next 2 moves -3; wider crux windows while chalked |
 | Harness, rope | Marty's kit; Leonard | Lead climbing; top-rope practice on Swan Slab |
 | Quickdraws | Marty's kit, then Eichorn, Robbins... | Clip bolts, and fixed pitons on cam routes |
-| Cams | Leonard onward | Place in cracks; the rack refills each pitch |
+| Cams, nuts | Leonard onward; booty on the wall | Place in cracks of their width: pick the size, then seat it while your grip lasts (PlaceCheck). Solid, good and over-cammed pieces hold; a marginal one rips out of a fall from more than a move above it. The rack refills each pitch. See README, "Placing gear" |
 | Belay device | Robbins (Nutcracker) | Soft catches (+10 stamina after a fall), restful belays (+6), rappel retreat |
 | Aiders | Harding | Pull through a hard move on a wall pitch (costs the free ascent). On the screen you nail a piton first (see below): a perfect pin takes 8 minutes, a seated one 12, an over-driven one 16, and one that pops costs 3 stamina and 6 minutes and you try again. Each pin takes a piece off the rack, as a cam did |
 | Ascenders | Johnson (Astroman) | Jug fixed ropes: 3 stamina, 8 minutes, you can't fall |

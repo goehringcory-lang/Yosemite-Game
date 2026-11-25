@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/nut_big.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "nut_big"
+display_name = "Big nuts"
+description = "A set of big wired nuts on one carabiner, for hand-sized constrictions."
+icon = ExtResource("2_icon")
+tier = 1
+trade_value = 26
+kind = "nut"
+size = "big"
+width_min = 3
+width_max = 4
+color = Color(0.2471, 0.6275, 0.4392, 1)

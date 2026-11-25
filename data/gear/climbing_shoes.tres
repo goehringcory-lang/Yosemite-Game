@@ -11,3 +11,4 @@ description = "Tight, thin, and sticky. They smear on granite that approach shoe
 icon = ExtResource("2_icon")
 tier = 1
 trade_value = 45
+kind = "body"

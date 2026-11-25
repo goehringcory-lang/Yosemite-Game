@@ -12,3 +12,4 @@ icon = ExtResource("2_icon")
 tier = 1
 trade_value = 0
 keepsake = true
+kind = "camp"
