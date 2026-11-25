@@ -8,7 +8,9 @@ extends Node
 ##   SHOT_INTRO   1 to shoot the route card instead of the climb
 ##   SHOT_SPECIAL cards to shoot instead: "crux", "pumped", "dyno", "result", "pause", "night",
 ##                or "falcon" for a peregrine stooping past the wall, or a
-##                longer check part-way through: "swing", "nail", "haul", "layback"
+##                longer check part-way through: "swing", "nail", "haul", "layback",
+##                or "reach" for a hand reaching for the next hold (SHOT_REACH:
+##                how far, as a fraction of the reach, default 0.8)
 ##   SHOT_DIR     folder for the PNGs (default user://)
 ##   SHOT_UNLIT   1 to leave the wall unlit (ClimbLight off), as on Low
 ##   SHOT_PAD     1 to show the gamepad's buttons in the hints
@@ -160,6 +162,40 @@ func _ready() -> void:
 				game._crux_result_age = 0.12
 				game.set_process(false)
 				game._canvas.queue_redraw()
+			"reach":
+				# The hand part-way to the hardest hold in reach, held still.
+				# Climb on until the technique asked for (SHOT_TECHNIQUE) is in reach.
+				var want_t := _env("SHOT_TECHNIQUE", "")
+				for extra in 30:
+					if want_t == "" or [-1, 0, 1].any(func(d: int) -> bool: return game.state.technique_at(game.state.row + 1, game.state.col + d) == want_t):
+						break
+					var was := Vector3i(game.state.col, game.state.row, game.state.pitch)
+					game.state.stamina = ClimbState.MAX_STAMINA
+					game.state.move(_cheapest(game.state))
+					if not game.state.pending.is_empty():
+						game._resolve_crux("good")
+					game._after_action(was)
+					for f in 2:
+						await get_tree().process_frame
+				var pick := 99
+				var rank := {"crimp": 4, "sloper": 3, "jam": 3, "edge": 2, "jug": 1}
+				for dx in [-1, 0, 1]:
+					var t := game.state.technique_at(game.state.row + 1, game.state.col + dx)
+					var want := _env("SHOT_TECHNIQUE", "")
+					if want != "" and t != want:
+						continue
+					if rank.has(t) and (pick == 99 or rank[t] > rank.get(game.state.technique_at(game.state.row + 1, game.state.col + pick), 0)):
+						pick = dx
+				game._move_t = 1.0
+				if pick != 99 and game.state.pending.is_empty() and game.start_reach(pick):
+					# Held still: a slow frame would carry the hand past the hold.
+					game.reaching.held = game.reaching.duration * float(_env("SHOT_REACH", "0.8"))
+					game._move_t = 1.0
+					game._shown = Vector2(game.state.col, game.state.row)
+					game._banner_age = 99.0
+					game._toast_age = 99.0
+					game.set_process(false)
+					game._canvas.queue_redraw()
 			"pause":
 				game._phase = ClimbMinigame.Phase.PAUSE
 			"falcon":

@@ -303,6 +303,50 @@ const RESULT_TEXT := {
 ## The stamp rises from over the climber ([param at], the torso): it pops in
 ## big and settles; a miss shakes. [param flow] perfect cruxes in a row add
 ## "Flow x3" under a perfect.
+## The reach on the climbing screen (ClimbReach): a ring closes on the hold
+## at [param at] as the hand goes, through a pale band (the good grab) with a
+## bright line in it (the sweet spot). Pump shakes it. After a grab, a word
+## for how it landed floats off the hold at [param grab_at].
+static func reach(ci: CanvasItem, r: ClimbReach, at: Vector2, time: float, last: String, grab_at: Vector2, grab_age: float) -> void:
+	if r:
+		var shake := r.tremble() * Vector2(sin(time * 53.0), cos(time * 47.0)) * 1.2
+		var p := at + shake
+		var good := r.good_band()
+		var sweet := r.perfect_band()
+		var tint: Color = REACH_TINT.get(r.technique, UI.CREAM)
+		# The band, then the sweet spot, as rings at the radius the closing
+		# ring has at that point of the reach.
+		var r_lo := _reach_radius(minf(good.y, 1.6))
+		var r_hi := _reach_radius(good.x)
+		ci.draw_arc(p, (r_lo + r_hi) * 0.5, 0, TAU, 28, Color(tint, 0.2), maxf(r_hi - r_lo, 1.0))
+		ci.draw_arc(p, _reach_radius(r.center), 0, TAU, 28, Color(UI.GOOD, 0.85), maxf(_reach_radius(sweet.x) - _reach_radius(sweet.y), 1.5))
+		ci.draw_arc(p, 4.0, 0, TAU, 12, Color(tint, 0.9), 1.0)
+		var ring := _reach_radius(r.progress())
+		var hot := absf(r.progress() - r.center) <= r.perfect
+		ci.draw_arc(p, ring, 0, TAU, 28, Color(0.08, 0.07, 0.1, 0.8), 2.5)
+		ci.draw_arc(p, ring, 0, TAU, 28, UI.GOOD if hot else UI.CREAM, 1.0)
+		var name: String = REACH_NAMES.get(r.technique, r.technique)
+		if r.sequence == "bump":
+			name += " (same hand)"
+		UI.outlined(ci, at + Vector2(0, -26), name, tint, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+	if last != "" and grab_age < 0.7:
+		var word: String = {"perfect": "Precise", "good": "", "sloppy": "Sloppy"}.get(last, "")
+		if word != "":
+			var a := clampf(1.0 - grab_age / 0.7, 0.0, 1.0)
+			var color: Color = UI.GOOD if last == "perfect" else UI.WARN
+			UI.outlined(ci, grab_at + Vector2(0, -14 - grab_age * 16.0), word, Color(color, a), 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+const REACH_NAMES := {"jug": "Jug", "edge": "Edge", "crimp": "Crimp", "jam": "Hand jam", "sloper": "Sloper"}
+const REACH_TINT := {"jug": Color("9fd36a"), "edge": Color("f2e6c8"), "crimp": Color("f0a050"), "jam": Color("8fc8e8"), "sloper": Color("d8b0e0")}
+
+
+## The closing ring's radius at [param p] of the reach: wide as the hand
+## leaves, the hold's own ring (7) when it lands, and inside it past that.
+static func _reach_radius(p: float) -> float:
+	return maxf(7.0 + 15.0 * (1.0 - p), 2.0)
+
+
 static func crux_result(ci: CanvasItem, result: String, age: float, at := Vector2(SCREEN.x * 0.5, 130.0), flow := 0) -> void:
 	if age > 1.4:
 		return
@@ -503,6 +547,13 @@ static func result_card(ci: CanvasItem, state: ClimbState, profile: Dictionary, 
 			rows.append("A free ascent! No pulling on gear.")
 		if state.jug_moves > 0:
 			rows.append("Jugged %d fixed-rope moves" % state.jug_moves)
+		if state.precise_moves + state.sloppy_moves > 0:
+			var moves := "Moves: %d precise, %d sloppy of %d" % [state.precise_moves, state.sloppy_moves, state.free_moves]
+			if int(extra.get("best_move_flow", 0)) >= ClimbMinigame.FLOW_EASE:
+				moves += ", %d clean in a row" % int(extra.best_move_flow)
+			rows.append(moves)
+			if state.free_moves >= 10 and state.precise_moves * 10 >= state.free_moves * 7:
+				rows.append("Smooth climbing: %d%% of moves precise" % (state.precise_moves * 100 / state.free_moves))
 		if int(extra.get("best_flow", 0)) >= 2:
 			rows.append("Best flow: %d perfect cruxes in a row" % int(extra.best_flow))
 	# The medal, and what's new against your record on this route.
