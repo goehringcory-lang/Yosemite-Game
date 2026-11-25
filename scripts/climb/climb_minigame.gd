@@ -595,8 +595,9 @@ func _update_look(delta: float) -> void:
 
 ## True while the player holds Down to read the pitch above.
 func reading_line() -> bool:
+	# (While reaching for a hold, Down brings the hand back instead.)
 	return _phase == Phase.CLIMB and state.status == ClimbState.Status.CLIMBING and not route.boulder \
-		and Input.is_action_pressed("move_down")
+		and reaching == null and Input.is_action_pressed("move_down")
 
 
 ## The row the view centres on when looking up the pitch: the anchor near
