@@ -474,6 +474,7 @@ func dress(region: Node) -> void:
 	if region.get("region_id") != REGION or region.entities.has_node(CampPiece.node_name("chest")):
 		return
 	Cabin.build(region)
+	GearTent.build(region)
 	for piece: Dictionary in PIECES:
 		region.entities.add_child(CampPiece.make(piece))
 	# the supper after the finale, laid on here while it's waiting

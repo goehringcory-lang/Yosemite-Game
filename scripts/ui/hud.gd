@@ -16,7 +16,7 @@ const LOCATION_SHOWN := 4.0
 const HINTS_SHOWN := 8.0
 ## The wipe's color: the deep night of the palette, not flat black.
 const WIPE_COLOR := Color(0.067, 0.059, 0.09)
-const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary", "photo_album"]
+const COVERING_GROUPS := ["journal", "pause_menu", "park_map", "day_summary", "photo_album", "gear_tent"]
 
 var _player: Player
 ## The food energy you carry, under the time.
