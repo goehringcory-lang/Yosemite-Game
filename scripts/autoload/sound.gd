@@ -230,10 +230,14 @@ func bed_targets() -> Dictionary:
 			targets.amb_day = 0.6
 			targets.amb_wind = 0.25
 		"climb":
+			# The higher you are, the more it's only the wind: the valley's
+			# birds and crickets fall away below you.
+			var screen := get_tree().get_first_node_in_group("climb_screen")
+			var exposed: float = screen.exposure() if screen and screen.has_method("exposure") else 0.5
 			var day := _daylight()
-			targets.amb_day = 0.35 * day
-			targets.amb_night = 0.35 * (1.0 - day)
-			targets.amb_wind = 0.8
+			targets.amb_day = 0.4 * day * (1.0 - 0.8 * exposed)
+			targets.amb_night = 0.4 * (1.0 - day) * (1.0 - 0.6 * exposed)
+			targets.amb_wind = 0.55 + 0.4 * exposed
 		"world":
 			_world_targets(targets)
 	return targets

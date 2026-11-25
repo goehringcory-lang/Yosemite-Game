@@ -332,6 +332,10 @@ var message := ""
 ## Row -> {column -> hold} for the current pitch. A hold has "cost" and
 ## "crack", and sometimes "crux", "rest", "fixed", "hard", "dike", "kind".
 var holds: Dictionary = {}
+## Row -> column of the pitch's guaranteed line, the way the guidebook's topo
+## draws it (the screen chalks it and sketches it when you read the pitch).
+## Empty on a boulder problem.
+var line: Dictionary = {}
 ## The current pitch's spec (see ClimbProfiles).
 var spec: Dictionary = {}
 ## The screen sets this to get a skill check at the crux; without it a crux
@@ -1919,6 +1923,7 @@ func _crack_chance() -> float:
 
 func _generate_holds() -> void:
 	holds = {}
+	line = {}
 	_path = {}
 	bolts = {}
 	bolt_kinds = {}
@@ -1961,6 +1966,7 @@ func _generate_holds() -> void:
 				if not rowd.has(c):
 					rowd[c] = _make_hold(difficulty, false)
 		holds[r] = rowd
+	line = path
 	_remove_dead_ends(difficulty, cols)
 	_apply_features(path, difficulty)
 	_path = path

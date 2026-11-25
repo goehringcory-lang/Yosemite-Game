@@ -21,10 +21,77 @@ func _ready() -> void:
 	await test_checks_on_screen()
 	await test_weather_on_screen()
 	await test_light()
+	await test_presentation()
 	for r in Guidebook.routes():
 		await play_route(r)
 	print("\nOK: %d failure(s)" % failures)
 	get_tree().quit(failures)
+
+
+## Reading the wall: the line up each pitch (chalk and the topo sketch),
+## looking up the pitch with Down, the first pitch's look on its own, the
+## wind rising with height, the rope's bounce, and the view from the top.
+func test_presentation() -> void:
+	var nose: RouteData = load("res://data/routes/the_nose.tres")
+	Gear.owned = {"climbing_shoes": 1, "chalk_bag": 1, "harness": 1, "quickdraw": 6, "rope": 1, "cam": 10, "aiders": 2, "ascenders": 2, "haul_bag": 1, "portaledge": 1}
+	GameClock.paused = true
+	GameClock.minutes = 8 * 60
+	var game: ClimbMinigame = load("res://scenes/climb/climb_minigame.tscn").instantiate()
+	game.setup(nose, 6)
+	game.state.conditions = WallWeather.CALM.duplicate()
+	add_child(game)
+	await get_tree().process_frame
+	var line_ok := game.state.line.size() == game.state.top_row - 1
+	for r: int in game.state.line:
+		line_ok = line_ok and not game.state.hold_at(r, game.state.line[r]).is_empty()
+	check(line_ok, "every row of the pitch has its line, on a real hold")
+	game.skip_intro()
+	check(game._scout_t == 0.0, "the first pitch looks up its line on its own")
+	await get_tree().create_timer(1.8).timeout
+	check(game._look > 0.0 and game._view_row > game._shown.y + 0.5, "...and the view rises up the pitch (%.2f)" % game._look)
+	var before := Vector3i(game.state.col, game.state.row, game.state.pitch)
+	game._move_t = 1.0
+	var ev := InputEventAction.new()
+	ev.action = "move_up"
+	ev.pressed = true
+	game._climb_input(ev)
+	check(game._scout_t < 0.0, "climbing on stops the look")
+	await get_tree().create_timer(1.2).timeout
+	check(game._look == 0.0, "...and the view comes back to you")
+	Input.action_press("move_down")
+	await get_tree().create_timer(1.2).timeout
+	check(game.reading_line() and game._look > 0.9, "holding Down looks up the pitch")
+	Input.action_release("move_down")
+	var low := game.exposure()
+	game.state.pitch = 6
+	game.state._start_pitch()
+	game._new_pitch()
+	check(game.exposure() > low and game.exposure() <= 1.0, "high on the wall it's more exposed (%.2f > %.2f)" % [game.exposure(), low])
+	var mode := Sound.ambience()
+	Sound.set_ambience("climb")
+	var sound_targets := Sound.bed_targets()
+	Sound.set_ambience(mode)
+	check(sound_targets.amb_wind > 0.7, "...and the wind is up (%.2f)" % sound_targets.amb_wind)
+	game._mark_height(6)
+	check(game._height_mark.ends_with("ft up"), "a belay past a 500 ft mark calls it out (%s)" % game._height_mark)
+	game.state.events.append({"type": "fall"})
+	game._events()
+	check(game._twang == 1.0, "a fall sets the rope bouncing")
+	game.state.status = ClimbState.Status.TOPPED_OUT
+	game.state.events.append({"type": "topout"})
+	game._events()
+	check(game._summit_age == 0.0 and game._phase == ClimbMinigame.Phase.CLIMB, "topping out opens the view from the top")
+	for i in 30:
+		await get_tree().process_frame
+	press(game, "interact")
+	check(game._phase != ClimbMinigame.Phase.RESULT, "a key too soon doesn't skip the view")
+	game._summit_age = ClimbMinigame.SUMMIT_SKIP
+	press(game, "interact")
+	for i in 3:
+		await get_tree().process_frame
+	check(game._phase == ClimbMinigame.Phase.RESULT, "...a key after it brings the result card")
+	game.queue_free()
+	await get_tree().process_frame
 
 
 ## On High graphics real light falls on the wall: the sun by day, the

@@ -51,6 +51,19 @@ const DYNO_SPEED := 0.7
 ## Seconds a perfect crux holds still, and the run of perfects that has the
 ## belayer call out the flow.
 const HITSTOP := 0.08
+## The first pitch's look up the line: wait, rise, hold, come back (seconds).
+const SCOUT_TIMES := [0.5, 1.3, 0.9, 1.0]
+## How long the topo sketch takes to draw itself, and when it fades.
+const TOPO_DRAW := 1.2
+const TOPO_FADE := Vector2(3.5, 5.0)
+## Feet of height at which the altimeter calls out a mark at a belay.
+const HEIGHT_MARK_FT := 500
+## The feet at which the wall feels fully exposed (wind up, valley quiet).
+const EXPOSED_FT := 1500.0
+## After the top-out vista, any key brings the result card after this long;
+## it comes up on its own after the longer one.
+const SUMMIT_SKIP := 1.8
+const SUMMIT_HOLD := 9.0
 const FLOW_CALL := 3
 ## The top of the gear tray along the bottom. A belayer whose feet sink below
 ## this is off the bottom of the picture, not half hidden behind the tray.
@@ -153,6 +166,20 @@ const FLOW_EASE := 5
 const FLOW_CRUX_WINDOW := 0.02
 ## A beat's pause on a perfect crux: the climber and the sparks hold still.
 var _hitstop := 0.0
+## Reading the line: 0 with the view on the climber, 1 looking up the pitch
+## to its anchor. Hold Down to look; the first pitch looks once on its own.
+var _look := 0.0
+## Seconds into the first pitch's look up the line, or -1.
+var _scout_t := -1.0
+## Seconds since this pitch started, for the topo sketch drawing itself in.
+var _pitch_age := 99.0
+## The rope's bounce after a fall, 1 fading to 0.
+var _twang := 0.0
+## Seconds since topping out (the vista), or -1.
+var _summit_age := -1.0
+## A height reached at a belay ("1,000 ft"), and how long it's shown.
+var _height_mark := ""
+var _height_mark_age := 99.0
 ## The route's record before this climb (Achievements.sends), for "New best"
 ## on the result card.
 var _record_before := {}
@@ -222,10 +249,13 @@ func skip_intro() -> void:
 	if _phase == Phase.INTRO:
 		_phase = Phase.CLIMB
 		_banner_age = 0.0
+		_pitch_age = 0.0
 		_speak("start")
 		var note := state.crack_note()
 		if note != "":
 			_toast(note)
+		if not route.boulder and state.pitch == 0:
+			_scout_t = 0.0
 
 
 func _process(delta: float) -> void:
@@ -253,7 +283,14 @@ func _process(delta: float) -> void:
 		_shown = _from.lerp(Vector2(state.col, state.row), t)
 	else:
 		_shown = Vector2(state.col, state.row)
-	_view_row = lerpf(_view_row, _shown.y, minf(delta * 6.0, 1.0))
+	_update_look(delta)
+	_pitch_age += delta
+	_height_mark_age += delta
+	_twang = maxf(_twang - delta * 1.1, 0.0)
+	if _summit_age >= 0.0:
+		_summit_age += delta
+	var look_row := lerpf(_shown.y, _look_row(), _look * _look * (3.0 - 2.0 * _look))
+	_view_row = lerpf(_view_row, look_row, minf(delta * 6.0, 1.0))
 	_fade = maxf(_fade - delta * 2.5, 0.0)
 	if _phase == Phase.CRUX:
 		_update_crux(delta)
@@ -305,8 +342,11 @@ func _input(event: InputEvent) -> void:
 	if not is_press or event.is_echo():
 		return
 	get_viewport().set_input_as_handled()
-	# The top-out and the retreat play out before the result card comes up.
+	# The top-out and the retreat play out before the result card comes up;
+	# on top, once the view has opened up, any key brings it.
 	if _result_delay >= 0.0:
+		if _summit_age >= SUMMIT_SKIP:
+			_result_delay = 0.0001
 		return
 	var cancel := event.is_action_pressed("ui_cancel")
 	# E and Space both confirm on the cards, like the other screens.
@@ -344,6 +384,8 @@ func _input(event: InputEvent) -> void:
 
 
 func _climb_input(event: InputEvent) -> void:
+	# Climbing on stops the look up the line (the view eases back).
+	_scout_t = -1.0
 	if state.status != ClimbState.Status.CLIMBING or _move_t < 0.55:
 		if event.is_action_pressed("ui_cancel") and state.status == ClimbState.Status.CLIMBING:
 			_phase = Phase.PAUSE
@@ -532,8 +574,74 @@ func _new_pitch() -> void:
 	_view_row = 0.0
 	_move_t = 1.0
 	_banner_age = 0.0
+	_pitch_age = 0.0
+	_look = 0.0
+	_scout_t = -1.0
 	_grip_view.reset()
 	_pose_mode = "wall"
+
+
+## Eases the view up the pitch and back: on its own the first time, and
+## while Down is held.
+func _update_look(delta: float) -> void:
+	if _scout_t >= 0.0:
+		_scout_t += delta
+		var t := _scout_t - SCOUT_TIMES[0]
+		if t < 0.0:
+			_look = 0.0
+		elif t < SCOUT_TIMES[1]:
+			_look = t / SCOUT_TIMES[1]
+		elif t < SCOUT_TIMES[1] + SCOUT_TIMES[2]:
+			_look = 1.0
+		elif t < SCOUT_TIMES[1] + SCOUT_TIMES[2] + SCOUT_TIMES[3]:
+			_look = 1.0 - (t - SCOUT_TIMES[1] - SCOUT_TIMES[2]) / SCOUT_TIMES[3]
+		else:
+			_look = 0.0
+			_scout_t = -1.0
+		return
+	var want := 1.0 if reading_line() else 0.0
+	_look = move_toward(_look, want, delta * 1.6)
+
+
+## True while the player holds Down to read the pitch above.
+func reading_line() -> bool:
+	# (While reaching for a hold, Down brings the hand back instead.)
+	return _phase == Phase.CLIMB and state.status == ClimbState.Status.CLIMBING and not route.boulder \
+		and reaching == null and Input.is_action_pressed("move_down")
+
+
+## The row the view centres on when looking up the pitch: the anchor near
+## the top of the screen (along a roof, near its right edge).
+func _look_row() -> float:
+	var ahead := 7.0 if _roof else 4.5
+	return maxf(_shown.y, float(state.top_row) - ahead)
+
+
+## How exposed the climber is, 0 on the ground to 1 at [constant EXPOSED_FT]
+## and above. The wind rises with it and the valley's sounds fall away
+## (Sound reads it), and the air moving up the face shows.
+func exposure() -> float:
+	if route == null or route.boulder or state == null:
+		return 0.0
+	return clampf(_progress() * route.total_height_ft() / EXPOSED_FT, 0.0, 1.0)
+
+
+## At a belay, the altimeter calls out each 500 ft passed.
+func _mark_height(pitch: int) -> void:
+	if route.boulder or pitch <= 0:
+		return
+	var total := float(route.total_height_ft())
+	var n := float(route.pitches.size())
+	var was := int(total * (pitch - 1) / n) / HEIGHT_MARK_FT
+	var now := int(total * pitch / n)
+	if now / HEIGHT_MARK_FT > was and now >= HEIGHT_MARK_FT:
+		_height_mark = "%s ft up" % _thousands(now / HEIGHT_MARK_FT * HEIGHT_MARK_FT)
+		_height_mark_age = 0.0
+		Sound.play("climb_crux", -16.0, 0.0, 0.5)
+
+
+static func _thousands(n: int) -> String:
+	return "%d,%03d" % [n / 1000, n % 1000] if n >= 1000 else str(n)
 
 
 func _toast(text: String) -> void:
@@ -556,6 +664,7 @@ func _events() -> void:
 				_banner_age = 0.0
 				if e.pitch == 0:
 					_speak("start")
+				_mark_height(int(e.pitch))
 			"clip":
 				Sound.play("climb_clip")
 				Rumble.play("clip")
@@ -623,6 +732,7 @@ func _events() -> void:
 				Rumble.play("fall")
 				_fell = true
 				_shake = 6.0
+				_twang = 1.0
 				_speak("fall")
 				_fx.dust(_torso(), _dust_color(), 10)
 			"crux":
@@ -670,7 +780,11 @@ func _events() -> void:
 				Rumble.play("top")
 				_fx.confetti(_torso() + Vector2(0, -20))
 				_pose_mode = "cheer"
-				_result_delay = 1.6
+				if route.boulder:
+					_result_delay = 1.6
+				else:
+					_result_delay = SUMMIT_HOLD
+					_summit_age = 0.0
 				_won_line = ClimbProfiles.banter(route, "top")
 				_speak("top")
 			"storm":
@@ -1146,6 +1260,7 @@ func _draw_screen() -> void:
 	if _wall_view == null:
 		_draw_sky(height)
 	_draw_wall()
+	_draw_line_and_chalk()
 	_draw_protection()
 	_draw_crack_cues()
 	_draw_rope()
@@ -1158,6 +1273,8 @@ func _draw_screen() -> void:
 		_grip_view.draw(_canvas, _hand_on_hold(), Rect2(L.GRID_X - 30.0, 30.0, float(L.WALL_W) + 20.0, TRAY_TOP - 30.0))
 	_canvas.draw_set_transform(Vector2.ZERO)
 	_draw_atmosphere()
+	if _summit_age >= 0.0:
+		_draw_summit()
 	_draw_hud(height)
 	if _fade > 0.0:
 		_canvas.draw_rect(Rect2(Vector2.ZERO, SCREEN), Color(0, 0, 0, _fade))
@@ -1374,6 +1491,78 @@ func _draw_wall() -> void:
 				_canvas.draw_rect(Rect2(p + Vector2(0, 0), Vector2(2, 1)), Color("ad7a22"))
 
 
+## The chalk on the holds ahead, and the topo sketch of the line: drawn in as
+## a pitch starts, and again while you hold Down to read it.
+func _draw_line_and_chalk() -> void:
+	if state.status != ClimbState.Status.CLIMBING or _phase == Phase.NIGHT:
+		return
+	var at := func(r: float, c: float) -> Vector2: return _screen(r, c)
+	ClimbTopo.draw_chalk(_canvas, state, at, ClimbTopo.chalkiness(state, profile))
+	var fade := 1.0 - clampf((_pitch_age - TOPO_FADE.x) / (TOPO_FADE.y - TOPO_FADE.x), 0.0, 1.0)
+	var alpha := maxf(fade if _phase == Phase.CLIMB else 0.0, _look)
+	ClimbTopo.draw_line(_canvas, state, at, alpha * 0.95, maxf(_pitch_age / TOPO_DRAW, _look))
+
+
+## The top: the wall drops away and the view opens over the whole country,
+## with you standing on the rim, before the result card.
+func _draw_summit() -> void:
+	var a := clampf((_summit_age - 0.7) / 1.1, 0.0, 1.0)
+	if a <= 0.0:
+		return
+	var ease := a * a * (3.0 - 2.0 * a)
+	var tint := Color(1, 1, 1, ease)
+	_canvas.draw_texture(_sky_tex, Vector2.ZERO, tint)
+	if ease >= 0.99:
+		NightSky.draw(_canvas, _time, ClimbSky.stars(_pal))
+	for i in _clouds.size():
+		var x := fposmod(140.0 + i * 131.0 + _time * (3.0 + i * 1.7), SCREEN.x + 140.0) - 70.0
+		_canvas.draw_texture(_clouds[i], Vector2(x, 30.0 + i * 20.0).round(), Color(1, 1, 1, ease * (0.35 if _pal.night else 0.95)))
+	# The country sinks a last little way as the view opens.
+	var lift := 1.0 + 0.35 * (1.0 - ease)
+	for layer: Dictionary in _layers:
+		_canvas.draw_texture(layer.tex, Vector2(0, roundf(lift * layer.sink) - layer.pad), tint)
+	# The rim you stand on, lit along its edge.
+	var rock: Color = _pal.get("rock", Color("8a8780"))
+	var lit: Color = _pal.get("lit", Color("e4ddcc"))
+	var rise := (1.0 - ease) * 30.0
+	var rim := PackedVector2Array([Vector2(0, 238 + rise), Vector2(36, 231 + rise), Vector2(84, 227 + rise), Vector2(130, 228 + rise),
+		Vector2(168, 234 + rise), Vector2(200, 246 + rise), Vector2(222, 270), Vector2(0, 270)])
+	_canvas.draw_colored_polygon(rim, Color(rock.darkened(0.4), ease))
+	for i in rim.size() - 3:
+		_canvas.draw_line(rim[i], rim[i + 1], Color(lit, 0.8 * ease), 1.0)
+	# Granite grain on the summit slab.
+	for i in 60:
+		var h := hash(i * 7919)
+		var gp := Vector2(float(h % 200), 240.0 + float((h >> 8) % 30) + rise)
+		if gp.x < 200.0 - (gp.y - 240.0 - rise) * 0.2:
+			_canvas.draw_rect(Rect2(gp, Vector2(1, 1)), Color(rock.darkened(0.65) if h % 3 else lit.darkened(0.3), 0.7 * ease))
+	# You, arms up; and your partner, sitting on the rope.
+	var you := Vector2(104, 227 + rise).round()
+	var ink := Color(0.082, 0.078, 0.11, ease)
+	_canvas.draw_rect(Rect2(you + Vector2(-2, -15), Vector2(4, 8)), ink)
+	_canvas.draw_rect(Rect2(you + Vector2(-1, -19), Vector2(3, 3)), ink)
+	_canvas.draw_rect(Rect2(you + Vector2(-2, -7), Vector2(1, 7)), ink)
+	_canvas.draw_rect(Rect2(you + Vector2(1, -7), Vector2(1, 7)), ink)
+	var wave := 1.0 if fmod(_time, 0.8) < 0.4 else 0.0
+	_canvas.draw_rect(Rect2(you + Vector2(-4, -21 - wave), Vector2(1, 7)), ink)
+	_canvas.draw_rect(Rect2(you + Vector2(3, -21 - wave), Vector2(1, 7)), ink)
+	if not route.top_rope:
+		var mate := Vector2(62, 230 + rise).round()
+		_canvas.draw_rect(Rect2(mate + Vector2(-2, -9), Vector2(5, 6)), ink)
+		_canvas.draw_rect(Rect2(mate + Vector2(-1, -12), Vector2(3, 3)), ink)
+		_canvas.draw_rect(Rect2(mate + Vector2(-3, -3), Vector2(8, 2)), ink)
+		_canvas.draw_line(mate + Vector2(3, -5), you + Vector2(0, -8), Color(ROPE, ease), 1.0)
+	# The words.
+	var w := clampf((_summit_age - 1.6) * 1.6, 0.0, 1.0)
+	if w > 0.0:
+		UI.outlined(_canvas, Vector2(SCREEN.x * 0.5, 62), "You topped out", UI.GOLD, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER, w)
+		UI.outlined(_canvas, Vector2(SCREEN.x * 0.5, 82), route.display_name, UI.CREAM, 16, -1.0, HORIZONTAL_ALIGNMENT_CENTER, w)
+		var days := "" if state.nights_spent <= 0 else ("  ·  %d nights on the wall" % state.nights_spent if state.nights_spent > 1 else "  ·  a night on the wall")
+		UI.outlined(_canvas, Vector2(SCREEN.x * 0.5, 98), "%s ft%s" % [_thousands(route.total_height_ft()), days], UI.CREAM, 10, -1.0, HORIZONTAL_ALIGNMENT_CENTER, w)
+	if _summit_age >= SUMMIT_SKIP + 0.6 and _phase != Phase.RESULT:
+		UI.keys(_canvas, Vector2(SCREEN.x - 12, SCREEN.y - 10), "[%s] Carry on" % _button("E", "A"), UI.CREAM, 10, HORIZONTAL_ALIGNMENT_RIGHT)
+
+
 func _bolt_pos(cell: Vector2i) -> Vector2:
 	return (_screen(cell.y, cell.x) + Vector2(10, -5)).round()
 
@@ -1460,7 +1649,9 @@ func _draw_rope() -> void:
 func _sag(a: Vector2, b: Vector2, amount: float) -> void:
 	var length := a.distance_to(b)
 	var sway := sin(_time * 1.6 + a.y * 0.02) * (4.0 if state.is_windy() else 1.5)
-	var mid := (a + b) / 2.0 + Vector2(length * amount * 0.5 + sway, length * amount * 0.6)
+	# After a fall the rope bounces as it takes the weight and settles.
+	sway += sin(_time * 24.0) * _twang * _twang * minf(length * 0.08, 7.0)
+	var mid := (a + b) / 2.0 + Vector2(length * amount * 0.5 + sway, length * amount * 0.6 - cos(_time * 24.0) * _twang * _twang * 3.0)
 	var pts := PackedVector2Array()
 	var n := clampi(int(length / 3.0), 8, 48)
 	for i in n + 1:
@@ -1748,6 +1939,8 @@ func _hint(usable: Dictionary) -> String:
 		if state.can_aid(dx):
 			parts.append("[%s]+[%s] Aid" % [_button("Shift", "Y"), _button("Arrows", "Stick")])
 			break
+	if not route.boulder and _pitch_age < 8.0 and parts.size() < 2:
+		parts.append("[%s] Read the line" % _button("Down", "Stick"))
 	if parts.is_empty():
 		# The reminder is for the first minute; after that it just covers the wall.
 		if _time < 40.0 and state.pitch == 0:
@@ -1895,6 +2088,12 @@ func _weather(delta: float) -> void:
 		# Grit and a pine needle or two blown across the face.
 		_fx.spawn(Vector2(SCREEN.x + 4, randf_range(20.0, SCREEN.y - 40.0)), Vector2(randf_range(-260.0, -180.0), randf_range(-12.0, 12.0)),
 			2.4, Color(0.961, 0.933, 0.878, 0.45), 0, 0.0)
+	var ex := exposure()
+	if ex > 0.2 and not state.is_stormy() and randf() < delta * 7.0 * ex:
+		# High up, the air moving up the face carries specks past you: dust,
+		# a seed, a bit of lichen, rising and drifting off the edge.
+		_fx.spawn(Vector2(randf_range(L.GRID_X - 40.0, SCREEN.x), SCREEN.y + 4), Vector2(randf_range(-30.0, 20.0), randf_range(-70.0, -40.0)),
+			4.0, Color(0.961, 0.933, 0.878, 0.25 + 0.3 * ex), 0, 0.0)
 	if state.is_hot() and randf() < delta * 5.0:
 		# Heat coming off the rock.
 		_fx.spawn(Vector2(randf_range(L.GRID_X, L.GRID_X + 200.0), randf_range(120.0, 230.0)), Vector2(0, -14), 1.6, Color(1.0, 0.93, 0.75, 0.35), 0, -4.0)
@@ -1915,9 +2114,12 @@ func _draw_atmosphere() -> void:
 func _draw_hud(height: float) -> void:
 	var feet := int(round(height * route.total_height_ft()))
 	# The cards stand alone: no plate, bars or toolbar peeking out behind them.
-	if _phase == Phase.INTRO or _phase == Phase.RESULT:
+	if _phase == Phase.INTRO or _phase == Phase.RESULT or _summit_age > 0.6:
 		return
 	ClimbHud.route_plate(_canvas, state, feet)
+	if _height_mark_age < 4.0:
+		var a := clampf(_height_mark_age * 4.0, 0.0, 1.0) * clampf((4.0 - _height_mark_age) * 2.0, 0.0, 1.0)
+		UI.outlined(_canvas, Vector2(72, 56), _height_mark, UI.GOLD, 10, -1.0, HORIZONTAL_ALIGNMENT_LEFT, a)
 	ClimbHud.topo_bar(_canvas, state, height)
 	ClimbHud.stamina(_canvas, state, _stamina_flash, 0.0)
 	ClimbHud.pump(_canvas, state, _time)

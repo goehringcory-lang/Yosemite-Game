@@ -7,6 +7,8 @@ extends Node
 ##   SHOT_MOVES   moves to climb before each shot (default 5)
 ##   SHOT_INTRO   1 to shoot the route card instead of the climb
 ##   SHOT_SPECIAL cards to shoot instead: "grip" (the grip close-up), "crux", "pumped", "dyno", "result", "pause", "night",
+##                "read" (Down held: the view up the pitch and its topo), "chalk",
+##                "summit" (the top-out vista),
 ##                or "falcon" for a peregrine stooping past the wall, or a
 ##                longer check part-way through: "swing", "nail", "haul", "layback",
 ##                or "reach" for a hand reaching for the next hold (SHOT_REACH:
@@ -65,6 +67,7 @@ func _ready() -> void:
 			await get_tree().process_frame
 			continue
 		game.skip_intro()
+		game._scout_t = -1.0 # no look up the line in the picture
 		for f in 3:
 			await get_tree().process_frame
 		if _env("SHOT_BANNER", "0") != "1":
@@ -132,6 +135,25 @@ func _ready() -> void:
 						c.tension = 0.56
 						c.strain = 0.25
 						c.pace = 0.0
+			"read":
+				# Holding Down: the view up the pitch and its topo sketch.
+				game._pitch_age = 99.0
+				game._look = 1.0
+				game._view_row = game._look_row()
+				game.set_process(false)
+				game._canvas.queue_redraw()
+				if game._wall_view:
+					game._back.queue_redraw()
+					game._wall_view.queue_redraw()
+			"chalk":
+				# Mid-pitch, the sketch long faded: only the chalk shows the way.
+				game._pitch_age = 99.0
+			"summit":
+				# The top-out vista, with its words up.
+				game.state.status = ClimbState.Status.TOPPED_OUT
+				game.state.events.append({"type": "topout"})
+				game._events()
+				game._summit_age = 3.0
 			"grip":
 				# The grip close-up beside the hand on the hold you're on.
 				game._grip_view.reset()
