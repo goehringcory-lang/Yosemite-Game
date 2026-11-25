@@ -13,7 +13,7 @@ extends RefCounted
 ##    light dims before it breaks, then the air clears;
 ##  - nights are darker and colder blue, with no valley haze.
 
-const REGIONS := ["tuolumne_meadows", "tenaya_lake"]
+const REGIONS := ["tuolumne_meadows", "tenaya_lake", "cathedral_lakes"]
 ## A climb in the high country, whose weather (WallWeather) names the hour the
 ## afternoon storm breaks, so the sky over the meadow agrees with the guidebook.
 const STORM_ROUTE := "cathedral_peak"

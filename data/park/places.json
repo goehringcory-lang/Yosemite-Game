@@ -62,6 +62,36 @@
 			"region": "bridalveil_fall"
 		},
 		{
+			"hub": "tuolumne_meadows",
+			"key": "cathedral_lakes/Cathedral Lakes",
+			"name": "Cathedral Lakes",
+			"region": "cathedral_lakes"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "cathedral_lakes/Lower Cathedral Lake",
+			"name": "Lower Cathedral Lake",
+			"region": "cathedral_lakes"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "cathedral_lakes/Upper Cathedral Lake",
+			"name": "Upper Cathedral Lake",
+			"region": "cathedral_lakes"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "cathedral_lakes/Medlicott Meadow",
+			"name": "Medlicott Meadow",
+			"region": "cathedral_lakes"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "cathedral_lakes/Cathedral Pass Overlook",
+			"name": "Cathedral Pass Overlook",
+			"region": "cathedral_lakes"
+		},
+		{
 			"hub": "yosemite_valley",
 			"key": "crane_flat/Crane Flat",
 			"name": "Crane Flat",
@@ -261,6 +291,42 @@
 		},
 		{
 			"hub": "yosemite_valley",
+			"key": "hetch_hetchy/Hetch Hetchy",
+			"name": "Hetch Hetchy",
+			"region": "hetch_hetchy"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "hetch_hetchy/O'Shaughnessy Dam",
+			"name": "O'Shaughnessy Dam",
+			"region": "hetch_hetchy"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "hetch_hetchy/Tueeulala Fall",
+			"name": "Tueeulala Fall",
+			"region": "hetch_hetchy"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "hetch_hetchy/Kolana Overlook",
+			"name": "Kolana Overlook",
+			"region": "hetch_hetchy"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "hetch_hetchy/Wapama Falls",
+			"name": "Wapama Falls",
+			"region": "hetch_hetchy"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "hetch_hetchy/Rancheria Trailhead",
+			"name": "Rancheria Trailhead",
+			"region": "hetch_hetchy"
+		},
+		{
+			"hub": "yosemite_valley",
 			"key": "housekeeping_camp/Housekeeping Camp",
 			"name": "Housekeeping Camp",
 			"region": "housekeeping_camp"
@@ -294,6 +360,30 @@
 			"key": "mirror_lake/Mirror Lake",
 			"name": "Mirror Lake",
 			"region": "mirror_lake"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "taft_point/Taft Point",
+			"name": "Taft Point",
+			"region": "taft_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "taft_point/The Fissures",
+			"name": "The Fissures",
+			"region": "taft_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "taft_point/Crocker Point",
+			"name": "Crocker Point",
+			"region": "taft_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "taft_point/Roosevelt Meadow",
+			"name": "Roosevelt Meadow",
+			"region": "taft_point"
 		},
 		{
 			"hub": "yosemite_valley",

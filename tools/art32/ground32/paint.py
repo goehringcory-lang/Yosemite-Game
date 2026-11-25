@@ -68,6 +68,7 @@ SKIP = {"tuolumne_meadows", "tenaya_lake"}
 REGIONS: dict[str, dict] = {
     "lamon_homestead": {"forest": "orchard"},
     "el_portal": {"forest": "oakwood"},
+    "hetch_hetchy": {"forest": "oakwood"},
     "curry_village": {"lawn": (26, 28, 53, 23)},
     "the_ahwahnee": {"hotel": True, "flagstone": True},
     # The back of Half Dome: steep rock round the summit and the saddle, and

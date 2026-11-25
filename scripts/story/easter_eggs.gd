@@ -13,6 +13,9 @@ const MIDNIGHT_TEXT := "Past midnight. The bolt is freshly chalked, and a headla
 const CROW_BEAR_BOX_TEXT := "Crow's bear box. Inside: peanut butter, a stack of tortillas, a paperback with no cover, and a coffee can with DON'T written on the lid in Sharpie."
 const HORSETAIL_TEXT := "In winter, look up at El Capitan's east shoulder: Horsetail Fall runs there only on snowmelt. On a few clear evenings late in winter, around 5:30, the setting sun lights it orange from top to bottom. Photographers call it the natural firefall."
 const CLARK_NOTE_TEXT := "A note is pinned inside the window, in Clark's hand: 'Write it at the front of the book, not the back.'"
+const FISSURES_FALCON_TEXT := "In spring, watch the sheer cliff face just below The Fissures: a pair of peregrine falcons sometimes nests on a ledge out of sight, stooping past the rim like arrows."
+const CATHEDRAL_GLOW_TEXT := "Right before dark, alpenglow touches Cathedral Peak's spire last of all: a warm rose flame floating above the cold blue granite."
+const HETCH_MUIR_TEXT := "At dusk, when the reservoir falls glass-still, you can almost picture what John Muir saw before 1913: black oak groves, meadow grass, and the Tuolumne winding wide across the floor below Kolana Rock."
 
 
 ## Dresses [param region] for its Easter eggs. Safe to call once per region.
@@ -56,6 +59,21 @@ static func dress(region: Region) -> void:
 			if clark:
 				clark.extra_text = CLARK_NOTE_TEXT
 				clark.extra_after_quest = "tenaya_ahwahnee"
+		"taft_point":
+			var fissures := _sign(region, "FissuresSign")
+			if fissures:
+				fissures.extra_text = FISSURES_FALCON_TEXT
+				fissures.extra_season = GameClock.Season.SPRING
+		"cathedral_lakes":
+			var peak := _sign(region, "CathedralPeakSign")
+			if peak:
+				peak.extra_text = CATHEDRAL_GLOW_TEXT
+				peak.extra_hours = Vector2i(17, 21)
+		"hetch_hetchy":
+			var dam := _sign(region, "DamSign")
+			if dam:
+				dam.extra_text = HETCH_MUIR_TEXT
+				dam.extra_hours = Vector2i(17, 22)
 
 
 ## Lets the player walk the Camp 4 slackline from its sign (SlacklineSpot).

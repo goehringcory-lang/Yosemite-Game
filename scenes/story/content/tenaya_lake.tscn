@@ -25,3 +25,11 @@ script = ExtResource("3_fw")
 kind = "hole"
 size = Vector2(300, 140)
 title = "Tenaya Lake Basin"
+
+[node name="CathedralPassTrail" parent="." instance=ExtResource("1_door")]
+position = Vector2(1136, 1120)
+label = "John Muir Trail, north over Cathedral Pass to Cathedral Lakes"
+target_region = "cathedral_lakes"
+target_spawn = "south"
+minutes = 85
+closure = "tioga_road"
