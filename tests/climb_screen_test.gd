@@ -28,7 +28,9 @@ func _ready() -> void:
 
 
 ## On High graphics real light falls on the wall: the sun by day, the
-## headlamp after dark. On Low the wall is drawn with everything else.
+## headlamp after dark. On both settings the wall is painted in its granite's
+## own ramp, which the palette snap lets through, and has its own shader for
+## the fine grain.
 func test_light() -> void:
 	var route: RouteData = load("res://data/routes/the_nose.tres")
 	var game: ClimbMinigame = load("res://scenes/climb/climb_minigame.tscn").instantiate()
@@ -36,8 +38,31 @@ func test_light() -> void:
 	game.state.conditions = WallWeather.CALM.duplicate()
 	add_child(game)
 	await get_tree().process_frame
+	check(game._wall_view != null and game._wall_view.material is ShaderMaterial, "the wall has its own shader for the fine grain")
+	check(int(game._snap.material.get_shader_parameter("keep_count")) == ClimbRock.RAMP_STEPS, "the palette snap lets the granite ramp through")
+	check(int(game._wall_view.material.get_shader_parameter("ramp_count")) == ClimbRock.RAMP_STEPS, "the wall's shader knows the granite ramp")
+	# Every opaque stone pixel of the finished wall is on the ramp or left
+	# alone as lichen, chalk or gear: none lands between ramp tones.
+	var pal := ClimbSky.palette(12.0)
+	var wall := ClimbRock.paint(game.state, "elcap", pal, 5)
+	var ramp: PackedColorArray = wall.ramp
+	var q := ClimbHiRes.quantize(wall.image, ramp)
+	var on_ramp := 0
+	var stone := 0
+	var tones := {}
+	for col in ramp:
+		tones[col.to_rgba32() | 0xff] = true
+	for y in range(0, q.get_height(), 3):
+		for x in range(0, q.get_width(), 3):
+			var c := q.get_pixel(x, y)
+			if c.a < 0.9:
+				continue
+			stone += 1
+			if tones.has(Color(c.r, c.g, c.b).to_rgba32() | 0xff):
+				on_ramp += 1
+	check(stone > 0 and on_ramp > stone * 0.8, "most of the wall is on its granite ramp (%d of %d)" % [on_ramp, stone])
 	if not LitSprites.active():
-		check(game._wall_view == null and game._light == null, "on Low the wall keeps its painted look")
+		check(game._light == null, "on Low there is no real light on the wall")
 		game.queue_free()
 		return
 	check(game._wall_view != null and game._wall_view.material is ShaderMaterial, "the wall is drawn with real light")
