@@ -328,7 +328,7 @@ func describe(id: String) -> String:
 		"gear_rack":
 			var rack := PackedStringArray()
 			for gear: GearData in Gear.GEAR:
-				var n := Gear.cached_count(gear.id)
+				var n := 0 if gear.generic else Gear.cached_count(gear.id)
 				if n > 0:
 					rack.append(ItemDB.count_name(n, gear.display_name) if n > 1 else gear.display_name)
 			text += " Your gear bag: %d of %d room used." % [Gear.bag_used(), Gear.bag_room()]
@@ -474,6 +474,7 @@ func dress(region: Node) -> void:
 	if region.get("region_id") != REGION or region.entities.has_node(CampPiece.node_name("chest")):
 		return
 	Cabin.build(region)
+	GearTent.build(region)
 	for piece: Dictionary in PIECES:
 		region.entities.add_child(CampPiece.make(piece))
 	# the supper after the finale, laid on here while it's waiting

@@ -11,3 +11,4 @@ description = "For snow slopes and glaciers in the high country."
 icon = ExtResource("2_icon")
 tier = 4
 trade_value = 55
+kind = "ice"

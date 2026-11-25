@@ -11,3 +11,5 @@ description = "A dynamic rope. Its length sets how far you can climb before a be
 icon = ExtResource("2_icon")
 tier = 1
 trade_value = 70
+kind = "rope"
+size = "60 m"

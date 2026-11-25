@@ -11,3 +11,4 @@ description = "Clips the rope to bolts on slab and dike routes, like Snake Dike.
 icon = ExtResource("2_icon")
 tier = 2
 trade_value = 14
+kind = "draw"

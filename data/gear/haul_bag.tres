@@ -11,3 +11,4 @@ description = "Carries days of food and water up a big wall."
 icon = ExtResource("2_icon")
 tier = 3
 trade_value = 78
+kind = "wall"

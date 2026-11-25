@@ -17,6 +17,7 @@ func check(cond: bool, what: String) -> void:
 func _ready() -> void:
 	await get_tree().process_frame
 	await test_controls()
+	await test_reach_on_screen()
 	await test_checks_on_screen()
 	await test_weather_on_screen()
 	await test_light()
@@ -420,6 +421,136 @@ func play_route(r: RouteData) -> void:
 	await get_tree().process_frame
 
 
+## Hold an arrow to reach, let go to grab: the screen makes the move with
+## how the grab landed, keeps the hand sequence and the flow, and the
+## Climbing moves assist turns it into two taps or a plain press.
+func test_reach_on_screen() -> void:
+	Settings.climb_moves = Settings.ClimbMoves.REACH
+	var game := _nose_screen(4)
+	await get_tree().process_frame
+	var s := game.state
+	# Find a move onto a hold that takes a reach.
+	var dx := 99
+	for d in [-1, 1, 0]:
+		if not s.hold_at(s.row + 1, s.col + d).is_empty() and s.technique_at(s.row + 1, s.col + d) != "step":
+			dx = d
+			break
+	if dx == 99:
+		check(false, "the Nose's first move takes a reach")
+		game.queue_free()
+		return
+	var action: String = {-1: "move_left", 0: "move_up", 1: "move_right"}[dx]
+	var row := s.row
+	var ev := InputEventAction.new()
+	ev.action = action
+	ev.pressed = true
+	game._input(ev)
+	check(game.reaching != null and s.row == row, "holding an arrow reaches; nothing moves yet")
+	check(game.reach_hand() == ClimbState.hand_for(dx), "the reaching hand is the arrow's side (%s)" % game.reach_hand())
+	# Let go in the sweet spot.
+	var r := game.reaching
+	r.held = r.duration * r.center
+	check(is_equal_approx(game.reach_progress(), r.center), "the poses can read how far the hand has gone")
+	release(game, action)
+	check(game.reaching == null and s.row == row + 1, "letting go grabs, and the move is made")
+	check(game.last_grab == "perfect" and s.precise_moves == 1, "let go as the ring closes: a precise move")
+	check(game.move_flow == 1, "a clean move starts a flow")
+	# Let go at once (not on a jug) and the hand comes back.
+	game._move_t = 1.0
+	for d in [-1, 1, 0]:
+		var t := s.technique_at(s.row + 1, s.col + d)
+		if t != "step" and t != "jug" and s.pending.is_empty():
+			row = s.row
+			var st := s.stamina
+			game.start_reach(d)
+			game._grab()
+			check(game.reaching == null and s.row == row and s.stamina == st, "let go at once and the hand comes back, free")
+			game.start_reach(d)
+			ev = InputEventAction.new()
+			ev.action = "move_down"
+			ev.pressed = true
+			game._input(ev)
+			check(game.reaching == null and s.row == row, "Down brings a reaching hand back")
+			break
+	# Hold on too long and the hand slaps on by itself.
+	game._move_t = 1.0
+	var d2 := 99
+	for d in [-1, 1, 0]:
+		if not s.hold_at(s.row + 1, s.col + d).is_empty() and s.technique_at(s.row + 1, s.col + d) != "step":
+			d2 = d
+			break
+	if d2 != 99 and s.pending.is_empty():
+		var a2: String = {-1: "move_left", 0: "move_up", 1: "move_right"}[d2]
+		row = s.row
+		ev = InputEventAction.new()
+		ev.action = a2
+		ev.pressed = true
+		game._input(ev)
+		for i in 120:
+			game._process(1.0 / 60.0)
+			if game.reaching == null:
+				break
+		check(game.reaching == null and s.row == row + 1 and game.last_grab == "sloppy", "hang on too long and you slap on (sloppy)")
+		check(game.move_flow == 0, "a sloppy grab ends the flow")
+	# Five clean moves in a row ease the pump.
+	game.move_flow = ClimbMinigame.FLOW_EASE - 1
+	s.pump = 3
+	s.stamina = ClimbState.MAX_STAMINA
+	game._move_t = 1.0
+	var d3 := 99
+	for d in [0, -1, 1]:
+		if not s.hold_at(s.row + 1, s.col + d).is_empty() and s.technique_at(s.row + 1, s.col + d) != "step" and s.sequence_for(d) != "bump":
+			d3 = d
+			break
+	if d3 != 99 and s.pending.is_empty():
+		var change := s.pump_change(s.hold_at(s.row + 1, s.col + d3))
+		game.start_reach(d3)
+		game.reaching.held = game.reaching.duration * game.reaching.center
+		game._grab()
+		check(game.move_flow == ClimbMinigame.FLOW_EASE and s.pump <= clampi(3 + change, 0, ClimbState.PUMP_MAX) - 1, "five clean moves in a row ease the pump")
+		check(is_equal_approx(s.flow_window, ClimbMinigame.FLOW_CRUX_WINDOW), "...and widen the next crux's green")
+	# Tap twice: the first tap reaches, the second grabs.
+	Settings.climb_moves = Settings.ClimbMoves.TWO_TAPS
+	s.pending = {}
+	game._phase = ClimbMinigame.Phase.CLIMB
+	game._move_t = 1.0
+	var d4 := 99
+	for d in [0, -1, 1]:
+		if not s.hold_at(s.row + 1, s.col + d).is_empty() and s.technique_at(s.row + 1, s.col + d) != "step":
+			d4 = d
+			break
+	if d4 != 99:
+		var a4: String = {-1: "move_left", 0: "move_up", 1: "move_right"}[d4]
+		row = s.row
+		ev = InputEventAction.new()
+		ev.action = a4
+		ev.pressed = true
+		game._input(ev)
+		release(game, a4)
+		check(game.reaching != null and s.row == row, "Tap twice: letting go doesn't grab")
+		game.reaching.held = game.reaching.duration * game.reaching.center
+		game._input(ev)
+		check(game.reaching == null and s.row == row + 1, "...the second tap does")
+	# Simple: a press moves straight onto the hold, as before.
+	Settings.climb_moves = Settings.ClimbMoves.SIMPLE
+	s.pending = {}
+	game._phase = ClimbMinigame.Phase.CLIMB
+	game._move_t = 1.0
+	row = s.row
+	var precise := s.precise_moves + s.sloppy_moves
+	for d in ["move_up", "move_left", "move_right"]:
+		ev = InputEventAction.new()
+		ev.action = d
+		ev.pressed = true
+		game._input(ev)
+		if s.row > row:
+			break
+	check(game.reaching == null and s.row == row + 1 and s.precise_moves + s.sloppy_moves == precise, "Simple: a press moves, every grab good")
+	Settings.climb_moves = Settings.ClimbMoves.REACH
+	game.queue_free()
+	await get_tree().process_frame
+
+
 ## A new screen on the Nose with the big-wall rack, past the route card.
 func _nose_screen(seed := 6) -> ClimbMinigame:
 	var nose: RouteData = load("res://data/routes/the_nose.tres")
@@ -604,11 +735,17 @@ func test_checks_on_screen() -> void:
 	await get_tree().process_frame
 
 
+## A tap of a key: an arrow that starts a reach lets go straight away (a tap
+## grabs a jug cleanly, and slaps onto anything else, but still moves).
 func press(game: ClimbMinigame, action: String) -> void:
 	var ev := InputEventAction.new()
 	ev.action = action
 	ev.pressed = true
 	game._input(ev)
+	if game.reaching and action.begins_with("move_"):
+		# let go as the ring closes (a release at once would bring the hand back)
+		game.reaching.held = game.reaching.duration * game.reaching.center
+		release(game, action)
 
 
 func release(game: ClimbMinigame, action: String) -> void:

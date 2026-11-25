@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="GearData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/gear_data.gd" id="1_gear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gear/rope_70.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_gear")
+id = "rope_70"
+display_name = "70 m rope"
+description = "A longer dynamic rope. Ten more meters lets you link pitches and lower off longer routes."
+icon = ExtResource("2_icon")
+tier = 3
+trade_value = 110
+kind = "rope"
+size = "70 m"
+width_min = -1
+width_max = -1
+color = Color(0.1843, 0.5412, 0.6039, 1)

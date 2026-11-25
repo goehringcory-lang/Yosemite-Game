@@ -267,6 +267,6 @@ func text(note: String) -> String:
 	lines.append("")
 	lines.append("Settings")
 	lines.append("  Graphics: %s   Full screen: %s   Pixel font: %s" % [Settings.graphics_name(), Settings.fullscreen, Settings.pixel_font])
-	lines.append("  Activity timing: %s   Hold to tap: %s   Text speed: %s" % [Settings.TIMING_NAMES[Settings.timing], Settings.hold_taps, Settings.TEXT_SPEED_NAMES[Settings.text_speed]])
+	lines.append("  Activity timing: %s   Hold to tap: %s   Climbing moves: %s   Text speed: %s" % [Settings.TIMING_NAMES[Settings.timing], Settings.hold_taps, Settings.CLIMB_MOVE_NAMES[Settings.climb_moves], Settings.TEXT_SPEED_NAMES[Settings.text_speed]])
 	lines.append("  Vibration: %s   Pause when away: %s" % [Settings.vibration, Settings.pause_away])
 	return "\n".join(lines) + "\n"

@@ -11,3 +11,4 @@ description = "Clamps for climbing a fixed rope on multi-day walls."
 icon = ExtResource("2_icon")
 tier = 3
 trade_value = 60
+kind = "wall"

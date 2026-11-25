@@ -18,7 +18,12 @@ extends CanvasLayer
 ## a pin (NailCheck), and each belay hauling the bag (HaulCheck). They play
 ## in the crux phase too, drawn by ClimbCheckHud.
 ##
-## Controls: arrows climb (up = straight up, left/right = up-left/up-right);
+## Controls: arrows climb (up = straight up, left/right = up-left/up-right).
+## A move is a reach (ClimbReach): hold the arrow and the hand goes for the
+## hold, let go to grab it. Left reaches with the left hand, right with the
+## right, and up brings the low hand up to match; alternate hands for a
+## clean sequence. The Climbing moves assist (Settings) makes it two taps,
+## or a plain press;
 ## use tool = clip a bolt or place a cam; interact = eat (at a belay ledge),
 ## shake out (on a jug, when pumped) or chalk up (on the wall); Shift + an arrow = aid a hard move or jug a fixed
 ## rope (when you have the gear); cancel = retreat (asks first).
@@ -142,6 +147,21 @@ var _won_line := ""
 ## Perfect cruxes in a row ("Flow"), and the longest run this climb.
 var flow := 0
 var best_flow := 0
+## The move being reached for, or null (see ClimbReach).
+var reaching: ClimbReach
+## How the last move was grabbed: "perfect", "good" or "sloppy" ("" before
+## the first). The climber's poses read it, with reach_hand/reach_progress.
+var last_grab := ""
+## Clean moves in a row (not sloppy, not a bump); every FLOW_EASE eases the
+## pump, and from FLOW_EASE on the next crux's green is a little wider.
+var move_flow := 0
+var best_move_flow := 0
+var _grab_age := 99.0
+var _grab_at := Vector2.ZERO
+var _reach_action := ""
+var _reach_taught := false
+const FLOW_EASE := 5
+const FLOW_CRUX_WINDOW := 0.02
 ## A beat's pause on a perfect crux: the climber and the sparks hold still.
 var _hitstop := 0.0
 ## Reading the line: 0 with the view on the climber, 1 looking up the pitch
@@ -243,6 +263,7 @@ func _process(delta: float) -> void:
 	_banner_age += delta
 	_speech_age += delta
 	_crux_result_age += delta
+	_grab_age += delta
 	_bird_phase += delta
 	_update_falcon(delta)
 	_stamina_flash = maxf(_stamina_flash - delta * 3.0, 0.0)
@@ -271,6 +292,8 @@ func _process(delta: float) -> void:
 	_fade = maxf(_fade - delta * 2.5, 0.0)
 	if _phase == Phase.CRUX:
 		_update_crux(delta)
+	if reaching and _phase == Phase.CLIMB and reaching.update(anim_delta):
+		_grab() # held on too long: the hand slaps onto the hold
 	if _phase == Phase.NIGHT:
 		_night_age += delta
 	if _result_delay >= 0.0:
@@ -298,9 +321,15 @@ func _input(event: InputEvent) -> void:
 	var is_press := false
 	# A stick past its deadzone sends a press with every motion event, so a
 	# held or wobbling stick counts once, as it crosses (MenuInput.pressed).
-	for a in ["move_up", "move_left", "move_right", "use_tool", "interact", "ui_cancel"]:
+	for a in ["move_up", "move_left", "move_right", "move_down", "use_tool", "interact", "ui_cancel"]:
 		if MenuInput.pressed(event, a):
 			is_press = true
+	# Letting go of the arrow is the grab when reaching for a hold.
+	if reaching and _phase == Phase.CLIMB and Settings.climb_moves == Settings.ClimbMoves.REACH \
+			and not event.is_echo() and event.is_action_released(_reach_action):
+		get_viewport().set_input_as_handled()
+		_grab()
+		return
 	# Letting go is the move on a dyno, so its release gets through too.
 	if _phase == Phase.CRUX and _crux.get("holding", false) and not event.is_echo():
 		for a in ["move_up", "use_tool", "interact"]:
@@ -367,6 +396,18 @@ func _climb_input(event: InputEvent) -> void:
 	elif MenuInput.pressed(event, "move_right"):
 		dx = 1
 	var assist := Input.is_action_pressed("assist")
+	# Tap twice: the second tap of any arrow grabs.
+	if reaching:
+		if dx != 99 and Settings.climb_moves == Settings.ClimbMoves.TWO_TAPS:
+			_grab()
+		elif event.is_action_pressed("ui_cancel"):
+			reaching = null
+			_phase = Phase.PAUSE
+		elif MenuInput.pressed(event, "move_down"):
+			reaching = null # Down: bring the hand back
+		return
+	if dx != 99 and not assist and Settings.climb_moves != Settings.ClimbMoves.SIMPLE and start_reach(dx):
+		return
 	if dx != 99:
 		if assist and state.can_jug(dx):
 			state.jug(dx)
@@ -393,6 +434,87 @@ func _climb_input(event: InputEvent) -> void:
 		_phase = Phase.PAUSE
 		return
 	_after_action(before)
+
+
+## Starts reaching for the hold up and [param dx] (see ClimbReach). Ledges,
+## kicked steps and moves that can't be made go straight through (false).
+func start_reach(dx: int) -> bool:
+	var r := state.row + 1
+	var c := state.col + dx
+	if state.status != ClimbState.Status.CLIMBING or not state.pending.is_empty() or state.hold_at(r, c).is_empty():
+		return false
+	var technique := state.technique_at(r, c)
+	if technique == "step":
+		return false
+	reaching = ClimbReach.new(dx, technique, state.sequence_for(dx), state.pump, Settings.room(), Settings.pace())
+	_reach_action = {-1: "move_left", 0: "move_up", 1: "move_right"}[dx]
+	return true
+
+
+## Lets go of the reach: the hand grabs the hold, and the move is made with
+## how it landed.
+func _grab() -> void:
+	if reaching == null:
+		return
+	var reach := reaching
+	reaching = null
+	var result := reach.release()
+	if result == "cancel":
+		return # a slip of the finger: the hand comes back
+	last_grab = result
+	var clean := result != "sloppy" and reach.sequence != "bump"
+	if clean:
+		move_flow += 1
+		best_move_flow = maxi(best_move_flow, move_flow)
+	else:
+		move_flow = 0
+	# A flow of clean moves carries into the next crux.
+	state.flow_window = FLOW_CRUX_WINDOW if move_flow >= FLOW_EASE else 0.0
+	var before := Vector3i(state.col, state.row, state.pitch)
+	var falls := state.falls
+	_grab_at = _screen(state.row + 1, state.col + reach.dx)
+	_grab_age = 0.0
+	state.move(reach.dx, result)
+	if state.falls != falls:
+		move_flow = 0
+		state.flow_window = 0.0
+	elif clean and move_flow % FLOW_EASE == 0 and state.status == ClimbState.Status.CLIMBING:
+		state.ease_pump()
+		_fx.dust(_grab_at, UI.GOOD, 3)
+		Sound.play("climb_crux", -12.0, 0.0, 1.3 + 0.05 * mini(move_flow / FLOW_EASE, 6))
+	match result:
+		"perfect":
+			Sound.play("climb_move", -6.0, 0.0, 1.3)
+			_fx.dust(_grab_at, _dust_color(), 2)
+		"sloppy":
+			_shake = maxf(_shake, 1.5)
+			_fx.dust(_grab_at + Vector2(0, 6), _dust_color(), 4)
+			if not _reach_taught and state.status == ClimbState.Status.CLIMBING:
+				_reach_taught = true
+				state.message = _reach_lesson(reach)
+	_after_action(before)
+
+
+## The first sloppy grab of a climb says what went wrong.
+func _reach_lesson(reach: ClimbReach) -> String:
+	var how := "Let go as the ring closes on the hold." if Settings.climb_moves == Settings.ClimbMoves.REACH else "Tap again as the ring closes on the hold."
+	if reach.sequence == "bump":
+		return "Same hand twice: that's a bump, and it's harder. Alternate hands (left, right) for a clean sequence."
+	if reach.progress() < reach.center:
+		return "Too early: the hand slaps on short. %s" % how
+	return "Too late: you overreach and slap on. %s" % how
+
+
+## The hand that's reaching ("left", "right", or "match" for straight up),
+## or "" when nothing is.
+func reach_hand() -> String:
+	return reaching.hand if reaching else ""
+
+
+## How far the reaching hand has gone: 0 as it leaves, 1 on the hold (more
+## when overreaching), or 0 when nothing is reaching.
+func reach_progress() -> float:
+	return reaching.progress() if reaching else 0.0
 
 
 ## Eats the smallest food that will spoil soonest, keeping a real meal for
@@ -1134,6 +1256,7 @@ func _draw_screen() -> void:
 	_draw_belayer()
 	_draw_climber()
 	_draw_reachable()
+	ClimbHud.reach(_canvas, reaching, _reach_target(), _time, last_grab, _grab_at, _grab_age)
 	_fx.draw(_canvas)
 	_canvas.draw_set_transform(Vector2.ZERO)
 	_draw_atmosphere()
@@ -1151,7 +1274,7 @@ func _draw_screen() -> void:
 			ClimbHud.pause_card(_canvas, state)
 		Phase.RESULT:
 			ClimbHud.result_card(_canvas, state, profile, _won_line, _result_age, state.status == ClimbState.Status.TOPPED_OUT,
-				{"record": _record_before, "best_flow": best_flow})
+				{"record": _record_before, "best_flow": best_flow, "best_move_flow": best_move_flow})
 
 
 ## About how much food energy this route wants, for the route card.
@@ -1738,7 +1861,15 @@ func _hint(usable: Dictionary) -> String:
 		parts.append("[%s] Read the line" % _button("Down", "Stick"))
 	if parts.is_empty():
 		# The reminder is for the first minute; after that it just covers the wall.
-		return "[%s] Climb    [%s] Retreat" % [_button("Arrows", "Stick"), _button("Esc", "B")] if _time < 40.0 and state.pitch == 0 else ""
+		if _time < 40.0 and state.pitch == 0:
+			var climb := "Climb"
+			match Settings.climb_moves:
+				Settings.ClimbMoves.REACH:
+					climb = "Hold to reach, let go to grab"
+				Settings.ClimbMoves.TWO_TAPS:
+					climb = "Tap to reach, tap to grab"
+			return "[%s] %s    [%s] Retreat" % [_button("Arrows", "Stick"), climb, _button("Esc", "B")]
+		return ""
 	return "    ".join(parts)
 
 
@@ -1757,8 +1888,15 @@ func _usable() -> Dictionary:
 
 
 ## Rings round the holds you can reach, with what each move costs.
+## Screen point of the hold being reached for.
+func _reach_target() -> Vector2:
+	if reaching == null:
+		return Vector2.ZERO
+	return _screen(state.row + 1, state.col + reaching.dx).round()
+
+
 func _draw_reachable() -> void:
-	if state.status != ClimbState.Status.CLIMBING or _move_t < 1.0 or _phase != Phase.CLIMB:
+	if state.status != ClimbState.Status.CLIMBING or _move_t < 1.0 or _phase != Phase.CLIMB or reaching:
 		return
 	var pulse := 0.6 + 0.4 * sin(_time * 5.0)
 	for dx in [-1, 0, 1]:
@@ -1777,7 +1915,13 @@ func _draw_reachable() -> void:
 		var color := _cost_color(cost)
 		if hold.get("rest", false):
 			color = UI.GOOD
-		_canvas.draw_arc(p, 7.0, 0, TAU, 16, Color(color, pulse), 1.0)
+		var technique := state.technique_at(r, c)
+		if state.sequence_for(dx) == "bump" and Settings.climb_moves != Settings.ClimbMoves.SIMPLE:
+			# Same hand again: a broken ring.
+			for i in 6:
+				_canvas.draw_arc(p, 7.0, i * TAU / 6.0, i * TAU / 6.0 + TAU / 10.0, 4, Color(color, pulse), 1.0)
+		else:
+			_canvas.draw_arc(p, 7.0, 0, TAU, 16, Color(color, pulse), 1.0)
 		_chevron(p, dx, Color(color, pulse))
 		# what the move costs, in energy
 		var label := "-%d" % cost
@@ -1787,10 +1931,8 @@ func _draw_reachable() -> void:
 			label += " rest"
 		elif hold.get("fixed", false):
 			label += " fixed"
-		elif hold.get("grip", "") == "jug":
-			label += " jug"
-		elif hold.get("grip", "") == "crimp":
-			label += " crimp"
+		elif technique in ["jug", "crimp", "jam", "sloper"]:
+			label += " " + technique
 		# the number in cream (the ring's colour says how hard; a green "-1"
 		# read as a gain), unless it's a rest or crux, which keep their colour
 		var ink: Color = color if hold.get("rest", false) or hold.get("crux", false) else UI.CREAM
@@ -1908,6 +2050,9 @@ func _draw_hud(height: float) -> void:
 			ClimbGearArt.rack_strip(_canvas, state, Vector2(10, SCREEN.y - 44), state.crack_width(state.row, state.col) if on_crack else -1)
 		ClimbHud.hints(_canvas, _hint(usable), toolbar_end + 6.0)
 	if _phase == Phase.CLIMB:
+		if move_flow >= 3 and state.status == ClimbState.Status.CLIMBING:
+			# The flow of clean moves, beside the climber.
+			UI.outlined(_canvas, _torso() + Vector2(14, -30), "flow x%d" % move_flow, UI.GOOD if move_flow >= FLOW_EASE else UI.CREAM, 10)
 		ClimbHud.toast(_canvas, _toast_text, _toast_age)
 		ClimbHud.pitch_banner(_canvas, state, _banner_age)
 	if _phase == Phase.CRUX or _crux_result_age < 1.4:

@@ -7,7 +7,9 @@
 script = ExtResource("1_gear")
 id = "cam"
 display_name = "Cam"
-description = "Spring-loaded protection for cracks. More cams mean shorter falls."
+description = "Spring-loaded protection for cracks. More cams mean shorter falls. Each one you get is the next size your rack is missing."
 icon = ExtResource("2_icon")
 tier = 1
 trade_value = 50
+kind = "cam"
+generic = true

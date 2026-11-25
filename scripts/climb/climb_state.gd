@@ -113,6 +113,14 @@ const SHAKE_PUMP := 5
 const MINUTES_TO_SHAKE := 3
 ## Stamina it takes to place a cam or clip a draw, by the hold you're on.
 const PROTECT_COST := {"jug": 1, "edge": 2, "crimp": 5}
+## Reaching and grabbing (the screen's ClimbReach, see [method move]).
+const PRECISE_SAVING := 1
+const SLOPPY_COST := 1
+const SLOPPY_PUMP := 1
+const JAM_REST := 1
+## Pitch styles where a crack hold is a hand jam, and where edges are slopers.
+const JAM_STYLES := ["crack", "flake", "chimney", "roof"]
+const SLOPER_STYLES := ["slab", "dike"]
 ## Seconds your grip gives you to place a piece (PlaceCheck) or clip from a
 ## bad hold (ClipCheck), by the hold you hang on, less GRIP_PER_PUMP for each
 ## point of pump; never under GRIP_MIN. A stance gives GRIP_REST.
@@ -308,6 +316,17 @@ var jug_moves := 0
 ## Crux moves done well, and missed.
 var perfect_cruxes := 0
 var slipped_cruxes := 0
+## How each move was grabbed on the screen (see ClimbReach): "perfect" moves
+## cost a point less, "sloppy" ones a point more and a point of pump. Bots and
+## tests grab every hold "good", so their numbers are the same as before.
+var precise_moves := 0
+var sloppy_moves := 0
+var free_moves := 0
+## The hand that made the last move: "left", "right", or "" at a belay, after
+## a match (straight up) or a fall. Reaching with the same hand twice is a bump.
+var last_hand := ""
+## Added to the crux meter's green by a flow of clean moves on the screen.
+var flow_window := 0.0
 ## What just happened, for the UI.
 var message := ""
 ## Row -> {column -> hold} for the current pitch. A hold has "cost" and
@@ -687,8 +706,65 @@ func bolts_per_pitch() -> int:
 	return bolts.size()
 
 
+## The hand technique the hold at ([param r], [param c]) asks for: "jug",
+## "edge", "crimp", "jam" (a crack hold on a crack, flake, chimney or roof
+## pitch), "sloper" (friction holds on slab and dike pitches), or "step"
+## (ledges, snow). It sets how a reach is timed (ClimbReach), and the hand
+## poses read it. A hold's "shape" (when the art tags one) refines it.
+func technique_at(r: int, c: int) -> String:
+	var hold := hold_at(r, c)
+	var grip_name: String = hold.get("grip", "step")
+	if hold.is_empty() or int(hold.get("cost", 0)) <= 0 or grip_name == "step" or is_snow():
+		return "step"
+	var shape: String = hold.get("shape", "")
+	if shape.ends_with("_jam"):
+		return "jam"
+	if shape == "palm":
+		return "sloper"
+	if grip_name == "jug":
+		return "jug"
+	if hold.get("crack", false) and style() in JAM_STYLES:
+		return "jam"
+	if style() in SLOPER_STYLES and grip_name == "edge":
+		return "sloper"
+	return grip_name
+
+
+## The technique of the hold you're on.
+func technique() -> String:
+	return technique_at(row, col)
+
+
+## The hand a move with [param dx] reaches with: left for up-left, right for
+## up-right, and straight up matches ("match": the low hand comes up beside
+## the high one).
+static func hand_for(dx: int) -> String:
+	return "left" if dx < 0 else ("right" if dx > 0 else "match")
+
+
+## "clean" when the reaching hand isn't the one that just moved, "bump" when
+## it is (you move the same hand twice and hang off the other the whole
+## time), "match" for straight up.
+##
+## A bump the wall forces on you (nothing else in reach but that hand's
+## side) counts as a match: no penalty for the rock's shape.
+func sequence_for(dx: int) -> String:
+	var hand := hand_for(dx)
+	if hand == "match":
+		return "match"
+	if hand != last_hand:
+		return "clean"
+	for d in [-1, 0, 1]:
+		if d != dx and not hold_at(row + 1, col + d).is_empty():
+			return "bump"
+	return "match"
+
+
 ## Moves up one row. [param dx] is -1 (up-left), 0 (straight up), or 1 (up-right).
-func move(dx: int) -> bool:
+## [param grab] is how the screen's reach landed ("perfect", "good" or
+## "sloppy"; see ClimbReach): a perfect grab costs 1 less (and a perfect jam
+## eases the pump), a sloppy one 1 more and a point of pump.
+func move(dx: int, grab := "good") -> bool:
 	if status != Status.CLIMBING or not pending.is_empty():
 		return false
 	var target := hold_at(row + 1, col + dx)
@@ -702,8 +778,32 @@ func move(dx: int) -> bool:
 		message = "No hold there."
 		return false
 	var cost := move_cost(row + 1, col + dx)
+	var technique_name := technique_at(row + 1, col + dx)
+	if technique_name == "step":
+		grab = "good" # ledges and kicked steps aren't reached for
+	var extra_pump := 0
+	match grab:
+		"perfect":
+			cost = maxi(cost - PRECISE_SAVING, 1)
+			precise_moves += 1
+			if technique_name == "jam":
+				extra_pump = -JAM_REST
+		"sloppy":
+			cost += SLOPPY_COST
+			extra_pump = SLOPPY_PUMP
+			sloppy_moves += 1
+	free_moves += 1
+	var hand := hand_for(dx)
+	last_hand = "" if hand == "match" else hand
+	if extra_pump != 0:
+		pump = clampi(pump + extra_pump, 0, PUMP_MAX)
 	_step(dx, cost, MINUTES_PER_MOVE - int(Perks.bonus("light_rack")))
 	return true
+
+
+## A flow of clean moves on the screen eases the forearms a little.
+func ease_pump(amount := 1) -> void:
+	pump = maxi(pump - amount, 0)
 
 
 ## True when no hold is in reach above: straight up or a column either side.
@@ -926,6 +1026,7 @@ func crux_window() -> float:
 	window += CRUX_MERCY_WINDOW * _crux_mercy()
 	window -= PUMP_WINDOW * pump
 	window += float(pending.get("narrow", 0.0))
+	window += flow_window
 	if is_wet():
 		window -= WET_WINDOW
 	if is_windy():
@@ -1795,6 +1896,7 @@ func _start_pitch() -> void:
 	_rested_rows = {}
 	_shaken_rows = {}
 	pump = 0
+	last_hand = ""
 	spec = ClimbProfiles.pitch_spec(route, pitch)
 	top_row = int(spec.rows)
 	_width_rng.seed = _rng.seed + 7919 * (pitch + 1)
