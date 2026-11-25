@@ -111,7 +111,7 @@ void fragment() {
 	vec3 c = texture(screen_tex, SCREEN_UV).rgb;
 	bool kept = false;
 	for (int k = 0; k < keep_count; k++) {
-		if (all(lessThan(abs(c - keep[k]), vec3(0.75 / 255.0)))) {
+		if (all(lessThan(abs(c - keep[k]), vec3(2.5 / 255.0)))) {
 			kept = true;
 		}
 	}

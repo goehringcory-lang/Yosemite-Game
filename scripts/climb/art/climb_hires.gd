@@ -217,7 +217,7 @@ static func _scale_rows(data: PackedInt32Array, w: int, h: int, y0: int, y1: int
 			var e2 := p
 			var e3 := p
 			if p == a and p == d and p == c and p == b:
-				if grained and (p & 0xff000000) != 0:
+				if grained and (p & 0xff000000) == 0xff000000:
 					# A flat pixel of stone: one hash, a byte for each screen pixel.
 					var hv := (x * 73856093) ^ y_mix
 					hv = ((hv ^ (hv >> 15)) * 2246822519) & 0xffffffffffff
@@ -352,7 +352,7 @@ static func quantize(im: Image, ramp: PackedColorArray) -> Image:
 				var idx := pick & 0xff
 				if f16 > 0 and DITHER[dy | (x & 3)] * 16.0 < f16:
 					idx = (pick >> 8) & 0xff
-				rows[i + x] = ints[idx]
+				rows[i + x] = (ints[idx] & 0xffffff) | (p & 0xff000000)
 		return rows)
 	return Image.create_from_data(w, h, false, Image.FORMAT_RGBA8, out.to_byte_array())
 

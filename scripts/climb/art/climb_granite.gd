@@ -199,3 +199,126 @@ static func cavity(im: Image, p: Vector2i, r: int, amount: float) -> void:
 			var d := sqrt(dx * dx + dy * dy)
 			if d <= r:
 				darken(im, p.x + dx, p.y + dy, amount * (1.0 - d / (r + 1)))
+
+
+# ---------------------------------------------------------------- planes
+
+## Big facets of the wall, [param count] of them: tall bands of rock turned
+## a little away from the sun (a shade darker, darkest against the corner
+## they make) or toward it (a shade lighter), each with a sharp arête where it
+## starts, so the face reads as planes of rock and not one flat sheet.
+static func planes(im: Image, rng: RandomNumberGenerator, edge: PackedInt32Array, count: int) -> void:
+	var w := im.get_width()
+	var h := im.get_height()
+	for i in count:
+		var x0 := rng.randf_range(10.0, w - 110.0)
+		var width := rng.randf_range(36.0, 90.0)
+		var y0 := rng.randi_range(-60, h - 160)
+		var length := rng.randi_range(160, 480)
+		var away := rng.randf() < 0.65
+		var amount := rng.randf_range(0.09, 0.16) if away else rng.randf_range(0.05, 0.09)
+		var slant := rng.randf_range(-0.08, 0.08)
+		var seed_value := rng.randi()
+		for k in length:
+			var y := y0 + k
+			if y < 0 or y >= h:
+				continue
+			var t := float(k) / length
+			var fade := minf(minf(t, 1.0 - t) * 5.0, 1.0)
+			var left := int(x0 + slant * k + P.smooth_noise(k * 0.04, 2.0, seed_value) * 6.0)
+			var right := int(left + width * (0.75 + 0.5 * P.smooth_noise(k * 0.02, 5.0, seed_value)))
+			var lim := edge[y] - 6 if y < edge.size() else w - 30
+			right = mini(right, lim)
+			if right <= left + 4:
+				continue
+			for x in range(maxi(left, 0), right):
+				var across := float(x - left) / (right - left)
+				# darkest near the arête, easing off across the plane
+				var a := amount * fade * (1.0 - across * 0.6)
+				if across > 0.85 and not P.dither(x, y, (1.0 - across) * 6.0):
+					continue
+				if away:
+					darken(im, x, y, a)
+				else:
+					lighten(im, x, y, a)
+			# the arête: a lit edge where the plane turns away from the sun
+			if away and fade > 0.3:
+				lighten(im, left - 1, y, 0.16 * fade)
+				darken(im, left, y, 0.1 * fade)
+
+
+## Royal Arches' great curving shells: [param count] arcs of exfoliating
+## granite, each a lit lip with a dark undercut and shadow under it, the rock
+## within the curve a little recessed.
+static func arches(im: Image, rng: RandomNumberGenerator, edge: PackedInt32Array, count: int) -> void:
+	var w := im.get_width()
+	var h := im.get_height()
+	for i in count:
+		var cx := rng.randf_range(40.0, w - 80.0)
+		var cy := rng.randf_range(60.0, h + 40.0)
+		var rx := rng.randf_range(70.0, 170.0)
+		var ry := rng.randf_range(40.0, 110.0)
+		var depth := rng.randf_range(3.0, 6.0)
+		var a0 := rng.randf_range(0.0, 0.5)
+		var a1 := PI - rng.randf_range(0.0, 0.5)
+		var steps := int(rx * PI * 1.6)
+		var last := Vector2i(-999, -999)
+		for k in steps:
+			var t := lerpf(a0, a1, float(k) / steps)
+			var x := int(cx + rx * cos(t))
+			var y := int(cy - ry * sin(t))
+			if Vector2i(x, y) == last:
+				continue
+			last = Vector2i(x, y)
+			if y < 0 or y >= h or x < 2 or x >= (edge[y] - 6 if y < edge.size() else w - 30):
+				continue
+			var taper := minf(minf(t - a0, a1 - t) * 3.0, 1.0)
+			# the shell's lit lip, two pixels thick, then the undercut and a
+			# wide soft shadow on the rock below
+			lighten(im, x, y - 2, 0.08 * taper)
+			lighten(im, x, y - 1, 0.18 * taper)
+			lighten(im, x, y, 0.2 * taper)
+			darken(im, x, y + 1, 0.3 * taper)
+			for s in int(depth * 2.0 * taper):
+				var f := float(s) / (depth * 2.0)
+				if f > 0.6 and not P.dither(x, y + 2 + s, (1.0 - f) * 2.5):
+					continue
+				darken(im, x, y + 2 + s, 0.2 * (1.0 - f) * taper)
+		# the recess under the arch
+		for yy in range(int(cy - ry * 0.9), int(cy)):
+			if yy < 0 or yy >= h:
+				continue
+			var span := rx * sqrt(maxf(1.0 - pow((cy - yy) / ry, 2.0), 0.0)) * 0.9
+			for xx in range(int(cx - span), int(cx + span)):
+				if xx > 1 and xx < (edge[yy] - 6 if yy < edge.size() else w - 30) and P.dither(xx, yy, 0.5):
+					darken(im, xx, yy, 0.05)
+
+
+## Glacier polish: smooth, pale patches with ragged edges where the ice
+## ground the granite glassy. [param amount] 0..1 is how much of the face;
+## polished pixels carry [param alpha] so the fine grain leaves them smooth.
+static func polish(im: Image, rng: RandomNumberGenerator, edge: PackedInt32Array, amount: float, alpha: int) -> void:
+	var w := im.get_width()
+	var h := im.get_height()
+	var noise := FastNoiseLite.new()
+	noise.seed = rng.randi()
+	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	noise.frequency = 0.012
+	noise.fractal_octaves = 3
+	noise.fractal_gain = 0.55
+	var field := noise.get_image(w, h, false, false, true).get_data()
+	var cut := int(255 * (1.0 - amount * 0.45))
+	var data := im.get_data().to_int32_array()
+	for y in h:
+		var lim := edge[y] - 6 if y < edge.size() else w - 30
+		var row := y * w
+		for x in mini(lim, w):
+			var v := field[row + x]
+			if v < cut:
+				continue
+			var p := data[row + x]
+			if ((p >> 24) & 0xff) != 0xff:
+				continue
+			var col := Color8(p & 0xff, (p >> 8) & 0xff, (p >> 16) & 0xff).lightened(0.04 + 0.05 * float(v - cut) / maxf(255 - cut, 1))
+			data[row + x] = col.r8 | (col.g8 << 8) | (col.b8 << 16) | (alpha << 24)
+	im.set_data(w, h, false, Image.FORMAT_RGBA8, data.to_byte_array())

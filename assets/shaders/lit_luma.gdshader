@@ -29,7 +29,7 @@ uniform int ramp_count = 0;
 // The wall is painted on the 480 x 270 menu grid and doubled; this carves
 // the stone's own small facets and crystals at the doubled grid, one screen
 // pixel each, so the granite reads twice as finely as anything painted.
-uniform float micro = 1.5;
+uniform float micro = 1.2;
 // the doubled wall's size in pixels, for the fine relief's grid
 uniform vec2 micro_scale = vec2(1.0);
 
@@ -91,6 +91,10 @@ void fragment() {
 		float crystal = step(0.985, hash(wp + 3.7)) * (hash(wp + 9.1) - 0.4);
 		// the darkest tones (crack insides, deep shadow) keep still
 		float give = smoothstep(1.0, 4.0, float(at));
+		// the holds and cracks of the line (and polished patches) are
+		// marked by a lower alpha: no grain on them
+		give *= step(0.995, COLOR.a);
+		COLOR.a = 1.0;
 		float shift = (fine * 9.0 + crystal * 2.5) * micro * give;
 		// the lightness the sun asks for, then the ramp tones either side
 		float stepped = ramp_luma[clamp(at + int(round(shift)), 0, ramp_count - 1)];

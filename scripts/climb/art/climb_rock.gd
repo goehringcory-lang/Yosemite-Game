@@ -18,11 +18,11 @@ const ROCKS := {
 	"polished": ["4e5864", "727e8c", "9aa4b0", "c4cad0", "e8ecee"],
 	"golden": ["5e4034", "8a6040", "b48850", "d4aa6c", "ecca8c"],
 	"orange": ["5c3a30", "86543e", "b27a54", "daa270", "f6ca92"],
-	"dark": ["262a3c", "44485c", "6a6e82", "9498ac", "c0c4d6"],
+	"dark": ["2e2c3a", "4e4c5a", "767480", "a09ca4", "cac6c8"],
 	"pale": ["6a5442", "98785a", "c4a27a", "e2c69a", "f6e8c4"],
 	"roof": ["2e2c3a", "4c4a5a", "6c6a7c", "908e9e", "b6b4c4"],
-	"elcap": ["3a3c50", "646676", "9698a2", "c6c4c0", "eeeadc"],
-	"arches": ["54505a", "787480", "a09c98", "ccc4b0", "ece2c6"],
+	"elcap": ["40425a", "707284", "a4a4ae", "d0cec8", "f4f0e4"],
+	"arches": ["443e4a", "6e6874", "9c948e", "c8bca4", "eadcbc"],
 	"dome": ["68646a", "928e96", "bcb8bc", "e0dcd8", "f6f2ea"],
 	"knobby": ["5e4c3c", "8a725a", "b49c7a", "d8c09a", "f2e4c4"],
 	"columbia": ["363844", "5a5c68", "84868e", "aeaeb0", "dad8d0"],
@@ -145,13 +145,33 @@ static func paint(state: ClimbState, rock_key: String, pal: Dictionary, seed_val
 	if style not in ["snow", "ice", "chimney"]:
 		_big_forms(im, c, rng, state, style, deco, edge, rock_key)
 	_features(im, c, rng, state, style, deco, edge)
+	var before := im.get_data().to_int32_array()
 	_paint_holds(im, c, rng, state, style, edge)
+	_mark_crisp(im, before)
 	if style not in ["chimney", "snow", "ice"] and edge.size() == h:
 		_finish(im, edge)
 	return result
 
 
 const BANDS := 8
+
+## Alpha a stone pixel carries to keep the fine grain off it (see
+## lit_luma.gdshader): the holds, cracks and ledges of the line, so they read
+## cleanly, and polished patches, which are smooth.
+const CRISP_ALPHA := 253
+const POLISH_ALPHA := 254
+
+
+## Marks every pixel _paint_holds changed (compared with [param before]) as
+## crisp: the fine grain leaves the climbing line alone.
+static func _mark_crisp(im: Image, before: PackedInt32Array) -> void:
+	var after := im.get_data().to_int32_array()
+	var mark := CRISP_ALPHA << 24
+	for i in after.size():
+		var p := after[i]
+		if p != before[i] and ((p >> 24) & 0xff) == 0xff:
+			after[i] = (p & 0xffffff) | mark
+	im.set_data(im.get_width(), im.get_height(), false, Image.FORMAT_RGBA8, after.to_byte_array())
 
 
 ## The wall's big forms (ClimbGranite): exfoliation sheets, then water
@@ -164,7 +184,13 @@ static func _big_forms(im: Image, c: Dictionary, rng: RandomNumberGenerator, sta
 		sheets += 2
 	if style == "knobs":
 		sheets = 1
+	if not smooth and style != "knobs":
+		ClimbGranite.planes(im, rng, edge, 2 + h / 300)
 	ClimbGranite.sheets(im, c, rng, edge, sheets * maxi(h / 270, 1), 0.6 if rock_key == "arches" else 0.0)
+	if rock_key == "arches":
+		ClimbGranite.arches(im, rng, edge, 3 + h / 250)
+	if smooth or rock_key in ["apron", "pale"]:
+		ClimbGranite.polish(im, rng, edge, 0.5 if smooth else 0.25, POLISH_ALPHA)
 	var sources: Array = []
 	var top := state.top_row
 	for r in [0, top]:
@@ -648,11 +674,16 @@ static func _dike(im: Image, c: Dictionary, rng: RandomNumberGenerator, state: C
 		var x := lerpf(xs[seg], xs[seg + 1], t) + sin(y * 0.05) * 2.0
 		var wobble := int(P.noise(y / 3, 0, 4) * 3.0)
 		var half := 5 + wobble
-		P.rect(im, int(x) - half - 1, y, half * 2 + 3, 1, c.seam)
-		P.rect(im, int(x) - half, y, half * 2 + 1, 1, dark)
-		P.rect(im, int(x) - half, y, 2, 1, mid)
-		P.px(im, int(x) - half, y, lit)
-		P.rect(im, int(x) + half - 2, y, 2, 1, c.deep)
+		# A raised ribbon: its sunlit left flank, a rough top, the right
+		# flank in shade and a shadow thrown onto the slab beside it.
+		P.rect(im, int(x) - half - 1, y, half * 2 + 3, 1, mid)
+		P.rect(im, int(x) - half + 2, y, half * 2 - 3, 1, dark.lerp(mid, 0.5 + P.noise(int(x), y, 5) * 0.4))
+		P.rect(im, int(x) - half - 1, y, 3, 1, tone(c, 4.4))
+		P.px(im, int(x) - half - 2, y, tone(c, 3.6))
+		P.rect(im, int(x) + half - 1, y, 2, 1, c.deep)
+		P.px(im, int(x) + half + 1, y, c.seam)
+		for k in 4:
+			ClimbGranite.darken(im, int(x) + half + 2 + k, y, 0.26 - k * 0.06)
 		if P.noise(int(x), y, 8) < 0.12:
 			P.px(im, int(x) + int(P.noise(y, 3, 8) * 6.0) - 3, y, mid)
 
@@ -668,9 +699,13 @@ static func _knobs(im: Image, c: Dictionary, rng: RandomNumberGenerator) -> void
 		for i in rng.randi_range(2, 5):
 			var x := cx + rng.randi_range(-12, 12)
 			var y := cy + rng.randi_range(-9, 9)
-			var r := rng.randi_range(2, 4)
-			P.ellipse(im, x + 1, y + 2, r + 1, r * 0.7 + 1, c.seam)
-			P.shaded_ellipse(im, x, y, r, r * 0.7, tone(c, 2.9), tone(c, 4.1), tone(c, 1.6))
+			var r := rng.randi_range(3, 6)
+			# its shadow falls down and to the right of it
+			for s in range(1, r + 2):
+				P.ellipse(im, x + 1 + s * 0.6, y + 1 + s * 0.8, r, r * 0.7, (c.shade as Color).lerp(c.deep, 0.5 - s * 0.06))
+			P.ellipse(im, x + 1, y + 1, r + 1, r * 0.7 + 1, c.seam)
+			P.shaded_ellipse(im, x, y, r, r * 0.75, tone(c, 2.9), tone(c, 4.3), tone(c, 1.5))
+			P.px(im, x - r / 2, y - r / 3, tone(c, 4.8))
 	# Salt-and-pepper crystals of the coarse porphyritic granite.
 	for i in w * h / 55:
 		var p := Vector2i(rng.randi_range(0, w - 1), rng.randi_range(0, h - 1))
@@ -690,15 +725,16 @@ static func _chimney(im: Image, c: Dictionary, rng: RandomNumberGenerator, deco:
 	_face(im, c, rng, "crack", deco, state, "dark")
 	for yy in h:
 		for xx in range(right, w):
-			if P.dither(xx, yy, 0.5) or xx < right + 3:
-				im.set_pixel(xx, yy, im.get_pixel(xx, yy).darkened(0.22))
+			# in shade, deepest against the slot and easing off across it
+			im.set_pixel(xx, yy, im.get_pixel(xx, yy).darkened(0.12 + 0.14 * clampf(1.0 - (xx - right) / 60.0, 0.0, 1.0)))
 	# The slot: dark rock receding, with a pale seam of light far above.
 	for yy in h:
 		for xx in range(left, right):
 			var depth := 1.0 - absf((xx - (left + right) * 0.5) / ((right - left) * 0.5))
-			var t := 0.2 + depth * 0.9 + P.smooth_noise(xx * 0.2, yy * 0.05, 2) * 0.5
-			var q := roundi((t + (P.BAYER[yy & 3][xx & 3] / 16.0 - 0.5) * 0.4) * 2.0) / 2.0
-			im.set_pixel(xx, yy, tone(c, clampf(q, 0.0, 3.0)))
+			# Darkest against the walls, where neither sees the sky; the
+			# back of the slot catches a little light from far above.
+			var t := depth * 0.8 + P.smooth_noise(xx * 0.2, yy * 0.05, 2) * 0.5 - 0.15
+			im.set_pixel(xx, yy, (c.seam as Color).lerp(c.deep, clampf(t + 0.6, 0.0, 1.0)) if t < 0.4 else tone(c, clampf(t - 0.4, 0.0, 1.6)))
 	# The lips of each wall, lit on the left wall's edge, and a shadow cast
 	# into the slot.
 	P.rect(im, left - 3, 0, 3, h, tone(c, 3.9))
@@ -1021,7 +1057,7 @@ static func _paint_holds(im: Image, c: Dictionary, rng: RandomNumberGenerator, s
 static func _crack_line(im: Image, c: Dictionary, a: Vector2, b: Vector2) -> void:
 	var steps := int(a.distance_to(b)) + 1
 	var w := im.get_width()
-	var core: Color = (c.seam as Color).lerp(c.deep, 0.25)
+	var core: Color = (c.seam as Color).darkened(0.15)
 	for k in steps:
 		var t := float(k) / steps
 		var p := a.lerp(b, t)
@@ -1033,8 +1069,8 @@ static func _crack_line(im: Image, c: Dictionary, a: Vector2, b: Vector2) -> voi
 		var wide := 1 + int(sin(t * PI) * (0.8 + pod * 1.4))
 		ClimbGranite.darken(im, x - 3, y, 0.05)
 		P.px(im, x - 2, y, im.get_pixel(x - 2, y).lightened(0.1))
-		P.px(im, x - 1, y, tone(c, 4.0))
-		P.rect(im, x, y, wide, 1, c.deep)
+		P.px(im, x - 1, y, tone(c, 4.4))
+		P.rect(im, x, y, wide, 1, (c.deep as Color).lerp(c.seam, 0.4))
 		P.px(im, x + wide / 2, y, core)
 		P.px(im, x + wide, y, tone(c, 1.0))
 		P.px(im, x + wide + 1, y, tone(c, 2.2))

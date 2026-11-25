@@ -162,7 +162,7 @@ void fragment() {{
 \tvec3 c = texture(screen_tex, SCREEN_UV).rgb;
 \tbool kept = false;
 \tfor (int k = 0; k < keep_count; k++) {{
-\t\tif (all(lessThan(abs(c - keep[k]), vec3(0.75 / 255.0)))) {{
+\t\tif (all(lessThan(abs(c - keep[k]), vec3(2.5 / 255.0)))) {{
 \t\t\tkept = true;
 \t\t}}
 \t}}
