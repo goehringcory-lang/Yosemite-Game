@@ -16,15 +16,15 @@ const L := preload("res://scripts/climb/art/climb_layout.gd")
 const ROCKS := {
 	"apron": ["56525e", "7c7884", "a29ea8", "cac6cc", "ece8ec"],
 	"polished": ["4e5864", "727e8c", "9aa4b0", "c4cad0", "e8ecee"],
-	"golden": ["5a4430", "82603e", "ac8654", "d6ac70", "f2d492"],
+	"golden": ["5e4034", "8a6040", "b48850", "d4aa6c", "ecca8c"],
 	"orange": ["5c3a30", "86543e", "b27a54", "daa270", "f6ca92"],
 	"dark": ["262a3c", "44485c", "6a6e82", "9498ac", "c0c4d6"],
-	"pale": ["6c665e", "968e82", "c4bcac", "e6dec8", "faf4e0"],
+	"pale": ["6a5442", "98785a", "c4a27a", "e2c69a", "f6e8c4"],
 	"roof": ["2e2c3a", "4c4a5a", "6c6a7c", "908e9e", "b6b4c4"],
-	"elcap": ["3e3e4c", "6a6a7a", "9e9ea4", "cacac6", "eeeadc"],
+	"elcap": ["3a3c50", "646676", "9698a2", "c6c4c0", "eeeadc"],
 	"arches": ["54505a", "787480", "a09c98", "ccc4b0", "ece2c6"],
 	"dome": ["68646a", "928e96", "bcb8bc", "e0dcd8", "f6f2ea"],
-	"knobby": ["564e44", "7e7662", "aca088", "d4c8a6", "f0e6c4"],
+	"knobby": ["5e4c3c", "8a725a", "b49c7a", "d8c09a", "f2e4c4"],
 	"columbia": ["363844", "5a5c68", "84868e", "aeaeb0", "dad8d0"],
 	"ice": ["4a6ca8", "7a9ccc", "b0cce6", "dcecf8", "f8fcff"],
 }
@@ -70,6 +70,30 @@ static func colors(rock_key: String, pal: Dictionary) -> Dictionary:
 	out["chalk"] = _light(Color("f5eee0"), tint, minf(lum + 0.1, 1.1))
 	out["tint"] = tint
 	out["lum"] = lum
+	out["ramp"] = _ramp(out)
+	return out
+
+
+## How many tones the fine granite ramp has (see [method _ramp]).
+const RAMP_STEPS := 20
+
+
+## The rock's fine ramp, dark to light: RAMP_STEPS tones running from the
+## seam color through deep, shade, base and lit to the highlight, each an
+## exact 8-bit color. The finished wall is quantized to these tones (see
+## ClimbHiRes.quantize) and the palette snap lets them through untouched, so
+## the stone shades in twenty even steps instead of jumping between the
+## house palette's few greys and tans.
+static func _ramp(c: Dictionary) -> PackedColorArray:
+	var out := PackedColorArray()
+	var dark: Color = c.seam
+	# A warm cream above the highlight, for sunlit lips and polish.
+	var top: Color = (c.hi as Color).lerp(Color("fbf4e2"), 0.45)
+	for i in RAMP_STEPS:
+		# -1 is the seam, 0..4 the five tones, 5 the cream.
+		var t := -1.0 + 6.0 * i / float(RAMP_STEPS - 1)
+		var col: Color = dark.lerp(c.deep, t + 1.0) if t < 0.0 else (tone(c, t) if t <= 4.0 else (c.hi as Color).lerp(top, t - 4.0))
+		out.append(Color8(col.r8, col.g8, col.b8))
 	return out
 
 
@@ -116,7 +140,10 @@ static func paint(state: ClimbState, rock_key: String, pal: Dictionary, seed_val
 			_face(im, c, rng, style, deco, state, rock_key)
 			result["edge"] = _ragged_edge(im, c, rng, false)
 	result["image"] = im
+	result["ramp"] = c.ramp
 	var edge: PackedInt32Array = result.edge
+	if style not in ["snow", "ice", "chimney"]:
+		_big_forms(im, c, rng, state, style, deco, edge, rock_key)
 	_features(im, c, rng, state, style, deco, edge)
 	_paint_holds(im, c, rng, state, style, edge)
 	if style not in ["chimney", "snow", "ice"] and edge.size() == h:
@@ -125,6 +152,32 @@ static func paint(state: ClimbState, rock_key: String, pal: Dictionary, seed_val
 
 
 const BANDS := 8
+
+
+## The wall's big forms (ClimbGranite): exfoliation sheets, then water
+## streaks from the belay ledges and the tops of the cracks.
+static func _big_forms(im: Image, c: Dictionary, rng: RandomNumberGenerator, state: ClimbState, style: String, deco: Array, edge: PackedInt32Array, rock_key: String) -> void:
+	var h := im.get_height()
+	var smooth := style == "slab" or style == "dike" or rock_key in ["polished", "dome"]
+	var sheets := 2 if smooth else 4
+	if rock_key in ["elcap", "golden", "orange", "dark", "columbia"]:
+		sheets += 2
+	if style == "knobs":
+		sheets = 1
+	ClimbGranite.sheets(im, c, rng, edge, sheets * maxi(h / 270, 1), 0.6 if rock_key == "arches" else 0.0)
+	var sources: Array = []
+	var top := state.top_row
+	for r in [0, top]:
+		var p := L.wall_px(top, r, 0)
+		for i in 4:
+			sources.append(Vector2i(rng.randi_range(8, im.get_width() - 60), int(p.y) + 14))
+	for r in range(1, top):
+		for col: int in state.holds.get(r, {}):
+			if state.holds[r][col].get("crack", false) and not state.holds.get(r + 1, {}).get(col, {}).get("crack", false):
+				var q := L.wall_px(top, r, col)
+				sources.append(Vector2i(int(q.x) + 4, int(q.y) + 10))
+	var amount := 0.85 if "streaks" in deco else (0.25 if smooth else 0.45)
+	ClimbGranite.streaks(im, c, rng, sources, amount, edge)
 
 
 ## Last pass over the finished wall: a gentle contrast curve with warm lights
@@ -258,7 +311,6 @@ static func _face(im: Image, c: Dictionary, rng: RandomNumberGenerator, style: S
 		out.append_array(part)
 	im.set_data(w, h, false, Image.FORMAT_RGBA8, out.to_byte_array())
 	_joints(im, c, rng, smooth)
-	_stains(im, c, rng, deco)
 	_lichen(im, c, rng, deco, h)
 	# Feldspar glints and dark crystals, in small clusters of two or three
 	# pixels, so the grain reads as stone and not as static.
@@ -528,23 +580,36 @@ static func _flakes(im: Image, c: Dictionary, rng: RandomNumberGenerator, state:
 		_flake_shape(im, c, int(p.x) - 6, int(p.y) + 26, rng.randi_range(56, 92), rng.randi_range(8, 13), rng.randf_range(-0.12, 0.12))
 
 
+## A flake: a plate of granite peeling off the face. Only its free edge is
+## drawn hard (a lit rim, the dark gap behind, and a shadow thrown onto the
+## face beyond); the attached side fades into the face, the plate itself a
+## shade lighter where it stands proud.
 static func _flake_shape(im: Image, c: Dictionary, x: int, bottom_y: int, height: int, max_w: int, lean: float) -> void:
-	var w_main := maxi(int(max_w * 0.6), 4)
+	var w_main := maxi(int(max_w * 0.8), 5)
 	for k in height:
 		var t := float(k) / height
-		# Square body, pointed ends.
-		var taper := minf(minf(t, 1.0 - t) * 7.0, 1.0)
-		var half := maxi(int(w_main * (0.35 + 0.65 * taper)), 1)
+		# Rounded body, pointed ends.
+		var taper := sqrt(maxf(sin(t * PI), 0.0))
+		var half := maxi(int(w_main * taper), 1)
 		var cx := x + int(lean * (height - k))
 		var y := bottom_y - k
-		P.rect(im, cx - half - 1, y, half * 2 + 4, 1, c.seam)
-		P.rect(im, cx - half, y, half * 2 + 1, 1, tone(c, 2.5))
-		P.rect(im, cx - half, y, mini(2, half + 1), 1, tone(c, 3.6))
-		P.rect(im, cx + half - 1, y, 2, 1, tone(c, 1.6))
-		P.px(im, cx + half + 1, y, c.deep)
-		P.px(im, cx + half + 2, y, c.deep)
+		if y < 0 or y >= im.get_height():
+			continue
+		# the plate, lightening toward its free edge
+		for s in half:
+			var f := float(s) / half
+			if f > 0.25 or P.dither(cx + s, y, f * 4.0):
+				ClimbGranite.lighten(im, cx + s, y, 0.05 + 0.12 * f)
+		var e := cx + half
+		P.px(im, e, y, tone(c, 4.3))
+		P.px(im, e + 1, y, (c.seam as Color).lerp(c.deep, 0.2))
+		P.px(im, e + 2, y, c.deep)
+		# its shadow, widest at the middle of the flake
+		var sh := int(1 + 3.0 * taper)
+		for s in sh:
+			ClimbGranite.darken(im, e + 3 + s, y, 0.3 * (1.0 - float(s) / (sh + 1)))
 	var tx := x + int(lean * height)
-	P.rect(im, tx - 2, bottom_y - height, 5, 1, tone(c, 3.9))
+	P.px(im, tx, bottom_y - height, tone(c, 3.9))
 
 
 ## The dike: a ribbon of different rock snaking up the face, following the
@@ -897,7 +962,7 @@ static func paint_roof(state: ClimbState, rock_key: String, pal: Dictionary, see
 			if hold.get("crux", false):
 				for i in 5:
 					P.px(im, p.x + rng.randi_range(-4, 4), p.y + rng.randi_range(2, 8), c.chalk)
-	return {"image": im, "lip_x": lip_x, "ledge_y": ledge_y + 1, "wall_x": wall_x, "shelf_top": shelf_top}
+	return {"image": im, "lip_x": lip_x, "ledge_y": ledge_y + 1, "wall_x": wall_x, "shelf_top": shelf_top, "ramp": c.ramp}
 
 
 # ---------------------------------------------------------------- holds
@@ -949,20 +1014,31 @@ static func _paint_holds(im: Image, c: Dictionary, rng: RandomNumberGenerator, s
 						break
 
 
-## A crack running from [param a] to [param b]: meandering, a dark core, a lit
-## lip on the left and a shaded one on the right, pinching at the ends.
+## A crack running from [param a] to [param b]: meandering, swelling into
+## pods and pinching at constrictions. Sun-side lip lit, a deep (not black)
+## inside with a darker core, the far wall in shade, light bouncing off its
+## rim, and the face around it a touch darker where it turns in.
 static func _crack_line(im: Image, c: Dictionary, a: Vector2, b: Vector2) -> void:
 	var steps := int(a.distance_to(b)) + 1
+	var w := im.get_width()
+	var core: Color = (c.seam as Color).lerp(c.deep, 0.25)
 	for k in steps:
 		var t := float(k) / steps
 		var p := a.lerp(b, t)
-		var x := int(p.x + sin(p.y * 0.21) * 1.0)
+		var x := int(p.x + sin(p.y * 0.21) * 1.0 + sin(p.y * 0.047) * 1.5)
 		var y := int(p.y)
-		var wide := 1 + int(sin(t * PI) * 1.2)
+		if y < 0 or y >= im.get_height() or x < 2 or x > w - 6:
+			continue
+		var pod := 0.5 + 0.5 * sin(p.y * 0.13 + a.x)
+		var wide := 1 + int(sin(t * PI) * (0.8 + pod * 1.4))
+		ClimbGranite.darken(im, x - 3, y, 0.05)
+		P.px(im, x - 2, y, im.get_pixel(x - 2, y).lightened(0.1))
 		P.px(im, x - 1, y, tone(c, 4.0))
-		P.rect(im, x, y, wide, 1, c.seam.darkened(0.2))
-		P.px(im, x + wide, y, c.seam)
-		P.px(im, x + wide + 1, y, tone(c, 1.9))
+		P.rect(im, x, y, wide, 1, c.deep)
+		P.px(im, x + wide / 2, y, core)
+		P.px(im, x + wide, y, tone(c, 1.0))
+		P.px(im, x + wide + 1, y, tone(c, 2.2))
+		ClimbGranite.darken(im, x + wide + 2, y, 0.08)
 
 
 ## A belay ledge: a rough shelf with a lit, uneven top, a chipped front, a dark
@@ -988,6 +1064,8 @@ static func _ledge(im: Image, c: Dictionary, rng: RandomNumberGenerator, y: int,
 		P.px(im, x, y + jy + thick + 2, Color(0.082, 0.078, 0.11, 0.3))
 		if P.noise(x, 3, 9) < 0.06:
 			P.px(im, x, y + jy + 3, c.seam)
+	# The ledge's shadow on the wall below it, deeper where the ledge is.
+	ClimbGranite.shadow_below(im, 0, e, y + 7, 11.0, y)
 	for i in 5:
 		var x := rng.randi_range(4, maxi(e - 10, 6))
 		P.rect(im, x, y - 2, rng.randi_range(2, 3), 2, tone(c, 2.6))

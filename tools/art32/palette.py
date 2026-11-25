@@ -123,7 +123,11 @@ def write_swatch(path: str) -> None:
 def write_shader(path: str) -> None:
     """A full-screen canvas shader that snaps whatever is behind it to the
     palette (with a light ordered dither). It covers art that is drawn in
-    code at run time, such as the climbing screen."""
+    code at run time, such as the climbing screen.
+
+    Colours listed in `keep` pass through untouched: the climbing wall is
+    already quantized to its own finer granite ramp (ClimbRock.ramp), which
+    the house palette's six greys and four tans would break into blotches."""
     colors = ",\n\t".join(f"vec3({r / 255:.4f}, {g / 255:.4f}, {b / 255:.4f})" for r, g, b in COLORS)
     labs = ",\n\t".join(f"vec3({l:.3f}, {a:.3f}, {b:.3f})" for l, a, b in LABS)
     with open(path, "w") as f:
@@ -133,6 +137,9 @@ shader_type canvas_item;
 uniform sampler2D screen_tex : hint_screen_texture, filter_nearest;
 uniform float dither : hint_range(0.0, 0.2) = 0.03;
 uniform float pixel_size = 2.0;
+// colours that are already final (the wall's granite ramp), and how many
+uniform vec3 keep[24];
+uniform int keep_count = 0;
 
 const vec3 PAL[{len(COLORS)}] = vec3[](
 \t{colors}
@@ -140,6 +147,7 @@ const vec3 PAL[{len(COLORS)}] = vec3[](
 const vec3 LAB[{len(COLORS)}] = vec3[](
 \t{labs}
 );
+const int BAYER[16] = int[](0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5);
 
 vec3 to_lab(vec3 c) {{
 \tc = mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c));
@@ -152,9 +160,16 @@ vec3 to_lab(vec3 c) {{
 
 void fragment() {{
 \tvec3 c = texture(screen_tex, SCREEN_UV).rgb;
-\tvec2 p = floor(FRAGCOORD.xy / pixel_size);
-\tfloat b = (mod(p.x, 4.0) * 0.25 + mod(p.y, 4.0)) * 0.25;
-\tc = clamp(c + (b - 0.47) * dither, 0.0, 1.0);
+\tbool kept = false;
+\tfor (int k = 0; k < keep_count; k++) {{
+\t\tif (all(lessThan(abs(c - keep[k]), vec3(0.75 / 255.0)))) {{
+\t\t\tkept = true;
+\t\t}}
+\t}}
+\t// a true 4x4 Bayer matrix (the old row ramp drew scanlines)
+\tivec2 p = ivec2(floor(FRAGCOORD.xy / pixel_size)) & ivec2(3);
+\tfloat b = (float(BAYER[p.y * 4 + p.x]) + 0.5) / 16.0;
+\tc = clamp(c + (b - 0.5) * dither, 0.0, 1.0);
 \tvec3 l = to_lab(c);
 \tfloat best = 1e9;
 \tvec3 out_c = c;
@@ -166,7 +181,7 @@ void fragment() {{
 \t\t\tout_c = PAL[i];
 \t\t}}
 \t}}
-\tCOLOR = vec4(out_c, 1.0);
+\tCOLOR = vec4(kept ? texture(screen_tex, SCREEN_UV).rgb : out_c, 1.0);
 }}
 """)
 

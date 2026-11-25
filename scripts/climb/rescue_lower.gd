@@ -61,6 +61,8 @@ const SNAG_LIP := 9
 
 ## How far down they are, and how fast they're going.
 var depth := 0.0
+var _snap: ColorRect
+var _keep := PackedVector3Array()
 var speed := 0.0
 var heat := 0.0
 ## Bumps into the rock so far.
@@ -104,12 +106,14 @@ func _ready() -> void:
 	add_child(_canvas)
 	# Painted in code like the climbing screen, and kept on the palette the
 	# same way.
-	var snap := ColorRect.new()
-	UiScale.fit(snap)
-	snap.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	snap.material = ShaderMaterial.new()
-	snap.material.shader = load("res://assets/shaders/palette_snap.gdshader")
-	add_child(snap)
+	_snap = ColorRect.new()
+	UiScale.fit(_snap)
+	_snap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_snap.material = ShaderMaterial.new()
+	_snap.material.shader = load("res://assets/shaders/palette_snap.gdshader")
+	add_child(_snap)
+	_snap.material.set_shader_parameter("keep", _keep)
+	_snap.material.set_shader_parameter("keep_count", _keep.size())
 
 
 ## Starts lowering from the top of [param route] (the scene is painted for
@@ -250,7 +254,14 @@ func _paint(route: RouteData, who: Texture2D) -> void:
 	var colors := ClimbRock.colors(rock, _pal)
 	for i in SNAGS.size():
 		_paint_snag(im, colors, int(_rope_y(SNAGS[i][0])), int(_rope_y(SNAGS[i][1]) - _rope_y(SNAGS[i][0])), seed_value + i)
-	_wall_tex = ClimbHiRes.wall_texture(im, rock, 0.0, seed_value + 31)
+	_wall_tex = ClimbHiRes.wall_texture(im, rock, 0.0, seed_value + 31, wall.ramp)
+	# The wall's granite ramp passes the palette snap untouched.
+	_keep = PackedVector3Array()
+	for col: Color in wall.ramp:
+		_keep.append(Vector3(col.r, col.g, col.b))
+	if _snap:
+		_snap.material.set_shader_parameter("keep", _keep)
+		_snap.material.set_shader_parameter("keep_count", _keep.size())
 	_them = ClimbSprites.belayer(_look_of(who), "sit")
 	_kit = Gear.carried_all()
 

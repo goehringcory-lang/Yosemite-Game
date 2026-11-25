@@ -61,11 +61,25 @@ static func texture(im: Image) -> ImageTexture:
 ## The wall picture as a texture: doubled, with its granite's grain and, when
 ## [param wet] > 0 (0..1), wet. [param seed_value] keeps the grain the same for
 ## the same pitch.
-static func wall_texture(im: Image, rock_key: String, wet: float, seed_value: int) -> ImageTexture:
+## With a [param ramp] (ClimbRock.colors(...).ramp), the stone is quantized
+## to it first and the grain steps along it, so the whole face stays on the
+## granite's own tones.
+static func wall_texture(im: Image, rock_key: String, wet: float, seed_value: int, ramp := PackedColorArray()) -> ImageTexture:
 	var src := _rgba(im)
 	if wet > 0.0:
 		src = _wet(src, wet, seed_value)
+	if not ramp.is_empty():
+		src = quantize(src, ramp)
 	var detail := {"grain": GRAIN.get(rock_key, GRAIN.apron), "seed": seed_value, "glints": WET_GLINTS if wet > 0.0 else 0}
+	if not ramp.is_empty():
+		var ints := PackedInt32Array()
+		var index := {}
+		for i in ramp.size():
+			var v := _int(ramp[i])
+			ints.append(v)
+			index[v] = i
+		detail["ramp"] = ints
+		detail["ramp_index"] = index
 	var tex := ImageTexture.create_from_image(scale2x(src, detail))
 	tex.set_size_override(im.get_size())
 	return tex
@@ -175,6 +189,8 @@ static func _scale_rows(data: PackedInt32Array, w: int, h: int, y0: int, y1: int
 		crystal_t = int(grain[2])
 		glint_t = int(grain[3]) + int(detail.get("glints", 0))
 	var seed_mix: int = int(detail.get("seed", 0)) * 83492791
+	var ramp: PackedInt32Array = detail.get("ramp", PackedInt32Array())
+	var ramp_index: Dictionary = detail.get("ramp_index", {})
 	# Each color's darker and lighter neighbors, worked out once.
 	var darker := {}
 	var lighter := {}
@@ -207,10 +223,18 @@ static func _scale_rows(data: PackedInt32Array, w: int, h: int, y0: int, y1: int
 					hv = ((hv ^ (hv >> 15)) * 2246822519) & 0xffffffffffff
 					hv = hv ^ (hv >> 13)
 					if not darker.has(p):
-						var col := _color(p)
-						darker[p] = _int(col.darkened(FLECK_DARK))
-						lighter[p] = _int(col.lightened(SPECK_LIGHT))
-						glint[p] = _int(col.lightened(GLINT_LIGHT))
+						var at: int = ramp_index.get(p, -1)
+						if at >= 0:
+							# On the granite ramp: a fleck is a tone darker, a
+							# speck a tone lighter, a glint three lighter.
+							darker[p] = ramp[maxi(at - 1, 0)]
+							lighter[p] = ramp[mini(at + 1, ramp.size() - 1)]
+							glint[p] = ramp[mini(at + 3, ramp.size() - 1)]
+						else:
+							var col := _color(p)
+							darker[p] = _int(col.darkened(FLECK_DARK))
+							lighter[p] = _int(col.lightened(SPECK_LIGHT))
+							glint[p] = _int(col.lightened(GLINT_LIGHT))
 					var dk: int = darker[p]
 					var lt: int = lighter[p]
 					if crystal_t > 0 and ((hv >> 32) & 255) < crystal_t:
@@ -258,6 +282,97 @@ static func _scale_rows(data: PackedInt32Array, w: int, h: int, y0: int, y1: int
 			ox0 += 2
 			ox1 += 2
 	return out
+
+
+## How far (in Lab, lightness counted fully and colour by half) a pixel may
+## be from the nearest ramp tone and still count as stone. Further off are
+## lichen, chalk, plants and gear, which keep their colors.
+const RAMP_REACH := 16.0
+## Each band's 4x4 ordered dither thresholds, 0..1.
+const DITHER := [0.03125, 0.53125, 0.15625, 0.65625, 0.78125, 0.28125, 0.90625, 0.40625, 0.21875, 0.71875, 0.09375, 0.59375, 0.96875, 0.46875, 0.84375, 0.34375]
+
+
+## [param im] with every stone pixel moved onto the [param ramp]: the two
+## ramp tones either side of its lightness, mixed by an ordered dither laid
+## in the wall's own pixels (so it scrolls with the wall and never swims).
+static func quantize(im: Image, ramp: PackedColorArray) -> Image:
+	var src := _rgba(im)
+	var w := src.get_width()
+	var h := src.get_height()
+	var data := src.get_data().to_int32_array()
+	var labs: Array[Vector3] = []
+	var ints := PackedInt32Array()
+	for col in ramp:
+		labs.append(_lab(col))
+		ints.append(_int(col))
+	var n := ramp.size()
+	var reach2 := RAMP_REACH * RAMP_REACH
+	var out := _bands(h, w * h >= PARALLEL_PIXELS, func(y0: int, y1: int) -> PackedInt32Array:
+		var rows := data.slice(y0 * w, y1 * w)
+		# color -> lo | hi << 8 | mix (0..16) << 16, or -1 to leave it be
+		var seen := {}
+		for y in range(y0, y1):
+			var i := (y - y0) * w
+			var dy := (y & 3) << 2
+			for x in w:
+				var p := rows[i + x]
+				if ((p >> 24) & 0xff) < 200:
+					continue
+				var key := p & 0xffffff
+				var pick: int = seen.get(key, -2)
+				if pick == -2:
+					var lab := _lab(_color(p))
+					var best := 0
+					var best_d := 1e20
+					for k in n:
+						var d := lab - labs[k]
+						var dist := d.x * d.x + 0.5 * (d.y * d.y + d.z * d.z)
+						if dist < best_d:
+							best_d = dist
+							best = k
+					if best_d > reach2:
+						pick = -1
+					else:
+						var other := best
+						if lab.x > labs[best].x and best < n - 1:
+							other = best + 1
+						elif lab.x < labs[best].x and best > 0:
+							other = best - 1
+						var f := 0.0
+						if other != best:
+							f = clampf((lab.x - labs[best].x) / (labs[other].x - labs[best].x), 0.0, 1.0)
+							# Dither only the middle of the step, so most of the
+							# face is solid tones and the checkerboard stays rare.
+							f = clampf((f - 0.3) / 0.4, 0.0, 1.0)
+						pick = best | (other << 8) | (roundi(f * 16.0) << 16)
+					seen[key] = pick
+				if pick < 0:
+					continue
+				var f16 := (pick >> 16) & 0xff
+				var idx := pick & 0xff
+				if f16 > 0 and DITHER[dy | (x & 3)] * 16.0 < f16:
+					idx = (pick >> 8) & 0xff
+				rows[i + x] = ints[idx]
+		return rows)
+	return Image.create_from_data(w, h, false, Image.FORMAT_RGBA8, out.to_byte_array())
+
+
+## CIE Lab of [param c] (sRGB, D65), as the palette tools reckon it.
+static func _lab(c: Color) -> Vector3:
+	var lin := func(v: float) -> float:
+		return v / 12.92 if v <= 0.04045 else pow((v + 0.055) / 1.055, 2.4)
+	var r: float = lin.call(c.r)
+	var g: float = lin.call(c.g)
+	var b: float = lin.call(c.b)
+	var x := (0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047
+	var y := 0.2126 * r + 0.7152 * g + 0.0722 * b
+	var z := (0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883
+	var f := func(t: float) -> float:
+		return pow(t, 1.0 / 3.0) if t > 0.008856 else 7.787 * t + 16.0 / 116.0
+	var fx: float = f.call(x)
+	var fy: float = f.call(y)
+	var fz: float = f.call(z)
+	return Vector3(116.0 * fy - 16.0, 500.0 * (fx - fy), 200.0 * (fy - fz))
 
 
 ## Wet rock: every painted pixel darker and cooler, and darker still where

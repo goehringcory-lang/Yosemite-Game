@@ -69,6 +69,8 @@ var _canvas: Control
 var _back: Control
 var _wall_view: Control
 var _light: ClimbLight
+## The palette snap over the whole screen.
+var _snap: ColorRect
 var _phase := Phase.INTRO
 var _pal: Dictionary
 var _sky_tex: Texture2D
@@ -157,22 +159,28 @@ func _ready() -> void:
 	add_to_group("climb_screen") # Sound plays the wind while it's up
 	profile = ClimbProfiles.get_profile(route.id)
 	belayer_look = ClimbProfiles.belayer_look(route)
+	# The wall draws on its own canvas item with its own shader on every
+	# setting: on High the sun and the headlamp light it (ClimbLight); on
+	# both it carves the stone's fine relief along its granite ramp.
+	_back = _screen_item(_draw_back)
+	_wall_view = _screen_item(_draw_wall_view)
 	if LitSprites.active():
 		_light = ClimbLight.new()
-		_back = _screen_item(_draw_back)
-		_wall_view = _screen_item(_draw_wall_view)
 		_wall_view.material = _light.wall_material
 		_wall_view.light_mask = LitSprites.LIT_LAYER
+	else:
+		_wall_view.material = ShaderMaterial.new()
+		(_wall_view.material as ShaderMaterial).shader = ClimbLight.SHADER
 	_canvas = _screen_item(_draw_screen)
 	if _light:
 		_canvas.add_child(_light)
 	# The climbing art is painted in code; this keeps all of it on the palette.
-	var snap := ColorRect.new()
-	UiScale.fit(snap)
-	snap.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	snap.material = ShaderMaterial.new()
-	snap.material.shader = load("res://assets/shaders/palette_snap.gdshader")
-	add_child(snap)
+	_snap = ColorRect.new()
+	UiScale.fit(_snap)
+	_snap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_snap.material = ShaderMaterial.new()
+	_snap.material.shader = load("res://assets/shaders/palette_snap.gdshader")
+	add_child(_snap)
 	_start_minutes = GameClock.minutes
 	state.start_minutes = _start_minutes
 	_paint_scenery()
@@ -243,9 +251,9 @@ func _process(delta: float) -> void:
 	if _phase == Phase.CLIMB and state.stamina <= 25 and state.status == ClimbState.Status.CLIMBING and fmod(_time, 0.9) < delta:
 		_fx.sweat(_torso() + Vector2(4, -16))
 	_canvas.queue_redraw()
-	if _wall_view:
-		_back.queue_redraw()
-		_wall_view.queue_redraw()
+	_back.queue_redraw()
+	_wall_view.queue_redraw()
+	if _light:
 		_light.update(fmod(_hour(), 24.0), _pal.night and _phase != Phase.NIGHT, _torso() + Vector2(0, -14), 1.0 if state.is_stormy() else 0.0)
 
 
@@ -852,7 +860,8 @@ func _paint_wall(seed_value: int) -> void:
 	_roof = state.style() == "roof"
 	if _roof:
 		_roof_info = ClimbRock.paint_roof(state, rock, _pal, seed_value + state.pitch * 97)
-		_wall_tex = ClimbHiRes.wall_texture(_roof_info.image, rock, _wetness(), seed_value + state.pitch * 97)
+		_wall_tex = ClimbHiRes.wall_texture(_roof_info.image, rock, _wetness(), seed_value + state.pitch * 97, _roof_info.ramp)
+		_keep_ramp(_roof_info.ramp, _roof_info.image.get_size() * 2)
 		_wall_pitch = state.pitch
 		return
 	var wall := ClimbRock.paint(state, rock, _pal, seed_value + state.pitch * 97)
@@ -863,8 +872,21 @@ func _paint_wall(seed_value: int) -> void:
 		ClimbScenes.paint_base(im, profile.get("ground", ""), state, _pal, _wall_edge, seed_value)
 	if state.pitch == route.pitches.size() - 1:
 		ClimbScenes.paint_finish(im, profile.get("finish", ""), state, _pal, _wall_edge, seed_value)
-	_wall_tex = ClimbHiRes.wall_texture(im, rock, _wetness(), seed_value + state.pitch * 97)
+	_wall_tex = ClimbHiRes.wall_texture(im, rock, _wetness(), seed_value + state.pitch * 97, wall.ramp)
+	_keep_ramp(wall.ramp, im.get_size() * 2)
 	_wall_pitch = state.pitch
+
+
+## Tells the palette snap (and the wall's light) the granite ramp the wall is
+## painted in, so its tones pass the snap untouched.
+func _keep_ramp(ramp: PackedColorArray, doubled: Vector2i) -> void:
+	var keep := PackedVector3Array()
+	for col in ramp:
+		keep.append(Vector3(col.r, col.g, col.b))
+	_snap.material.set_shader_parameter("keep", keep)
+	_snap.material.set_shader_parameter("keep_count", keep.size())
+	ClimbLight.set_ramp(_wall_view.material, ramp)
+	_wall_view.material.set_shader_parameter("micro_scale", Vector2(doubled))
 
 
 ## How wet this pitch's rock looks, 0..1: soaked in the rain, wet after it,
@@ -958,8 +980,6 @@ func _draw_screen() -> void:
 		return
 	var height := _progress()
 	_canvas.draw_set_transform(_shake_offset())
-	if _wall_view == null:
-		_draw_sky(height)
 	_draw_wall()
 	_draw_protection()
 	_draw_rope()
@@ -1119,7 +1139,7 @@ func _draw_sky(height: float) -> void:
 	_draw_birds()
 
 
-## The sky behind the wall, on its own canvas item (High graphics).
+## The sky behind the wall, on its own canvas item.
 func _draw_back() -> void:
 	if _phase == Phase.NIGHT:
 		return
@@ -1130,7 +1150,8 @@ func _draw_back() -> void:
 	_canvas = front
 
 
-## The wall's picture, on its own canvas item so real light falls on it.
+## The wall's picture, on its own canvas item with its own shader (and, on
+## High, real light).
 func _draw_wall_view() -> void:
 	if _phase == Phase.NIGHT:
 		return
@@ -1340,7 +1361,7 @@ func _draw_climber() -> void:
 		_canvas.draw_line(torso + Vector2(-2, 6), hp + Vector2(0, -4), ROPE_DARK, 2.0)
 		_canvas.draw_texture(UI.icon_texture("haul_bag"), (hp + Vector2(-6, -6)).round())
 	# Headlamp glow after dark (on High, ClimbLight's real headlamp).
-	if _pal.night and _wall_view == null:
+	if _pal.night and _light == null:
 		for i in 6:
 			_canvas.draw_circle(torso + Vector2(0, -14), 52.0 - i * 8.0, Color(1, 0.831, 0.541, 0.045))
 
