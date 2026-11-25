@@ -41,11 +41,13 @@ func test_settings() -> void:
 	check(Settings.pace() == 1.0 and Settings.room() == 1.0, "Standard timing changes nothing")
 	Settings.timing = Settings.Timing.GENTLE
 	Settings.hold_taps = true
+	Settings.climb_moves = Settings.ClimbMoves.TWO_TAPS
 	check(Settings.save() == OK, "the assists save")
 	Settings.reset_defaults()
-	check(Settings.timing == Settings.Timing.STANDARD and not Settings.hold_taps, "reset turns them off")
+	check(Settings.timing == Settings.Timing.STANDARD and not Settings.hold_taps and Settings.climb_moves == Settings.ClimbMoves.REACH, "reset turns them off")
 	Settings.load_settings()
-	check(Settings.timing == Settings.Timing.GENTLE and Settings.hold_taps, "and they load back")
+	check(Settings.timing == Settings.Timing.GENTLE and Settings.hold_taps and Settings.climb_moves == Settings.ClimbMoves.TWO_TAPS, "and they load back")
+	Settings.climb_moves = Settings.ClimbMoves.REACH
 	check(Settings.pace() < 1.0 and Settings.room() > 1.0, "Gentle is slower with more room")
 	Settings.timing = Settings.Timing.RELAXED
 	check(Settings.pace() < 1.0 and Settings.pace() > Settings.TIMING_PACE[Settings.Timing.GENTLE]

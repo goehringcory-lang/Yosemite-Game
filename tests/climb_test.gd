@@ -57,6 +57,8 @@ func _ready() -> void:
 	test_snow_rules()
 	test_fixed_ropes()
 	test_boulder()
+	test_reach_grabs()
+	test_techniques()
 	await test_climb_ending_past_the_curfew()
 	print("\nOK: %d failure(s)" % failures)
 	get_tree().quit(failures)
@@ -158,6 +160,116 @@ func test_every_route_is_climbable() -> void:
 	hard_careful /= hard_count
 	hard_greedy /= hard_count
 	check(hard_careful - hard_greedy >= 0.15, "on the hard routes, planning tops out clearly more often than taking the cheapest hold (%d%% vs %d%%)" % [roundi(hard_careful * 100), roundi(hard_greedy * 100)])
+
+
+## The reach (ClimbReach on the screen): a careful climber whose grabs land
+## like a fair player's (a fifth precise, a fifth sloppy) tops out as often
+## as one who grabs everything "good"; all-sloppy grabs still get a careful
+## climber up the beginner routes, and up most of the rest with spare food.
+func test_reach_grabs() -> void:
+	var stats := OS.get_environment("CLIMB_STATS") != ""
+	var fair_total := 0.0
+	var count := 0
+	for r in Guidebook.routes():
+		var runs := 20
+		var fair := 0
+		var sloppy := 0
+		for seed in runs:
+			food_for(r)
+			var state := ClimbState.new(r, int(kit_for(r).get("cam", 0)), seed, kit_for(r))
+			var bot := ClimbBot.new()
+			bot.grabs = {"perfect": 0.2, "good": 0.6, "sloppy": 0.2}
+			bot._grab_rng.seed = seed
+			bot.play(state)
+			fair += 1 if state.status == ClimbState.Status.TOPPED_OUT else 0
+			food_for(r)
+			Inventory.add("trail_mix", 2)
+			var messy := ClimbState.new(r, int(kit_for(r).get("cam", 0)), seed, kit_for(r))
+			var sloppy_bot := ClimbBot.new()
+			sloppy_bot.grabs = {"sloppy": 1.0}
+			sloppy_bot.play(messy)
+			sloppy += 1 if messy.status == ClimbState.Status.TOPPED_OUT else 0
+		Inventory.items.clear()
+		if stats:
+			print("REACH %-24s fair %3d%%  all sloppy (+2 mix) %3d%%" % [r.id, fair * 100 / runs, sloppy * 100 / runs])
+		check(fair / float(runs) >= 0.8, "a fair reacher tops out %s (%d of %d)" % [r.id, fair, runs])
+		if r.pitches.max() <= ClimbState.EASY_GRADE:
+			check(sloppy / float(runs) >= 0.8, "%s forgives sloppy grabs (%d of %d)" % [r.id, sloppy, runs])
+		fair_total += fair / float(runs)
+		count += 1
+	check(fair_total / count >= 0.9, "fair reaching tops out about as often as the plan says (%d%%)" % roundi(fair_total / count * 100))
+	# The rules of one grab.
+	var r: RouteData = load("res://data/routes/the_nose.tres")
+	var s := ClimbState.new(r, 10, 3, kit_for(r))
+	var dx := 0
+	for d in [0, -1, 1]:
+		if not s.hold_at(s.row + 1, s.col + d).is_empty() and s.move_cost(s.row + 1, s.col + d) > 1:
+			dx = d
+			break
+	var cost := s.move_cost(s.row + 1, s.col + dx)
+	var before := s.stamina
+	var pump_before := s.pump
+	var change := s.pump_change(s.hold_at(s.row + 1, s.col + dx))
+	s.move(dx, "sloppy")
+	check(s.stamina == before - cost - ClimbState.SLOPPY_COST or s.row == 0, "a sloppy grab costs a point more")
+	check(s.pump == clampi(pump_before + change + ClimbState.SLOPPY_PUMP, 0, ClimbState.PUMP_MAX) or s.row == 0, "...and a point of pump")
+	check(s.last_hand == ClimbState.hand_for(dx).replace("match", ""), "the hand that moved is remembered")
+	if dx != 0:
+		check(s.sequence_for(-dx) == "clean", "the other hand is clean")
+		var others := [-1, 0, 1].filter(func(d: int) -> bool: return d != dx and not s.hold_at(s.row + 1, s.col + d).is_empty())
+		check(s.sequence_for(dx) == ("bump" if not others.is_empty() else "match"), "the same hand again is a bump, unless the wall leaves no other way")
+	check(s.sequence_for(0) == "match", "straight up is a match")
+	check(ClimbState.hand_for(-1) == "left" and ClimbState.hand_for(1) == "right", "left reaches with the left hand")
+
+
+## The hand techniques: cracks are jams on crack pitches, slab edges are
+## slopers, and an art "shape" tag refines them.
+func test_techniques() -> void:
+	var seen := {}
+	for r in Guidebook.routes():
+		var s := ClimbState.new(r, 10, 1, kit_for(r))
+		for row in s.holds:
+			for c in s.holds[row]:
+				seen[s.technique_at(row, c)] = true
+	for t in ["jug", "edge", "crimp", "jam", "sloper", "step"]:
+		check(seen.has(t), "some first pitch has %s holds" % t)
+	var r: RouteData = Guidebook.routes()[0]
+	var s := ClimbState.new(r, 10, 1, kit_for(r))
+	var row := 1
+	var col: int = s.holds[row].keys()[0]
+	s.holds[row][col]["shape"] = "hand_jam"
+	check(s.technique_at(row, col) == "jam", "a hand-jam shape is a jam")
+	s.holds[row][col]["shape"] = "palm"
+	check(s.technique_at(row, col) == "sloper", "a palm shape is a sloper")
+	# The reach: a tap lands on a jug, not on a crimp; the sweet spot is precise.
+	var jug := ClimbReach.new(1, "jug", "clean")
+	jug.update(0.02)
+	check(jug.release() == "good", "a tap grabs a jug")
+	var crimp := ClimbReach.new(1, "crimp", "clean")
+	crimp.update(0.02)
+	check(crimp.release() == "cancel", "a tap on a crimp brings the hand back")
+	var rushed := ClimbReach.new(1, "crimp", "clean")
+	rushed.update(rushed.duration * 0.3)
+	check(rushed.release() == "sloppy", "a rushed grab slaps onto a crimp")
+	var tight := ClimbReach.new(1, "crimp", "bump", 6)
+	check(tight.perfect * tight.duration >= ClimbReach.MIN_PERFECT_SECONDS - 0.001 and tight.good * tight.duration >= ClimbReach.MIN_GOOD_SECONDS - 0.001, "pump and a bump never squeeze a grab under a couple of frames")
+	check(ClimbReach.new(1, "sloper", "clean").duration > ClimbReach.new(1, "crimp", "clean").duration, "a sloper is a slow press, a crimp snappy")
+	var sweet := ClimbReach.new(1, "crimp", "clean")
+	sweet.update(sweet.duration * sweet.center)
+	check(sweet.release() == "perfect", "letting go as the ring closes is precise")
+	var late := ClimbReach.new(-1, "edge", "clean")
+	var auto := false
+	for i in 200:
+		if late.update(1.0 / 60.0):
+			auto = true
+			break
+	check(auto and late.result == "sloppy", "hang on too long and the hand slaps on by itself")
+	var clean := ClimbReach.new(1, "edge", "clean")
+	var bump := ClimbReach.new(1, "edge", "bump")
+	var pumped := ClimbReach.new(1, "edge", "clean", 6)
+	check(clean.good > bump.good and clean.good > pumped.good, "a bump or pump narrows the grab")
+	var gentle := ClimbReach.new(1, "edge", "clean", 0, 1.6, 0.55)
+	check(gentle.good > clean.good and gentle.duration > clean.duration, "the Timing assist widens and slows the reach")
 
 
 ## How often a climber who only reads the rings (the cheapest hold, gear
