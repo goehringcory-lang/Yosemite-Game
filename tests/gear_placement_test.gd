@@ -74,6 +74,14 @@ func test_rack() -> void:
 	check(ClimbRack.pitch_widths({"name": "Chockstone Chimney", "style": "chimney"})[1] == 7, "a chimney's cracks are wide")
 	check(ClimbRack.pitch_widths({"name": "Pitch 3", "style": "slab", "widths": [1, 2]}) == [1, 2], "a spec's widths win")
 	check(ClimbRack.range_text([4, 6]) == "hands to fists", "widths read the way climbers say them")
+	# Once Gear knows its sizes, the rack is the real one, size by size.
+	if Gear.has_method("rack_carried"):
+		var saved := Gear.owned.duplicate()
+		Gear.owned = {"cam_1": 2, "nut_mid": 1, "rope": 1}
+		Gear.cached = {}
+		var real := ClimbRack.from_gear()
+		check(real.size() == 2 and real[0].kind == "nut" and int(real[1].count) == 2 and int(real[1].width_min) == 4, "the rack is what you carry: a nut and two #1s")
+		Gear.owned = saved
 	var s := ClimbState.new(route("nutcracker"), 6, 1, {})
 	s.set_rack([{"id": "nut_mid", "kind": "nut", "width_min": 2, "width_max": 3, "color": Color.GOLD, "count": 1, "name": "Nut"},
 		{"id": "cam_1", "kind": "cam", "width_min": 4, "width_max": 4, "color": Color.RED, "count": 2, "name": "#1"}])
