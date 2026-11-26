@@ -14,6 +14,10 @@ extends RefCounted
 ## {region id: {exit name: pixels}}.
 const NUDGES_PATH := "res://data/park/seam_nudges.json"
 static var _nudges = null
+## More nudges, a file per region: data/park/seam_nudges/<region id>.json,
+## {exit name: pixels}. An exit in both uses its region's own file.
+const NUDGES_DIR := "res://data/park/seam_nudges/"
+static var _own_nudges := {}
 
 ## An exit or spawn this close to a map edge is on that edge.
 const EXIT_SLACK := 48.0
@@ -169,6 +173,15 @@ static func nudge(region_id: String, exit_name: String) -> float:
 			var parsed = JSON.parse_string(FileAccess.get_file_as_string(NUDGES_PATH))
 			if parsed is Dictionary:
 				_nudges = parsed
+	if not _own_nudges.has(region_id):
+		# A region's own file (data/park/seam_nudges/<id>.json), so threads
+		# adding seams in different areas don't all edit the one file.
+		var own := NUDGES_DIR + region_id + ".json"
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(own)) if FileAccess.file_exists(own) else null
+		_own_nudges[region_id] = parsed if parsed is Dictionary else {}
+	var mine: Dictionary = _own_nudges[region_id]
+	if mine.has(exit_name):
+		return float(mine[exit_name])
 	return float(_nudges.get(region_id, {}).get(exit_name, 0.0))
 
 
