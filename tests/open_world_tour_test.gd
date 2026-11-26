@@ -83,7 +83,7 @@ func _ready() -> void:
 			continue
 		entered_by[way.to] = way.spawn
 		await _check_arrival(way.to, "%s from %s" % [way.to, way.from])
-		if way.to in RELOAD_IN:
+		if way.to in RELOAD_IN and OS.get_environment("PERF_TOUR_NO_RELOAD") == "":
 			await _check_reload(way.to)
 		_push_ways(stack)
 	await _check_odd_saves()
