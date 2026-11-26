@@ -1,0 +1,172 @@
+{
+	"route": "royal_arches",
+	"rock": "arches",
+	"pitches": [
+		{
+			"name": "The Dihedral",
+			"style": "crack",
+			"diff": 2,
+			"height": 18,
+			"width": 8,
+			"line": [[4.0, 0.0], [3.7, 9.0], [4.0, 18]],
+			"belay": "ledge",
+			"beta": "A big corner up the first stretch, with a crack in the back that takes anything.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "hand",
+					"points": [[4.3, 0.8], [4.3, 4.04], [4.3, 7.28], [4.3, 10.52], [4.3, 13.76], [4.3, 17.0]],
+					"widths": [3.5, 4.5, 4.0, 5.0, 4.25, 4.5],
+					"constrictions": [1, 3, 5]
+				}
+			],
+			"pins": [
+				{"y": 11.0, "kind": "pin", "tags": ["rusty"]}
+			]
+		},
+		{
+			"name": "Arch Cracks",
+			"style": "crack",
+			"diff": 2,
+			"height": 18,
+			"width": 8,
+			"line": [[4.0, 0.0], [3.0, 9.0], [4.5, 18.0]],
+			"belay": "ledge",
+			"beta": "Cracks curving under the great arches. Stay low under the arch, where the jams are.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "hand",
+					"points": [[4.2, 0.8], [3.6, 5.0], [3.25, 9.0], [3.9, 13.0], [4.6, 17.0]],
+					"widths": [3.0, 4.0, 3.5, 4.5, 4.0],
+					"constrictions": [1, 3]
+				}
+			]
+		},
+		{
+			"name": "Rotten Chimney",
+			"style": "chimney",
+			"diff": 3,
+			"height": 16,
+			"width": 8,
+			"line": [[4.0, 0.0], [4.0, 8.0], [4.0, 16]],
+			"belay": "ledge",
+			"beta": "A loose chimney. Test what you pull on, and sling the chockstones that are really stuck.",
+			"cracks": [
+				{
+					"id": "ch",
+					"kind": "chimney",
+					"points": [[4.0, 0.5], [4.0, 4.12], [4.0, 7.75], [4.0, 11.38], [4.0, 15.0]],
+					"widths": [7.0, 7.0, 7.0, 7.0, 7.0],
+					"constrictions": [],
+					"tags": ["no_jams"]
+				},
+				{
+					"id": "back",
+					"kind": "hand",
+					"points": [[4.5, 1.0], [4.5, 4.38], [4.5, 7.75], [4.5, 11.12], [4.5, 14.5]],
+					"widths": [4.0, 5.0, 4.5, 5.5, 5.0],
+					"constrictions": [1, 3]
+				}
+			],
+			"horns": [
+				{"y": 5.0, "x": 4.0, "tags": ["chockstone"]},
+				{"y": 11.0, "x": 4.0, "tags": ["chockstone", "loose"]}
+			],
+			"zones": [
+				{
+					"kind": "loose",
+					"rect": [2.5, 6.0, 3.0, 3.5],
+					"data": {"what": "rotten rock"}
+				}
+			],
+			"rests": [
+				{"y": 12.0, "kind": "stance"}
+			]
+		},
+		{
+			"name": "The Pendulum",
+			"style": "crack",
+			"diff": 2,
+			"height": 14,
+			"width": 13,
+			"line": [[3.0, 0.0], [3.0, 6.0], [10.0, 6.5], [10.0, 14.0]],
+			"belay": "ledge",
+			"fixed_rope": [5.0, 6.5],
+			"beta": "A fixed line hangs off a bolt. Lower on it and swing right across blank rock to the next crack system.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "hand",
+					"points": [[3.25, 0.8], [3.25, 3.3], [3.25, 5.8]],
+					"widths": [3.5, 4.5, 4.0],
+					"constrictions": [1]
+				},
+				{
+					"id": "c1",
+					"kind": "hand",
+					"points": [[10.25, 6.6], [10.25, 8.73], [10.25, 10.87], [10.25, 13.0]],
+					"widths": [3.5, 4.5, 3.75, 4.5],
+					"constrictions": [1, 3]
+				}
+			],
+			"bolts": [5.6],
+			"cruxes": [
+				{
+					"id": "pendulum",
+					"name": "Pendulum",
+					"d0": 6.0,
+					"d1": 12.6,
+					"special": "pendulum",
+					"read": "Run right across the slab as you're lowered, and let the swing carry you to the crack. Grab it at the top of the arc."
+				}
+			]
+		},
+		{
+			"name": "Upper Arches",
+			"style": "crack",
+			"diff": 3,
+			"height": 18,
+			"width": 8,
+			"line": [[4.0, 0.0], [4.3, 9.0], [4.0, 18]],
+			"belay": "ledge",
+			"beta": "More cracks and ledges toward the top of the arches.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "hand",
+					"points": [[4.25, 0.8], [4.25, 4.04], [4.25, 7.28], [4.25, 10.52], [4.25, 13.76], [4.25, 17.0]],
+					"widths": [3.0, 4.0, 3.5, 4.5, 3.75, 4.25],
+					"constrictions": [1, 3, 5]
+				}
+			],
+			"rests": [
+				{"y": 8.5, "kind": "stance"}
+			]
+		},
+		{
+			"name": "The Friction Traverse",
+			"style": "slab",
+			"diff": 3,
+			"height": 12,
+			"width": 14,
+			"angle": -20,
+			"line": [[2.5, 0.0], [2.5, 3.0], [11.5, 6.0], [11.5, 12.0]],
+			"belay": "tree",
+			"beta": "A long slab traverse on bolts. Clip them all and don't rush: your feet are all you've got.",
+			"bolts": [2.5, 3.6, 4.6, 5.6, 8.0, 10.5],
+			"runout": 3.5,
+			"cruxes": [
+				{
+					"id": "friction",
+					"name": "Friction traverse",
+					"from": 4.0,
+					"to": 5.2,
+					"sequence": ["rh", "rh", "lh", "rh"],
+					"hip": "smear",
+					"read": "Shuffle, don't step: keep both feet smearing and lead with the right hand."
+				}
+			]
+		}
+	]
+}

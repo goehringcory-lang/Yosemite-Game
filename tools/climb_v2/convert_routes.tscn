@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tools/climb_v2/convert_routes.gd" id="1_tool"]
+
+[node name="ConvertRoutes" type="Node"]
+script = ExtResource("1_tool")

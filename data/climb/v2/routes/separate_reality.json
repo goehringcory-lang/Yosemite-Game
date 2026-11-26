@@ -1,0 +1,63 @@
+{
+	"route": "separate_reality",
+	"rock": "roof",
+	"pitches": [
+		{
+			"name": "The Roof",
+			"style": "crack",
+			"diff": 5,
+			"height": 12,
+			"width": 13,
+			"line": [[2.5, 0.0], [2.5, 6.5], [10.5, 6.8], [10.8, 12.0]],
+			"belay": "top",
+			"beta": "Up a corner to the roof, then out its crack upside down for six metres, high over the river. Don't look down until you've turned the lip.",
+			"sections": [
+				{"from": 6.2, "to": 7.4, "style": "roof", "angle": 90}
+			],
+			"cracks": [
+				{
+					"id": "corner",
+					"kind": "hand",
+					"points": [[2.75, 0.8], [2.75, 2.63], [2.75, 4.47], [2.75, 6.3]],
+					"widths": [3.5, 4.5, 4.0, 4.5],
+					"constrictions": [1, 3]
+				},
+				{
+					"id": "roof",
+					"kind": "hand",
+					"points": [[2.8, 6.5], [4.8, 6.55], [6.8, 6.62], [8.8, 6.7], [10.6, 6.8]],
+					"widths": [3.0, 3.75, 3.25, 4.25, 4.0],
+					"constrictions": [1, 3],
+					"tags": ["roof"]
+				},
+				{
+					"id": "lip",
+					"kind": "hand",
+					"points": [[10.9, 7.0], [10.9, 9.0], [10.9, 11.0]],
+					"widths": [4.0, 4.75, 4.25],
+					"constrictions": [1]
+				}
+			],
+			"cruxes": [
+				{
+					"id": "jams",
+					"name": "Roof jams",
+					"d0": 6.7,
+					"d1": 11.2,
+					"sequence": ["rh", "lh", "rh", "lh", "lh", "rh"],
+					"hip": "heel",
+					"read": "Toes cammed in the crack behind you, heels hooked. The left hand crosses once in the middle so the right leads at the lip."
+				},
+				{
+					"id": "lip",
+					"name": "The lip",
+					"d0": 12.2,
+					"d1": 15.2,
+					"sequence": ["rh", "lh", "rh", "rh", "lh"],
+					"hip": "heel",
+					"read": "Right hand jams over the lip twice before the feet cut. Then swing them down and pull."
+				}
+			]
+		}
+	]
+}

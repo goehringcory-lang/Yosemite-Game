@@ -1,0 +1,230 @@
+{
+	"route": "steck_salathe",
+	"rock": "dark",
+	"pitches": [
+		{
+			"name": "Flake System",
+			"style": "flake",
+			"diff": 3,
+			"height": 18,
+			"width": 8,
+			"line": [[4.0, 0.0], [3.6, 9.0], [4.0, 18]],
+			"belay": "ledge",
+			"beta": "Big flakes up the base of Sentinel. Salathé's hard-steel pins are still in places.",
+			"flakes": [
+				{
+					"id": "f0",
+					"side": "right",
+					"points": [[4.3, 1.0], [4.24, 4.2], [4.18, 7.4], [4.12, 10.6], [4.06, 13.8], [4.0, 17.0]],
+					"widths": [4.0, 5.0, 4.25, 5.5, 4.5, 5.0]
+				}
+			],
+			"pins": [
+				{"y": 10.0, "kind": "pin", "tags": ["rusty"]}
+			]
+		},
+		{
+			"name": "Chockstone Chimney",
+			"style": "chimney",
+			"diff": 3,
+			"height": 16,
+			"width": 8,
+			"line": [[4.0, 0.0], [4.0, 8.0], [4.0, 16]],
+			"belay": "ledge",
+			"beta": "Back on one wall, feet on the other. Wedged chockstones are the protection: sling them as you pass.",
+			"cracks": [
+				{
+					"id": "ch",
+					"kind": "chimney",
+					"points": [[4.0, 0.5], [4.0, 4.12], [4.0, 7.75], [4.0, 11.38], [4.0, 15.0]],
+					"widths": [7.0, 7.0, 7.0, 7.0, 7.0],
+					"constrictions": [],
+					"tags": ["no_jams"]
+				},
+				{
+					"id": "back",
+					"kind": "fist",
+					"points": [[4.6, 1.0], [4.6, 4.25], [4.6, 7.5], [4.6, 10.75], [4.6, 14.0]],
+					"widths": [5.5, 6.25, 5.75, 6.5, 6.0],
+					"constrictions": [1, 3]
+				}
+			],
+			"horns": [
+				{"y": 4.0, "x": 4.0, "tags": ["chockstone"]},
+				{"y": 8.0, "x": 4.1, "tags": ["chockstone"]},
+				{"y": 12.0, "x": 3.9, "tags": ["chockstone"]}
+			]
+		},
+		{
+			"name": "Wilson Overhang",
+			"style": "crack",
+			"diff": 4,
+			"height": 16,
+			"width": 8,
+			"angle": 15,
+			"line": [[4.0, 0.0], [3.7, 8.0], [4.0, 16]],
+			"belay": "ledge",
+			"beta": "A wide crack steepens into an overhang that pushes you out. Big cams, and an old pin under the roof.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "offwidth",
+					"points": [[4.3, 0.8], [4.3, 3.64], [4.3, 6.48], [4.3, 9.32], [4.3, 12.16], [4.3, 15.0]],
+					"widths": [5.5, 6.5, 6.0, 7.0, 6.25, 6.0],
+					"constrictions": [1, 3]
+				}
+			],
+			"sections": [
+				{"from": 8.5, "to": 11.5, "angle": 30}
+			],
+			"pins": [
+				{"y": 7.5, "kind": "pin", "tags": ["rusty"]}
+			],
+			"cruxes": [
+				{
+					"id": "wilson",
+					"name": "Wilson Overhang",
+					"from": 9.0,
+					"to": 11.2,
+					"sequence": ["rh", "rh", "lh", "rh"],
+					"hip": "offwidth",
+					"read": "Right side in. Arm-bar, then shuffle the right arm up twice while the left heel-toes; the left hand only goes over the lip."
+				}
+			]
+		},
+		{
+			"name": "Flake Traverse",
+			"style": "flake",
+			"diff": 3,
+			"height": 14,
+			"width": 12,
+			"line": [[3.0, 0.0], [3.0, 5.0], [9.0, 8.0], [9.0, 14.0]],
+			"belay": "ledge",
+			"beta": "Out right along a flake to a stance. Clip long slings here, or the rope drag will stop you.",
+			"flakes": [
+				{
+					"id": "f0",
+					"side": "left",
+					"points": [[3.3, 4.8], [5.0, 5.8], [7.0, 6.9], [8.8, 7.9]],
+					"widths": [4.0, 4.75, 4.25, 5.0]
+				}
+			],
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "finger",
+					"points": [[3.25, 0.8], [3.25, 2.7], [3.25, 4.6]],
+					"widths": [2.0, 2.75, 2.5],
+					"constrictions": [1]
+				},
+				{
+					"id": "c1",
+					"kind": "hand",
+					"points": [[9.25, 8.5], [9.25, 10.0], [9.25, 11.5], [9.25, 13.0]],
+					"widths": [3.5, 4.5, 4.0, 4.5],
+					"constrictions": [1, 3]
+				}
+			],
+			"rests": [
+				{"y": 9.0, "kind": "stance"}
+			]
+		},
+		{
+			"name": "Wide Cracks",
+			"style": "crack",
+			"diff": 4,
+			"height": 16,
+			"width": 8,
+			"line": [[4.0, 0.0], [4.3, 8.0], [4.0, 16]],
+			"belay": "ledge",
+			"beta": "Wide cracks eat your big cams. Use the fixed pins and save the #4 for the top.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "fist",
+					"points": [[4.3, 0.8], [4.3, 3.64], [4.3, 6.48], [4.3, 9.32], [4.3, 12.16], [4.3, 15.0]],
+					"widths": [5.5, 6.25, 6.0, 7.0, 6.25, 6.75],
+					"constrictions": [1, 3, 5]
+				}
+			],
+			"pins": [
+				{"y": 3.5, "kind": "pin", "tags": ["rusty"]},
+				{"y": 10.5, "kind": "pin", "tags": ["rusty"]}
+			],
+			"rests": [
+				{"y": 7.0, "kind": "stance"}
+			]
+		},
+		{
+			"name": "The Narrows",
+			"style": "chimney",
+			"diff": 4,
+			"height": 16,
+			"width": 8,
+			"line": [[4.0, 0.0], [4.0, 8.0], [4.0, 16]],
+			"belay": "ledge",
+			"beta": "A squeeze chimney so tight you exhale to move. Inch up it: one side, then the other.",
+			"cracks": [
+				{
+					"id": "ch",
+					"kind": "chimney",
+					"points": [[4.0, 0.5], [4.0, 4.12], [4.0, 7.75], [4.0, 11.38], [4.0, 15.0]],
+					"widths": [7.0, 7.0, 7.0, 7.0, 7.0],
+					"constrictions": [],
+					"tags": ["no_jams", "squeeze"]
+				},
+				{
+					"id": "back",
+					"kind": "fist",
+					"points": [[4.5, 1.0], [4.5, 4.38], [4.5, 7.75], [4.5, 11.12], [4.5, 14.5]],
+					"widths": [6.0, 6.75, 6.25, 6.75, 6.5],
+					"constrictions": [1, 3]
+				}
+			],
+			"horns": [
+				{"y": 4.5, "x": 4.0, "tags": ["chockstone"]}
+			],
+			"cruxes": [
+				{
+					"id": "narrows",
+					"name": "The Narrows",
+					"from": 8.5,
+					"to": 11.5,
+					"sequence": ["lh", "rh", "rh", "lh", "lh", "rh"],
+					"hip": "chimney",
+					"read": "Right side in, breathe out, and move one side at a time: two moves right, two left. Rush it and you wedge."
+				}
+			]
+		},
+		{
+			"name": "Summit Chimney",
+			"style": "chimney",
+			"diff": 3,
+			"height": 14,
+			"width": 8,
+			"line": [[4.0, 0.0], [4.0, 7.0], [4.0, 14]],
+			"belay": "top",
+			"beta": "A last, friendlier chimney to Sentinel's summit.",
+			"cracks": [
+				{
+					"id": "ch",
+					"kind": "chimney",
+					"points": [[4.0, 0.5], [4.0, 4.67], [4.0, 8.83], [4.0, 13.0]],
+					"widths": [7.0, 7.0, 7.0, 7.0],
+					"constrictions": [],
+					"tags": ["no_jams"]
+				},
+				{
+					"id": "back",
+					"kind": "hand",
+					"points": [[4.5, 1.0], [4.5, 4.83], [4.5, 8.67], [4.5, 12.5]],
+					"widths": [4.5, 5.5, 5.0, 5.5],
+					"constrictions": [1, 3]
+				}
+			],
+			"horns": [
+				{"y": 7.0, "x": 4.0, "tags": ["chockstone"]}
+			]
+		}
+	]
+}
