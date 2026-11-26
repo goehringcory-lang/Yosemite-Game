@@ -16,8 +16,9 @@ extends CanvasLayer
 ## while it's still appearing shows the whole page, and confirm again goes on.
 
 const NAME_COLOR := Color(1, 0.831, 0.541)
-## Room left at the start of each option for the arrow (MenuInput.mark).
-const CURSOR := "   "
+## Room left at the start of each option for the arrow (MenuInput.mark), so a
+## long option that wraps keeps its second line under its first word.
+const CURSOR_ROOM := 10.0
 const HINT_COLOR := Color(0.961, 0.933, 0.878, 0.6)
 ## The box's width. It sits centered and only as tall as its page, so a
 ## short line gets a short box, as Stardew Valley's and Eastward's do; it
@@ -36,6 +37,13 @@ const DETAIL_DIM := Color(0.961, 0.933, 0.878, 0.65)
 ## Portraits are painted at 40 px and shown at exactly twice that, so they
 ## stay crisp and read at a glance, like Stardew's 64 px faces.
 const PORTRAIT_SIZE := Vector2(80, 80)
+## The box never comes closer than this to the screen's edges: every line in
+## it wraps to its column (long names, long costs, long notes), and a list
+## longer than MAX_ROWS scrolls with the cursor, so it can't grow past the
+## screen.
+const SCREEN_MARGIN := 4.0
+const MAX_ROWS := 8
+const MORE_COLOR := Color(0.961, 0.933, 0.878, 0.5)
 ## A talking blip every this many letters while a person's line types out.
 const BLIP_EVERY := 3
 ## How far the box rises as it opens, in pixels, and how long it takes.
@@ -61,12 +69,25 @@ var _details: Array = []
 var _detail_panel: PanelContainer
 var _detail_column: VBoxContainer
 var _cursor := 0
+## The first option showing when the list is longer than MAX_ROWS, and the
+## "more" lines above and below the rows that show.
+var _first_row := 0
+## How many options show at once: MAX_ROWS, or fewer when long options wrap
+## to two lines and eight of them would reach the top of the screen.
+var _row_cap := MAX_ROWS
+var _more_above: Label
+var _more_below: Label
+## How wide the words column is for the page showing.
+var _column_width := BOX_WIDTH - FRAME_SIDES
 var _opened_frame := 0
 ## The brass tag the speaker's name sits on, the bar behind the chosen option,
 ## and the arrow that bobs when the page is waiting for E.
 var _tag_style: StyleBoxTexture
 var _select_style: StyleBoxTexture
 var _plain_style: StyleBoxEmpty
+## The same, with room on the left for the arrow (lists without pictures).
+var _select_indent: StyleBoxTexture
+var _plain_indent: StyleBoxEmpty
 var _arrow: TextureRect
 var _hint_text_width := 0.0
 ## The speaker's face, in a frame at the right of the box.
@@ -160,9 +181,13 @@ func _ready() -> void:
 	_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text_label.custom_minimum_size = Vector2(BOX_WIDTH - FRAME_SIDES, 0)
 	column.add_child(_text_label)
+	_more_above = _more_label()
+	column.add_child(_more_above)
 	_options_box = VBoxContainer.new()
 	_options_box.add_theme_constant_override("separation", 0)
 	column.add_child(_options_box)
+	_more_below = _more_label()
+	column.add_child(_more_below)
 	_detail_panel = PanelContainer.new()
 	_detail_panel.add_theme_stylebox_override("panel", MenuInput.card_style(6.0, 5.0, 3.0, 3.0))
 	_detail_panel.custom_minimum_size.x = DETAIL_WIDTH
@@ -195,6 +220,10 @@ func _ready() -> void:
 	_select_style.expand_margin_bottom = 1.0
 	_plain_style = StyleBoxEmpty.new()
 	_plain_style.content_margin_left = 2.0
+	_select_indent = _select_style.duplicate()
+	_select_indent.content_margin_left = CURSOR_ROOM
+	_plain_indent = _plain_style.duplicate()
+	_plain_indent.content_margin_left = CURSOR_ROOM
 	var hud := get_tree().get_first_node_in_group("hud") as HUD
 	if hud:
 		hud.device_changed.connect(_refresh_hint)
@@ -205,6 +234,15 @@ func _ready() -> void:
 	tween.tween_property(root, "modulate:a", 1.0, OPEN_TIME)
 	tween.tween_property(root, "position:y", 0.0, OPEN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	Sound.play("ui_open", -2.0)
+
+
+## A dim "2 more" line for a list that scrolls.
+func _more_label() -> Label:
+	var label := Label.new()
+	label.add_theme_color_override("font_color", MORE_COLOR)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.visible = false
+	return label
 
 
 ## A nine-slice style from a texture, with its corners [param margin] pixels in.
@@ -263,6 +301,8 @@ static func pages(text: String) -> PackedStringArray:
 ## (Leave) show an empty card.
 func choose(prompt: String, options: Array, speaker := "", icons := [], details := [], cursor := 0) -> int:
 	_cursor = clampi(cursor, 0, maxi(options.size() - 1, 0))
+	_first_row = 0
+	_row_cap = MAX_ROWS
 	_icons = icons
 	_details = details
 	_show(speaker, prompt, options)
@@ -290,9 +330,11 @@ func _show(speaker: String, text: String, options: Array, mood := "neutral") -> 
 		_portrait.scale = Vector2(1.03, 0.97)
 		_portrait.create_tween().tween_property(_portrait, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	var card := not _details.is_empty()
-	var width := BOX_WIDTH_CARD if card else BOX_WIDTH
-	_text_label.custom_minimum_size.x = width - FRAME_SIDES - (PORTRAIT_ROOM if face else 0.0) - (DETAIL_WIDTH + 6.0 if card else 0.0)
+	var width := minf(BOX_WIDTH_CARD if card else BOX_WIDTH, UiScale.SCREEN.x - SCREEN_MARGIN * 2.0)
+	_column_width = width - FRAME_SIDES - (PORTRAIT_ROOM if face else 0.0) - (DETAIL_WIDTH + 6.0 if card else 0.0)
+	_text_label.custom_minimum_size.x = _column_width
 	_panel.custom_minimum_size.x = width
+	_fit_name()
 	_speaker = speaker
 	_voice = Portraits.voice_pitch(speaker)
 	_blipped = 0
@@ -306,6 +348,18 @@ func _show(speaker: String, text: String, options: Array, mood := "neutral") -> 
 	_fit()
 
 
+## The name tag hugs the name, but a name longer than the column is cut
+## short with "..." instead of pushing the box wider.
+func _fit_name() -> void:
+	var font := _name_label.get_theme_font("font")
+	var font_size := _name_label.get_theme_font_size("font_size")
+	var wide := font.get_string_size(_name_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x + 8.0
+	var fits := wide <= _column_width
+	_name_label.clip_text = not fits
+	_name_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if fits else TextServer.OVERRUN_TRIM_ELLIPSIS
+	_name_label.custom_minimum_size.x = 0.0 if fits else _column_width
+
+
 ## Shrinks the box to its page. A Control grows to hold its contents but
 ## never shrinks back on its own, so after a long list of choices the next
 ## short line would sit in a tall box. Collapsing it to its bottom edge lets
@@ -314,7 +368,29 @@ func _fit() -> void:
 	var half := roundf(_panel.custom_minimum_size.x / 2.0)
 	_panel.offset_left = -half
 	_panel.offset_right = half
+	_panel.offset_bottom = -8.0
 	_panel.offset_top = _panel.offset_bottom
+
+
+## Nudges the box back inside the screen if it ever grew past an edge, so
+## nothing in it is cut off whatever is in it.
+func _keep_on_screen() -> void:
+	var rect := _panel.get_rect()
+	var low := Vector2(SCREEN_MARGIN, SCREEN_MARGIN)
+	var high := UiScale.SCREEN - Vector2(SCREEN_MARGIN, SCREEN_MARGIN)
+	var shift := 0.0
+	if rect.position.x < low.x:
+		shift = low.x - rect.position.x
+	elif rect.end.x > high.x:
+		shift = maxf(high.x - rect.end.x, low.x - rect.position.x)
+	if shift != 0.0:
+		_panel.offset_left += shift
+		_panel.offset_right += shift
+	# too tall: show fewer options at a time rather than lose the top or bottom
+	if rect.position.y < low.y and _row_cap > 3 and _options.size() > 3:
+		_row_cap = mini(_row_cap, _options.size()) - 1
+		_refresh_options()
+		_fit()
 
 
 ## True once the whole page is showing.
@@ -330,6 +406,7 @@ func reveal_all() -> void:
 
 
 func _process(delta: float) -> void:
+	_keep_on_screen()
 	if not is_revealed():
 		_shown += delta * Settings.chars_per_second()
 		if is_revealed():
@@ -390,16 +467,33 @@ func _refresh_options() -> void:
 		child.queue_free()
 	_refresh_detail()
 	var pictures := _icons.any(func(icon: Variant) -> bool: return icon != null)
+	# a long list shows MAX_ROWS at a time and scrolls with the cursor
+	var rows := mini(_options.size(), _row_cap)
+	if _cursor < _first_row:
+		_first_row = _cursor
+	elif _cursor >= _first_row + rows:
+		_first_row = _cursor - rows + 1
+	_first_row = clampi(_first_row, 0, maxi(_options.size() - rows, 0))
+	_more_above.visible = _first_row > 0
+	_more_above.text = "%d more" % _first_row
+	var below := _options.size() - _first_row - rows
+	_more_below.visible = below > 0
+	_more_below.text = "%d more" % below
 	for i in _options.size():
 		var label := Label.new()
-		label.text = CURSOR + _options[i]
+		label.text = _options[i]
+		# a long option wraps to the column instead of widening the box
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		MenuInput.mark(label, i == _cursor)
 		if i == _cursor:
 			label.add_theme_color_override("font_color", NAME_COLOR)
-			label.add_theme_stylebox_override("normal", _select_style)
+			label.add_theme_stylebox_override("normal", _select_indent)
 		else:
-			label.add_theme_stylebox_override("normal", _plain_style)
+			label.add_theme_stylebox_override("normal", _plain_indent)
+		var shown := i >= _first_row and i < _first_row + rows
 		if not pictures:
+			label.custom_minimum_size.x = _column_width - 2.0
+			label.visible = shown
 			_options_box.add_child(label)
 			continue
 		# a picture after the cursor; options without one keep the column
@@ -417,6 +511,7 @@ func _refresh_options() -> void:
 		label.text = _options[i]
 		MenuInput.mark(label, false) # the arrow goes in its own column here
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.custom_minimum_size.x = _column_width - 2.0 - 8.0 - 16.0 - 6.0
 		row.add_child(cursor)
 		row.add_child(picture)
 		row.add_child(label)
@@ -425,6 +520,7 @@ func _refresh_options() -> void:
 		var holder := PanelContainer.new()
 		holder.add_theme_stylebox_override("panel", _select_style if i == _cursor else _plain_style)
 		holder.add_child(row)
+		holder.visible = shown
 		_options_box.add_child(holder)
 
 
@@ -441,6 +537,7 @@ func _refresh_detail() -> void:
 		var title := Label.new()
 		title.text = card.title
 		title.add_theme_color_override("font_color", NAME_COLOR)
+		_wrap(title, DETAIL_WIDTH - 12.0)
 		_detail_column.add_child(title)
 	for entry: Array in card.get("rows", []):
 		var line := HBoxContainer.new()
@@ -455,6 +552,7 @@ func _refresh_detail() -> void:
 			line.add_child(picture)
 		var text := Label.new()
 		text.text = entry[1]
+		_wrap(text, DETAIL_WIDTH - 12.0 - (19.0 if entry[0] != null else 0.0))
 		if entry.size() > 2 and entry[2]:
 			text.add_theme_color_override("font_color", DETAIL_SHORT)
 		line.add_child(text)
@@ -462,14 +560,20 @@ func _refresh_detail() -> void:
 	if card.get("facts", "") != "":
 		var facts := Label.new()
 		facts.text = card.facts
+		_wrap(facts, DETAIL_WIDTH - 12.0)
 		_detail_column.add_child(facts)
 	if card.get("note", "") != "":
 		var note := Label.new()
 		note.text = card.note
-		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		note.custom_minimum_size.x = DETAIL_WIDTH - 12.0
+		_wrap(note, DETAIL_WIDTH - 12.0)
 		note.add_theme_color_override("font_color", DETAIL_DIM)
 		_detail_column.add_child(note)
+
+
+## Makes a line on the card wrap at [param width] instead of widening it.
+static func _wrap(label: Label, width: float) -> void:
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.custom_minimum_size.x = width
 
 
 ## Waits for confirm (true) or cancel (false).
@@ -501,11 +605,13 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		_cursor = wrapi(_cursor - 1, 0, _options.size())
 		_refresh_options()
+		_fit() # the rows showing may be shorter or taller
 		Sound.play("ui_move")
 	elif not _options.is_empty() and (MenuInput.pressed(event, "move_down") or MenuInput.pressed(event, "ui_down")):
 		get_viewport().set_input_as_handled()
 		_cursor = wrapi(_cursor + 1, 0, _options.size())
 		_refresh_options()
+		_fit()
 		Sound.play("ui_move")
 
 

@@ -42,3 +42,13 @@ static func wrap_children(canvas_layer: CanvasLayer) -> Control:
 ## Where a point in the 960x540 world view lands on the menu screen.
 static func from_view(point: Vector2) -> Vector2:
 	return point / FACTOR
+
+
+## Moves [param control] (placed by position, on a SCREEN-sized layer) back
+## inside the menu screen, [param margin] from its edges, if what's in it
+## made it grow past one. A control bigger than the screen keeps its
+## top-left corner on screen.
+static func keep_inside(control: Control, margin := 4.0) -> void:
+	var low := Vector2(margin, margin)
+	var high := SCREEN - low - control.size
+	control.position = control.position.clamp(low, high.max(low))
