@@ -185,6 +185,12 @@ func test_fixture_sequence() -> void:
 	var w := V2Wall.from_dict(V2Data.load_json(WallSourceStub.FIXTURE))
 	var spots := CruxReader.spots_for(w, null, 0)
 	check(spots.size() == 1 and spots[0].id == "crux_top" and spots[0].sequence == ["lh", "rh", "lh"], "a wall crux zone becomes a spot with its sequence")
+	# A special zone whose first hold is also tagged special:<kind> is one spot.
+	var tagged := V2Wall.from_dict(swing_pitch())
+	for h in tagged.holds:
+		if h.id == "h9":
+			h.tags.append("special:swing")
+	check(CruxReader.spots_for(tagged, null, 0).size() == 1, "a tagged hold inside its special zone doesn't make a second spot")
 	var h := w.hold("h14")
 	var dem := CruxReader.demands(h, spots[0], w, 1)
 	check(dem.any(func(x: Dictionary) -> bool: return x.id == "beta" and x.step.hand == "rh"), "step 2 of the authored beta asks for the right hand")

@@ -27,6 +27,10 @@ static func spots_for(wall: V2Wall, route: RouteData, pitch: int) -> Array:
 		for tag in h.tags:
 			if tag.begins_with("special:"):
 				var kind := tag.trim_prefix("special:")
+				# The wall may tag the first hold of a special crux zone too:
+				# that zone already is the spot.
+				if spots.any(func(s: Dictionary) -> bool: return str(s.kind) == kind and rect_of(s).grow(0.5).has_point(h.pos)):
+					continue
 				spots.append({"id": "hold_" + h.id, "kind": kind, "name": _special_name(kind), "beta": "",
 					"rect": V2Data.rect_arr(Rect2(h.pos - Vector2(0.4, 0.4), Vector2(0.8, 0.8 + CruxTuning.SPOT_HALF_M * 2.0))),
 					"preset": "", "sequence": [], "data": {}})
