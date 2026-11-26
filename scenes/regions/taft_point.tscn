@@ -40,6 +40,10 @@
 [ext_resource type="Script" path="res://scripts/world/forage_spawner.gd" id="38_o0x6p"]
 [ext_resource type="Script" path="res://scripts/world/place.gd" id="39_drau2"]
 [ext_resource type="Texture2D" path="res://assets/sprites/valley/taft_point_wall.png" id="40_kvkor"]
+[ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="90_exit"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rime"]
+size = Vector2(24, 96)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eppyh"]
 size = Vector2(32, 8)
@@ -1571,16 +1575,6 @@ shape = SubResource("RectangleShape2D_o2nwu")
 [node name="TaftPointCamp" parent="Entities" unique_id=2087801272 instance=ExtResource("14_oow0g")]
 position = Vector2(2416, 1440)
 place_name = "Taft Point"
-
-[node name="PohonoTrailEast" parent="Entities" unique_id=30927176 instance=ExtResource("15_cfwlx")]
-position = Vector2(2928, 1056)
-label = "Pohono Trail, east to Sentinel Dome and Glacier Point"
-target_region = "glacier_point"
-target_spawn = "sentinel_dome_trailhead"
-minutes = 45
-closure = "four_mile_trail"
-needs_hub = "glacier_point"
-locked_text = "The rim trail to Glacier Point opens once you've climbed the Glacier Point Apron above Curry Village."
 
 [node name="PohonoTrailWest" parent="Entities" unique_id=1036260934 instance=ExtResource("15_cfwlx")]
 position = Vector2(176, 1120)
@@ -7128,7 +7122,7 @@ amount_scale = 2.0
 position = Vector2(1616, 976)
 
 [node name="east" type="Marker2D" parent="Markers" unique_id=1619349049]
-position = Vector2(2832, 1040)
+position = Vector2(3008, 1040)
 
 [node name="west" type="Marker2D" parent="Markers" unique_id=277482478]
 position = Vector2(272, 1104)
@@ -7177,6 +7171,16 @@ radius = 288
 show_on_map = true
 
 [node name="Exits" type="Node2D" parent="." unique_id=505209854]
+
+[node name="PohonoTrailEast" type="Area2D" parent="Exits" unique_id=1909002001]
+position = Vector2(3056, 1040)
+script = ExtResource("90_exit")
+label = "Pohono Trail, east to Sentinel Dome and Glacier Point"
+target_region = "glacier_point"
+target_spawn = "pohono_west"
+
+[node name="Shape" type="CollisionShape2D" parent="Exits/PohonoTrailEast" unique_id=1909002002]
+shape = SubResource("RectangleShape2D_rime")
 
 [node name="TaftPointWall" type="Sprite2D" parent="." unique_id=959039293]
 z_index = -8

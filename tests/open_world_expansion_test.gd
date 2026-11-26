@@ -30,6 +30,7 @@ func _ready() -> void:
 	_check_world_registrations()
 	_check_binocular_views()
 	await _check_pohono_loop(world)
+	await _check_rim_south(world)
 	await _check_cathedral_loop(world)
 	await _check_hetch_hetchy(world)
 	_check_finds_and_happenings()
@@ -55,7 +56,7 @@ func _check_world_registrations() -> void:
 
 
 func _check_binocular_views() -> void:
-	for view_id in ["taft_point", "cathedral_pass", "hetch_hetchy"]:
+	for view_id in ["taft_point", "union_point", "cathedral_pass", "hetch_hetchy"]:
 		check(BinocularView.VIEWS.has(view_id), "BinocularView has '%s' panorama" % view_id)
 		var spec: Dictionary = BinocularView.VIEWS[view_id]
 		var scale := BinocularView.make_scale(spec)
@@ -97,15 +98,68 @@ func _check_pohono_loop(world: Node) -> void:
 	var fissures := world.region.find_child("FissuresSign", true, false) as InfoSign
 	check(fissures != null and fissures.extra_text != "", "Taft Point's Fissures sign has its spring falcon Easter egg")
 
-	# On east to Glacier Point, then back to Taft Point
-	var east: RegionDoor = world.region.entities.get_node_or_null("PohonoTrailEast")
-	check(east != null and east.target_region == "glacier_point" and east.needs_hub == "glacier_point",
-		"Taft Point has PohonoTrailEast to Glacier Point")
-	east.interact(world.player)
-	await _wait_region(world, "glacier_point")
-	check(world.region.region_id == "glacier_point", "PohonoTrailEast arrives at Glacier Point")
-	var back: RegionDoor = world.region.entities.get_node_or_null("PohonoTrailToTaft")
-	check(back != null and back.target_region == "taft_point", "Glacier Point has PohonoTrailToTaft back to Taft Point")
+	# On east along the rim: the Pohono Trail walks straight over the map
+	# edge into Glacier Point (a seam, no fade), and back.
+	var east := world.region.find_child("PohonoTrailEast", true, false) as RegionExit
+	check(east != null and east.target_region == "glacier_point" and east.minutes == 0,
+		"Taft Point's Pohono Trail walks on east into Glacier Point")
+	await world.go_to_region("glacier_point", east.target_spawn if east else "pohono_west")
+	await _settle(world)
+	check(world.region.region_id == "glacier_point", "the Pohono Trail arrives at Glacier Point")
+	var back := world.region.find_child("PohonoTrailWest", true, false) as RegionExit
+	check(back != null and back.target_region == "taft_point" and back.minutes == 0,
+		"Glacier Point's Pohono Trail walks on west to Taft Point")
+
+	# The Four Mile Trail: west from Glacier Point into Union Point, and down
+	# the switchbacks to the Valley.
+	var four_mile := world.region.find_child("FourMileTrailWest", true, false) as RegionExit
+	check(four_mile != null and four_mile.target_region == "union_point" and four_mile.minutes == 0,
+		"Glacier Point's Four Mile Trail walks on west to Union Point")
+	await world.go_to_region("union_point", "east")
+	await _settle(world)
+	check(world.region.region_id == "union_point", "the Four Mile Trail arrives at Union Point")
+	check(world.region.hub_id == "glacier_point", "Union Point counts under Glacier Point")
+	check(world.region.entities.get_node_or_null("UnionPointViewer") is ScenicViewer, "Union Point has its scenic viewer")
+	check(BinocularView.VIEWS.has("union_point"), "Union Point's viewer has a view")
+	var down: RegionDoor = world.region.entities.get_node_or_null("FourMileTrailDown")
+	check(down != null and down.target_region == "four_mile_trailhead" and down.minutes > 0,
+		"Union Point's switchbacks go on down to the Four Mile trailhead")
+	down.interact(world.player)
+	await _wait_region(world, "four_mile_trailhead")
+	check(world.region.region_id == "four_mile_trailhead", "the switchbacks arrive at the Four Mile trailhead")
+	var up_again: RegionDoor = world.region.entities.get_node_or_null("FourMileTrail")
+	check(up_again != null and up_again.target_region == "union_point", "the Four Mile trailhead leads up to Union Point")
+
+
+func _check_rim_south(world: Node) -> void:
+	GameClock.season = GameClock.Season.SUMMER
+	GameClock.minutes = 8 * 60
+	await world.go_to_region("glacier_point", "panorama_south")
+	await _settle(world)
+	# The Panorama Trail walks off Glacier Point's south edge into Illilouette Gorge.
+	var panorama := world.region.find_child("PanoramaTrailSouth", true, false) as RegionExit
+	check(panorama != null and panorama.target_region == "illilouette" and panorama.minutes == 0,
+		"Glacier Point's Panorama Trail walks on south into Illilouette Gorge")
+	var road := world.region.find_child("GlacierPointRoad", true, false) as RegionExit
+	check(road != null and road.target_region == "bridalveil_creek" and road.minutes == 0,
+		"Glacier Point Road walks on south into Bridalveil Creek")
+	check(world.region.find_child("Travel_GlacierPointParking", true, false) is TravelPoint,
+		"you can still drive from Glacier Point's lot")
+	await world.go_to_region("illilouette", "north")
+	await _settle(world)
+	check(world.region.region_id == "illilouette" and world.region.hub_id == "glacier_point", "Illilouette Gorge counts under Glacier Point")
+	check(world.region.walk_minutes > 0, "walking the Panorama Trail takes clock time")
+	var mist: RegionDoor = world.region.entities.get_node_or_null("MistTrailDown")
+	check(mist != null and mist.target_region == "happy_isles", "the top of Nevada Fall has the Mist Trail down to Happy Isles")
+	var jmt: RegionDoor = world.region.entities.get_node_or_null("JohnMuirTrailEast")
+	check(jmt != null and jmt.target_region == "little_yosemite_valley", "the top of Nevada Fall has the John Muir Trail on to Little Yosemite Valley")
+	await world.go_to_region("bridalveil_creek", "north")
+	await _settle(world)
+	check(world.region.region_id == "bridalveil_creek" and world.region.hub_id == "glacier_point", "Bridalveil Creek counts under Glacier Point")
+	var drive := world.region.find_child("GlacierPointRoadSouth", true, false) as RegionExit
+	check(drive != null and drive.travel_to == "yosemite_valley", "the drive back to the Valley leaves from Bridalveil Creek")
+	var mono: RegionDoor = world.region.entities.get_node_or_null("MonoMeadowTrail")
+	check(mono != null and mono.target_region == "illilouette", "the Mono Meadow trail goes down to Illilouette Creek")
 
 
 func _check_cathedral_loop(world: Node) -> void:

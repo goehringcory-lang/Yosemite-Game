@@ -57,6 +57,12 @@ func _notification(what: int) -> void:
 ## Label measures, so once the text changes the label widens to hold them,
 ## and a bubble or centered row sized to it still fits.
 func _process(_delta: float) -> void:
+	fit_now()
+
+
+## Widens the label for its buttons now, not at its next frame: for a box
+## placed by its size the same frame its text changes (the HUD's prompt).
+func fit_now() -> void:
 	if text == _measured:
 		return
 	_measured = text

@@ -548,6 +548,11 @@ func _any_road_open() -> bool:
 ## still leave this region when every road is shut, or "" if there are none.
 func _on_foot_text() -> String:
 	var trails: Array[String] = []
+	# Trails that walk straight on over the map edge and on down (the Four
+	# Mile Trail west from Glacier Point, through Union Point) come first.
+	for exit in _region.find_children("*", "RegionExit", true, false):
+		if exit.target_region != "" and exit.minutes == 0 and exit.label.contains("Trail, down"):
+			trails.append(exit.label)
 	for door in _region.find_children("*", "RegionDoor", true, false):
 		if door.minutes > 0 and door.is_unlocked() and (door.closure == "" or Park.is_open(door.closure)):
 			trails.append(door.label)

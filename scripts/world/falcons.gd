@@ -17,7 +17,7 @@ extends Node2D
 ## The places under the big walls where they hunt.
 const CLIFFS := ["el_capitan_meadow", "bridalveil_fall", "tunnel_view", "glacier_point", "leidig_meadow",
 	"yosemite_village", "half_dome", "ahwahnee_meadow", "mirror_lake", "four_mile_trailhead",
-	"taft_point", "hetch_hetchy"]
+	"taft_point", "hetch_hetchy", "union_point", "illilouette"]
 ## Seconds outdoors under the cliffs between chances of one, and the chance,
 ## by GameClock.Season (spring, when they nest and feed young, the most).
 const CHECK_EVERY := 14.0

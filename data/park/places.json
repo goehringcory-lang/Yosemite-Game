@@ -50,6 +50,30 @@
 			"region": "big_oak_flat_junction"
 		},
 		{
+			"hub": "glacier_point",
+			"key": "bridalveil_creek/Bridalveil Creek",
+			"name": "Bridalveil Creek",
+			"region": "bridalveil_creek"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "bridalveil_creek/McGurk Meadow",
+			"name": "McGurk Meadow",
+			"region": "bridalveil_creek"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "bridalveil_creek/Bridalveil Creek Campground",
+			"name": "Bridalveil Creek Campground",
+			"region": "bridalveil_creek"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "bridalveil_creek/Mono Meadow Trailhead",
+			"name": "Mono Meadow Trailhead",
+			"region": "bridalveil_creek"
+		},
+		{
 			"hub": "yosemite_valley",
 			"key": "bridalveil_fall/Bridalveil Fall",
 			"name": "Bridalveil Fall",
@@ -380,6 +404,36 @@
 			"region": "housekeeping_camp"
 		},
 		{
+			"hub": "glacier_point",
+			"key": "illilouette/Illilouette Gorge",
+			"name": "Illilouette Gorge",
+			"region": "illilouette"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "illilouette/Illilouette Fall",
+			"name": "Illilouette Fall",
+			"region": "illilouette"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "illilouette/Illilouette Creek Bridge",
+			"name": "Illilouette Creek Bridge",
+			"region": "illilouette"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "illilouette/Panorama Point",
+			"name": "Panorama Point",
+			"region": "illilouette"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "illilouette/Top of Nevada Fall",
+			"name": "Top of Nevada Fall",
+			"region": "illilouette"
+		},
+		{
 			"hub": "yosemite_valley",
 			"key": "lamon_homestead/Lamon Homestead",
 			"name": "Lamon Homestead",
@@ -594,6 +648,24 @@
 			"key": "tuolumne_meadows/Cathedral Peak",
 			"name": "Cathedral Peak",
 			"region": "tuolumne_meadows"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "union_point/Four Mile Trail",
+			"name": "Four Mile Trail",
+			"region": "union_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "union_point/Union Point",
+			"name": "Union Point",
+			"region": "union_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "union_point/Four Mile switchbacks",
+			"name": "Four Mile switchbacks",
+			"region": "union_point"
 		},
 		{
 			"hub": "yosemite_valley",
