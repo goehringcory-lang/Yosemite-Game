@@ -86,6 +86,8 @@ func _ready() -> void:
 		if way.to in RELOAD_IN and OS.get_environment("PERF_TOUR_NO_RELOAD") == "":
 			await _check_reload(way.to)
 		_push_ways(stack)
+	_check_pictures_budget()
+	await _check_pictures_come_back()
 	await _check_odd_saves()
 	if only.is_empty():
 		var missed := all.filter(func(id: String) -> bool: return not entered_by.has(id))
@@ -119,6 +121,9 @@ func _start_world() -> Node:
 ## Every hub, door and road open, at midday in summer, so the tour isn't
 ## stopped by a season, a closing time or the story.
 func _open_everything() -> void:
+	# Fewer areas keep their ground pictures than in play, so the reloads
+	# (which start afresh) don't hide the giving back.
+	world.keep_pictures = 2
 	Park.open_world = true
 	for hub in ParkAtlas.HUBS:
 		Park.unlock_hub(hub.id)
@@ -350,3 +355,51 @@ func _reload_with(edit: Callable) -> void:
 	NewGame.reset_all()
 	world = await _start_world()
 	_open_everything()
+
+
+## Regions left behind give back their ground pictures, beyond the last few
+## (World._budget_textures), and nothing laid out is missing its ground.
+func _check_pictures_budget() -> void:
+	var full := 0
+	var released := 0
+	for r: Region in world._regions.values():
+		if r.indoors:
+			continue
+		if RegionTextures.is_released(r):
+			released += 1
+			check(not r.is_inside_tree(), "%s: laid out with its ground given back" % r.region_id)
+		elif r.get_node_or_null("GroundArt") or r.get_node_or_null("GroundPainting"):
+			full += 1
+	var ways_on: Array = world.region.get_meta("exit_targets", [])
+	check(full <= world.keep_pictures + 2 + ways_on.size(),
+		"only the last few regions keep their ground pictures (%d keep them, %d gave them back)" % [full, released])
+	if only_all():
+		check(released > 0, "regions left behind gave back their ground pictures (%d)" % released)
+
+
+func only_all() -> bool:
+	return OS.get_environment("PERF_TOUR_ONLY") == ""
+
+
+## A region that gave its pictures back gets the same ones back when the
+## player returns: the same ground picture and normal map, drawn as before.
+func _check_pictures_come_back() -> void:
+	var gone: Region = null
+	for r: Region in world._regions.values():
+		if RegionTextures.is_released(r):
+			gone = r
+			break
+	if gone == null:
+		return
+	var kept: Dictionary = gone.get_meta(RegionTextures.META)
+	var id := gone.region_id
+	await _go(id, str(entered_by.get(id, "arrival")), 0, "back to %s, which gave its pictures back" % id)
+	check(not RegionTextures.is_released(world.region), "%s: has its pictures back" % id)
+	for ground_name: String in kept:
+		var ground := world.region.get_node(ground_name) as Sprite2D
+		check(ground.texture != null and ground.texture.resource_path == kept[ground_name].texture,
+			"%s: %s has its own picture again" % [id, ground_name])
+		if kept[ground_name].normal != "":
+			var normal = (ground.material as ShaderMaterial).get_shader_parameter("normal_map")
+			check(normal is Texture2D and normal.resource_path == kept[ground_name].normal, "%s: %s has its normal map again" % [id, ground_name])
+	await _check_arrival(id, "back in %s" % id)
