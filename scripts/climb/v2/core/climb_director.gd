@@ -199,6 +199,20 @@ func take_fall() -> V2Fall:
 	return fall
 
 
+## Puts the climber hanging at [param pos] (the King Swing landing at the far
+## crack, standing in aiders, an inchworm up a chimney), with [param tags]
+## added to the pose.
+func hang_at(pos: Vector2, tags := PackedStringArray()) -> void:
+	session.sys.body.settle(pos)
+	if not tags.is_empty():
+		session.sys.body.tag_pose(tags)
+
+
+## Counts [param n] aid moves (pulling on gear): they cost the medal.
+func count_aid(n := 1) -> void:
+	session.result.aid_moves += n
+
+
 ## Shakes out if the pose allows it ([param kind] "" = body's rest_kind;
 ## the belay passes "belay").
 func rest(kind: StringName = &"") -> bool:
@@ -242,7 +256,11 @@ func _top_out() -> void:
 		session.bus.send(&"clipped", [anchor.id, false])
 	session.result.pitches_done += 1
 	session.bus.send(&"pitch_finished", [session.pitch])
-	go(&"belay")
+	var special := session.sys.cruxes.belay_special()
+	if special != &"" and _phases.has(&"special"):
+		go(&"special", {"kind": special, "belay": true})
+	else:
+		go(&"belay")
 
 
 ## From the belay: the next pitch, or the top.
