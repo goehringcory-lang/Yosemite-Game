@@ -31,6 +31,13 @@ const SEAMS := {
 	"the_ahwahnee": ["ToStonemanBridge", "NorthsideDriveWest"],
 	"ahwahnee_trail": ["ToHomestead", "ToAhwahnee"],
 	"lamon_homestead": ["ToCurryVillage", "NorthToAhwahnee"],
+	# The high country: the Tioga Road along Tenaya Lake into Tuolumne
+	# Meadows, the John Muir Trail south to Cathedral Lakes, and the trail
+	# north from Soda Springs to Glen Aulin.
+	"tuolumne_meadows": ["TiogaRoadWest", "JMTSouth", "GlenAulinTrail"],
+	"tenaya_lake": ["TiogaRoadEast"],
+	"cathedral_lakes": ["JMTNorth"],
+	"glen_aulin": ["ToTuolumne"],
 	# The south rim: Glacier Point walks on west into Union Point (the Four
 	# Mile Trail) and Taft Point (the Pohono Trail), and south into
 	# Illilouette Gorge (the Panorama Trail) and Bridalveil Creek (the road).
@@ -99,6 +106,15 @@ func _ready() -> void:
 	check(off_road != null and absf(world.region.to_local(world.player.global_position).y - off_road.point.y) > Seam.CORRIDOR,
 			"el_capitan_meadow: crossed well away from the road")
 	_check_spans()
+	# The high country: on along the Tioga Road from Tuolumne into Tenaya
+	# Lake, down the John Muir Trail into Cathedral Lakes, and up the trail
+	# from Soda Springs into Glen Aulin, each with no trip.
+	for walk: Array in [["west", "move_left", "tenaya_lake"], ["cathedral_lakes_trail", "move_down", "cathedral_lakes"],
+			["glen_aulin_trail", "move_up", "glen_aulin"]]:
+		await world.go_to_region("tuolumne_meadows", walk[0])
+		for i in 30:
+			await get_tree().process_frame
+		await _walk_across(world, walk[1], walk[2])
 	# A north-south seam: from the hotel down the trail by Stoneman Bridge.
 	await world.go_to_region("the_ahwahnee", "south_entry")
 	# stepping in through a gate there's no fade to settle behind

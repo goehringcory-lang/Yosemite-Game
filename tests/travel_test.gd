@@ -163,16 +163,17 @@ func _ready() -> void:
 		"the Tioga Road drives on from Crane Flat to Tenaya Lake (%d min)" % (GameClock.minutes - clock))
 	check(world.player.global_position.distance_to(world.region.get_spawn("west").global_position) < 64.0,
 		"the drive comes in at Tenaya Lake's west end, by Olmsted Point")
+	# Tenaya Lake and Tuolumne Meadows lie side by side at the road: you
+	# walk on from one into the other, with no trip.
 	clock = GameClock.minutes
 	world.use_exit(world.region.get_node("Exits/TiogaRoadEast"))
 	await _settle(world)
-	check(world.region.region_id == "tuolumne_meadows" and GameClock.minutes == clock + 15,
-		"the Tioga Road goes on along the lake to Tuolumne Meadows (%d min)" % (GameClock.minutes - clock))
+	check(world.region.region_id == "tuolumne_meadows" and GameClock.minutes - clock < 5,
+		"the Tioga Road walks on along the lake into Tuolumne Meadows (%d min)" % (GameClock.minutes - clock))
 	clock = GameClock.minutes
-	world.use_exit(world.region.get_node("Exits/TiogaRoadWest"))
-	await _settle(world)
-	check(world.region.region_id == "tenaya_lake" and GameClock.minutes == clock + 15,
-		"west from Tuolumne, the Tioga Road comes back to Tenaya Lake (%d min)" % (GameClock.minutes - clock))
+	await _walk_into(world, "move_left", "tenaya_lake")
+	check(world.region.region_id == "tenaya_lake" and GameClock.minutes - clock < 15,
+		"west from Tuolumne, the Tioga Road walks back to Tenaya Lake (%d min)" % (GameClock.minutes - clock))
 	GameClock.season = GameClock.Season.WINTER
 	world.use_exit(world.region.get_node("Exits/TiogaRoadWest"))
 	await _settle(world)
@@ -802,3 +803,24 @@ func _check_hub_maps() -> void:
 		check(region.find_children("*", "TravelPoint", true, false).size() > 0, "%s has a map kiosk" % hub.id)
 		check(region.get_places().size() >= 5, "%s has named places" % hub.id)
 		region.free()
+
+
+## Walks [param action] until the player crosses a seam into [param into]
+## (the next area is laid beside this one at the edge: no trip).
+func _walk_into(world: Node, action: String, into: String) -> void:
+	for i in 300:
+		if world.seam and world.seam.neighbor.region_id == into:
+			break
+		await get_tree().process_frame
+	# walk at an ordinary pace (as seams_test does): at this test's time
+	# scale the player covers the overlap in a tick or two
+	var scale := Engine.time_scale
+	Engine.time_scale = 4.0
+	Input.action_press(action)
+	for i in 1200:
+		await get_tree().process_frame
+		if world.region.region_id == into:
+			break
+	Input.action_release(action)
+	Engine.time_scale = scale
+	await _settle(world)

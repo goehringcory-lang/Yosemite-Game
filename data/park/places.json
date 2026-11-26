@@ -296,6 +296,36 @@
 			"region": "glacier_point"
 		},
 		{
+			"hub": "tuolumne_meadows",
+			"key": "glen_aulin/Glen Aulin",
+			"name": "Glen Aulin",
+			"region": "glen_aulin"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "glen_aulin/Glen Aulin Pool",
+			"name": "Glen Aulin Pool",
+			"region": "glen_aulin"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "glen_aulin/White Cascade",
+			"name": "White Cascade",
+			"region": "glen_aulin"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "glen_aulin/Tuolumne Falls",
+			"name": "Tuolumne Falls",
+			"region": "glen_aulin"
+		},
+		{
+			"hub": "tuolumne_meadows",
+			"key": "glen_aulin/Glen Aulin Trail",
+			"name": "Glen Aulin Trail",
+			"region": "glen_aulin"
+		},
+		{
 			"hub": "yosemite_valley",
 			"key": "half_dome/Half Dome",
 			"name": "Half Dome",

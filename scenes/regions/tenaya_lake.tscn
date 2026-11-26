@@ -4324,8 +4324,6 @@ script = ExtResource("41_2ql6i")
 label = "Tioga Road, to Tuolumne Meadows"
 target_region = "tuolumne_meadows"
 target_spawn = "west"
-minutes = 15
-miles = 8.1
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/TiogaRoadEast" unique_id=587675070]
 shape = SubResource("RectangleShape2D_kwlk5")

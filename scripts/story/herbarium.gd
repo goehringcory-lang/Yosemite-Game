@@ -29,7 +29,7 @@ const VALLEY_AREAS := ["yosemite_village", "curry_village", "the_ahwahnee", "ahw
 	"el_capitan_meadow", "tunnel_view", "happy_isles", "mirror_lake", "leidig_meadow", "four_mile_trailhead",
 	"bridalveil_fall", "housekeeping_camp", "ahwahnee_meadow", "upper_pines", "tenaya_creek"]
 ## High-country areas outside Tuolumne Meadows that count under Tuolumne's hub.
-const HIGH_COUNTRY_AREAS := ["tenaya_lake", "cathedral_lakes"]
+const HIGH_COUNTRY_AREAS := ["tenaya_lake", "cathedral_lakes", "glen_aulin"]
 ## South-rim areas outside Glacier Point that count under Glacier Point's hub.
 const RIM_AREAS := ["taft_point", "union_point", "illilouette", "bridalveil_creek"]
 ## Low foothill-canyon areas that share El Portal's flora group.
@@ -464,7 +464,7 @@ const PLANTS: Array[Dictionary] = [
 	{"id": "lodgepole_pine", "name": "Lodgepole Pine", "latin": "Pinus contorta",
 		"note": "Needles in twos, bark in thin scales like cornflakes. It rings every high meadow.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.HIGH_COUNTRY,
-		"grows": {"tuolumne_meadows": "arrival", "tenaya_lake": "", "cathedral_lakes": "", "bridalveil_creek": "campground"}},
+		"grows": {"tuolumne_meadows": "arrival", "tenaya_lake": "", "cathedral_lakes": "", "glen_aulin": "arrival", "bridalveil_creek": "campground"}},
 	{"id": "sierra_juniper", "name": "Sierra Juniper", "latin": "Juniperus grandis",
 		"note": "Cinnamon bark and a trunk as thick as it is tall, rooted in a crack in a granite dome.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.HIGH_COUNTRY,
@@ -488,7 +488,7 @@ const PLANTS: Array[Dictionary] = [
 	{"id": "pussypaws", "name": "Pussypaws", "latin": "Calyptridium umbellatum",
 		"note": "Fuzzy pink pads on granite sand. They lie down in the cool of morning and rise in the heat.",
 		"seasons": SUMMER, "habitat": ItemData.Habitat.HIGH_COUNTRY,
-		"grows": {"tuolumne_meadows": "lembert_dome", "tenaya_lake": "olmsted_point", "cathedral_lakes": "overlook"}},
+		"grows": {"tuolumne_meadows": "lembert_dome", "tenaya_lake": "olmsted_point", "cathedral_lakes": "overlook", "glen_aulin": "tuolumne_falls"}},
 	{"id": "mule_ears", "name": "Mountain Mule Ears", "latin": "Wyethia mollis",
 		"note": "Big woolly leaves like a mule's ears and yellow sunflowers. The leaves rattle in the wind.",
 		"seasons": SUMMER, "habitat": ItemData.Habitat.HIGH_COUNTRY,
@@ -508,11 +508,11 @@ const PLANTS: Array[Dictionary] = [
 	{"id": "lemmons_willow", "name": "Lemmon's Willow", "latin": "Salix lemmonii",
 		"note": "A shrubby willow in thickets by the Tuolumne. Its catkins feed the first bees of the year.",
 		"seasons": GROWING, "habitat": ItemData.Habitat.RIVERSIDE,
-		"grows": {"tuolumne_meadows": "", "tenaya_lake": "east_beach", "cathedral_lakes": "lower_lake"}},
+		"grows": {"tuolumne_meadows": "", "tenaya_lake": "east_beach", "cathedral_lakes": "lower_lake", "glen_aulin": "pool"}},
 	{"id": "mountain_hemlock", "name": "Mountain Hemlock", "latin": "Tsuga mertensiana",
 		"note": "Its top always nods over, as if bowing. Muir thought it the most beautiful conifer of all.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.HIGH_COUNTRY, "rarity": UNCOMMON,
-		"grows": {"tuolumne_meadows": "cathedral_lakes_trailhead", "cathedral_lakes": "camp"}},
+		"grows": {"tuolumne_meadows": "cathedral_lakes_trailhead", "cathedral_lakes": "camp", "glen_aulin": "camp"}},
 	{"id": "quaking_aspen", "name": "Quaking Aspen", "latin": "Populus tremuloides",
 		"note": "Round leaves on flat stalks that shiver in the lightest air, then turn gold all at once.",
 		"seasons": GROWING, "habitat": ItemData.Habitat.RIVERSIDE, "rarity": UNCOMMON,
