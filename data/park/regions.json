@@ -1,0 +1,2229 @@
+{
+	"_note": "Written by tools/map/list_regions.tscn. Run it again after adding a region or an exit.",
+	"regions": [
+		{
+			"exit_points": {
+				"ahwahnee_lobby": {
+					"at": [
+						1528,
+						480
+					],
+					"label": "Lobby"
+				}
+			},
+			"exits": [
+				"ahwahnee_lobby"
+			],
+			"hub": "yosemite_valley",
+			"id": "ahwahnee_dining_room",
+			"indoors": true,
+			"lonlat": [
+				-119.5745,
+				37.7465
+			],
+			"name": "The Ahwahnee: Dining Room"
+		},
+		{
+			"exit_points": {
+				"ahwahnee_lobby": {
+					"at": [
+						8,
+						480
+					],
+					"label": "Lobby"
+				},
+				"ahwahnee_solarium": {
+					"at": [
+						704,
+						232
+					],
+					"label": "Solarium"
+				}
+			},
+			"exits": [
+				"ahwahnee_lobby",
+				"ahwahnee_solarium"
+			],
+			"hub": "yosemite_valley",
+			"id": "ahwahnee_great_lounge",
+			"indoors": true,
+			"lonlat": [
+				-119.5745,
+				37.7465
+			],
+			"name": "The Ahwahnee: Great Lounge"
+		},
+		{
+			"exit_points": {
+				"ahwahnee_mural_room": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Elevator"
+				}
+			},
+			"exits": [
+				"ahwahnee_mural_room"
+			],
+			"hub": "yosemite_valley",
+			"id": "ahwahnee_guest_room",
+			"indoors": true,
+			"lonlat": [
+				-119.5745,
+				37.7465
+			],
+			"name": "The Ahwahnee: Guest Room"
+		},
+		{
+			"exit_points": {
+				"ahwahnee_dining_room": {
+					"at": [
+						8,
+						384
+					],
+					"label": "Dining Room"
+				},
+				"ahwahnee_great_lounge": {
+					"at": [
+						952,
+						384
+					],
+					"label": "Great Lounge"
+				},
+				"ahwahnee_mural_room": {
+					"at": [
+						480,
+						168
+					],
+					"label": "Elevator Lobby"
+				},
+				"the_ahwahnee": {
+					"at": [
+						480,
+						536
+					],
+					"label": "The Ahwahnee grounds"
+				}
+			},
+			"exits": [
+				"ahwahnee_dining_room",
+				"ahwahnee_great_lounge",
+				"ahwahnee_mural_room",
+				"the_ahwahnee"
+			],
+			"hub": "yosemite_valley",
+			"id": "ahwahnee_lobby",
+			"indoors": true,
+			"lonlat": [
+				-119.5745,
+				37.7465
+			],
+			"name": "The Ahwahnee: Lobby"
+		},
+		{
+			"exit_points": {
+				"the_ahwahnee": {
+					"at": [
+						2048,
+						512
+					],
+					"label": "The Ahwahnee"
+				},
+				"yosemite_village": {
+					"at": [
+						0,
+						512
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"the_ahwahnee",
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "ahwahnee_meadow",
+			"indoors": false,
+			"lonlat": [
+				-119.579,
+				37.747
+			],
+			"name": "Ahwahnee Meadow"
+		},
+		{
+			"exit_points": {
+				"ahwahnee_guest_room": {
+					"at": [
+						480,
+						168
+					],
+					"label": "Elevator to the guest floors"
+				},
+				"ahwahnee_lobby": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Lobby"
+				}
+			},
+			"exits": [
+				"ahwahnee_guest_room",
+				"ahwahnee_lobby"
+			],
+			"hub": "yosemite_valley",
+			"id": "ahwahnee_mural_room",
+			"indoors": true,
+			"lonlat": [
+				-119.5745,
+				37.7465
+			],
+			"name": "The Ahwahnee: Elevator Lobby"
+		},
+		{
+			"exit_points": {
+				"ahwahnee_great_lounge": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Great Lounge"
+				}
+			},
+			"exits": [
+				"ahwahnee_great_lounge"
+			],
+			"hub": "yosemite_valley",
+			"id": "ahwahnee_solarium",
+			"indoors": true,
+			"lonlat": [
+				-119.5745,
+				37.7465
+			],
+			"name": "The Ahwahnee: Solarium"
+		},
+		{
+			"exit_points": {
+				"lamon_homestead": {
+					"at": [
+						448,
+						2688
+					],
+					"label": "Lamon Homestead"
+				},
+				"the_ahwahnee": {
+					"at": [
+						2048,
+						16
+					],
+					"label": "The Ahwahnee"
+				}
+			},
+			"exits": [
+				"lamon_homestead",
+				"the_ahwahnee"
+			],
+			"hub": "yosemite_valley",
+			"id": "ahwahnee_trail",
+			"indoors": false,
+			"lonlat": [
+				-119.576,
+				37.744
+			],
+			"name": "Stoneman Meadow"
+		},
+		{
+			"exit_points": {
+				"wawona": {
+					"at": [
+						352,
+						408
+					],
+					"label": "Wawona"
+				}
+			},
+			"exits": [
+				"wawona"
+			],
+			"hub": "wawona",
+			"id": "artist_studio",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Artist's Studio"
+		},
+		{
+			"exit_points": {
+				"yosemite_village": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "bests_studio",
+			"indoors": true,
+			"lonlat": [
+				-119.5873,
+				37.7475
+			],
+			"name": "Best's Studio"
+		},
+		{
+			"exit_points": {
+				"crane_flat": {
+					"at": [
+						1376,
+						0
+					],
+					"label": "Big Oak Flat Road"
+				},
+				"el_capitan_meadow": {
+					"at": [
+						2048,
+						704
+					],
+					"label": "Northside Drive, back into the Valley"
+				}
+			},
+			"exits": [
+				"crane_flat",
+				"el_capitan_meadow"
+			],
+			"hub": "yosemite_valley",
+			"id": "big_oak_flat_junction",
+			"indoors": false,
+			"lonlat": [
+				-119.669,
+				37.7213
+			],
+			"name": "Big Oak Flat Road Junction"
+		},
+		{
+			"exit_points": {
+				"wawona": {
+					"at": [
+						384,
+						440
+					],
+					"label": "Wawona"
+				}
+			},
+			"exits": [
+				"wawona"
+			],
+			"hub": "wawona",
+			"id": "blacksmith_shop",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Blacksmith's Shop"
+		},
+		{
+			"exit_points": {
+				"four_mile_trailhead": {
+					"at": [
+						2048,
+						704
+					],
+					"label": "Southside Drive east"
+				},
+				"tunnel_view": {
+					"at": [
+						0,
+						704
+					],
+					"label": "Wawona Road, up to Tunnel View"
+				}
+			},
+			"exits": [
+				"four_mile_trailhead",
+				"tunnel_view"
+			],
+			"hub": "yosemite_valley",
+			"id": "bridalveil_fall",
+			"indoors": false,
+			"lonlat": [
+				-119.649,
+				37.717
+			],
+			"name": "Bridalveil Fall"
+		},
+		{
+			"exit_points": {
+				"tenaya_lake": {
+					"at": [
+						1744,
+						1952
+					],
+					"label": "John Muir Trail, south over Cathedral Pass to Tenaya Lake"
+				},
+				"tuolumne_meadows": {
+					"at": [
+						976,
+						192
+					],
+					"label": "John Muir Trail, north down to Tuolumne Meadows"
+				}
+			},
+			"exits": [
+				"tenaya_lake",
+				"tuolumne_meadows"
+			],
+			"hub": "tuolumne_meadows",
+			"id": "cathedral_lakes",
+			"indoors": false,
+			"lonlat": [
+				-119.419,
+				37.84
+			],
+			"name": "Cathedral Lakes"
+		},
+		{
+			"exit_points": {
+				"wawona": {
+					"at": [
+						416,
+						472
+					],
+					"label": "Wawona"
+				}
+			},
+			"exits": [
+				"wawona"
+			],
+			"hub": "wawona",
+			"id": "clark_cottage",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Clark Cottage"
+		},
+		{
+			"exit_points": {
+				"big_oak_flat_junction": {
+					"at": [
+						1056,
+						1152
+					],
+					"label": "Big Oak Flat Road"
+				},
+				"hetch_hetchy": {
+					"at": [
+						944,
+						704
+					],
+					"label": "Hetch Hetchy Road, northwest to O'Shaughnessy Dam and Wapama Falls"
+				},
+				"tenaya_lake": {
+					"at": [
+						2048,
+						672
+					],
+					"label": "Tioga Road"
+				}
+			},
+			"exits": [
+				"big_oak_flat_junction",
+				"hetch_hetchy",
+				"tenaya_lake"
+			],
+			"hub": "yosemite_valley",
+			"id": "crane_flat",
+			"indoors": false,
+			"lonlat": [
+				-119.7987,
+				37.7536
+			],
+			"name": "Crane Flat"
+		},
+		{
+			"exit_points": {
+				"mirror_lake": {
+					"at": [
+						0,
+						832
+					],
+					"label": "Back down to Mirror Lake"
+				}
+			},
+			"exits": [
+				"mirror_lake"
+			],
+			"hub": "yosemite_valley",
+			"id": "crows_camp",
+			"indoors": false,
+			"lonlat": [
+				-119.542,
+				37.748
+			],
+			"name": "Crow's Camp"
+		},
+		{
+			"exit_points": {
+				"curry_village": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Curry Village"
+				}
+			},
+			"exits": [
+				"curry_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "curry_mountain_shop",
+			"indoors": true,
+			"lonlat": [
+				-119.5728,
+				37.7385
+			],
+			"name": "Mountain Shop"
+		},
+		{
+			"exit_points": {
+				"curry_village": {
+					"at": [
+						576,
+						568
+					],
+					"label": "Curry Village"
+				}
+			},
+			"exits": [
+				"curry_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "curry_pavilion",
+			"indoors": true,
+			"lonlat": [
+				-119.5728,
+				37.7385
+			],
+			"name": "Pavilion"
+		},
+		{
+			"exit_points": {
+				"curry_village": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Curry Village"
+				}
+			},
+			"exits": [
+				"curry_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "curry_registration",
+			"indoors": true,
+			"lonlat": [
+				-119.5728,
+				37.7385
+			],
+			"name": "Registration Office"
+		},
+		{
+			"exit_points": {
+				"curry_village": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Curry Village"
+				}
+			},
+			"exits": [
+				"curry_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "curry_store",
+			"indoors": true,
+			"lonlat": [
+				-119.5728,
+				37.7385
+			],
+			"name": "Camp Curry Store"
+		},
+		{
+			"exit_points": {
+				"curry_mountain_shop": {
+					"at": [
+						2128,
+						1144
+					],
+					"label": "Mountain Shop"
+				},
+				"curry_pavilion": {
+					"at": [
+						1488,
+						1120
+					],
+					"label": "Pavilion"
+				},
+				"curry_registration": {
+					"at": [
+						1104,
+						1120
+					],
+					"label": "Registration Office"
+				},
+				"curry_store": {
+					"at": [
+						1808,
+						1144
+					],
+					"label": "Camp Curry Store"
+				},
+				"glacier_point": {
+					"at": [
+						1904,
+						352
+					],
+					"label": "Ledge Trail, up to Glacier Point"
+				},
+				"housekeeping_camp": {
+					"at": [
+						16,
+						1648
+					],
+					"label": "Southside Drive west"
+				},
+				"lamon_homestead": {
+					"at": [
+						3184,
+						1232
+					],
+					"label": "Lamon Homestead"
+				},
+				"upper_pines": {
+					"at": [
+						3184,
+						1648
+					],
+					"label": "Southside Drive east"
+				}
+			},
+			"exits": [
+				"curry_mountain_shop",
+				"curry_pavilion",
+				"curry_registration",
+				"curry_store",
+				"glacier_point",
+				"housekeeping_camp",
+				"lamon_homestead",
+				"upper_pines"
+			],
+			"hub": "yosemite_valley",
+			"id": "curry_village",
+			"indoors": false,
+			"lonlat": [
+				-119.5728,
+				37.7385
+			],
+			"name": "Curry Village"
+		},
+		{
+			"exit_points": {
+				"yosemite_village": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "degnans",
+			"indoors": true,
+			"lonlat": [
+				-119.5873,
+				37.7475
+			],
+			"name": "Degnan's"
+		},
+		{
+			"exit_points": {
+				"big_oak_flat_junction": {
+					"at": [
+						0,
+						704
+					],
+					"label": "Northside Drive west, to the Big Oak Flat Road junction"
+				},
+				"bridalveil_fall": {
+					"at": [
+						2336,
+						1472
+					],
+					"label": "El Capitan Bridge, to Southside Drive"
+				},
+				"leidig_meadow": {
+					"at": [
+						2560,
+						704
+					],
+					"label": "Northside Drive east"
+				}
+			},
+			"exits": [
+				"big_oak_flat_junction",
+				"bridalveil_fall",
+				"leidig_meadow"
+			],
+			"hub": "yosemite_valley",
+			"id": "el_capitan_meadow",
+			"indoors": false,
+			"lonlat": [
+				-119.637,
+				37.723
+			],
+			"name": "El Capitan Meadow"
+		},
+		{
+			"exit_points": {
+				"el_portal_market": {
+					"at": [
+						1680,
+						704
+					],
+					"label": "El Portal Market"
+				},
+				"el_portal_post_office": {
+					"at": [
+						2032,
+						704
+					],
+					"label": "El Portal Post Office"
+				},
+				"yosemite_view_lodge": {
+					"at": [
+						368,
+						1056
+					],
+					"label": "Yosemite View Lodge"
+				}
+			},
+			"exits": [
+				"el_portal_market",
+				"el_portal_post_office",
+				"yosemite_view_lodge"
+			],
+			"hub": "el_portal",
+			"id": "el_portal",
+			"indoors": false,
+			"lonlat": [
+				-119.7843,
+				37.6747
+			],
+			"name": "El Portal"
+		},
+		{
+			"exit_points": {
+				"el_portal": {
+					"at": [
+						480,
+						536
+					],
+					"label": "El Portal"
+				}
+			},
+			"exits": [
+				"el_portal"
+			],
+			"hub": "el_portal",
+			"id": "el_portal_market",
+			"indoors": true,
+			"lonlat": [
+				-119.7843,
+				37.6747
+			],
+			"name": "El Portal Market"
+		},
+		{
+			"exit_points": {
+				"el_portal": {
+					"at": [
+						384,
+						440
+					],
+					"label": "El Portal"
+				}
+			},
+			"exits": [
+				"el_portal"
+			],
+			"hub": "el_portal",
+			"id": "el_portal_post_office",
+			"indoors": true,
+			"lonlat": [
+				-119.7843,
+				37.6747
+			],
+			"name": "El Portal Post Office"
+		},
+		{
+			"exit_points": {
+				"bridalveil_fall": {
+					"at": [
+						0,
+						736
+					],
+					"label": "Bridalveil Fall"
+				},
+				"glacier_point": {
+					"at": [
+						1040,
+						320
+					],
+					"label": "Four Mile Trail, up to Glacier Point"
+				},
+				"yosemite_village": {
+					"at": [
+						2048,
+						736
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"bridalveil_fall",
+				"glacier_point",
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "four_mile_trailhead",
+			"indoors": false,
+			"lonlat": [
+				-119.603,
+				37.733
+			],
+			"name": "Four Mile Trailhead"
+		},
+		{
+			"exit_points": {
+				"glacier_point": {
+					"at": [
+						384,
+						440
+					],
+					"label": "Glacier Point"
+				}
+			},
+			"exits": [
+				"glacier_point"
+			],
+			"hub": "glacier_point",
+			"id": "geology_hut",
+			"indoors": true,
+			"lonlat": [
+				-119.5738,
+				37.7306
+			],
+			"name": "Geology Hut"
+		},
+		{
+			"exit_points": {
+				"curry_village": {
+					"at": [
+						2352,
+						864
+					],
+					"label": "Ledge Trail, down to Curry Village"
+				},
+				"four_mile_trailhead": {
+					"at": [
+						112,
+						640
+					],
+					"label": "Four Mile Trail, down to the Valley"
+				},
+				"geology_hut": {
+					"at": [
+						2256,
+						608
+					],
+					"label": "Geology Hut"
+				},
+				"glacier_snack_stand": {
+					"at": [
+						1616,
+						1184
+					],
+					"label": "Glacier Point Gifts & Snacks"
+				},
+				"happy_isles": {
+					"at": [
+						2672,
+						1376
+					],
+					"label": "Panorama Trail, down to Happy Isles"
+				},
+				"taft_point": {
+					"at": [
+						1280,
+						2128
+					],
+					"label": "Pohono Trail, west to Taft Point and The Fissures"
+				}
+			},
+			"exits": [
+				"curry_village",
+				"four_mile_trailhead",
+				"geology_hut",
+				"glacier_snack_stand",
+				"happy_isles",
+				"taft_point"
+			],
+			"hub": "glacier_point",
+			"id": "glacier_point",
+			"indoors": false,
+			"lonlat": [
+				-119.5738,
+				37.7306
+			],
+			"name": "Glacier Point"
+		},
+		{
+			"exit_points": {
+				"glacier_point": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Glacier Point"
+				}
+			},
+			"exits": [
+				"glacier_point"
+			],
+			"hub": "glacier_point",
+			"id": "glacier_snack_stand",
+			"indoors": true,
+			"lonlat": [
+				-119.5738,
+				37.7306
+			],
+			"name": "Glacier Point Gifts & Snacks"
+		},
+		{
+			"exit_points": {
+				"wawona": {
+					"at": [
+						384,
+						440
+					],
+					"label": "Wawona"
+				}
+			},
+			"exits": [
+				"wawona"
+			],
+			"hub": "wawona",
+			"id": "grove_museum",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Mariposa Grove Museum"
+		},
+		{
+			"exit_points": {
+				"lamon_homestead": {
+					"at": [
+						256,
+						376
+					],
+					"label": "Lamon Homestead"
+				}
+			},
+			"exits": [
+				"lamon_homestead"
+			],
+			"hub": "yosemite_valley",
+			"id": "guardian_cabin",
+			"indoors": true,
+			"lonlat": [
+				-119.5676,
+				37.7356
+			],
+			"name": "Your cabin"
+		},
+		{
+			"exit_points": {
+				"the_ahwahnee": {
+					"at": [
+						480,
+						536
+					],
+					"label": "The Ahwahnee"
+				}
+			},
+			"exits": [
+				"the_ahwahnee"
+			],
+			"hub": "yosemite_valley",
+			"id": "guardian_cave",
+			"indoors": true,
+			"lonlat": [
+				-119.5712,
+				37.7482
+			],
+			"name": "The Gap in the Talus"
+		},
+		{
+			"exit_points": {
+				"half_dome": {
+					"at": [
+						912,
+						1240
+					],
+					"label": "the cables"
+				},
+				"little_yosemite_valley": {
+					"at": [
+						1072,
+						1984
+					],
+					"label": "Half Dome Trail, down to Little Yosemite Valley"
+				}
+			},
+			"exits": [
+				"half_dome",
+				"little_yosemite_valley"
+			],
+			"hub": "yosemite_valley",
+			"id": "half_dome",
+			"indoors": false,
+			"lonlat": [
+				-119.5332,
+				37.7459
+			],
+			"name": "Half Dome"
+		},
+		{
+			"exit_points": {
+				"glacier_point": {
+					"at": [
+						1808,
+						448
+					],
+					"label": "Mist Trail and Panorama Trail, up to Glacier Point"
+				},
+				"little_yosemite_valley": {
+					"at": [
+						1360,
+						464
+					],
+					"label": "Mist Trail, up past Vernal and Nevada Falls to Little Yosemite Valley"
+				},
+				"tenaya_creek": {
+					"at": [
+						2304,
+						1248
+					],
+					"label": "Tenaya Creek, to Mirror Lake"
+				},
+				"upper_pines": {
+					"at": [
+						0,
+						1248
+					],
+					"label": "Upper Pines and Curry Village"
+				}
+			},
+			"exits": [
+				"glacier_point",
+				"little_yosemite_valley",
+				"tenaya_creek",
+				"upper_pines"
+			],
+			"hub": "yosemite_valley",
+			"id": "happy_isles",
+			"indoors": false,
+			"lonlat": [
+				-119.5585,
+				37.7325
+			],
+			"name": "Happy Isles"
+		},
+		{
+			"exit_points": {
+				"crane_flat": {
+					"at": [
+						336,
+						864
+					],
+					"label": "Hetch Hetchy Road, back to Crane Flat"
+				}
+			},
+			"exits": [
+				"crane_flat"
+			],
+			"hub": "yosemite_valley",
+			"id": "hetch_hetchy",
+			"indoors": false,
+			"lonlat": [
+				-119.788,
+				37.9478
+			],
+			"name": "Hetch Hetchy"
+		},
+		{
+			"exit_points": {
+				"wawona": {
+					"at": [
+						416,
+						472
+					],
+					"label": "Wawona"
+				}
+			},
+			"exits": [
+				"wawona"
+			],
+			"hub": "wawona",
+			"id": "hill_studio",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Thomas Hill's Studio"
+		},
+		{
+			"exit_points": {
+				"wawona": {
+					"at": [
+						352,
+						408
+					],
+					"label": "Wawona"
+				}
+			},
+			"exits": [
+				"wawona"
+			],
+			"hub": "wawona",
+			"id": "hodgdon_cabin",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Hodgdon Homestead Cabin"
+		},
+		{
+			"exit_points": {
+				"curry_village": {
+					"at": [
+						2048,
+						480
+					],
+					"label": "Curry Village"
+				},
+				"yosemite_village": {
+					"at": [
+						0,
+						480
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"curry_village",
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "housekeeping_camp",
+			"indoors": false,
+			"lonlat": [
+				-119.58,
+				37.742
+			],
+			"name": "Housekeeping Camp"
+		},
+		{
+			"exit_points": {
+				"ahwahnee_trail": {
+					"at": [
+						320,
+						12
+					],
+					"label": "The Ahwahnee"
+				},
+				"curry_village": {
+					"at": [
+						16,
+						368
+					],
+					"label": "Curry Village"
+				},
+				"guardian_cabin": {
+					"at": [
+						752,
+						292
+					],
+					"label": "Your cabin"
+				}
+			},
+			"exits": [
+				"ahwahnee_trail",
+				"curry_village",
+				"guardian_cabin"
+			],
+			"hub": "yosemite_valley",
+			"id": "lamon_homestead",
+			"indoors": false,
+			"lonlat": [
+				-119.5676,
+				37.7356
+			],
+			"name": "Lamon Homestead"
+		},
+		{
+			"exit_points": {
+				"el_capitan_meadow": {
+					"at": [
+						0,
+						480
+					],
+					"label": "El Capitan Meadow"
+				},
+				"yosemite_village": {
+					"at": [
+						2048,
+						480
+					],
+					"label": "Yosemite Village and Camp 4"
+				}
+			},
+			"exits": [
+				"el_capitan_meadow",
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "leidig_meadow",
+			"indoors": false,
+			"lonlat": [
+				-119.6,
+				37.741
+			],
+			"name": "Leidig Meadow"
+		},
+		{
+			"exit_points": {
+				"half_dome": {
+					"at": [
+						1840,
+						352
+					],
+					"label": "Half Dome Trail, up through the forest to Sub Dome"
+				},
+				"happy_isles": {
+					"at": [
+						144,
+						864
+					],
+					"label": "Mist Trail, down past Nevada and Vernal Falls to Happy Isles"
+				},
+				"tenaya_lake": {
+					"at": [
+						1856,
+						416
+					],
+					"label": "Sunrise Trail, over Clouds Rest shoulder to Tenaya Lake"
+				}
+			},
+			"exits": [
+				"half_dome",
+				"happy_isles",
+				"tenaya_lake"
+			],
+			"hub": "yosemite_valley",
+			"id": "little_yosemite_valley",
+			"indoors": false,
+			"lonlat": [
+				-119.5135,
+				37.7317
+			],
+			"name": "Little Yosemite Valley"
+		},
+		{
+			"exit_points": {
+				"tuolumne_meadows": {
+					"at": [
+						352,
+						408
+					],
+					"label": "Tuolumne Meadows"
+				}
+			},
+			"exits": [
+				"tuolumne_meadows"
+			],
+			"hub": "tuolumne_meadows",
+			"id": "mccauley_cabin",
+			"indoors": true,
+			"lonlat": [
+				-119.3597,
+				37.8736
+			],
+			"name": "McCauley Cabin"
+		},
+		{
+			"exit_points": {
+				"crows_camp": {
+					"at": [
+						2304,
+						832
+					],
+					"label": "A faint path up Tenaya Creek"
+				},
+				"tenaya_creek": {
+					"at": [
+						0,
+						1216
+					],
+					"label": "Tenaya Creek, to Happy Isles"
+				}
+			},
+			"exits": [
+				"crows_camp",
+				"tenaya_creek"
+			],
+			"hub": "yosemite_valley",
+			"id": "mirror_lake",
+			"indoors": false,
+			"lonlat": [
+				-119.548,
+				37.746
+			],
+			"name": "Mirror Lake"
+		},
+		{
+			"exit_points": {
+				"tuolumne_meadows": {
+					"at": [
+						448,
+						472
+					],
+					"label": "Tuolumne Meadows"
+				}
+			},
+			"exits": [
+				"tuolumne_meadows"
+			],
+			"hub": "tuolumne_meadows",
+			"id": "parsons_lodge",
+			"indoors": true,
+			"lonlat": [
+				-119.3597,
+				37.8736
+			],
+			"name": "Parsons Memorial Lodge"
+		},
+		{
+			"exit_points": {
+				"glacier_point": {
+					"at": [
+						2928,
+						1056
+					],
+					"label": "Pohono Trail, east to Sentinel Dome and Glacier Point"
+				},
+				"tunnel_view": {
+					"at": [
+						176,
+						1120
+					],
+					"label": "Pohono Trail, down along the south rim to Tunnel View"
+				}
+			},
+			"exits": [
+				"glacier_point",
+				"tunnel_view"
+			],
+			"hub": "glacier_point",
+			"id": "taft_point",
+			"indoors": false,
+			"lonlat": [
+				-119.6042,
+				37.713
+			],
+			"name": "Taft Point"
+		},
+		{
+			"exit_points": {
+				"happy_isles": {
+					"at": [
+						0,
+						736
+					],
+					"label": "Happy Isles"
+				},
+				"mirror_lake": {
+					"at": [
+						2048,
+						704
+					],
+					"label": "Mirror Lake"
+				}
+			},
+			"exits": [
+				"happy_isles",
+				"mirror_lake"
+			],
+			"hub": "yosemite_valley",
+			"id": "tenaya_creek",
+			"indoors": false,
+			"lonlat": [
+				-119.558,
+				37.74
+			],
+			"name": "Tenaya Creek"
+		},
+		{
+			"exit_points": {
+				"cathedral_lakes": {
+					"at": [
+						1136,
+						1120
+					],
+					"label": "John Muir Trail, north over Cathedral Pass to Cathedral Lakes"
+				},
+				"crane_flat": {
+					"at": [
+						0,
+						1152
+					],
+					"label": "Tioga Road"
+				},
+				"little_yosemite_valley": {
+					"at": [
+						1040,
+						1072
+					],
+					"label": "Sunrise Trail, down to Little Yosemite Valley"
+				},
+				"tuolumne_meadows": {
+					"at": [
+						3200,
+						1216
+					],
+					"label": "Tioga Road, to Tuolumne Meadows"
+				}
+			},
+			"exits": [
+				"cathedral_lakes",
+				"crane_flat",
+				"little_yosemite_valley",
+				"tuolumne_meadows"
+			],
+			"hub": "tuolumne_meadows",
+			"id": "tenaya_lake",
+			"indoors": false,
+			"lonlat": [
+				-119.456,
+				37.8325
+			],
+			"name": "Tenaya Lake"
+		},
+		{
+			"exit_points": {
+				"ahwahnee_lobby": {
+					"at": [
+						1584,
+						1104
+					],
+					"label": "The Ahwahnee"
+				},
+				"ahwahnee_meadow": {
+					"at": [
+						16,
+						1872
+					],
+					"label": "Northside Drive"
+				},
+				"ahwahnee_trail": {
+					"at": [
+						1600,
+						2048
+					],
+					"label": "Stoneman Bridge"
+				},
+				"guardian_cave": {
+					"at": [
+						2256,
+						456
+					],
+					"label": "the gap in the talus"
+				}
+			},
+			"exits": [
+				"ahwahnee_lobby",
+				"ahwahnee_meadow",
+				"ahwahnee_trail",
+				"guardian_cave"
+			],
+			"hub": "yosemite_valley",
+			"id": "the_ahwahnee",
+			"indoors": false,
+			"lonlat": [
+				-119.5745,
+				37.7465
+			],
+			"name": "The Ahwahnee"
+		},
+		{
+			"exit_points": {
+				"bridalveil_fall": {
+					"at": [
+						2048,
+						1056
+					],
+					"label": "Wawona Road, down to the Valley"
+				},
+				"taft_point": {
+					"at": [
+						1008,
+						880
+					],
+					"label": "Pohono Trail, up to Crocker Point and Taft Point"
+				}
+			},
+			"exits": [
+				"bridalveil_fall",
+				"taft_point"
+			],
+			"hub": "yosemite_valley",
+			"id": "tunnel_view",
+			"indoors": false,
+			"lonlat": [
+				-119.6772,
+				37.7156
+			],
+			"name": "Tunnel View"
+		},
+		{
+			"exit_points": {
+				"tuolumne_meadows": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Tuolumne Meadows"
+				}
+			},
+			"exits": [
+				"tuolumne_meadows"
+			],
+			"hub": "tuolumne_meadows",
+			"id": "tuolumne_lodge",
+			"indoors": true,
+			"lonlat": [
+				-119.3597,
+				37.8736
+			],
+			"name": "Tuolumne Meadows Lodge"
+		},
+		{
+			"exit_points": {
+				"cathedral_lakes": {
+					"at": [
+						1072,
+						1616
+					],
+					"label": "Cathedral Lakes Trail, up to Lower and Upper Cathedral Lake"
+				},
+				"mccauley_cabin": {
+					"at": [
+						2352,
+						448
+					],
+					"label": "McCauley Cabin"
+				},
+				"parsons_lodge": {
+					"at": [
+						1936,
+						480
+					],
+					"label": "Parsons Memorial Lodge"
+				},
+				"tenaya_lake": {
+					"at": [
+						16,
+						1504
+					],
+					"label": "Tioga Road, to Tenaya Lake"
+				},
+				"tuolumne_lodge": {
+					"at": [
+						4144,
+						1728
+					],
+					"label": "Tuolumne Meadows Lodge"
+				},
+				"tuolumne_store": {
+					"at": [
+						2768,
+						1664
+					],
+					"label": "Tuolumne Meadows Store & Grill"
+				},
+				"tuolumne_visitor_center": {
+					"at": [
+						1552,
+						1696
+					],
+					"label": "Tuolumne Meadows Visitor Center"
+				}
+			},
+			"exits": [
+				"cathedral_lakes",
+				"mccauley_cabin",
+				"parsons_lodge",
+				"tenaya_lake",
+				"tuolumne_lodge",
+				"tuolumne_store",
+				"tuolumne_visitor_center"
+			],
+			"hub": "tuolumne_meadows",
+			"id": "tuolumne_meadows",
+			"indoors": false,
+			"lonlat": [
+				-119.3597,
+				37.8736
+			],
+			"name": "Tuolumne Meadows"
+		},
+		{
+			"exit_points": {
+				"tuolumne_meadows": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Tuolumne Meadows"
+				}
+			},
+			"exits": [
+				"tuolumne_meadows"
+			],
+			"hub": "tuolumne_meadows",
+			"id": "tuolumne_store",
+			"indoors": true,
+			"lonlat": [
+				-119.3597,
+				37.8736
+			],
+			"name": "Tuolumne Meadows Store & Grill"
+		},
+		{
+			"exit_points": {
+				"tuolumne_meadows": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Tuolumne Meadows"
+				}
+			},
+			"exits": [
+				"tuolumne_meadows"
+			],
+			"hub": "tuolumne_meadows",
+			"id": "tuolumne_visitor_center",
+			"indoors": true,
+			"lonlat": [
+				-119.3597,
+				37.8736
+			],
+			"name": "Tuolumne Meadows Visitor Center"
+		},
+		{
+			"exit_points": {
+				"curry_village": {
+					"at": [
+						0,
+						896
+					],
+					"label": "Curry Village"
+				},
+				"happy_isles": {
+					"at": [
+						2048,
+						896
+					],
+					"label": "Happy Isles"
+				}
+			},
+			"exits": [
+				"curry_village",
+				"happy_isles"
+			],
+			"hub": "yosemite_valley",
+			"id": "upper_pines",
+			"indoors": false,
+			"lonlat": [
+				-119.565,
+				37.735
+			],
+			"name": "Upper Pines"
+		},
+		{
+			"exit_points": {
+				"yosemite_village": {
+					"at": [
+						512,
+						536
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "valley_lodge_lobby",
+			"indoors": true,
+			"lonlat": [
+				-119.5873,
+				37.7475
+			],
+			"name": "Yosemite Valley Lodge"
+		},
+		{
+			"exit_points": {
+				"yosemite_village": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "valley_post_office",
+			"indoors": true,
+			"lonlat": [
+				-119.5873,
+				37.7475
+			],
+			"name": "Yosemite Valley Post Office"
+		},
+		{
+			"exit_points": {
+				"yosemite_village": {
+					"at": [
+						576,
+						568
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "village_store_inside",
+			"indoors": true,
+			"lonlat": [
+				-119.5873,
+				37.7475
+			],
+			"name": "Village Store"
+		},
+		{
+			"exit_points": {
+				"wawona": {
+					"at": [
+						448,
+						472
+					],
+					"label": "Wawona"
+				}
+			},
+			"exits": [
+				"wawona"
+			],
+			"hub": "wawona",
+			"id": "washburn_cottage",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Washburn Cottage"
+		},
+		{
+			"exit_points": {
+				"artist_studio": {
+					"at": [
+						2624,
+						288
+					],
+					"label": "Artist's Studio"
+				},
+				"blacksmith_shop": {
+					"at": [
+						2560,
+						608
+					],
+					"label": "Blacksmith's Shop"
+				},
+				"clark_cottage": {
+					"at": [
+						944,
+						1696
+					],
+					"label": "Clark Cottage"
+				},
+				"grove_museum": {
+					"at": [
+						3792,
+						2144
+					],
+					"label": "Mariposa Grove Museum"
+				},
+				"hill_studio": {
+					"at": [
+						224,
+						1152
+					],
+					"label": "Thomas Hill's Studio"
+				},
+				"hodgdon_cabin": {
+					"at": [
+						2240,
+						288
+					],
+					"label": "Hodgdon Homestead Cabin"
+				},
+				"washburn_cottage": {
+					"at": [
+						432,
+						1696
+					],
+					"label": "Washburn Cottage"
+				},
+				"wawona_hotel_lobby": {
+					"at": [
+						720,
+						1152
+					],
+					"label": "Wawona Hotel"
+				},
+				"wawona_jail": {
+					"at": [
+						2736,
+						480
+					],
+					"label": "Jail"
+				},
+				"wawona_store": {
+					"at": [
+						1616,
+						544
+					],
+					"label": "Wawona Store"
+				},
+				"wells_fargo": {
+					"at": [
+						2432,
+						288
+					],
+					"label": "Wells Fargo Office"
+				}
+			},
+			"exits": [
+				"artist_studio",
+				"blacksmith_shop",
+				"clark_cottage",
+				"grove_museum",
+				"hill_studio",
+				"hodgdon_cabin",
+				"washburn_cottage",
+				"wawona_hotel_lobby",
+				"wawona_jail",
+				"wawona_store",
+				"wells_fargo"
+			],
+			"hub": "wawona",
+			"id": "wawona",
+			"indoors": false,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Wawona"
+		},
+		{
+			"exit_points": {
+				"wawona_hotel_lobby": {
+					"at": [
+						8,
+						416
+					],
+					"label": "Lobby"
+				}
+			},
+			"exits": [
+				"wawona_hotel_lobby"
+			],
+			"hub": "wawona",
+			"id": "wawona_hotel_dining",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Wawona Hotel: Dining Room"
+		},
+		{
+			"exit_points": {
+				"wawona": {
+					"at": [
+						512,
+						536
+					],
+					"label": "Wawona"
+				},
+				"wawona_hotel_dining": {
+					"at": [
+						1016,
+						416
+					],
+					"label": "Dining Room"
+				}
+			},
+			"exits": [
+				"wawona",
+				"wawona_hotel_dining"
+			],
+			"hub": "wawona",
+			"id": "wawona_hotel_lobby",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Wawona Hotel"
+		},
+		{
+			"exit_points": {
+				"wawona": {
+					"at": [
+						288,
+						376
+					],
+					"label": "Wawona"
+				}
+			},
+			"exits": [
+				"wawona"
+			],
+			"hub": "wawona",
+			"id": "wawona_jail",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Jail"
+		},
+		{
+			"exit_points": {
+				"wawona": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Wawona"
+				}
+			},
+			"exits": [
+				"wawona"
+			],
+			"hub": "wawona",
+			"id": "wawona_store",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Wawona Store"
+		},
+		{
+			"exit_points": {
+				"yosemite_village": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "welcome_center",
+			"indoors": true,
+			"lonlat": [
+				-119.5873,
+				37.7475
+			],
+			"name": "Valley Welcome Center"
+		},
+		{
+			"exit_points": {
+				"wawona": {
+					"at": [
+						352,
+						408
+					],
+					"label": "Wawona"
+				}
+			},
+			"exits": [
+				"wawona"
+			],
+			"hub": "wawona",
+			"id": "wells_fargo",
+			"indoors": true,
+			"lonlat": [
+				-119.6555,
+				37.5366
+			],
+			"name": "Wells Fargo Office"
+		},
+		{
+			"exit_points": {
+				"yosemite_village": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "wilderness_center",
+			"indoors": true,
+			"lonlat": [
+				-119.5873,
+				37.7475
+			],
+			"name": "Wilderness Center"
+		},
+		{
+			"exit_points": {
+				"yosemite_village": {
+					"at": [
+						480,
+						568
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "yosemite_chapel",
+			"indoors": true,
+			"lonlat": [
+				-119.5873,
+				37.7475
+			],
+			"name": "Yosemite Chapel"
+		},
+		{
+			"exit_points": {
+				"yosemite_village": {
+					"at": [
+						480,
+						536
+					],
+					"label": "Yosemite Village"
+				}
+			},
+			"exits": [
+				"yosemite_village"
+			],
+			"hub": "yosemite_valley",
+			"id": "yosemite_museum",
+			"indoors": true,
+			"lonlat": [
+				-119.5873,
+				37.7475
+			],
+			"name": "Yosemite Museum"
+		},
+		{
+			"exit_points": {
+				"el_portal": {
+					"at": [
+						480,
+						536
+					],
+					"label": "El Portal"
+				}
+			},
+			"exits": [
+				"el_portal"
+			],
+			"hub": "el_portal",
+			"id": "yosemite_view_lodge",
+			"indoors": true,
+			"lonlat": [
+				-119.7843,
+				37.6747
+			],
+			"name": "Yosemite View Lodge"
+		},
+		{
+			"exit_points": {
+				"ahwahnee_meadow": {
+					"at": [
+						3824,
+						1232
+					],
+					"label": "Northside Drive east"
+				},
+				"bests_studio": {
+					"at": [
+						2320,
+						704
+					],
+					"label": "Best's Studio"
+				},
+				"degnans": {
+					"at": [
+						2352,
+						1024
+					],
+					"label": "Degnan's"
+				},
+				"four_mile_trailhead": {
+					"at": [
+						16,
+						1936
+					],
+					"label": "Southside Drive west"
+				},
+				"housekeeping_camp": {
+					"at": [
+						3824,
+						1936
+					],
+					"label": "Southside Drive east"
+				},
+				"leidig_meadow": {
+					"at": [
+						16,
+						1232
+					],
+					"label": "Northside Drive west"
+				},
+				"valley_lodge_lobby": {
+					"at": [
+						1232,
+						1440
+					],
+					"label": "Yosemite Valley Lodge"
+				},
+				"valley_post_office": {
+					"at": [
+						2768,
+						704
+					],
+					"label": "Yosemite Valley Post Office"
+				},
+				"village_store_inside": {
+					"at": [
+						2896,
+						1056
+					],
+					"label": "Village Store"
+				},
+				"welcome_center": {
+					"at": [
+						1808,
+						704
+					],
+					"label": "Valley Welcome Center"
+				},
+				"wilderness_center": {
+					"at": [
+						2544,
+						704
+					],
+					"label": "Wilderness Center"
+				},
+				"yosemite_chapel": {
+					"at": [
+						2448,
+						1888
+					],
+					"label": "Yosemite Chapel"
+				},
+				"yosemite_museum": {
+					"at": [
+						2064,
+						704
+					],
+					"label": "Yosemite Museum"
+				}
+			},
+			"exits": [
+				"ahwahnee_meadow",
+				"bests_studio",
+				"degnans",
+				"four_mile_trailhead",
+				"housekeeping_camp",
+				"leidig_meadow",
+				"valley_lodge_lobby",
+				"valley_post_office",
+				"village_store_inside",
+				"welcome_center",
+				"wilderness_center",
+				"yosemite_chapel",
+				"yosemite_museum"
+			],
+			"hub": "yosemite_valley",
+			"id": "yosemite_village",
+			"indoors": false,
+			"lonlat": [
+				-119.5873,
+				37.7475
+			],
+			"name": "Yosemite Village"
+		}
+	]
+}

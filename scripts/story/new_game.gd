@@ -23,6 +23,7 @@ static func reset() -> void:
 	FieldLog.start_new_game()
 	Discoveries.start_new_game()
 	Finds.start_new_game()
+	MapFog.start_new_game()
 	WallBooty.start_new_game()
 	Festivals.start_new_game()
 	Stewardship.start_new_game()
