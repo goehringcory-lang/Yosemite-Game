@@ -4651,8 +4651,11 @@ shape = SubResource("RectangleShape2D_qpiwj")
 [node name="BigOakFlatRoadWest" type="Area2D" parent="Exits" unique_id=1096940523]
 position = Vector2(0, 736)
 script = ExtResource("46_dq7cb")
-label = "Big Oak Flat Road"
-message = "Big Oak Flat Road goes on west out of the park, past the Big Oak Flat Entrance to Groveland."
+label = "Evergreen Road and Hetch Hetchy Road"
+target_region = "hetch_hetchy"
+target_spawn = "arrival"
+minutes = 35
+miles = 16.0
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/BigOakFlatRoadWest" unique_id=1455606638]
 shape = SubResource("RectangleShape2D_5lsmx")

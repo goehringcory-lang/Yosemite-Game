@@ -158,7 +158,13 @@ func _place_trails_hetch() -> void:
 	# Road back out to Crane Flat (year-round, no winter closure).
 	_trail_door("HetchHetchyRoadBack", foot(10, 26),
 		"Hetch Hetchy Road, back to Crane Flat",
-		"crane_flat", "arrival", 35)
+		"crane_flat", "west", 35)
+	# The road itself, just below the lot: drive on out to Crane Flat
+	# (Crane Flat's road west comes in at "arrival").
+	var road := region_exit("HetchHetchyRoadOut", tile_pos(12, 28), Vector2(128, 12),
+		"Hetch Hetchy Road and Evergreen Road", "crane_flat", "west")
+	road.set("minutes", 35)
+	road.set("miles", 16.0)
 
 
 func _place_markers_hetch() -> void:
