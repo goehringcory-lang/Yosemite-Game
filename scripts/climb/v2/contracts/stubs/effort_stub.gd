@@ -19,8 +19,8 @@ func price(move: V2Move) -> void:
 	var h := session.wall.hold(move.hold_id)
 	var size := h.size if h else 0.5
 	var c := V2Cost.new()
-	c.pump = (0.02 + 0.05 * (1.0 - size) + 0.05 * move.strain - 0.02 * move.security) * session.mods.pump_mult
-	c.gas = 0.004 * session.mods.gas_mult
+	c.pump = (0.02 + 0.05 * (1.0 - size) + 0.05 * move.strain - 0.02 * move.security) * session.mods.pump_mult * move.crux_cost
+	c.gas = 0.004 * session.mods.gas_mult * move.crux_cost
 	c.minutes = 1
 	move.cost = c
 

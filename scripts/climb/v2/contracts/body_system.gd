@@ -63,6 +63,13 @@ func settle(pos: Vector2) -> void:
 	session.pose = p
 
 
+## Adds [param tags] to the pose (after settle: "aiders", "chimney"...).
+func tag_pose(tags: PackedStringArray) -> void:
+	for t in tags:
+		if not session.pose.tags.has(t):
+			session.pose.tags.append(t)
+
+
 ## What kind of rest the current pose gives ("" for none): jug, stance,
 ## kneebar, stem, jam, hang (on the rope) (query; effort decides how much it gives back).
 func rest_kind() -> StringName:

@@ -15,6 +15,7 @@ func id() -> StringName:
 
 func risk(move: V2Move) -> void:
 	move.risk = 1.0 if session.sys.effort.pumped_out() and not move.has_tag("rest") else 0.0
+	move.risk = clampf(move.risk + move.crux_risk, 0.0, 1.0)
 
 
 func resolve(fall: V2Fall) -> V2Fall:

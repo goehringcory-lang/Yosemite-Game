@@ -13,7 +13,8 @@ func id() -> StringName:
 	return &"effort"
 
 
-## Fills move.cost from the move's geometry. Pure.
+## Fills move.cost from the move's geometry, with pump and gas multiplied by
+## move.crux_cost. Pure.
 func price(move: V2Move) -> void:
 	move.cost = V2Cost.new()
 

@@ -13,7 +13,7 @@ extends RefCounted
 ## See scripts/climb/v2/CONTRACTS.md for how the v2 pieces fit together.
 
 ## Bumped when a contract changes in a way other threads must know about.
-const CONTRACT_VERSION := 1
+const CONTRACT_VERSION := 2
 
 ## Wall space is in metres: x to the right, y UP, (0, 0) at the pitch's lower
 ## belay. Views turn it into screen pixels with [method to_screen].

@@ -54,7 +54,7 @@ Every session field has one writer. Everyone else reads.
 | Field | Writer |
 |-------|--------|
 | `session.wall` (holds, cracks, zones, fixed pieces' placement) | wall (built once per pitch) |
-| `session.pose` | body (`commit`, `swap_hand`, `settle`, `use_hand`/`return_hand`) |
+| `session.pose` | body (`commit`, `swap_hand`, `settle`, `tag_pose`, `use_hand`/`return_hand`) |
 | `session.effort` | effort (`apply`, `rest`, `eat`) |
 | `session.rope`, `V2Piece.clipped/back_clipped/sling_m` | rope |
 | placed `V2Piece`s (`session.pieces`, their placement fields) | gear |
@@ -63,20 +63,24 @@ Every session field has one writer. Everyone else reads.
 | `session.minutes`, `session.result`, `session.pitch`, `session.phase` | director |
 | `session.mods` | director (from Gear, Settings, Perks, WallWeather) |
 | `session.notes[<system id>]` | that system (scratch state; kept in snapshots) |
-| `V2Move` fields | body (geometry), cruxes (`crux_id`, `in_sequence`, tags), effort (`cost`), falls (`risk`) |
+| `V2Move` fields | body (geometry), cruxes (`crux_id`, `in_sequence`, `crux_cost`, `crux_risk`, tags), effort (`cost`), falls (`risk`) |
 | `V2Fall` fields | rope (geometry: chain, slack, length), falls (outcome) |
 
 Mutators that cross systems are called only by the director: e.g. a fall is
 `rope.fall_geometry -> falls.resolve -> rope.remove(popped) -> body.settle ->
 director.spend(cost)`. A phase changes state through its own system or a
 director intent (`commit`, `spend`, `take_fall`, `rest`, `eat`, `use_hand`,
-`return_hand`, `go`, `next_pitch`).
+`return_hand`, `hang_at`, `count_aid`, `go`, `next_pitch`). A belay-time
+special (hauling) comes from `cruxes.belay_special()`: after the pitch is led
+the director opens the special phase with `{"kind", "belay": true}` and that
+phase goes on to the belay.
 
 ## The move pipeline
 
 `ClimbDirector.preview(hold_id, hip_shift)`:
 `body.preview -> cruxes.constrain -> effort.price -> falls.risk`.
-Previews run on every aim change and in bot searches, so they are **pure**: no
+Cruxes may set `move.crux_cost` (effort multiplies pump and gas by it) and
+`move.crux_risk` (falls adds it to the fall chance). Previews run on every aim change and in bot searches, so they are **pure**: no
 session changes, no random draws. `ClimbDirector.commit(move)` spends the
 cost, `body.commit`, `cruxes.committed`, then rolls `falls.falls_now` once.
 Random numbers come only from `session.rng_for(<system id>)`, drawn only in
@@ -89,7 +93,7 @@ Phases: `read -> climb <-> clip / place / fall / special -> belay -> (next
 pitch) ... -> result`. The director owns the table (`ClimbDirector.PHASES`)
 and passes input verbs to the current phase (`ClimbPhase.handle`). In the
 climb phase the director answers `rope`, `rack`, `rest`, `eat` and `cancel`
-itself (clip the nearest piece, open the rack at a crack, shake out, eat, a
+itself (clip the nearest piece, open the rack when `gear.can_rack()`, shake out, eat, a
 double cancel retreats) and passes the rest (`aim_*`, `commit`, `body`,
 `swap`) to body's climb phase.
 

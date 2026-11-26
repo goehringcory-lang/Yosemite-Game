@@ -16,6 +16,20 @@ func placeable() -> Array[V2Crack]:
 	return []
 
 
+## True if the rack verb has anything to do here: a crack in reach (the
+## default), or more (an old pin to tug-test, stuck booty to work free).
+## The director opens the place phase only when this is true. Pure.
+func can_rack() -> bool:
+	return not placeable().is_empty()
+
+
+## How [param piece] was placed, in the gear's own words, for the partner's
+## grading at the belay (falls reads it): e.g. {"grade": "bomber", "line":
+## "...", "why": "tipped"}. {} = no opinion (falls grades by quality). Pure.
+func grade_for(_piece: V2Piece) -> Dictionary:
+	return {}
+
+
 ## What you see offering rack item [param item_id] at [param at] in crack
 ## [param crack_id] (query): {fits: bool, lobes: "tipped"|"sweet"|"over"|"",
 ## seated: bool (nuts), note: String}. The pump it costs is priced by
