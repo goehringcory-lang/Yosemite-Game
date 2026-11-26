@@ -84,6 +84,10 @@ func _init() -> void:
 		_save("call_swift" + take, _call_swift(116 + i), RATE_FX, -16.0)
 		_save("call_coyote" + take, _call_coyote(118 + i), RATE_FX, -17.0)
 		_save("thunder" + take, _thunder(120 + i), RATE_BED, -7.0)
+		_save("call_nutcracker" + take, _call_nutcracker(160 + i), RATE_FX, -14.0)
+		_save("call_pika" + take, _call_pika(162 + i), RATE_FX, -16.0)
+		_save("call_canyon_wren" + take, _call_canyon_wren(164 + i), RATE_FX, -15.0)
+		_save("call_marmot" + take, _call_marmot(166 + i), RATE_FX, -15.0)
 	# Nailing a piton on an aid move (last, so the sounds above keep their
 	# random takes). The screen plays it higher as the pin seats.
 	_save("climb_pin", _pin(130), RATE_FX, -5.0)
@@ -1011,6 +1015,91 @@ func _call_coyote(seed_value: int) -> PackedFloat32Array:
 			var env := minf(t * 8.0, 1.0) * pow(1.0 - t, 1.2)
 			buf[s0 + i] += (sin(phase) + 0.25 * sin(phase * 2.0)) * env * 0.25
 	_distance(buf, RATE_FX, 2000.0)
+	return buf
+
+
+## A Clark's nutcracker: one to three grating, nasal "kraaa"s, rougher
+## than the jay's, from a whitebark pine up the slope.
+func _call_nutcracker(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(1.4, RATE_FX)
+	var f := _rng.randf_range(1300.0, 1600.0)
+	var at := 0.05
+	for k in _rng.randi_range(1, 3):
+		_add_voice(buf, RATE_FX, at, _rng.randf_range(0.32, 0.38), f * 1.1, f * 0.85, 0.33,
+			[[1.0, 0.8], [2.0, 1.0], [3.0, 0.9], [4.0, 0.6], [5.0, 0.4], [6.0, 0.25]], 95.0, 0.7, 0.14, 0.7)
+		at += _rng.randf_range(0.42, 0.52)
+	_distance(buf, RATE_FX, 3800.0)
+	return buf
+
+
+## An American pika in the talus: a short, high, nasal "eeenk", sometimes
+## twice, far off.
+func _call_pika(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(0.7, RATE_FX)
+	var f := _rng.randf_range(3000.0, 3600.0)
+	var at := 0.05
+	for k in _rng.randi_range(1, 2):
+		var dur := _rng.randf_range(0.13, 0.19)
+		_add_voice(buf, RATE_FX, at, dur, f * 1.08, f * 0.82, 0.3, [[1.0, 1.0], [2.0, 0.35]], 60.0, 0.25, 0.0, 0.7)
+		at += dur + _rng.randf_range(0.12, 0.2)
+	_distance(buf, RATE_FX, 3500.0)
+	return buf
+
+
+## A canyon wren's song: a cascade of clear whistles falling from high to
+## low, quickest in the middle, ending on a few lower buzzy notes, with
+## the canyon's echo behind it.
+func _call_canyon_wren(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(3.0, RATE_FX)
+	var notes := _rng.randi_range(8, 12)
+	var top := _rng.randf_range(3500.0, 3900.0)
+	var low := _rng.randf_range(1500.0, 1700.0)
+	var at := 0.05
+	for k in notes:
+		var t := float(k) / (notes - 1)
+		var f := top * pow(low / top, t)
+		# quick through the middle, slower at the ends
+		var gap := lerpf(0.12, 0.065, sin(PI * t))
+		_add_voice(buf, RATE_FX, at, gap * 0.85, f * 1.04, f * 0.93, 0.3, [[1.0, 1.0], [2.0, 0.08]], 0.0, 0.0, 0.0, 0.8)
+		at += gap * _rng.randf_range(0.95, 1.05)
+	at += 0.04
+	for k in _rng.randi_range(2, 3):
+		_add_voice(buf, RATE_FX, at, 0.11, low * 0.8, low * 0.7, 0.3, [[1.0, 1.0], [2.0, 0.5], [3.0, 0.3]], 70.0, 0.6)
+		at += 0.14
+	# the canyon answering: two soft, darker echoes
+	var dry := buf.duplicate()
+	var echo := _distance_copy(dry, 2600.0)
+	for e in 2:
+		var delay := int((0.24 + e * 0.22) * RATE_FX)
+		var gain := 0.32 * pow(0.5, e)
+		for i in buf.size() - delay:
+			buf[i + delay] += echo[i] * gain
+	_distance(buf, RATE_FX, 4500.0)
+	return buf
+
+
+func _distance_copy(buf: PackedFloat32Array, cutoff: float) -> PackedFloat32Array:
+	var out := buf.duplicate()
+	_distance(out, RATE_FX, cutoff)
+	return out
+
+
+## A yellow-bellied marmot's alarm: two to four sharp, short whistles
+## "chk!" with uneven gaps, across the talus.
+func _call_marmot(seed_value: int) -> PackedFloat32Array:
+	_rng.seed = seed_value
+	var buf := _buf(1.4, RATE_FX)
+	var f := _rng.randf_range(2200.0, 2800.0)
+	var at := 0.05
+	for k in _rng.randi_range(2, 4):
+		var dur := _rng.randf_range(0.08, 0.14)
+		_add_voice(buf, RATE_FX, at, dur, f * 1.12, f * 0.9, 0.32, [[1.0, 1.0], [2.0, 0.3]], 0.0, 0.0, 0.06, 0.5)
+		_add_click(buf, RATE_FX, at, 0.003, 0.15, 3000.0)
+		at += dur + _rng.randf_range(0.14, 0.4)
+	_distance(buf, RATE_FX, 4000.0)
 	return buf
 
 

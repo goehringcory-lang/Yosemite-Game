@@ -257,7 +257,8 @@ func count() -> int:
 ## and not the call you just did. Climbs wait out rain and snow.
 func eligible() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
-	var weather := Weather.today()
+	# the Valley's weather (the calls are mostly its walls), wherever you are
+	var weather := Weather.park_today()
 	var wet: bool = weather.rain > 0.0 or weather.snow > 0.0
 	var last: String = history[-1].id if not history.is_empty() else ""
 	for call: Dictionary in CALLS:
