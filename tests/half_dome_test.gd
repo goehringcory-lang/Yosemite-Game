@@ -249,7 +249,7 @@ func test_sleep_out(world: Node) -> void:
 func test_muir_quest() -> void:
 	_fresh()
 	check(QuestLog.get_quest(Backcountry.MUIR_QUEST) != null and RegisterPages.HISTORY.has(Backcountry.MUIR_QUEST), "Muir's Above the Clouds is a quest with a Register note")
-	QuestLog.completed.append_array(["muir_cathedral", "muir_glacier", "muir_soda_springs", "muir_cassiope"])
+	QuestLog.completed.append_array(["muir_cathedral", "muir_glacier", "muir_soda_springs", "muir_cassiope", "muir_valley_under_water"])
 	QuestLog.talk_to("john_muir")
 	check(not QuestLog.active.has(Backcountry.MUIR_QUEST), "Muir waits until you've been up Anderson's cables")
 	QuestLog.completed.append("anderson_cables")
@@ -277,7 +277,7 @@ func test_muir_quest() -> void:
 
 func test_cloud_sea(world: Node) -> void:
 	_fresh()
-	QuestLog.completed.append_array(["muir_cathedral", "muir_glacier", "muir_soda_springs", "muir_cassiope", "anderson_cables"])
+	QuestLog.completed.append_array(["muir_cathedral", "muir_glacier", "muir_soda_springs", "muir_cassiope", "muir_valley_under_water", "anderson_cables"])
 	var season := GameClock.season
 	GameClock.season = GameClock.Season.SUMMER
 	QuestLog.talk_to("john_muir")
