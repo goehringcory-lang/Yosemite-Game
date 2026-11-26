@@ -505,9 +505,35 @@ func test_dialogue_and_minigame_scenes() -> void:
 	await get_tree().process_frame
 	var screen := get_viewport().get_visible_rect()
 	var panel_rect := box4._panel.get_global_rect()
-	var last_option: Control = box4._options_box.get_child(options.size() - 1)
 	check(screen.encloses(panel_rect), "the dialogue box with 9 options fits the screen (%s)" % panel_rect)
-	check(last_option.get_global_rect().end.y <= screen.end.y, "the last option is on screen (bottom %.0f)" % last_option.get_global_rect().end.y)
+	# past MAX_ROWS the list scrolls with the cursor: down to the last option
+	box4._cursor = options.size() - 1
+	box4._refresh_options()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var last_option: Control = box4._options_box.get_child(options.size() - 1)
+	check(last_option.is_visible_in_tree() and screen.encloses(last_option.get_global_rect()),
+		"the last option scrolls into view on screen (%s)" % last_option.get_global_rect())
+	check(not box4._options_box.get_child(0).visible and box4._more_above.visible, "and the first scrolls away, with a 'more' line above")
+	check(screen.encloses(box4._panel.get_global_rect()), "and the box still fits")
+	box4.press(false)
+	await get_tree().process_frame
+	box4.close()
+
+	# A shop card with long lines, a long name and a long option all wrap
+	# (or cut short) inside the screen instead of pushing the box past it.
+	box4 = DialogueBox.open(self)
+	var long_card := {"title": "Mid nuts", "rows": [[null, "Costs 24 of the 701 your pack is worth here", false],
+		[null, "They'd take 3 Brown Trout, 2 Pilot Bread, 4 Trail Mix, and 12 off your tab", false]],
+		"facts": "You have 0 · one swap a day", "note": "A set of mid-sized wired nuts on one carabiner."}
+	box4.choose("Your pack is worth 701 in trade here. What do you want?",
+		["Mid nuts · costs 24 and a very long description that runs on and on past the column", "Done"],
+		"Marty Kessler of the Camp Four rack trade and the long name", [], [long_card, null])
+	box4.reveal_all()
+	for i in 3:
+		await get_tree().process_frame
+	panel_rect = box4._panel.get_global_rect()
+	check(screen.grow(-4.0).encloses(panel_rect), "a shop box with long lines stays inside the screen (%s)" % panel_rect)
 	box4.press(false)
 	await get_tree().process_frame
 	box4.close()

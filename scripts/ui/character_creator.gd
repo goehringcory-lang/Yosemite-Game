@@ -365,6 +365,9 @@ func _finish_name(keep: bool) -> void:
 func _process(delta: float) -> void:
 	if not _open:
 		return
+	# the list, the preview and the hints can come out taller than PANEL_SIZE;
+	# keep the whole frame on screen
+	UiScale.keep_inside(_panel)
 	_time += delta
 	if _shown != PlayerLook.version:
 		_shown = PlayerLook.version
