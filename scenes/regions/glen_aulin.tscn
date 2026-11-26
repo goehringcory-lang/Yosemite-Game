@@ -1,7 +1,6 @@
 [gd_scene format=4]
 
 [ext_resource type="Script" path="res://scripts/world/region.gd" id="1_w7ijv"]
-[ext_resource type="Shader" path="res://assets/shaders/fade_ends.gdshader" id="fade_ends"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ahwahnee/ground_glen_aulin.png" id="2_ist8y"]
 [ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="3_v2b72"]
 [ext_resource type="Script" path="res://scripts/world/seasonal_canopy.gd" id="4_8corb"]
@@ -46,6 +45,12 @@
 [ext_resource type="Script" path="res://scripts/world/place.gd" id="43_kgwff"]
 [ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="44_wsa1f"]
 [ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_wall.png" id="45_ip6bq"]
+[ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_rapids_0.png" id="rapids_0"]
+[ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_rapids_1.png" id="rapids_1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_rapids_2.png" id="rapids_2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_rapids_3.png" id="rapids_3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_rapids_4.png" id="rapids_4"]
+[ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_rapids_5.png" id="rapids_5"]
 [ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_fall_0.png" id="46_6aied"]
 [ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_fall_1.png" id="47_y81yi"]
 [ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_fall_2.png" id="48_3gral"]
@@ -57,9 +62,6 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_mist_2.png" id="54_bdcn7"]
 [ext_resource type="Texture2D" path="res://assets/sprites/valley/glen_aulin_mist_3.png" id="55_6n286"]
 [ext_resource type="Script" path="res://scripts/world/ambient_fx.gd" id="56_3lycg"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_fade_ends"]
-shader = ExtResource("fade_ends")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4hsmm"]
 size = Vector2(48, 16)
@@ -1454,26 +1456,26 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_mhx0c"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_rapids"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("46_6aied")
+"texture": ExtResource("rapids_0")
 }, {
 "duration": 1.0,
-"texture": ExtResource("47_y81yi")
+"texture": ExtResource("rapids_1")
 }, {
 "duration": 1.0,
-"texture": ExtResource("48_3gral")
+"texture": ExtResource("rapids_2")
 }, {
 "duration": 1.0,
-"texture": ExtResource("49_gv04i")
+"texture": ExtResource("rapids_3")
 }, {
 "duration": 1.0,
-"texture": ExtResource("50_l8586")
+"texture": ExtResource("rapids_4")
 }, {
 "duration": 1.0,
-"texture": ExtResource("51_p1i8j")
+"texture": ExtResource("rapids_5")
 }],
 "loop": 1,
 "name": &"default",
@@ -1625,7 +1627,7 @@ position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_ceq8n")
 
 [node name="TuolumneFallsSign" type="StaticBody2D" parent="Entities" unique_id=1661323606]
-position = Vector2(1936, 1440)
+position = Vector2(2032, 1440)
 collision_mask = 0
 script = ExtResource("14_uraw4")
 title = "Tuolumne Falls"
@@ -7312,7 +7314,7 @@ position = Vector2(1168, 752)
 position = Vector2(1936, 1424)
 
 [node name="white_cascade" type="Marker2D" parent="Markers" unique_id=1966805679]
-position = Vector2(1072, 816)
+position = Vector2(912, 432)
 
 [node name="Places" type="Node2D" parent="." unique_id=369929428]
 
@@ -7392,8 +7394,7 @@ z_index = -5
 position = Vector2(2000, 1296)
 rotation = 1.5707964
 scale = Vector2(1, 0.5)
-material = SubResource("ShaderMaterial_fade_ends")
-sprite_frames = SubResource("SpriteFrames_mhx0c")
+sprite_frames = SubResource("SpriteFrames_rapids")
 autoplay = "default"
 
 [node name="TuolumneFallsSpray" type="CPUParticles2D" parent="." unique_id=1573484400]

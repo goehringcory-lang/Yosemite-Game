@@ -107,17 +107,14 @@ func _glen_aulin() -> void:
 
 
 ## Tuolumne Falls: the cascade's white water, laid along the river's flow
-## (the wall fall's frames turned on their side), with spray at its foot.
+## (the wall fall's frames turned on their side, faded at both ends by
+## tools/hubs/glen_aulin_rapids.py), with spray at its foot.
 func _place_tuolumne_falls() -> void:
-	var cascade := _animation("TuolumneFalls", "glen_aulin_fall", 8.0, Vector2(62.5 * T, 40.5 * T), -5, V)
+	var cascade := _animation("TuolumneFalls", "glen_aulin_rapids", 8.0, Vector2(62.5 * T, 40.5 * T), -5, V)
 	if cascade:
 		cascade.centered = true
 		cascade.rotation = PI / 2.0
 		cascade.scale = Vector2(1.0, 0.5)
-		# melt both ends into the river rather than ending in a hard line
-		var fade := ShaderMaterial.new()
-		fade.shader = load("res://assets/shaders/fade_ends.gdshader")
-		cascade.material = fade
 	_ambient("TuolumneFallsSpray", "mist", Vector2(60.0 * T, 40.5 * T), Vector2(28, 10))
 
 
@@ -130,7 +127,7 @@ func _place_glen_features() -> void:
 	for c: Array in [[41, 22.5, 2], [45.5, 23.5, 5], [50, 22.5, 8], [41.5, 17, 11], [49.5, 17.5, 14], [45.5, 17, 20]]:
 		decor("TentCabin%d" % c[2], C + "tent_cabin_%d.png" % c[2], foot(c[0], c[1]), Vector2(40, 10))
 
-	_info_sign("TuolumneFallsSign", foot(60, 44), "Tuolumne Falls",
+	_info_sign("TuolumneFallsSign", foot(63, 44), "Tuolumne Falls",
 		"A wide cascade, about 100 feet in all, where the Tuolumne River slides and splashes down a broad face of granite. The footbridge just below puts you close enough to feel the spray.")
 	_info_sign("WhiteCascadeSign", foot(34, 26), "White Cascade",
 		"The river churns over a last ledge of granite and pours into a deep green pool. Glaciers scooped the basin; the water has been polishing the rock ever since.")
@@ -172,7 +169,7 @@ func _place_markers_glen() -> void:
 	marker("camp", 52, 21)
 	marker("pool", 36, 23)
 	marker("tuolumne_falls", 60, 44)
-	marker("white_cascade", 33, 25)
+	marker("white_cascade", 28, 13)
 	place("Glen Aulin", 44, 21, 12)
 	place("Glen Aulin Pool", 28, 22, 9)
 	place("White Cascade", 28, 14, 7)

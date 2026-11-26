@@ -124,8 +124,9 @@ func _check_cathedral_loop(world: Node) -> void:
 		await get_tree().process_frame
 	check(world.seam != null and world.seam.neighbor.region_id == "cathedral_lakes",
 		"Cathedral Lakes is laid out beside Tuolumne at the trail")
-	world.use_exit(trail)
+	Input.action_press("move_down")
 	await _wait_region(world, "cathedral_lakes")
+	Input.action_release("move_down")
 	check(world.region.region_id == "cathedral_lakes", "the John Muir Trail arrives at Cathedral Lakes")
 	var north: RegionExit = world.region.get_node_or_null("Exits/JMTNorth")
 	check(north != null and north.target_region == "tuolumne_meadows" and north.minutes == 0,

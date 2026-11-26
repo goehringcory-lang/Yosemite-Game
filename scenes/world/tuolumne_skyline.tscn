@@ -21,6 +21,7 @@ material = SubResource("ShaderMaterial_unlit")
 script = ExtResource("1_sky")
 summer = "res://assets/sprites/tuolumne/skyline_summer.png"
 winter = "res://assets/sprites/tuolumne/skyline_winter.png"
+gives_way_to = PackedStringArray("glen_aulin")
 
 [node name="HighSierraView" type="Node2D" parent="."]
 script = ExtResource("3_view")

@@ -46,6 +46,9 @@ done
 # Paint normal maps for all generated region art.
 "$PYTHON" tools/normals/normals.py "${mine[@]}"
 
+# Tuolumne Falls' white water: the fall frames faded at both ends.
+"$PYTHON" tools/hubs/glen_aulin_rapids.py
+
 # Update water_cells.json for the new ground only.
 cp data/park/water_cells.json "$stamp.cells"
 "$PYTHON" tools/perf/water_cells.py
