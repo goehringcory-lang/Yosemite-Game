@@ -52,18 +52,59 @@ static var _today_key := "":
 		if v == "":
 			_today_date = -1
 static var _today := {}
+## today() up high or down the canyon: worked out from _today at _local_ft.
+static var _local := {}
+static var _local_ft := -1
+static var _local_base := {}
 
 
-## Today's weather, from the date: {snow, rain, clouds} each 0..1. Snow and
-## rain are how hard it's coming down; clouds is how much of the sky is
-## covered (overcast when it rains or snows).
+## Today's weather where you are, from the date: {snow, rain, clouds} each
+## 0..1. Snow and rain are how hard it's coming down; clouds is how much of
+## the sky is covered (overcast when it rains or snows). The park shares one
+## storm a day (on_day, the Valley floor's weather); up high and down the
+## canyon it falls as Climate.localize says (snow on Tuolumne when the Valley
+## gets rain). On the Valley floor this is the park's own dictionary.
+## The high country's summer afternoon shower is apart: see [method shower].
 static func today() -> Dictionary:
+	var base := park_today()
+	var ft := Climate.elevation()
+	if ft >= Climate.RAIN_BELOW_FT and ft < Climate.MOUNTAIN_FT:
+		return base
+	if ft != _local_ft or not is_same(base, _local_base):
+		_local_ft = ft
+		_local_base = base
+		_local = Climate.localize(base, GameClock.season, GameClock.day, ft)
+	return _local
+
+
+## The park's weather today, the Valley floor's (see [method on_day]).
+static func park_today() -> Dictionary:
 	var date := (GameClock.year * 4 + GameClock.season) * 64 + GameClock.day
 	if date == _today_date:
 		return _today
 	_today_date = date
 	_today = on_day(GameClock.year, GameClock.season, GameClock.day)
 	return _today
+
+
+## Today's weather in [param region_id] (whose hub is [param hub_id]),
+## wherever you are: for things that happen in a place of their own (the
+## people out walking there, the cables on Half Dome).
+static func at(region_id: String, hub_id := "") -> Dictionary:
+	var ft := Climate.elevation(region_id, hub_id)
+	return Climate.localize(park_today(), GameClock.season, GameClock.day, ft)
+
+
+## How hard the high country's summer afternoon storm is raining where you
+## are now (0 to 1; see Climate.shower). Rain from it adds to today().rain.
+static func shower() -> float:
+	return Climate.shower()
+
+
+## How hard it's raining where you are now: the day's rain and any passing
+## storm.
+static func rain_now() -> float:
+	return maxf(float(today().rain), shower())
 
 
 ## The weather on any date, worked out the way [method today] does (the
@@ -128,7 +169,10 @@ func _process(delta: float) -> void:
 	_view = _camera_view()
 	var dark_flag := 1 if _darkness() > 0.35 else 0
 	var motes_flag := 1 if _motes_on() else 0
-	var key := (((GameClock.year * 4 + GameClock.season) * 64 + GameClock.day) * 2 + dark_flag) * 2 + motes_flag
+	# the place (up high it snows when it rains below) and any passing storm
+	var shower_flag := roundi(shower() * 4.0)
+	var key := hash([(GameClock.year * 4 + GameClock.season) * 64 + GameClock.day, dark_flag, motes_flag,
+		Climate.elevation(), shower_flag])
 	if key != _key:
 		_key = key
 		_populate(dark_flag, motes_flag)
@@ -201,8 +245,12 @@ func _populate(dark_flag: int, motes_flag: int) -> void:
 				counts["mote"] = 0.75
 	if w.snow > 0.0:
 		counts["snow"] = w.snow
-	if w.rain > 0.0:
-		counts["rain"] = w.rain
+	if w.snow > 0.0:
+		counts.erase("petal")
+		counts.erase("fluff")
+	var rain := maxf(float(w.rain), shower())
+	if rain > 0.0:
+		counts["rain"] = rain
 		counts.erase("petal")
 	var day_key := (GameClock.year * 4 + GameClock.season) * 64 + GameClock.day
 	# Later in the same day (the light changed): keep what still belongs in

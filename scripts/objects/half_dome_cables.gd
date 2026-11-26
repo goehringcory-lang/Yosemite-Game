@@ -39,7 +39,13 @@ func get_prompt() -> String:
 static func closed_reason() -> String:
 	if not Park.is_open("half_dome_cables"):
 		return Park.SEASONAL["half_dome_cables"].why
-	if float(Weather.today().get("rain", 0.0)) > 0.0:
+	# the dome's own weather, wherever you ask from
+	var weather := Weather.at("half_dome")
+	if float(weather.get("snow", 0.0)) > 0.0:
+		return "Snow on the dome. The cables are glazed and the steps between the posts are drifted over: come back once it has melted off."
+	if Climate.since_storm() >= -Climate.SHOWER_THUNDER and Climate.since_storm() < Climate.SHOWER_HOURS:
+		return "Thunderheads over the dome. Up on the cables you'd be the tallest thing for miles, holding a steel line: nobody goes up with lightning about. It'll blow through within the hour."
+	if float(weather.get("rain", 0.0)) > 0.0:
 		return "Rain on the granite. Under the cables the rock is polished like glass by a century of boots, and wet it's like ice. Nobody goes up in the rain: come back on a dry day."
 	if not Park.open_world and not Backcountry.has_permit():
 		return "A ranger's sign at the foot of the cables: Half Dome hikers need a permit. Ranger Hodges writes wilderness permits at the ranger station in Yosemite Village."
