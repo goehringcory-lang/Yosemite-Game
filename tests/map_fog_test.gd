@@ -138,7 +138,7 @@ func _ready() -> void:
 	check(map._tab == ParkMap.Tab.PARK and map._looking(), "Tab shows the park map, looking around")
 	check(map._fog_rect.texture != null, "the fog is drawn on it")
 	map._hover_nearest()
-	check(map._hover.get("kind", "") in ["area", "hub"], "the cursor starts on where you are (%s)" % map._hover.get("label", ""))
+	check(map._hover.get("kind", "") in ["area", "hub", "trailhead"], "the cursor starts on where you are (%s)" % map._hover.get("label", ""))
 	map._cursor_at = Vector2(20, 230)
 	map._hover_nearest()
 	check(map._hover.is_empty(), "out on bare map the cursor is on nothing")

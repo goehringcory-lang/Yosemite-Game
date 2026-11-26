@@ -422,10 +422,10 @@
 				},
 				"hetch_hetchy": {
 					"at": [
-						944,
-						704
+						0,
+						736
 					],
-					"label": "Hetch Hetchy Road, northwest to O'Shaughnessy Dam and Wapama Falls"
+					"label": "Evergreen Road and Hetch Hetchy Road"
 				},
 				"tenaya_lake": {
 					"at": [
@@ -1069,10 +1069,10 @@
 			"exit_points": {
 				"crane_flat": {
 					"at": [
-						336,
-						864
+						400,
+						912
 					],
-					"label": "Hetch Hetchy Road, back to Crane Flat"
+					"label": "Hetch Hetchy Road and Evergreen Road"
 				}
 			},
 			"exits": [
