@@ -28,8 +28,8 @@ const QUIT_CONFIRM := "Quit? Progress since your last save is lost. Press again 
 const QUIT_SAVED := "Quit? Your game is saved. Press again to quit."
 const TITLE_CONFIRM := "To the title? Progress since your last save is lost. Press again."
 const TITLE_SAVED := "To the title? Your game is saved. Press again."
-enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, TIMING, HOLD_TAPS, CLIMB_MOVES, VIBRATION, PAUSE_AWAY, AUTO_RUN, FONT, GRAPHICS, WIND, WAYFINDING, JOURNEYS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
-const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Activity timing", "Hold to tap", "Climbing moves", "Vibration", "Pause when away", "Auto-run", "Font", "Graphics", "Wind", "Signposts", "Trip map", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
+enum Setting { TEXT_SPEED, FULLSCREEN, WINDOW_SIZE, PROMPTS, TIPS, TIMING, HOLD_TAPS, CLIMB_MOVES, VIBRATION, PAUSE_AWAY, AUTO_RUN, FONT, GRAPHICS, WIND, WAYFINDING, ARRIVAL_TITLES, JOURNEYS, MASTER_VOLUME, MUSIC_VOLUME, EFFECTS_VOLUME, AMBIENCE_VOLUME, CONTROLS, BACK }
+const SETTING_NAMES := ["Text speed", "Full screen", "Window size", "Button prompts", "Tips", "Activity timing", "Hold to tap", "Climbing moves", "Vibration", "Pause when away", "Auto-run", "Font", "Graphics", "Wind", "Signposts", "Region titles", "Trip map", "Volume", "Music", "Sound effects", "Ambience", "Controls", "Back"]
 const SETTING_HELP := [
 	"How fast conversations appear. Press E (A) to show a page at once.",
 	"Fill covers the whole screen. Pixel perfect keeps every pixel the same size, with a border where the screen isn't a whole multiple of 960 x 540.",
@@ -45,7 +45,8 @@ const SETTING_HELP := [
 	"Smooth letters are easiest to read; pixel letters match the art.",
 	"Low uses a simpler renderer for older computers. A change takes effect when you next start the game.",
 	"Trees and plants sway and gusts cross the grass. Off keeps them still.",
-	"Little signs at the screen's edge point to Half Dome, El Capitan and the other landmarks, and a ? to places you haven't found.",
+	"Little signs at the screen's edge point to Half Dome, El Capitan and the other landmarks, a ? to places you haven't found, and a pin to whatever you track on the park map.",
+	"Show a region's name across the screen the first time you arrive.",
 	"Drives, long trails and shuttle rides play on the park map, the road unrolling as the clock runs. Off, they fade to black. Any key skips the map.",
 	"How loud the whole game is.",
 	"The songs for each season, the night, and the title screen.",
@@ -906,6 +907,8 @@ func change_setting(which: int, step: int) -> void:
 			Settings.wind = not Settings.wind
 		Setting.WAYFINDING:
 			Settings.wayfinding = not Settings.wayfinding
+		Setting.ARRIVAL_TITLES:
+			Settings.arrival_titles = not Settings.arrival_titles
 		Setting.JOURNEYS:
 			Settings.journeys = not Settings.journeys
 		Setting.MASTER_VOLUME:
@@ -1092,6 +1095,8 @@ func _setting_value(which: int) -> String:
 			value = "On" if Settings.wind else "Off"
 		Setting.WAYFINDING:
 			value = "On" if Settings.wayfinding else "Off"
+		Setting.ARRIVAL_TITLES:
+			value = "On" if Settings.arrival_titles else "Off"
 		Setting.JOURNEYS:
 			value = "On" if Settings.journeys else "Off"
 		Setting.MASTER_VOLUME, Setting.MUSIC_VOLUME, Setting.EFFECTS_VOLUME, Setting.AMBIENCE_VOLUME:
