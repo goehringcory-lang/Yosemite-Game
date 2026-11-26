@@ -31,7 +31,7 @@ const VALLEY_AREAS := ["yosemite_village", "curry_village", "the_ahwahnee", "ahw
 ## High-country areas outside Tuolumne Meadows that count under Tuolumne's hub.
 const HIGH_COUNTRY_AREAS := ["tenaya_lake", "cathedral_lakes"]
 ## South-rim areas outside Glacier Point that count under Glacier Point's hub.
-const RIM_AREAS := ["taft_point"]
+const RIM_AREAS := ["taft_point", "union_point"]
 ## Low foothill-canyon areas that share El Portal's flora group.
 const FOOTHILL_AREAS := ["hetch_hetchy"]
 const HUB_NAMES := {"yosemite_valley": "the Valley floor", "el_portal": "El Portal", "wawona": "Wawona",
@@ -395,23 +395,23 @@ const PLANTS: Array[Dictionary] = [
 	{"id": "jeffrey_pine", "name": "Jeffrey Pine", "latin": "Pinus jeffreyi",
 		"note": "Like a ponderosa, but put your nose in the bark: vanilla. The cone's prickles turn in.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.FOREST,
-		"grows": {"glacier_point": "sentinel_dome", "taft_point": "crocker_point"}},
+		"grows": {"glacier_point": "sentinel_dome", "taft_point": "crocker_point", "union_point": "switchbacks"}},
 	{"id": "red_fir", "name": "California Red Fir", "latin": "Abies magnifica",
 		"note": "Stiff blue-green needles that curve up like a hockey stick, and cones that stand upright.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.FOREST,
-		"grows": {"glacier_point": "washburn_point", "taft_point": "roosevelt_meadow"}},
+		"grows": {"glacier_point": "washburn_point", "taft_point": "roosevelt_meadow", "union_point": "seep"}},
 	{"id": "pinemat_manzanita", "name": "Pinemat Manzanita", "latin": "Arctostaphylos nevadensis",
 		"note": "A manzanita that lies down: a green mat over the granite under the firs and pines.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.FOREST,
-		"grows": {"glacier_point": "sentinel_dome", "taft_point": "fissures"}},
+		"grows": {"glacier_point": "sentinel_dome", "taft_point": "fissures", "union_point": "union_point"}},
 	{"id": "snow_plant", "name": "Snow Plant", "latin": "Sarcodes sanguinea", "rarity": RARE, "protected": true,
 		"note": "All scarlet, no green. It lives on the fungi at the pines' roots and comes up as the snow goes.",
 		"seasons": SPRING | SUMMER, "habitat": ItemData.Habitat.FOREST,
-		"grows": {"glacier_point": "arrival", "taft_point": "camp"}},
+		"grows": {"glacier_point": "arrival", "taft_point": "camp", "union_point": "seep"}},
 	{"id": "huckleberry_oak", "name": "Huckleberry Oak", "latin": "Quercus vacciniifolia",
 		"note": "An oak that never grows past your waist: a tangle of small leaves over the granite.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.CHAPARRAL,
-		"grows": {"glacier_point": "washburn_point"}},
+		"grows": {"glacier_point": "washburn_point", "union_point": "switchbacks"}},
 	{"id": "bush_chinquapin", "name": "Bush Chinquapin", "latin": "Chrysolepis sempervirens",
 		"note": "Leaves gold-dusted underneath and nuts in a burr as spiny as a sea urchin.",
 		"seasons": ALL_YEAR, "habitat": ItemData.Habitat.CHAPARRAL,

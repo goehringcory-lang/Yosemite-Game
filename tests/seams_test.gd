@@ -31,6 +31,11 @@ const SEAMS := {
 	"the_ahwahnee": ["ToStonemanBridge", "NorthsideDriveWest"],
 	"ahwahnee_trail": ["ToHomestead", "ToAhwahnee"],
 	"lamon_homestead": ["ToCurryVillage", "NorthToAhwahnee"],
+	# The south rim: Glacier Point walks on west into Union Point (the Four
+	# Mile Trail) and Taft Point (the Pohono Trail).
+	"glacier_point": ["FourMileTrailWest", "PohonoTrailWest"],
+	"union_point": ["FourMileTrailEast"],
+	"taft_point": ["PohonoTrailEast"],
 }
 
 var failures := 0

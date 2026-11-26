@@ -70,7 +70,7 @@ const SQUIRRELS := {
 ## The high country, above the Valley's oaks: where the nutcrackers, the
 ## chickarees and the golden-mantled ground squirrels live.
 const HIGH_REGIONS := ["tuolumne_meadows", "tuolumne_lodge", "glacier_point", "half_dome", "little_yosemite_valley",
-	"crane_flat", "big_oak_flat_junction", "tenaya_lake", "taft_point", "cathedral_lakes"]
+	"crane_flat", "big_oak_flat_junction", "tenaya_lake", "taft_point", "cathedral_lakes", "union_point"]
 ## Butterflies of the Valley: western tiger swallowtail, California sister,
 ## Lorquin's admiral, a cabbage white (their columns on the sheet).
 const BUTTERFLY_KINDS := 4

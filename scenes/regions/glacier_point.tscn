@@ -66,6 +66,9 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/glacier/restrooms_glow.png" id="64_vlbcw"]
 [ext_resource type="Script" uid="uid://i0wunuiki2ah" path="res://scripts/objects/scenic_viewer.gd" id="65_scnvw"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rimw"]
+size = Vector2(24, 96)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p8una"]
 size = Vector2(32, 8)
 
@@ -3028,13 +3031,6 @@ shape = SubResource("RectangleShape2D_ommyi")
 [node name="Travel_SentinelDomeTrailhead" parent="Entities" unique_id=1381411894 instance=ExtResource("20_se7hd")]
 position = Vector2(1392, 2112)
 label = "Sentinel Dome Trailhead"
-
-[node name="FourMileTrail" parent="Entities" unique_id=30927176 instance=ExtResource("31_ebuve")]
-position = Vector2(112, 640)
-label = "Four Mile Trail, down to the Valley"
-target_region = "four_mile_trailhead"
-target_spawn = "four_mile_trail"
-minutes = 120
 
 [node name="PanoramaTrail" parent="Entities" unique_id=1606411524 instance=ExtResource("31_ebuve")]
 position = Vector2(2672, 1376)
@@ -7520,6 +7516,9 @@ position = Vector2(2320, 880)
 [node name="road_south" type="Marker2D" parent="Markers" unique_id=2076741322]
 position = Vector2(1200, 2384)
 
+[node name="pohono_west" type="Marker2D" parent="Markers" unique_id=1909001003]
+position = Vector2(112, 1744)
+
 [node name="Places" type="Node2D" parent="." unique_id=851554697]
 
 [node name="GlacierPoint" type="Marker2D" parent="Places" unique_id=512289947]
@@ -7644,6 +7643,26 @@ show_banner = false
 show_on_map = true
 
 [node name="Exits" type="Node2D" parent="." unique_id=271704077]
+
+[node name="FourMileTrailWest" type="Area2D" parent="Exits" unique_id=1872001001]
+position = Vector2(16, 624)
+script = ExtResource("58_7issq")
+label = "Four Mile Trail, down to the Valley"
+target_region = "union_point"
+target_spawn = "east"
+
+[node name="Shape" type="CollisionShape2D" parent="Exits/FourMileTrailWest" unique_id=1872001002]
+shape = SubResource("RectangleShape2D_rimw")
+
+[node name="PohonoTrailWest" type="Area2D" parent="Exits" unique_id=1909001001]
+position = Vector2(16, 1744)
+script = ExtResource("58_7issq")
+label = "Pohono Trail, west to Taft Point"
+target_region = "taft_point"
+target_spawn = "east"
+
+[node name="Shape" type="CollisionShape2D" parent="Exits/PohonoTrailWest" unique_id=1909001002]
+shape = SubResource("RectangleShape2D_rimw")
 
 [node name="GlacierPointRoad" type="Area2D" parent="Exits" unique_id=800227703]
 position = Vector2(1200, 2416)

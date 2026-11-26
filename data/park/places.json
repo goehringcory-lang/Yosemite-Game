@@ -542,6 +542,24 @@
 			"region": "tuolumne_meadows"
 		},
 		{
+			"hub": "glacier_point",
+			"key": "union_point/Four Mile Trail",
+			"name": "Four Mile Trail",
+			"region": "union_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "union_point/Union Point",
+			"name": "Union Point",
+			"region": "union_point"
+		},
+		{
+			"hub": "glacier_point",
+			"key": "union_point/Four Mile switchbacks",
+			"name": "Four Mile switchbacks",
+			"region": "union_point"
+		},
+		{
 			"hub": "yosemite_valley",
 			"key": "upper_pines/Upper Pines",
 			"name": "Upper Pines",

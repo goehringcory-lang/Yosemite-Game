@@ -563,6 +563,23 @@
 				264,
 				1272
 			]
+		},
+		{
+			"id": "union_point_toll_spike",
+			"region": "union_point",
+			"title": "Toll Trail Spike",
+			"text": "A square-cut iron spike rusted into a crack in the granite rib beside the switchbacks. McCauley and Conway's crew pinned the 1872 toll trail's cribbing to the rock with spikes like this one.",
+			"rumor": "Old ironwork from the 1872 toll trail still sticks out of the rock beside the Four Mile switchbacks.",
+			"reward": {
+				"railroad_spike": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				784,
+				624
+			]
 		}
 	]
 }

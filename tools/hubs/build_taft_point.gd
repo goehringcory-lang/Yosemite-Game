@@ -67,7 +67,7 @@ func _taft_layout() -> void:
 	_water(CREEK, 1, Terrain.CREEK, 0.25)
 	# Pohono Trail running east-west, plus spurs to Taft Point, The Fissures,
 	# Crocker Point, and a south backcountry clearing.
-	_path([Vector2(4, 34), Vector2(18, 33), Vector2(34, 32), Vector2(50, 31), Vector2(68, 32), Vector2(92, 32)], 1, Terrain.TRAIL, 0.35)
+	_path([Vector2(4, 34), Vector2(18, 33), Vector2(34, 32), Vector2(50, 31), Vector2(68, 32), Vector2(95, 32)], 1, Terrain.TRAIL, 0.35)
 	_path([Vector2(50, 31), Vector2(50, 22), Vector2(50, 12), Vector2(50, 6)], 1, Terrain.TRAIL, 0.25)
 	_path([Vector2(50, 19), Vector2(40, 19), Vector2(34, 15)], 1, Terrain.TRAIL, 0.25)
 	_path([Vector2(50, 19), Vector2(60, 19), Vector2(66, 15)], 1, Terrain.TRAIL, 0.25)
@@ -131,11 +131,10 @@ func _place_rim_features() -> void:
 
 
 func _place_trails_taft() -> void:
-	# East to Glacier Point (Sentinel Dome Trailhead). Guarded when open_world is off.
-	_trail_door("PohonoTrailEast", foot(91, 32),
-		"Pohono Trail, east to Sentinel Dome and Glacier Point",
-		"glacier_point", "sentinel_dome_trailhead", 45, "four_mile_trail",
-		"The rim trail to Glacier Point opens once you've climbed the Glacier Point Apron above Curry Village.")
+	# East along the rim, straight on over the map edge into Glacier Point
+	# (its west edge, by Sentinel Dome), with no fade.
+	region_exit("PohonoTrailEast", tile_pos(W - 0.5, 32), Vector2(12, 48),
+		"Pohono Trail, east to Sentinel Dome and Glacier Point", "glacier_point", "pohono_west")
 	# West down the Pohono Trail to Tunnel View.
 	_trail_door("PohonoTrailWest", foot(5, 34),
 		"Pohono Trail, down along the south rim to Tunnel View",
@@ -144,7 +143,7 @@ func _place_trails_taft() -> void:
 
 func _place_markers_taft() -> void:
 	marker("arrival", 50, 30)
-	marker("east", 88, 32)
+	marker("east", 93.5, 32)
 	marker("west", 8, 34)
 	marker("overlook", 50, 8)
 	marker("fissures", 35, 17)

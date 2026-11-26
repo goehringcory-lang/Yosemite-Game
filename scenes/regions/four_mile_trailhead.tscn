@@ -417,10 +417,10 @@ y_sort_enabled = true
 
 [node name="FourMileTrail" parent="Entities" unique_id=30927176 instance=ExtResource("5_iu408")]
 position = Vector2(1040, 320)
-label = "Four Mile Trail, up to Glacier Point"
-target_region = "glacier_point"
-target_spawn = "four_mile_trailhead"
-minutes = 180
+label = "Four Mile Trail, up the switchbacks toward Glacier Point"
+target_region = "union_point"
+target_spawn = "switchbacks_top"
+minutes = 120
 closure = "four_mile_trail"
 needs_hub = "glacier_point"
 locked_text = "The Four Mile Trail climbs 3,200 feet in switchbacks up the wall to Glacier Point. The rim is still ahead of you: climb the Glacier Point Apron first, and the way up opens."
