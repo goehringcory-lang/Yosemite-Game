@@ -77,10 +77,16 @@ func handle(verb: StringName, pressed: bool) -> bool:
 			_memory[String(s.pose.next_hand)] = aimed
 			body.swap_hand()
 			auto_swapped = false
+			_turn_pose = s.pose.to_dict()
+			if hip_shift != Vector2.ZERO:
+				hip_shift = Vector2.ZERO
+				s.bus.send(&"hip_changed", [body.base_hip()])
 			_rebuild_set()
 			_pick_aim(String(_memory.get(String(s.pose.next_hand), "")))
 			return true
 		&"commit":
+			# Priced fresh: a rest or food since the aim changes the cost.
+			_preview()
 			if move and move.valid:
 				director.commit(move)
 			return true
@@ -224,6 +230,13 @@ func best_aim() -> String:
 			var m := body.preview(hid)
 			if not m.valid:
 				if neutral_only:
+					continue
+				if _in_crux(hid) or not ClimbBody.hip_hints:
+					# No solving the puzzle for the player: plain height.
+					var hh := s.wall.hold(hid)
+					if hh.pos.y - high > best_score:
+						best_score = hh.pos.y - high
+						best = hid
 					continue
 				m = body.suggest_shift(hid)[1]
 				if m == null:

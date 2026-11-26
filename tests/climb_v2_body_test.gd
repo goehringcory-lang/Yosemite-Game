@@ -35,6 +35,7 @@ func _ready() -> void:
 	test_ladder_route()
 	test_techniques()
 	test_rests_and_hands()
+	test_review_fixes()
 	test_hang()
 	await test_screen()
 	ClimbSystems.pins.clear()
@@ -477,3 +478,53 @@ func _hold(screen: ClimbScreenV2, action: StringName, down: bool) -> void:
 	e.action = action
 	e.pressed = down
 	screen._unhandled_input(e)
+
+
+func test_review_fixes() -> void:
+	# The body turns back square after a drop-knee.
+	var d := on_wall([["a", 2.6, 3.0, "jug", 0.9], ["b", 2.8, 2.5, "edge", 0.6], ["t", 3.85, 3.25, "edge", 0.6], ["u", 3.3, 3.9, "edge", 0.6],
+		["f1", 2.6, 1.4, "edge", 0.6, "f"], ["f2", 3.35, 1.95, "edge", 0.6, "f"]], ["a", "b"], ["f1", "f2"], &"rh")
+	var body: ClimbBody = d.session.sys.body
+	var turned := body.preview("t", Vector2(0.3, 0))
+	d.commit(turned)
+	check(d.session.pose.facing != 0, "a drop-knee turns the body side-on")
+	var next := body.preview("u")
+	check(next.to.facing == 0, "and the next move squares it up again")
+	# A crack reads the same wherever it is on the wall.
+	for x: float in [1.0, 3.0, 4.6]:
+		var c := V2Crack.new()
+		c.id = "c"
+		c.points = PackedVector2Array([Vector2(x, 1.0), Vector2(x, 5.0)])
+		c.widths = PackedFloat32Array([4.2, 4.2])
+		d = on_wall([["a", x - 0.3, 3.0, "jug", 0.9], ["b", x, 2.6, "jam", 0.6, "h", Vector2(0, -1), [], "c"],
+			["t", x, 3.4, "jam", 0.6, "h", Vector2(0, -1), [], "c"], ["f1", x - 0.2, 1.6, "edge", 0.6, "f"], ["f2", x + 0.1, 1.9, "edge", 0.6, "f"]],
+			["a", "b"], ["f1", "f2"], &"rh", 0.0, [c])
+		body = d.session.sys.body
+		var cell := ClimbBody.clamp_shift(Vector2(x - body.base_hip().x, 0))
+		var m := body.preview("t", cell)
+		var off := body.preview("t", cell + Vector2(-0.15, 0))
+		check(m.has_tag("hand_jam") and not off.has_tag("hand_jam"), "a crack at x=%.1f: square is a jam, one step off is not" % x)
+	# Swapping keeps the turn: a refresh (a rest, food) doesn't lose the aim.
+	d = started()
+	var phase := d.current as BodyAimPhase
+	d.handle_verb(&"swap", true)
+	var aim := phase.aimed
+	var hand := d.session.pose.next_hand
+	phase.refresh()
+	check(phase.aimed == aim and d.session.pose.next_hand == hand, "a rest after a swap keeps the hand and the aim")
+	# Inside a crux the body gives no hip hints.
+	d = on_wall([["a", 2.8, 3.0, "jug", 0.9], ["b", 3.2, 2.6, "edge", 0.6], ["t", 3.1, 4.0, "jug", 0.9],
+		["f1", 2.8, 1.6, "edge", 0.6, "f"], ["f2", 3.2, 1.9, "edge", 0.6, "f"]], ["a", "b"], ["f1", "f2"], &"rh")
+	var z := V2Zone.new()
+	z.id = "crux"
+	z.kind = &"crux"
+	z.rect = Rect2(2, 2, 2, 3)
+	d.session.wall.zones.append(z)
+	body = d.session.sys.body
+	phase = d.current as BodyAimPhase
+	phase.aim_at("t")
+	check(body.preview("t").reason == "too far" and phase.fix == "", "inside a crux a move just says too far, no hip hint")
+	# A dyno lands with the hips up at the hold, not left in the crouch.
+	z.rect = Rect2()
+	var dyno := body.preview("t", Vector2(0, -0.45))
+	check(dyno.has_tag("dyno") and dyno.to.hip.y > body.base_hip().y, "a dyno arrives with the hips higher than standing")

@@ -75,7 +75,7 @@ func start_pose(wall: V2Wall) -> V2Pose:
 			p.set_limb(hand, V2Limb.make(&"hold", hands[i].pos, hands[i].id))
 		else:
 			p.set_limb(hand, V2Limb.make(&"free", stand + Vector2(-0.3 + 0.6 * i, 0.6)))
-	p.hip = _natural_hip(p, wall)
+	p.hip = _natural_hip(p, wall) if not hands.is_empty() else stand
 	var feet := _pick_feet(wall, p, p.hip, 0.0)
 	p.set_limb(&"lf", feet.lf)
 	p.set_limb(&"rf", feet.rf)
@@ -172,7 +172,7 @@ func rest_kind() -> StringName:
 		if h.kind == &"stance":
 			return &"stance"
 		if (h.kind == &"jug" or h.kind == &"horn") and h.size >= 0.8:
-			best = h.kind
+			best = &"jug"
 		elif h.kind == &"jam" and best == &"" and _jam_quality(h, pose.hip) >= 0.85:
 			best = &"jam"
 	if best != &"":
@@ -291,6 +291,7 @@ func _solve(pose: V2Pose, hand: StringName, hold_id: String, hip_shift: Vector2)
 	m.from = pose.copy()
 	m.to = pose.copy()
 	m.to.tags = PackedStringArray()
+	m.to.facing = 0
 	var shift := clamp_shift(hip_shift)
 	var base := _launch_hip(pose, hand, wall)
 	var L := base + shift
@@ -383,7 +384,7 @@ func _solve(pose: V2Pose, hand: StringName, hold_id: String, hip_shift: Vector2)
 	if m.reach > 1.0:
 		if m.reach <= BodyTuning.LUNGE_MAX and h.size >= BodyTuning.LUNGE_MIN_SIZE:
 			m.tags.append("lunge")
-		elif preloaded and throw_reach > BodyTuning.LUNGE_MAX * 0.95 and throw_reach <= BodyTuning.DYNO_MAX and h.size >= BodyTuning.DYNO_MIN_SIZE:
+		elif preloaded and throw_reach > BodyTuning.LUNGE_MAX * 0.95 and throw_reach <= BodyTuning.DYNO_MAX and (h.size >= BodyTuning.DYNO_MIN_SIZE or h.has_tag("dyno")):
 			m.tags.append("dyno")
 			m.reach = throw_reach
 			sh = throw_sh
@@ -391,21 +392,35 @@ func _solve(pose: V2Pose, hand: StringName, hold_id: String, hip_shift: Vector2)
 		else:
 			var why := "too far"
 			var from_standing := m.reach if not preloaded else throw_reach
-			if from_standing <= BodyTuning.DYNO_MAX and h.size >= BodyTuning.DYNO_MIN_SIZE and not preloaded:
+			var hinting := hip_hints and wall.zones_at(h.pos, &"crux").is_empty()
+			if not hinting:
+				pass
+			elif from_standing <= BodyTuning.DYNO_MAX and (h.size >= BodyTuning.DYNO_MIN_SIZE or h.has_tag("dyno")) and not preloaded:
 				why = "too far: sit the hips low to throw for it"
 			elif from_standing <= BodyTuning.DYNO_MAX and h.size < BodyTuning.DYNO_MIN_SIZE:
 				why = "too far, and too small to throw for"
 			return _invalid(m, why, feet)
-		# The body travels with the hand: the hips arrive higher.
-		grab_hip = L + (h.pos - sh).normalized() * (dist - BodyTuning.REACH_M)
+		# The body travels with the hand: the hips arrive higher (a dyno
+		# springs from standing height, not from the crouch).
+		var from_hip := L if not m.has_tag("dyno") else Vector2(L.x, L.y - shift.y)
+		grab_hip = from_hip + (h.pos - sh).normalized() * (dist - BodyTuning.REACH_M)
 		var rf2 := _keep_or_cut(rf, grab_hip, &"rf")
 		var lf2 := _keep_or_cut(lf, grab_hip, &"lf")
 		if (lf2.kind == &"free" and lf.on_rock()) or (rf2.kind == &"free" and rf.on_rock()):
 			m.tags.append("feetcut")
+			for turn: String in ["dropknee", "backstep"]:
+				if m.tags.has(turn):
+					m.tags.remove_at(m.tags.find(turn))
 		lf = lf2
 		rf = rf2
 	if mantle:
+		# Pressing out over the ledge: the hips come up to it, the feet follow
+		# if they can, and the other hand must still reach its hold.
 		grab_hip = Vector2(h.pos.x, h.pos.y - 0.2)
+		lf = _keep_or_cut(lf, grab_hip, &"lf")
+		rf = _keep_or_cut(rf, grab_hip, &"rf")
+		if stay.kind == &"hold" and stay.pos.distance_to(shoulder(grab_hip, other)) > BodyTuning.REACH_M * 1.1 and stay.pos.y > grab_hip.y + 0.2:
+			return _invalid(m, "can't keep the other hand on to mantle", feet)
 
 	# --- balance: does the support hold the centre of mass?
 	# The reaching arm and the lean carry the centre of mass toward the hold.
@@ -437,8 +452,8 @@ func _solve(pose: V2Pose, hand: StringName, hold_id: String, hip_shift: Vector2)
 				rf = flag
 			m.tags.append("flag")
 			swing = maxf(0.0, swing - BodyTuning.FLAG_COUNTER)
-		if swing > BodyTuning.BALANCE_SLACK:
-			m.tags.append("barndoor")
+	if swing > BodyTuning.BALANCE_SLACK:
+		m.tags.append("barndoor")
 
 	# --- techniques from the geometry
 	var feet_on: Array[V2Limb] = []
@@ -477,22 +492,28 @@ func _solve(pose: V2Pose, hand: StringName, hold_id: String, hip_shift: Vector2)
 	var sec := BodyTuning.SEC_HOLD_ON * hold_on + BodyTuning.SEC_FEET * feet_q + BodyTuning.SEC_TARGET * target_grip
 	if m.has_tag("barndoor"):
 		sec -= BodyTuning.SEC_BARN * swing
-	if m.has_tag("layback") or m.has_tag("stem"):
+	if m.has_tag("stem"):
 		sec += 0.08
+	elif m.has_tag("layback"):
+		sec += 0.04
 	if m.has_tag("lunge"):
-		var over := (m.reach - 1.0) / (BodyTuning.LUNGE_MAX - 1.0)
+		var over := clampf((m.reach - 1.0) / (BodyTuning.LUNGE_MAX - 1.0), 0.0, 1.0)
 		sec *= 1.0 - 0.45 * over * over
 	elif m.has_tag("dyno"):
-		var over := (m.reach - BodyTuning.LUNGE_MAX) / (BodyTuning.DYNO_MAX - BodyTuning.LUNGE_MAX)
-		sec *= 0.6 - 0.3 * over * over
+		var over := clampf((m.reach - BodyTuning.LUNGE_MAX) / (BodyTuning.DYNO_MAX - BodyTuning.LUNGE_MAX), 0.0, 1.0)
+		sec *= 0.5 - 0.25 * over * over
 	m.security = clampf(sec, 0.0, 1.0)
 
 	var strain := maxf(0.0, m.reach - BodyTuning.STRAIN_REACH_FROM) * BodyTuning.STRAIN_REACH
 	strain += lockoff * BodyTuning.STRAIN_LOCKOFF * (1.0 - 0.6 * feet_share)
 	if m.has_tag("cross"):
 		strain += BodyTuning.STRAIN_CROSS
+	if m.has_tag("mantle"):
+		strain += BodyTuning.STRAIN_MANTLE
 	if high_step:
 		strain += BodyTuning.STRAIN_HIGH_STEP
+	if m.has_tag("layback"):
+		strain += BodyTuning.STRAIN_LAYBACK
 	if m.has_tag("barndoor"):
 		strain += swing * BodyTuning.STRAIN_BARN
 	if feet_on.is_empty():
@@ -672,7 +693,7 @@ func _foot_options(wall: V2Wall, pose: V2Pose, hip: Vector2, foot: StringName, w
 func _smear_or_free(wall: V2Wall, hip: Vector2, foot: StringName) -> V2Limb:
 	var side := -1.0 if foot == &"lf" else 1.0
 	var at := hip + Vector2(side * 0.25, -0.75)
-	if wall.angle <= 15.0 and at.y >= wall.start.y:
+	if BodyTuning.SMEAR_VERTICAL - wall.angle / 40.0 >= 0.05 and at.y >= wall.start.y:
 		return V2Limb.make(&"smear", at)
 	return V2Limb.make(&"free", hip + Vector2(side * 0.2, -0.7))
 
@@ -770,11 +791,15 @@ func _grip(h: V2Hold, hip: Vector2) -> float:
 		return 0.0
 	var wall := session.wall
 	if h.kind == &"jam" and h.crack_id != "":
-		if absf(hip.x - h.pos.x) < 0.15:
+		if absf(hip.x - h.pos.x) < BodyTuning.JAM_SQUARE:
 			return _jam_quality(h, hip)
-		# Leaning off the crack: a layback on its edge.
+		# Leaning off the crack: a layback on its edge, as good as the edge is
+		# (a seam gives little to pull on, a flared crack less).
 		var lean := clampf(absf(hip.x - h.pos.x) / 0.4, 0.0, 1.0)
-		return maxf(_jam_quality(h, hip) * (1.0 - lean), 0.45 + 0.25 * lean)
+		var c := wall.crack(h.crack_id)
+		var width := c.width_near(h.pos) if c else 4.0
+		var edge := clampf(width / 3.0, 0.2, 1.0) * (1.0 - 0.5 * clampf(c.flare if c else 0.0, 0.0, 1.0))
+		return maxf(_jam_quality(h, hip) * (1.0 - lean), (0.35 + 0.25 * lean) * edge)
 	var a := clampf(_align(h, hip), 0.0, 1.0)
 	var steep := clampf(wall.angle, 0.0, 60.0)
 	match h.kind:
@@ -798,7 +823,7 @@ func _jam_quality(h: V2Hold, _hip: Vector2) -> float:
 
 ## "hand_jam" etc. when the hand goes into [param h] square to the crack.
 func _jam_tag(h: V2Hold, hip: Vector2) -> String:
-	if h.kind != &"jam" or h.crack_id == "" or absf(hip.x - h.pos.x) >= 0.15:
+	if h.kind != &"jam" or h.crack_id == "" or absf(hip.x - h.pos.x) >= BodyTuning.JAM_SQUARE:
 		return ""
 	var c := session.wall.crack(h.crack_id)
 	var width := c.width_near(h.pos) if c else 4.0
@@ -824,7 +849,7 @@ func _layback(h: V2Hold, stay: V2Hold, hip: Vector2, feet_on: Array[V2Limb], wal
 ## The sideways direction a hold pulls (-1, 0, 1), from where the hips are.
 func _side_pull(h: V2Hold, hip: Vector2) -> int:
 	if h.kind == &"jam" and h.crack_id != "":
-		if absf(hip.x - h.pos.x) < 0.15:
+		if absf(hip.x - h.pos.x) < BodyTuning.JAM_SQUARE:
 			return 0
 		return 1 if hip.x > h.pos.x else -1
 	if absf(h.pull.x) < BodyTuning.SIDE_PULL:

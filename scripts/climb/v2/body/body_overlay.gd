@@ -118,7 +118,8 @@ func _draw() -> void:
 		draw_line(to_overlay(base), to_overlay(hip), Color(1, 1, 1, 0.5), 1.0, true)
 		draw_circle(to_overlay(base), 2.5, Color(1, 1, 1, 0.5))
 		draw_circle(to_overlay(hip), 4.0, tone(move))
-		var com := hip + Vector2(0, ClimbV2.TORSO_M * 0.3)
+		var lean := (aimed.pos.x - hip.x) * BodyTuning.REACH_LEAN if aimed else 0.0
+		var com := hip + Vector2(lean, ClimbV2.TORSO_M * 0.3)
 		var foot_y := hip.y - ClimbV2.LEG_M
 		var barn := move != null and move.has_tag("barndoor")
 		var a := to_overlay(com)

@@ -50,6 +50,9 @@ const BACKSTEP_REACH := 0.07
 const HIGH_STEP := 0.35
 ## Knee height under the hip (a drop-knee wants the outside foot above it).
 const KNEE_DROP := 0.5
+## The hips count as square to a crack (a jam) within this of it; further
+## off is a layback. Half a hip step, so one step decides it cleanly.
+const JAM_SQUARE := 0.1
 ## Feet this far apart around the hips are a stem.
 const STEM_SPAN := 1.15
 ## A hold pulls sideways when |pull.x| is at least this (laybacks).
@@ -81,6 +84,9 @@ const HIGH_STEP_LOCKOFF := 0.35
 const STRAIN_BARN := 1.2
 const STRAIN_FEET_CUT := 0.3
 const STRAIN_DROPKNEE := 0.05
+## Laybacks are pumpy: arms pull against the feet the whole time.
+const STRAIN_LAYBACK := 0.12
+const STRAIN_MANTLE := 0.1
 const STRAIN_BACKSTEP := 0.04
 ## The staying arm starts to lock off when its hand is less than LOCKOFF_FROM
 ## above its shoulder, and is fully locked LOCKOFF_SPAN lower.
