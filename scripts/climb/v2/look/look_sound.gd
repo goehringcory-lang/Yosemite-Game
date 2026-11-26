@@ -66,6 +66,11 @@ func listen(bus: ClimbEvents, session: ClimbSession) -> void:
 		if r.success:
 			play("climb_topout"))
 	bus.effort_changed.connect(func(e: V2Effort) -> void: pump = e.pump)
+	# Big-wall specials (thread 8, contract v2): each step of nailing, a
+	# pendulum, hauling or a chimney. Wired by name so this works before
+	# and after that event exists.
+	if bus.has_signal(&"special_step"):
+		bus.connect(&"special_step", func(kind: StringName, data: Dictionary) -> void: special_step(kind, data))
 
 
 ## Plays [param id] (a take of it, if it has takes) unless it just played.
@@ -109,6 +114,48 @@ func step(delta: float, wind: float, exposure: float) -> void:
 		if _gust_wait <= 0.0:
 			play("slack_gust", lerpf(-16.0, -6.0, gusty), randf_range(0.85, 1.1))
 			_gust_wait = lerpf(18.0, 6.0, gusty) * randf_range(0.7, 1.3)
+
+
+## Nailing: the pin's ring is the whole feedback, so each tap's tone has
+## its own pitch (rising as it drives, a clear ring when it's home, a dead
+## clack in rotten rock, a ping off the top, a thunk when it bottoms out).
+const NAIL_TONES := {
+	"rising": [1.0, -3.0], "ring": [1.32, 0.0], "clack": [0.62, -2.0],
+	"ping": [1.6, -4.0], "thunk": [0.5, -1.0],
+}
+var _nail_taps := 0
+
+
+## One step of a big-wall special (thread 8's special_step).
+func special_step(kind: StringName, data: Dictionary) -> void:
+	match String(kind):
+		"nail":
+			var tone: Array = NAIL_TONES.get(str(data.get("tone", "rising")), NAIL_TONES.rising)
+			_nail_taps = _nail_taps + 1 if str(data.get("tone", "")) == "rising" else 0
+			var rise := minf(_nail_taps * 0.04, 0.24)
+			# Hammer taps come fast: let them through the gap.
+			_last_at.erase("climb_pin")
+			play("climb_pin", tone[1], float(tone[0]) + rise)
+		"swing":
+			match str(data.get("stage", "")):
+				"lowered":
+					play("climb2_rope_pull", -4.0, 0.8)
+				"swing":
+					play("climb2_whoosh", -4.0, 0.9 + 0.2 * clampf(float(data.get("peak", 0.5)), 0.0, 1.0))
+				"missed":
+					play("climb2_catch", -4.0, 1.2)
+				"grabbed":
+					play("climb2_slap")
+		"haul":
+			match str(data.get("stage", data.get("event", ""))):
+				"snag", "jammed":
+					play("climb2_catch", -6.0, 1.4)
+				"freed":
+					play("climb2_rope_pull", -2.0, 0.85)
+				"docked":
+					play("climb_clip")
+		"chimney":
+			play("climb_move", -3.0 if bool(data.get("slipped", false)) else -6.0, 0.75 if bool(data.get("slipped", false)) else 0.9)
 
 
 func _touch(session: ClimbSession, m: V2Move) -> void:

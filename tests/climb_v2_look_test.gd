@@ -228,6 +228,14 @@ func test_sound() -> void:
 		snd.step(1.0 / 30.0, 0.0, 0.0)
 	var breaths := snd.played.filter(func(id: String) -> bool: return id.begins_with("climb2_breath")).size()
 	check(breaths >= 5, "pumped: breathing hard, often (%d breaths in 10 s)" % breaths)
+	snd.played.clear()
+	for tone in ["rising", "rising", "ring", "clack"]:
+		snd.special_step(&"nail", {"tone": tone})
+	check(snd.played.count("climb_pin") == 4, "every hammer tap on a pin sounds, even fast ones")
+	snd.step(1.0, 0.0, 0.0)
+	snd.special_step(&"swing", {"stage": "swing", "peak": 0.8})
+	snd.special_step(&"swing", {"stage": "grabbed"})
+	check(snd.played.has("climb2_whoosh") and snd.played.has("climb2_slap"), "a pendulum whooshes and slaps the far hold")
 	for id in ["climb2_rope_pull", "climb2_catch", "climb2_breath_1", "climb2_nut", "climb2_slap"]:
 		check(ResourceLoader.exists("res://assets/audio/%s.wav" % id), "the %s sound is built" % id)
 
