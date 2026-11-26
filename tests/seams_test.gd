@@ -31,6 +31,13 @@ const SEAMS := {
 	"the_ahwahnee": ["ToStonemanBridge", "NorthsideDriveWest"],
 	"ahwahnee_trail": ["ToHomestead", "ToAhwahnee"],
 	"lamon_homestead": ["ToCurryVillage", "NorthToAhwahnee"],
+	# The high country: the Tioga Road along Tenaya Lake into Tuolumne
+	# Meadows, the John Muir Trail south to Cathedral Lakes, and the trail
+	# north from Soda Springs to Glen Aulin.
+	"tuolumne_meadows": ["TiogaRoadWest", "JMTSouth", "GlenAulinTrail"],
+	"tenaya_lake": ["TiogaRoadEast"],
+	"cathedral_lakes": ["JMTNorth"],
+	"glen_aulin": ["ToTuolumne"],
 }
 
 var failures := 0

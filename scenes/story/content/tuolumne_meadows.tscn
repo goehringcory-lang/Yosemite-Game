@@ -11,13 +11,20 @@
 [ext_resource type="PackedScene" path="res://scenes/world/tuolumne_skyline.tscn" id="skyline_r"]
 [ext_resource type="Script" path="res://scripts/objects/bulletin_board.gd" id="board_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/buildings/camp4_board.png" id="board_tex"]
-[ext_resource type="PackedScene" path="res://scenes/objects/region_door.tscn" id="9_door"]
+[ext_resource type="Script" path="res://scripts/objects/info_sign.gd" id="sign_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/info_sign.png" id="sign_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_board_col"]
 size = Vector2(72, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_board_hit"]
 size = Vector2(84, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sign_col"]
+size = Vector2(24, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sign_hit"]
+size = Vector2(36, 28)
 
 [node name="TuolumneMeadowsStory" type="Node2D"]
 
@@ -79,10 +86,74 @@ monitoring = false
 position = Vector2(0, -16)
 shape = SubResource("RectangleShape2D_board_hit")
 
-[node name="CathedralLakesTrail" parent="." instance=ExtResource("9_door")]
-position = Vector2(1072, 1616)
-label = "Cathedral Lakes Trail, up to Lower and Upper Cathedral Lake"
-target_region = "cathedral_lakes"
-target_spawn = "north"
-minutes = 75
-closure = "tioga_road"
+[node name="GlenAulinTrailSign" type="StaticBody2D" parent="."]
+position = Vector2(2112, 432)
+collision_mask = 0
+script = ExtResource("sign_script")
+title = "Glen Aulin Trail"
+text = "North over the granite beside the Tuolumne River: Tuolumne Falls, White Cascade and the Glen Aulin camp, about 4.5 miles. Most of it is easy walking on glacier-polished slabs."
+
+[node name="Sprite" type="Sprite2D" parent="GlenAulinTrailSign"]
+texture = ExtResource("sign_tex")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="GlenAulinTrailSign"]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_sign_col")
+
+[node name="Hitbox" type="Area2D" parent="GlenAulinTrailSign"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="GlenAulinTrailSign/Hitbox"]
+position = Vector2(0, -14)
+shape = SubResource("RectangleShape2D_sign_hit")
+
+[node name="JMTCathedralSign" type="StaticBody2D" parent="."]
+position = Vector2(1200, 2656)
+collision_mask = 0
+script = ExtResource("sign_script")
+title = "John Muir Trail"
+text = "South: Cathedral Lakes, just over the rise under Cathedral Peak. North: back down through the lodgepoles to the Tioga Road and Tuolumne Meadows."
+
+[node name="Sprite" type="Sprite2D" parent="JMTCathedralSign"]
+texture = ExtResource("sign_tex")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="JMTCathedralSign"]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_sign_col")
+
+[node name="Hitbox" type="Area2D" parent="JMTCathedralSign"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="JMTCathedralSign/Hitbox"]
+position = Vector2(0, -14)
+shape = SubResource("RectangleShape2D_sign_hit")
+
+[node name="TiogaRoadWestSign" type="StaticBody2D" parent="."]
+position = Vector2(160, 1440)
+collision_mask = 0
+script = ExtResource("sign_script")
+title = "Tioga Road"
+text = "West along the road: Tenaya Lake, its granite beaches and Olmsted Point, about 8 miles. Watch for cyclists and marmots on the shoulder."
+
+[node name="Sprite" type="Sprite2D" parent="TiogaRoadWestSign"]
+texture = ExtResource("sign_tex")
+offset = Vector2(0, -16)
+
+[node name="Collision" type="CollisionShape2D" parent="TiogaRoadWestSign"]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_sign_col")
+
+[node name="Hitbox" type="Area2D" parent="TiogaRoadWestSign"]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Shape" type="CollisionShape2D" parent="TiogaRoadWestSign/Hitbox"]
+position = Vector2(0, -14)
+shape = SubResource("RectangleShape2D_sign_hit")

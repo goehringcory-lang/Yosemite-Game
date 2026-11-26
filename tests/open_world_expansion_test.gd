@@ -111,13 +111,25 @@ func _check_pohono_loop(world: Node) -> void:
 func _check_cathedral_loop(world: Node) -> void:
 	GameClock.season = GameClock.Season.SUMMER
 	GameClock.minutes = 8 * 60
-	await world.go_to_region("tuolumne_meadows", "cathedral_lakes_trailhead")
+	# The John Muir Trail walks straight on off Tuolumne's south edge into
+	# Cathedral Lakes: an edge seam, no timed trip.
+	await world.go_to_region("tuolumne_meadows", "cathedral_lakes_trail")
 	await _settle(world)
-	var trail: RegionDoor = world.region.entities.get_node_or_null("CathedralLakesTrail")
-	check(trail != null and trail.target_region == "cathedral_lakes", "Tuolumne Meadows has CathedralLakesTrail")
-	trail.interact(world.player)
+	var trail: RegionExit = world.region.get_node_or_null("Exits/JMTSouth")
+	check(trail != null and trail.target_region == "cathedral_lakes" and trail.minutes == 0,
+		"Tuolumne Meadows' John Muir Trail walks on to Cathedral Lakes")
+	for _i in 120:
+		if world.seam != null and world.seam.neighbor.region_id == "cathedral_lakes":
+			break
+		await get_tree().process_frame
+	check(world.seam != null and world.seam.neighbor.region_id == "cathedral_lakes",
+		"Cathedral Lakes is laid out beside Tuolumne at the trail")
+	world.use_exit(trail)
 	await _wait_region(world, "cathedral_lakes")
-	check(world.region.region_id == "cathedral_lakes", "CathedralLakesTrail arrives at Cathedral Lakes")
+	check(world.region.region_id == "cathedral_lakes", "the John Muir Trail arrives at Cathedral Lakes")
+	var north: RegionExit = world.region.get_node_or_null("Exits/JMTNorth")
+	check(north != null and north.target_region == "tuolumne_meadows" and north.minutes == 0,
+		"Cathedral Lakes' John Muir Trail walks back down to Tuolumne")
 	check(world.region.entities.get_node_or_null("CathedralPassViewer") is ScenicViewer, "Cathedral Lakes has its scenic viewer")
 	check(world.region.entities.get_node_or_null("CathedralCamp") is BackcountryCamp, "Cathedral Lakes has a backcountry camp")
 	var water: FishingWater = world.region.entities.get_node_or_null("LowerCathedralLakeWater")

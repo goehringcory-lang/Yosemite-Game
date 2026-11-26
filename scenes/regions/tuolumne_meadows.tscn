@@ -2506,6 +2506,9 @@ size = Vector2(28, 12)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hst42"]
 size = Vector2(32, 80)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trail_edge"]
+size = Vector2(64, 16)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xf0h3"]
 size = Vector2(32, 80)
 
@@ -4110,18 +4113,6 @@ offset = Vector2(0, -94)
 position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_y1dt6")
 
-[node name="TreeLodgepoleC116" type="StaticBody2D" parent="Entities" unique_id=2042876075]
-position = Vector2(1973.0315, 59.6138)
-collision_mask = 0
-
-[node name="Sprite" type="Sprite2D" parent="Entities/TreeLodgepoleC116" unique_id=634656316]
-texture = ExtResource("33_654nr")
-offset = Vector2(0, -70)
-
-[node name="Collision" type="CollisionShape2D" parent="Entities/TreeLodgepoleC116" unique_id=1633691928]
-position = Vector2(0, -3)
-shape = SubResource("RectangleShape2D_oweoc")
-
 [node name="TreeLodgepoleA117" type="StaticBody2D" parent="Entities" unique_id=888745048]
 position = Vector2(2117.2674, 31.5932)
 collision_mask = 0
@@ -5130,18 +5121,6 @@ offset = Vector2(0, -110)
 position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_bnikv")
 
-[node name="TreeLodgepoleA201" type="StaticBody2D" parent="Entities" unique_id=942149673]
-position = Vector2(1975.1036, 219.1228)
-collision_mask = 0
-
-[node name="Sprite" type="Sprite2D" parent="Entities/TreeLodgepoleA201" unique_id=1654496188]
-texture = ExtResource("31_evgut")
-offset = Vector2(0, -110)
-
-[node name="Collision" type="CollisionShape2D" parent="Entities/TreeLodgepoleA201" unique_id=1721665243]
-position = Vector2(0, -4)
-shape = SubResource("RectangleShape2D_hva3s")
-
 [node name="TreeLodgepoleA202" type="StaticBody2D" parent="Entities" unique_id=259926931]
 position = Vector2(2085.65, 250.6873)
 collision_mask = 0
@@ -5393,18 +5372,6 @@ offset = Vector2(0, -94)
 [node name="Collision" type="CollisionShape2D" parent="Entities/TreeLodgepoleB222" unique_id=261596865]
 position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_l0hg4")
-
-[node name="TreeSnag223" type="StaticBody2D" parent="Entities" unique_id=1040302225]
-position = Vector2(1978.3345, 315.3843)
-collision_mask = 0
-
-[node name="Sprite" type="Sprite2D" parent="Entities/TreeSnag223" unique_id=968624178]
-texture = ExtResource("42_c5t1n")
-offset = Vector2(0, -74)
-
-[node name="Collision" type="CollisionShape2D" parent="Entities/TreeSnag223" unique_id=1459876356]
-position = Vector2(0, -4)
-shape = SubResource("RectangleShape2D_dsauf")
 
 [node name="TreeLodgepoleA224" type="StaticBody2D" parent="Entities" unique_id=464495188]
 position = Vector2(2098.5, 313.3302)
@@ -13274,18 +13241,6 @@ offset = Vector2(0, -26)
 position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_s48f0")
 
-[node name="RockGraniteA947" type="StaticBody2D" parent="Entities" unique_id=416717001]
-position = Vector2(2009.4958, 223.8961)
-collision_mask = 0
-
-[node name="Sprite" type="Sprite2D" parent="Entities/RockGraniteA947" unique_id=141117391]
-texture = ExtResource("53_m45tw")
-offset = Vector2(0, -34)
-
-[node name="Collision" type="CollisionShape2D" parent="Entities/RockGraniteA947" unique_id=807064617]
-position = Vector2(0, -12)
-shape = SubResource("RectangleShape2D_17pqd")
-
 [node name="RockGraniteC948" type="StaticBody2D" parent="Entities" unique_id=784308768]
 position = Vector2(4239.977, 2582.6246)
 collision_mask = 0
@@ -13489,18 +13444,6 @@ offset = Vector2(0, -14)
 [node name="Collision" type="CollisionShape2D" parent="Entities/RockGraniteD964" unique_id=611258381]
 position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_55ycs")
-
-[node name="RockGraniteC965" type="StaticBody2D" parent="Entities" unique_id=1314992152]
-position = Vector2(1957.4388, 56.0247)
-collision_mask = 0
-
-[node name="Sprite" type="Sprite2D" parent="Entities/RockGraniteC965" unique_id=22997630]
-texture = ExtResource("55_kodac")
-offset = Vector2(0, -20)
-
-[node name="Collision" type="CollisionShape2D" parent="Entities/RockGraniteC965" unique_id=771845840]
-position = Vector2(0, -9)
-shape = SubResource("RectangleShape2D_wcd24")
 
 [node name="RockGraniteB966" type="StaticBody2D" parent="Entities" unique_id=1666532021]
 position = Vector2(2160.3296, 1689.2891)
@@ -14148,6 +14091,12 @@ position = Vector2(720, 2624)
 [node name="lyell_trailhead" type="Marker2D" parent="Markers" unique_id=580844511]
 position = Vector2(4272, 2032)
 
+[node name="glen_aulin_trail" type="Marker2D" parent="Markers" unique_id=1840212621]
+position = Vector2(2000, 80)
+
+[node name="cathedral_lakes_trail" type="Marker2D" parent="Markers" unique_id=1840212622]
+position = Vector2(1136, 2704)
+
 [node name="meadow" type="Marker2D" parent="Markers" unique_id=1658879369]
 position = Vector2(1936, 1168)
 
@@ -14256,11 +14205,29 @@ script = ExtResource("64_5fc0e")
 label = "Tioga Road, to Tenaya Lake"
 target_region = "tenaya_lake"
 target_spawn = "east"
-minutes = 15
-miles = 8.1
 
 [node name="Shape" type="CollisionShape2D" parent="Exits/TiogaRoadWest" unique_id=646247330]
 shape = SubResource("RectangleShape2D_hst42")
+
+[node name="GlenAulinTrail" type="Area2D" parent="Exits" unique_id=1840212617]
+position = Vector2(2000, 16)
+script = ExtResource("64_5fc0e")
+label = "Glen Aulin Trail, to Glen Aulin"
+target_region = "glen_aulin"
+target_spawn = "south"
+
+[node name="Shape" type="CollisionShape2D" parent="Exits/GlenAulinTrail" unique_id=1840212618]
+shape = SubResource("RectangleShape2D_trail_edge")
+
+[node name="JMTSouth" type="Area2D" parent="Exits" unique_id=1840212619]
+position = Vector2(1136, 2736)
+script = ExtResource("64_5fc0e")
+label = "John Muir Trail, to Cathedral Lakes"
+target_region = "cathedral_lakes"
+target_spawn = "north"
+
+[node name="Shape" type="CollisionShape2D" parent="Exits/JMTSouth" unique_id=1840212620]
+shape = SubResource("RectangleShape2D_trail_edge")
 
 [node name="TiogaRoadEast" type="Area2D" parent="Exits" unique_id=2047907697]
 position = Vector2(4464, 1472)

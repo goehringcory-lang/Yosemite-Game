@@ -22,7 +22,7 @@ extends RefCounted
 const PERMIT := "wilderness_permit"
 const CANISTER := "bear_canister"
 ## Regions past the trailhead. A night out here is a night in the wilderness.
-const REGIONS := ["little_yosemite_valley", "half_dome", "tenaya_lake", "taft_point", "cathedral_lakes", "hetch_hetchy"]
+const REGIONS := ["little_yosemite_valley", "half_dome", "tenaya_lake", "taft_point", "cathedral_lakes", "glen_aulin", "hetch_hetchy"]
 ## Firsts, kept in QuestLog.unlocks: a night out with your food in the
 ## canister, standing on top of Half Dome (by either way up), going up the
 ## cables, and the afternoon light from the Diving Board.

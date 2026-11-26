@@ -123,6 +123,10 @@ func _layout() -> void:
 	# The old road west from the lot to Soda Springs, and the trail to Dog Lake.
 	_path([Vector2(107, 19), Vector2(96, 18), Vector2(82, 17), Vector2(70, 18)], 2, Terrain.TRAIL, 0.3)
 	_path([Vector2(121, 19), Vector2(125, 14), Vector2(127, 9)], 1, Terrain.TRAIL, 0.4)
+	# The Glen Aulin trail north from Soda Springs over the granite, off the
+	# map's north edge into Glen Aulin (build_glen_aulin.gd), which lies
+	# beside it there (a seam).
+	_path([Vector2(64, 15), Vector2(62, 9), Vector2(62.5, 4), Vector2(62, -1)], 1, Terrain.TRAIL, 0.3)
 	# Soda Springs and Parsons Lodge on their rise: trampled ground.
 	_ellipse(66, 16, 9, 4, Terrain.CAMP, 0.3, [Terrain.MEADOW, Terrain.SUBALPINE])
 	# The meadow trail from the visitor center over the footbridge.
@@ -143,11 +147,16 @@ func _layout() -> void:
 	# Trails south: to Cathedral Peak round the east side of its base, and up
 	# Lyell Canyon from the lodge.
 	_path([Vector2(30, 47), Vector2(31, 58), Vector2(36, 70), Vector2(35, 82), Vector2(24, 82.5)], 1, Terrain.TRAIL, 0.4)
+	# ...and on south off the map's edge, where Cathedral Lakes lies beside
+	# it (a seam: the John Muir Trail walks straight on, no trip).
+	_path([Vector2(35, 82), Vector2(35.5, 84), Vector2(35, 86)], 1, Terrain.TRAIL, 0.3)
 	_path([Vector2(133, 60), Vector2(134, 70), Vector2(137, 85)], 1, Terrain.TRAIL, 0.4)
 	_mark_open()
 	clear_trees(34, 44, 56, 54) # the visitor center
 	clear_trees(80, 44, 100, 53) # the store
 	clear_trees(56, 10, 76, 21) # Soda Springs
+	clear_trees(60, 0, 65, 10) # the Glen Aulin trail
+	clear_trees(33, 82, 38, 86) # the John Muir Trail on to Cathedral Lakes
 	clear_trees(104, 17, 122, 22) # the Lembert lot
 	clear_trees(118, 48, 140, 63) # the lodge
 	clear_trees(12, 76, 38, 85) # the foot of Cathedral Peak
@@ -282,8 +291,14 @@ func _place_lodge() -> void:
 
 func _place_roads() -> void:
 	# West along the Tioga Road to Tenaya Lake (build_tenaya_lake.gd), and on
-	# from there to Crane Flat.
-	_long_road("TiogaRoadWest", tile_pos(0, 46.5), Vector2(16, 40), "Tioga Road, to Tenaya Lake", "tenaya_lake", "east", 15, 8.1)
+	# from there to Crane Flat. Tenaya Lake lies beside this map at the road
+	# (a seam, scripts/world/seam.gd): you walk on into it with no trip.
+	region_exit("TiogaRoadWest", tile_pos(0, 46.5), Vector2(16, 40), "Tioga Road, to Tenaya Lake", "tenaya_lake", "east")
+	# North from Soda Springs into Glen Aulin (build_glen_aulin.gd), and south
+	# on the John Muir Trail past Cathedral Peak into Cathedral Lakes
+	# (build_cathedral_lakes.gd): each lies beside this map's edge there.
+	region_exit("GlenAulinTrail", tile_pos(62, 0), Vector2(64, 16), "Glen Aulin Trail, to Glen Aulin", "glen_aulin", "south")
+	region_exit("JMTSouth", tile_pos(35, 85), Vector2(64, 16), "John Muir Trail, to Cathedral Lakes", "cathedral_lakes", "north")
 	_road_out("TiogaRoadEast", tile_pos(139, 45.5), Vector2(16, 40), "Tioga Road",
 		"Tioga Road climbs east over Tioga Pass toward Lee Vining and Mono Lake.")
 
@@ -292,6 +307,8 @@ func _place_markers() -> void:
 	marker("arrival", 40, 49.5)
 	marker("west", 2, 46.5)
 	marker("cathedral_lakes_trailhead", 31, 49)
+	marker("glen_aulin_trail", 62, 2)
+	marker("cathedral_lakes_trail", 35, 84)
 	marker("soda_springs", 66, 19.5)
 	marker("lembert_dome", 108, 22)
 	marker("tuolumne_lodge", 128, 57)
