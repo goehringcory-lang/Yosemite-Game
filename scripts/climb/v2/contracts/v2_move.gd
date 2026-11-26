@@ -32,6 +32,11 @@ var tags := PackedStringArray()
 ## The crux zone it's in, and whether it follows the zone's sequence.
 var crux_id := ""
 var in_sequence := true
+## What the crux beta does to this move: effort multiplies its pump and gas by
+## [member crux_cost] (1 on beta, up to ~2.5 off it), and falls adds
+## [member crux_risk] to its fall chance (a dyno thrown from a bad pose).
+var crux_cost := 1.0
+var crux_risk := 0.0
 
 # --- effort (thread 4)
 var cost := V2Cost.new()
@@ -50,4 +55,4 @@ func to_dict() -> Dictionary:
 		"from": from.to_dict() if from else {}, "to": to.to_dict() if to else {},
 		"reach": reach, "strain": strain, "security": security, "load": load.duplicate(),
 		"valid": valid, "reason": reason, "tags": Array(tags), "crux_id": crux_id,
-		"in_sequence": in_sequence, "cost": cost.to_dict(), "risk": risk}
+		"in_sequence": in_sequence, "crux_cost": crux_cost, "crux_risk": crux_risk, "cost": cost.to_dict(), "risk": risk}
