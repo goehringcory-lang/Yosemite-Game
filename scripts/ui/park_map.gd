@@ -629,13 +629,12 @@ func _draw_area_illustrated() -> void:
 
 
 ## Is this sign's place known: a peak or fall (seen from anywhere), your
-## camp, a place you've walked to, or any place once you've seen the Valley
-## from a high lookout (Discoveries)?
+## camp, a place you've walked to or seen from a vista (Vistas), or any place
+## once you've seen the Valley from a high lookout (Discoveries)?
 func _point_known(point: Dictionary) -> bool:
-	if point.get("tier", "") != "place" or Discoveries.valley_seen:
+	if point.get("tier", "") != "place":
 		return true
-	var place_name: String = point.get("name", "")
-	return not Discoveries.is_listed_name(place_name) or Discoveries.is_name_found(place_name)
+	return Discoveries.is_name_known(point.get("name", ""))
 
 
 ## The size of a point's sign.

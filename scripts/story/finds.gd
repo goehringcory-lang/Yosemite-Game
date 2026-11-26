@@ -131,20 +131,31 @@ static func icon_of(find: Dictionary) -> Texture2D:
 	return null
 
 
+## A gear cache (Vistas): seen glinting from a vista, which passes on its
+## rumor; otherwise it lies like any find.
+static func is_cache(find: Dictionary) -> bool:
+	return bool(find.get("cache", false)) and str(find.get("vista", "")) != ""
+
+
 ## How many hidden-find rumors the Logbook passes on at once.
 func rumor_limit() -> int:
 	return RUMORS + (2 if Perks.has("trail_sense") else 0)
 
 
-## Up to rumor_limit() hints about finds not yet found, in areas you've walked into.
+## The lines about caches seen glinting from a vista you've taken in, then up
+## to rumor_limit() hints about finds not yet found, in areas you've walked into.
 ## The same few stay until one is found, so they don't shuffle each visit.
 func rumors() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	var limit := rumor_limit()
+	# a gear cache's line comes from its vista, once you've taken in the view
+	for find in _finds:
+		if is_cache(find) and not found.has(find.id) and Vistas.is_surveyed(str(find.vista)):
+			result.append(find)
+	var limit := rumor_limit() + result.size()
 	for find in _finds:
 		if result.size() >= limit:
 			break
-		if found.has(find.id) or str(find.get("rumor", "")) == "":
+		if found.has(find.id) or str(find.get("rumor", "")) == "" or is_cache(find):
 			continue
 		if Discoveries.is_found(Discoveries.key_for(find.region, _region_name(find.region))):
 			result.append(find)

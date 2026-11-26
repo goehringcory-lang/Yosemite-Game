@@ -1,0 +1,997 @@
+{
+	"_note": "Vistas (Vistas autoload): high lookouts you walk up to and 'take in the view'. 'sights' are the areas whose place names the view puts on the area map; 'landmarks' the Landmark log ids it sights. The panorama is BinocularView.VIEWS[view], or 'panorama' (the same shape: bearings, ClimbLandscape kinds 'k', layer 'l', scale 's'). 'quiz' is the peak-finder's answer (a landmark id) and 'quiz_target' its target in the panorama. lonlat/radius_m fill in the park map (MapFog). 'pos' is in the region's own pixels: tools/discovery/find_spots.tscn with FIND_PLACE=1 fills it in near 'spot.place'. Sightlines want a naturalist's check.",
+	"vistas": [
+		{
+			"id": "tunnel_view",
+			"region": "tunnel_view",
+			"title": "Tunnel View",
+			"stand": "railing",
+			"lonlat": [
+				-119.6774,
+				37.7156
+			],
+			"radius_m": 6000.0,
+			"line": "The whole Valley opens at once, framed like a door: granite on the left, granite on the right, and Half Dome at the far end.",
+			"sights": [
+				"tunnel_view",
+				"bridalveil_fall",
+				"el_capitan_meadow",
+				"leidig_meadow",
+				"four_mile_trailhead"
+			],
+			"landmarks": [
+				"el_capitan",
+				"merced_river",
+				"half_dome",
+				"clouds_rest",
+				"sentinel_rock",
+				"cathedral_rocks",
+				"bridalveil_fall",
+				"leaning_tower"
+			],
+			"quiz": "half_dome",
+			"panorama": {
+				"title": "Tunnel View",
+				"vantage": "tunnel_view",
+				"from": 45.0,
+				"to": 140.0,
+				"ground": "el_cap_meadow",
+				"density": [
+					[
+						45.0,
+						10.0
+					],
+					[
+						140.0,
+						10.0
+					]
+				],
+				"backdrop": [
+					{
+						"k": "sierra_crest",
+						"b": 82.0,
+						"s": 0.7,
+						"l": 0.0
+					}
+				],
+				"targets": [
+					{
+						"id": "el_capitan",
+						"name": "El Capitan",
+						"k": "el_capitan",
+						"l": 2.0,
+						"s": 1.15,
+						"bearing": 62.0,
+						"stat": "7,573 ft",
+						"mi": 1.9,
+						"text": "The Valley's west gate. Three thousand feet of unbroken granite on the left of the view, and the first thing everyone points at."
+					},
+					{
+						"id": "clouds_rest",
+						"name": "Clouds Rest",
+						"k": "clouds_rest",
+						"l": 0.0,
+						"s": 0.75,
+						"bearing": 80.0,
+						"stat": "9,926 ft",
+						"mi": 11.0,
+						"text": "The long pale ridge far up the Valley, behind and above Half Dome. It stands higher than Half Dome does."
+					},
+					{
+						"id": "half_dome",
+						"name": "Half Dome",
+						"k": "half_dome",
+						"l": 0.0,
+						"s": 0.55,
+						"bearing": 86.0,
+						"stat": "8,842 ft",
+						"mi": 9.8,
+						"text": "Small and far from here, at the very end of the Valley, with its sheer face turned toward you."
+					},
+					{
+						"id": "sentinel_rock",
+						"name": "Sentinel Rock",
+						"k": "sentinel_rock",
+						"l": 1.0,
+						"s": 0.8,
+						"bearing": 96.0,
+						"stat": "7,038 ft",
+						"mi": 5.5,
+						"text": "The narrow granite tower on the Valley's south wall, standing guard over the Merced."
+					},
+					{
+						"id": "cathedral_rocks",
+						"name": "Cathedral Rocks",
+						"k": "cathedral_rocks",
+						"l": 2.0,
+						"s": 1.1,
+						"bearing": 112.0,
+						"stat": "6,638 ft",
+						"mi": 2.0,
+						"text": "The buttresses on the right of the view, with the Cathedral Spires above. Bridalveil Fall pours off their west side."
+					},
+					{
+						"id": "bridalveil_fall",
+						"name": "Bridalveil Fall",
+						"k": "bridalveil",
+						"l": 2.0,
+						"s": 1.0,
+						"bearing": 121.0,
+						"ay": 0.25,
+						"stat": "620 ft drop",
+						"mi": 1.5,
+						"text": "Pohono, as the Ahwahneechee called it. In the afternoon the sun behind you can hang a rainbow in its spray."
+					}
+				],
+				"wrap": 0.0,
+				"elevation": "4,400 ft"
+			},
+			"quiz_target": "half_dome",
+			"spot": {
+				"place": "Tunnel View",
+				"center": true
+			},
+			"pos": [
+				1072.0,
+				992.0
+			]
+		},
+		{
+			"id": "glacier_point",
+			"region": "glacier_point",
+			"title": "Glacier Point",
+			"stand": "railing",
+			"lonlat": [
+				-119.5732,
+				37.7306
+			],
+			"radius_m": 7000.0,
+			"line": "Three thousand feet straight down, Curry Village is a scatter of tent roofs. Across the gap, Half Dome stands at eye level.",
+			"sights": [
+				"curry_village",
+				"happy_isles",
+				"upper_pines",
+				"housekeeping_camp",
+				"mirror_lake",
+				"the_ahwahnee",
+				"ahwahnee_meadow",
+				"yosemite_village",
+				"half_dome",
+				"little_yosemite_valley",
+				"tenaya_creek"
+			],
+			"landmarks": [
+				"yosemite_falls",
+				"royal_arches",
+				"washington_column",
+				"north_dome",
+				"mount_watkins",
+				"tenaya_canyon",
+				"half_dome",
+				"clouds_rest",
+				"liberty_cap",
+				"nevada_fall",
+				"vernal_fall",
+				"illilouette_fall"
+			],
+			"quiz": "liberty_cap",
+			"view": "glacier_point",
+			"quiz_target": "liberty_cap",
+			"spot": {
+				"place": "Glacier Point",
+				"center": true
+			},
+			"pos": [
+				1920.0,
+				472.0
+			]
+		},
+		{
+			"id": "sentinel_dome",
+			"region": "glacier_point",
+			"title": "Sentinel Dome",
+			"stand": "benchmark",
+			"lonlat": [
+				-119.5843,
+				37.7232
+			],
+			"radius_m": 9000.0,
+			"line": "A bare granite crown with the whole park turning around it: the Valley rim to the north, the Clark Range to the east, El Capitan's broad top to the west.",
+			"sights": [
+				"glacier_point",
+				"taft_point",
+				"yosemite_village",
+				"el_capitan_meadow",
+				"leidig_meadow"
+			],
+			"landmarks": [
+				"el_capitan",
+				"yosemite_falls",
+				"north_dome",
+				"half_dome",
+				"clouds_rest",
+				"mount_starr_king",
+				"clark_range"
+			],
+			"quiz": "mount_starr_king",
+			"panorama": {
+				"title": "Sentinel Dome",
+				"vantage": "sentinel_dome",
+				"from": 280.0,
+				"to": 490.0,
+				"ground": "valley_forest",
+				"density": [
+					[
+						280.0,
+						6.0
+					],
+					[
+						490.0,
+						6.0
+					]
+				],
+				"backdrop": [
+					{
+						"k": "north_rim",
+						"b": 330.0,
+						"s": 1.0,
+						"l": 0.0
+					},
+					{
+						"k": "sierra_crest",
+						"b": 440.0,
+						"s": 0.9,
+						"l": 0.0
+					}
+				],
+				"targets": [
+					{
+						"id": "el_capitan",
+						"name": "El Capitan",
+						"k": "el_capitan",
+						"l": 1.0,
+						"s": 0.65,
+						"bearing": 292.0,
+						"stat": "7,573 ft",
+						"mi": 3.6,
+						"text": "From up here you look across at El Capitan's broad, rounded top, not its face: the way a climber sees it at the end of the Nose."
+					},
+					{
+						"id": "yosemite_falls",
+						"name": "Yosemite Falls",
+						"k": "yosemite_falls",
+						"l": 1.0,
+						"s": 0.8,
+						"bearing": 335.0,
+						"ay": 0.25,
+						"stat": "2,425 ft drop",
+						"mi": 2.4,
+						"text": "Straight across the Valley, all three drops in one line, the Upper Fall leaping from its notch."
+					},
+					{
+						"id": "north_dome",
+						"name": "North Dome",
+						"k": "north_dome",
+						"l": 1.0,
+						"s": 0.9,
+						"bearing": 18.0,
+						"stat": "7,542 ft",
+						"mi": 3.0,
+						"text": "The round crown above the Royal Arches, across the Valley from Half Dome."
+					},
+					{
+						"id": "clouds_rest",
+						"name": "Clouds Rest",
+						"k": "clouds_rest",
+						"l": 0.0,
+						"s": 1.1,
+						"bearing": 54.0,
+						"stat": "9,926 ft",
+						"mi": 6.5,
+						"text": "The long ridge rising behind Half Dome, the higher of the two."
+					},
+					{
+						"id": "half_dome",
+						"name": "Half Dome",
+						"k": "half_dome",
+						"l": 1.0,
+						"s": 1.0,
+						"bearing": 64.0,
+						"stat": "8,842 ft",
+						"mi": 3.6,
+						"text": "Close enough from here to see the cables' line up its rounded back."
+					},
+					{
+						"id": "mt_clark",
+						"name": "Clark Range",
+						"k": "mt_clark",
+						"l": 0.0,
+						"s": 0.9,
+						"bearing": 100.0,
+						"stat": "11,522 ft",
+						"mi": 11.0,
+						"text": "The sharp fin of the Clark Range on the southeast skyline, named for Galen Clark, the first Guardian of Yosemite."
+					},
+					{
+						"id": "mt_starr_king",
+						"name": "Mount Starr King",
+						"k": "mt_starr_king",
+						"l": 1.0,
+						"s": 1.2,
+						"bearing": 118.0,
+						"stat": "9,092 ft",
+						"mi": 5.0,
+						"text": "A steep bald dome standing alone to the southeast, named for Thomas Starr King."
+					}
+				],
+				"elevation": "8,122 ft"
+			},
+			"quiz_target": "mt_starr_king",
+			"spot": {
+				"place": "Sentinel Dome",
+				"center": true
+			},
+			"pos": [
+				576.0,
+				1648.0
+			]
+		},
+		{
+			"id": "taft_point",
+			"region": "taft_point",
+			"title": "Taft Point",
+			"stand": "railing",
+			"lonlat": [
+				-119.604,
+				37.7125
+			],
+			"radius_m": 5000.0,
+			"line": "The rim just stops. Across the air, El Capitan's whole face is lit from the side, and the Fissures drop away at your feet.",
+			"sights": [
+				"taft_point",
+				"el_capitan_meadow",
+				"leidig_meadow",
+				"four_mile_trailhead",
+				"bridalveil_fall"
+			],
+			"landmarks": [
+				"el_capitan",
+				"merced_river",
+				"three_brothers",
+				"yosemite_falls",
+				"sentinel_rock"
+			],
+			"quiz": "three_brothers",
+			"view": "taft_point",
+			"quiz_target": "eagle_peak",
+			"spot": {
+				"place": "Taft Point",
+				"center": true
+			},
+			"pos": [
+				1632.0,
+				336.0
+			]
+		},
+		{
+			"id": "half_dome",
+			"region": "half_dome",
+			"title": "Half Dome's summit",
+			"stand": "benchmark",
+			"lonlat": [
+				-119.5332,
+				37.7459
+			],
+			"radius_m": 9000.0,
+			"line": "The top is wide and almost flat, and the edge is a long way off for a reason. Below the visor, Mirror Lake is a blue fleck in Tenaya Canyon.",
+			"sights": [
+				"half_dome",
+				"little_yosemite_valley",
+				"mirror_lake",
+				"tenaya_creek",
+				"happy_isles",
+				"curry_village"
+			],
+			"landmarks": [
+				"north_dome",
+				"mount_watkins",
+				"tenaya_canyon",
+				"mount_hoffmann",
+				"clouds_rest",
+				"cathedral_peak",
+				"liberty_cap",
+				"clark_range",
+				"mount_conness"
+			],
+			"quiz": "cathedral_peak",
+			"panorama": {
+				"title": "Half Dome's summit",
+				"vantage": "half_dome_summit",
+				"from": 290.0,
+				"to": 520.0,
+				"ground": "valley_forest",
+				"density": [
+					[
+						290.0,
+						6.0
+					],
+					[
+						520.0,
+						6.0
+					]
+				],
+				"backdrop": [
+					{
+						"k": "sierra_crest",
+						"b": 420.0,
+						"s": 1.0,
+						"l": 0.0
+					}
+				],
+				"targets": [
+					{
+						"id": "north_dome",
+						"name": "North Dome",
+						"k": "north_dome",
+						"l": 1.0,
+						"s": 0.8,
+						"bearing": 300.0,
+						"stat": "7,542 ft",
+						"mi": 1.8,
+						"text": "Across Tenaya Canyon to the northwest, the round dome over the Royal Arches."
+					},
+					{
+						"id": "mt_hoffmann",
+						"name": "Mount Hoffmann",
+						"k": "mt_hoffmann",
+						"l": 0.0,
+						"s": 0.9,
+						"bearing": 345.0,
+						"stat": "10,850 ft",
+						"mi": 9.0,
+						"text": "Near the geographic center of the park, its bare summit ridge to the north."
+					},
+					{
+						"id": "mt_watkins",
+						"name": "Mount Watkins",
+						"k": "mt_watkins",
+						"l": 1.0,
+						"s": 1.0,
+						"bearing": 8.0,
+						"stat": "8,500 ft",
+						"mi": 2.0,
+						"text": "Straight across Tenaya Canyon, its face falling to Mirror Lake."
+					},
+					{
+						"id": "cathedral_peak",
+						"name": "Cathedral Peak",
+						"k": "cathedral_peak",
+						"l": 0.0,
+						"s": 0.6,
+						"bearing": 40.0,
+						"stat": "10,911 ft",
+						"mi": 11.0,
+						"text": "The spire on the far skyline to the northeast, out in the Tuolumne high country."
+					},
+					{
+						"id": "clouds_rest",
+						"name": "Clouds Rest",
+						"k": "clouds_rest",
+						"l": 1.0,
+						"s": 1.4,
+						"bearing": 56.0,
+						"stat": "9,926 ft",
+						"mi": 3.0,
+						"text": "The long granite ridge right behind you, higher still, falling nearly a mile into Tenaya Canyon."
+					},
+					{
+						"id": "mt_clark",
+						"name": "Clark Range",
+						"k": "mt_clark",
+						"l": 0.0,
+						"s": 0.9,
+						"bearing": 125.0,
+						"stat": "11,522 ft",
+						"mi": 7.5,
+						"text": "The Clark Range to the southeast, its fin of a summit sharp against the sky."
+					},
+					{
+						"id": "liberty_cap",
+						"name": "Liberty Cap",
+						"k": "liberty_cap",
+						"l": 2.0,
+						"s": 1.0,
+						"bearing": 150.0,
+						"stat": "7,076 ft",
+						"mi": 1.5,
+						"text": "Below to the south, the smooth dome standing over Nevada Fall."
+					}
+				],
+				"elevation": "8,842 ft"
+			},
+			"quiz_target": "cathedral_peak",
+			"spot": {
+				"place": "Half Dome",
+				"center": true,
+				"start": "summit"
+			},
+			"pos": [
+				912,
+				304
+			]
+		},
+		{
+			"id": "olmsted_point",
+			"region": "tenaya_lake",
+			"title": "Olmsted Point",
+			"stand": "railing",
+			"lonlat": [
+				-119.4843,
+				37.8107
+			],
+			"radius_m": 7000.0,
+			"line": "Glacial erratics sit on the bare granite like dropped marbles. Down Tenaya Canyon, Half Dome shows its back, the round side nobody photographs.",
+			"sights": [
+				"tenaya_lake"
+			],
+			"landmarks": [
+				"clouds_rest",
+				"half_dome",
+				"tenaya_canyon",
+				"tenaya_lake",
+				"tenaya_peak",
+				"polly_dome"
+			],
+			"quiz": "half_dome",
+			"view": "olmsted_point",
+			"quiz_target": "half_dome",
+			"spot": {
+				"place": "Olmsted Point",
+				"center": true
+			},
+			"pos": [
+				464.0,
+				432.0
+			]
+		},
+		{
+			"id": "lembert_dome",
+			"region": "tuolumne_meadows",
+			"title": "Lembert Dome",
+			"stand": "benchmark",
+			"lonlat": [
+				-119.3497,
+				37.88
+			],
+			"radius_m": 6000.0,
+			"line": "The whole meadow lies spread out below, the river looping through it like dropped string, and the Cathedral Range lined up along the south.",
+			"sights": [
+				"tuolumne_meadows",
+				"cathedral_lakes"
+			],
+			"landmarks": [
+				"fairview_dome",
+				"pothole_dome",
+				"tuolumne_river",
+				"cathedral_peak",
+				"unicorn_peak",
+				"mount_dana",
+				"mount_gibbs",
+				"mount_conness"
+			],
+			"quiz": "unicorn_peak",
+			"panorama": {
+				"title": "Lembert Dome",
+				"vantage": "lembert_dome",
+				"from": 80.0,
+				"to": 280.0,
+				"ground": "tuolumne",
+				"density": [
+					[
+						80.0,
+						6.0
+					],
+					[
+						280.0,
+						6.0
+					]
+				],
+				"backdrop": [
+					{
+						"k": "sierra_crest",
+						"b": 110.0,
+						"s": 1.0,
+						"l": 0.0
+					},
+					{
+						"k": "sierra_crest",
+						"b": 200.0,
+						"s": 0.8,
+						"l": 0.0
+					}
+				],
+				"targets": [
+					{
+						"id": "mt_dana",
+						"name": "Mount Dana",
+						"k": "mt_lyell",
+						"l": 0.0,
+						"s": 1.0,
+						"bearing": 100.0,
+						"stat": "13,061 ft",
+						"mi": 7.0,
+						"text": "The big red-brown peak to the east, built of old metamorphic rock, not granite."
+					},
+					{
+						"id": "mt_gibbs",
+						"name": "Mount Gibbs",
+						"k": "mt_maclure",
+						"l": 0.0,
+						"s": 0.9,
+						"bearing": 118.0,
+						"stat": "12,773 ft",
+						"mi": 7.5,
+						"text": "Mount Dana's neighbor to the south, the same old dark rock."
+					},
+					{
+						"id": "unicorn_peak",
+						"name": "Unicorn Peak",
+						"k": "unicorn_peak",
+						"l": 1.0,
+						"s": 1.0,
+						"bearing": 205.0,
+						"stat": "",
+						"mi": 4.5,
+						"text": "The single horn on the Cathedral Range, just east of Cathedral Peak."
+					},
+					{
+						"id": "cathedral_peak",
+						"name": "Cathedral Peak",
+						"k": "cathedral_peak",
+						"l": 1.0,
+						"s": 1.0,
+						"bearing": 218.0,
+						"stat": "10,911 ft",
+						"mi": 5.0,
+						"text": "The great spire to the southwest, the Cathedral Range's namesake. John Muir climbed it in 1869."
+					},
+					{
+						"id": "fairview_dome",
+						"name": "Fairview Dome",
+						"k": "basket_dome",
+						"l": 1.0,
+						"s": 0.8,
+						"bearing": 252.0,
+						"stat": "9,731 ft",
+						"mi": 5.5,
+						"text": "The big dome at the west end of the meadows, long clean slabs on its face."
+					},
+					{
+						"id": "pothole_dome",
+						"name": "Pothole Dome",
+						"k": "basket_dome",
+						"l": 2.0,
+						"s": 0.5,
+						"bearing": 264.0,
+						"stat": "",
+						"mi": 2.5,
+						"text": "The low granite hump where the meadow begins, polished by the ice."
+					}
+				],
+				"wrap": 0.0,
+				"elevation": "9,450 ft"
+			},
+			"quiz_target": "unicorn_peak",
+			"spot": {
+				"place": "Lembert Dome",
+				"center": true
+			},
+			"pos": [
+				3648.0,
+				336.0
+			]
+		},
+		{
+			"id": "pothole_dome",
+			"region": "tuolumne_meadows",
+			"title": "Pothole Dome",
+			"stand": "benchmark",
+			"lonlat": [
+				-119.3963,
+				37.8781
+			],
+			"radius_m": 3500.0,
+			"line": "A low granite hump at the meadow's west end, an easy walk up. From the top the meadow runs east for miles, and Lembert Dome sits at the far end like a sleeping animal.",
+			"sights": [
+				"tuolumne_meadows"
+			],
+			"landmarks": [
+				"tuolumne_river",
+				"cathedral_peak",
+				"unicorn_peak",
+				"lembert_dome",
+				"mount_dana"
+			],
+			"quiz": "lembert_dome",
+			"panorama": {
+				"title": "Pothole Dome",
+				"vantage": "pothole_dome",
+				"from": 60.0,
+				"to": 200.0,
+				"ground": "tuolumne",
+				"density": [
+					[
+						60.0,
+						7.0
+					],
+					[
+						200.0,
+						7.0
+					]
+				],
+				"backdrop": [
+					{
+						"k": "sierra_crest",
+						"b": 110.0,
+						"s": 0.9,
+						"l": 0.0
+					}
+				],
+				"targets": [
+					{
+						"id": "lembert_dome",
+						"name": "Lembert Dome",
+						"k": "north_dome",
+						"l": 1.0,
+						"s": 0.8,
+						"bearing": 86.0,
+						"stat": "9,450 ft",
+						"mi": 2.5,
+						"text": "At the far end of the meadow, the gentle back and steep face of a dome the glacier rode over."
+					},
+					{
+						"id": "mt_dana",
+						"name": "Mount Dana",
+						"k": "mt_lyell",
+						"l": 0.0,
+						"s": 0.8,
+						"bearing": 98.0,
+						"stat": "13,061 ft",
+						"mi": 9.0,
+						"text": "The big peak on the eastern skyline, behind Lembert Dome."
+					},
+					{
+						"id": "unicorn_peak",
+						"name": "Unicorn Peak",
+						"k": "unicorn_peak",
+						"l": 1.0,
+						"s": 0.9,
+						"bearing": 150.0,
+						"stat": "",
+						"mi": 3.5,
+						"text": "The horn on the Cathedral Range."
+					},
+					{
+						"id": "cathedral_peak",
+						"name": "Cathedral Peak",
+						"k": "cathedral_peak",
+						"l": 1.0,
+						"s": 1.0,
+						"bearing": 168.0,
+						"stat": "10,911 ft",
+						"mi": 3.5,
+						"text": "The Cathedral Range's great spire, standing over the lakes at its foot."
+					}
+				],
+				"wrap": 0.0,
+				"elevation": "Tuolumne Meadows"
+			},
+			"quiz_target": "lembert_dome",
+			"spot": {
+				"place": "Pothole Dome",
+				"center": true
+			},
+			"pos": [
+				592.0,
+				504.0
+			]
+		},
+		{
+			"id": "crane_flat_lookout",
+			"region": "crane_flat",
+			"title": "Crane Flat Fire Lookout",
+			"stand": "lookout",
+			"lonlat": [
+				-119.8186,
+				37.7593
+			],
+			"radius_m": 8000.0,
+			"line": "From the lookout's catwalk the forest rolls away in every direction, green and then blue. Far to the east the high peaks stand white along the crest.",
+			"sights": [
+				"crane_flat",
+				"big_oak_flat_junction"
+			],
+			"landmarks": [
+				"tuolumne_grove",
+				"half_dome",
+				"clark_range"
+			],
+			"quiz": "clark_range",
+			"panorama": {
+				"title": "Crane Flat Fire Lookout",
+				"vantage": "crane_flat",
+				"from": 60.0,
+				"to": 160.0,
+				"ground": "valley_forest",
+				"density": [
+					[
+						60.0,
+						9.0
+					],
+					[
+						160.0,
+						9.0
+					]
+				],
+				"backdrop": [
+					{
+						"k": "sierra_crest",
+						"b": 95.0,
+						"s": 1.0,
+						"l": 0.0
+					},
+					{
+						"k": "sierra_crest",
+						"b": 135.0,
+						"s": 0.9,
+						"l": 0.0
+					}
+				],
+				"targets": [
+					{
+						"id": "half_dome",
+						"name": "Half Dome",
+						"k": "half_dome",
+						"l": 0.0,
+						"s": 0.35,
+						"bearing": 100.0,
+						"stat": "8,842 ft",
+						"mi": 16.0,
+						"text": "Far to the east, just showing over the forest: Half Dome, seen from the back."
+					},
+					{
+						"id": "mt_clark",
+						"name": "Clark Range",
+						"k": "mt_clark",
+						"l": 0.0,
+						"s": 0.75,
+						"bearing": 116.0,
+						"stat": "11,522 ft",
+						"mi": 20.0,
+						"text": "The Clark Range along the eastern skyline, white with snow into summer."
+					}
+				],
+				"wrap": 0.0,
+				"elevation": "Fire lookout"
+			},
+			"quiz_target": "mt_clark",
+			"spot": {
+				"place": "Crane Flat",
+				"center": true
+			},
+			"pos": [
+				968.0,
+				512.0
+			]
+		},
+		{
+			"id": "oshaughnessy_dam",
+			"region": "hetch_hetchy",
+			"title": "O'Shaughnessy Dam",
+			"stand": "railing",
+			"lonlat": [
+				-119.788,
+				37.9467
+			],
+			"radius_m": 5000.0,
+			"line": "On one side, a sheer drop of concrete. On the other, still water filling a valley that was once a second Yosemite, with falls pouring off its north wall.",
+			"sights": [
+				"hetch_hetchy"
+			],
+			"landmarks": [
+				"oshaughnessy_dam",
+				"tueeulala_falls",
+				"wapama_falls",
+				"hetch_hetchy_reservoir",
+				"hetch_hetchy_dome",
+				"kolana_rock"
+			],
+			"quiz": "kolana_rock",
+			"view": "hetch_hetchy",
+			"quiz_target": "kolana_rock",
+			"spot": {
+				"place": "O'Shaughnessy Dam",
+				"center": true
+			},
+			"pos": [
+				528.0,
+				928.0
+			]
+		},
+		{
+			"id": "wawona_point",
+			"region": "wawona",
+			"title": "Wawona Point",
+			"stand": "benchmark",
+			"lonlat": [
+				-119.5972,
+				37.5319
+			],
+			"radius_m": 5000.0,
+			"line": "Above the big trees the forest falls away, and the whole Wawona basin lies below: the meadow, the hotel's white roofs, the South Fork winding west.",
+			"sights": [
+				"wawona"
+			],
+			"landmarks": [
+				"wawona_meadow",
+				"south_fork_merced",
+				"wawona_dome"
+			],
+			"quiz": "wawona_dome",
+			"panorama": {
+				"title": "Wawona Point",
+				"vantage": "wawona_point",
+				"from": 320.0,
+				"to": 420.0,
+				"ground": "el_cap_meadow",
+				"density": [
+					[
+						320.0,
+						9.0
+					],
+					[
+						420.0,
+						9.0
+					]
+				],
+				"backdrop": [
+					{
+						"k": "north_rim",
+						"b": 350.0,
+						"s": 0.9,
+						"l": 0.0
+					},
+					{
+						"k": "sierra_crest",
+						"b": 400.0,
+						"s": 0.8,
+						"l": 0.0
+					}
+				],
+				"targets": [
+					{
+						"id": "wawona_dome",
+						"name": "Wawona Dome",
+						"k": "basket_dome",
+						"l": 1.0,
+						"s": 1.1,
+						"bearing": 382.0,
+						"stat": "",
+						"mi": 2.0,
+						"text": "The granite dome over the Wawona basin, across the meadow from the big trees."
+					}
+				],
+				"elevation": "Mariposa Grove"
+			},
+			"quiz_target": "wawona_dome",
+			"spot": {
+				"place": "Mariposa Grove",
+				"center": true
+			},
+			"pos": [
+				3152.0,
+				2576.0
+			]
+		}
+	]
+}

@@ -1390,6 +1390,9 @@ func _update_location() -> void:
 	if _started:
 		for found in Discoveries.visit(region, place):
 			hud.show_discovery(found)
+		if not region.indoors:
+			for landmark in Landmarks.visit_region(region.region_id):
+				hud.show_landmark(landmark)
 
 
 func get_offstage_persist_nodes() -> Array[Node]:
