@@ -30,6 +30,13 @@ const SAVE_SLACK := 256.0
 ## pixels) to a seam, and taken away again past SEAM_FAR.
 const SEAM_NEAR := 720.0
 const SEAM_FAR := 960.0
+## The hubs down the road load ahead only while video memory for pictures
+## is under this (bytes); past it they load behind the trip map instead.
+const PRELOAD_HUBS_UNDER := 768 * 1048576
+## How many regions left behind keep their ground pictures (the rest give
+## them back until they're next laid out): on High, and on Low.
+const KEEP_PICTURES := 6
+const KEEP_PICTURES_LOW := 3
 ## The seam laid out now counts as this much nearer than another on the same
 ## edge, so walking along an edge where two regions meet it doesn't flick
 ## between them.
@@ -70,7 +77,11 @@ var _preloaded: Dictionary = {}
 ## What is read with each region scene (see _extra_loads), by scene path.
 var _extra: Dictionary = {}
 ## Normal maps loaded in the background, held until used (see LitSprites).
-var _warm: Array[Resource] = []
+var _warm: Dictionary = {}
+## Tests set this to keep fewer (or more) pictures than KEEP_PICTURES.
+var keep_pictures := -1
+## Regions entered, the latest first (see _budget_textures).
+var _recent: Array[String] = []
 ## A seam crossed this tick, and where the camera's smoothing had got to,
 ## in the new region's pixels (see _hand_camera_over).
 var _crossed := false
@@ -809,6 +820,7 @@ func _enter_region(id: String, spawn_name := "", staged_seams := false) -> void:
 	if region:
 		remove_child(region)
 	region = _get_region(id)
+	RegionTextures.restore(region)
 	add_child(region)
 	move_child(region, 0)
 	var spawn: Marker2D = region.get_spawn(spawn_name) if spawn_name != "" else null
@@ -906,6 +918,7 @@ func _arrive() -> void:
 	region_changed.emit(region)
 	_update_location()
 	_preload_neighbors()
+	_budget_textures()
 
 
 ## Region [param id], from those visited this session, or made now (with its
@@ -1136,6 +1149,7 @@ func _lay_seam(next: Seam) -> void:
 		return
 	seam = next
 	seam.neighbor.position = seam.offset
+	RegionTextures.restore(seam.neighbor)
 	add_child(seam.neighbor)
 	seam.open(region)
 	# behind the region the player is in, which draws over its own edges
@@ -1292,15 +1306,78 @@ func _preload_neighbors() -> void:
 	ids.append_array(region.get_meta("exit_targets"))
 	ids.append(region.hub_id)
 	ids.append(Park.HOME_REGION)
-	for leg in Park.legs_from(region.hub_id):
-		var hub := Park.get_hub(leg.to)
-		ids.append(hub.arrival_region if hub.arrival_region != "" else hub.id)
+	# The hubs down the road arrive behind the trip map, which waits for
+	# them, so they only load ahead where there's memory to spare: a whole
+	# hub's pictures are a lot of video memory for an older computer.
+	if not Settings.low() and Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) < PRELOAD_HUBS_UNDER:
+		for leg in Park.legs_from(region.hub_id):
+			var hub := Park.get_hub(leg.to)
+			ids.append(hub.arrival_region if hub.arrival_region != "" else hub.id)
+	# Regions kept from earlier visits that gave back their ground pictures
+	# (RegionTextures) get them loaded again ahead, like a new region.
+	var pictures: Array[String] = []
+	for id in ids:
+		var kept: Region = _regions.get(id)
+		if kept and RegionTextures.is_released(kept):
+			pictures.append_array(RegionTextures.paths(kept))
+	_let_go_of_preloads(ids, pictures)
+	for path in pictures:
+		if not (_warm.has(path) or _preloading == path or path in _preload_queue or ResourceLoader.has_cached(path)):
+			_preload_queue.append(path)
 	for id in ids:
 		var path := region_scene_path(id)
 		if id == "" or _regions.has(id) or _preloaded.has(path) or _preloading == path or path in _preload_queue \
 				or ResourceLoader.has_cached(path) or not ResourceLoader.exists(path):
 			continue
 		_preload_queue.append(path)
+
+
+## Lets go of regions loaded ahead that aren't a way on from here any more
+## (and their story scenes and normal maps), and of queued loads for them.
+## Without this every region ever loaded ahead stayed in memory, with all
+## its pictures, though it was never set up; next time it loads again.
+func _let_go_of_preloads(wanted_ids: Array[String], pictures: Array[String] = []) -> void:
+	var wanted := {}
+	for path in pictures:
+		wanted[path] = true
+	for id in wanted_ids:
+		var path := region_scene_path(id)
+		wanted[path] = true
+		for extra in _extra.get(path, []):
+			wanted[extra] = true
+	for path: String in _preloaded.keys():
+		if not wanted.has(path):
+			_preloaded.erase(path)
+	for path: String in _warm.keys():
+		if not wanted.has(path):
+			_warm.erase(path)
+	_preload_queue.assign(_preload_queue.filter(func(path: String) -> bool: return wanted.has(path)))
+
+
+## The regions kept from earlier visits beyond the last few give back their
+## ground pictures (RegionTextures), so video memory doesn't grow with every
+## area the player has been to. The one they're in, the one laid out beside
+## it, and any region being set up keep theirs; the pictures come back before
+## a region is laid out again.
+func _budget_textures() -> void:
+	_recent.erase(region.region_id)
+	_recent.push_front(region.region_id)
+	var keep := keep_pictures if keep_pictures >= 0 else KEEP_PICTURES_LOW if Settings.low() else KEEP_PICTURES
+	var ways_on: Array = region.get_meta("exit_targets", [])
+	var kept := 0
+	for id: String in _recent.duplicate():
+		var r: Region = _regions.get(id)
+		if r == null:
+			continue
+		if r == region or (seam and seam.neighbor == r) or r.is_inside_tree() or r.indoors:
+			continue
+		# a way on from here is about to be wanted (and is loaded ahead)
+		if id in ways_on:
+			continue
+		if kept < keep:
+			kept += 1
+		else:
+			RegionTextures.release(r)
 
 
 ## Loads the queued regions one at a time on a background thread.
@@ -1321,7 +1398,7 @@ func _pump_preload() -> void:
 						if not path in _preload_queue and not ResourceLoader.has_cached(path):
 							_preload_queue.push_front(path)
 				elif loaded:
-					_warm.append(loaded)
+					_warm[_preloading] = loaded
 		_preloading = ""
 	while _preloading == "" and not _preload_queue.is_empty():
 		var path: String = _preload_queue.pop_front()
