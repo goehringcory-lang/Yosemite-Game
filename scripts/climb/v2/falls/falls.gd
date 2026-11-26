@@ -69,6 +69,10 @@ func causes(move: V2Move) -> Dictionary:
 	t[&"strain"] = strain * T.PUMP_FRESH
 	t[&"hold"] = hold * T.PUMP_FRESH
 	t[&"pump"] = (feet + strain + hold) * k
+	# The real effort system (thread 4) says how reliable small holds are now.
+	if session.sys.effort.has_method("hold_factor"):
+		var hf := float(session.sys.effort.call("hold_factor"))
+		t[&"pump"] = float(t[&"pump"]) + T.SMALL_HOLD_PUMP * (1.0 - hf) * (1.0 - clampf(size, 0.0, 1.0))
 	if h and (session.mods.wet > 0.3 or not session.wall.zones_at(h.pos, &"wet").is_empty()):
 		t[&"wet"] = T.WET_SMALL if size < 0.3 else T.WET
 	if move.crux_id != "" and not move.in_sequence:
@@ -86,7 +90,7 @@ func risk(move: V2Move) -> void:
 func risk_of(move: V2Move) -> float:
 	if move == null or not move.valid or move.has_tag("rest"):
 		return 0.0
-	if session.sys.effort.pumped_out():
+	if _boxed(move):
 		return 1.0
 	var total := 0.0
 	for v: float in causes(move).values():
@@ -98,9 +102,17 @@ func risk_of(move: V2Move) -> float:
 	return minf(total, T.RISK_CAP)
 
 
+## Pumped out, or (with thread 4's effort) a move that leaves you boxed:
+## effort shows the ghost red for these, and they always fail (pure).
+func _boxed(move: V2Move) -> bool:
+	if session.sys.effort.pumped_out():
+		return true
+	return session.sys.effort.has_method("will_fail") and bool(session.sys.effort.call("will_fail", move))
+
+
 ## The biggest cause of [param move]'s risk, or "" (pure).
 func top_cause(move: V2Move) -> String:
-	if move and move.valid and session.sys.effort.pumped_out():
+	if move and move.valid and _boxed(move):
 		return "pump"
 	var best := ""
 	var most := 0.0

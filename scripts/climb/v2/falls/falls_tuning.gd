@@ -19,6 +19,9 @@ const WET_SMALL := 0.20
 const OUT_OF_SEQUENCE := 0.15
 const DYNO := 0.10
 const DYNO_OVERSHOOT := 0.25
+## With thread 4's effort: small holds get this much riskier as
+## hold_factor() drops from 1 (reliable) to 0 (full pump).
+const SMALL_HOLD_PUMP := 0.2
 ## Below this a move is solid: it never fails (a 2% fall on a jug reads as a bug).
 const DEAD_ZONE := 0.08
 ## The highest risk short of being pumped out.
