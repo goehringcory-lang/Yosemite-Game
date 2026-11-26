@@ -1,0 +1,110 @@
+{
+	"route": "lyell_glacier",
+	"rock": "ice",
+	"pitches": [
+		{
+			"name": "Moraine and Snowfield",
+			"style": "snow",
+			"diff": 1,
+			"height": 18,
+			"width": 8,
+			"angle": -40,
+			"line": [[4.0, 0.0], [3.4, 9.0], [4.0, 18]],
+			"belay": "ledge",
+			"unprotected": true,
+			"beta": "Easy snow. Kick steps with your crampons and keep the axe in your uphill hand. The rope is for the crevasses ahead: your axe is your protection.",
+			"zones": [
+				{
+					"kind": "sun",
+					"rect": [0, 0, 8, 18],
+					"data": {"what": "softens in the afternoon"}
+				}
+			]
+		},
+		{
+			"name": "Sun Cups",
+			"style": "snow",
+			"diff": 2,
+			"height": 18,
+			"width": 8,
+			"angle": -35,
+			"line": [[4.0, 0.0], [4.5, 9.0], [4.0, 18]],
+			"belay": "ledge",
+			"unprotected": true,
+			"beta": "Bumpy, sun-cupped snow. In the afternoon it turns to slush: climb early.",
+			"zones": [
+				{
+					"kind": "sun",
+					"rect": [0, 0, 8, 18],
+					"data": {"what": "slush after noon"}
+				}
+			],
+			"cruxes": [
+				{"id": "cups", "name": "Sun cups", "from": 9.0, "to": 10.6, "sequence": ["rh", "lh", "rh"]}
+			]
+		},
+		{
+			"name": "The Crevasse Field",
+			"style": "ice",
+			"diff": 3,
+			"height": 16,
+			"width": 8,
+			"angle": -30,
+			"line": [[4.0, 0.0], [3.0, 6.0], [5.0, 11.0], [4.0, 16.0]],
+			"belay": "ledge",
+			"unprotected": true,
+			"beta": "Blue ice and crevasses. Cross the snow bridges one at a time while your partner holds the rope tight.",
+			"zones": [
+				{
+					"kind": "loose",
+					"rect": [1.0, 7.0, 6.0, 1.2],
+					"data": {"what": "crevasse"}
+				}
+			],
+			"cruxes": [
+				{
+					"id": "bridge",
+					"name": "Crevasse bridge",
+					"from": 7.0,
+					"to": 8.6,
+					"sequence": ["lh", "rh", "rh"],
+					"hip": "high_step",
+					"read": "Spread your weight. Plant the axe beyond the bridge before you step onto it."
+				}
+			]
+		},
+		{
+			"name": "The Bergschrund",
+			"style": "ice",
+			"diff": 2,
+			"height": 14,
+			"width": 8,
+			"angle": -45,
+			"line": [[4.0, 0.0], [3.7, 7.0], [4.0, 14]],
+			"belay": "top",
+			"unprotected": true,
+			"beta": "The gap where the glacier pulls away from the mountain. Step across it, then scramble the rock to the ridge.",
+			"sections": [
+				{"from": 10.0, "to": 14.0, "style": "face"}
+			],
+			"zones": [
+				{
+					"kind": "loose",
+					"rect": [1.0, 6.5, 6.0, 1.0],
+					"data": {"what": "bergschrund"}
+				}
+			],
+			"cruxes": [
+				{
+					"id": "schrund",
+					"name": "The bergschrund",
+					"from": 6.4,
+					"to": 8.0,
+					"sequence": ["rh", "rh", "lh"],
+					"hip": "lunge",
+					"read": "Axe in high on the far lip first, then step across: don't jump."
+				}
+			]
+		}
+	]
+}

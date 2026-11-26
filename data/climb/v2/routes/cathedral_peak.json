@@ -1,0 +1,141 @@
+{
+	"route": "cathedral_peak",
+	"rock": "knobby",
+	"pitches": [
+		{
+			"name": "Approach Slabs",
+			"style": "knobs",
+			"diff": 2,
+			"height": 18,
+			"width": 8,
+			"angle": -20,
+			"line": [[4.0, 0.0], [3.5, 9.0], [4.0, 18]],
+			"belay": "ledge",
+			"beta": "Low-angle slabs covered in knobs. Sling the big ones for protection.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "hand",
+					"points": [[4.5, 6.0], [4.5, 7.5], [4.5, 9.0]],
+					"widths": [3.5, 4.5, 4.0],
+					"constrictions": [1]
+				}
+			],
+			"horns": [2.5, 5.0, 10.0, 13.0, 16.0]
+		},
+		{
+			"name": "Lower Buttress",
+			"style": "knobs",
+			"diff": 2,
+			"height": 18,
+			"width": 8,
+			"line": [[4.0, 0.0], [4.4, 9.0], [4.0, 18]],
+			"belay": "ledge",
+			"beta": "Knobby granite, easy and fun. A crack up the middle takes a cam or two.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "hand",
+					"points": [[4.3, 3.0], [4.3, 6.0], [4.3, 9.0], [4.3, 12.0]],
+					"widths": [3.0, 4.0, 3.5, 4.25],
+					"constrictions": [1, 3]
+				}
+			],
+			"horns": [2.0, 14.0, 16.5]
+		},
+		{
+			"name": "The Chimney",
+			"style": "knobs",
+			"diff": 3,
+			"height": 16,
+			"width": 8,
+			"line": [[4.0, 0.0], [4.0, 8.0], [4.0, 16]],
+			"belay": "ledge",
+			"beta": "A short chimney, the buttress's one bottleneck. Rest below it.",
+			"sections": [
+				{"from": 7.0, "to": 11.0, "style": "chimney"}
+			],
+			"cracks": [
+				{
+					"id": "ch",
+					"kind": "chimney",
+					"points": [[4.0, 6.8], [4.0, 9.0], [4.0, 11.2]],
+					"widths": [7.0, 7.0, 7.0],
+					"constrictions": [],
+					"tags": ["no_jams"]
+				},
+				{
+					"id": "back",
+					"kind": "fist",
+					"points": [[4.5, 7.0], [4.5, 9.0], [4.5, 11.0]],
+					"widths": [5.0, 6.0, 5.5],
+					"constrictions": [1]
+				}
+			],
+			"horns": [2.5, 5.0, 13.0, 15.0],
+			"rests": [
+				{"y": 5.0, "kind": "stance"}
+			],
+			"cruxes": [
+				{
+					"id": "chimney",
+					"name": "Chimney",
+					"from": 8.0,
+					"to": 10.0,
+					"sequence": ["rh", "lh", "rh", "rh"],
+					"hip": "chimney"
+				}
+			]
+		},
+		{
+			"name": "Upper Knobs",
+			"style": "knobs",
+			"diff": 3,
+			"height": 18,
+			"width": 8,
+			"line": [[4.0, 0.0], [3.6, 9.0], [4.0, 18]],
+			"belay": "ledge",
+			"beta": "More knobs, steeper now. The view opens up over Tuolumne.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "finger",
+					"points": [[4.4, 8.0], [4.4, 9.5], [4.4, 11.0]],
+					"widths": [2.0, 3.0, 2.5],
+					"constrictions": [1]
+				}
+			],
+			"horns": [2.0, 5.0, 12.5, 15.5],
+			"cruxes": [
+				{
+					"id": "reach",
+					"name": "The long reach",
+					"from": 13.0,
+					"to": 14.6,
+					"sequence": ["lh", "rh", "rh"],
+					"hip": "high_step"
+				}
+			]
+		},
+		{
+			"name": "Summit Block",
+			"style": "knobs",
+			"diff": 2,
+			"height": 12,
+			"width": 8,
+			"line": [[4.0, 0.0], [3.8, 6.0], [4.0, 12]],
+			"belay": "top",
+			"beta": "A summit as big as a kitchen table. Hold on, and look around.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "hand",
+					"points": [[4.3, 1.0], [4.3, 3.5], [4.3, 6.0]],
+					"widths": [3.5, 4.5, 4.0],
+					"constrictions": [1]
+				}
+			],
+			"horns": [7.0, 10.0]
+		}
+	]
+}

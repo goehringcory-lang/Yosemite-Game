@@ -1,0 +1,113 @@
+{
+	"route": "snake_dike",
+	"rock": "dome",
+	"pitches": [
+		{
+			"name": "Slab Start",
+			"style": "slab",
+			"diff": 2,
+			"height": 20,
+			"width": 8,
+			"angle": -25,
+			"line": [[4.0, 0.0], [3.5, 10.0], [4.0, 20]],
+			"belay": "ledge",
+			"runout": 7.0,
+			"beta": "Friction slabs over to the dike. The bolts are far apart: the route is graded R for runout.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "finger",
+					"points": [[4.4, 1.0], [4.4, 2.25], [4.4, 3.5]],
+					"widths": [2.0, 3.0, 2.5],
+					"constrictions": [1]
+				}
+			],
+			"bolts": [6.5, 12.5, 17.5]
+		},
+		{
+			"name": "The Dike Begins",
+			"style": "dike",
+			"diff": 3,
+			"height": 20,
+			"width": 8,
+			"angle": -25,
+			"line": [[4.0, 0.0], [4.4, 10.0], [4.0, 20]],
+			"belay": "ledge",
+			"runout": 7.5,
+			"beta": "A raised vein of harder rock snakes up the dome. Stay on it: it's the easy way, and the only holds.",
+			"bolts": [3.0, 10.0, 17.0],
+			"cruxes": [
+				{
+					"id": "step",
+					"name": "Off the dike",
+					"from": 12.5,
+					"to": 14.0,
+					"sequence": ["lh", "lh", "rh"],
+					"hip": "high_step"
+				}
+			]
+		},
+		{
+			"name": "The First Runout",
+			"style": "dike",
+			"diff": 3,
+			"height": 20,
+			"width": 8,
+			"angle": -25,
+			"line": [[4.0, 0.0], [3.6, 10.0], [4.0, 20]],
+			"belay": "ledge",
+			"runout": 8.0,
+			"beta": "The bolts get further apart. Clip every one; there's nothing in between.",
+			"bolts": [4.0, 11.5, 18.0],
+			"cruxes": [
+				{
+					"id": "runout",
+					"name": "Runout",
+					"from": 13.0,
+					"to": 15.0,
+					"sequence": ["rh", "lh", "lh", "rh"],
+					"hip": "smear",
+					"read": "Easy moves a long way above the bolt. Breathe, and keep your weight over your feet."
+				}
+			]
+		},
+		{
+			"name": "The Long Runout",
+			"style": "dike",
+			"diff": 2,
+			"height": 20,
+			"width": 8,
+			"angle": -30,
+			"line": [[4.0, 0.0], [4.3, 10.0], [4.0, 20]],
+			"belay": "ledge",
+			"runout": 8.5,
+			"beta": "Pitch after pitch of dike. Don't hurry, and rest at the stance halfway.",
+			"bolts": [5.0, 13.0],
+			"rests": [
+				{"y": 9.5, "kind": "stance"}
+			]
+		},
+		{
+			"name": "Ramp to the Gully",
+			"style": "slab",
+			"diff": 3,
+			"height": 20,
+			"width": 8,
+			"angle": -30,
+			"line": [[4.0, 0.0], [3.5, 10.0], [4.0, 20]],
+			"belay": "top",
+			"runout": 7.5,
+			"beta": "Easier ground to the gully. After this it's scrambling to Half Dome's summit.",
+			"bolts": [4.0, 11.0, 17.5],
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "hand",
+					"points": [[4.5, 15.0], [4.5, 17.0], [4.5, 19.0]],
+					"widths": [3.5, 4.5, 4.0],
+					"constrictions": [1]
+				}
+			]
+		}
+	]
+}

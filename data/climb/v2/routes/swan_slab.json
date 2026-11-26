@@ -1,0 +1,40 @@
+{
+	"route": "swan_slab",
+	"rock": "polished",
+	"pitches": [
+		{
+			"name": "Swan Slab",
+			"style": "slab",
+			"diff": 1,
+			"height": 14,
+			"width": 8,
+			"angle": -15,
+			"line": [[4.0, 0.0], [3.6, 7.0], [4.0, 14]],
+			"belay": "top",
+			"beta": "Low-angle granite polished by every climber in Camp 4. The rope runs from the anchor above you, so a slip only drops you onto it. Keep your hips over your feet.",
+			"cracks": [
+				{
+					"id": "seam0",
+					"kind": "seam",
+					"points": [[4.9, 3.0], [4.9, 4.75], [4.9, 6.5]],
+					"widths": [0.5, 1.0, 0.75],
+					"constrictions": [1]
+				}
+			],
+			"rests": [
+				{"y": 5.0, "kind": "stance", "name": "The scoop"}
+			],
+			"cruxes": [
+				{
+					"id": "wave",
+					"name": "The polished wave",
+					"from": 8.0,
+					"to": 9.8,
+					"sequence": ["rh", "lh", "lh", "rh"],
+					"hip": "high_step",
+					"read": "The wave is all feet: step high with the left, rock your hips over it, then the right hand finds the edge above."
+				}
+			]
+		}
+	]
+}

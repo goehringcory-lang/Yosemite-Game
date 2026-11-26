@@ -1,0 +1,46 @@
+{
+	"route": "midnight_lightning",
+	"rock": "columbia",
+	"pitches": [
+		{
+			"name": "The overhanging face",
+			"style": "face",
+			"diff": 5,
+			"height": 5.5,
+			"width": 6,
+			"angle": 15,
+			"line": [[3.0, 0.0], [2.8, 2.75], [3.0, 5.5]],
+			"belay": "top",
+			"beta": "No rope: a crash pad and a spotter. Three hard moves, the lightning bolt, the swing and the mantel, on rock polished by everyone in Camp 4.",
+			"cruxes": [
+				{
+					"id": "bolt",
+					"name": "The lightning bolt",
+					"from": 1.7,
+					"to": 2.5,
+					"sequence": ["rh", "lh"],
+					"hip": "drop_knee",
+					"read": "Right hand to the bottom of the chalked bolt, drop the left knee to reach up with the left."
+				},
+				{
+					"id": "swing",
+					"name": "The swing",
+					"from": 3.0,
+					"to": 3.9,
+					"sequence": ["lh", "lh"],
+					"hip": "lunge",
+					"read": "Feet cut loose. Let them swing, and hold on with the left until they stop."
+				},
+				{
+					"id": "mantel",
+					"name": "The mantel",
+					"from": 4.4,
+					"to": 5.0,
+					"sequence": ["rh", "lh"],
+					"hip": "mantel",
+					"read": "Press both palms on the lip and get a heel up. Everyone falls off here: it's the move that made it famous."
+				}
+			]
+		}
+	]
+}

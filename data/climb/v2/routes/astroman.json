@@ -1,0 +1,267 @@
+{
+	"route": "astroman",
+	"rock": "pale",
+	"pitches": [
+		{
+			"name": "Fingertip Start",
+			"style": "crack",
+			"diff": 3,
+			"height": 16,
+			"width": 8,
+			"line": [[4.0, 0.0], [3.7, 8.0], [4.0, 16]],
+			"belay": "ledge",
+			"beta": "Thin cracks from the very start. Chalk up; small nuts and #0.3-#0.5 cams.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "finger",
+					"points": [[4.25, 0.8], [4.25, 3.17], [4.25, 5.53], [4.25, 7.9], [4.25, 10.27], [4.25, 12.63], [4.25, 15.0]],
+					"widths": [0.75, 1.5, 1.0, 2.0, 1.25, 2.25, 1.75],
+					"constrictions": [1, 3, 5]
+				}
+			],
+			"pins": [
+				{"y": 8.0, "kind": "pin", "tags": ["rusty"]}
+			]
+		},
+		{
+			"name": "The Boulder Problem",
+			"style": "crack",
+			"diff": 4,
+			"height": 14,
+			"width": 11,
+			"line": [[3.0, 0.0], [3.0, 4.5], [7.5, 6.0], [7.5, 14.0]],
+			"belay": "ledge",
+			"beta": "A short, hard traverse right into a fingertip crack. Tiny pieces before you go.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "seam",
+					"points": [[7.7, 5.5], [7.7, 7.42], [7.7, 9.35], [7.7, 11.27], [7.7, 13.2]],
+					"widths": [0.25, 1.0, 0.5, 1.25, 1.0],
+					"constrictions": [1, 3]
+				}
+			],
+			"bolts": [3.8],
+			"cruxes": [
+				{
+					"id": "boulder",
+					"name": "Boulder Problem",
+					"d0": 4.6,
+					"d1": 8.4,
+					"sequence": ["rh", "rh", "lh", "rh", "rh", "lh", "rh"],
+					"hip": "flag",
+					"read": "Lead with the right hand all the way; the left only matches. Flag the left foot behind to stop the barn door."
+				}
+			]
+		},
+		{
+			"name": "Enduro Corner",
+			"style": "crack",
+			"diff": 4,
+			"height": 20,
+			"width": 8,
+			"line": [[4.0, 0.0], [3.7, 10.0], [4.0, 20]],
+			"belay": "ledge",
+			"beta": "A long, sustained corner, fingers to thin hands, nowhere to rest. Layback where the jams get thin.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "finger",
+					"points": [
+						[4.3, 0.8],
+						[4.3, 3.08],
+						[4.3, 5.35],
+						[4.3, 7.62],
+						[4.3, 9.9],
+						[4.3, 12.18],
+						[4.3, 14.45],
+						[4.3, 16.72],
+						[4.3, 19.0]
+					],
+					"widths": [2.5, 3.25, 2.75, 3.5, 3.0, 4.0, 3.25, 3.75, 3.5],
+					"constrictions": [1, 3, 5, 7]
+				}
+			],
+			"pins": [
+				{"y": 14.5, "kind": "pin", "tags": ["rusty"]}
+			],
+			"cruxes": [
+				{
+					"id": "enduro1",
+					"name": "The layback",
+					"from": 6.0,
+					"to": 8.0,
+					"sequence": ["rh", "lh", "rh", "rh"],
+					"hip": "layback"
+				},
+				{
+					"id": "enduro2",
+					"name": "Fingerlocks",
+					"from": 13.0,
+					"to": 15.0,
+					"sequence": ["lh", "rh", "lh", "lh"],
+					"read": "Thumbs down in the slot: the locks are better than they look. Don't layback this bit, you'll pump out."
+				}
+			]
+		},
+		{
+			"name": "Changing Corners",
+			"style": "crack",
+			"diff": 4,
+			"height": 16,
+			"width": 8,
+			"line": [[3.5, 0.0], [3.5, 7.0], [4.8, 9.0], [4.8, 16.0]],
+			"belay": "ledge",
+			"beta": "Switch from one corner to the other on thin holds. Stem wide between them.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "finger",
+					"points": [[3.7, 0.8], [3.7, 3.03], [3.7, 5.27], [3.7, 7.5]],
+					"widths": [1.5, 2.25, 1.75, 2.5],
+					"constrictions": [1, 3]
+				},
+				{
+					"id": "c1",
+					"kind": "finger",
+					"points": [[5.0, 9.0], [5.0, 11.0], [5.0, 13.0], [5.0, 15.0]],
+					"widths": [2.0, 3.0, 2.25, 2.75],
+					"constrictions": [1, 3]
+				}
+			],
+			"cruxes": [
+				{
+					"id": "switch",
+					"name": "Changing corners",
+					"from": 7.0,
+					"to": 9.0,
+					"sequence": ["lh", "rh", "rh", "lh"],
+					"hip": "stem",
+					"read": "Stem across with the right foot first; the right hand goes twice to reach the new corner, then match."
+				}
+			]
+		},
+		{
+			"name": "The Sidewalk",
+			"style": "slab",
+			"diff": 3,
+			"height": 16,
+			"width": 8,
+			"angle": -15,
+			"line": [[4.0, 0.0], [3.5, 8.0], [4.0, 16]],
+			"belay": "ledge",
+			"runout": 4.5,
+			"beta": "A ramp of easier ground. Eat, drink, and shake out: the Harding Slot is next.",
+			"cracks": [
+				{
+					"id": "s0",
+					"kind": "hand",
+					"points": [[4.6, 1.0], [4.6, 3.0], [4.6, 5.0]],
+					"widths": [3.5, 4.5, 4.0],
+					"constrictions": [1]
+				},
+				{
+					"id": "s1",
+					"kind": "finger",
+					"points": [[3.4, 7.0], [3.4, 8.75], [3.4, 10.5]],
+					"widths": [2.0, 3.0, 2.5],
+					"constrictions": [1]
+				},
+				{
+					"id": "s2",
+					"kind": "hand",
+					"points": [[4.5, 12.0], [4.5, 13.5], [4.5, 15.0]],
+					"widths": [3.0, 4.0, 3.5],
+					"constrictions": [1]
+				}
+			],
+			"rests": [
+				{"y": 4.0, "kind": "stance"},
+				{"y": 10.5, "kind": "stance"}
+			]
+		},
+		{
+			"name": "Harding Slot",
+			"style": "chimney",
+			"diff": 4,
+			"height": 16,
+			"width": 8,
+			"line": [[4.0, 0.0], [4.0, 8.0], [4.0, 16]],
+			"belay": "ledge",
+			"beta": "An offwidth flare to a body-width slot so tight you can't turn your head. Then don't stop.",
+			"sections": [
+				{"from": 0.0, "to": 6.5, "style": "crack"}
+			],
+			"cracks": [
+				{
+					"id": "flare",
+					"kind": "offwidth",
+					"points": [[4.2, 0.8], [4.2, 2.87], [4.2, 4.93], [4.2, 7.0]],
+					"widths": [6.0, 6.75, 6.25, 7.0],
+					"constrictions": [1, 3],
+					"flare": 0.6
+				},
+				{
+					"id": "slot",
+					"kind": "chimney",
+					"points": [[4.0, 7.0], [4.0, 9.67], [4.0, 12.33], [4.0, 15.0]],
+					"widths": [7.0, 7.0, 7.0, 7.0],
+					"constrictions": [],
+					"tags": ["no_jams", "squeeze"]
+				},
+				{
+					"id": "back",
+					"kind": "fist",
+					"points": [[4.5, 7.5], [4.5, 9.83], [4.5, 12.17], [4.5, 14.5]],
+					"widths": [5.5, 6.5, 6.0, 6.5],
+					"constrictions": [1, 3]
+				}
+			],
+			"cruxes": [
+				{
+					"id": "wing",
+					"name": "Chicken wing",
+					"from": 3.5,
+					"to": 5.5,
+					"sequence": ["rh", "rh", "lh"],
+					"hip": "lunge",
+					"read": "Lock the right arm in the flare bent like a wing, sink onto it, then lunge for the slot's edge."
+				},
+				{
+					"id": "slot",
+					"name": "Harding Slot",
+					"from": 9.0,
+					"to": 12.0,
+					"sequence": ["lh", "rh", "lh", "lh", "rh", "rh"],
+					"hip": "chimney",
+					"read": "Squeeze in right side first and exhale. Two moves each side; you can't see your feet, so trust them."
+				}
+			]
+		},
+		{
+			"name": "The Headwall",
+			"style": "crack",
+			"diff": 4,
+			"height": 16,
+			"width": 8,
+			"angle": 10,
+			"line": [[4.0, 0.0], [3.7, 8.0], [4.0, 16]],
+			"belay": "top",
+			"beta": "Steep to the very top of Washington Column. Old pins, and a crack that never quite lets up.",
+			"cracks": [
+				{
+					"id": "c0",
+					"kind": "finger",
+					"points": [[4.25, 0.8], [4.25, 3.17], [4.25, 5.53], [4.25, 7.9], [4.25, 10.27], [4.25, 12.63], [4.25, 15.0]],
+					"widths": [2.0, 3.0, 2.25, 3.5, 2.75, 3.25, 3.0],
+					"constrictions": [1, 3, 5]
+				}
+			],
+			"pins": [
+				{"y": 4.5, "kind": "pin", "tags": ["rusty"]},
+				{"y": 10.5, "kind": "pin", "tags": ["rusty"]}
+			]
+		}
+	]
+}
