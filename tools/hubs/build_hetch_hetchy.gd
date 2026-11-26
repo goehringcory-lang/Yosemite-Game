@@ -284,7 +284,9 @@ func _place_trails_hetch() -> void:
 
 func _place_markers_hetch() -> void:
 	marker("arrival", 12, 26)
-	marker("road_in", 6.5, 26.5)
+	# (up off the road beside the station: within 200 px of the way back,
+	# but not in line with it, so walking on west after arriving stays put)
+	marker("road_in", 5, 22.5)
 	marker("entrance", 5, 25)
 	marker("dam", 19, 28)
 	marker("tunnel", 25, 20)

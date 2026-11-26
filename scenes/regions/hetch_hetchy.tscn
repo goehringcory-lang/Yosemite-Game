@@ -4576,7 +4576,7 @@ amount_scale = 2.4
 position = Vector2(400, 848)
 
 [node name="road_in" type="Marker2D" parent="Markers" unique_id=2067654250]
-position = Vector2(224, 864)
+position = Vector2(176, 736)
 
 [node name="entrance" type="Marker2D" parent="Markers" unique_id=782220869]
 position = Vector2(176, 816)
