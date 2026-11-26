@@ -362,6 +362,18 @@
 			"region": "housekeeping_camp"
 		},
 		{
+			"hub": "yosemite_valley",
+			"key": "housekeeping_camp/Housekeeping Footbridge",
+			"name": "Housekeeping Footbridge",
+			"region": "housekeeping_camp"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "housekeeping_camp/Housekeeping Beach",
+			"name": "Housekeeping Beach",
+			"region": "housekeeping_camp"
+		},
+		{
 			"hub": "glacier_point",
 			"key": "illilouette/Illilouette Gorge",
 			"name": "Illilouette Gorge",
@@ -390,18 +402,6 @@
 			"key": "illilouette/Top of Nevada Fall",
 			"name": "Top of Nevada Fall",
 			"region": "illilouette"
-		},
-		{
-			"hub": "yosemite_valley",
-			"key": "housekeeping_camp/Housekeeping Footbridge",
-			"name": "Housekeeping Footbridge",
-			"region": "housekeeping_camp"
-		},
-		{
-			"hub": "yosemite_valley",
-			"key": "housekeeping_camp/Housekeeping Beach",
-			"name": "Housekeeping Beach",
-			"region": "housekeeping_camp"
 		},
 		{
 			"hub": "yosemite_valley",
