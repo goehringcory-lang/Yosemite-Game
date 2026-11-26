@@ -24,6 +24,9 @@ const VIEWPOINTS := ["tunnel_view", "glacier_point", "half_dome", "taft_point"]
 var found: Dictionary = {}
 ## Seen the Valley from above: every place shows on its area map.
 var valley_seen := false
+## Areas seen from a vista (Vistas): their places' names show on the area
+## map before you walk there. region_id -> true.
+var sighted: Dictionary = {}
 
 ## Every place, in the list's order: {key, name, region, hub}.
 var _places: Array[Dictionary] = []
@@ -40,6 +43,7 @@ func _ready() -> void:
 func start_new_game() -> void:
 	found.clear()
 	valley_seen = false
+	sighted.clear()
 	changed.emit()
 
 
@@ -67,6 +71,34 @@ func is_found(key: String) -> bool:
 func is_name_found(place_name: String) -> bool:
 	for key: String in _by_name.get(place_name, []):
 		if found.has(key):
+			return true
+	return false
+
+
+## Seen from a vista (Vistas.survey): the names of every place in these areas
+## show on the area map, still to be walked to. Returns how many were new.
+func sight_regions(region_ids: Array) -> int:
+	var fresh := 0
+	for region_id in region_ids:
+		if not sighted.has(str(region_id)):
+			sighted[str(region_id)] = true
+			fresh += 1
+	if fresh > 0:
+		changed.emit()
+	return fresh
+
+
+func is_region_sighted(region_id: String) -> bool:
+	return sighted.has(region_id)
+
+
+## Should the area map name this place: walked to, seen from a vista, or the
+## whole Valley seen from above (or not a listed place at all)?
+func is_name_known(place_name: String) -> bool:
+	if valley_seen or not is_listed_name(place_name):
+		return true
+	for key: String in _by_name.get(place_name, []):
+		if found.has(key) or sighted.has(str(_by_key[key].region)):
 			return true
 	return false
 
@@ -102,7 +134,7 @@ func visit(region: Region, place: Place) -> Array[Dictionary]:
 
 
 func save_data() -> Dictionary:
-	return {"found": found.keys(), "valley_seen": valley_seen}
+	return {"found": found.keys(), "valley_seen": valley_seen, "sighted": sighted.keys()}
 
 
 func load_data(data: Dictionary) -> void:
@@ -110,6 +142,9 @@ func load_data(data: Dictionary) -> void:
 	for key in data.get("found", []):
 		found[str(key)] = true
 	valley_seen = bool(data.get("valley_seen", false))
+	sighted.clear()
+	for region_id in data.get("sighted", []):
+		sighted[str(region_id)] = true
 	changed.emit()
 
 
