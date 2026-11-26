@@ -739,6 +739,8 @@ Rebuild them with `tools/hubs/rebuild_interiors.sh` (Pillow and numpy; `ONLY_ROO
 
 A new climbing game is being built beside the current one in `scripts/climb/v2/`: the wall waits for you, you aim the next hand at a hold and see a ghost of the pose before you commit, one body button moves your hips, pump and gas (food) are what you spend, you pull rope up an arm-length at a time to clip, offer cams and read their lobes, and falls are real but soft. No timing bars or arrow games. It is off unless switched on (`VALLEY_CLIMB_V2=1`, or a list of route ids), and for now draws debug shapes. How the pieces fit, who owns what, and the rules every part follows are in [scripts/climb/v2/CONTRACTS.md](scripts/climb/v2/CONTRACTS.md); `tests/climb_v2_test` climbs a fixture pitch through it end to end.
 
+The v2 climber (`scripts/climb/v2/art/`) is a hi-res, full-body climber seen from behind, in the look you chose: a skeleton solved every frame from where the hands and feet are (they stay exactly on their holds), painted as hard-edged pixel art at the screen's full density and animated between moves (hips lead, the hand lands, the feet step up; dynos crouch and cut loose; falls drop, catch, bounce and swing). Pump shows on the body (shaking arms, elbows out, quick breathing, sweat), the ghost of an aimed move acts out what a crux says is wrong with it, and the rope runs from the belay through every clipped piece. Sheets: `tools/shots/climber_v2_sheet.tscn` (`SHEET=poses` or `looks`), film: `tools/shots/climber_v2_clip.tscn`; test: `tests/climb_v2_art_test`.
+
 ## The climbing screen
 
 ![Firefall Slab at dawn](docs/climb_firefall_slab_dawn.png)
