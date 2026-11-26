@@ -305,6 +305,19 @@ func test_pins() -> void:
 	weak.quality = 0.2
 	check(g.tug_reading("pin_1").note.contains("wouldn't"), "a bad pin feels bad")
 	check((s.note(&"gear").tested as Dictionary).has("pin_1"), "what the pin told you is remembered")
+	# A lone pin, no crack in reach: the rack still opens to tug it.
+	d.handle_verb(&"cancel", true)
+	s.wall.cracks.clear()
+	check(g.placeable().is_empty() and g.can_rack(), "with only an old pin in reach you can still open the rack")
+	check(d.handle_verb(&"rack", true) and s.phase == &"place", "...and the place phase opens")
+	ph = d.current as TradGear.PlacePhase
+	check(ph.entries.size() == 1 and ph.current().type == "pin", "it offers just the pin to tug, no cams")
+	d.handle_verb(&"aim_up", true)
+	d.handle_verb(&"commit", true)
+	check(str(ph.reading.get("note", "")) != "", "the tug still reads")
+	d.handle_verb(&"cancel", true)
+	stand_at(d, 3.0)
+	check(not g.can_rack(), "nothing in reach: no rack")
 
 
 func test_booty() -> void:
@@ -346,7 +359,7 @@ func test_partner_words() -> void:
 	p.quality = 0.9
 	check(g.grade_for(p).grade == "bomber" and g.grade_for(p).line.contains("6 m"), "the partner names the piece and where: %s" % g.grade_for(p).line)
 	p.tags = PackedStringArray(["tipped"])
-	check(g.grade_for(p).grade == "tipped out", "a tipped piece is called out")
+	check(g.grade_for(p).grade == "tipped out" and g.grade_for(p).why == "tipped", "a tipped piece is called out, with why")
 	p.tags = PackedStringArray(["overcammed"])
 	check(g.grade_for(p).line.contains("ten minutes"), "an over-cammed one cost the partner time")
 

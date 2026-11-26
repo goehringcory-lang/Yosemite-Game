@@ -114,6 +114,11 @@ func placeable() -> Array[V2Crack]:
 	return session.wall.cracks_within(shoulder(), PLACE_REACH)
 
 
+## The rack opens at a crack, an old pin or a stuck piece in reach.
+func can_rack() -> bool:
+	return not placeable().is_empty() or not pins_in_reach().is_empty() or not booty_in_reach().is_empty()
+
+
 func in_reach(at: Vector2) -> bool:
 	return at.distance_to(shoulder()) <= PLACE_REACH + 0.001
 
@@ -366,7 +371,9 @@ func grade_for(piece: V2Piece) -> Dictionary:
 		"barely seated": "barely seated, one tug and it came out", "a prayer": "that one was a prayer",
 		"it popped": "popped when you came on it",
 	}
-	return {"grade": grade, "line": "Your %s at %d m: %s." % [piece_name(piece), roundi(piece.pos.y), lines[grade]]}
+	var why: String = {"tipped out": "tipped", "walked a bit": "walked", "over-cammed": "overcammed",
+		"barely seated": "shallow", "a prayer": "marginal", "it popped": "popped"}.get(grade, "")
+	return {"grade": grade, "line": "Your %s at %d m: %s." % [piece_name(piece), roundi(piece.pos.y), lines[grade]], "why": why}
 
 
 ## The size printed on a piece: "#0.75", "mid"... (Gear's size label, else
@@ -561,14 +568,14 @@ class PlacePhase extends ClimbPhase:
 		name = &"place"
 		var g := gear()
 		var cracks := g.placeable()
-		if cracks.is_empty():
-			director.go(&"climb")
-			return
-		crack_id = cracks[0].id
-		var c := director.session.wall.crack(crack_id)
-		at = c.nearest(g.shoulder() + Vector2(0, 0.1)).pos
-		if not g.in_reach(at):
-			at = c.nearest(g.shoulder()).pos
+		crack_id = ""
+		at = g.shoulder()
+		if not cracks.is_empty():
+			crack_id = cracks[0].id
+			var c := director.session.wall.crack(crack_id)
+			at = c.nearest(g.shoulder() + Vector2(0, 0.1)).pos
+			if not g.in_reach(at):
+				at = c.nearest(g.shoulder()).pos
 		_build_entries()
 		if entries.is_empty():
 			director.go(&"climb")
@@ -587,7 +594,7 @@ class PlacePhase extends ClimbPhase:
 		var s := director.session
 		entries.clear()
 		for it in s.rack.items:
-			if int(it.count) > 0 and str(it.kind) in ["cam", "nut", "offset"]:
+			if crack_id != "" and int(it.count) > 0 and str(it.kind) in ["cam", "nut", "offset"]:
 				entries.append({"type": "item", "id": str(it.id)})
 		for p in gear().pins_in_reach():
 			entries.append({"type": "pin", "id": p.id})
@@ -625,6 +632,8 @@ class PlacePhase extends ClimbPhase:
 				return true
 			&"aim_up", &"aim_down":
 				var c := s.wall.crack(crack_id)
+				if c == null:
+					return true
 				var next: Vector2 = c.nearest(at + Vector2(0, TradGear.SLIDE_M if verb == &"aim_up" else -TradGear.SLIDE_M)).pos
 				if g.in_reach(next) and next != at:
 					at = next

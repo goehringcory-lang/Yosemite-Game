@@ -56,16 +56,16 @@ No bar, number or colour grades a piece. Quality stays hidden on the
 
 ## For other threads
 
-- **Falls (7):** `grade_for(piece)` gives `{grade, line}` naming the piece and
+- **Falls (7):** `grade_for(piece)` gives `{grade, line, why}` naming the piece and
   height ("Your red #1 at 6 m: walked up the crack a bit."). Tags on placed
   pieces: `overcammed`, `tipped`, `walked`, `shallow`, `stretched`, `offset`.
   Fable suggests pops scale with fall severity near the quality threshold so
   graded readings matter, and over-cammed pieces cost belay minutes.
 - **Effort (4):** `price_action("offer", {stretched, hand_hold})`. Gear applies
   the fiddle and stretch multipliers itself, so don't also scale by tries.
-- **Foundation (1):** pins and booty are only reachable when a crack is in
-  reach, because the director opens "place" only when `placeable()` has a
-  crack. An additive `can_rack()` hook would let a lone pin be tug-tested.
+- **Foundation (1):** TradGear overrides `can_rack()` (contract v2, #204): the
+  rack opens at a crack, an old pin or a stuck piece in reach; with no crack
+  it offers only the pin or booty. `grade_for` returns `{grade, line, why}`.
 - **Art/look (9, 10):** the inset is the only placement view; placed pieces
   on the wall are drawn by the look. `piece_offered` carries the reading
   (`state`, `e`, `walks`, `stop`, `murky`) for sounds and animation.
