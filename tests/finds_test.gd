@@ -53,8 +53,13 @@ func _check_list() -> void:
 		check(Finds.icon_of(find) != null, "%s: has an icon to lie on the ground" % id)
 	# Spread over the park, not piled into a few areas.
 	check(regions.size() >= 15, "finds lie in %d areas (15 or more)" % regions.size())
+	# (a gear cache seen from a vista (Vistas) can make a third)
+	var plain := {}
+	for find: Dictionary in Finds.all():
+		if not Finds.is_cache(find):
+			plain[find.region] = int(plain.get(find.region, 0)) + 1
 	for region_id: String in regions:
-		check(int(regions[region_id]) <= 2, "%s: holds no more than two finds" % region_id)
+		check(int(plain.get(region_id, 0)) <= 2 and int(regions[region_id]) <= 3, "%s: holds no more than two finds, and a cache" % region_id)
 	# Gear is the rare, valuable kind: a few cams at most.
 	var cams := 0
 	for find: Dictionary in Finds.all():

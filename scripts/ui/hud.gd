@@ -240,6 +240,14 @@ func show_discovery(found: Dictionary) -> void:
 		Sound.play("story_sting", -6.0, 0.0)
 
 
+## A landmark walked to for the first time (Landmarks): a card of its own,
+## and its note opens in the Logbook.
+func show_landmark(landmark: Dictionary) -> void:
+	if _discovery_icon == null:
+		_discovery_icon = Discoveries.icon()
+	toasts.notify("landmark:%s" % landmark.id, _discovery_icon, "Landmark: %s" % landmark.name, 1)
+
+
 ## A hidden find taken (FindSpot): its little story, with what you took, and
 ## the story sting. The reward's own toast comes from Inventory or Gear.
 func show_find(find: Dictionary) -> void:

@@ -33,6 +33,9 @@ static func attach(region: Region) -> void:
 	Camp.dress(region)
 	# Hidden finds off the paths (data/park/finds.json).
 	Finds.dress(region)
+	# Vistas to take in, and registers and sketch spots (Vistas, Challenges).
+	Vistas.dress(region)
+	Challenges.dress(region)
 	# Wren's slackline can be rigged between trees in any outdoor region.
 	if not region.indoors:
 		region.add_child(TravelSlackline.new())
