@@ -118,7 +118,7 @@ func apply_wet() -> void:
 	if wet <= 0.0 and _wet <= 0.0:
 		return
 	_wet = wet
-	var rain: float = Weather.today().rain
+	var rain: float = Weather.rain_now()
 	var pal := ClimbSky.palette(Sun.hour_now())
 	var sky: Color = (pal.mid as Color).lerp(pal.low, 0.35)
 	sky = sky.lerp(Color(0.6, 0.63, 0.66), 0.7 if rain > 0.0 else 0.35)
@@ -158,7 +158,10 @@ func apply() -> void:
 		mat.set_shader_parameter("frost", g["frost"])
 		mat.set_shader_parameter("flower_fill", g["fill"])
 	_wet_wait = 0.0
-	var snow := Seasons.snow_cover()
+	# this area's own snow (up high it lies deeper and longer), so an area
+	# laid beside you at a seam looks as it will when you walk into it
+	var region := get_parent() as Region
+	var snow := Seasons.snow_cover(-1, -1, -1, region.region_id, region.hub_id) if region else Seasons.snow_cover()
 	for ground in _grounds:
 		(ground.material as ShaderMaterial).set_shader_parameter("snow", snow)
 	if _cap_material == null:

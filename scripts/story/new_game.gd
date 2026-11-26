@@ -27,6 +27,7 @@ static func reset() -> void:
 	Landmarks.start_new_game()
 	Vistas.start_new_game()
 	Challenges.start_new_game()
+	MapFog.start_new_game()
 	WallBooty.start_new_game()
 	Festivals.start_new_game()
 	Stewardship.start_new_game()

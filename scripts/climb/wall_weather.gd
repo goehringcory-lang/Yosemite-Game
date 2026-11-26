@@ -24,6 +24,9 @@ extends RefCounted
 ## ClimbState.STORM_HOUR, but the lightning never sends you down.
 const CALM := {"rain": 0.0, "snow": 0.0, "dry_hour": 0.0, "wet_why": "", "wind": false, "hot": false, "storm_hour": 14.5, "lightning": false}
 ## Chance of a windy day, by season (spring, summer, fall, winter).
+## How high an alpine wall's weather is worked out for (feet): above the
+## meadows, where the climbs are.
+const ALPINE_FT := 10000
 const WIND_CHANCE := [0.3, 0.15, 0.3, 0.45]
 ## Chance of an afternoon storm in the high country, by season.
 const STORM_CHANCE := [0.35, 0.75, 0.25, 0.0]
@@ -47,11 +50,15 @@ static func on_day(route_id: String, year: int, season: int, day: int) -> Dictio
 	var profile := ClimbProfiles.get_profile(route_id)
 	var alpine: bool = profile.get("weather", "valley") == "alpine"
 	var sun: Array = profile.get("sun", [10, 16])
+	# The park's storm as it falls on this rock: an alpine wall stands far
+	# above Tuolumne, where spring and fall storms come as snow.
+	var ft := ALPINE_FT if alpine else Climate.VALLEY_FT
 	var w := Weather.on_day(year, season, day)
 	if year == GameClock.year and season == GameClock.season and day == GameClock.day:
-		w = Weather.today()
+		w = Weather.park_today()
+	w = Climate.localize(w, season, day, ft)
 	var before := _yesterday(year, season, day)
-	var y := Weather.on_day(before.x, before.y, before.z)
+	var y := Climate.weather_at(before.x, before.y, before.z, ft)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("wall:%s:%d:%d:%d" % ["alpine" if alpine else "valley", year, season, day])
 	var out := CALM.duplicate()
@@ -68,12 +75,23 @@ static func on_day(route_id: String, year: int, season: int, day: int) -> Dictio
 		out["wet_why"] = "yesterday"
 	out["wind"] = rng.randf() < WIND_CHANCE[season]
 	out["hot"] = season == GameClock.Season.SUMMER
-	out["storm_hour"] = -1.0
-	if alpine and rng.randf() < STORM_CHANCE[season]:
-		# Between 1:30 and 3:30 in the afternoon, on the half hour.
-		out["storm_hour"] = 13.5 + 0.5 * rng.randi_range(0, 4)
+	out["storm_hour"] = alpine_storm_hour(year, season, day) if alpine else -1.0
 	out["lightning"] = true
 	return out
+
+
+## The hour the afternoon storm breaks over the high country's walls on a
+## date, or -1 for none. From the date alone (not the weather), so the sky
+## over Tuolumne (HighCountry.storm_hour) can ask without going round
+## through Weather.
+static func alpine_storm_hour(year: int, season: int, day: int) -> float:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("wall:alpine:%d:%d:%d" % [year, season, day])
+	rng.randf() # the wind's roll, in on_day
+	if rng.randf() < STORM_CHANCE[season]:
+		# Between 1:30 and 3:30 in the afternoon, on the half hour.
+		return 13.5 + 0.5 * rng.randi_range(0, 4)
+	return -1.0
 
 
 ## The day before (year, season, day), as Vector3i(year, season, day).
