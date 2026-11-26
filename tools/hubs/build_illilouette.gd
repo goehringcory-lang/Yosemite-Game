@@ -160,6 +160,8 @@ func _illilouette() -> void:
 	_layout()
 	start_region("Illilouette", "illilouette", "Illilouette Gorge", GEO_ILLILOUETTE)
 	_root.hub_id = "glacier_point"
+	# The clock time walking it end to end takes (Region.walk_minutes).
+	_root.walk_minutes = 90
 	# the creek's current lines drift south, downstream (seasonal_ground.gdshader)
 	_root.set_meta("water_flow", Vector2(0.0, 9.0))
 	paint_ground()

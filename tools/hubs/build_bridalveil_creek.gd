@@ -74,6 +74,8 @@ func _bridalveil_creek() -> void:
 	_bridalveil_layout()
 	start_region("BridalveilCreek", "bridalveil_creek", "Bridalveil Creek", GEO)
 	_root.hub_id = "glacier_point"
+	# The clock time walking it end to end takes (Region.walk_minutes).
+	_root.walk_minutes = 60
 	paint_ground()
 	_save_ground_art("ground_bridalveil_creek", 1890)
 	_place_features_bridalveil()

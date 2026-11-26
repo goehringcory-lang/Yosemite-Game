@@ -124,6 +124,8 @@ func _build_union_point() -> void:
 	_union_layout()
 	start_region("UnionPoint", "union_point", "Four Mile Trail", UGEO)
 	_root.hub_id = "glacier_point"
+	# The clock time walking it end to end takes (Region.walk_minutes).
+	_root.walk_minutes = 40
 	paint_ground()
 	_save_ground_art("ground_union_point", 1872)
 	_place_union_view()
