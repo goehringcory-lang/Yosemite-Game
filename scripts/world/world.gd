@@ -722,6 +722,9 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 		message = "You stayed out too late and passed out..."
 	if message_extra != "":
 		message += "\n" + message_extra
+	var sky_note := Climate.forecast_note()
+	if sky_note != "":
+		message += "\n" + sky_note
 	var cold_note := Warmth.morning_note()
 	if cold_note != "":
 		message += "\n" + cold_note
@@ -865,6 +868,9 @@ func _face_away_from_way_back(left: String) -> void:
 ## Everything that follows the player into a region, by a door or a fade or
 ## across a seam.
 func _arrive() -> void:
+	# first, so everything below (and every region_changed listener) asks
+	# about the weather and snow of where you are now
+	Climate.arrive(region.region_id, region.hub_id)
 	$DayNight.visible = not region.indoors
 	Warmth.outdoors = not region.indoors
 	if region.region_id == "mirror_lake" and GameClock.season == GameClock.Season.FALL:
