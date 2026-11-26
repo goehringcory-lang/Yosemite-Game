@@ -120,6 +120,9 @@ var journeys_headless := false
 @onready var park_map: ParkMap = $ParkMap
 ## The forest past the map edges, seen only beside a seam.
 var backdrop := SeamBackdrop.new()
+## Which areas are streamed in, and where things are across them, for
+## everything outside World (see WorldStream and docs/STREAMING.md).
+var stream: WorldStream
 ## Tilts the camera up at the cliffs; also carries its lag over a seam.
 var framing := LandmarkFraming.new()
 ## Today's events, for the page at bedtime.
@@ -130,6 +133,8 @@ func _ready() -> void:
 	# Cross seams after the player's tick, not before it: a walker moved to
 	# another parent mid-tick misses its move that tick, and stutters.
 	process_physics_priority = 1000
+	stream = WorldStream.new(self)
+	add_child(stream)
 	add_to_group("world")
 	add_to_group("persist")
 	add_to_group("persist_provider")
@@ -812,6 +817,7 @@ func _enter_region(id: String, spawn_name := "", staged_seams := false) -> void:
 	_fit_camera()
 	_settle_view()
 	_arrive()
+	stream.sync()
 
 
 ## Frames the view where the player has just arrived, so it shows settled
@@ -1121,6 +1127,7 @@ func _lay_seam(next: Seam) -> void:
 	# behind the region the player is in, which draws over its own edges
 	move_child(seam.neighbor, 0)
 	_fit_camera()
+	stream.sync()
 
 
 ## Do [param a] and [param b] lay out the same neighbor through the same
@@ -1159,6 +1166,7 @@ func _drop_seam() -> void:
 	seam = null
 	if region:
 		_fit_camera()
+	stream.sync()
 
 
 func _physics_process(_delta: float) -> void:
@@ -1214,6 +1222,7 @@ func _cross_seam() -> void:
 	framing.crossed(region, shift)
 	seam_crossed.emit(shift)
 	_arrive()
+	stream.sync()
 
 
 ## Just after crossing a seam, before the camera moves this frame (and after
