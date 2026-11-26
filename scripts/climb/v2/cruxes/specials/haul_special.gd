@@ -8,7 +8,7 @@ extends CruxSpecial
 ## at a better angle, or ask your partner to climb over and free it, which
 ## always works and takes a while. Under a roof, only the partner can.
 
-const T := CruxTuning
+const T = preload("res://scripts/climb/v2/cruxes/crux_tuning.gd")
 
 
 func start() -> void:

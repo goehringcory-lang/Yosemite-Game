@@ -19,7 +19,7 @@ extends CruxSystem
 ## chimneys and offwidths, and hauling the bag at the belay: see specials/.
 ## See CRUXES.md beside this file.
 
-const T := CruxTuning
+const T = preload("res://scripts/climb/v2/cruxes/crux_tuning.gd")
 const SPECIAL_SCRIPTS := {
 	&"swing": preload("res://scripts/climb/v2/cruxes/specials/swing_special.gd"),
 	&"nail": preload("res://scripts/climb/v2/cruxes/specials/nail_special.gd"),
@@ -113,28 +113,8 @@ func constrain(move: V2Move) -> void:
 		if not missed.is_empty():
 			risk += T.DYNO_BAD_LAUNCH_RISK
 	move.in_sequence = missed.is_empty()
-	_set(move, "crux_cost", minf(cost, T.COST_CAP))
-	_set(move, "crux_risk", clampf(risk, 0.0, 0.95))
-
-
-## The crux cost and risk on [param move] (0/1 defaults when the contract
-## fields aren't there yet).
-static func cost_of(move: V2Move) -> float:
-	var v: Variant = move.get("crux_cost")
-	return float(v) if v != null else 1.0
-
-
-static func risk_of(move: V2Move) -> float:
-	var v: Variant = move.get("crux_risk")
-	return float(v) if v != null else 0.0
-
-
-static func _set(move: V2Move, field: String, value: float) -> void:
-	if field in move:
-		move.set(field, value)
-	else:
-		# Before contract v2 the numbers ride along as tags.
-		move.tags.append("%s=%.3f" % [field, value])
+	move.crux_cost = minf(cost, T.COST_CAP)
+	move.crux_risk = clampf(risk, 0.0, 0.95)
 
 
 ## A compact tag for a missed demand: crux_miss:hand_rh, crux_miss:hip_x-1,

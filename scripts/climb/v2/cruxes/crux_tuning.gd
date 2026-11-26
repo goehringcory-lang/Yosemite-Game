@@ -108,5 +108,8 @@ const WORM_PUMP_PER_M := 0.02
 ## Having the wrong side in (against the crack's lean).
 const WORM_WRONG_SIDE := 1.45
 ## Lock techniques by crack width (Camalot scale; 7 = #4). [name, best, half-width].
-const LOCKS_UPPER := [["fist jam", 5.8, 0.9], ["hand stack", 7.2, 1.0], ["arm bar", 8.6, 1.1], ["chicken wing", 9.8, 1.0], ["back and palms", 12.0, 2.0]]
-const LOCKS_LOWER := [["heel-toe", 7.0, 1.2], ["knee bar", 8.8, 1.2], ["butterfly", 10.0, 1.0], ["back and foot", 12.0, 2.2]]
+## The bands overlap, so some lock always works where the crack is a
+## sensible width; a flare past them, or a spot between their best widths,
+## is where you slip.
+const LOCKS_UPPER := [["fist jam", 5.8, 1.1], ["hand stack", 7.2, 1.2], ["arm bar", 8.6, 1.3], ["chicken wing", 9.9, 1.3], ["back and palms", 12.0, 2.2]]
+const LOCKS_LOWER := [["heel-toe", 7.0, 1.4], ["knee bar", 8.8, 1.4], ["butterfly", 10.0, 1.3], ["back and foot", 12.0, 2.4]]

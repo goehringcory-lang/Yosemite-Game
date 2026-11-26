@@ -113,14 +113,10 @@ func do_option(option: Dictionary) -> void:
 	if fx.has("rest"):
 		director.rest(fx.rest)
 	if fx.has("hang"):
-		_hang(fx.hang, fx.get("tags", PackedStringArray()))
+		director.hang_at(fx.hang, fx.get("tags", PackedStringArray()))
 	if int(fx.get("aid", 0)) > 0:
-		if director.has_method("count_aid"):
-			director.call("count_aid", int(fx.aid))
-		else:
-			s.result.aid_moves += int(fx.aid)
-	if s.bus.has_signal("special_step"):
-		s.bus.send(&"special_step", [special.kind, fx.get("step", {})])
+		director.count_aid(int(fx.aid))
+	s.bus.send(&"special_step", [special.kind, fx.get("step", {})])
 	_say = str(fx.get("say", ""))
 	sel = 0
 	if bool(fx.get("done", false)):
@@ -147,17 +143,6 @@ func _price(c: Array) -> V2Cost:
 		if priced and (priced.pump != 0.0 or priced.gas != 0.0 or priced.minutes != 0):
 			return priced
 	return V2Cost.make(float(c[0]) * s.mods.pump_mult, float(c[1]) * s.mods.gas_mult, int(c[2]))
-
-
-func _hang(pos: Vector2, tags: PackedStringArray) -> void:
-	if director.has_method("hang_at"):
-		director.call("hang_at", pos, tags)
-	else:
-		# Before contract v2: the same thing hang_at does.
-		director.session.sys.body.settle(pos)
-		for t in tags:
-			if not director.session.pose.tags.has(t):
-				director.session.pose.tags.append(t)
 
 
 func _save() -> void:

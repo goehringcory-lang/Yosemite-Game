@@ -14,7 +14,7 @@ extends CruxSpecial
 ## reach of the crack you aim at a hold there and grab it; a peak far past
 ## it slams you into the corner.
 
-const T := CruxTuning
+const T = preload("res://scripts/climb/v2/cruxes/crux_tuning.gd")
 
 
 func start() -> void:
@@ -48,20 +48,41 @@ func start() -> void:
 	var d := absf(target.x - pivot.x)
 	# The least rope that reaches: the crack at 60 degrees out.
 	var base := maxf(d / sin(deg_to_rad(60.0)), 1.5)
+	# The rope lengths worth lowering out: each one puts a hold on the far
+	# crack right on the arc (the rope as long as the hold is far away).
+	var ropes: Array = []
+	if not free_grab:
+		var line: Array[float] = []
+		for h in w.holds:
+			if h.hand and absf(h.pos.x - target.x) < 0.6 and h.pos.y < pivot.y - 0.3 and h.pos.y > pivot.y - 9.0:
+				var r := h.pos.distance_to(pivot)
+				if r >= d * 1.02:
+					line.append(r)
+		line.sort()
+		for r in line:
+			if ropes.is_empty() or r - float(ropes.back()) >= 0.6:
+				ropes.append(r)
+		if ropes.size() > 3:
+			ropes = [ropes[0], ropes[ropes.size() / 2], ropes.back()]
+	if ropes.is_empty():
+		for extra: float in T.SWING_LOWER_OPTIONS:
+			ropes.append(base + extra)
 	state = {"stage": "lower", "pivot": V2Data.arr(pivot), "side": side, "d": d, "target_y": target.y,
-		"base": base, "rope": base, "peak": 0.0, "free_grab": free_grab, "target": V2Data.arr(target), "kicks": 0, "slams": 0, "misses": 0, "spots": _kick_spots(pivot, side)}
+		"base": base, "rope": float(ropes[0]), "ropes": ropes, "peak": 0.0, "free_grab": free_grab, "target": V2Data.arr(target),
+		"kicks": 0, "slams": 0, "misses": 0, "spots": []}
 
 
 ## Where you can kick off: footholds on the near side under the pivot, or
 ## features drawn from the pitch when there are none.
-func _kick_spots(pivot: Vector2, side: float) -> Array:
+func _kick_spots(pivot: Vector2, side: float, r: float) -> Array:
 	var w := session().wall
 	var out: Array = []
 	for h in w.holds:
 		if not h.foot or h.hand and h.kind == &"jug":
 			continue
 		var dx := (h.pos.x - pivot.x) * side
-		if dx > 0.3 or dx < -3.0 or h.pos.y > pivot.y - 0.5 or h.pos.y < pivot.y - 6.0:
+		var far := h.pos.distance_to(pivot)
+		if dx > 0.3 or dx < -3.0 or far < r - 1.0 or far > r + 0.3:
 			continue
 		var footing := "edge"
 		if h.has_tag("polished"):
@@ -82,7 +103,8 @@ func _kick_spots(pivot: Vector2, side: float) -> Array:
 			var f: String = kinds[int(noise("kick%d" % i) * kinds.size()) % kinds.size()]
 			if i == 0 and f in ["wet", "polished"]:
 				f = "edge"
-			out.append({"id": "kick%d" % i, "pos": V2Data.arr(pivot + Vector2(-side * (0.6 + 0.7 * i), -2.4 - 0.4 * i)), "footing": f})
+			var ang := (0.15 + 0.22 * i) * -side
+			out.append({"id": "kick%d" % i, "pos": V2Data.arr(pivot + Vector2(sin(ang), -cos(ang)) * (r - 0.4)), "footing": f})
 			i += 1
 	return out
 
@@ -93,8 +115,7 @@ func title() -> String:
 
 func rope_options() -> Array:
 	var out: Array = []
-	for extra: float in T.SWING_LOWER_OPTIONS:
-		var r := float(state.base) + extra
+	for r: float in state.ropes:
 		out.append({"id": "lower", "rope": r, "label": "Lower out %.0f m and swing" % r})
 	return out
 
@@ -166,7 +187,7 @@ func preview(option: Dictionary) -> Dictionary:
 				say = "In reach of the crack"
 			return {"peak": p, "pos": V2Data.arr(peak_pos(p)), "say": say}
 		"grab":
-			return {"say": "Grab it", "pos": V2Data.arr(_grab_pos(option))}
+			return {"say": "in reach at the top of this swing", "pos": V2Data.arr(_grab_pos(option))}
 	return {}
 
 
@@ -175,7 +196,8 @@ func apply(option: Dictionary) -> Dictionary:
 		"lower":
 			state.rope = float(option.rope)
 			state.stage = "swing"
-			var extra := float(state.rope) - float(state.base)
+			state.spots = _kick_spots(V2Data.vec(state.pivot), float(state.side), float(state.rope))
+			var extra := maxf(float(state.rope) - float(state.base), 0.0)
 			return {"cost": [0.0, 0.0, T.SWING_LOWER_MINUTES + int(extra)], "say": "Lowered out. Now run.",
 				"hang": peak_pos(0.0), "tags": PackedStringArray(["hang", "swing"]),
 				"step": {"stage": "lowered", "rope": state.rope}}

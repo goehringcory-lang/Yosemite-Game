@@ -13,7 +13,7 @@ extends CruxSpecial
 ## carry pins of it. Tie-offs, a size off, back-cleaning the pin below to
 ## reuse it, or a skyhook as the last resort are the compromises.
 
-const T := CruxTuning
+const T = preload("res://scripts/climb/v2/cruxes/crux_tuning.gd")
 
 
 func start() -> void:

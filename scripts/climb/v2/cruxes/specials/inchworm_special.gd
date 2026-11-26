@@ -13,7 +13,7 @@ extends CruxSpecial
 ## One choice per section up front: which side goes in. Against the crack's
 ## lean every shuffle costs more; switching sides halfway is a big effort.
 
-const T := CruxTuning
+const T = preload("res://scripts/climb/v2/cruxes/crux_tuning.gd")
 
 var _crack: V2Crack
 
@@ -82,8 +82,20 @@ func lock_at(half: String, y: float) -> Dictionary:
 func options() -> Array:
 	if state.stage == "side":
 		return [{"id": "side", "side": -1.0, "label": "Left side in"}, {"id": "side", "side": 1.0, "label": "Right side in"}]
+	var out := _shuffles(str(state.moving))
+	if out.is_empty():
+		# This half can't go further until the other one moves.
+		out = _shuffles("lower" if str(state.moving) == "upper" else "upper")
+	if float(state.last_q) >= 0.5:
+		out.append({"id": "rest", "label": "Rest, both halves locked"})
+	out.append({"id": "switch", "label": "Turn round: other side in"})
+	return out
+
+
+## The spots the [param half] can move to: up to an arm's (or a leg's)
+## shuffle, keeping the body between its two locks.
+func _shuffles(half: String) -> Array:
 	var out: Array = []
-	var half := str(state.moving)
 	var from := float(state.upper) if half == "upper" else float(state.lower)
 	var lo := from + T.WORM_SPOT_M
 	var hi := from + T.WORM_REACH_M
@@ -96,16 +108,13 @@ func options() -> Array:
 		var l := lock_at(half, y)
 		out.append({"id": "shuffle", "half": half, "y": y, "lock": l.name, "label": "%s up %.1f m: %s" % ["Reach" if half == "upper" else "Bring your legs", y - from, l.name]})
 		y += T.WORM_SPOT_M
-	if float(state.last_q) >= 0.5:
-		out.append({"id": "rest", "label": "Rest, both halves locked"})
-	out.append({"id": "switch", "label": "Turn round: other side in"})
 	return out
 
 
 func preview(option: Dictionary) -> Dictionary:
 	match str(option.id):
 		"shuffle":
-			return {"say": str(option.lock), "y": option.y, "x": state.x}
+			return {"say": "", "y": option.y, "x": state.x}
 		"side":
 			return {"say": "Face %s" % ("left" if float(option.side) < 0.0 else "right")}
 		"rest":
@@ -136,7 +145,8 @@ func apply(option: Dictionary) -> Dictionary:
 			var bad := (1.0 + (1.0 - q) * 1.5) * _side_mult()
 			var c := [T.WORM_PUMP_PER_M * dist * bad, T.WORM_GAS_PER_M * dist * bad, 1 + roundi(dist * 3.0)]
 			var say := "%s. Solid." % str(l.name).capitalize() if q >= 0.7 else "%s. It'll do." % str(l.name).capitalize()
-			if q < T.WORM_SLIP_BELOW:
+			var slipped := q < T.WORM_SLIP_BELOW
+			if slipped:
 				# It won't lock: you slide back past where you started.
 				state.slips = int(state.slips) + 1
 				y = maxf(from - T.WORM_SLIP_M, float(state.bottom))
@@ -149,7 +159,8 @@ func apply(option: Dictionary) -> Dictionary:
 			else:
 				state.lower = y
 			state.last_q = q
-			state.moving = "lower" if half == "upper" else "upper"
+			# After a slip the same half tries again; otherwise the other moves.
+			state.moving = half if slipped else ("lower" if half == "upper" else "upper")
 			var fx := {"cost": c, "say": say, "hang": hip_pos(), "tags": _tags(),
 				"step": {"stage": "shuffle", "half": half, "y": y, "lock": l.name, "slipped": q < T.WORM_SLIP_BELOW}}
 			if float(state.upper) >= float(state.top) and float(state.lower) >= float(state.top) - 1.2:
