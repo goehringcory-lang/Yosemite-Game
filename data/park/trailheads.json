@@ -1,0 +1,29 @@
+{
+	"_about": "Fast-travel points (Trailheads autoload). Each is a parking kiosk already in its region (node) or a trailhead sign Trailheads puts down beside a spawn (spawn). pos, spawn and lonlat are filled in by tools/travel/place_trailheads.tscn; run it after adding a point or moving its region's spots.",
+	"points": [
+		{"id":"home","kind":"home","lonlat":[-119.56915,37.73636],"name":"Your cabin (Lamon Homestead)","pos":[344.0,296.0],"region":"lamon_homestead","spawn":"home"},
+		{"id":"village_parking","kind":"parking","lonlat":[-119.58086,37.74621],"name":"Yosemite Village Parking","node":"Travel_YosemiteVillageParking","pos":[3152.0,1336.0],"region":"yosemite_village","spawn":"arrival"},
+		{"id":"curry_parking","kind":"parking","lonlat":[-119.57806,37.73678],"name":"Curry Village Parking","node":"Travel_CurryVillageParking","pos":[592.0,1440.0],"region":"curry_village","spawn":"shuttle"},
+		{"id":"happy_isles","kind":"trailhead","lonlat":[-119.55788,37.7318],"name":"Happy Isles Trailhead (Mist Trail, John Muir Trail)","pos":[1272.0,872.0],"region":"happy_isles","spawn":"isles"},
+		{"id":"mirror_lake","kind":"trailhead","lonlat":[-119.55206,37.74398],"name":"Mirror Lake Trailhead","pos":[376.0,1192.0],"region":"mirror_lake","spawn":"arrival"},
+		{"id":"upper_pines","kind":"campground","lonlat":[-119.56504,37.73589],"name":"Upper Pines Campground","pos":[1016.0,552.0],"region":"upper_pines","spawn":"campground"},
+		{"id":"four_mile","kind":"trailhead","lonlat":[-119.60303,37.73284],"name":"Four Mile Trailhead","pos":[1016.0,616.0],"region":"four_mile_trailhead","spawn":"trailhead"},
+		{"id":"el_cap_meadow","kind":"trailhead","lonlat":[-119.6357,37.72204],"name":"El Capitan Meadow","pos":[1528.0,968.0],"region":"el_capitan_meadow","spawn":"meadow"},
+		{"id":"bridalveil","kind":"trailhead","lonlat":[-119.64804,37.7165],"name":"Bridalveil Fall Trailhead","pos":[1208.0,696.0],"region":"bridalveil_fall","spawn":"arrival"},
+		{"id":"tunnel_view","kind":"parking","lonlat":[-119.67845,37.71454],"name":"Tunnel View Parking","node":"Travel_TunnelViewParking","pos":[784.0,960.0],"region":"tunnel_view","spawn":"arrival"},
+		{"id":"little_yosemite","kind":"campground","lonlat":[-119.51362,37.7312],"name":"Little Yosemite Valley Camp","pos":[1000.0,760.0],"region":"little_yosemite_valley","spawn":"camp"},
+		{"id":"glacier_point","kind":"parking","lonlat":[-119.57405,37.7298],"name":"Glacier Point Parking","node":"Travel_GlacierPointParking","pos":[1744.0,1408.0],"region":"glacier_point","spawn":"arrival"},
+		{"id":"sentinel_dome","kind":"parking","lonlat":[-119.57589,37.72689],"name":"Sentinel Dome Trailhead","node":"Travel_SentinelDomeTrailhead","pos":[1392.0,2112.0],"region":"glacier_point","spawn":"sentinel_dome_trailhead"},
+		{"id":"taft_point","kind":"trailhead","lonlat":[-119.60358,37.7127],"name":"Taft Point","pos":[1656.0,968.0],"region":"taft_point","spawn":"arrival"},
+		{"id":"wawona_store","kind":"parking","lonlat":[-119.65867,37.5407],"name":"Wawona Store","node":"Travel_Wawona_Store","pos":[1440.0,608.0],"region":"wawona","spawn":"arrival"},
+		{"id":"mariposa_grove","kind":"parking","lonlat":[-119.65625,37.53408],"name":"Mariposa Grove Welcome Plaza","node":"Travel_Mariposa_Grove_Welcome_Plaza","pos":[1904.0,2208.0],"region":"wawona","spawn":"mariposa_grove"},
+		{"id":"el_portal","kind":"parking","lonlat":[-119.78689,37.67496],"name":"El Portal Market","node":"Travel_El_Portal_Market","pos":[1488.0,800.0],"region":"el_portal","spawn":"arrival"},
+		{"id":"crane_flat","kind":"trailhead","lonlat":[-119.79874,37.75449],"name":"Crane Flat","pos":[1016.0,360.0],"region":"crane_flat","spawn":"meadow"},
+		{"id":"hetch_hetchy","kind":"parking","lonlat":[-119.79513,37.94833],"name":"Hetch Hetchy Dam Parking","node":"Travel_Hetch_Hetchy","pos":[496.0,768.0],"region":"hetch_hetchy","spawn":"arrival"},
+		{"id":"olmsted_point","kind":"parking","lonlat":[-119.46094,37.83131],"name":"Olmsted Point Parking","node":"Travel_Olmsted_Point","pos":[656.0,1024.0],"region":"tenaya_lake","spawn":"olmsted_point"},
+		{"id":"tenaya_beach","kind":"parking","lonlat":[-119.44888,37.83105],"name":"Tenaya Lake East Beach","node":"Travel_East_Beach","pos":[2960.0,1088.0],"region":"tenaya_lake","spawn":"arrival"},
+		{"id":"tuolumne_vc","kind":"parking","lonlat":[-119.36532,37.87267],"name":"Tuolumne Meadows Visitor Center","node":"Travel_Visitor_Center_Parking","pos":[1168.0,1600.0],"region":"tuolumne_meadows","spawn":"arrival"},
+		{"id":"dog_lake","kind":"parking","lonlat":[-119.35124,37.87638],"name":"Dog Lake and Lembert Dome Parking","node":"Travel_Dog_Lake_Parking","pos":[3856.0,704.0],"region":"tuolumne_meadows","spawn":"lembert_dome"},
+		{"id":"cathedral_lakes","kind":"trailhead","lonlat":[-119.42306,37.83904],"name":"Cathedral Lakes","pos":[952.0,1256.0],"region":"cathedral_lakes","spawn":"lower_lake"}
+	]
+}
