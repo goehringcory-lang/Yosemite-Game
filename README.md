@@ -1030,6 +1030,12 @@ godot --headless --path . res://tests/transitions_test.tscn
 It uses every way between two places in the real game, the way a player does (about 150: every road, trail and doorway exit, every gate and building door), walking into each one and holding the direction on for a moment after arriving. It checks each is one clean change of place: it lands in the right region, on the spot it names and not shoved off it, the place changes once and not again (no exit that fires on arrival, so no chain of rooms at the Ahwahnee), the landing is clear of every exit and beside a way back, walking over a seam is a walk with nothing jumping on screen, and a seam reached before the area past it is ready is still walked over, not cut. It prints a line per way with its slowest frame. `TRANSITIONS_ONLY=curry_village,leidig_meadow` sweeps just those regions; `TRANSITIONS_DEBUG=1` prints every change of place and every jump on screen. An exit fires only while the player's body really is in it (`RegionExit.touches`): just after arriving, physics could still see the player where they stood in the last place.
 
 ```bash
+godot --headless --path . res://tests/open_world_tour_test.tscn
+```
+
+It tours the whole open world in one running game: every road, trail, door, shuttle stop and drive, to every area the park has (72 in about 115 trips), as a player gets around. Each arrival must end the trip (not leave it under a fade), stand the player on open ground on the map, free to move with the clock running, keep the HUD on the screen, and play its first frames without a stall. It saves on every arrival and, in 14 places spread over the park (each hub and its far corners), quits to the title and loads that save, checking it comes back in the same area, on the same spot, facing the same way. Then it loads saves the park has changed under: a spot something now stands on (stepped clear, nearby), a spot off the map and an area that has gone (home). It prints the worst frames and how much memory the tour took. `PERF_TOUR_ONLY=a,b` tours just the ways in and out of those areas, `PERF_TOUR_VERBOSE=1` prints each trip with its memory, and `PERF_TOUR_NO_RELOAD=1` skips the reloads (to measure memory over a whole park). `tools/perf/region_memory.tscn` lists what holds texture memory in each area (`PERF_REGIONS`, `stay` waits in place, `PERF_OFF` frees World's children by class); run it under a renderer.
+
+```bash
 godot --headless --path . res://tests/ahwahnee_test.tscn
 ```
 
