@@ -2,7 +2,7 @@ extends Node
 ## Saves a screenshot of the v2 climbing screen part-way up a pitch, with the
 ## next move's ghost showing. Needs a window (not --headless). Environment:
 ##   SHOT_ROUTE   route id (default: the frozen fixture pitch, v2_fixture)
-##   SHOT_STEPS   scripted-climber steps before the shot (default 30)
+##   SHOT_STEPS   scripted-climber steps before the shot (default 25)
 ##   SHOT_OUT     the PNG (default user://climb_v2.png)
 ## Run: SHOT_STEPS=40 godot --path . res://tools/shots/climb_v2_shot.tscn
 
@@ -19,6 +19,7 @@ func _ready() -> void:
 		route.id = route_id
 		route.display_name = "Fixture"
 		route.protection = "bolts"
+		route.pitches.assign([2, 2])
 	else:
 		route = load("res://data/routes/%s.tres" % route_id)
 	var rack := V2Rack.new()
@@ -31,7 +32,7 @@ func _ready() -> void:
 	add_child(screen)
 	await get_tree().process_frame
 	var bot := ClimbV2TestBot.new(screen.director)
-	for i in int(_env("SHOT_STEPS", "30")):
+	for i in int(_env("SHOT_STEPS", "25")):
 		if screen.director.done:
 			break
 		bot.step()
