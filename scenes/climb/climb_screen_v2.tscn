@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/climb/v2/screen/climb_screen_v2.gd" id="1_screen"]
+
+[node name="ClimbScreenV2" type="CanvasLayer"]
+script = ExtResource("1_screen")

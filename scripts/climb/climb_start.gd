@@ -4,6 +4,8 @@ extends StaticBody2D
 ## start the climbing minigame.
 
 const MINIGAME := preload("res://scenes/climb/climb_minigame.tscn")
+## The new climbing (scripts/climb/v2), used only where ClimbV2 is switched on.
+const SCREEN_V2 := "res://scenes/climb/climb_screen_v2.tscn"
 
 signal climb_finished(route: RouteData, success: bool)
 
@@ -97,6 +99,8 @@ func climb(player: Player, top_out := true) -> bool:
 	player.can_act = false
 	var was_paused := GameClock.paused
 	GameClock.paused = true
+	if top_out and uses_v2(route):
+		return await _climb_v2(player, top_out, was_paused)
 	var minigame: ClimbMinigame = MINIGAME.instantiate()
 	minigame.setup(route)
 	tree.root.add_child(minigame)
@@ -120,6 +124,39 @@ func climb(player: Player, top_out := true) -> bool:
 	# The nights on the wall are new days. Time passes last: a climb that ran
 	# past 2 AM ends with the player passed out and sent home, not at the top.
 	var passed_out := GameClock.advance_through_nights(result[1], state.nights_spent)
+	if success and top_out and route.destination() != "" and not passed_out:
+		tree.call_group("world", "go_to_region", route.destination(), route.destination_spawn)
+	return success and not passed_out
+
+
+## True if [param p_route] climbs on the new v2 screen (ClimbV2's switch).
+static func uses_v2(p_route: RouteData) -> bool:
+	return p_route != null and not p_route.boulder and ClimbV2.enabled_for(p_route.id)
+
+
+## The v2 climb (behind ClimbV2's switch; rescues stay on the old one). Perks, achievements and medals
+## stay on the old climbing until the cutover; the tick, the top-out and the
+## clock work the same.
+func _climb_v2(player: Player, top_out: bool, was_paused: bool) -> bool:
+	var tree := player.get_tree()
+	var screen: ClimbScreenV2 = load(SCREEN_V2).instantiate()
+	screen.setup(route)
+	tree.root.add_child(screen)
+	ScreenWipe.attach(screen)
+	var done: Array = await screen.finished
+	var result: V2Result = screen.result
+	var success: bool = done[0]
+	GameClock.paused = was_paused
+	var report: Array[Dictionary] = []
+	if success and QuestLog.record_climb(route.id):
+		report = QuestLog.tick_report(route.id)
+	player.can_act = true
+	climb_finished.emit(route, success)
+	if not report.is_empty():
+		await DialogueBox.say_to(player, report)
+	if success and top_out and route.destination_hub != "":
+		Park.unlock_hub(route.destination_hub)
+	var passed_out := GameClock.advance_through_nights(done[1], result.nights_spent if result else 0)
 	if success and top_out and route.destination() != "" and not passed_out:
 		tree.call_group("world", "go_to_region", route.destination(), route.destination_spawn)
 	return success and not passed_out
