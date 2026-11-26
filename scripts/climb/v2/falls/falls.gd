@@ -414,9 +414,16 @@ func clean_pitch() -> Array[Dictionary]:
 		if p.gear_id != "":
 			session.rack.give_back(p.gear_id)
 		var name := piece_name(p)
+		var line := PartnerLines.grade_line(grade, group, rng, {"piece": name})
+		# Trad gear (thread 6) can word the verdict from what it knows about
+		# the placement; what the fall did (popped, held, welded) stays ours.
+		if not grade in [&"popped", &"held", &"stuck"] and session.sys.gear.has_method("grade_for"):
+			var g: Variant = session.sys.gear.call("grade_for", p)
+			if g is Dictionary and str(g.get("line", "")) != "":
+				line = str(g.line)
 		session.bus.send(&"piece_cleaned", [p.id, String(grade)])
 		out.append({"piece_id": p.id, "gear_id": p.gear_id, "name": name, "kind": String(group),
-			"grade": String(grade), "line": PartnerLines.grade_line(grade, group, rng, {"piece": name}),
+			"grade": String(grade), "line": line,
 			"minutes": minutes, "highlight": false, "quality": seen_quality(p)})
 	_mark_highlights(out)
 	_n().report = out.duplicate(true)
@@ -437,6 +444,8 @@ func grade_of(p: V2Piece) -> StringName:
 		return &"bomber"
 	if p.tags.has("tipped"):
 		return &"tipped"
+	if q < T.GOOD and (p.tags.has("shallow") or p.tags.has("stretched")):
+		return &"marginal"
 	if q >= T.GOOD and not p.tags.has("walked"):
 		return &"good"
 	if q >= T.WALKED:
