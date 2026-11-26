@@ -565,6 +565,303 @@
 			]
 		},
 		{
+			"id": "floor_devils_elbow_fly",
+			"region": "leidig_meadow",
+			"title": "Fly in the Driftwood",
+			"text": "An Elk Hair Caddis, hooked fast in a bleached snag where the river bends hard at Devil's Elbow. Somebody cast across from the meadow, caught the wood instead of a trout, and couldn't wade over to get it back. You can.",
+			"rumor": "Greg swears he lost his best caddis in a snag on the far side of the Merced below Leidig Meadow. Says there's a line of stepping stones if you look.",
+			"reward": {
+				"elk_hair_caddis": 1.0
+			},
+			"spot": {
+				"near": "water",
+				"place": "Devil's Elbow"
+			},
+			"seasons": [
+				"summer",
+				"fall"
+			],
+			"pos": [
+				420.0,
+				1112.0
+			]
+		},
+		{
+			"id": "floor_shallows_cobra",
+			"region": "four_mile_trailhead",
+			"title": "Cans in the Shallows",
+			"text": "Two cans of King Cobra, wedged between river stones in the shallows to stay cold, with a note on a scrap of guidebook page: \"For whoever bothers to wade over. Send it.\"",
+			"rumor": "A climber at Camp 4 says somebody left beer cooling in the Merced across from Sentinel Beach, on the side nobody walks to.",
+			"reward": {
+				"king_cobra": 2.0
+			},
+			"spot": {
+				"near": "water",
+				"place": "Sentinel Shallows"
+			},
+			"seasons": [
+				"summer",
+				"fall"
+			],
+			"pos": [
+				920.0,
+				1112.0
+			]
+		},
+		{
+			"id": "floor_housekeeping_beach_bag",
+			"region": "housekeeping_camp",
+			"title": "Forgotten Beach Bag",
+			"text": "A canvas beach bag half buried in the sand on the far side of the footbridge: a damp paperback, one flip-flop, and a bag of dried apricots nobody is coming back for.",
+			"rumor": "Kids at Housekeeping say the best beach is the one over the footbridge, and somebody forgot their whole bag there.",
+			"reward": {
+				"dried_apricots": 2.0
+			},
+			"spot": {
+				"near": "water",
+				"place": "Housekeeping Beach"
+			},
+			"pos": [
+				1260.0,
+				1112.0
+			]
+		},
+		{
+			"id": "floor_gravel_bar_lunch",
+			"region": "upper_pines",
+			"title": "Lunch on a Warm Rock",
+			"text": "A lunch left out on a flat rock on the gravel bar across Clark's Bridge: pilot bread and a wedge of cheddar in a paper sack, warm from the sun. A Steller's jay is already working out how to open it.",
+			"rumor": "A camper at Upper Pines walked over Clark's Bridge to eat by the river and came back without their lunch.",
+			"reward": {
+				"pilot_bread": 1.0,
+				"cheddar_wedge": 1.0
+			},
+			"spot": {
+				"near": "water",
+				"place": "Pines Gravel Bar"
+			},
+			"pos": [
+				1320.0,
+				1500.0
+			]
+		},
+		{
+			"id": "tunnel_view_cache",
+			"region": "bridalveil_fall",
+			"title": "Stashed Rack",
+			"text": "Under a ledge at the foot of Cathedral Rocks, a small stuff sack with two nuts clipped to it. A party stashed their rack here before the long slog up the gully, then went down another way. You take the two nuts and leave the sack where it was.",
+			"rumor": "From Tunnel View, the light caught something pale low on the wall, at the foot of Cathedral Rocks, back from the road.",
+			"reward": {
+				"nut_small": 1.0,
+				"nut_mid": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"vista": "tunnel_view",
+			"cache": true,
+			"pos": [
+				992.0,
+				392.0
+			]
+		},
+		{
+			"id": "glacier_point_cache",
+			"region": "curry_village",
+			"title": "Apron Retreat",
+			"text": "A quickdraw hangs from a bolt at the foot of the Glacier Point Apron, one gate wired shut with a twist of tape. Somebody retreated from the slab when the afternoon turned hot and left it as a marker. You unwire it and it snaps clean.",
+			"rumor": "From Glacier Point, something caught the light at the foot of the Apron, east of Curry Village.",
+			"reward": {
+				"quickdraw": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"vista": "glacier_point",
+			"cache": true,
+			"pos": [
+				2904.0,
+				296.0
+			]
+		},
+		{
+			"id": "sentinel_dome_cache",
+			"region": "four_mile_trailhead",
+			"title": "Sentinel Tidy-Up",
+			"text": "At the foot of Sentinel Rock, a nut and an old piton are tucked together behind a boulder, where somebody cleaned a crack and set the leftovers aside. The nut is bright. The piton has been here a good while longer.",
+			"rumor": "From Sentinel Dome, a glint showed at the foot of Sentinel Rock, down in the trees west of the Four Mile Trail.",
+			"reward": {
+				"nut_mid": 1.0,
+				"rusty_piton": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"vista": "sentinel_dome",
+			"cache": true,
+			"pos": [
+				1664.0,
+				408.0
+			]
+		},
+		{
+			"id": "taft_point_cache",
+			"region": "el_capitan_meadow",
+			"title": "West Side Bail",
+			"text": "Jammed in a crack on El Cap's west side, a big nut with a frayed cord still threaded through it. A party left it as a bail anchor when the wind came up and rappelled off. Someone's bad day is your good one.",
+			"rumor": "From Taft Point, you can see the west side of El Capitan across the valley. Something glinted at its foot, in the rocks above the meadow.",
+			"reward": {
+				"nut_big": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"vista": "taft_point",
+			"cache": true,
+			"pos": [
+				528.0,
+				504.0
+			]
+		},
+		{
+			"id": "half_dome_cache",
+			"region": "mirror_lake",
+			"title": "Washington Column Stash",
+			"text": "In a hollow under a slab, a big nut and a bag of trail mix, left by a party who meant to come back for them after their route on Washington Column. Nobody did. The trail mix is sealed and still good.",
+			"rumor": "From the top of Half Dome, something showed pale in the rocks toward Washington Column, where Tenaya Canyon starts to climb.",
+			"reward": {
+				"nut_big": 1.0,
+				"trail_mix": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"vista": "half_dome",
+			"cache": true,
+			"pos": [
+				1328.0,
+				536.0
+			]
+		},
+		{
+			"id": "olmsted_point_cache",
+			"region": "tenaya_lake",
+			"title": "Tenaya Stash",
+			"text": "In a pocket of granite below the road, a small nut and a blue-green glass insulator sit side by side. Someone found the glass on a hike, someone else left the nut, or it was the same person on two different days.",
+			"rumor": "From Olmsted Point, a glint showed down by the shore of Tenaya Lake, among the boulders below the road.",
+			"reward": {
+				"nut_small": 1.0,
+				"glass_insulator": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"vista": "olmsted_point",
+			"cache": true,
+			"pos": [
+				576.0,
+				504.0
+			]
+		},
+		{
+			"id": "lembert_dome_cache",
+			"region": "tuolumne_meadows",
+			"title": "Southwest Face Draw",
+			"text": "A quickdraw is clipped to a bolt at the foot of Lembert Dome's southwest face, its sling sun-bleached nearly white. The leader lowered off from here when thunder started up. You take it down with a tug.",
+			"rumor": "From Lembert Dome, something caught the sun at the foot of the southwest face, near where the slabs meet the trees.",
+			"reward": {
+				"quickdraw": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"vista": "lembert_dome",
+			"cache": true,
+			"pos": [
+				3856.0,
+				2144.0
+			]
+		},
+		{
+			"id": "pothole_dome_cache",
+			"region": "cathedral_lakes",
+			"title": "Lunch Behind the Boulder",
+			"text": "Behind a boulder, out of the wind, a mid-size nut and two bags of dried apricots. A climber left them to fetch after a day on the Cathedral Peak approach, then walked out another way.",
+			"rumor": "From Pothole Dome, a spot of color showed far off toward Cathedral Lakes, on the ground by a big boulder.",
+			"reward": {
+				"nut_mid": 1.0,
+				"dried_apricots": 2.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"vista": "pothole_dome",
+			"cache": true,
+			"pos": [
+				1968.0,
+				984.0
+			]
+		},
+		{
+			"id": "crane_flat_lookout_cache",
+			"region": "big_oak_flat_junction",
+			"title": "Roadside Supplies",
+			"text": "Under a fir at the edge of the old road, a canvas bag with two cans of King Cobra and a stick of beef jerky. Somebody was waiting for a ride out of the forest and forgot the bag when it came.",
+			"rumor": "From the Crane Flat lookout, you spot a bag under the firs near the Big Oak Flat junction, just off the old road.",
+			"reward": {
+				"king_cobra": 2.0,
+				"beef_jerky": 1.0
+			},
+			"spot": {
+				"near": "woods"
+			},
+			"vista": "crane_flat_lookout",
+			"cache": true,
+			"pos": [
+				1560.0,
+				472.0
+			]
+		},
+		{
+			"id": "oshaughnessy_dam_cache",
+			"region": "hetch_hetchy",
+			"title": "Wapama Trail Cam",
+			"text": "On the granite beside the Wapama Falls trail, a cam hangs from a sling in a crack, still bright. A climber placed it for a quick top-rope and a thunderstorm sent everyone down. It comes out smooth. Cams like this are rare.",
+			"rumor": "From the top of O'Shaughnessy Dam, a bright glint showed on the granite wall along the Wapama Falls trail.",
+			"reward": {
+				"cam": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"vista": "oshaughnessy_dam",
+			"cache": true,
+			"pos": [
+				2544.0,
+				864.0
+			]
+		},
+		{
+			"id": "wawona_point_cache",
+			"region": "wawona",
+			"title": "Sugar Pine Pocket",
+			"text": "Beside a sugar pine, a small nut and two bags of dried apples in a pocket of dry needles. A hiker on the way up Wawona Point left them to lighten a pack, and never walked the same path down.",
+			"rumor": "From Wawona Point, something shone among the sugar pines below, along the old road toward the hotel.",
+			"reward": {
+				"nut_small": 1.0,
+				"dried_apples": 2.0
+			},
+			"spot": {
+				"near": "woods"
+			},
+			"vista": "wawona_point",
+			"cache": true,
+			"pos": [
+				2944.0,
+				2248.0
+			]
+		},
+		{
 			"id": "union_point_toll_spike",
 			"region": "union_point",
 			"title": "Toll Trail Spike",

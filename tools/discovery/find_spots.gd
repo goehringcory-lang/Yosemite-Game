@@ -36,9 +36,18 @@ func _ready() -> void:
 	var wanted := OS.get_environment("FIND_REGIONS").split(",", false)
 	var placing := OS.get_environment("FIND_PLACE") != ""
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(Finds.DATA))
+	# Vistas and the registers and sketch spots (Challenges) are placed the
+	# same way, into their own files.
+	var vistas: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(Vistas.DATA))
+	var challenges: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(Challenges.DATA))
+	var everything: Array = []
+	everything.append_array(data.finds)
+	everything.append_array(vistas.vistas)
+	everything.append_array(challenges.registers)
+	everything.append_array(challenges.sketches)
 	if placing:
 		wanted = PackedStringArray()
-		for find: Dictionary in data.finds:
+		for find: Dictionary in everything:
 			if not find.has("pos") and not find.region in wanted:
 				wanted.append(find.region)
 	var ids := PackedStringArray()
@@ -56,15 +65,16 @@ func _ready() -> void:
 		await get_tree().physics_frame
 		await get_tree().physics_frame
 		if placing:
-			_place(region, data.finds)
+			_place(region, everything)
 		else:
 			_survey(region)
 		remove_child(region)
 		region.free()
 	if placing:
-		var file := FileAccess.open(Finds.DATA, FileAccess.WRITE)
-		file.store_string(JSON.stringify(data, "\t", false) + "\n")
-		file.close()
+		for pair in [[Finds.DATA, data], [Vistas.DATA, vistas], [Challenges.DATA, challenges]]:
+			var file := FileAccess.open(pair[0], FileAccess.WRITE)
+			file.store_string(JSON.stringify(pair[1], "\t", false) + "\n")
+			file.close()
 	get_tree().quit()
 
 
@@ -76,6 +86,8 @@ func _place(region: Region, finds: Array) -> void:
 	var ground := region.get_ground()
 	var off := WalkCheck.path_distance(ground)
 	var bounds := region.get_bounds().grow(-EDGE)
+	var arrival_walk := walked
+	var arrival := start
 	var busy: Array[Vector2] = []
 	for node in region.find_children("*", "", true, false):
 		if node is Node2D and node.has_method("interact"):
@@ -93,12 +105,22 @@ func _place(region: Region, finds: Array) -> void:
 		if find.region != region.region_id or find.has("pos"):
 			continue
 		var spot: Dictionary = find.get("spot", {})
+		# Some spots are only reached another way (Half Dome's summit, up
+		# the cables): walk from that marker instead of the arrival.
+		walked = arrival_walk
+		start = arrival
+		if spot.has("start") and region.get_spawn(str(spot.start)):
+			start = region.get_spawn(str(spot.start))
+			walked = walk.walk(region, start.global_position)
 		var place: Place = null
 		for p in region.get_places():
 			if p.display_name == spot.get("place", ""):
 				place = p
 		var best := Vector2.INF
 		var best_score := -INF
+		# A vista stands at its place (the railing at the point, the top of
+		# the dome): the open spot nearest the place's middle.
+		var centered: bool = spot.get("center", false) and place != null
 		for at: Vector2i in walked:
 			var pos := Vector2(at) * WalkCheck.STEP
 			if not bounds.has_point(pos):
@@ -110,6 +132,15 @@ func _place(region: Region, finds: Array) -> void:
 				continue
 			var cell := ground.local_to_map(ground.to_local(pos))
 			var d: int = off.get(cell, 99)
+			if centered:
+				if d < 1 or busy.any(func(b: Vector2) -> bool: return b.distance_to(pos) < CLEAR) \
+						or placed.any(func(b: Vector2) -> bool: return b.distance_to(pos) < CLEAR):
+					continue
+				var near_score := -pos.distance_to(place.global_position)
+				if near_score > best_score and not _covered(covers, pos):
+					best_score = near_score
+					best = pos
+				continue
 			if d < int(spot.get("off", MIN_OFF)):
 				continue
 			# (a map painted by hand has no terrain tiles to tell by)

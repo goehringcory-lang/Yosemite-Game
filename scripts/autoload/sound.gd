@@ -59,7 +59,8 @@ const NIGHT_UNTIL := 6
 ## Sounds that come in numbered takes (name_1, name_2, ...).
 const VARIANTS := {"step_dirt": 3, "step_snow": 3, "step_wood": 3, "step_wet": 3, "climb_move": 3,
 	"call_chickadee": 2, "call_jay": 2, "call_robin": 2, "call_warbler": 2, "call_woodpecker": 2,
-	"call_raven": 2, "call_owl": 2, "call_frogs": 2, "call_swift": 2, "call_coyote": 2, "thunder": 2}
+	"call_raven": 2, "call_owl": 2, "call_frogs": 2, "call_swift": 2, "call_coyote": 2, "thunder": 2,
+	"call_nutcracker": 2, "call_pika": 2, "call_canyon_wren": 2, "call_marmot": 2}
 ## Seconds between wildlife calls, at random in this range (a dawn chorus
 ## comes faster, night calls slower), and how far to the side they come from
 ## (pixels from the middle of the view, so they pan left or right).
@@ -71,8 +72,16 @@ const CALL_VOICES := 3
 const BEDS := ["amb_day", "amb_night", "amb_wind", "amb_rain"]
 ## Seconds for a bed to fade most of the way to its new level.
 const BED_FADE := 1.5
-## Hubs high enough that the wind is always up.
-const HIGH_COUNTRY := ["glacier_point", "tuolumne_meadows"]
+## The beds by how high you are (Climate.zone): how loud the birds by day
+## and the crickets at night are against the Valley floor's, and how much
+## the wind is up. Above the oaks the wind is always about, and up in the
+## high country it's mostly wind.
+const ZONE_BIRDS := {"foothill": 1.0, "valley": 1.0, "montane": 0.85, "subalpine": 0.6}
+const ZONE_CRICKETS := {"foothill": 1.0, "valley": 1.0, "montane": 0.6, "subalpine": 0.3}
+const ZONE_WIND := {"foothill": 0.0, "valley": 0.0, "montane": 0.25, "subalpine": 0.4}
+## Areas with canyon walls close by, where the canyon wren's falling song
+## carries (it sings round the Valley's talus too, less often).
+const CANYON_WREN_PLACES := ["hetch_hetchy", "el_portal", "tunnel_view", "bridalveil_fall", "mirror_lake"]
 const POOL_SIZE := 10
 ## Seconds a fire, fall or river you've just left (by a door, a trip or a
 ## night's sleep) takes to fade out, instead of stopping dead (let_go).
@@ -247,19 +256,32 @@ func _world_targets(targets: Dictionary) -> void:
 	var world := get_tree().get_first_node_in_group("world")
 	var region: Region = world.region if world else null
 	var weather := Weather.today()
-	var rain := clampf(weather.rain, 0.0, 1.0)
+	var rain := clampf(Weather.rain_now(), 0.0, 1.0)
 	var winter := GameClock.season == GameClock.Season.WINTER
 	if region and region.indoors:
 		# Indoors you only hear the rain on the roof.
 		targets.amb_rain = 0.25 * rain
 		return
 	var day := _daylight()
-	var high := region != null and region.hub_id in HIGH_COUNTRY
-	targets.amb_day = day * (0.4 if winter else 1.0) * (1.0 - 0.7 * rain)
+	var zone := _zone(region)
+	var high := zone == "subalpine"
+	# Up high there are fewer songbirds and the nights are too cold for many
+	# crickets; down the canyon the nights are warm and loud.
+	var birds: float = ZONE_BIRDS.get(zone, 1.0)
+	var crickets: float = ZONE_CRICKETS.get(zone, 1.0)
+	targets.amb_day = day * (0.4 if winter else 1.0) * birds * (1.0 - 0.7 * rain)
 	# No crickets in the snow.
-	targets.amb_night = (1.0 - day) * (0.0 if winter else 1.0) * (1.0 - 0.5 * rain)
-	targets.amb_wind = clampf(0.2 + (0.4 if high else 0.0) + (0.3 if winter else 0.0) + 0.3 * weather.snow, 0.0, 1.0)
+	var snowy := winter or Seasons.snow_cover() > 0.3
+	targets.amb_night = (1.0 - day) * (0.0 if snowy else crickets) * (1.0 - 0.5 * rain)
+	targets.amb_wind = clampf(0.2 + ZONE_WIND.get(zone, 0.0) + (0.3 if winter else 0.0) + 0.3 * weather.snow + (0.15 if high else 0.0) * HighCountry.storm_gloom(), 0.0, 1.0)
 	targets.amb_rain = 0.8 * rain
+
+
+## How high the area [param region] is (Climate.zone): "valley" off the map.
+static func _zone(region: Region) -> String:
+	if region == null:
+		return "valley"
+	return Climate.zone(region.region_id, region.hub_id)
 
 
 ## 1 by day, 0 at night, easing through dawn (5:30 to 7) and dusk (19:30 to 21).
@@ -345,7 +367,6 @@ func call_choices() -> Dictionary:
 	var hour := GameClock.hour + GameClock.minute / 60.0
 	var season := GameClock.season
 	var winter := season == GameClock.Season.WINTER
-	var warm := season in [GameClock.Season.SPRING, GameClock.Season.SUMMER]
 	match mode:
 		"title":
 			return {"call_chickadee": 3, "call_jay": 1, "call_robin": 2}
@@ -358,23 +379,84 @@ func call_choices() -> Dictionary:
 			var region: Region = world.region if world else null
 			if region and region.indoors:
 				return {}
-			var high := region != null and region.hub_id in HIGH_COUNTRY
+			var zone := _zone(region)
+			var place := region.region_id if region else ""
 			if day > 0.5:
-				var birds := {
-					"call_chickadee": 3 if warm else 2,
-					"call_jay": 3 if season == GameClock.Season.FALL else 2,
-					"call_robin": 0 if winter or high else (4 if hour < 9.0 else 2),
-					"call_warbler": 2 if warm and not high else 0,
-					"call_woodpecker": 2 if not winter else 1,
-					"call_raven": 3 if winter or high else 1,
-				}
-				if high:
-					birds["call_swift"] = 0 if winter else 1
-				return birds
-			if winter:
-				return {"call_owl": 1}
-			return {"call_owl": 3, "call_frogs": 3 if warm and not high else 0, "call_coyote": 1}
+				return _day_calls(zone, place, hour, season)
+			return _night_calls(zone, season)
 	return {}
+
+
+## The birds (and, up high, the marmots and pikas) that call by day in
+## [param zone] (Climate.zone) at [param place].
+func _day_calls(zone: String, place: String, hour: float, season: int) -> Dictionary:
+	var winter := season == GameClock.Season.WINTER
+	var warm := season in [GameClock.Season.SPRING, GameClock.Season.SUMMER]
+	var wren := 0 if winter else (3 if place in CANYON_WREN_PLACES else 1)
+	match zone:
+		"subalpine":
+			# Tuolumne, Tenaya, Glacier Point, the top of Half Dome: Clark's
+			# nutcrackers in the whitebark pines, mountain chickadees, ravens
+			# on the wind, and from the talus the pika's bleat and the
+			# marmot's chirp (both sleep or hide out the winter).
+			return {
+				"call_nutcracker": 3,
+				"call_chickadee": 2 if not winter else 1,
+				"call_jay": 1 if not winter else 0,
+				"call_raven": 3 if winter else 2,
+				"call_woodpecker": 1 if not winter else 0,
+				"call_swift": 0 if winter else 1,
+				"call_pika": 0 if winter else 2,
+				"call_marmot": 2 if warm else 0,
+			}
+		"montane":
+			# Crane Flat, Little Yosemite: fir forest, jays and chickadees,
+			# the odd nutcracker drifting down.
+			return {
+				"call_chickadee": 3,
+				"call_jay": 3,
+				"call_woodpecker": 2 if not winter else 1,
+				"call_nutcracker": 1,
+				"call_robin": 0 if winter else 1,
+				"call_warbler": 1 if warm else 0,
+				"call_raven": 2 if winter else 1,
+			}
+		"foothill":
+			# El Portal: oak and chaparral, warm, scrub jays and canyon wrens.
+			return {
+				"call_jay": 3,
+				"call_warbler": 2 if warm else 0,
+				"call_woodpecker": 2,
+				"call_canyon_wren": wren,
+				"call_robin": 0 if winter else 1,
+				"call_chickadee": 1,
+				"call_raven": 1,
+			}
+	return {
+		"call_chickadee": 3 if warm else 2,
+		"call_jay": 3 if season == GameClock.Season.FALL else 2,
+		"call_robin": 0 if winter else (4 if hour < 9.0 else 2),
+		"call_warbler": 2 if warm else 0,
+		"call_woodpecker": 2 if not winter else 1,
+		"call_raven": 3 if winter else 1,
+		"call_canyon_wren": wren,
+	}
+
+
+## What calls at night in [param zone]: owls everywhere, coyotes, and frogs
+## in the warm wet places (down the canyon most of all).
+func _night_calls(zone: String, season: int) -> Dictionary:
+	if season == GameClock.Season.WINTER:
+		return {"call_owl": 1}
+	var warm := season in [GameClock.Season.SPRING, GameClock.Season.SUMMER]
+	match zone:
+		"subalpine":
+			return {"call_owl": 2, "call_coyote": 2, "call_frogs": 1 if season == GameClock.Season.SUMMER else 0}
+		"montane":
+			return {"call_owl": 3, "call_coyote": 1, "call_frogs": 1 if warm else 0}
+		"foothill":
+			return {"call_owl": 2, "call_frogs": 4 if warm else 1, "call_coyote": 2}
+	return {"call_owl": 3, "call_frogs": 3 if warm else 0, "call_coyote": 1}
 
 
 ## Seconds until the next call: a dawn chorus comes thick and fast, night
@@ -388,7 +470,7 @@ func _call_gap() -> float:
 		gap *= 1.8
 	if _mode == "title":
 		gap *= 1.5
-	return gap * (1.0 + 3.0 * clampf(Weather.today().rain, 0.0, 1.0))
+	return gap * (1.0 + 3.0 * clampf(Weather.rain_now(), 0.0, 1.0))
 
 
 ## A weighted pick from [param choices], not the one that just called if
@@ -425,12 +507,24 @@ func _update_calls(delta: float) -> void:
 	var rain: float = Weather.today().rain if _mode == "world" else 0.0
 	if rain >= THUNDER_RAIN and randf() < 0.35 and not _indoors():
 		id = "thunder"
+	elif _mode == "world" and _storm_near() and randf() < 0.45:
+		id = "thunder"
 	else:
 		id = _pick_call(call_choices())
 	if id == "":
 		return
 	_last_call = id
 	play_call(id)
+
+
+## True while the high country's summer afternoon storm is building or
+## breaking overhead, and you're up there to hear it (from Glacier Point up;
+## indoors you hear it through the walls).
+func _storm_near() -> bool:
+	if Climate.elevation() < Climate.HIGH_FT:
+		return false
+	var since := Climate.since_storm()
+	return since >= -Climate.SHOWER_THUNDER and since <= Climate.SHOWER_HOURS + 0.5
 
 
 ## Plays wildlife call (or thunder) [param id] from off to one side of the

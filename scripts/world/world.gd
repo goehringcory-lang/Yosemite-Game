@@ -23,6 +23,9 @@ const BEAR_TRACKS_DELAY := 3.8
 ## Regions that are gone, and where a save made in one picks up instead.
 ## The big Valley map became separate areas joined by trail scenes.
 const RETIRED_REGIONS := {"yosemite_valley": "yosemite_village"}
+## A saved spot this far off its map's ground (a seam's overlap, an edge
+## being walked over) still counts as on the map when the save loads.
+const SAVE_SLACK := 256.0
 ## The next region is laid beside this one once the player is this close (in
 ## pixels) to a seam, and taken away again past SEAM_FAR.
 const SEAM_NEAR := 720.0
@@ -183,12 +186,13 @@ func _ready() -> void:
 	var first_day := FirstDay.new()
 	add_child(first_day)
 	var saved := SaveManager.peek_node(name)
-	var start := str(saved.get("region", Park.HOME_REGION))
-	start = RETIRED_REGIONS.get(start, start)
+	var saved_region := str(saved.get("region", Park.HOME_REGION))
+	var start: String = RETIRED_REGIONS.get(saved_region, saved_region)
 	if not ResourceLoader.exists(region_scene_path(start)):
 		start = Park.HOME_REGION
 	# A loaded save puts the player back where they were; this is the fallback.
 	_enter_region(start, Park.HOME_SPAWN if start == Park.HOME_REGION else "arrival")
+	var fallback := player.global_position
 	if not SaveManager.load_game():
 		SaveManager.clear_pending()
 		NewGame.reset()
@@ -196,10 +200,20 @@ func _ready() -> void:
 		if forage:
 			forage.respawn()
 	else:
-		# the save put the player back where they were, off the fallback spawn
+		# The save put the player back where they were, off the fallback
+		# spawn. Saved in an area that has since gone (or been replaced),
+		# the spot means nothing here: start from the fallback. Saved on a
+		# spot that is off the map now, or that something now stands on (an
+		# update moved a fence or added a tent), step them clear.
+		if start != saved_region:
+			player.global_position = fallback
+		elif not region.get_bounds().grow(SAVE_SLACK).has_point(region.to_local(player.global_position)):
+			player.global_position = fallback
+		_arrived_at = player.global_position
 		_update_seam(true)
 		_fit_camera()
 		_settle_view()
+		_unstick_player()
 	Achievements.settle()
 	player.apply_look() # the look saved with the game just loaded, if any
 	hud.bind_player(player)
@@ -727,6 +741,9 @@ func sleep(passed_out := false, camp_spawn := "", extra_nights := 0) -> void:
 		message = "You stayed out too late and passed out..."
 	if message_extra != "":
 		message += "\n" + message_extra
+	var sky_note := Climate.forecast_note()
+	if sky_note != "":
+		message += "\n" + sky_note
 	var cold_note := Warmth.morning_note()
 	if cold_note != "":
 		message += "\n" + cold_note
@@ -871,6 +888,9 @@ func _face_away_from_way_back(left: String) -> void:
 ## Everything that follows the player into a region, by a door or a fade or
 ## across a seam.
 func _arrive() -> void:
+	# first, so everything below (and every region_changed listener) asks
+	# about the weather and snow of where you are now
+	Climate.arrive(region.region_id, region.hub_id)
 	$DayNight.visible = not region.indoors
 	Warmth.outdoors = not region.indoors
 	if region.region_id == "mirror_lake" and GameClock.season == GameClock.Season.FALL:
@@ -1399,6 +1419,9 @@ func _update_location() -> void:
 	if _started:
 		for found in Discoveries.visit(region, place):
 			hud.show_discovery(found)
+		if not region.indoors:
+			for landmark in Landmarks.visit_region(region.region_id):
+				hud.show_landmark(landmark)
 
 
 func get_offstage_persist_nodes() -> Array[Node]:

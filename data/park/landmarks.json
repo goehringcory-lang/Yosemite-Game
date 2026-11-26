@@ -1,0 +1,503 @@
+{
+	"_note": "Landmark log (Landmarks autoload). Sighted from vistas (data/park/vistas.json lists the ids), visited by walking into one of 'visit'. 'note' shows once visited.",
+	"landmarks": [
+		{
+			"id": "el_capitan",
+			"name": "El Capitan",
+			"hub": "yosemite_valley",
+			"kind": "wall",
+			"visit": [
+				"el_capitan_meadow"
+			],
+			"seen": "A dark wall at the Valley's west gate, taller than it looks.",
+			"note": "El Capitan is one of the largest exposed granite monoliths in the world, a single clean sweep of rock left standing by the glaciers. Warren Harding's team first climbed the Nose in 1958 after many weeks on the wall, and peregrine falcons nest on its ledges today."
+		},
+		{
+			"id": "half_dome",
+			"name": "Half Dome",
+			"hub": "yosemite_valley",
+			"kind": "dome",
+			"visit": [
+				"half_dome"
+			],
+			"seen": "A split dome at the Valley's head, one face cut sheer.",
+			"note": "Half Dome was never sliced in half by a glacier, though the ice did quarry and steepen its north face. The rest of the dome has rounded off as the granite peels away in curved sheets, and George Anderson drilled his way up the back in 1875."
+		},
+		{
+			"id": "yosemite_falls",
+			"name": "Yosemite Falls",
+			"hub": "yosemite_valley",
+			"kind": "fall",
+			"visit": [
+				"yosemite_village"
+			],
+			"seen": "White ribbons on the north wall, loudest in late spring.",
+			"note": "Yosemite Falls drops in three parts, the Upper Fall, the middle cascades and the Lower Fall, and together they rank among the tallest waterfalls in North America. It runs on snowmelt, so it thunders in May and can shrink to a trickle or dry rock by late summer."
+		},
+		{
+			"id": "bridalveil_fall",
+			"name": "Bridalveil Fall",
+			"hub": "yosemite_valley",
+			"kind": "fall",
+			"visit": [
+				"bridalveil_fall"
+			],
+			"seen": "A veil of water off the south wall, swaying in the wind.",
+			"note": "Bridalveil Creek drops from a hanging valley, a side canyon left high and dry when the glacier cut the main Valley much deeper. Wind often bends the water into mist, and the Ahwahneechee name Pohono is commonly translated as spirit of the puffing wind."
+		},
+		{
+			"id": "cathedral_rocks",
+			"name": "Cathedral Rocks",
+			"hub": "yosemite_valley",
+			"kind": "wall",
+			"visit": [
+				"bridalveil_fall"
+			],
+			"seen": "Stacked granite buttresses beside the falls.",
+			"note": "Cathedral Rocks stand on the Valley's south side as a cluster of granite buttresses, with the Cathedral Spires rising above them. From Tunnel View they frame the right edge of the scene, across the Valley from El Capitan."
+		},
+		{
+			"id": "sentinel_rock",
+			"name": "Sentinel Rock",
+			"hub": "yosemite_valley",
+			"kind": "wall",
+			"visit": [
+				"four_mile_trailhead"
+			],
+			"seen": "A tall, narrow tower leaning over the south side.",
+			"note": "Sentinel Rock is a tall, narrow pillar of granite on the Valley's south wall, named for the look of standing guard. Sentinel Creek spills down beside it in a wet spring, and the Four Mile Trail begins not far from its foot."
+		},
+		{
+			"id": "three_brothers",
+			"name": "Three Brothers",
+			"hub": "yosemite_valley",
+			"kind": "wall",
+			"visit": [
+				"leidig_meadow"
+			],
+			"seen": "Three stacked summits stepping up the north wall.",
+			"note": "The Three Brothers are three granite summits that step up the Valley's north wall, and the tallest is Eagle Peak. Early accounts tie the name to the sons of Chief Tenaya, a story recorded after the Mariposa Battalion entered the Valley in 1851."
+		},
+		{
+			"id": "leaning_tower",
+			"name": "Leaning Tower",
+			"hub": "yosemite_valley",
+			"kind": "wall",
+			"visit": [],
+			"seen": "A wall that leans out over the road, a long way up.",
+			"note": "Leaning Tower is a granite face on the Valley's south wall that overhangs outward, so a rope dropped from the top would swing well clear of the rock. Dark streaks of water stain and lichen mark where the spring melt runs down its slope."
+		},
+		{
+			"id": "clouds_rest",
+			"name": "Clouds Rest",
+			"hub": "yosemite_valley",
+			"kind": "peak",
+			"visit": [],
+			"seen": "A long pale ridge far above the Valley's east end.",
+			"note": "Clouds Rest is a long granite ridge more than a mile above the Valley floor, with a sheer drop on its north side toward Tenaya Canyon. Its summit stands higher than Half Dome, which it looks straight across at."
+		},
+		{
+			"id": "north_dome",
+			"name": "North Dome",
+			"hub": "yosemite_valley",
+			"kind": "dome",
+			"visit": [
+				"ahwahnee_meadow"
+			],
+			"seen": "A rounded dome on the north rim, facing Half Dome.",
+			"note": "North Dome is a rounded granite dome on the Valley's north rim, sitting directly across from Half Dome. Its shape comes from sheeting, the slow peeling of granite in curved layers, and a natural arch, Indian Arch, stands on the rim nearby."
+		},
+		{
+			"id": "royal_arches",
+			"name": "Royal Arches",
+			"hub": "yosemite_valley",
+			"kind": "wall",
+			"visit": [
+				"the_ahwahnee",
+				"ahwahnee_meadow"
+			],
+			"seen": "Curved ledges like arches on the wall above the hotel.",
+			"note": "The Royal Arches are a row of curved ridges and arch-shaped grooves on the north wall above the Ahwahnee. They formed as the granite peeled off in curved sheets, and Royal Arch Cascade runs down beside them during the snowmelt."
+		},
+		{
+			"id": "washington_column",
+			"name": "Washington Column",
+			"hub": "yosemite_valley",
+			"kind": "wall",
+			"visit": [
+				"the_ahwahnee",
+				"ahwahnee_meadow"
+			],
+			"seen": "A blocky buttress standing out from the wall.",
+			"note": "Washington Column is a massive granite buttress that stands out from the north wall beside the Royal Arches, with Tenaya Canyon opening just beyond it. Climbers know it for long routes on its face, and the dark streaks on the rock are lichen and mineral stain left by water."
+		},
+		{
+			"id": "mount_watkins",
+			"name": "Mount Watkins",
+			"hub": "yosemite_valley",
+			"kind": "peak",
+			"visit": [
+				"mirror_lake",
+				"tenaya_creek"
+			],
+			"seen": "A broad pale slope above the Valley's upper end.",
+			"note": "Mount Watkins is a broad granite peak that rises above Mirror Lake on the north side of Tenaya Canyon. It honors Carleton Watkins, whose photographs of Yosemite in 1861 helped persuade Congress to protect the Valley in 1864."
+		},
+		{
+			"id": "vernal_fall",
+			"name": "Vernal Fall",
+			"hub": "yosemite_valley",
+			"kind": "fall",
+			"visit": [
+				"happy_isles",
+				"little_yosemite_valley"
+			],
+			"seen": "A white curtain over a granite step, mist rising from it.",
+			"note": "Vernal Fall drops the Merced River over a clean granite step, and the Mist Trail climbs beside it on stone stairs that are soaked with spray in spring. Above the brink the river slides over smooth rock, where the current is far stronger than it looks."
+		},
+		{
+			"id": "nevada_fall",
+			"name": "Nevada Fall",
+			"hub": "yosemite_valley",
+			"kind": "fall",
+			"visit": [
+				"happy_isles",
+				"little_yosemite_valley"
+			],
+			"seen": "A tall white fall with a rounded dome beside it.",
+			"note": "Nevada Fall is where the Merced turns hard over a granite lip and drops free, then hits a ledge and bounces out in white spray. The name is Spanish for snow-covered, taken from the Sierra Nevada, the range the river comes down from."
+		},
+		{
+			"id": "liberty_cap",
+			"name": "Liberty Cap",
+			"hub": "yosemite_valley",
+			"kind": "dome",
+			"visit": [
+				"happy_isles",
+				"little_yosemite_valley"
+			],
+			"seen": "A smooth gray dome beside Nevada Fall.",
+			"note": "Liberty Cap is a smooth granite dome beside Nevada Fall, named for its likeness to the soft caps worn as a symbol of freedom. It is a fine example of the rounded domes that glaciers polished along the Merced canyon."
+		},
+		{
+			"id": "illilouette_fall",
+			"name": "Illilouette Fall",
+			"hub": "glacier_point",
+			"kind": "fall",
+			"visit": [],
+			"seen": "A thin fall deep in a side canyon across the Valley.",
+			"note": "Illilouette Fall drops from a hanging valley into a deep gorge, fed by a creek that drains the country around Glacier Point. The Illilouette basin has been allowed to burn naturally since the 1970s, and the forest there is now a patchwork of ages."
+		},
+		{
+			"id": "glacier_point_apron",
+			"name": "Glacier Point Apron",
+			"hub": "glacier_point",
+			"kind": "wall",
+			"visit": [
+				"curry_village",
+				"happy_isles"
+			],
+			"seen": "A great smooth slab leaning against the wall.",
+			"note": "The Glacier Point Apron is a broad, gently tilted slab of granite below Glacier Point, climbed by friction rather than handholds. Slabs like this are common in the Valley because the granite sheds in long smooth plates."
+		},
+		{
+			"id": "tenaya_canyon",
+			"name": "Tenaya Canyon",
+			"hub": "yosemite_valley",
+			"kind": "canyon",
+			"visit": [
+				"mirror_lake",
+				"tenaya_creek"
+			],
+			"seen": "A deep gray gap running back from the Valley's east end.",
+			"note": "Tenaya Canyon is a glacier-carved gorge that runs from Tenaya Lake down to the Valley, and in the Ice Age the Tenaya Glacier fed into the main Yosemite ice. Mirror Lake sits at its mouth, slowly filling with the sand and gravel that Tenaya Creek carries down."
+		},
+		{
+			"id": "merced_river",
+			"name": "Merced River",
+			"hub": "yosemite_valley",
+			"kind": "river",
+			"visit": [
+				"el_capitan_meadow",
+				"leidig_meadow",
+				"el_portal"
+			],
+			"seen": "A clear green river winding slowly across the Valley floor.",
+			"note": "The Merced River starts high in the Sierra and runs through the Valley as a quiet, meandering stream on a floor that was once a lake. Willows and cottonwoods line its banks, and in winter an American dipper can be seen bobbing on its stones."
+		},
+		{
+			"id": "sentinel_dome",
+			"name": "Sentinel Dome",
+			"hub": "glacier_point",
+			"kind": "dome",
+			"visit": [
+				"glacier_point"
+			],
+			"seen": "A bald round dome on the south rim.",
+			"note": "Sentinel Dome is a bare granite dome on the south rim with a wide view of Yosemite Falls, Half Dome and El Capitan. A wind-twisted Jeffrey pine that Ansel Adams photographed there died in the drought of the 1970s."
+		},
+		{
+			"id": "mount_starr_king",
+			"name": "Mount Starr King",
+			"hub": "glacier_point",
+			"kind": "peak",
+			"visit": [],
+			"seen": "A smooth dome far to the south, past the rim.",
+			"note": "Mount Starr King is a large smooth granite dome south of Glacier Point, standing apart from the Valley walls. It is named for Thomas Starr King, a San Francisco minister whose writing about Yosemite brought it national attention."
+		},
+		{
+			"id": "clark_range",
+			"name": "Clark Range",
+			"hub": "glacier_point",
+			"kind": "peak",
+			"visit": [],
+			"seen": "A line of high peaks far to the southeast, white late.",
+			"note": "The Clark Range is a cluster of high peaks on the southeast skyline, named for Galen Clark, the first guardian of the Yosemite Grant. Some of its summits are dark metamorphic rock, older than the pale granite of the Valley."
+		},
+		{
+			"id": "cathedral_peak",
+			"name": "Cathedral Peak",
+			"hub": "tuolumne_meadows",
+			"kind": "peak",
+			"visit": [
+				"cathedral_lakes"
+			],
+			"seen": "A pointed granite spire over the meadow.",
+			"note": "Cathedral Peak is a granite spire whose sides were sharpened by glaciers that flowed around it. John Muir climbed it in 1869 and wrote of it as a temple, and the Cathedral Lakes sit near its foot."
+		},
+		{
+			"id": "unicorn_peak",
+			"name": "Unicorn Peak",
+			"hub": "tuolumne_meadows",
+			"kind": "peak",
+			"visit": [
+				"cathedral_lakes"
+			],
+			"seen": "A slender horn of rock on the ridge beyond the lakes.",
+			"note": "Unicorn Peak is a slender granite horn above Elizabeth Lake, named for the single spike that rises from its summit. The talus slopes below are good places to listen for the squeak of an American pika, which lives in cold rock piles and cannot stand heat."
+		},
+		{
+			"id": "lembert_dome",
+			"name": "Lembert Dome",
+			"hub": "tuolumne_meadows",
+			"kind": "dome",
+			"visit": [
+				"tuolumne_meadows"
+			],
+			"seen": "A whale-backed dome at the meadow's east end.",
+			"note": "Lembert Dome is a polished granite dome shaped like a whale's back, with a gentle slope on one side and a steep face on the other. The glacier smoothed the side it climbed and plucked the far side into steps, and the dome is named for Jean-Baptiste Lembert, who homesteaded the meadow in the 1880s."
+		},
+		{
+			"id": "pothole_dome",
+			"name": "Pothole Dome",
+			"hub": "tuolumne_meadows",
+			"kind": "dome",
+			"visit": [
+				"tuolumne_meadows"
+			],
+			"seen": "A low gray dome at the meadow's west end.",
+			"note": "Pothole Dome is the low granite hill at the western end of Tuolumne Meadows, polished and grooved by the glacier that once filled the basin. Look on top for large boulders that the ice carried in and left behind."
+		},
+		{
+			"id": "fairview_dome",
+			"name": "Fairview Dome",
+			"hub": "tuolumne_meadows",
+			"kind": "dome",
+			"visit": [
+				"tenaya_lake"
+			],
+			"seen": "A big dome with long bare slabs, north of the road.",
+			"note": "Fairview Dome is a large granite dome near Tioga Road, its long bare slabs scoured by the glaciers that flowed down through the Tuolumne country. Climbers know it for its long, smooth faces, some of them a thousand feet of clean granite."
+		},
+		{
+			"id": "mount_dana",
+			"name": "Mount Dana",
+			"hub": "tuolumne_meadows",
+			"kind": "peak",
+			"visit": [],
+			"seen": "A dark, high peak at the park's eastern edge.",
+			"note": "Mount Dana is the second highest peak in Yosemite, built of dark metamorphic rock much older than the pale granite to the west. It is named for James Dwight Dana, a Yale geologist, and it can be climbed from Tioga Pass."
+		},
+		{
+			"id": "mount_gibbs",
+			"name": "Mount Gibbs",
+			"hub": "tuolumne_meadows",
+			"kind": "peak",
+			"visit": [],
+			"seen": "A steep peak beside Mount Dana on the skyline.",
+			"note": "Mount Gibbs is a high peak on the park's eastern edge, close to Mount Dana, and like its neighbor it is made of darker, older rock. It was named for the chemist Oliver Wolcott Gibbs by members of the California Geological Survey."
+		},
+		{
+			"id": "mount_conness",
+			"name": "Mount Conness",
+			"hub": "tuolumne_meadows",
+			"kind": "peak",
+			"visit": [],
+			"seen": "A pale peak at the park's northeast edge.",
+			"note": "Mount Conness is a granite peak on the park's northeast boundary, with a small remnant glacier on its north side. It is named for John Conness, the senator who introduced the bill that became the 1864 Yosemite Grant."
+		},
+		{
+			"id": "mount_hoffmann",
+			"name": "Mount Hoffmann",
+			"hub": "tuolumne_meadows",
+			"kind": "peak",
+			"visit": [],
+			"seen": "A rounded gray summit near the middle of the park.",
+			"note": "Mount Hoffmann is a granite peak near the geographic center of the park, and from its top the high country opens in every direction. It is named for Charles Hoffmann, a topographer of the Whitney Survey, and May Lake lies at its foot."
+		},
+		{
+			"id": "tenaya_lake",
+			"name": "Tenaya Lake",
+			"hub": "tuolumne_meadows",
+			"kind": "lake",
+			"visit": [
+				"tenaya_lake"
+			],
+			"seen": "A bright blue lake with pale granite shores.",
+			"note": "Tenaya Lake lies in a basin scooped out by a glacier and rimmed with smooth granite, with sandy beaches along its shore. It is named for Chief Tenaya of the Ahwahneechee, and the older name recorded for the lake, Pywiack, is often translated as shiny rocks."
+		},
+		{
+			"id": "tenaya_peak",
+			"name": "Tenaya Peak",
+			"hub": "tuolumne_meadows",
+			"kind": "peak",
+			"visit": [
+				"tenaya_lake"
+			],
+			"seen": "A granite crown above the lake road.",
+			"note": "Tenaya Peak is a granite summit above Tenaya Lake, with views across the lake and over the Cathedral Range. Whitebark pines grow near its top, and Clark's nutcrackers bury their seeds across slopes like these."
+		},
+		{
+			"id": "polly_dome",
+			"name": "Polly Dome",
+			"hub": "tuolumne_meadows",
+			"kind": "dome",
+			"visit": [
+				"tenaya_lake"
+			],
+			"seen": "A smooth gray dome beside the highway.",
+			"note": "Polly Dome is a granite dome near Tenaya Lake, with small glacier-scoured pools called Polly Dome Lakes in the basin near its base. Its smooth, rounded back shows how a glacier left the high country polished and bare."
+		},
+		{
+			"id": "tuolumne_river",
+			"name": "Tuolumne River",
+			"hub": "tuolumne_meadows",
+			"kind": "river",
+			"visit": [
+				"tuolumne_meadows"
+			],
+			"seen": "A shallow river threading the meadow grass.",
+			"note": "The Tuolumne River gathers snowmelt from the high country and winds slowly through Tuolumne Meadows before it plunges down toward Hetch Hetchy. The wet meadow feeds sedges and wildflowers, and Belding's ground squirrels pop up from their burrows along its banks."
+		},
+		{
+			"id": "hetch_hetchy_reservoir",
+			"name": "Hetch Hetchy Reservoir",
+			"hub": "hetch_hetchy",
+			"kind": "lake",
+			"visit": [
+				"hetch_hetchy"
+			],
+			"seen": "A long green lake held in by a thin line of concrete.",
+			"note": "Hetch Hetchy Reservoir fills a glaciated valley that was once much like Yosemite Valley, and it now stores water for San Francisco. The valley was dammed after a long fight in Congress between the city and John Muir and the Sierra Club, which ended with the Raker Act in 1913."
+		},
+		{
+			"id": "kolana_rock",
+			"name": "Kolana Rock",
+			"hub": "hetch_hetchy",
+			"kind": "wall",
+			"visit": [
+				"hetch_hetchy"
+			],
+			"seen": "A great stone shoulder on the reservoir's north side.",
+			"note": "Kolana Rock is a huge granite buttress on the north side of Hetch Hetchy Reservoir, rising straight from the water. The trail to Wapama Falls passes beneath it, through oaks and over bare granite."
+		},
+		{
+			"id": "hetch_hetchy_dome",
+			"name": "Hetch Hetchy Dome",
+			"hub": "hetch_hetchy",
+			"kind": "dome",
+			"visit": [
+				"hetch_hetchy"
+			],
+			"seen": "A rounded granite dome above the water.",
+			"note": "Hetch Hetchy Dome is a granite dome above the reservoir, its upper face scoured smooth by the glacier that carved this valley. Before the dam, the valley floor was a flat meadow where Native people gathered seeds and acorns."
+		},
+		{
+			"id": "wapama_falls",
+			"name": "Wapama Falls",
+			"hub": "hetch_hetchy",
+			"kind": "fall",
+			"visit": [
+				"hetch_hetchy"
+			],
+			"seen": "A roaring fall on the north wall in spring.",
+			"note": "Wapama Falls drops from the plateau beside Hetch Hetchy Dome, and in spring and early summer its spray soaks the footbridges on the trail below. Those crossings can be dangerous in high water, so the trail is sometimes closed."
+		},
+		{
+			"id": "tueeulala_falls",
+			"name": "Tueeulala Falls",
+			"hub": "hetch_hetchy",
+			"kind": "fall",
+			"visit": [
+				"hetch_hetchy"
+			],
+			"seen": "A thin veil of water that fades by summer.",
+			"note": "Tueeulala Falls spills from the north wall west of Wapama Falls, and it is a seasonal veil that thins out and often disappears by summer. When the wind is up it catches the water and blows it sideways before it reaches the rock."
+		},
+		{
+			"id": "oshaughnessy_dam",
+			"name": "O'Shaughnessy Dam",
+			"hub": "hetch_hetchy",
+			"kind": "dam",
+			"visit": [
+				"hetch_hetchy"
+			],
+			"seen": "A curved concrete wall closing the valley's west end.",
+			"note": "O'Shaughnessy Dam was completed in 1923 and raised in 1938, and it is named for Michael O'Shaughnessy, San Francisco's city engineer. Most of the water's journey to the city runs downhill by gravity, with no pumps."
+		},
+		{
+			"id": "wawona_dome",
+			"name": "Wawona Dome",
+			"hub": "wawona",
+			"kind": "dome",
+			"visit": [
+				"wawona"
+			],
+			"seen": "A big granite dome above the Wawona basin.",
+			"note": "Wawona Dome rises over the Wawona basin and is made of the same Sierra granite as the high Valley walls. The great Ice Age glaciers that carved Yosemite Valley barely touched this basin, so its slopes are gentler and its soils deeper."
+		},
+		{
+			"id": "wawona_meadow",
+			"name": "Wawona Meadow",
+			"hub": "wawona",
+			"kind": "meadow",
+			"visit": [
+				"wawona"
+			],
+			"seen": "A wide green meadow with the old hotel at its edge.",
+			"note": "Wawona Meadow is a broad, flat meadow in the Wawona basin, with a historic hotel and a golf course at its edge. Mule deer graze there at dawn and dusk, and acorn woodpeckers work the oaks nearby."
+		},
+		{
+			"id": "south_fork_merced",
+			"name": "South Fork Merced",
+			"hub": "wawona",
+			"kind": "river",
+			"visit": [
+				"wawona"
+			],
+			"seen": "A clear creek running through the Wawona forest.",
+			"note": "The South Fork of the Merced River runs through Wawona over pools and gravel bars, lower and warmer than the main river in the Valley. Galen Clark settled along it in the 1850s, and his way station grew into the town of Wawona."
+		},
+		{
+			"id": "tuolumne_grove",
+			"name": "Tuolumne Grove",
+			"hub": "crane_flat",
+			"kind": "grove",
+			"visit": [
+				"crane_flat"
+			],
+			"seen": "A small stand of giant trees below the road.",
+			"note": "Tuolumne Grove is a small stand of giant sequoias reached by a trail that follows an old road, and one dead sequoia had a tunnel cut through it in the late 1870s. Sequoia cones are opened by fire, so seedlings come up best on bare, burned ground."
+		}
+	]
+}

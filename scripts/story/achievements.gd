@@ -124,6 +124,18 @@ const ACHIEVEMENTS: Array[Dictionary] = [
 		"unlock": {"type": "finds", "count": 1}, "how": "Find something hidden off the beaten path."},
 	{"id": "every_find", "name": "Off the Beaten Path", "group": "Valley life",
 		"unlock": {"type": "finds", "count": "all"}, "how": "Find everything hidden off the paths in the park."},
+	{"id": "room_with_a_view", "name": "Room with a View", "group": "Valley life",
+		"unlock": {"type": "vistas", "count": 1}, "how": "Stop at a vista and take in the view."},
+	{"id": "every_vista", "name": "Lookout Keeper", "group": "Valley life",
+		"unlock": {"type": "vistas", "count": "all"}, "how": "Take in the view from every vista in the park."},
+	{"id": "peak_finder", "name": "Peak-Finder", "group": "Valley life",
+		"unlock": {"type": "named", "count": "all"}, "how": "Name the peak under the arrow at every vista."},
+	{"id": "landmarks_20", "name": "Feet on the Ground", "group": "Valley life",
+		"unlock": {"type": "landmarks", "count": 20}, "how": "Walk to 20 of the park's landmarks."},
+	{"id": "every_register", "name": "Signed In", "group": "Valley life",
+		"unlock": {"type": "registers", "count": "all"}, "how": "Sign every summit register and benchmark in the park."},
+	{"id": "full_sketchbook", "name": "Full Sketchbook", "group": "Valley life",
+		"unlock": {"type": "sketches", "count": "all"}, "how": "Sketch every view worth drawing, each at its own hour."},
 	{"id": "night_out", "name": "Under the Stars", "group": "Valley life",
 		"unlock": {"type": "unlock", "id": Backcountry.NIGHT_OUT}, "how": "Spend a night in the backcountry with your food in a bear canister."},
 	{"id": "slackline_gold", "name": "Gold on the Line", "group": "Valley life",
@@ -181,6 +193,9 @@ func _ready() -> void:
 	FieldLog.changed.connect(_on_progress)
 	Discoveries.changed.connect(_on_progress)
 	Finds.changed.connect(_on_progress)
+	Vistas.changed.connect(_on_progress)
+	Landmarks.changed.connect(_on_progress)
+	Challenges.changed.connect(_on_progress)
 	Perks.changed.connect(_on_progress)
 	Herbarium.changed.connect(_on_progress)
 	Rescues.changed.connect(_on_progress)
@@ -410,6 +425,21 @@ func progress(achievement: Dictionary) -> Array[int]:
 		"finds":
 			have = Finds.count()
 			need = Finds.total() if str(unlock.count) == "all" else int(unlock.count)
+		"vistas":
+			have = Vistas.count()
+			need = Vistas.total() if str(unlock.count) == "all" else int(unlock.count)
+		"named":
+			have = Vistas.named_count()
+			need = Vistas.total() if str(unlock.count) == "all" else int(unlock.count)
+		"landmarks":
+			have = Landmarks.visited_count()
+			need = Landmarks.total() if str(unlock.count) == "all" else int(unlock.count)
+		"registers":
+			have = Challenges.signed_count()
+			need = Challenges.registers().size() if str(unlock.count) == "all" else int(unlock.count)
+		"sketches":
+			have = Challenges.sketched_count()
+			need = Challenges.sketches().size() if str(unlock.count) == "all" else int(unlock.count)
 		"animals":
 			have = FieldLog.count()
 			need = FieldLog.total() if str(unlock.count) == "all" else int(unlock.count)

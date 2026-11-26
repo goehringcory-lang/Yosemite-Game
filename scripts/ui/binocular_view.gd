@@ -313,7 +313,9 @@ func _ready() -> void:
 	layer = 28
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	UiScale.layer(self)
-	spec = VIEWS.get(view_id, VIEWS.glacier_point)
+	# (a VistaView hands over a panorama of its own)
+	if spec.is_empty():
+		spec = VIEWS.get(view_id, VIEWS.glacier_point)
 	_targets.clear()
 	for t: Dictionary in spec.targets:
 		_targets.append(t)
@@ -393,14 +395,15 @@ static func _density(knots: Array, b: float) -> float:
 
 
 ## Bearings east of north run on past 360, so the panorama's run from west
-## round to the southeast is one rising line.
-static func unwrap(bearing: float) -> float:
-	return bearing if bearing > 180.0 else bearing + 360.0
+## round to the southeast is one rising line. (A view facing south, from east
+## round to west, sets its "wrap" lower, so its bearings stay as they are.)
+static func unwrap(bearing: float, wrap := 180.0) -> float:
+	return bearing if bearing > wrap else bearing + 360.0
 
 
 ## The panorama x of [param bearing] on [param scale] (see make_scale).
 static func scale_x(scale: PackedFloat32Array, view: Dictionary, bearing: float) -> float:
-	var f := (unwrap(bearing) - float(view.from)) * 4.0
+	var f := (unwrap(bearing, float(view.get("wrap", 180.0))) - float(view.from)) * 4.0
 	var i := clampi(int(floorf(f)), 0, scale.size() - 2)
 	return lerpf(scale[i], scale[i + 1], f - i)
 

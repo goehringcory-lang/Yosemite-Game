@@ -1,0 +1,284 @@
+{
+	"_note": "Mini-challenges across the park (Challenges autoload). registers: summit registers, survey benchmarks and logbooks you find and sign. sketches: stand there at the right hours (and seasons) to sketch it into the Logbook's sketchbook. 'pos' in the region's pixels; tools/discovery/find_spots.tscn with FIND_PLACE=1 fills it in.",
+	"registers": [
+		{
+			"id": "register_half_dome",
+			"region": "half_dome",
+			"title": "Half Dome Summit Register",
+			"text": "A battered steel box under a ledge holds a notebook swollen from years of weather. The last page reads, in blue pen, Mina and Joe, up at dawn, down by dusk, knees shot. You add your own name below it.",
+			"spot": {
+				"near": "rock",
+				"start": "summit",
+				"place": "Half Dome"
+			},
+			"pos": [
+				576,
+				488
+			]
+		},
+		{
+			"id": "register_glacier_point",
+			"region": "glacier_point",
+			"title": "Sentinel Dome Benchmark",
+			"text": "A round bronze disk is set in the bare granite on top of the dome, its stamped letters worn soft by wind and boots. It marks a point for the old survey crews, and somebody has scratched a little heart beside it. You make a rubbing and sign the trail notebook in the box nearby.",
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				856.0,
+				856.0
+			]
+		},
+		{
+			"id": "register_taft_point",
+			"region": "taft_point",
+			"title": "Benchmark Near the Fissures",
+			"text": "Set in a flat of granite a short walk from the Fissures, a survey disk with a ring of letters around its edge. A line of pebbles beside it spells out Stay back from the edge. You add one more pebble.",
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				2424.0,
+				648.0
+			]
+		},
+		{
+			"id": "register_tuolumne_meadows",
+			"region": "tuolumne_meadows",
+			"title": "Lembert Dome Register",
+			"text": "On the summit, a tin canister is wedged under a rock, with a pad inside the lid. Recent entries read Priya, first dome, great wind and Four of us from Fresno, fed a marmot, regret nothing. You sign beneath.",
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				2136.0,
+				1880.0
+			]
+		},
+		{
+			"id": "register_cathedral_lakes",
+			"region": "cathedral_lakes",
+			"title": "Old Trail Register Box",
+			"text": "A wooden box with a hinged lid is nailed to a post at the trail's edge, a notebook and stub of pencil inside. One line says Lisa and Ben, thru-hikers, July storm, the lake was worth it. You write your name and the weather.",
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				1464.0,
+				1112.0
+			]
+		},
+		{
+			"id": "register_tenaya_lake",
+			"region": "tenaya_lake",
+			"title": "Olmsted Point Benchmark",
+			"text": "A bronze disk is set into the granite at the overlook, ringed by a few glacial erratics and the odd carved date. A visitor has left a stack of tiny pebbles beside it. You rub the lettering and leave a pebble.",
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				1344.0,
+				832.0
+			]
+		},
+		{
+			"id": "register_hetch_hetchy",
+			"region": "hetch_hetchy",
+			"title": "Survey Disk by the Dam",
+			"text": "Near the end of the dam, a survey disk sits in the concrete, its stamping dulled by decades of spray and sun. Someone has drawn a small chalk wave beside it. You sign the small notebook in a nearby crack.",
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				2232.0,
+				936.0
+			]
+		},
+		{
+			"id": "register_wawona",
+			"region": "wawona",
+			"title": "Wawona Point Benchmark",
+			"text": "At the top of the rocky rise, a survey disk set in a granite knob looks out over the sugar pines. Around it are initials scratched by earlier visitors, mostly faded to gray. You add yours very lightly.",
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				856.0,
+				1784.0
+			]
+		},
+		{
+			"id": "register_crane_flat",
+			"region": "crane_flat",
+			"title": "Fire Lookout Logbook",
+			"text": "On a shelf in the lookout, a spiral logbook records visitors by date and weather. One entry reads Dave and Alma, smoke on the horizon, pie for the lookout. You add a line about the view and the wind.",
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				1528.0,
+				504.0
+			]
+		}
+	],
+	"sketches": [
+		{
+			"id": "sketch_alpenglow",
+			"region": "glacier_point",
+			"title": "Alpenglow on Half Dome",
+			"hours": [
+				17.0,
+				20.0
+			],
+			"early": "Best when the sun is low and the sky turns pink.",
+			"text": "The last light turns the face of Half Dome from gold to rose while the valley floor goes blue. You sketch the glow in quick strokes before it fades.",
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				2728.0,
+				1480.0
+			]
+		},
+		{
+			"id": "sketch_mirror_lake",
+			"region": "mirror_lake",
+			"title": "Mirror Lake Reflection",
+			"hours": [
+				6.0,
+				10.0
+			],
+			"seasons": [
+				"spring",
+				"summer"
+			],
+			"early": "Best in the still of the morning, before the wind.",
+			"text": "Mount Watkins hangs upside down in the glassy water, every ledge doubled. You sketch the line where the rock meets its reflection.",
+			"spot": {
+				"near": "water"
+			},
+			"pos": [
+				832.0,
+				704.0
+			]
+		},
+		{
+			"id": "sketch_bridalveil_rainbow",
+			"region": "tunnel_view",
+			"title": "Bridalveil Rainbow",
+			"hours": [
+				15.0,
+				18.0
+			],
+			"seasons": [
+				"spring",
+				"summer"
+			],
+			"early": "Best when the sun is low behind you and the fall is running.",
+			"text": "A faint rainbow stands in the mist at the foot of Bridalveil Fall, swaying with the breeze. You sketch its colors in the corner of the page.",
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				1600.0,
+				656.0
+			]
+		},
+		{
+			"id": "sketch_tuolumne_stars",
+			"region": "tuolumne_meadows",
+			"title": "Stars over Tuolumne",
+			"hours": [
+				21.0,
+				28.0
+			],
+			"early": "Best when it's fully dark and the moon is down.",
+			"text": "The Milky Way arches over the domes and the meadow grass, with no light to dim it. You sketch the sky and the dark shapes of the granite.",
+			"spot": {
+				"near": "meadow"
+			},
+			"pos": [
+				3480.0,
+				960.0
+			]
+		},
+		{
+			"id": "sketch_tenaya_sunrise",
+			"region": "tenaya_lake",
+			"title": "Tenaya Lake at Sunrise",
+			"hours": [
+				5.0,
+				8.0
+			],
+			"early": "Best at first light, when the water is calm.",
+			"text": "The sun clears the ridge and pink light slides across the granite domes and the still lake. You sketch the shoreline and one lone pine.",
+			"spot": {
+				"near": "water"
+			},
+			"pos": [
+				1056.0,
+				536.0
+			]
+		},
+		{
+			"id": "sketch_el_cap_headlamps",
+			"region": "el_capitan_meadow",
+			"title": "Headlamps on El Capitan",
+			"hours": [
+				20.0,
+				26.0
+			],
+			"early": "Best after dark, when climbers' lights show on the wall.",
+			"text": "Tiny lights crawl up the dark face of El Capitan where climbers are spending the night on the wall. You sketch the wall and its dotted line of stars.",
+			"spot": {
+				"near": "meadow"
+			},
+			"pos": [
+				1984.0,
+				896.0
+			]
+		},
+		{
+			"id": "sketch_wapama_roar",
+			"region": "hetch_hetchy",
+			"title": "Wapama Falls at Full Roar",
+			"hours": [
+				8.0,
+				16.0
+			],
+			"seasons": [
+				"spring"
+			],
+			"early": "Best in spring, when the snowmelt is running high.",
+			"text": "Wapama Falls pours down the granite in three heavy ribbons, throwing spray across the trail. You sketch the white water and the wet rocks.",
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				1752.0,
+				888.0
+			]
+		},
+		{
+			"id": "sketch_wawona_bridge",
+			"region": "wawona",
+			"title": "Covered Bridge in Fall Color",
+			"hours": [
+				9.0,
+				17.0
+			],
+			"seasons": [
+				"fall"
+			],
+			"early": "Best in fall, when the leaves have turned.",
+			"text": "The little covered bridge is framed by yellow and orange leaves along the South Fork. You sketch the red roof and the leaves turning on the river below.",
+			"spot": {
+				"near": "water"
+			},
+			"pos": [
+				1080.0,
+				1552.0
+			]
+		}
+	]
+}

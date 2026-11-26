@@ -116,6 +116,11 @@ func _ready() -> void:
 		if not wanted.is_empty() and region_id not in wanted:
 			continue
 		await _dress(region_id, REGIONS[region_id])
+	# Areas named that aren't listed (corridors, tools/hubs/build_corridor.gd)
+	# get a seed from their id.
+	for region_id: String in wanted:
+		if not REGIONS.has(region_id):
+			await _dress(region_id, absi(hash(region_id)) % 10000)
 	get_tree().quit()
 
 
