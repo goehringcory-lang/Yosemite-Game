@@ -428,8 +428,9 @@ func _crane_flat() -> void:
 	marker("meadow", 30, 11)
 	place("Crane Flat", 30, 14, 14)
 	_long_road("BigOakFlatRoadDown", tile_pos(32.5, 35.5), Vector2(48, 12), "Big Oak Flat Road", "big_oak_flat_junction", "north", 20, 9.2)
-	region_exit("BigOakFlatRoadWest", tile_pos(-0.5, 22.5), Vector2(12, 48), "Big Oak Flat Road", "", "") \
-		.set("message", "Big Oak Flat Road goes on west out of the park, past the Big Oak Flat Entrance to Groveland.")
+	# West toward the Big Oak Flat Entrance, where Evergreen Road turns off
+	# north to Hetch Hetchy (build_hetch_hetchy.gd).
+	_long_road("BigOakFlatRoadWest", tile_pos(-0.5, 22.5), Vector2(12, 48), "Evergreen Road and Hetch Hetchy Road", "hetch_hetchy", "arrival", 35, 16.0)
 	# The Tioga Road east: the drive to Tuolumne (its closure and lock hold
 	# as on the map), with its first stop at Tenaya Lake (build_tenaya_lake.gd).
 	_drive_on("TiogaRoad", tile_pos(63.5, 20.5), Vector2(12, 48), "Tioga Road", "tuolumne_meadows", 55, 30.0)
