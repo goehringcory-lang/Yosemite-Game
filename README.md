@@ -735,6 +735,10 @@ Rebuild them with `tools/hubs/rebuild_interiors.sh` (Pillow and numpy; `ONLY_ROO
 ![Yosemite Chapel](docs/interiors_yosemite_chapel.png)
 ![The Wawona Hotel's lobby](docs/interiors_wawona_hotel_lobby.png)
 
+## Climbing v2 (in progress)
+
+A new climbing game is being built beside the current one in `scripts/climb/v2/`: the wall waits for you, you aim the next hand at a hold and see a ghost of the pose before you commit, one body button moves your hips, pump and gas (food) are what you spend, you pull rope up an arm-length at a time to clip, offer cams and read their lobes, and falls are real but soft. No timing bars or arrow games. It is off unless switched on (`VALLEY_CLIMB_V2=1`, or a list of route ids), and for now draws debug shapes. How the pieces fit, who owns what, and the rules every part follows are in [scripts/climb/v2/CONTRACTS.md](scripts/climb/v2/CONTRACTS.md); `tests/climb_v2_test` climbs a fixture pitch through it end to end.
+
 ## The climbing screen
 
 ![Firefall Slab at dawn](docs/climb_firefall_slab_dawn.png)
