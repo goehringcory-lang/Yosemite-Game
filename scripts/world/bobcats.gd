@@ -13,7 +13,7 @@ extends Wanderers
 const SEASON_CHANCE := [0.8, 0.7, 1.0, 1.5]
 ## Meadows they hunt, where one is twice as likely.
 const MEADOWS := ["el_capitan_meadow", "leidig_meadow", "ahwahnee_meadow", "yosemite_village", "wawona", "crane_flat",
-	"tuolumne_meadows", "mirror_lake", "big_oak_flat_junction", "taft_point", "cathedral_lakes", "hetch_hetchy", "union_point"]
+	"tuolumne_meadows", "mirror_lake", "big_oak_flat_junction", "taft_point", "cathedral_lakes", "hetch_hetchy", "union_point", "bridalveil_creek"]
 ## In the middle of the day the odds are this much of the rest.
 const MIDDAY := 0.4
 const NOTICE_MESSAGE := "A bobcat! It freezes mid-stalk and stares at you, ear tufts up. Then it slips off into the grass."

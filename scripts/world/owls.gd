@@ -13,7 +13,7 @@ extends Wanderers
 
 const SEASON_CHANCE := [1.0, 1.0, 1.0, 0.8]
 ## The meadows they hunt.
-const MEADOWS := ["crane_flat", "wawona", "big_oak_flat_junction", "taft_point"]
+const MEADOWS := ["crane_flat", "wawona", "big_oak_flat_junction", "taft_point", "bridalveil_creek"]
 ## In the middle of the day the odds are this much of the rest.
 const MIDDAY := 0.25
 const NOTICE_MESSAGE := "The great gray owl turns its huge round face toward you. It listens a moment, then glides off without a sound."

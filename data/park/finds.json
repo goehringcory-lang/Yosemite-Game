@@ -580,6 +580,40 @@
 				784,
 				624
 			]
+		},
+		{
+			"id": "illilouette_panorama_headlamp",
+			"region": "illilouette",
+			"title": "Lost Headlamp",
+			"text": "A headlamp wedged in a crack in the granite below Panorama Point, its battery long dead. Somebody watched the sunset light on Half Dome from here and walked out in the dark without it.",
+			"rumor": "Sunset hikers on the Panorama Trail leave things behind on the granite below Panorama Point.",
+			"reward": {
+				"lost_headlamp": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				2064,
+				832
+			]
+		},
+		{
+			"id": "mcgurk_insulator",
+			"region": "bridalveil_creek",
+			"title": "Old Glass Insulator",
+			"text": "A green glass insulator half buried in the duff at the edge of McGurk Meadow, from the phone line that once ran along the road to Glacier Point.",
+			"rumor": "Bits of the old Glacier Point phone line still turn up in the woods around McGurk Meadow.",
+			"reward": {
+				"glass_insulator": 1.0
+			},
+			"spot": {
+				"near": "woods"
+			},
+			"pos": [
+				592,
+				1488
+			]
 		}
 	]
 }
