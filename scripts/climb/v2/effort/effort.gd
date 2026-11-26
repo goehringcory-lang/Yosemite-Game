@@ -89,9 +89,11 @@ func price(move: V2Move) -> void:
 	for tag: StringName in T.GAS_TAG:
 		if move.has_tag(tag):
 			gas *= float(T.GAS_TAG[tag])
-	c.pump = pump
+	# Off the crux's beta (cruxes sets crux_cost, contract v2): dearer.
+	var crux := float(move.get("crux_cost")) if move.get("crux_cost") != null else 1.0
+	c.pump = pump * crux if pump > 0.0 else pump
 	c.minutes = 1
-	c.gas = gas * session.mods.gas_mult + c.minutes * T.GAS_PER_MINUTE
+	c.gas = gas * crux * session.mods.gas_mult + c.minutes * T.GAS_PER_MINUTE
 
 
 func price_action(kind: StringName, data := {}) -> V2Cost:
@@ -100,7 +102,14 @@ func price_action(kind: StringName, data := {}) -> V2Cost:
 	var gas := float(a[1])
 	var minutes := int(a[2])
 	if kind in T.TAXED and session.phase != &"belay":
-		pump += T.HANG_TAX * held_demand()
+		# The hold the hanging hand is on (gear passes it), else both hands' holds.
+		var h := session.wall.hold(str(data.get("hand_hold", ""))) if session.wall and data.has("hand_hold") else null
+		if session.pose.tags.has("hang"):
+			pass
+		elif h:
+			pump += T.HANG_TAX * demand(h)
+		else:
+			pump += T.HANG_TAX * held_demand()
 	if kind == &"rope_pull" and int(data.get("arms", 1)) > T.OVERHEAD_ARMS:
 		pump *= T.OVERHEAD_MULT
 	if kind == &"fall":

@@ -13,10 +13,12 @@ them in `effort_overlay.gd`. Test: `tests/climb_v2_effort_test.tscn`. Pictures:
   (jug 0.5 … crimp/sloper 1.4) × size × the share of weight on the hands
   (feet on is cheap, feet cut is dear) × stretch × pulling the hold the wrong
   way (up to ×1.5) × body positions (flag, drop-knee, stem, heel hook,
-  kneebar take weight onto the feet) × move tags (dyno ×1.5…). Capped at
+  kneebar take weight onto the feet) × move tags (dyno ×1.5…) × the crux's
+  `crux_cost` when off beta (contract v2). Capped at
   0.15 a move. Easy ground with the weight on your feet gives a little back.
 - **The hang tax:** clipping, pulling rope, offering and placing gear cost
-  0.4× what the holds you're hanging on cost. Clip off the jug, not the crimp.
+  0.4× what the hold you hang on costs (`{"hand_hold": id}` if the caller
+  knows which; else both hands' holds). Clip off the jug, not the crimp.
   Overhead pulls (3+ arm-lengths) cost ×1.4.
 - **Bands, no hidden dice:** fresh < 0.5 ≤ working < 0.75 ≤ pumped (small holds
   unreliable: `hold_factor()`) < 0.9 ≤ boxed (a straining move or any move off
