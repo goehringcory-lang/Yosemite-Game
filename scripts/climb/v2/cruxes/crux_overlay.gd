@@ -104,11 +104,22 @@ func _draw_card(n: Dictionary) -> void:
 		return
 
 
+## True once the real climber art (thread 9) is in: it acts the tells out
+## on the ghost itself, so these marks would double up.
+func _art_shows_tells() -> bool:
+	var p := get_parent()
+	while p and not ("climber" in p):
+		p = p.get_parent()
+	var c: Object = p.get("climber") if p else null
+	var script: Script = c.get_script() if c else null
+	return script != null and not script.resource_path.contains("/stubs/")
+
+
 ## The tells on the ghost for a crux move that's off: drawn at the ghost's
 ## hips, feet and hands, so you see it before you commit.
 func _draw_tells() -> void:
 	var m := _move
-	if m == null or m.crux_id == "" or m.to == null:
+	if m == null or m.crux_id == "" or m.to == null or _art_shows_tells():
 		return
 	var hip := at(m.to.hip)
 	var u := metres()
