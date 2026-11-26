@@ -23,6 +23,9 @@ const BEAR_TRACKS_DELAY := 3.8
 ## Regions that are gone, and where a save made in one picks up instead.
 ## The big Valley map became separate areas joined by trail scenes.
 const RETIRED_REGIONS := {"yosemite_valley": "yosemite_village"}
+## A saved spot this far off its map's ground (a seam's overlap, an edge
+## being walked over) still counts as on the map when the save loads.
+const SAVE_SLACK := 256.0
 ## The next region is laid beside this one once the player is this close (in
 ## pixels) to a seam, and taken away again past SEAM_FAR.
 const SEAM_NEAR := 720.0
@@ -178,12 +181,13 @@ func _ready() -> void:
 	var first_day := FirstDay.new()
 	add_child(first_day)
 	var saved := SaveManager.peek_node(name)
-	var start := str(saved.get("region", Park.HOME_REGION))
-	start = RETIRED_REGIONS.get(start, start)
+	var saved_region := str(saved.get("region", Park.HOME_REGION))
+	var start: String = RETIRED_REGIONS.get(saved_region, saved_region)
 	if not ResourceLoader.exists(region_scene_path(start)):
 		start = Park.HOME_REGION
 	# A loaded save puts the player back where they were; this is the fallback.
 	_enter_region(start, Park.HOME_SPAWN if start == Park.HOME_REGION else "arrival")
+	var fallback := player.global_position
 	if not SaveManager.load_game():
 		SaveManager.clear_pending()
 		NewGame.reset()
@@ -191,10 +195,20 @@ func _ready() -> void:
 		if forage:
 			forage.respawn()
 	else:
-		# the save put the player back where they were, off the fallback spawn
+		# The save put the player back where they were, off the fallback
+		# spawn. Saved in an area that has since gone (or been replaced),
+		# the spot means nothing here: start from the fallback. Saved on a
+		# spot that is off the map now, or that something now stands on (an
+		# update moved a fence or added a tent), step them clear.
+		if start != saved_region:
+			player.global_position = fallback
+		elif not region.get_bounds().grow(SAVE_SLACK).has_point(region.to_local(player.global_position)):
+			player.global_position = fallback
+		_arrived_at = player.global_position
 		_update_seam(true)
 		_fit_camera()
 		_settle_view()
+		_unstick_player()
 	Achievements.settle()
 	player.apply_look() # the look saved with the game just loaded, if any
 	hud.bind_player(player)
