@@ -175,6 +175,7 @@ func test_actions() -> void:
 	hang_on(s, jug)
 	check(e.price_action(&"rope_pull", {"arms": 3}).pump > pull_jug.pump, "an overhead pull (3 arm-lengths) is harder")
 	check(e.price_action(&"fall", {"drop_m": 8.0}).gas > e.price_action(&"fall", {"drop_m": 1.0}).gas, "a longer fall costs more gas")
+	check(e.price_action(&"fall", {"drop_m": 4.0, "hard": true}).pump > e.price_action(&"fall", {"drop_m": 4.0}).pump, "a hard catch costs a little extra pump")
 	check(e.price_action(&"chalk").pump < 0.0, "a chalk dip eases the pump")
 	s.pose.tags.append("hang")
 	check(e.price_action(&"clip").pump < on_jug.pump, "no hang tax when hanging on the rope")

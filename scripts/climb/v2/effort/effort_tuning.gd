@@ -69,6 +69,8 @@ const OVERHEAD_ARMS := 2
 const OVERHEAD_MULT := 1.4
 ## Each metre of a fall adds this much gas (the scare and the climb back).
 const FALL_GAS_PER_M := 0.002
+## A hard catch (the partner stopping a near ground fall) jolts the arms this much more.
+const HARD_CATCH := 0.04
 
 # ------------------------------------------------------------------ deep pump and bands
 

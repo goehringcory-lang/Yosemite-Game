@@ -114,6 +114,8 @@ func price_action(kind: StringName, data := {}) -> V2Cost:
 		pump *= T.OVERHEAD_MULT
 	if kind == &"fall":
 		gas += T.FALL_GAS_PER_M * float(data.get("drop_m", 0.0))
+		if data.get("hard", false):
+			pump += T.HARD_CATCH
 	if pump > 0.0:
 		pump *= pump_mult()
 	return V2Cost.make(pump, gas * session.mods.gas_mult + minutes * T.GAS_PER_MINUTE, minutes)
