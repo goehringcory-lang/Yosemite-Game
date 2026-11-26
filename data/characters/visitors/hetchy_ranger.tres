@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/wilderness_ranger.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hetchy_ranger"
+display_name = "Ranger Okafor"
+years = "1970s"
+affiliation = "National Park Service, wilderness ranger"
+bio = "A ranger at the Rancheria Falls trailhead in Hetch Hetchy. An invented character, not a historical figure."
+idle_lines = PackedStringArray("The entrance station's only open in daylight hours. If you're out past dusk, you're walking out in the dark.", "Rattlesnakes sun themselves right on the trail. Look before you step, and give them room.", "Wapama's footbridges can flood in a big snowmelt year. If the water's over the planks, turn around.", "Fishing is from shore only. No boats, no swimming: this is San Francisco's drinking water.", "Poison oak and ticks, both. Long pants, and check yourself at the end of the day.", "Summer afternoons get hot out here. Start early and carry water.")
+sprite_sheet = ExtResource("2_sprite")
+color = Color(0.415, 0.47, 0.3, 1)
+home = "Hetch Hetchy"
+visitor = true
+sources = "Invented for the game. Hetch Hetchy's entrance station keeps daylight hours; the reservoir is San Francisco's drinking water (shore fishing only, no boating or swimming); rattlesnakes, ticks and poison oak are common on the trails."

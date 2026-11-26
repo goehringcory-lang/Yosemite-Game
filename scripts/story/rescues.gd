@@ -159,6 +159,15 @@ const CALLS: Array[Dictionary] = [
 		"done": "Nora warmed up on trail rations and caught a lift down Big Oak Flat Road with the plow crew.",
 		"thanks": "Thank you for breaking trail through the Crane Flat drifts for me. -Nora Delgado",
 		"gift": {"degnan_loaf": 1, "chocolate_bar": 2}},
+	{"id": "rancheria_trail_heat", "title": "Out of water past Wapama", "who": "Priya Nandakumar", "look": "visitor_backpacker",
+		"stages": ["search", "feed", "report"], "feed": 8, "seasons": [1], "hub": "yosemite_valley",
+		"region": "hetch_hetchy", "start": "wapama", "near": "rancheria", "offset": Vector2(-140, 50),
+		"place": "the Rancheria Falls trail",
+		"radio": "Hiker overdue on the Rancheria Falls trail at Hetch Hetchy. Left the dam this morning with one bottle, and it's a hot afternoon with no shade past Wapama. Follow her prints east from the falls.",
+		"found": ["I ran out of water an hour ago and the sun just keeps coming off the granite.", "I'm dizzy and I stopped sweating, which I know is a bad sign."],
+		"done": "Priya cooled off in the shade with something to eat, and walked back toward the dam at an easy pace with your water.",
+		"thanks": "Camp 4: I now carry two liters for every five miles, and I start before the heat. Thank you for finding me past Wapama. -Priya Nandakumar",
+		"gift": {"dried_apples": 2, "trail_mix": 1}},
 ]
 
 ## What Jo says as the radio calls come in, and when there's nothing on it.

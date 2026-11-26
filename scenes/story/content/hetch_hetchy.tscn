@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/npc.tscn" id="1_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/hetchy_ranger.tres" id="2_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/hetchy_angler.tres" id="3_r"]
+[ext_resource type="Resource" path="res://data/characters/visitors/hetchy_backpacker.tres" id="4_r"]
+
+[node name="HetchHetchyStory" type="Node2D"]
+
+[node name="RancheriaRanger" parent="." instance=ExtResource("1_r")]
+character = ExtResource("2_r")
+spot = "rancheria"
+offset = Vector2(-48, 8)
+wander_radius = 32
+
+[node name="KolanaAngler" parent="." instance=ExtResource("1_r")]
+character = ExtResource("3_r")
+spot = "kolana"
+offset = Vector2(-72, -16)
+wander_radius = 24
+
+[node name="CampBackpacker" parent="." instance=ExtResource("1_r")]
+character = ExtResource("4_r")
+spot = "camp"
+offset = Vector2(-40, 24)
+wander_radius = 48

@@ -35,6 +35,12 @@ const FALLS := {
 	"ephemeral": {"dries": 0.4, "least": 0.0},
 	# Bridalveil Fall runs all year, thin as a horse's tail by fall.
 	"steady": {"dries": 0.0, "least": 0.18},
+	# Wapama Falls (Hetch Hetchy), fed by Falls Creek's big catchment: it
+	# thins to a ribbon by late summer, but never quite quits.
+	"wapama": {"dries": 0.0, "least": 0.12},
+	# Tueeulala Fall (Hetch Hetchy) comes off a small hanging valley and is
+	# dry rock from late summer until the fall storms.
+	"tueeulala": {"dries": 0.3, "least": 0.0},
 }
 
 ## Horsetail Fall, on El Capitan's east shoulder, runs only on winter snowmelt

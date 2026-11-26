@@ -20,6 +20,14 @@ const KINDS := {
 	"four_mile_trailhead": "ephemeral", # Sentinel Fall
 	"curry_village": "ephemeral", # Staircase Falls
 	"the_ahwahnee": "ephemeral", # Royal Arch Cascade
+	"hetch_hetchy": "wapama", # Wapama Falls
+}
+
+## Falls in a region with a different kind from the region's own, by the
+## start of the node's name (the fall, its mist and its spray): Hetch Hetchy
+## has two, and Tueeulala dries up while Wapama keeps a thin flow.
+const NAMED_KINDS := {
+	"hetch_hetchy": {"Tueeulala": "tueeulala"},
 }
 
 ## Painted water that dries up, per region: the area (ground texture pixels),
@@ -40,6 +48,7 @@ var _spray: Array[AmbientFx] = []
 ## The droplets and rainbow beside each spray (FallSpray).
 var _bows: Array[FallSpray] = []
 var _key := ""
+var _region_id := ""
 var _dry_area := {}
 var _ground: ShaderMaterial
 
@@ -47,7 +56,8 @@ var _ground: ShaderMaterial
 func _ready() -> void:
 	var region := get_parent()
 	if region is Region:
-		kind = KINDS.get((region as Region).region_id, "yosemite")
+		_region_id = (region as Region).region_id
+		kind = KINDS.get(_region_id, "yosemite")
 		_dry_area = DRY_AREAS.get((region as Region).region_id, {})
 	var ground := region.get_node_or_null("GroundArt") as CanvasItem
 	if ground and ground.material is ShaderMaterial and not _dry_area.is_empty():
@@ -73,7 +83,7 @@ func _ready() -> void:
 		var bow := FallSpray.new()
 		bow.name = "FallSpray"
 		bow.area = spray.area
-		bow.kind = kind
+		bow.kind = _kind_of(spray)
 		bow.position = spray.position
 		spray.add_sibling.call_deferred(bow)
 		_bows.append(bow)
@@ -97,14 +107,23 @@ func add_fall(sprite: AnimatedSprite2D) -> void:
 	apply()
 
 
+## The kind of fall [param node] is (its name, else the region's).
+func _kind_of(node: Node) -> String:
+	for key: String in NAMED_KINDS.get(_region_id, {}):
+		if str(node.name).begins_with(key):
+			return NAMED_KINDS[_region_id][key]
+	return kind
+
+
 ## Dresses the falls for today's flow.
 func apply() -> void:
 	_key = "%d:%d" % [GameClock.season, GameClock.day]
 	flow = Seasons.waterfall_flow(kind)
-	var dry := flow <= 0.0
 	for fall in _falls:
+		var fall_flow := Seasons.waterfall_flow(_kind_of(fall))
+		var dry := fall_flow <= 0.0
 		var mat := fall.material as ShaderMaterial
-		mat.set_shader_parameter("flow", flow)
+		mat.set_shader_parameter("flow", fall_flow)
 		mat.set_shader_parameter("dry", dry)
 		# A dry stain doesn't move.
 		if dry:
@@ -112,19 +131,22 @@ func apply() -> void:
 		elif not fall.is_playing():
 			fall.play()
 	for i in _mists.size():
-		_mists[i].visible = not dry
-		_mists[i].modulate.a = _mist_alpha[i] * lerpf(0.35, 1.0, flow)
+		var mist_flow := Seasons.waterfall_flow(_kind_of(_mists[i]))
+		_mists[i].visible = mist_flow > 0.0
+		_mists[i].modulate.a = _mist_alpha[i] * lerpf(0.35, 1.0, mist_flow)
 	for spray in _spray:
-		spray.emitting = not dry
-		spray.modulate.a = lerpf(0.4, 1.0, flow)
+		var spray_kind := _kind_of(spray)
+		var spray_flow := Seasons.waterfall_flow(spray_kind)
+		spray.emitting = spray_flow > 0.0
+		spray.modulate.a = lerpf(0.4, 1.0, spray_flow)
 		for child in spray.get_children():
 			if child is SoundEmitter:
 				# Heard in proportion to the water coming down.
-				(child as SoundEmitter).flow_kind = kind
+				(child as SoundEmitter).flow_kind = spray_kind
 				(child as SoundEmitter)._refresh_level()
 	for bow in _bows:
-		bow.flow = flow
-		bow.visible = not dry
+		bow.flow = Seasons.waterfall_flow(bow.kind)
+		bow.visible = bow.flow > 0.0
 		bow.apply()
 	if _ground:
 		_ground.set_shader_parameter("dry_amount", 1.0 - clampf(flow / float(_dry_area["from"]), 0.0, 1.0))

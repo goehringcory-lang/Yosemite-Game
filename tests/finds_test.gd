@@ -59,7 +59,8 @@ func _check_list() -> void:
 		if not Finds.is_cache(find):
 			plain[find.region] = int(plain.get(find.region, 0)) + 1
 	for region_id: String in regions:
-		check(int(plain.get(region_id, 0)) <= 2 and int(regions[region_id]) <= 3, "%s: holds no more than two finds, and a cache" % region_id)
+		var most := 6 if region_id == "hetch_hetchy" else 2
+		check(int(plain.get(region_id, 0)) <= most and int(regions[region_id]) <= most + 1, "%s: holds no more than two finds (six in the big Hetch Hetchy), and a cache" % region_id)
 	# Gear is the rare, valuable kind: a few cams at most.
 	var cams := 0
 	for find: Dictionary in Finds.all():

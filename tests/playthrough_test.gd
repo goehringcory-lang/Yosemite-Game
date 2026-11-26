@@ -23,6 +23,7 @@ const WORLD_ABILITIES := {
 	"first_photograph": "the first picture taken with Ansel's camera (Photos)",
 	"saw_moonbow": "watching the spring moonbow at Lower Yosemite Fall (Moonbow)",
 	"saw_firefall": "watching the summer Firefall from Camp Curry (Firefall)",
+	"saw_hetchy_dusk": "standing at Kolana Overlook above Hetch Hetchy at dusk (HetchyVigil)",
 	"saw_dry_mirror_lake": "visiting Mirror Lake dried to a meadow in fall (World)",
 	"saw_horsetail": "watching Horsetail Fall glow in late winter (HorsetailFall)",
 }

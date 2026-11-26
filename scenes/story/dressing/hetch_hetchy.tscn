@@ -1,0 +1,42 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/valley/hetch_hetchy_tunnel_roof.png" id="roof"]
+[ext_resource type="Script" path="res://scripts/world/tunnel_roof.gd" id="roof_script"]
+[ext_resource type="Script" path="res://scripts/world/night_light.gd" id="light"]
+[ext_resource type="Texture2D" path="res://assets/sprites/valley/hetch_hetchy_tunnel_floor.png" id="floor"]
+
+[node name="HetchHetchyDressing" type="Node2D"]
+
+[node name="WapamaTunnelFloor" type="Sprite2D" parent="."]
+z_index = -7
+position = Vector2(704, 598)
+texture = ExtResource("floor")
+centered = false
+
+[node name="WapamaTunnelRoof" type="Sprite2D" parent="."]
+z_index = 6
+position = Vector2(704, 568)
+texture = ExtResource("roof")
+centered = false
+script = ExtResource("roof_script")
+inside = Rect2(700, 592, 264, 96)
+
+[node name="TunnelLampWest" type="PointLight2D" parent="."]
+position = Vector2(716, 600)
+script = ExtResource("light")
+strength = 0.7
+radius = 64.0
+flicker = 0.1
+
+[node name="TunnelLampMid" type="PointLight2D" parent="."]
+position = Vector2(832, 640)
+script = ExtResource("light")
+strength = 0.6
+radius = 72.0
+
+[node name="TunnelLampEast" type="PointLight2D" parent="."]
+position = Vector2(948, 600)
+script = ExtResource("light")
+strength = 0.7
+radius = 64.0
+flicker = 0.1

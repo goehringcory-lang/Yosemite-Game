@@ -4620,7 +4620,7 @@ position = Vector2(1056, 1104)
 position = Vector2(1968, 672)
 
 [node name="west" type="Marker2D" parent="Markers" unique_id=1019875905]
-position = Vector2(80, 736)
+position = Vector2(160, 656)
 
 [node name="meadow" type="Marker2D" parent="Markers" unique_id=626721718]
 position = Vector2(976, 368)
@@ -4653,7 +4653,7 @@ position = Vector2(0, 736)
 script = ExtResource("46_dq7cb")
 label = "Evergreen Road and Hetch Hetchy Road"
 target_region = "hetch_hetchy"
-target_spawn = "arrival"
+target_spawn = "road_in"
 minutes = 35
 miles = 16.0
 

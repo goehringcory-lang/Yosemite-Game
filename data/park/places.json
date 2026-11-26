@@ -387,6 +387,12 @@
 		},
 		{
 			"hub": "yosemite_valley",
+			"key": "hetch_hetchy/Rancheria Falls",
+			"name": "Rancheria Falls",
+			"region": "hetch_hetchy"
+		},
+		{
+			"hub": "yosemite_valley",
 			"key": "housekeeping_camp/Housekeeping Camp",
 			"name": "Housekeeping Camp",
 			"region": "housekeeping_camp"

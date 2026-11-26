@@ -842,6 +842,78 @@
 			]
 		},
 		{
+			"id": "hetch_railroad_spike",
+			"region": "hetch_hetchy",
+			"title": "Hetch Hetchy Railroad Spike",
+			"text": "A square-headed iron spike lies in the gravel by the road, near the old grade. The Hetch Hetchy Railroad ran from Hetch Hetchy Junction, near Chinese Camp, from 1915 to 1949, hauling cement and machinery for the dam.",
+			"rumor": "The old Hetch Hetchy Railroad grade, which hauled dam materials from 1915 to 1949, still sheds iron spikes in the gravel along the road in.",
+			"reward": {
+				"railroad_spike": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				112,
+				688
+			]
+		},
+		{
+			"id": "hetch_survey_benchmark",
+			"region": "hetch_hetchy",
+			"title": "USGS Benchmark Disk",
+			"text": "A brass survey disk set into a boulder, stamped with an elevation of about 3,800 feet. Surveyors left marks like this to measure the canyon floor, now partly under the reservoir.",
+			"rumor": "Surveyors left brass benchmark disks set into boulders along the canyon floor at Hetch Hetchy, about 3,800 feet up.",
+			"reward": {
+				"rusty_piton": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				1616,
+				944
+			]
+		},
+		{
+			"id": "hetch_dam_raise_rivet",
+			"region": "hetch_hetchy",
+			"title": "Dam Raise Rivet",
+			"text": "A heavy iron rivet, left from the work crews who raised O'Shaughnessy Dam in 1938. The dam was first completed in 1923, and the raise made the reservoir deeper.",
+			"rumor": "Hardware from the 1938 raising of O'Shaughnessy Dam still turns up in the rocks at the dam's north end.",
+			"reward": {
+				"rusty_piton": 1.0
+			},
+			"spot": {
+				"near": "rock"
+			},
+			"pos": [
+				496,
+				624
+			]
+		},
+		{
+			"id": "hetch_kolana_fly_tin",
+			"region": "hetch_hetchy",
+			"title": "Angler's Fly Tin",
+			"text": "A dented tin of trout flies wedged between boulders on the bank near Kolana Rock, dropped by an angler. Fishing from shore is fine here, but boating and swimming are not, since this is San Francisco's drinking water.",
+			"rumor": "An angler fishing from the shore near Kolana Rock lost a tin of flies in the summer or fall.",
+			"reward": {
+				"greg_fly_box": 1.0
+			},
+			"seasons": [
+				"summer",
+				"fall"
+			],
+			"spot": {
+				"near": "water"
+			},
+			"pos": [
+				2000,
+				1008
+			]
+		},
+		{
 			"id": "wawona_point_cache",
 			"region": "wawona",
 			"title": "Sugar Pine Pocket",

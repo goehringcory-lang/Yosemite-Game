@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_backpacker.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hetchy_backpacker"
+display_name = "Backpacker"
+years = "1970s"
+affiliation = "Park visitor"
+bio = "An everyday visitor camped out past the Rancheria. Not a historical figure."
+idle_lines = PackedStringArray("Hetch Hetchy is the snow-free place to hike in winter and spring, when the high country is buried.", "I checked my socks and my collar for ticks tonight. Spring grass out here is full of them.", "Poison oak all along the trail. Leaves of three, let it be.", "The Wapama footbridges can flood in a big snowmelt year. Ask at the trailhead before you cross.", "Hot summer afternoons out here. I start at dawn and nap through the worst of it.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Hetch Hetchy backcountry"
+visitor = true
+sources = "Invented for the game. Hetch Hetchy's low elevation keeps its trails snow-free in winter and spring; poison oak, ticks and rattlesnakes are common there, and the Wapama Falls footbridges can be overtopped in heavy snowmelt."

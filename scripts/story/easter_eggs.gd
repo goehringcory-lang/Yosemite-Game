@@ -74,6 +74,11 @@ static func dress(region: Region) -> void:
 			if dam:
 				dam.extra_text = HETCH_MUIR_TEXT
 				dam.extra_hours = Vector2i(17, 22)
+			# Muir's quest: standing at Kolana Overlook at dusk.
+			var vigil := preload("res://scripts/story/hetchy_vigil.gd").new()
+			vigil.name = "HetchyVigil"
+			vigil.region = region
+			region.add_child(vigil)
 
 
 ## Lets the player walk the Camp 4 slackline from its sign (SlacklineSpot).
