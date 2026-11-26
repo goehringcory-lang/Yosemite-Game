@@ -46,6 +46,8 @@ const FALLS := {
 ## Horsetail Fall, on El Capitan's east shoulder, runs only on winter snowmelt
 ## and the first weeks of spring.
 const HORSETAIL_SPRING_DAYS := 14
+## Up in the mountains you see your breath below this (degrees F).
+const COLD_F := 45.0
 
 static var _snow_date := -1
 static var _snow_key := "":
@@ -54,17 +56,34 @@ static var _snow_key := "":
 		if v == "":
 			_snow_date = -1
 static var _snow := 0.0
+## Mountain snow by Vector4i(year, season, day, feet).
+static var _mountain := {}
 static var _yday_rain_key := -1
 static var _yday_rain := 0.0
 
 
 ## How much snow lies on the ground, 0 (bare) to 1 (the floor is white).
 ## Leave the date out for today.
-static func snow_cover(year := -1, season := -1, day := -1) -> float:
+## Leave the place out for where you are; give [param region_id] (and its
+## hub) for an area of its own (one laid beside you at a seam). Up in the
+## mountains the snow is the mountain's own (Climate.mountain_snow: deeper,
+## earlier, lasting into summer up high); down the canyon a winter storm is
+## only rain.
+static func snow_cover(year := -1, season := -1, day := -1, region_id := "_here", hub_id := "") -> float:
 	if year < 0:
 		year = GameClock.year
 		season = GameClock.season
 		day = GameClock.day
+	var ft := Climate.elevation(region_id, hub_id)
+	if ft < Climate.RAIN_BELOW_FT:
+		return 0.0
+	if ft >= Climate.MOUNTAIN_FT:
+		var key := Vector4i(year, season, day, ft)
+		if not _mountain.has(key):
+			if _mountain.size() > 64:
+				_mountain.clear()
+			_mountain[key] = Climate.mountain_snow(year, season, day, ft)
+		return _mountain[key]
 	var date := (year * 4 + season) * 64 + day
 	if date == _snow_date:
 		return _snow
@@ -139,6 +158,9 @@ static func wetness(hour := -1.0) -> float:
 		return 0.0
 	if weather.rain > 0.0:
 		return clampf(0.55 + weather.rain * 0.6, 0.0, 1.0)
+	var storm := _storm_wet(hour)
+	if storm > 0.0:
+		return storm
 	var key := (GameClock.year * 4 + GameClock.season) * 64 + GameClock.day
 	var yday_rain := _yday_rain
 	if key != _yday_rain_key:
@@ -160,11 +182,31 @@ static func wetness(hour := -1.0) -> float:
 	return 0.8 * (1.0 - dry)
 
 
+## The high country's afternoon storm: soaked while it rains, drying
+## over the next couple of hours (0 when it passed over dry, or none today).
+static func _storm_wet(hour: float) -> float:
+	if Climate.elevation() < Climate.SHOWER_FT:
+		return 0.0
+	var since := Climate.since_storm(hour)
+	if since < 0.0:
+		return 0.0
+	var strength := Climate.shower_strength()
+	if strength <= 0.0:
+		return 0.0
+	var soaked := clampf(0.45 + strength * 0.6, 0.0, 1.0)
+	if since < Climate.SHOWER_HOURS:
+		return soaked * smoothstep(0.0, 0.25, since)
+	return soaked * (1.0 - smoothstep(Climate.SHOWER_HOURS, Climate.SHOWER_WET, since))
+
+
 ## True when the air is cold enough to see your breath: all winter, on any
 ## day with snow lying, and on spring and fall mornings and nights while the
 ## sun is down or still low.
 static func cold(hour := -1.0) -> bool:
 	if GameClock.season == GameClock.Season.WINTER or snow_cover() > 0.05:
+		return true
+	# Up high the nights and mornings are cold even in summer.
+	if Climate.is_mountain() and Climate.temperature_f(-1, hour) < COLD_F:
 		return true
 	if GameClock.season == GameClock.Season.SUMMER:
 		return false

@@ -25,6 +25,7 @@ func _ready() -> void:
 	SaveManager.save_path = "user://stream_test_save.json"
 	SaveManager.delete_save()
 	_check_links()
+	_check_corridor_specs()
 	Engine.time_scale = 4.0
 	var world: Node = load("res://scenes/world/world.tscn").instantiate()
 	add_child(world)
@@ -126,3 +127,21 @@ func _check_corridor(world: Node) -> void:
 		await get_tree().physics_frame
 	check(is_equal_approx(stream.corridor_minutes_paid() - base, paid), "walking back over the same ground costs nothing more")
 	r.walk_minutes = 0
+
+
+## The corridor builder's spec check (tools/hubs/build_corridor.gd), which
+## the area threads lean on before building.
+func _check_corridor_specs() -> void:
+	var builder = load("res://tools/hubs/build_corridor.gd")
+	var good := {"id": "test_corridor", "name": "Test Trail", "hub": "glacier_point", "geo": [-119.6, 37.7],
+		"size": [64, 36], "walk_minutes": 30, "ground": "fir",
+		"ends": [{"side": "west", "at": 18, "target_region": "taft_point", "target_spawn": "east"},
+			{"side": "east", "at": 20, "target_region": "glacier_point", "target_spawn": "west"}]}
+	check(builder.check_spec(good).is_empty(), "a corridor spec with two ends checks out (%s)" % [builder.check_spec(good)])
+	var bad := good.duplicate(true)
+	bad.ends[1].side = "up"
+	bad.ends[0].at = 1
+	bad.erase("walk_minutes")
+	check(builder.check_spec(bad).size() == 1, "a spec missing walk_minutes is turned away")
+	bad.walk_minutes = 10
+	check(builder.check_spec(bad).size() == 2, "and so are a bad side and an end in the corner (%s)" % [builder.check_spec(bad)])

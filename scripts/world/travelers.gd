@@ -408,7 +408,9 @@ static func today(id: String) -> Array:
 	var date := "%d:%d:%d" % [GameClock.year, GameClock.season, GameClock.day]
 	var kept: Array = _days.get(id, [])
 	if kept.is_empty() or kept[0] != date:
-		var weather := Weather.today()
+		# the weather where their day starts, wherever you are
+		var stops: Array = PLANS[id].get("stops", []) if PLANS.has(id) else []
+		var weather := Weather.at(String(stops[0].region)) if not stops.is_empty() else Weather.park_today()
 		var wet: bool = weather.rain > 0.0 or weather.snow > 0.0
 		kept = [date, day_of(id, GameClock.season, wet)]
 		_days[id] = kept

@@ -175,9 +175,9 @@ func _step(at: Vector2) -> void:
 func _ground_color() -> Color:
 	var color := Color(0.8, 0.72, 0.56, 0.6)
 	var weather := Weather.today()
-	if weather.rain > 0.0:
+	if Weather.rain_now() > 0.0:
 		color = Color(0.8, 0.88, 1.0, 0.65)
-	elif weather.snow > 0.0:
+	elif weather.snow > 0.0 or Seasons.snow_cover() >= PRINT_SNOW:
 		color = Color(0.96, 0.98, 1.0, 0.8)
 	elif GameClock.season == GameClock.Season.WINTER:
 		color.a = 0.0
@@ -204,9 +204,9 @@ func _step_sound() -> void:
 	var weather := Weather.today()
 	if _indoors():
 		surface = "step_wood"
-	elif weather.snow > 0.0 or GameClock.season == GameClock.Season.WINTER:
+	elif weather.snow > 0.0 or GameClock.season == GameClock.Season.WINTER or Seasons.snow_cover() >= PRINT_SNOW:
 		surface = "step_snow"
-	elif weather.rain > 0.0:
+	elif Weather.rain_now() > 0.0:
 		surface = "step_wet"
 	Sound.play(surface, -9.0, 0.08)
 

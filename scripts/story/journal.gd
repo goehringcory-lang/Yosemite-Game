@@ -939,8 +939,12 @@ func _logged(animal: Dictionary) -> Dictionary:
 func _logbook_page() -> void:
 	_achievements()
 	_places_found()
+	_vistas_seen()
+	_landmarks_log()
 	_happenings_seen()
 	_finds()
+	_registers()
+	_sketchbook()
 	_summits()
 	_sends()
 	_fish()
@@ -985,6 +989,64 @@ func _places_found() -> void:
 			DONE if area[0] == area[1] else DIM)
 	if not any:
 		_line("Walk somewhere new and it goes in here. From a high lookout the whole Valley shows on your area map.", DIM)
+
+
+## The vistas you've taken in (Vistas), with the peak-finder's stamp.
+func _vistas_seen() -> void:
+	_heading("Vistas taken in: %d of %d" % [Vistas.count(), Vistas.total()])
+	if Vistas.count() == 0:
+		_line("Somewhere high, with the land spread out below: stop and take in the view, and the names of what you see go on your map.", DIM)
+		return
+	for vista: Dictionary in Vistas.all():
+		if Vistas.is_surveyed(vista.id):
+			_check_line(true, str(vista.title) + (" · named the peak" if Vistas.is_named(vista.id) else ""), DONE)
+
+
+## The Landmark log (Landmarks): only what you've sighted or walked to, like
+## a sketchbook. Sighted: where from, and how it looks far off. Walked to:
+## the naturalist's note.
+func _landmarks_log() -> void:
+	_heading("Landmarks: %d sighted, %d walked to" % [Landmarks.known_count(), Landmarks.visited_count()])
+	if Landmarks.known_count() == 0:
+		_line("The big walls, domes, peaks and falls go in here once you've seen them from a vista, and get a page of their own once you've walked to them.", DIM)
+		return
+	for landmark: Dictionary in Landmarks.all():
+		if Landmarks.is_visited(landmark.id):
+			_check_line(true, str(landmark.name), DONE)
+			_line("     " + str(landmark.note), DIM)
+		elif Landmarks.is_sighted(landmark.id):
+			_check_line(false, "%s · seen from %s" % [landmark.name, Landmarks.sighted[landmark.id]], DIM)
+			_line("     " + str(landmark.get("seen", "")), DIM)
+
+
+## Summit registers and benchmarks signed (Challenges), and what the next
+## few signatures earn.
+func _registers() -> void:
+	var signed := Challenges.signed_count()
+	_heading("Registers signed: %d" % signed)
+	if signed == 0:
+		_line("Summit registers, survey benchmarks and lookout logbooks wait in high places. Sign them.", DIM)
+		return
+	for register: Dictionary in Challenges.registers():
+		if Challenges.is_signed(register.id):
+			_check_line(true, "%s · %s" % [register.title, _area_name(register.region)], DONE)
+	var next := Challenges.next_milestone()
+	if not next.is_empty():
+		_line("Sign %d more for %s." % [int(next.count) - signed, Challenges.milestone_text(next)], DIM)
+
+
+## Sketches made at the right place and time (Challenges), and hints for
+## spots you've stood at too early or too late.
+func _sketchbook() -> void:
+	_heading("Sketchbook: %d" % Challenges.sketched_count())
+	for sketch: Dictionary in Challenges.sketches():
+		if Challenges.is_sketched(sketch.id):
+			_check_line(true, "%s · %s" % [sketch.title, _area_name(sketch.region)], DONE)
+			_line("     " + str(sketch.text), DIM)
+		elif Challenges.is_tried(sketch.id):
+			_check_line(false, "%s · %s" % [sketch.title, str(sketch.early)], DIM)
+	if Challenges.sketched_count() == 0 and Challenges.tried_count() == 0:
+		_line("Some views are worth drawing, if you're there at the right hour. Look for a flat rock to sit on.", DIM)
 
 
 ## The Happenings you've seen through (Happenings), area by area: the
@@ -1032,7 +1094,7 @@ func _finds() -> void:
 	if Finds.count() == 0 and rumors.is_empty():
 		_line("Things turn up off the beaten path: stuck gear at the foot of a wall, something left behind in the trees. Wander, and look closely.", DIM)
 	for find: Dictionary in rumors:
-		_line("Heard: " + str(find.rumor), DIM)
+		_line(("Seen: " if Finds.is_cache(find) else "Heard: ") + str(find.rumor), DIM)
 
 
 ## The summits you've stood on, highest first, and how to reach the rest.

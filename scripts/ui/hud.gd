@@ -39,6 +39,8 @@ var _message_tween: Tween
 var _info_anchor := Vector2.ZERO
 ## True while a menu, map or conversation covers the screen.
 var _covered := false
+## The big region name card shown on a first arrival (see show_arrival).
+var arrival_title: ArrivalTitle
 ## What the use prompt names, so a new target fades its prompt in.
 var _prompt_target: Node
 
@@ -96,6 +98,11 @@ func _ready() -> void:
 	_screen.add_child(toasts)
 	# signs at the screen's edge toward landmarks and undiscovered places
 	_screen.add_child(Wayfinding.new())
+	# a region's name across the screen on a first arrival
+	arrival_title = ArrivalTitle.new()
+	_screen.add_child(arrival_title)
+	# a pointer toward what you track on the park map
+	_screen.add_child(Tracker.new())
 	_screen.move_child(toasts, fade.get_index()) # under the fade, so the black covers it
 	Inventory.added.connect(_on_item_added)
 	Gear.added.connect(_on_gear_added)
@@ -233,6 +240,14 @@ func show_discovery(found: Dictionary) -> void:
 		Sound.play("story_sting", -6.0, 0.0)
 
 
+## A landmark walked to for the first time (Landmarks): a card of its own,
+## and its note opens in the Logbook.
+func show_landmark(landmark: Dictionary) -> void:
+	if _discovery_icon == null:
+		_discovery_icon = Discoveries.icon()
+	toasts.notify("landmark:%s" % landmark.id, _discovery_icon, "Landmark: %s" % landmark.name, 1)
+
+
 ## A hidden find taken (FindSpot): its little story, with what you took, and
 ## the story sting. The reward's own toast comes from Inventory or Gear.
 func show_find(find: Dictionary) -> void:
@@ -255,6 +270,18 @@ func _on_gear_sent_to_camp(id: String, amount: int) -> void:
 	if gear:
 		var what := gear.display_name if amount == 1 else ItemDB.count_name(amount, gear.display_name)
 		show_message("No room in your gear bag: %s went to the gear rack at camp." % what)
+
+
+## Shows a region's name big across the screen (BotW-style), unless the
+## Region titles setting is off. The small location banner steps aside.
+func show_arrival(title: String, subtitle: String) -> void:
+	if not Settings.arrival_titles or arrival_title == null:
+		return
+	if location_panel.modulate.a > 0.0:
+		if _location_tween:
+			_location_tween.kill()
+		location_panel.modulate.a = 0.0
+	arrival_title.show_title(title, subtitle)
 
 
 ## The location banner at the top of the screen.
@@ -283,6 +310,8 @@ func set_location(text: String) -> void:
 ## The place name shows as you arrive, then fades after a few seconds, as
 ## in Stardew Valley; it comes back each time you go somewhere new.
 func _show_location_banner() -> void:
+	if arrival_title != null and arrival_title.is_showing():
+		return # the big region card stands in for it
 	if _location_tween:
 		_location_tween.kill()
 	location_panel.modulate.a = 1.0
@@ -374,6 +403,7 @@ func _update_cover() -> void:
 	for panel: Control in [clock_panel, location_panel, info_panel]:
 		panel.modulate.a = alpha
 	message_label.visible = not covered
+	arrival_title.set_covered(covered)
 	if covered:
 		if _hints_tween:
 			_hints_tween.kill()

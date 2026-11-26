@@ -90,6 +90,8 @@ static var wind := true
 ## Small signs at the screen's edge point toward the great landmarks and
 ## the parts of the Valley you haven't found yet (see Wayfinding).
 static var wayfinding := true
+## A region's name crosses the screen the first time you arrive (see ArrivalTitle).
+static var arrival_titles := true
 ## Trips that take clock time (drives, long trails, the shuttle) play on the
 ## park map, a marker running the route, instead of fading to black (see
 ## Journey).
@@ -229,6 +231,7 @@ static func load_settings() -> void:
 	auto_run = bool(config.get_value("input", "auto_run", auto_run))
 	wind = bool(config.get_value("display", "wind", wind))
 	wayfinding = bool(config.get_value("display", "wayfinding", wayfinding))
+	arrival_titles = bool(config.get_value("display", "arrival_titles", arrival_titles))
 	journeys = bool(config.get_value("display", "journeys", journeys))
 	master_volume = clampi(int(config.get_value("audio", "master", master_volume)), 0, MAX_VOLUME)
 	effects_volume = clampi(int(config.get_value("audio", "effects", effects_volume)), 0, MAX_VOLUME)
@@ -267,6 +270,7 @@ static func save() -> Error:
 	config.set_value("input", "auto_run", auto_run)
 	config.set_value("display", "wind", wind)
 	config.set_value("display", "wayfinding", wayfinding)
+	config.set_value("display", "arrival_titles", arrival_titles)
 	config.set_value("display", "journeys", journeys)
 	config.set_value("audio", "master", master_volume)
 	config.set_value("audio", "effects", effects_volume)
@@ -357,6 +361,7 @@ static func reset_defaults() -> void:
 	auto_run = false
 	wind = true
 	wayfinding = true
+	arrival_titles = true
 	journeys = true
 	master_volume = 8
 	effects_volume = MAX_VOLUME

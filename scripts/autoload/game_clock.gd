@@ -173,7 +173,8 @@ func is_moonbow_time() -> bool:
 func is_horsetail_time() -> bool:
 	if season != Season.WINTER or day < HORSETAIL_DAYS.x or day > HORSETAIL_DAYS.y:
 		return false
-	var weather := Weather.today()
+	# El Capitan's weather: the Valley floor's, wherever you watch from
+	var weather := Weather.park_today()
 	if weather.snow > 0.0 or weather.rain > 0.0 or weather.clouds > 0.7:
 		return false
 	var start := HORSETAIL_HOUR * 60 + HORSETAIL_MINUTE
