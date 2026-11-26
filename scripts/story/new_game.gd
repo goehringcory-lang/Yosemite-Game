@@ -22,6 +22,7 @@ static func reset() -> void:
 	Rescues.start_new_game()
 	FieldLog.start_new_game()
 	Discoveries.start_new_game()
+	Trailheads.start_new_game()
 	Finds.start_new_game()
 	Landmarks.start_new_game()
 	Vistas.start_new_game()

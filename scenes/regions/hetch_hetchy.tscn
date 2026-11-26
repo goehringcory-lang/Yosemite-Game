@@ -64,6 +64,8 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/valley/hetch_hetchy_mist_3.png" id="62_80irn"]
 [ext_resource type="Script" path="res://scripts/world/ambient_fx.gd" id="63_v1gfk"]
 
+[ext_resource type="Script" path="res://scripts/world/region_exit.gd" id="90_roadout"]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jlojb"]
 size = Vector2(8, 28)
 
@@ -563,6 +565,9 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_roadout"]
+size = Vector2(128, 12)
+
 [node name="HetchHetchy" type="Node2D" unique_id=1548536388]
 y_sort_enabled = true
 script = ExtResource("1_3quoo")
@@ -941,7 +946,7 @@ title = "Hetch Hetchy Reservoir"
 position = Vector2(336, 864)
 label = "Hetch Hetchy Road, back to Crane Flat"
 target_region = "crane_flat"
-target_spawn = "arrival"
+target_spawn = "west"
 minutes = 35
 
 [node name="TreeSnag25" type="StaticBody2D" parent="Entities" unique_id=1532948730]
@@ -3321,6 +3326,18 @@ display_name = "Rancheria Trailhead"
 show_on_map = true
 
 [node name="Exits" type="Node2D" parent="." unique_id=991329827]
+
+[node name="HetchHetchyRoadOut" type="Area2D" parent="Exits" unique_id=1904417731]
+position = Vector2(400, 912)
+script = ExtResource("90_roadout")
+label = "Hetch Hetchy Road and Evergreen Road"
+target_region = "crane_flat"
+target_spawn = "west"
+minutes = 35
+miles = 16.0
+
+[node name="Shape" type="CollisionShape2D" parent="Exits/HetchHetchyRoadOut" unique_id=1904417732]
+shape = SubResource("RectangleShape2D_roadout")
 
 [node name="HetchHetchyWall" type="Sprite2D" parent="." unique_id=611421976]
 z_index = -8

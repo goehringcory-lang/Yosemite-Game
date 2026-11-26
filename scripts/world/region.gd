@@ -18,6 +18,12 @@ extends Node2D
 @export var geo_anchor := Vector2.ZERO
 ## Inside a building: the day and night tint doesn't apply.
 @export var indoors := false
+## A stretch of trail or road standing in for miles (a "corridor" between
+## two areas, joined to them by seams): the clock minutes it takes to walk it
+## end to end along its longer side, on top of the clock's usual pace. They
+## pass as the player gets further along, not all at once (see WorldStream).
+## 0 for ordinary areas.
+@export var walk_minutes := 0
 
 const SeasonalDressing = preload("res://scripts/world/seasonal_dressing.gd")
 const WILD_DRESSING_DIR := "res://scenes/regions/dressing/wild/"
