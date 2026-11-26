@@ -10,7 +10,7 @@ func id() -> StringName:
 	return &"falls"
 
 
-## Fills move.risk, the chance the move fails (pure).
+## Fills move.risk, the chance the move fails, including move.crux_risk (pure).
 func risk(move: V2Move) -> void:
 	move.risk = 0.0
 

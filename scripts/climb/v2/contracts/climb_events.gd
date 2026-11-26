@@ -45,6 +45,9 @@ signal crux_entered(zone_id: String)
 signal crux_sent(zone_id: String, clean: bool)
 signal special_started(kind: StringName)
 signal special_finished(kind: StringName, ok: bool)
+## One stroke of a special: a hammer tap and its tone, a swing's peak, a haul
+## stroke, an inchworm shuffle. Look, sound and art react to these (no bars).
+signal special_step(kind: StringName, data: Dictionary)
 
 ## Every event sent, in order: [name, args].
 var trace: Array = []

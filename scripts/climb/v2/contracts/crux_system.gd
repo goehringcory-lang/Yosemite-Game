@@ -27,6 +27,13 @@ func committed(_move: V2Move) -> void:
 	pass
 
 
+## A special that runs at the belay once the pitch is led ("" for none), e.g.
+## "haul". The director opens the special phase with {"kind", "belay": true}
+## instead of the belay; that phase calls director.go(&"belay") when done.
+func belay_special() -> StringName:
+	return &""
+
+
 ## A special move that starts here ("" for none): swing, nail, haul,
 ## chimney, offwidth.
 func special_at(_pos: Vector2) -> StringName:

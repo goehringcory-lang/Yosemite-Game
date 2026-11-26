@@ -32,6 +32,7 @@ func _ready() -> void:
 	test_verbs()
 	await test_screen()
 	test_ladder_route()
+	test_crux_contract()
 	ClimbSystems.pins.clear()
 	ClimbV2.force = null
 	print("\nOK: %d failure(s)" % failures)
@@ -282,3 +283,38 @@ func test_ladder_route() -> void:
 	d.start()
 	var ok := ClimbV2TestBot.new(d).run(4000)
 	check(ok, "a real route (%s) climbs end to end on the stub ladder wall" % route.id)
+
+
+## Cruxes that haul at every belay (CONTRACT_VERSION 2's belay special).
+class HaulCruxes extends CruxStub:
+	func belay_special() -> StringName:
+		return &"haul"
+
+
+func test_crux_contract() -> void:
+	var d := new_director()
+	d.start()
+	d.handle_verb(&"commit", true)
+	var s := d.session
+	var hold: V2Hold = s.sys.body.reachable(s.pose.next_hand)[0]
+	var m := d.preview(hold.id)
+	var base := m.cost.pump
+	m.crux_cost = 2.0
+	s.sys.effort.price(m)
+	check(absf(m.cost.pump - base * 2.0) < 0.0001, "effort multiplies a move's pump by its crux cost")
+	m.crux_risk = 0.4
+	s.sys.falls.risk(m)
+	check(absf(m.risk - 0.4) < 0.0001, "falls adds a move's crux risk")
+	d.hang_at(Vector2(4, 5), PackedStringArray(["aiders"]))
+	check(s.pose.hip == Vector2(4, 5) and s.pose.tags.has("hang") and s.pose.tags.has("aiders"), "hang_at hangs the climber with tags")
+	d.count_aid(2)
+	check(s.result.aid_moves == 2, "count_aid counts aid moves")
+	var h := ClimbDirector.new()
+	h.setup(fixture_route(1), 7, V2Modifiers.new(), fixture_rack())
+	h.session.sys.cruxes = HaulCruxes.new()
+	h.session.sys.cruxes.attach(h.session)
+	h.start()
+	var ok := ClimbV2TestBot.new(h).run()
+	var names := h.session.bus.names([&"pitch_finished", &"special_started", &"special_step", &"special_finished", &"piece_cleaned"])
+	check(ok and names.slice(0, 4) == [&"pitch_finished", &"special_started", &"special_step", &"special_finished"] and names.has(&"piece_cleaned"),
+		"a belay special (the haul) runs before the belay: %s" % [names])
