@@ -58,7 +58,7 @@ static func storm_hour() -> float:
 	var date := Vector3i(GameClock.year, GameClock.season, GameClock.day)
 	if date != _storm_date:
 		_storm_date = date
-		_storm_hour = float(WallWeather.today(STORM_ROUTE).get("storm_hour", -1.0))
+		_storm_hour = WallWeather.alpine_storm_hour(date.x, date.y, date.z)
 	return _storm_hour
 
 

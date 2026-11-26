@@ -206,6 +206,12 @@
 			"region": "four_mile_trailhead"
 		},
 		{
+			"hub": "yosemite_valley",
+			"key": "four_mile_trailhead/Sentinel Shallows",
+			"name": "Sentinel Shallows",
+			"region": "four_mile_trailhead"
+		},
+		{
 			"hub": "glacier_point",
 			"key": "glacier_point/Glacier Point",
 			"name": "Glacier Point",
@@ -333,6 +339,18 @@
 		},
 		{
 			"hub": "yosemite_valley",
+			"key": "housekeeping_camp/Housekeeping Footbridge",
+			"name": "Housekeeping Footbridge",
+			"region": "housekeeping_camp"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "housekeeping_camp/Housekeeping Beach",
+			"name": "Housekeeping Beach",
+			"region": "housekeeping_camp"
+		},
+		{
+			"hub": "yosemite_valley",
 			"key": "lamon_homestead/Lamon Homestead",
 			"name": "Lamon Homestead",
 			"region": "lamon_homestead"
@@ -347,6 +365,12 @@
 			"hub": "yosemite_valley",
 			"key": "leidig_meadow/El Capitan Picnic Area",
 			"name": "El Capitan Picnic Area",
+			"region": "leidig_meadow"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "leidig_meadow/Devil's Elbow",
+			"name": "Devil's Elbow",
 			"region": "leidig_meadow"
 		},
 		{
@@ -551,6 +575,18 @@
 			"hub": "yosemite_valley",
 			"key": "upper_pines/Lower Pines",
 			"name": "Lower Pines",
+			"region": "upper_pines"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "upper_pines/Clark's Bridge",
+			"name": "Clark's Bridge",
+			"region": "upper_pines"
+		},
+		{
+			"hub": "yosemite_valley",
+			"key": "upper_pines/Pines Gravel Bar",
+			"name": "Pines Gravel Bar",
 			"region": "upper_pines"
 		},
 		{

@@ -563,6 +563,87 @@
 				264,
 				1272
 			]
+		},
+		{
+			"id": "floor_devils_elbow_fly",
+			"region": "leidig_meadow",
+			"title": "Fly in the Driftwood",
+			"text": "An Elk Hair Caddis, hooked fast in a bleached snag where the river bends hard at Devil's Elbow. Somebody cast across from the meadow, caught the wood instead of a trout, and couldn't wade over to get it back. You can.",
+			"rumor": "Greg swears he lost his best caddis in a snag on the far side of the Merced below Leidig Meadow. Says there's a line of stepping stones if you look.",
+			"reward": {
+				"elk_hair_caddis": 1.0
+			},
+			"spot": {
+				"near": "water",
+				"place": "Devil's Elbow"
+			},
+			"seasons": [
+				"summer",
+				"fall"
+			],
+			"pos": [
+				420.0,
+				1112.0
+			]
+		},
+		{
+			"id": "floor_shallows_cobra",
+			"region": "four_mile_trailhead",
+			"title": "Cans in the Shallows",
+			"text": "Two cans of King Cobra, wedged between river stones in the shallows to stay cold, with a note on a scrap of guidebook page: \"For whoever bothers to wade over. Send it.\"",
+			"rumor": "A climber at Camp 4 says somebody left beer cooling in the Merced across from Sentinel Beach, on the side nobody walks to.",
+			"reward": {
+				"king_cobra": 2.0
+			},
+			"spot": {
+				"near": "water",
+				"place": "Sentinel Shallows"
+			},
+			"seasons": [
+				"summer",
+				"fall"
+			],
+			"pos": [
+				920.0,
+				1112.0
+			]
+		},
+		{
+			"id": "floor_housekeeping_beach_bag",
+			"region": "housekeeping_camp",
+			"title": "Forgotten Beach Bag",
+			"text": "A canvas beach bag half buried in the sand on the far side of the footbridge: a damp paperback, one flip-flop, and a bag of dried apricots nobody is coming back for.",
+			"rumor": "Kids at Housekeeping say the best beach is the one over the footbridge, and somebody forgot their whole bag there.",
+			"reward": {
+				"dried_apricots": 2.0
+			},
+			"spot": {
+				"near": "water",
+				"place": "Housekeeping Beach"
+			},
+			"pos": [
+				1260.0,
+				1112.0
+			]
+		},
+		{
+			"id": "floor_gravel_bar_lunch",
+			"region": "upper_pines",
+			"title": "Lunch on a Warm Rock",
+			"text": "A lunch left out on a flat rock on the gravel bar across Clark's Bridge: pilot bread and a wedge of cheddar in a paper sack, warm from the sun. A Steller's jay is already working out how to open it.",
+			"rumor": "A camper at Upper Pines walked over Clark's Bridge to eat by the river and came back without their lunch.",
+			"reward": {
+				"pilot_bread": 1.0,
+				"cheddar_wedge": 1.0
+			},
+			"spot": {
+				"near": "water",
+				"place": "Pines Gravel Bar"
+			},
+			"pos": [
+				1320.0,
+				1500.0
+			]
 		}
 	]
 }

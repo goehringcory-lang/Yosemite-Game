@@ -8,6 +8,15 @@ extends CanvasLayer
 ## Yosemite Valley has an illustrated area map (see tools/mapgen/oblique). M
 ## opens it first. Arrow keys move between the labeled places, and at a Valley
 ## shuttle stop [E] rides to the chosen stop.
+##
+## Looking around (not choosing a trip), the Park map is the open-world map:
+## it starts as a parchment brochure and fills in as you explore (MapFog).
+## A cursor moves freely over it and settles on what's near: the hubs, every
+## area you've walked into, your stamps, the story's next steps, and known
+## trailheads. [E] follows (tracks) what's under it, so a pointer on screen
+## leads the way (Tracker); on bare map it puts down a stamp. [Space] stamps
+## or takes a stamp up, and [Shift] zooms in twice as close. Hidden finds are
+## never on it: a stamp of your own is how you mark one.
 
 signal travel_requested(leg: Dictionary)
 signal shuttle_requested(stop: Dictionary)
@@ -69,7 +78,18 @@ const WOOD_BEVEL := Color("92693d")
 const WOOD_SHADE := Color("6b4829")
 
 ## The gamepad's name for each keyboard control the map's hints mention.
-const GAMEPAD_BUTTONS := {"Arrows": "D-pad", "E": "A", "Esc": "B", "M": "Back", "Tab": "LB/RB"}
+const GAMEPAD_BUTTONS := {"Arrows": "D-pad", "E": "A", "Esc": "B", "M": "Back", "Tab": "LB/RB", "Space": "X", "Shift": "Y"}
+## The look-around cursor's speed over the park map, in map pixels a second,
+## at first and once held a moment.
+const CURSOR_SPEED := 50.0
+const CURSOR_FAST := 130.0
+## How near (screen pixels) the cursor must be to settle on a marker.
+const HOVER_REACH := 7.0
+const ZOOM_MAX := 2
+## Colors of the stamps (MapFog.STAMPS), and the tracked target's ring.
+const STAMP_COLORS := {"star": Color("f1cf6a"), "tent": Color("d9783a"), "fish": Color("6fb3d2"), "flower": Color("e58bb4"), "climb": Color("c9c2b4")}
+const TRACK_RING := Color("f5eee0")
+const AREA_DOT := Color("e4ddcc")
 
 var _tab := Tab.PARK
 var _travel := false
@@ -127,6 +147,25 @@ var _hint_label: Label
 ## The travel map's description panel (for tests: its text must fit).
 var _info_panel: PanelContainer
 
+# The open-world map (Park tab, looking around).
+## The park map's zoom (1 or 2) and the map pixel at the view's top-left.
+var _zoom := 1
+var _pan := Vector2.ZERO
+## The cursor, in park map pixels (unzoomed).
+var _cursor_at := Vector2.ZERO
+var _cursor_held := 0.0
+## Everything the cursor can settle on: {kind, id, label, lonlat, ...}.
+var _markers: Array[Dictionary] = []
+var _hover: Dictionary = {}
+## Choosing which stamp to put down, and which one.
+var _picking := false
+var _pick := 0
+var _park_clip: Control
+var _park_layers: Control
+var _fog_rect: TextureRect
+var _fog_version := -1
+var _base_image: Image
+
 
 func _ready() -> void:
 	layer = 20
@@ -170,6 +209,12 @@ func _show(region: Region, player_position: Vector2, travel: bool, preselect: St
 					_selected = id
 					break
 	_load_area_map()
+	_picking = false
+	_zoom = 1
+	_pan = Vector2.ZERO
+	_cursor_at = ParkAtlas.geo_to_map(_here, PARK_MAP.get_size())
+	MapFog.refresh_tracked()
+	_refresh_fog()
 	# Looking around opens the illustrated hub map first; a kiosk opens the park map to travel.
 	# Out past the edge of the picture (up at Crane Flat, say), it opens on the park map.
 	_tab = Tab.AREA if not _view.is_empty() and not travel and _on_view(_here) else Tab.PARK
@@ -184,13 +229,16 @@ func is_open() -> bool:
 
 func close() -> void:
 	visible = false
+	_picking = false
 	_shuttle_from = ""
 	closed.emit()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not visible:
 		return
+	if _looking() and _tab == Tab.PARK and not _picking:
+		_steer_cursor(delta)
 	# The maps are only redrawn on change. The "you are here" pin bobs and pulses,
 	# so only its small overlays redraw, and only when the animation steps.
 	var phase := int(Time.get_ticks_msec() / 160) % 4
@@ -204,13 +252,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
 	get_viewport().set_input_as_handled()
-	if event.is_action_pressed("map") or event.is_action_pressed("ui_cancel"):
+	if _picking and _tab == Tab.PARK and not event.is_action_pressed("map"):
+		_pick_input(event)
+	elif event.is_action_pressed("map") or event.is_action_pressed("ui_cancel"):
 		close()
 	elif event.is_action_pressed("ui_focus_next") or event.is_action_pressed("tab_next") or event.is_action_pressed("tab_previous"):
 		_tab = Tab.AREA if _tab == Tab.PARK else Tab.PARK
 		_refresh()
 	elif _tab != Tab.PARK:
 		_area_input(event)
+	elif _looking():
+		_look_input(event)
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var clicked := _hub_near(_park_canvas.get_local_mouse_position())
 		if clicked != "" and clicked == _selected:
@@ -232,6 +284,12 @@ func _cycle(step: int) -> void:
 
 func _select(hub_id: String) -> void:
 	_selected = hub_id
+	if _looking():
+		var hub := Park.get_hub(hub_id)
+		if hub:
+			_cursor_at = ParkAtlas.geo_to_map(Vector2(hub.longitude, hub.latitude), PARK_MAP.get_size())
+			_follow_cursor()
+			_hover_nearest()
 	_refresh()
 
 
@@ -255,8 +313,21 @@ func _hub_near(point: Vector2) -> String:
 	return best
 
 
+## Where a longitude/latitude is on the park canvas, with the zoom.
 func _map_point(lonlat: Vector2) -> Vector2:
-	return ParkAtlas.geo_to_map(lonlat, PARK_MAP.get_size()).floor()
+	return _view_of(ParkAtlas.geo_to_map(lonlat, PARK_MAP.get_size())).floor()
+
+
+## A park map pixel on the canvas, with the zoom.
+func _view_of(map_px: Vector2) -> Vector2:
+	return (map_px - _pan) * float(_zoom)
+
+
+## The longitude/latitude of a park map pixel.
+static func _lonlat_of_map(map_px: Vector2) -> Vector2:
+	var size := Vector2(PARK_MAP.get_size())
+	return Vector2(ParkAtlas.MAP_WEST + map_px.x / size.x * (ParkAtlas.MAP_EAST - ParkAtlas.MAP_WEST),
+		ParkAtlas.MAP_NORTH - map_px.y / size.y * (ParkAtlas.MAP_NORTH - ParkAtlas.MAP_SOUTH))
 
 
 # ---------------------------------------------------------------- area map navigation
@@ -383,10 +454,12 @@ func _refresh() -> void:
 	else:
 		_hint_label.text = "Travel from a map kiosk or a road out of the area.\n[%s] Choose   [%s] Close   %s" % [_button("Arrows"), _button("M"), tab_hint]
 	_area_title.text = "" if not _view.is_empty() else "%s area map" % Park.get_hub(_hub_here).display_name
+	if _looking():
+		_refresh_look_info()
 	_fit_info()
 	# still too long: the map's flag shows the story's next step, so the note
 	# can drop it and keep the road
-	if _info_panel.get_combined_minimum_size().y > INFO_RECT.size.y:
+	if _info_panel.get_combined_minimum_size().y > INFO_RECT.size.y and not (_looking() and _hover.get("kind", "hub") != "hub"):
 		_route_label.text = _road_text(hub)
 	_refresh_area_text()
 	_park_frame.queue_redraw()
@@ -494,6 +567,8 @@ func _draw_park() -> void:
 		var color := GOLD if leg.open else (LOCKED if leg.locked else CLOSED)
 		canvas.draw_polyline(points, INK, 3.0)
 		canvas.draw_polyline(points, color, 1.0)
+	if _looking():
+		_draw_open_world(canvas)
 	# Markers first, then the names, so no name is hidden under a marker.
 	var markers: Array[Rect2] = []
 	for hub in ParkAtlas.HUBS:
@@ -825,10 +900,27 @@ func _draw_pin(canvas: Control, at: Vector2) -> void:
 ## story's next step is (QuestTarget).
 func _draw_park_marker() -> void:
 	for target: Dictionary in _targets:
-		var hub := Park.get_hub(target.hub)
-		if hub:
-			_draw_quest_flag(_park_marker, _map_point(Vector2(hub.longitude, hub.latitude)) + Vector2(0, -4), target.what)
+		var at := _quest_lonlat(target)
+		if at != Vector2.INF:
+			_draw_quest_flag(_park_marker, _map_point(at) + Vector2(0, -4), target.what)
 	_draw_pin(_park_marker, _map_point(_here))
+	if _looking():
+		_draw_tracked_ring(_park_marker)
+		_draw_cursor(_park_marker)
+		if _tab == Tab.PARK and not _picking:
+			_draw_hover_label(_park_marker)
+		if _picking:
+			_draw_picker(_park_marker)
+
+
+## Where a story target's flag goes on the park map: its area, if the map
+## knows where that is, else its hub.
+func _quest_lonlat(target: Dictionary) -> Vector2:
+	var at := MapFog.region_lonlat(str(target.get("region", "")))
+	if at != Vector2.INF:
+		return at
+	var hub := Park.get_hub(str(target.get("hub", "")))
+	return Vector2(hub.longitude, hub.latitude) if hub else Vector2.INF
 
 
 ## A flag on a pole for the story's next step: gold with a "!" for the main
@@ -1057,14 +1149,30 @@ func _build() -> void:
 	_strip_box.shadow_color = Color(0.082, 0.078, 0.11, 0.4)
 	_strip_box.shadow_size = 2
 	_park_frame = _overlay(_park_view, _draw_park_frame)
+	# The picture and its fog sit in a clipped window, scaled for the zoom.
+	_park_clip = Control.new()
+	_park_clip.position = MAP_POS
+	_park_clip.size = PARK_MAP.get_size()
+	_park_clip.clip_contents = true
+	_park_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_park_view.add_child(_park_clip)
+	_park_layers = Control.new()
+	_park_layers.size = PARK_MAP.get_size()
+	_park_layers.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_park_clip.add_child(_park_layers)
 	var map := TextureRect.new()
 	map.texture = PARK_MAP
-	map.position = MAP_POS
 	map.size = PARK_MAP.get_size()
-	_park_view.add_child(map)
+	map.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_park_layers.add_child(map)
+	_fog_rect = TextureRect.new()
+	_fog_rect.size = PARK_MAP.get_size()
+	_fog_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_park_layers.add_child(_fog_rect)
 	_park_canvas = Control.new()
 	_park_canvas.position = MAP_POS
 	_park_canvas.size = PARK_MAP.get_size()
+	_park_canvas.clip_contents = true
 	_park_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_park_canvas.draw.connect(_draw_park)
 	_park_view.add_child(_park_canvas)
@@ -1161,3 +1269,366 @@ func _make_note_box() -> StyleBox:
 	box.content_margin_top = 5
 	box.content_margin_bottom = 5
 	return box
+
+
+# ---------------------------------------------------------------- the open-world map
+
+## Looking around (not choosing a trip or a shuttle stop): the cursor, the
+## stamps and tracking are on.
+func _looking() -> bool:
+	return not _travel and _shuttle_from == ""
+
+
+## Redraws the fog picture if more of the park was seen since last time.
+func _refresh_fog() -> void:
+	if _fog_version == MapFog.version and _fog_rect.texture != null:
+		return
+	if _base_image == null:
+		_base_image = PARK_MAP.get_image()
+	_fog_version = MapFog.version
+	_fog_rect.texture = ImageTexture.create_from_image(MapFog.fog_image(_base_image))
+
+
+## Moves the cursor while a direction is held, faster after a moment; once
+## let go, it settles onto the marker it's over.
+func _steer_cursor(delta: float) -> void:
+	var dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if dir == Vector2.ZERO:
+		_cursor_held = 0.0
+		if not _hover.is_empty():
+			var goal := ParkAtlas.geo_to_map(_hover.lonlat, PARK_MAP.get_size())
+			if _cursor_at.distance_to(goal) > 0.05:
+				_cursor_at = _cursor_at.lerp(goal, clampf(delta * 14.0, 0.0, 1.0))
+				_park_marker.queue_redraw()
+		return
+	_cursor_held += delta
+	var speed := CURSOR_SPEED if _cursor_held < 0.45 else CURSOR_FAST
+	_cursor_at = (_cursor_at + dir * speed * delta / float(_zoom)).clamp(Vector2.ZERO, Vector2(PARK_MAP.get_size()) - Vector2.ONE)
+	var before := _hover
+	var pan := _pan
+	_follow_cursor()
+	_hover_nearest()
+	if not _same_marker(before, _hover) or pan != _pan:
+		_refresh()
+	else:
+		_park_marker.queue_redraw()
+
+
+## Zoomed in, the view slides to keep the cursor away from its edges.
+func _follow_cursor() -> void:
+	if _zoom == 1:
+		_pan = Vector2.ZERO
+		return
+	var size := Vector2(PARK_MAP.get_size())
+	var window := size / float(_zoom)
+	var margin := window * 0.25
+	var pan := _pan
+	pan.x = clampf(pan.x, _cursor_at.x - window.x + margin.x, _cursor_at.x - margin.x)
+	pan.y = clampf(pan.y, _cursor_at.y - window.y + margin.y, _cursor_at.y - margin.y)
+	_pan = pan.clamp(Vector2.ZERO, size - window).floor()
+	_park_layers.position = -_pan * float(_zoom)
+
+
+func _set_zoom(zoom: int) -> void:
+	_zoom = zoom
+	_park_layers.scale = Vector2(_zoom, _zoom)
+	if _zoom > 1:
+		# centered on the cursor
+		var window := Vector2(PARK_MAP.get_size()) / float(_zoom)
+		_pan = (_cursor_at - window / 2.0).clamp(Vector2.ZERO, Vector2(PARK_MAP.get_size()) - window).floor()
+	_follow_cursor()
+	_park_layers.position = -_pan * float(_zoom)
+	_hover_nearest()
+	_refresh()
+
+
+## The marker nearest the cursor, if it's close enough (on screen).
+func _hover_nearest() -> void:
+	_build_markers()
+	var at := _view_of(_cursor_at)
+	var best: Dictionary = {}
+	var best_d := HOVER_REACH
+	for marker: Dictionary in _markers:
+		var d := _map_point(marker.lonlat).distance_to(at)
+		# the player's own stamps and the story win a tie
+		if d < best_d - (0.5 if marker.kind in ["stamp", "quest"] else 0.0):
+			best_d = d
+			best = marker
+	_hover = best
+	if _hover.get("kind", "") == "hub":
+		_selected = _hover.id
+
+
+func _same_marker(a: Dictionary, b: Dictionary) -> bool:
+	return a.get("kind", "") == b.get("kind", "") and str(a.get("id", "")) == str(b.get("id", ""))
+
+
+## Everything on the park map the cursor can settle on.
+func _build_markers() -> void:
+	_markers.clear()
+	for hub in ParkAtlas.HUBS:
+		_markers.append({"kind": "hub", "id": hub.id, "label": hub.display_name, "lonlat": Vector2(hub.longitude, hub.latitude), "region": hub.id})
+	for id: String in MapFog.visited:
+		if Park.get_hub(id) != null:
+			continue
+		var entry: Dictionary = MapFog.visited[id]
+		_markers.append({"kind": "area", "id": id, "label": str(entry.name), "lonlat": MapFog._v2(entry.lonlat), "region": id, "hub": str(entry.hub)})
+	for i in MapFog.stamps.size():
+		var stamp: Dictionary = MapFog.stamps[i]
+		_markers.append({"kind": "stamp", "id": "%d" % i, "index": i, "stamp": stamp.kind, "label": MapFog.STAMP_NAMES.get(stamp.kind, "Stamp"), "lonlat": MapFog._v2(stamp.lonlat), "region": ""})
+	for target: Dictionary in _targets:
+		var at := _quest_lonlat(target)
+		if at != Vector2.INF:
+			_markers.append({"kind": "quest", "id": target.quest.id, "label": target.quest.title, "lonlat": at, "region": target.region, "what": target.what})
+	for trailhead: Dictionary in _trailheads():
+		_markers.append(trailhead)
+
+
+## Trailheads you've found, from the Trailheads autoload when the game has
+## one (they're how you travel on foot between them).
+func _trailheads() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var source := get_node_or_null("/root/Trailheads")
+	if source == null or not source.has_method("all"):
+		return out
+	for entry in source.all():
+		if not entry is Dictionary or not entry.has("lonlat"):
+			continue
+		if source.has_method("is_known") and not source.is_known(entry.get("id", "")):
+			continue
+		out.append({"kind": "trailhead", "id": str(entry.get("id", "")), "label": str(entry.get("name", "Trailhead")), "lonlat": MapFog._v2(entry.lonlat), "region": str(entry.get("region", ""))})
+	return out
+
+
+func _look_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var local := _park_canvas.get_local_mouse_position()
+		if not Rect2(Vector2.ZERO, _park_canvas.size).has_point(local):
+			return
+		var before := _hover
+		_cursor_at = local / float(_zoom) + _pan
+		_hover_nearest()
+		if not _hover.is_empty() and _same_marker(before, _hover):
+			_track_hover()
+		_refresh()
+	elif event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		_set_zoom(ZOOM_MAX if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1)
+	elif event.is_action_pressed("assist"):
+		_set_zoom(1 if _zoom > 1 else ZOOM_MAX)
+	elif event.is_action_pressed("use_tool"):
+		if _hover.get("kind", "") == "stamp":
+			MapFog.remove_stamp(int(_hover.index))
+			Sound.play("ui_back", -4.0)
+			_hover_nearest()
+			_refresh()
+		else:
+			_start_pick()
+	elif event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"):
+		if _hover.is_empty():
+			_start_pick()
+		else:
+			_track_hover()
+			_refresh()
+
+
+## Follows what's under the cursor, or stops following it.
+func _track_hover() -> void:
+	var target := {"kind": _hover.kind, "id": str(_hover.id), "label": str(_hover.label), "lonlat": _hover.lonlat, "region": str(_hover.get("region", ""))}
+	var now := MapFog.track(target)
+	Sound.play("ui_select" if now else "ui_back", -4.0)
+
+
+func _start_pick() -> void:
+	if MapFog.stamps.size() >= MapFog.MAX_STAMPS:
+		_desc_label.text = "Your map is full of stamps (%d). Take one up with [%s] first." % [MapFog.MAX_STAMPS, _button("Space")]
+		return
+	_picking = true
+	_refresh()
+
+
+## Choosing a stamp: left and right pick one, [E] puts it down, [Esc] doesn't.
+func _pick_input(event: InputEvent) -> void:
+	if MenuInput.pressed(event, "move_left") or MenuInput.pressed(event, "move_up"):
+		_pick = wrapi(_pick - 1, 0, MapFog.STAMPS.size())
+		_refresh()
+	elif MenuInput.pressed(event, "move_right") or MenuInput.pressed(event, "move_down"):
+		_pick = wrapi(_pick + 1, 0, MapFog.STAMPS.size())
+		_refresh()
+	elif event.is_action_pressed("ui_cancel"):
+		_picking = false
+		_refresh()
+	elif MenuInput.confirm(event):
+		_picking = false
+		if MapFog.add_stamp(MapFog.STAMPS[_pick], _lonlat_of_map(_cursor_at)):
+			Sound.play("ui_select", -4.0)
+		_hover_nearest()
+		_refresh()
+
+
+## The note on the right while looking around: what's under the cursor.
+func _refresh_look_info() -> void:
+	if _tab == Tab.PARK and _hover.is_empty() and _markers.is_empty():
+		_hover_nearest()
+	var kind: String = _hover.get("kind", "")
+	var tracked := not _hover.is_empty() and MapFog.is_tracked({"kind": kind, "id": str(_hover.get("id", "")), "lonlat": _hover.get("lonlat", Vector2.ZERO)})
+	var e_text := "Stamp"
+	if kind != "":
+		e_text = "Stop tracking" if tracked else "Track"
+	var space_text := "Remove" if kind == "stamp" else "Stamp"
+	var zoom_text := "Zoom out" if _zoom > 1 else "Zoom in"
+	_hint_label.text = "[%s] Move   [%s] %s   [%s] %s   [%s] %s\n[%s] Close   [%s] Area" % [_button("Arrows"), _button("E"), e_text, _button("Space"), space_text, _button("Shift"), zoom_text, _button("M"), _button("Tab")]
+	if _picking:
+		var stamp: String = MapFog.STAMPS[_pick]
+		_name_label.text = "Put down a stamp"
+		_sub_label.text = "%s. %d of %d stamps used." % [MapFog.STAMP_NAMES[stamp], MapFog.stamps.size(), MapFog.MAX_STAMPS]
+		_desc_label.text = "Mark a place to come back to: a camp spot, a good hole, a meadow in bloom, a line to climb."
+		_acts_label.text = ""
+		_route_label.text = ""
+		_hint_label.text = "[%s] Choose   [%s] Put it here   [%s] Cancel" % [_button("Arrows"), _button("E"), _button("Esc")]
+		return
+	if kind == "hub":
+		if tracked:
+			_route_label.text += " Tracked."
+		return
+	_acts_label.text = ""
+	_route_label.modulate = GOLD
+	_route_label.text = "Tracked: a pointer on screen leads the way." if tracked else ""
+	match kind:
+		"area":
+			var hub := Park.get_hub(str(_hover.get("hub", "")))
+			_name_label.text = _hover.label
+			_sub_label.text = "Part of %s." % hub.display_name if hub else "An area you've walked."
+			_desc_label.text = "You are here." if _region and _region.region_id == _hover.id else "You've walked here. Track it and a pointer shows the way."
+		"stamp":
+			_name_label.text = _hover.label
+			_sub_label.text = "Your stamp."
+			_desc_label.text = "A place you marked to come back to."
+		"quest":
+			_name_label.text = _hover.label
+			_sub_label.text = "The story's next step." if _hover.what == "main" else "The press book's next step."
+			var where := MapFog.region_name(str(_hover.region))
+			_desc_label.text = "Head for %s." % where if where != "" else "Head this way."
+		"trailhead":
+			_name_label.text = _hover.label
+			_sub_label.text = "A trailhead you've found."
+			_desc_label.text = "Walk up to its sign to set out from here."
+		_:
+			_name_label.text = "Yosemite"
+			_sub_label.text = "%d%% of the park explored." % roundi(MapFog.seen_fraction() * 100.0)
+			_desc_label.text = "The map fills in as you go. Walk, drive and climb; from a high lookout you can see the country all around."
+			_acts_label.text = "Stamps: %d of %d." % [MapFog.stamps.size(), MapFog.MAX_STAMPS]
+			_route_label.text = ""
+
+
+## Areas you've walked, stamps and trailheads, under the hubs' markers.
+func _draw_open_world(canvas: Control) -> void:
+	for marker: Dictionary in _markers:
+		var p := _map_point(marker.lonlat)
+		match marker.kind:
+			"area":
+				canvas.draw_rect(Rect2(p - Vector2(1, 1), Vector2(3, 3)), INK)
+				canvas.draw_rect(Rect2(p, Vector2(1, 1)), AREA_DOT)
+			"trailhead":
+				_draw_trailhead(canvas, p)
+	for marker: Dictionary in _markers:
+		if marker.kind == "stamp":
+			_draw_stamp(canvas, _map_point(marker.lonlat), marker.stamp, 1.0)
+
+
+## The name of what's under the cursor, on a gold plaque above it.
+func _draw_hover_label(canvas: Control) -> void:
+	if _hover.get("kind", "") in ["area", "stamp", "trailhead", "quest"]:
+		var font := canvas.get_theme_default_font()
+		var p := _map_point(_hover.lonlat)
+		var text := str(_hover.label)
+		var width := ceilf(font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x)
+		var at := (p + Vector2(-width / 2.0, -9.0)).floor()
+		at.x = clampf(at.x, 4.0, canvas.size.x - width - 4.0)
+		at.y = clampf(at.y, 10.0, canvas.size.y - 4.0)
+		_plaque(canvas, at + Vector2(-3, -8), Vector2(width + 6.0, 11.0), SIGN_GOLD, SIGN_GOLD_SHADE, SIGN_GOLD_LIGHT, 1.0)
+		canvas.draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, BROWN)
+
+
+## A stamp: a small inked shape, centered on [param at].
+func _draw_stamp(canvas: Control, at: Vector2, kind: String, alpha: float) -> void:
+	var c := at.floor()
+	var fill: Color = STAMP_COLORS.get(kind, GOLD)
+	fill.a = alpha
+	var ink := Color(INK, alpha)
+	canvas.draw_rect(Rect2(c - Vector2(4, 4), Vector2(9, 9)), ink)
+	canvas.draw_rect(Rect2(c - Vector2(3, 3), Vector2(7, 7)), Color(PARCHMENT_LIGHT, alpha))
+	match kind:
+		"star":
+			canvas.draw_rect(Rect2(c + Vector2(0, -2), Vector2(1, 5)), fill)
+			canvas.draw_rect(Rect2(c + Vector2(-2, 0), Vector2(5, 1)), fill)
+			canvas.draw_rect(Rect2(c + Vector2(-1, -1), Vector2(3, 3)), fill)
+		"tent":
+			canvas.draw_colored_polygon(PackedVector2Array([c + Vector2(0.5, -2), c + Vector2(3.5, 3), c + Vector2(-2.5, 3)]), fill)
+			canvas.draw_rect(Rect2(c + Vector2(0, 1), Vector2(1, 2)), ink)
+		"fish":
+			canvas.draw_rect(Rect2(c + Vector2(-2, -1), Vector2(4, 3)), fill)
+			canvas.draw_rect(Rect2(c + Vector2(2, -2), Vector2(1, 1)), fill)
+			canvas.draw_rect(Rect2(c + Vector2(2, 2), Vector2(1, 1)), fill)
+			canvas.draw_rect(Rect2(c + Vector2(-1, 0), Vector2(1, 1)), ink)
+		"flower":
+			canvas.draw_rect(Rect2(c + Vector2(-1, -2), Vector2(3, 1)), fill)
+			canvas.draw_rect(Rect2(c + Vector2(-2, -1), Vector2(5, 1)), fill)
+			canvas.draw_rect(Rect2(c + Vector2(-1, 0), Vector2(3, 1)), fill)
+			canvas.draw_rect(Rect2(c + Vector2(0, -1), Vector2(1, 1)), Color(SIGN_GOLD, alpha))
+			canvas.draw_rect(Rect2(c + Vector2(0, 1), Vector2(1, 2)), Color(KIOSK_GREEN, alpha))
+		"climb":
+			canvas.draw_colored_polygon(PackedVector2Array([c + Vector2(-3, 3), c + Vector2(0, -3), c + Vector2(1, -3), c + Vector2(4, 3)]), Color(fill.darkened(0.25), alpha))
+			canvas.draw_rect(Rect2(c + Vector2(0, -3), Vector2(1, 2)), Color(CREAM, alpha))
+
+
+## A trailhead you've found: a little brown signpost.
+func _draw_trailhead(canvas: Control, at: Vector2) -> void:
+	var c := at.floor()
+	canvas.draw_rect(Rect2(c + Vector2(-3, -4), Vector2(7, 4)), INK)
+	canvas.draw_rect(Rect2(c + Vector2(-2, -3), Vector2(5, 2)), WOOD_LIGHT)
+	canvas.draw_rect(Rect2(c + Vector2(-1, 0), Vector2(3, 3)), INK)
+	canvas.draw_rect(Rect2(c + Vector2(0, 0), Vector2(1, 2)), WOOD_MID)
+
+
+## A cream ring that pulses round whatever is being tracked.
+func _draw_tracked_ring(canvas: Control) -> void:
+	if MapFog.tracked.is_empty():
+		return
+	var p := _map_point(MapFog._v2(MapFog.tracked.lonlat))
+	var r := 7.0 + float(_pin_phase % 2)
+	canvas.draw_arc(p, r + 1.0, 0.0, TAU, 20, Color(INK, 0.8), 1.0)
+	canvas.draw_arc(p, r, 0.0, TAU, 20, TRACK_RING, 1.0)
+
+
+## The look-around cursor: a small cross of corner ticks, gold when it's on
+## something.
+func _draw_cursor(canvas: Control) -> void:
+	if _tab != Tab.PARK:
+		return
+	var c := _view_of(_cursor_at).floor()
+	var color := SIGN_GOLD if not _hover.is_empty() else CREAM
+	var s := 5.0 if _hover.is_empty() else 6.0 + float(_pin_phase % 2)
+	for corner: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
+		var o := c + corner * s
+		var h := Rect2(Vector2(minf(o.x, o.x - corner.x * 2.0), o.y), Vector2(3, 1))
+		var v := Rect2(Vector2(o.x, minf(o.y, o.y - corner.y * 2.0)), Vector2(1, 3))
+		canvas.draw_rect(h.grow(1.0), Color(INK, 0.85))
+		canvas.draw_rect(v.grow(1.0), Color(INK, 0.85))
+		canvas.draw_rect(h, color)
+		canvas.draw_rect(v, color)
+	if _hover.is_empty():
+		canvas.draw_rect(Rect2(c, Vector2(1, 1)), color)
+
+
+## The row of stamps to choose from, just above the cursor.
+func _draw_picker(canvas: Control) -> void:
+	var count := MapFog.STAMPS.size()
+	var width := count * 12.0 + 4.0
+	var at := (_view_of(_cursor_at) + Vector2(-width / 2.0, -26.0)).floor()
+	at = at.clamp(Vector2(2, 2), canvas.size - Vector2(width + 2.0, 18.0))
+	_plaque(canvas, at, Vector2(width, 16.0), WOOD_MID, WOOD_SHADE, WOOD_LIGHT, 1.0)
+	for i in count:
+		var c := at + Vector2(8.0 + i * 12.0, 7.0)
+		if i == _pick:
+			canvas.draw_rect(Rect2(c - Vector2(6, 6), Vector2(13, 13)), SIGN_GOLD, false, 1.0)
+		_draw_stamp(canvas, c, MapFog.STAMPS[i], 1.0)
