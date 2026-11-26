@@ -115,7 +115,7 @@ func _climb_verb(verb: StringName, pressed: bool) -> bool:
 				current.handle(&"rope", true)
 			return true
 		&"rack":
-			if session.sys.gear.placeable().is_empty():
+			if not session.sys.gear.can_rack():
 				return false
 			go(&"place")
 			return true

@@ -93,7 +93,7 @@ Phases: `read -> climb <-> clip / place / fall / special -> belay -> (next
 pitch) ... -> result`. The director owns the table (`ClimbDirector.PHASES`)
 and passes input verbs to the current phase (`ClimbPhase.handle`). In the
 climb phase the director answers `rope`, `rack`, `rest`, `eat` and `cancel`
-itself (clip the nearest piece, open the rack at a crack, shake out, eat, a
+itself (clip the nearest piece, open the rack when `gear.can_rack()`, shake out, eat, a
 double cancel retreats) and passes the rest (`aim_*`, `commit`, `body`,
 `swap`) to body's climb phase.
 

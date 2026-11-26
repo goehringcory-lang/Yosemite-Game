@@ -305,6 +305,7 @@ func test_crux_contract() -> void:
 	m.crux_risk = 0.4
 	s.sys.falls.risk(m)
 	check(absf(m.risk - 0.4) < 0.0001, "falls adds a move's crux risk")
+	check(s.sys.gear.can_rack() == not s.sys.gear.placeable().is_empty() and s.sys.gear.grade_for(V2Piece.new()).is_empty(), "gear's can_rack and grade_for default sensibly")
 	d.hang_at(Vector2(4, 5), PackedStringArray(["aiders"]))
 	check(s.pose.hip == Vector2(4, 5) and s.pose.tags.has("hang") and s.pose.tags.has("aiders"), "hang_at hangs the climber with tags")
 	d.count_aid(2)
