@@ -435,10 +435,10 @@ y_sort_enabled = true
 
 [node name="MistTrail" parent="Entities" unique_id=30927176 instance=ExtResource("5_cgljf")]
 position = Vector2(1808, 448)
-label = "Mist Trail and Panorama Trail, up to Glacier Point"
-target_region = "glacier_point"
-target_spawn = "panorama_trailhead"
-minutes = 300
+label = "Mist Trail, up past Vernal and Nevada Falls"
+target_region = "illilouette"
+target_spawn = "nevada_fall_top"
+minutes = 150
 closure = "mist_trail"
 needs_hub = "glacier_point"
 locked_text = "The Mist Trail climbs past Vernal and Nevada Falls, and the Panorama Trail runs on along the rim to Glacier Point. The rim is still ahead of you: climb the Glacier Point Apron first, and the way up opens."

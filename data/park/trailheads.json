@@ -24,6 +24,7 @@
 		{"id":"tenaya_beach","kind":"parking","lonlat":[-119.44888,37.83105],"name":"Tenaya Lake East Beach","node":"Travel_East_Beach","pos":[2960.0,1088.0],"region":"tenaya_lake","spawn":"arrival"},
 		{"id":"tuolumne_vc","kind":"parking","lonlat":[-119.36532,37.87267],"name":"Tuolumne Meadows Visitor Center","node":"Travel_Visitor_Center_Parking","pos":[1168.0,1600.0],"region":"tuolumne_meadows","spawn":"arrival"},
 		{"id":"dog_lake","kind":"parking","lonlat":[-119.35124,37.87638],"name":"Dog Lake and Lembert Dome Parking","node":"Travel_Dog_Lake_Parking","pos":[3856.0,704.0],"region":"tuolumne_meadows","spawn":"lembert_dome"},
-		{"id":"cathedral_lakes","kind":"trailhead","lonlat":[-119.42306,37.83904],"name":"Cathedral Lakes","pos":[952.0,1256.0],"region":"cathedral_lakes","spawn":"lower_lake"}
+		{"id":"cathedral_lakes","kind":"trailhead","lonlat":[-119.42306,37.83904],"name":"Cathedral Lakes","pos":[952.0,1256.0],"region":"cathedral_lakes","spawn":"lower_lake"},
+		{"id":"glen_aulin","kind":"campground","lonlat":[-119.42137,37.91142],"name":"Glen Aulin High Sierra Camp","pos":[1720.0,680.0],"region":"glen_aulin","spawn":"camp"}
 	]
 }

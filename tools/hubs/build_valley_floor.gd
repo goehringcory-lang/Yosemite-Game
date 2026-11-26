@@ -519,7 +519,7 @@ func _four_mile_trailhead() -> void:
 	paint_ground()
 	_save_ground_art("ground_four_mile_trailhead", 1872)
 	_place_wall("sentinel", 103, fall_x * T + T / 2, 9, "SentinelFall")
-	_trail_door("FourMileTrail", foot(32, _foot_of_wall(32)), "Four Mile Trail, up to Glacier Point", "glacier_point", "four_mile_trailhead", 180,
+	_trail_door("FourMileTrail", foot(32, _foot_of_wall(32)), "Four Mile Trail, up the switchbacks toward Glacier Point", "union_point", "switchbacks_top", 120,
 		"four_mile_trail", "The Four Mile Trail climbs 3,200 feet in switchbacks up the wall to Glacier Point. The rim is still ahead of you: climb the Glacier Point Apron first, and the way up opens.")
 	_info_sign("FourMileSign", foot(28, 18), "Four Mile Trail",
 		"Up to Glacier Point in switchbacks along the wall, past Union Point: 4.8 miles and 3,200 feet of climbing. The toll trail built in 1872 was four miles, and the name stuck.")
@@ -934,7 +934,7 @@ func _happy_isles() -> void:
 	paint_ground()
 	_save_ground_art("ground_happy_isles", 1915)
 	_place_wall("happy_isles", 108)
-	_trail_door("MistTrail", foot(56, 13), "Mist Trail and Panorama Trail, up to Glacier Point", "glacier_point", "panorama_trailhead", 300,
+	_trail_door("MistTrail", foot(56, 13), "Mist Trail, up past Vernal and Nevada Falls", "illilouette", "nevada_fall_top", 150,
 		"mist_trail", "The Mist Trail climbs past Vernal and Nevada Falls, and the Panorama Trail runs on along the rim to Glacier Point. The rim is still ahead of you: climb the Glacier Point Apron first, and the way up opens.")
 	_info_sign("HappyIslesSign", foot(24, 36), "Happy Isles",
 		"The John Muir Trail starts here and runs about 211 miles to the summit of Mount Whitney.")

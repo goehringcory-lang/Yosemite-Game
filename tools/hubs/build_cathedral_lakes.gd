@@ -55,13 +55,13 @@ func _cathedral_layout() -> void:
 	_water(STREAM, 1, Terrain.CREEK, 0.25)
 	_bridge(52, 31, 35, 2)
 	# John Muir Trail north-south, plus loops to Lower shore, Upper shore, camp, and Pass Overlook.
-	_path([Vector2(30, 4), Vector2(30, 14), Vector2(44, 18), Vector2(52, 26), Vector2(52, 42), Vector2(54, 52), Vector2(54, 61)], 1, Terrain.TRAIL, 0.3)
+	_path([Vector2(30, -1), Vector2(30, 14), Vector2(44, 18), Vector2(52, 26), Vector2(52, 42), Vector2(54, 52), Vector2(54, 61)], 1, Terrain.TRAIL, 0.3)
 	_path([Vector2(44, 18), Vector2(34, 20), Vector2(22, 20)], 1, Terrain.TRAIL, 0.25)
 	_path([Vector2(52, 26), Vector2(62, 20), Vector2(72, 17)], 1, Terrain.TRAIL, 0.25)
 	_path([Vector2(52, 40), Vector2(34, 41), Vector2(18, 45), Vector2(14, 48)], 1, Terrain.TRAIL, 0.3)
 	_path([Vector2(52, 40), Vector2(70, 38), Vector2(82, 35)], 1, Terrain.TRAIL, 0.3)
 	_mark_open()
-	clear_trees(24, 2, 37, 15) # North JMT pass
+	clear_trees(24, 0, 37, 15) # North JMT pass
 	clear_trees(46, 44, 63, 62) # Cathedral Pass Overlook & South JMT trailhead
 	clear_trees(10, 43, 20, 53) # Backcountry camp clearing
 	clear_trees(14, 19, 44, 39) # Lower Lake shore
@@ -122,10 +122,10 @@ func _place_cathedral_features() -> void:
 
 
 func _place_trails_cathedral() -> void:
-	# North down the JMT to Tuolumne Meadows (Cathedral Lakes Trailhead).
-	_trail_door("JMTNorth", foot(30, 5),
-		"John Muir Trail, north down to Tuolumne Meadows",
-		"tuolumne_meadows", "cathedral_lakes_trailhead", 75, "tioga_road")
+	# North down the JMT to Tuolumne Meadows, which lies beside this map's
+	# north edge (a seam, scripts/world/seam.gd): walk straight on, no trip.
+	region_exit("JMTNorth", tile_pos(30, 0), Vector2(64, 16),
+		"John Muir Trail, down to Tuolumne Meadows", "tuolumne_meadows", "cathedral_lakes_trail")
 	# South over Cathedral Pass to Tenaya Lake (Sunrise Lakes Trailhead).
 	_trail_door("JMTSouth", foot(54, 60),
 		"John Muir Trail, south over Cathedral Pass to Tenaya Lake",

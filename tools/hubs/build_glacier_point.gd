@@ -179,6 +179,8 @@ func _layout() -> void:
 	# Trails.
 	_path([Vector2(39, 37), Vector2(34, 27), Vector2(26, 20), Vector2(14, 19), Vector2(2, 19)], 1, Terrain.TRAIL, 0.4) # Four Mile
 	_path([Vector2(62, 32), Vector2(70, 39), Vector2(78, 42), Vector2(83, 42)], 1, Terrain.TRAIL, 0.3) # Panorama
+	# ... and on south across the road, off the south edge into Illilouette Gorge
+	_path([Vector2(83, 42), Vector2(85, 50), Vector2(86, 58), Vector2(87, 66), Vector2(88, H - 1)], 1, Terrain.TRAIL, 0.3)
 	_path([Vector2(40, 38), Vector2(32, 36), Vector2(26, 44), Vector2(22, 47)], 1, Terrain.TRAIL, 0.4) # Pohono, to the dome
 	_path([Vector2(40, 66), Vector2(33, 62), Vector2(26, 57), Vector2(21, 53)], 1, Terrain.TRAIL, 0.4) # Sentinel Dome trail
 	_path([Vector2(10, 52), Vector2(2, 54)], 1, Terrain.TRAIL, 0.4) # Pohono, on west to Taft Point
@@ -325,7 +327,11 @@ func _place_lot() -> void:
 	_info_sign("WashburnSign", foot(96, 56), "Washburn Point",
 		"The best view of Vernal and Nevada Falls, one above the other on the Merced, with Liberty Cap beside Nevada Fall and Half Dome in profile above. Illilouette Fall drops into its gorge to the right.")
 	instance_scene("res://scenes/objects/travel_point.tscn", foot(43, 65), "Travel_SentinelDomeTrailhead").set("label", "Sentinel Dome Trailhead")
-	region_exit("GlacierPointRoad", tile_pos(37, H - 1), Vector2(48, 16), "Glacier Point Road", "", "").set("travel_to", "yosemite_valley")
+	# The road walks on south into Bridalveil Creek (build_bridalveil_creek.gd),
+	# with no fade; the drive back to the Valley leaves from there, or from the
+	# lot's travel point.
+	region_exit("GlacierPointRoad", tile_pos(37, H - 0.5), Vector2(48, 16), "Glacier Point Road, south to Bridalveil Creek",
+		"bridalveil_creek", "north")
 
 
 ## A building with its windows lit after dark.
@@ -348,8 +354,14 @@ func _trail_door(node_name: String, at_pos: Vector2, label: String, target_regio
 func _place_rim_trails() -> void:
 	# No winter closure from the top: a climber who tops out the Apron before
 	# the road opens can always walk down.
-	_trail_door("FourMileTrail", foot(3, 19), "Four Mile Trail, down to the Valley", "four_mile_trailhead", "four_mile_trail", 120)
-	_trail_door("PanoramaTrail", foot(83, 42), "Panorama Trail, down to Happy Isles", "happy_isles", "panorama", 240)
+	# The Four Mile Trail and the Pohono Trail walk straight on west, over the
+	# map edge, into Union Point (build_union_point.gd) and Taft Point
+	# (build_taft_point.gd), with no fade.
+	region_exit("FourMileTrailWest", tile_pos(-0.5, 19), Vector2(12, 48), "Four Mile Trail, down to the Valley", "union_point", "east")
+	region_exit("PohonoTrailWest", tile_pos(-0.5, 54), Vector2(12, 48), "Pohono Trail, west to Taft Point", "taft_point", "east")
+	# The Panorama Trail walks on south into Illilouette Gorge (build_illilouette.gd).
+	region_exit("PanoramaTrailSouth", tile_pos(88, H - 0.5), Vector2(48, 12), "Panorama Trail, down past Illilouette Fall",
+		"illilouette", "north")
 	# The Ledge Trail tops out by the Mountain House footings (Curry Village's
 	# end opens once you've climbed the Apron).
 	_trail_door("LedgeTrail", foot(73, 26), "Ledge Trail, down to Curry Village", "curry_village", "ledge_trailhead", 120)
@@ -386,6 +398,8 @@ func _place_markers_and_places() -> void:
 	marker("panorama_trailhead", 81, 42)
 	marker("ledge_trail_top", 72, 27)
 	marker("road_south", 37, 74)
+	marker("pohono_west", 3, 54)
+	marker("panorama_south", 88, 74)
 	place("Glacier Point", 63, 9, 9)
 	place("Overhanging Rock", 55, 8, 2, false)
 	place("Geology Hut", 70, 18, 3)

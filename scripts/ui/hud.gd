@@ -459,6 +459,9 @@ func _update_prompt() -> void:
 	# gift to, the line without the gift and then with it.
 	if prompt_label.text != text:
 		prompt_label.text = text
+		# its buttons' width this frame, so the clamp below keeps it all on screen
+		if prompt_label is ButtonHints:
+			(prompt_label as ButtonHints).fit_now()
 		prompt_panel.size = Vector2.ZERO
 	var screen := UiScale.from_view(_player.get_global_transform_with_canvas().origin)
 	# Above whichever head is higher, so it never covers the person you face.

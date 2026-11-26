@@ -165,8 +165,9 @@ func _place_roads_tenaya() -> void:
 	var west := _exits.get_node("TiogaRoadWest")
 	west.set("stop_region", "crane_flat")
 	west.set("stop_spawn", "east")
-	# East, on along the lake to Tuolumne Meadows: the same high country.
-	_long_road("TiogaRoadEast", tile_pos(99.5, 37.5), Vector2(12, 48), "Tioga Road, to Tuolumne Meadows", "tuolumne_meadows", "west", 15, 8.1)
+	# East, on along the lake to Tuolumne Meadows: the same high country, laid
+	# beside this map at the road (a seam), so you walk on with no trip.
+	region_exit("TiogaRoadEast", tile_pos(99.5, 37.5), Vector2(12, 48), "Tioga Road, to Tuolumne Meadows", "tuolumne_meadows", "west")
 
 
 func _place_markers_tenaya() -> void:
