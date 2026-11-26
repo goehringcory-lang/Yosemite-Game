@@ -14,6 +14,8 @@ const PAIRS := [
 	["tenaya_creek", "ToMirrorLake"], ["mirror_lake", "ToCrowsCamp"],
 	["ahwahnee_meadow", "ToAhwahnee"], ["the_ahwahnee", "ToStonemanBridge"],
 	["ahwahnee_trail", "ToHomestead"],
+	["glacier_point", "FourMileTrailWest"], ["glacier_point", "PohonoTrailWest"],
+	["glacier_point", "PanoramaTrailSouth"], ["glacier_point", "GlacierPointRoad"],
 ]
 
 

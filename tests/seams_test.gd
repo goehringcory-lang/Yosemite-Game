@@ -31,6 +31,14 @@ const SEAMS := {
 	"the_ahwahnee": ["ToStonemanBridge", "NorthsideDriveWest"],
 	"ahwahnee_trail": ["ToHomestead", "ToAhwahnee"],
 	"lamon_homestead": ["ToCurryVillage", "NorthToAhwahnee"],
+	# The south rim: Glacier Point walks on west into Union Point (the Four
+	# Mile Trail) and Taft Point (the Pohono Trail), and south into
+	# Illilouette Gorge (the Panorama Trail) and Bridalveil Creek (the road).
+	"glacier_point": ["FourMileTrailWest", "PohonoTrailWest", "PanoramaTrailSouth", "GlacierPointRoad"],
+	"union_point": ["FourMileTrailEast"],
+	"taft_point": ["PohonoTrailEast"],
+	"illilouette": ["PanoramaNorth"],
+	"bridalveil_creek": ["GlacierPointRoadNorth"],
 }
 
 var failures := 0

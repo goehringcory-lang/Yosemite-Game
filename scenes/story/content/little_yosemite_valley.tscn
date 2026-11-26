@@ -11,3 +11,10 @@ target_region = "tenaya_lake"
 target_spawn = "sunrise_trailhead"
 minutes = 180
 closure = "tioga_road"
+
+[node name="PanoramaTrailWest" parent="." instance=ExtResource("1_door")]
+position = Vector2(176, 800)
+label = "Panorama Trail, past the top of Nevada Fall to Illilouette Gorge"
+target_region = "illilouette"
+target_spawn = "nevada_fall_top"
+minutes = 20
