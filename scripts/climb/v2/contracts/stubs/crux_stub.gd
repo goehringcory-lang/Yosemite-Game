@@ -61,18 +61,21 @@ func phases() -> Dictionary:
 
 class SpecialPhase extends ClimbPhase:
 	var kind: StringName = &""
+	var at_belay := false
 
 	func enter(p_director: ClimbDirector, args := {}) -> void:
 		director = p_director
 		name = &"special"
 		kind = args.get("kind", &"")
+		at_belay = bool(args.get("belay", false))
 		director.session.bus.send(&"special_started", [kind])
 
 	func handle(verb: StringName, pressed: bool) -> bool:
 		if pressed and verb == &"commit":
 			director.spend(director.session.sys.effort.price_action(&"special"))
+			director.session.bus.send(&"special_step", [kind, {}])
 			director.session.bus.send(&"special_finished", [kind, true])
-			director.go(&"climb")
+			director.go(&"belay" if at_belay else &"climb")
 			return true
 		return false
 
