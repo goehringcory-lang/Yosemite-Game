@@ -109,7 +109,7 @@ func _fixed(p: V2Piece) -> void:
 		_:
 			_hanger(at)
 	if p.clipped:
-		_draw_hanging(at + Vector2(0, 3) if p.kind != &"anchor" else at + Vector2(0, 16), p.back_clipped)
+		_draw_hanging(at + Vector2(0, 3) if p.kind != &"anchor" else at + Vector2(0, 16), _rope_px(p), p.back_clipped)
 
 
 func _hanger(at: Vector2) -> void:
@@ -118,12 +118,19 @@ func _hanger(at: Vector2) -> void:
 	draw_rect(Rect2(at + Vector2(0, 0), Vector2(1, 2)), STEEL_DARK)
 
 
-## A quickdraw hanging from [param at]: top biner, dogbone, rope biner. A
-## back-clipped one hangs twisted (its gate shows the wrong way).
-func _draw_hanging(at: Vector2, back: bool) -> void:
-	draw_arc(at + Vector2(0, 2), 2.0, 0, TAU, 8, STEEL, 1.0)
-	draw_rect(Rect2(at + Vector2(-1, 4), Vector2(3, 7)), DRAW_SLING)
-	var bottom := at + Vector2(0, 13)
+## Where the rope runs through a clipped piece: sling_m below it, the spot
+## thread 9's climber draws the rope through.
+func _rope_px(p: V2Piece) -> Vector2:
+	return _px(p.pos - Vector2(0, p.sling_m))
+
+
+## A quickdraw hanging from [param at]: top biner, dogbone, and the rope
+## biner centred where the rope runs ([param rope]). A back-clipped one
+## hangs twisted (its gate shows the wrong way).
+func _draw_hanging(at: Vector2, rope: Vector2, back: bool) -> void:
+	var bottom := Vector2(at.x, maxf(rope.y, at.y + 6.0))
+	draw_arc(at + Vector2(0, 1), 1.5, 0, TAU, 8, STEEL, 1.0)
+	draw_rect(Rect2(at + Vector2(-1, 2), Vector2(3, maxf(bottom.y - at.y - 4.0, 1.0))), DRAW_SLING)
 	draw_arc(bottom, 2.5, 0, TAU, 8, STEEL, 1.0)
 	draw_line(bottom + Vector2(2 if not back else -2, -2), bottom + Vector2(2 if not back else -2, 2), STEEL_DARK, 1.0)
 
@@ -148,4 +155,4 @@ func _placed(p: V2Piece) -> void:
 		_:
 			_hanger(at)
 	if p.clipped:
-		_draw_hanging(at + Vector2(0, 10), p.back_clipped)
+		_draw_hanging(at + Vector2(0, 6), _rope_px(p), p.back_clipped)
