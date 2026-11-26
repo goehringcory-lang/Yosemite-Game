@@ -163,10 +163,11 @@ func _check_hetch_hetchy(world: Node) -> void:
 	GameClock.minutes = 9 * 60
 	await world.go_to_region("crane_flat", "arrival")
 	await _settle(world)
-	var road: RegionDoor = world.region.entities.get_node_or_null("HetchHetchyRoad")
-	check(road != null and road.target_region == "hetch_hetchy" and road.closure == "",
-		"Crane Flat has year-round HetchHetchyRoad to Hetch Hetchy")
-	road.interact(world.player)
+	# Evergreen Road leaves Big Oak Flat Road west of Crane Flat, by the entrance.
+	var road: RegionExit = world.region.find_child("BigOakFlatRoadWest", true, false)
+	check(road != null and road.target_region == "hetch_hetchy" and road.minutes > 0,
+		"Crane Flat's road west drives on to Hetch Hetchy, all year")
+	world.use_exit(road)
 	await _wait_region(world, "hetch_hetchy")
 	check(world.region.region_id == "hetch_hetchy", "Hetch Hetchy can be visited in winter")
 	check(world.region.entities.get_node_or_null("HetchHetchyViewer") is ScenicViewer, "Hetch Hetchy has its dam scenic viewer")
