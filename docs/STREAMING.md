@@ -56,6 +56,28 @@ lose its `minutes` (they move onto the corridor's `walk_minutes`).
 Keep the trip map (`minutes` > 0 exits, `drive_to`) for drives: driving the
 Tioga Road isn't walked.
 
+### Building a corridor
+
+`tools/hubs/build_corridor.gd` makes a corridor area from a spec,
+`tools/hubs/corridors/<id>.json` (the format is at the top of that file): its
+size, ground (forest, fir, subalpine, granite, meadow, foothill), a trail or
+road winding between its ends, optional clearings and signs, and
+`walk_minutes`. Each end gets a minutes-0 exit on its map edge and a marker
+named for its side (`west`, `east`, `north`, `south`) just inside, so:
+
+1. Write the spec, with each end's `target_region` and `target_spawn` (a
+   spot just inside the neighbor's facing edge).
+2. `tools/hubs/rebuild_corridors.sh <id>`: builds it onto the 32px grid
+   with painted ground, wild dressing, normal maps and water cells.
+3. In each neighbor, put a minutes-0 `RegionExit` on the facing edge with
+   `target_region` = the corridor and `target_spawn` = the side's marker
+   (a corridor's west end is entered from its west neighbor's east edge).
+4. Run `tests/stream_test.tscn`; it says which end doesn't line up, and why.
+   Nudge a painted road into line with `data/park/seam_nudges/<id>.json`.
+5. Dress it by hand like any area (signs, a viewpoint, a camp): it's an
+   ordinary region scene. Rebuilding rewrites it, so keep the spec current
+   or stop rebuilding once you hand-edit.
+
 ## WorldStream: what's laid out, and where
 
 `World.stream` (`scripts/world/world_stream.gd`) is the face of streaming for
