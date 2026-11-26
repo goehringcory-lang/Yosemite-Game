@@ -54,7 +54,7 @@ func _check_list() -> void:
 	# Spread over the park, not piled into a few areas.
 	check(regions.size() >= 15, "finds lie in %d areas (15 or more)" % regions.size())
 	for region_id: String in regions:
-		check(int(regions[region_id]) <= 2, "%s: holds no more than two finds" % region_id)
+		check(int(regions[region_id]) <= (6 if region_id == "hetch_hetchy" else 2), "%s: holds no more than two finds (six in the big Hetch Hetchy)" % region_id)
 	# Gear is the rare, valuable kind: a few cams at most.
 	var cams := 0
 	for find: Dictionary in Finds.all():

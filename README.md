@@ -482,6 +482,15 @@ The hubs down the roads out of the Valley are hand-made too, in the same Ahwahne
 
 - `tests/travel_test` drives the whole Tioga Road: Crane Flat to Tenaya Lake, on to Tuolumne, back, and shut in winter (with `Park.open_world` off).
 
+**Hetch Hetchy** (`tools/hubs/build_hetch_hetchy.gd`, rebuilt by `tools/hubs/rebuild_hetch_hetchy.sh`), at 3,800 feet in the park's northwest corner, open all year: Evergreen Road and Hetch Hetchy Road off Big Oak Flat Road, 35 min from Crane Flat. The canyon's north wall is at the top, the reservoir along the middle and Kolana Rock's shore across it at the bottom, out of reach. West to east:
+
+- **The road in**: the Hetch Hetchy entrance station (open daylight hours only; no boats, swimming or wading, since the reservoir is drinking water), the dam parking lot and its map kiosk, and picnic tables.
+- **O'Shaughnessy Dam** (1923, raised 1938): a walkway between the reservoir and a drop into the Tuolumne gorge, painted below the lip by `tools/hubs/hetch_hetchy_gorge.py` and shown with the vista shader, with the outlet jets spraying out of the dam's foot. The viewer on the crest looks east up the canyon.
+- **The Wapama tunnel** through the granite at the dam's north end: the trail's only way east. Its rock (`tools/hubs/hetch_hetchy_tunnel.py`, hung by `scenes/story/dressing/hetch_hetchy.tscn`) thins to see-through while you walk under it (`TunnelRoof`), with lamps lit at night.
+- **The north-wall trail** past Tueeulala Fall (dry from late summer until the fall storms; `SeasonalFalls.NAMED_KINDS`), over Wapama Falls' footbridge (a ribbon by late summer but never dry), Kolana Overlook (shore fishing for rainbows and browns), and the Rancheria Falls trailhead.
+- **Rancheria Falls** at the east end: granite steps and pools (creek fishing), a footbridge, and the backcountry camp in the pines.
+- **People and things to do**: a wilderness ranger, a shore angler and a backpacker; John Muir's quest "The Valley Under the Water" (stand at Kolana Overlook at dusk, `HetchyVigil`); a summer heat call on the Rancheria trail for search and rescue; happenings (a winter bald eagle, a shore angler, a rattlesnake on the trail, snowmelt at Wapama, a question about the dam); and six hidden finds, among them a Hetch Hetchy Railroad spike and a rivet from the 1938 raise.
+
 **Tuolumne Meadows** (`tools/hubs/build_tuolumne.gd`), north at the top, at 8,600 feet:
 
 - **The meadow**, one of the largest in the Sierra, painted as a sedge meadow in midsummer rather than a lawn: fine upright blades over low hummocks, an olive green with tawny drifts on the drier rises, a few shooting stars, lupine, buttercups and yampah, and now and then a Belding's ground squirrel burrow. The wet patches are darker, with low willows, corn lilies and small pools of snowmelt, and glacial erratics lie in the grass.

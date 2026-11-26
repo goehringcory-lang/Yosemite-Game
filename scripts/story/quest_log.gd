@@ -118,6 +118,8 @@ const QUESTS: Array[QuestData] = [
 	preload("res://data/quests/matthes_glacial_erratic.tres"),
 	preload("res://data/quests/bellamy_first_bloom.tres"),
 	preload("res://data/quests/bellamy_winter_train.tres"),
+	# Hetch Hetchy: Muir's lost valley, seen from Kolana Overlook at dusk.
+	preload("res://data/quests/muir_valley_under_water.tres"),
 ]
 
 const CHARACTERS: Array[CharacterData] = [

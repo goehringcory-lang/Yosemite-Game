@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Rebuilds Taft Point, Cathedral Lakes, and Hetch Hetchy onto the 32px grid:
+# Rebuilds Taft Point and Cathedral Lakes onto the 32px grid (Hetch Hetchy
+# has its own: tools/hubs/rebuild_hetch_hetchy.sh):
 # runs their 16px builders, upgrades their generated PNGs, migrates the scenes
 # to 32px, restores shared art untouched, paints native 32px ground with
 # tools/art32/ground32/paint.py, dresses wild ground clutter, generates normal
@@ -17,21 +18,16 @@ sleep 1
 
 "$GODOT" --headless --path . res://tools/hubs/build_taft_point.tscn
 "$GODOT" --headless --path . res://tools/hubs/build_cathedral_lakes.tscn
-"$GODOT" --headless --path . res://tools/hubs/build_hetch_hetchy.tscn
 
 mine=(
 	assets/sprites/ahwahnee/ground_taft_point.png
 	assets/sprites/valley/taft_point_wall.png
 	assets/sprites/ahwahnee/ground_cathedral_lakes.png
 	assets/sprites/valley/cathedral_lakes_wall.png
-	assets/sprites/ahwahnee/ground_hetch_hetchy.png
-	assets/sprites/valley/hetch_hetchy_wall.png
-	assets/sprites/valley/hetch_hetchy_fall_*.png
-	assets/sprites/valley/hetch_hetchy_mist_*.png
 )
 mapfile -t fresh < <(find assets -name '*.png' -newer "$stamp")
 "$PYTHON" tools/art32/upgrade.py --fresh "${mine[@]}"
-for scene in scenes/regions/taft_point.tscn scenes/regions/cathedral_lakes.tscn scenes/regions/hetch_hetchy.tscn; do
+for scene in scenes/regions/taft_point.tscn scenes/regions/cathedral_lakes.tscn; do
 	"$PYTHON" tools/art32/migrate_built.py "$scene" --fresh "${mine[@]}"
 done
 
@@ -43,11 +39,11 @@ done
 "$GODOT" --headless --path . --import > /dev/null 2>&1 || true
 
 # Paint native 32px ground for all three regions.
-"$GODOT" --headless --path . res://tools/art32/ground32/dump.tscn -- "$tmp/dump" taft_point cathedral_lakes hetch_hetchy
-"$PYTHON" tools/art32/ground32/paint.py "$tmp/dump" taft_point cathedral_lakes hetch_hetchy
+"$GODOT" --headless --path . res://tools/art32/ground32/dump.tscn -- "$tmp/dump" taft_point cathedral_lakes
+"$PYTHON" tools/art32/ground32/paint.py "$tmp/dump" taft_point cathedral_lakes
 
 # Dress wild ground clutter.
-"$GODOT" --headless --path . res://tools/hubs/dress_wilds.tscn -- taft_point cathedral_lakes hetch_hetchy
+"$GODOT" --headless --path . res://tools/hubs/dress_wilds.tscn -- taft_point cathedral_lakes
 
 # Paint normal maps for all generated region art.
 "$PYTHON" tools/normals/normals.py "${mine[@]}"
@@ -60,7 +56,6 @@ import json, sys
 keys = [
 	"res://assets/sprites/ahwahnee/ground_taft_point.png",
 	"res://assets/sprites/ahwahnee/ground_cathedral_lakes.png",
-	"res://assets/sprites/ahwahnee/ground_hetch_hetchy.png",
 ]
 new = json.load(open("data/park/water_cells.json"))
 old = json.load(open(sys.argv[1]))

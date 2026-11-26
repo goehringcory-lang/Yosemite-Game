@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/character_data.gd" id="1_s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/visitor_angler.png" id="2_sprite"]
+
+[resource]
+script = ExtResource("1_s")
+id = "hetchy_angler"
+display_name = "Shore Angler"
+years = "1970s"
+affiliation = "Park visitor"
+bio = "An everyday visitor fishing the Hetch Hetchy shoreline. Not a historical figure."
+idle_lines = PackedStringArray("Shore fishing only here. No boats, no swimming. This lake is San Francisco's drinking water, and they mean it.", "The rainbows are shy in the afternoon heat. I'll try again when the cliffs shade the water.", "You can see Wapama Falls from here and Tueeulala beside it. Not a bad view while the bobber sits.", "Hot afternoons out here, and the rocks hold it. Bring more water than you think.", "Watch the warm rocks on the trail. Rattlesnakes like them too.")
+sprite_sheet = ExtResource("2_sprite")
+home = "Hetch Hetchy"
+visitor = true
+sources = "Invented for the game. Hetch Hetchy Reservoir supplies San Francisco's drinking water: shore fishing is allowed with a California license, and boating and swimming are not."

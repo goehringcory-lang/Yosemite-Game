@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/story/quest_data.gd" id="1_s"]
+
+[resource]
+script = ExtResource("1_s")
+id = "muir_valley_under_water"
+title = "The Valley Under the Water"
+giver = "john_muir"
+requires = PackedStringArray("muir_cathedral")
+intro = PackedStringArray("There is a second Yosemite north of here, in the canyon of the Tuolumne. Hetch Hetchy. Same granite walls, same waterfalls, a meadow floor as flat as a table.", "I fought to keep it. I lost. They built a dam, and San Francisco drinks it now. Go and see what's left, and tell me what you see.", "Walk out to Kolana Overlook, above the reservoir, and stand there as the day goes. Dusk is best, when the water holds still. The dam has a plaque worth reading on your way.")
+steps = [{"type": "unlocked", "ability": "saw_hetchy_dusk", "objective": "Stand at Kolana Overlook in Hetch Hetchy at dusk (5 PM to 10 PM), then tell John Muir what you saw", "reminder": "Hetch Hetchy, out past the dam, and the trail to Kolana Overlook. Go at dusk. The reservoir is drinking water, so keep to the shore and the trail.", "done": ["You saw it? Tell me the water was still, and the walls held the light.", "Under all that blue there is a floor of oaks and meadow and a river wandering through. I knew every bend of it. A temple, I called it, and they said a reservoir was a better use.", "Don't tell me it's gone. Tell me it's remembered. That is the work now, and you've just done a little of it."]}]
+outro = PackedStringArray("The fight went on until 1913, and Congress voted for the dam. I died the next year and never believed it was settled.", "Some people today talk of draining it back to meadow. Maybe they will. Take this bread for the trail. It keeps.")
+reward_items = {"pilot_bread": 3}
